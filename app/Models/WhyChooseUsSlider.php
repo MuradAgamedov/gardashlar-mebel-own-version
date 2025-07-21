@@ -1,0 +1,89 @@
+<?php
+
+namespace App\Models;
+
+use App\Services\ImageService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class WhyChooseUsSlider extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'order',
+        'status',
+        'image',
+        'video_link',
+    ];
+
+    protected $casts = [
+        'order' => 'integer',
+        'status' => 'boolean',
+    ];
+
+    protected $appends = [
+        'image_url',
+    ];
+
+    /**
+     * Scope for active sliders
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', true);
+    }
+
+    /**
+     * Scope for ordering by order field
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('order');
+    }
+
+    /**
+     * Get image URL
+     */
+    public function getImageUrlAttribute()
+    {
+        return $this->getImageUrl($this->image);
+    }
+
+    /**
+     * Get image URL helper method
+     */
+    private function getImageUrl($imagePath)
+    {
+        if (empty($imagePath)) {
+            return '';
+        }
+
+        $imageService = app(ImageService::class);
+        return $imageService->getUrl($imagePath);
+    }
+
+    /**
+     * Auto-increment order when creating
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($slider) {
+            if (!isset($slider->order)) {
+                $maxOrder = static::max('order');
+                $slider->order = $maxOrder + 1;
+            }
+        });
+
+        static::deleting(function ($slider) {
+            $imageService = app(ImageService::class);
+            
+            // Delete image file
+            if ($slider->image) {
+                $imageService->delete($slider->image);
+            }
+        });
+    }
+}
