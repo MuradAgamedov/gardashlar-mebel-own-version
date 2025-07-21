@@ -171,11 +171,125 @@
                 </div>
             </div>
         </div>
+
+        <!-- The Advantages To Become A Partner Section -->
+        <div class="row mt-4">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>The Advantages To Become A Partner</h5>
+                            <a href="{{ route('admin.become-a-partner-advantages.create') }}" class="btn btn-primary">
+                                <i class="material-icons-outlined">add</i>
+                                Add New Advantage
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th width="50">Order</th>
+                                        <th width="80">Icon</th>
+                                        <th>Title</th>
+                                        <th>Languages</th>
+                                        <th width="80">Status</th>
+                                        <th width="150">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sortable-advantages">
+                                    @php
+                                        $advantages = \App\Models\BecomeAPartnerAdvantage::with('translates.language')->orderBy('order')->get();
+                                    @endphp
+                                    @forelse($advantages as $advantage)
+                                        @php
+                                            $firstTranslation = $advantage->translates->first();
+                                        @endphp
+                                        <tr data-id="{{ $advantage->id }}">
+                                            <td>
+                                                <div class="drag-handle">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <circle cx="8" cy="8" r="1"></circle>
+                                                        <circle cx="16" cy="8" r="1"></circle>
+                                                        <circle cx="8" cy="16" r="1"></circle>
+                                                        <circle cx="16" cy="16" r="1"></circle>
+                                                    </svg>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if($advantage->icon_url)
+                                                    <img src="{{ $advantage->icon_url }}" alt="Icon" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                                @else
+                                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                        <i class="material-icons-outlined text-muted">image</i>
+                                                    </div>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                {{ $firstTranslation ? $firstTranslation->title : 'No translation' }}
+                                            </td>
+                                            <td>
+                                                <div class="d-flex gap-1">
+                                                    @foreach($advantage->translates as $translate)
+                                                        <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
+                                                    @endforeach
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if($advantage->status)
+                                                    <span class="badge bg-success">Active</span>
+                                                @else
+                                                    <span class="badge bg-secondary">Inactive</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <div class="d-flex gap-2">
+                                                    <a href="{{ route('admin.become-a-partner-advantages.edit', $advantage) }}" class="btn btn-sm btn-warning">
+                                                        <i class="material-icons-outlined">edit</i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-danger delete-btn" 
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Advantage #' . $advantage->id }}"
+                                                            data-url="{{ route('admin.become-a-partner-advantages.destroy', $advantage) }}">
+                                                        <i class="material-icons-outlined">delete</i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="text-center py-4">
+                                                <div class="text-muted">
+                                                    <i class="material-icons-outlined" style="font-size: 48px;">star</i>
+                                                    <p class="mt-2">No advantages found</p>
+                                                    <a href="{{ route('admin.become-a-partner-advantages.create') }}" class="btn btn-primary">
+                                                        <i class="material-icons-outlined">add</i>
+                                                        Add First Advantage
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-switch to first tab with errors on form submission
@@ -189,6 +303,80 @@ document.addEventListener('DOMContentLoaded', function() {
             const tab = new bootstrap.Tab(firstTabWithError);
             tab.show();
         }
+    });
+
+    // Drag and drop reordering for advantages
+    const sortableList = document.getElementById('sortable-advantages');
+    if (sortableList) {
+        new Sortable(sortableList, {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: function(evt) {
+                const advantages = Array.from(sortableList.children).map((row, index) => {
+                    return row.getAttribute('data-id');
+                });
+
+                fetch('{{ route("admin.become-a-partner-advantages.reorder") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ advantages: advantages })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Advantages reordered successfully!',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message || 'Failed to reorder advantages',
+                            icon: 'error'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        });
+    }
+
+    // Delete confirmation for advantages
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const title = this.getAttribute('data-title');
+            const url = this.getAttribute('data-url');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Do you want to delete "${title}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = url;
+                    form.innerHTML = `
+                        @csrf
+                        @method('DELETE')
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        });
     });
 });
 </script>
@@ -214,6 +402,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .nav-tabs .nav-link:hover {
     border-color: #e9ecef #e9ecef #dee2e6;
+}
+
+.drag-handle {
+    cursor: grab;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.sortable-ghost {
+    opacity: 0.5;
+    background-color: #f8f9fa;
+}
+
+.sortable-chosen {
+    background-color: #e3f2fd;
 }
 </style>
 @endpush 

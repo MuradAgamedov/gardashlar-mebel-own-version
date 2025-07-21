@@ -53,14 +53,75 @@
                   <h6>Testimonials</h6>
                 </a>
               </li>
-              <li class="sidebar-list">
-                <a class="sidebar-link" href="{{ route('admin.become-a-partner.edit') }}">
-                  <svg class="stroke-icon">
-                    <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#Handshake') }}"></use>
-                  </svg>
-                  <h6>Become A Partner</h6>
-                </a>
-              </li>
+                          <li class="sidebar-list">
+              <a class="sidebar-link" href="{{ route('admin.become-a-partner.edit') }}">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#Handshake') }}"></use>
+                </svg>
+                <h6>Become A Partner</h6>
+              </a>
+            </li>
+            <li class="sidebar-list">
+              <a class="sidebar-link" href="{{ route('admin.become-a-investor.edit') }}">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#TrendingUp') }}"></use>
+                </svg>
+                <h6>Become A Investor</h6>
+              </a>
+            </li>
+            <li class="sidebar-list">
+              <a class="sidebar-link" href="{{ route('admin.partner-sliders.index') }}">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#Image') }}"></use>
+                </svg>
+                <h6>Partner Slider</h6>
+              </a>
+            </li>
+            <li class="sidebar-list">
+              <a class="sidebar-link" href="{{ route('admin.suggest-a-place.edit') }}">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#MapPin') }}"></use>
+                </svg>
+                <h6>Suggest A Place</h6>
+              </a>
+            </li>
+            <li class="sidebar-list">
+              <a class="sidebar-link" href="{{ route('admin.certificates.index') }}">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#Award') }}"></use>
+                </svg>
+                <h6>Certificates</h6>
+              </a>
+            </li>
+            <li class="sidebar-list">
+              <a class="sidebar-link" href="javascript:void(0)">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#Video') }}"></use>
+                </svg>
+                <h6>KIV Management</h6>
+                <i class="iconly-Arrow-Right-2 icli"></i>
+              </a>
+              <ul class="sidebar-submenu">
+                <li><a href="{{ route('admin.kiv-categories.index') }}">KIV Categories</a></li>
+                <li><a href="{{ route('admin.kivs.index') }}">KIVs</a></li>
+              </ul>
+            </li>
+            <li class="sidebar-list">
+              <a class="sidebar-link" href="{{ route('admin.reports.index') }}">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#FileText') }}"></use>
+                </svg>
+                <h6>Reports</h6>
+              </a>
+            </li>
+            <li class="sidebar-list">
+              <a class="sidebar-link" href="{{ route('admin.suggestions-complaints.edit') }}">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#Message') }}"></use>
+                </svg>
+                <h6>Suggestions & Complaints</h6>
+              </a>
+            </li>
             </ul>
           </div>
           <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
