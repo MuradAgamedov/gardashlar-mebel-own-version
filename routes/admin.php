@@ -28,7 +28,12 @@ use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\CompanyManagementController;
 use App\Http\Controllers\Admin\SiteUsageRulesController;
 use App\Http\Controllers\Admin\PrivacyPolicyController;
+use App\Http\Controllers\Admin\AboutController;
+use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\SuggestionController;
+use App\Http\Controllers\Admin\IndividualProjectOrderController;
+use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\ServiceAdvantageController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     
@@ -142,9 +147,36 @@ Route::post('vacancies/reorder', [VacancyController::class, 'reorder'])->name('v
     Route::get('privacy-policy/edit', [PrivacyPolicyController::class, 'edit'])->name('privacy-policy.edit');
     Route::put('privacy-policy/update', [PrivacyPolicyController::class, 'update'])->name('privacy-policy.update');
     
+    // About routes
+    Route::resource('abouts', AboutController::class);
+    Route::post('abouts/reorder', [AboutController::class, 'reorder'])->name('abouts.reorder');
+
+    // Company routes
+    Route::resource('companies', CompanyController::class);
+    Route::post('companies/reorder', [CompanyController::class, 'reorder'])->name('companies.reorder');
+    
     // Suggestion routes
     Route::resource('suggestions', SuggestionController::class);
     Route::post('suggestions/reorder', [SuggestionController::class, 'reorder'])->name('suggestions.reorder');
+    
+    // Individual Project Order routes
+    Route::resource('individual-project-orders', IndividualProjectOrderController::class);
+    Route::post('individual-project-orders/reorder', [IndividualProjectOrderController::class, 'reorder'])->name('individual-project-orders.reorder');
+    
+    // Service routes
+    Route::resource('services', ServiceController::class);
+    Route::post('services/reorder', [ServiceController::class, 'updateOrder'])->name('services.reorder');
+    Route::post('services/{id}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('services.toggle-status');
+    
+    // Service Advantages routes
+    Route::get('services/{serviceId}/advantages', [ServiceAdvantageController::class, 'index'])->name('service-advantages.index');
+    Route::get('services/{serviceId}/advantages/create', [ServiceAdvantageController::class, 'create'])->name('service-advantages.create');
+    Route::post('services/{serviceId}/advantages', [ServiceAdvantageController::class, 'store'])->name('service-advantages.store');
+    Route::get('services/{serviceId}/advantages/{advantageId}/edit', [ServiceAdvantageController::class, 'edit'])->name('service-advantages.edit');
+    Route::put('services/{serviceId}/advantages/{advantageId}', [ServiceAdvantageController::class, 'update'])->name('service-advantages.update');
+    Route::delete('services/{serviceId}/advantages/{advantageId}', [ServiceAdvantageController::class, 'destroy'])->name('service-advantages.destroy');
+    Route::post('services/{serviceId}/advantages/reorder', [ServiceAdvantageController::class, 'updateOrder'])->name('service-advantages.reorder');
+    Route::post('services/{serviceId}/advantages/{advantageId}/toggle-status', [ServiceAdvantageController::class, 'toggleStatus'])->name('service-advantages.toggle-status');
     
     // Image Upload route for CKEditor
     Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');

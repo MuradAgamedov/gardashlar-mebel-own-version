@@ -191,6 +191,46 @@
                                                         @enderror
                                                     </div>
                                                 </div>
+
+                                                <!-- SEO Section -->
+                                                <div class="row mt-3">
+                                                    <div class="col-md-12">
+                                                        <h6 class="mb-3">SEO Settings</h6>
+                                                    </div>
+                                                    <div class="col-md-12 mb-3">
+                                                        <label class="form-label">SEO Title</label>
+                                                        <input type="text" 
+                                                               class="form-control @error("translations.{$language->id}.seo_title") is-invalid @enderror" 
+                                                               name="translations[{{ $language->id }}][seo_title]" 
+                                                               value="{{ old("translations.{$language->id}.seo_title", $translation->seo_title ?? '') }}"
+                                                               placeholder="Enter SEO title for {{ $language->lang_code }}">
+                                                        @error("translations.{$language->id}.seo_title")
+                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                    
+                                                    <div class="col-md-12 mb-3">
+                                                        <label class="form-label">SEO Keywords</label>
+                                                        <textarea class="form-control @error("translations.{$language->id}.seo_keywords") is-invalid @enderror" 
+                                                                  name="translations[{{ $language->id }}][seo_keywords]" 
+                                                                  rows="3"
+                                                                  placeholder="Enter keywords separated by commas for {{ $language->lang_code }}">{{ old("translations.{$language->id}.seo_keywords", $translation->seo_keywords ?? '') }}</textarea>
+                                                        @error("translations.{$language->id}.seo_keywords")
+                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                    
+                                                    <div class="col-md-12 mb-3">
+                                                        <label class="form-label">SEO Description</label>
+                                                        <textarea class="form-control @error("translations.{$language->id}.seo_description") is-invalid @enderror" 
+                                                                  name="translations[{{ $language->id }}][seo_description]" 
+                                                                  rows="3"
+                                                                  placeholder="Enter SEO description for {{ $language->lang_code }}">{{ old("translations.{$language->id}.seo_description", $translation->seo_description ?? '') }}</textarea>
+                                                        @error("translations.{$language->id}.seo_description")
+                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
                                             </div>
                                         @endforeach
                                     </div>

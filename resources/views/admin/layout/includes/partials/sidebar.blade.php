@@ -83,6 +83,20 @@
         </ul>
       </li>
 
+      <!-- SERVICES -->
+      <li class="sidebar-main-title"><div><h5 class="sidebar-title">Services</h5></div></li>
+      <li class="sidebar-list">
+        <a class="sidebar-link" href="javascript:void(0)">
+          <i class="fas fa-cogs"></i>
+          <h6>Services</h6>
+          <i class="fas fa-chevron-down float-end"></i>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="{{ route('admin.services.index') }}">Services</a></li>
+          <li><a href="{{ route('admin.individual-project-orders.index') }}">Individual Project Orders</a></li>
+        </ul>
+      </li>
+
       <!-- OTHERS -->
       <li class="sidebar-main-title"><div><h5 class="sidebar-title">Other Sections</h5></div></li>
       <li class="sidebar-list">
@@ -96,6 +110,8 @@
           <li><a href="{{ route('admin.suggest-a-place.edit') }}">Suggest A Place</a></li>
           <li><a href="{{ route('admin.suggestions-complaints.edit') }}">Suggestions & Complaints</a></li>
           <li><a href="{{ route('admin.suggestions.index') }}">Suggestions</a></li>
+          <li><a href="{{ route('admin.abouts.index') }}">About us</a></li>
+          <li><a href="{{ route('admin.companies.index') }}">Companies</a></li>
           <li><a href="{{ route('admin.company-management.edit') }}">Company Management</a></li>
           <li><a href="{{ route('admin.reports.index') }}">Reports</a></li>
           <li><a href="{{ route('admin.faqs.index') }}">FAQs</a></li>

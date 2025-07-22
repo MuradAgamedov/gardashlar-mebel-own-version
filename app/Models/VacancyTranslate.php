@@ -16,6 +16,9 @@ class VacancyTranslate extends Model
         'position',
         'experience',
         'work_schedule',
+        'seo_title',
+        'seo_keywords',
+        'seo_description',
     ];
 
     /**

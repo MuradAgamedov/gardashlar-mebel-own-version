@@ -59,6 +59,9 @@ class VacancyController extends Controller
                 "translations.{$language->id}.position" => 'required|string|max:255',
                 "translations.{$language->id}.experience" => 'required|string|max:255',
                 "translations.{$language->id}.work_schedule" => 'required|string|max:1000',
+                "translations.{$language->id}.seo_title" => 'nullable|string|max:255',
+                "translations.{$language->id}.seo_keywords" => 'nullable|string',
+                "translations.{$language->id}.seo_description" => 'nullable|string',
             ], [
                 "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
                 "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
@@ -90,6 +93,9 @@ class VacancyController extends Controller
                     'position' => trim($translationData['position'] ?? ''),
                     'experience' => trim($translationData['experience'] ?? ''),
                     'work_schedule' => trim($translationData['work_schedule'] ?? ''),
+                    'seo_title' => trim($translationData['seo_title'] ?? ''),
+                    'seo_keywords' => trim($translationData['seo_keywords'] ?? ''),
+                    'seo_description' => trim($translationData['seo_description'] ?? ''),
                 ]);
             }
 
@@ -145,6 +151,9 @@ class VacancyController extends Controller
                 "translations.{$language->id}.position" => 'required|string|max:255',
                 "translations.{$language->id}.experience" => 'required|string|max:255',
                 "translations.{$language->id}.work_schedule" => 'required|string|max:1000',
+                "translations.{$language->id}.seo_title" => 'nullable|string|max:255',
+                "translations.{$language->id}.seo_keywords" => 'nullable|string',
+                "translations.{$language->id}.seo_description" => 'nullable|string',
             ], [
                 "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
                 "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
@@ -177,6 +186,9 @@ class VacancyController extends Controller
                         'position' => trim($translationData['position'] ?? ''),
                         'experience' => trim($translationData['experience'] ?? ''),
                         'work_schedule' => trim($translationData['work_schedule'] ?? ''),
+                        'seo_title' => trim($translationData['seo_title'] ?? ''),
+                        'seo_keywords' => trim($translationData['seo_keywords'] ?? ''),
+                        'seo_description' => trim($translationData['seo_description'] ?? ''),
                     ]
                 );
             }
