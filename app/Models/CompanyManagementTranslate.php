@@ -12,15 +12,25 @@ class CompanyManagementTranslate extends Model
     protected $fillable = [
         'company_management_id',
         'language_id',
-        'title',
         'content',
     ];
 
+    protected $casts = [
+        'company_management_id' => 'integer',
+        'language_id' => 'integer',
+    ];
+
+    /**
+     * Get the company management that owns this translation
+     */
     public function companyManagement()
     {
         return $this->belongsTo(CompanyManagement::class);
     }
 
+    /**
+     * Get the language for this translation
+     */
     public function language()
     {
         return $this->belongsTo(Language::class);

@@ -9,9 +9,13 @@ class CompanyManagement extends Model
 {
     use HasFactory;
 
-    protected $table = 'company_management';
+    protected $table = 'company_managements';
 
-    protected $fillable = [];
+    protected $fillable = ['status'];
+
+    protected $casts = [
+        'status' => 'boolean',
+    ];
 
     public function translates()
     {

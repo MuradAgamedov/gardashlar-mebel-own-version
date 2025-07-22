@@ -12,15 +12,25 @@ class WarrantyPolicyTranslate extends Model
     protected $fillable = [
         'warranty_policy_id',
         'language_id',
-        'title',
         'content',
     ];
 
+    protected $casts = [
+        'warranty_policy_id' => 'integer',
+        'language_id' => 'integer',
+    ];
+
+    /**
+     * Get the warranty policy that owns this translation
+     */
     public function warrantyPolicy()
     {
         return $this->belongsTo(WarrantyPolicy::class);
     }
 
+    /**
+     * Get the language for this translation
+     */
     public function language()
     {
         return $this->belongsTo(Language::class);

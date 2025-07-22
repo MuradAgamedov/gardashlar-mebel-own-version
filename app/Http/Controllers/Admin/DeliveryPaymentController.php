@@ -31,22 +31,15 @@ class DeliveryPaymentController extends Controller
     public function update(Request $request)
     {
         $languages = Language::all();
-
-        // Translation validation - only for languages that have data
-        foreach ($languages as $index => $language) {
-            $translationData = $request->input("translations.{$index}", []);
-            
-            // Only validate if title or content is provided
-            if (!empty($translationData['title']) || !empty($translationData['content'])) {
-                $request->validate([
-                    "translations.{$index}.title" => 'required|string|max:255',
-                    "translations.{$index}.content" => 'required|string',
-                ], [
-                    "translations.{$index}.title.required" => "Title is required for {$language->lang_code}.",
-                    "translations.{$index}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-                    "translations.{$index}.content.required" => "Content is required for {$language->lang_code}.",
-                ]);
-            }
+        
+        // Translation validation
+        foreach ($languages as $language) {
+            $request->validate([
+                "translations.{$language->id}.content" => 'required|string|max:5000',
+            ], [
+                "translations.{$language->id}.content.required" => "Content is required for {$language->lang_code}.",
+                "translations.{$language->id}.content.max" => "Content may not be greater than 5000 characters for {$language->lang_code}.",
+            ]);
         }
 
         try {
@@ -58,20 +51,16 @@ class DeliveryPaymentController extends Controller
                 ]);
             }
 
-            // Update or create translations - only for languages that have data
-            foreach ($languages as $index => $language) {
-                $translationData = $request->input("translations.{$index}", []);
+            // Update translations
+            foreach ($languages as $language) {
+                $translationData = $request->input("translations.{$language->id}", []);
                 
-                // Only update if title or content is provided
-                if (!empty($translationData['title']) || !empty($translationData['content'])) {
-                    $deliveryPayment->translates()->updateOrCreate(
-                        ['language_id' => $language->id],
-                        [
-                            'title' => trim($translationData['title'] ?? ''),
-                            'content' => trim($translationData['content'] ?? ''),
-                        ]
-                    );
-                }
+                $deliveryPayment->translates()->updateOrCreate(
+                    ['language_id' => $language->id],
+                    [
+                        'content' => trim($translationData['content'] ?? ''),
+                    ]
+                );
             }
 
             return redirect()->back()

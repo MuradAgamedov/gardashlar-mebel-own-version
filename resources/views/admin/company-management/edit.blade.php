@@ -134,18 +134,6 @@
                                                     
                                                     <div class="row">
                                                         <div class="col-md-12 mb-3">
-                                                            <label class="form-label">Title <span class="text-danger">*</span></label>
-                                                            <input type="text" 
-                                                                   class="form-control @error('translations.'.$index.'.title') is-invalid @enderror" 
-                                                                   name="translations[{{ $index }}][title]" 
-                                                                   value="{{ old('translations.'.$index.'.title', $translate->title ?? '') }}"
-                                                                   placeholder="Enter title for {{ $language->lang_code }}">
-                                                            @error('translations.'.$index.'.title')
-                                                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                            @enderror
-                                                        </div>
-                                                        
-                                                        <div class="col-md-12 mb-3">
                                                             <label class="form-label">Content <span class="text-danger">*</span></label>
                                                             <textarea class="form-control ckeditor @error('translations.'.$index.'.content') is-invalid @enderror" 
                                                                       name="translations[{{ $index }}][content]" 
@@ -192,42 +180,41 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize CKEditor for each language tab
+    window.editors = {};
     @foreach($languages as $language)
-       ClassicEditor
-    .create(document.querySelector('#content-{{ $language->id }}'), {
-        toolbar: [
-            'heading', '|', 
-            'bold', 'italic', 'link', 
-            'bulletedList', 'numberedList', 
-            '|', 'outdent', 'indent', 
-            '|', 'blockQuote', 'insertTable', 
-            '|', 'imageUpload', 'undo', 'redo'
-        ],
-        image: {
-            styles: [
-                'alignLeft', 'alignCenter', 'alignRight'
-            ],
-            toolbar: [
-                'imageStyle:alignLeft',
-                'imageStyle:alignCenter',
-                'imageStyle:alignRight',
-                '|',
-                'imageTextAlternative'
-            ]
-        },
-        simpleUpload: {
-            uploadUrl: '{{ route("admin.upload.image") }}',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
-        }
-    })
+ClassicEditor
+  .create(document.querySelector('#content-{{ $language->id }}'), {
+    toolbar: [
+      'heading', '|',
+      'bold', 'italic', 'underline', 'strikethrough', 'link', '|',
+      'bulletedList', 'numberedList', '|',
+      'imageUpload', 'insertTable', 'blockQuote', 'mediaEmbed', '|',
+      'undo', 'redo'
+    ],
+    image: {
+      toolbar: [
+        'imageTextAlternative',
+        'imageStyle:alignLeft',
+        'imageStyle:full',
+        'imageStyle:alignRight',
+        'linkImage',
+        'resizeImage',
+        'toggleImageCaption',
+        'imageStyle:inline',
+        'imageStyle:block'
+      ],
+      styles: [ 'full', 'alignLeft', 'alignRight', 'inline', 'block' ]
+    }
+  })
+  .then(editor => {
+    window.editors['{{ $language->id }}'] = editor;
+  })
+  .catch(error => {
+    console.error(error);
+  });
+@endforeach
 
-    .catch(error => {
-        console.error(error);
-    });
 
-    @endforeach
 
     // Auto-switch to first tab with errors on form submission
     const form = document.querySelector('form');
@@ -241,6 +228,46 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Custom image upload function
+function handleCustomImageUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            
+            // Şəkil ölçüsünü soruş
+            const imgWidth = prompt("Şəklin enini daxil edin (px):", "400");
+            const imgAlt = prompt("Alt text daxil edin:", "Uploaded Image");
+            
+            if (imgWidth) {
+                const imgTag = `<img src="${base64}" alt="${imgAlt}" style="width: ${imgWidth}px; height: auto;">`;
+                
+                // Aktiv textarea-nın ID-sindən CKEditor ID-sini tapırıq
+                const activePane = document.querySelector('.tab-pane.active');
+                const textarea = activePane.querySelector('textarea');
+                const textareaId = textarea.getAttribute('id'); // content-1
+                const langId = textareaId.split('-')[1]; // 1
+
+                const editorInstance = window.editors[langId]; // düzgün editor-i tapırıq
+
+                if (editorInstance) {
+                    editorInstance.model.change(writer => {
+                        const viewFragment = editorInstance.data.processor.toView(imgTag);
+                        const modelFragment = editorInstance.data.toModel(viewFragment);
+                        editorInstance.model.insertContent(modelFragment, editorInstance.model.document.selection);
+                    });
+                } else {
+                    alert("Editor tapılmadı.");
+                }
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+
 </script>
 
 <style>
@@ -299,4 +326,4 @@ document.addEventListener('DOMContentLoaded', function() {
     color: #dc3545;
 }
 </style>
-@endpush 
+@endpush

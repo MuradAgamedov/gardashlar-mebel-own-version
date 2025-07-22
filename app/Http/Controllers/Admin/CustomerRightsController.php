@@ -32,23 +32,14 @@ class CustomerRightsController extends Controller
     {
         $languages = Language::all();
         
-
-
-        // Translation validation - only for languages that have data
+        // Translation validation
         foreach ($languages as $language) {
-            $translationData = $request->input("translations.{$language->id}", []);
-            
-            // Only validate if title or content is provided
-            if (!empty($translationData['title']) || !empty($translationData['content'])) {
-                $request->validate([
-                    "translations.{$language->id}.title" => 'required|string|max:255',
-                    "translations.{$language->id}.content" => 'required|string',
-                ], [
-                    "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                    "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-                    "translations.{$language->id}.content.required" => "Content is required for {$language->lang_code}.",
-                ]);
-            }
+            $request->validate([
+                "translations.{$language->id}.content" => 'required|string|max:5000',
+            ], [
+                "translations.{$language->id}.content.required" => "Content is required for {$language->lang_code}.",
+                "translations.{$language->id}.content.max" => "Content may not be greater than 5000 characters for {$language->lang_code}.",
+            ]);
         }
 
         try {
@@ -60,20 +51,16 @@ class CustomerRightsController extends Controller
                 ]);
             }
 
-            // Update or create translations - only for languages that have data
+            // Update translations
             foreach ($languages as $language) {
                 $translationData = $request->input("translations.{$language->id}", []);
                 
-                // Only update if title or content is provided
-                if (!empty($translationData['title']) || !empty($translationData['content'])) {
-                    $customerRights->translates()->updateOrCreate(
-                        ['language_id' => $language->id],
-                        [
-                            'title' => trim($translationData['title'] ?? ''),
-                            'content' => trim($translationData['content'] ?? ''),
-                        ]
-                    );
-                }
+                $customerRights->translates()->updateOrCreate(
+                    ['language_id' => $language->id],
+                    [
+                        'content' => trim($translationData['content'] ?? ''),
+                    ]
+                );
             }
 
             return redirect()->back()

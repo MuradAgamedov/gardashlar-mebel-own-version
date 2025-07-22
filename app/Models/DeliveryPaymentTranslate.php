@@ -12,15 +12,25 @@ class DeliveryPaymentTranslate extends Model
     protected $fillable = [
         'delivery_payment_id',
         'language_id',
-        'title',
         'content',
     ];
 
+    protected $casts = [
+        'delivery_payment_id' => 'integer',
+        'language_id' => 'integer',
+    ];
+
+    /**
+     * Get the delivery payment that owns this translation
+     */
     public function deliveryPayment()
     {
         return $this->belongsTo(DeliveryPayment::class);
     }
 
+    /**
+     * Get the language for this translation
+     */
     public function language()
     {
         return $this->belongsTo(Language::class);

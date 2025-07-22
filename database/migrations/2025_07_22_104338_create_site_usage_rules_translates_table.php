@@ -11,16 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vacancy_requirement_translates', function (Blueprint $table) {
+        Schema::create('site_usage_rules_translates', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vacancy_requirement_id')->constrained('vacancy_requirements')->onDelete('cascade');
+            $table->foreignId('site_usage_rules_id')->constrained('site_usage_rules')->onDelete('cascade');
             $table->foreignId('language_id')->constrained('languages')->onDelete('cascade');
-            $table->string('title');
-            $table->longText('description'); // For CKEditor content
+            $table->text('content');
             $table->timestamps();
             
-            // Ensure unique combination of requirement and language
-            $table->unique(['vacancy_requirement_id', 'language_id']);
+            // Ensure unique combination of site_usage_rules and language
+            $table->unique(['site_usage_rules_id', 'language_id'], 'site_usage_rules_lang_unique');
         });
     }
 
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vacancy_requirement_translates');
+        Schema::dropIfExists('site_usage_rules_translates');
     }
-};
+}; 

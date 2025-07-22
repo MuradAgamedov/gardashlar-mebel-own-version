@@ -39,27 +39,18 @@ class CompanyManagementController extends Controller
                 $companyManagement = CompanyManagement::create();
             }
 
-            // Debug: Log all request data
-            \Log::info('Company Management Update Request:', $request->all());
-
             // Update or create translations - only for languages that have data
             foreach ($languages as $index => $language) {
                 $translationData = $request->input("translations.{$index}", []);
                 
-                // Debug: Log translation data for each language
-                \Log::info("Translation data for {$language->lang_code}:", $translationData);
-                
-                // Only update if title or content is provided
-                if (!empty($translationData['title']) || !empty($translationData['content'])) {
+                // Only update if content is provided
+                if (!empty($translationData['content'])) {
                     $companyManagement->translates()->updateOrCreate(
                         ['language_id' => $language->id],
                         [
-                            'title' => trim($translationData['title'] ?? ''),
                             'content' => trim($translationData['content'] ?? ''),
                         ]
                     );
-                    
-                    \Log::info("Updated translation for {$language->lang_code}");
                 }
             }
 
@@ -67,7 +58,6 @@ class CompanyManagementController extends Controller
                 ->with('success', 'Company Management updated successfully!');
 
         } catch (\Exception $e) {
-            \Log::error('Company Management Update Error:', ['error' => $e->getMessage()]);
             return redirect()->back()
                 ->with('error', 'Error updating company management: ' . $e->getMessage())
                 ->withInput();

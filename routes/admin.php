@@ -26,6 +26,9 @@ use App\Http\Controllers\Admin\WarrantyPolicyController;
 use App\Http\Controllers\Admin\RefundPolicyController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\CompanyManagementController;
+use App\Http\Controllers\Admin\SiteUsageRulesController;
+use App\Http\Controllers\Admin\PrivacyPolicyController;
+use App\Http\Controllers\Admin\SuggestionController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     
@@ -130,6 +133,18 @@ Route::post('vacancies/reorder', [VacancyController::class, 'reorder'])->name('v
     // Company Management routes
     Route::get('company-management/edit', [CompanyManagementController::class, 'edit'])->name('company-management.edit');
     Route::put('company-management/update', [CompanyManagementController::class, 'update'])->name('company-management.update');
+    
+    // Site Usage Rules routes
+    Route::get('site-usage-rules/edit', [SiteUsageRulesController::class, 'edit'])->name('site-usage-rules.edit');
+    Route::put('site-usage-rules/update', [SiteUsageRulesController::class, 'update'])->name('site-usage-rules.update');
+    
+    // Privacy Policy routes
+    Route::get('privacy-policy/edit', [PrivacyPolicyController::class, 'edit'])->name('privacy-policy.edit');
+    Route::put('privacy-policy/update', [PrivacyPolicyController::class, 'update'])->name('privacy-policy.update');
+    
+    // Suggestion routes
+    Route::resource('suggestions', SuggestionController::class);
+    Route::post('suggestions/reorder', [SuggestionController::class, 'reorder'])->name('suggestions.reorder');
     
     // Image Upload route for CKEditor
     Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');
