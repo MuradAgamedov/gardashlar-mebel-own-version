@@ -15,12 +15,14 @@ class Language extends Model
         'lang_name',
         'order',
         'status',
-        'is_main_language'
+        'is_main_language',
+        'is_default'
     ];
 
     protected $casts = [
         'status' => 'boolean',
         'is_main_language' => 'boolean',
+        'is_default' => 'boolean',
         'order' => 'integer'
     ];
 

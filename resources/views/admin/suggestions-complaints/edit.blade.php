@@ -115,10 +115,9 @@
                                             <div class="col-md-12">
                                                 <div class="form-group">
                                                     <label for="description_{{ $language->id }}">Description <span class="text-danger">*</span></label>
-                                                    <textarea class="form-control @error("translations.{$language->id}.description") is-invalid @enderror" 
+                                                    <textarea class="form-control ckeditor @error("translations.{$language->id}.description") is-invalid @enderror" 
                                                               id="description_{{ $language->id }}" 
                                                               name="translations[{{ $language->id }}][description]" 
-                                                              rows="4" 
                                                               placeholder="Enter description for {{ $language->lang_code }}">{{ old("translations.{$language->id}.description", $translation->description ?? '') }}</textarea>
                                                     @error("translations.{$language->id}.description")
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -127,38 +126,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="row mt-3">
-                                            <div class="col-md-12">
-                                                <div class="form-group">
-                                                    <label for="form_title_{{ $language->id }}">Form Title <span class="text-danger">*</span></label>
-                                                    <input type="text" 
-                                                           class="form-control @error("translations.{$language->id}.form_title") is-invalid @enderror" 
-                                                           id="form_title_{{ $language->id }}" 
-                                                           name="translations[{{ $language->id }}][form_title]" 
-                                                           value="{{ old("translations.{$language->id}.form_title", $translation->form_title ?? '') }}" 
-                                                           placeholder="Enter form title for {{ $language->lang_code }}">
-                                                    @error("translations.{$language->id}.form_title")
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                        </div>
 
-                                        <div class="row mt-3">
-                                            <div class="col-md-12">
-                                                <div class="form-group">
-                                                    <label for="form_description_{{ $language->id }}">Form Description <span class="text-danger">*</span></label>
-                                                    <textarea class="form-control @error("translations.{$language->id}.form_description") is-invalid @enderror" 
-                                                              id="form_description_{{ $language->id }}" 
-                                                              name="translations[{{ $language->id }}][form_description]" 
-                                                              rows="4" 
-                                                              placeholder="Enter form description for {{ $language->lang_code }}">{{ old("translations.{$language->id}.form_description", $translation->form_description ?? '') }}</textarea>
-                                                    @error("translations.{$language->id}.form_description")
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 @endforeach
                             </div>
@@ -177,8 +145,21 @@
     </div>
 </div>
 
+<script src="https://cdn.ckeditor.com/ckeditor5/27.1.0/classic/ckeditor.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize CKEditor for each language tab
+    @foreach($languages as $language)
+        ClassicEditor
+            .create(document.querySelector('#description_{{ $language->id }}'), {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', 'undo', 'redo'],
+                height: 400
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    @endforeach
+
     // Auto-switch to first tab with errors
     const tabsWithErrors = document.querySelectorAll('.nav-link .fa-exclamation-triangle.text-danger');
     if (tabsWithErrors.length > 0) {

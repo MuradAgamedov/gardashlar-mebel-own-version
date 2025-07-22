@@ -11,10 +11,12 @@ class BecomeAPartner extends Model
 
     protected $table = 'become_a_partners';
 
-    protected $fillable = [];
+    protected $fillable = [
+        'content'
+    ];
 
     /**
-     * Get all translations for this become a partner
+     * Get the translations for this partner
      */
     public function translates()
     {
@@ -22,15 +24,11 @@ class BecomeAPartner extends Model
     }
 
     /**
-     * Get translation for specific language
+     * Scope for ordering
      */
-    public function translate($languageId = null)
+    public function scopeOrdered($query)
     {
-        if (!$languageId) {
-            $languageId = Language::where('is_default', true)->first()->id ?? 1;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
+        return $query->orderBy('created_at', 'desc');
     }
 
     /**

@@ -34,15 +34,10 @@ class SuggestionsComplaintsController extends Controller
             $request->validate([
                 "translations.{$language->id}.title" => 'required|string|max:255',
                 "translations.{$language->id}.description" => 'required|string',
-                "translations.{$language->id}.form_title" => 'required|string|max:255',
-                "translations.{$language->id}.form_description" => 'required|string',
             ], [
                 "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
                 "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
                 "translations.{$language->id}.description.required" => "Description is required for {$language->lang_code}.",
-                "translations.{$language->id}.form_title.required" => "Form title is required for {$language->lang_code}.",
-                "translations.{$language->id}.form_title.max" => "Form title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.form_description.required" => "Form description is required for {$language->lang_code}.",
             ]);
         }
 
@@ -55,8 +50,6 @@ class SuggestionsComplaintsController extends Controller
                 [
                     'title' => trim($translationData['title'] ?? ''),
                     'description' => trim($translationData['description'] ?? ''),
-                    'form_title' => trim($translationData['form_title'] ?? ''),
-                    'form_description' => trim($translationData['form_description'] ?? ''),
                 ]
             );
         }

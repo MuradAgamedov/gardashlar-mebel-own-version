@@ -1,0 +1,242 @@
+@extends('admin.layout.app')
+
+@section('title', 'FAQs')
+
+@section('content')
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>FAQs</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('admin.dashboard') }}">
+                                <svg class="stroke-icon">
+                                    <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#stroke-home') }}"></use>
+                                </svg>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active">FAQs</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="material-icons-outlined">check_circle</i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="material-icons-outlined">error</i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>FAQs List</h5>
+                            <a href="{{ route('admin.faqs.create') }}" class="btn btn-primary">
+                                <i class="material-icons-outlined">add</i>
+                                Add New FAQ
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if($faqs->count() > 0)
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th width="50">Order</th>
+                                            <th>Question</th>
+                                            <th>Status</th>
+                                            <th width="150">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sortable-faqs">
+                                        @foreach($faqs as $faq)
+                                            @php
+                                                $mainTranslation = $faq->translates->where('language.is_default', true)->first() 
+                                                    ?? $faq->translates->first();
+                                            @endphp
+                                            <tr data-id="{{ $faq->id }}">
+                                                <td class="drag-handle" style="cursor: move;">
+                                                    <div class="d-flex align-items-center">
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M8 6C8 7.10457 7.10457 8 6 8C4.89543 8 4 7.10457 4 6C4 4.89543 4.89543 4 6 4C7.10457 4 8 4.89543 8 6Z" fill="#6c757d"/>
+                                                            <path d="M8 12C8 13.1046 7.10457 14 6 14C4.89543 14 4 13.1046 4 12C4 10.8954 4.89543 10 6 10C7.10457 10 8 10.8954 8 12Z" fill="#6c757d"/>
+                                                            <path d="M8 18C8 19.1046 7.10457 20 6 20C4.89543 20 4 19.1046 4 18C4 16.8954 4.89543 16 6 16C7.10457 16 8 16.8954 8 18Z" fill="#6c757d"/>
+                                                            <path d="M20 6C20 7.10457 19.1046 8 18 8C16.8954 8 16 7.10457 16 6C16 4.89543 16.8954 4 18 4C19.1046 4 20 4.89543 20 6Z" fill="#6c757d"/>
+                                                            <path d="M20 12C20 13.1046 19.1046 14 18 14C16.8954 14 16 13.1046 16 12C16 10.8954 16.8954 10 18 10C19.1046 10 20 10.8954 20 12Z" fill="#6c757d"/>
+                                                            <path d="M20 18C20 19.1046 19.1046 20 18 20C16.8954 20 16 19.1046 16 18C16 16.8954 16.8954 16 18 16C19.1046 16 20 16.8954 20 18Z" fill="#6c757d"/>
+                                                        </svg>
+                                                        <span class="ms-1">{{ $faq->order }}</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    {{ $mainTranslation->question ?? 'N/A' }}
+                                                </td>
+                                                <td>
+                                                    @if($faq->status)
+                                                        <span class="badge bg-success">Active</span>
+                                                    @else
+                                                        <span class="badge bg-secondary">Inactive</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex gap-2">
+                                                        <a href="{{ route('admin.faqs.edit', $faq) }}" 
+                                                           class="btn btn-sm btn-outline-primary">
+                                                            <i class="material-icons-outlined">edit</i>
+                                                        </a>
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-outline-danger delete-faq-btn" 
+                                                                data-faq-id="{{ $faq->id }}"
+                                                                data-faq-question="{{ $mainTranslation->question ?? 'N/A' }}"
+                                                                data-delete-url="{{ route('admin.faqs.destroy', $faq) }}">
+                                                            <i class="material-icons-outlined">delete</i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <div class="text-center text-muted py-5">
+                                <i class="material-icons-outlined" style="font-size: 64px; opacity: 0.3;">help</i>
+                                <h5 class="mt-3">No FAQs found</h5>
+                                <p>Start by adding your first FAQ.</p>
+                                <a href="{{ route('admin.faqs.create') }}" class="btn btn-primary">
+                                    <i class="material-icons-outlined">add</i>
+                                    Add First FAQ
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Sortable for FAQs table
+    const faqsTbody = document.getElementById('sortable-faqs');
+    if (faqsTbody) {
+        new Sortable(faqsTbody, {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: function(evt) {
+                const rows = faqsTbody.querySelectorAll('tr[data-id]');
+                const orderData = [];
+                
+                rows.forEach((row, index) => {
+                    const faqId = row.getAttribute('data-id');
+                    orderData.push({
+                        id: faqId,
+                        order: index + 1
+                    });
+                    
+                    // Update order number in the table
+                    const orderCell = row.querySelector('.drag-handle span');
+                    if (orderCell) {
+                        orderCell.textContent = index + 1;
+                    }
+                });
+                
+                // Send reorder request
+                fetch('{{ route("admin.faqs.reorder") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ faqs: orderData })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        console.error('Reorder failed:', data.message);
+                        alert('Error reordering FAQs: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error reordering FAQs. Please try again.');
+                });
+            }
+        });
+    }
+
+    // Delete FAQ functionality
+    const deleteButtons = document.querySelectorAll('.delete-faq-btn');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const faqId = this.getAttribute('data-faq-id');
+            const faqQuestion = this.getAttribute('data-faq-question');
+            const deleteUrl = this.getAttribute('data-delete-url');
+            
+            if (confirm(`Are you sure you want to delete the FAQ: "${faqQuestion}"?`)) {
+                // Create a form and submit it
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = deleteUrl;
+                
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                
+                const methodField = document.createElement('input');
+                methodField.type = 'hidden';
+                methodField.name = '_method';
+                methodField.value = 'DELETE';
+                
+                form.appendChild(csrfToken);
+                form.appendChild(methodField);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    });
+});
+</script>
+
+<style>
+.drag-handle {
+    cursor: move;
+}
+
+.drag-handle:hover {
+    background-color: #f8f9fa;
+}
+
+.sortable-ghost {
+    opacity: 0.5;
+    background-color: #e9ecef;
+}
+
+.sortable-chosen {
+    background-color: #fff3cd;
+}
+</style>
+@endpush 

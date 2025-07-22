@@ -12,8 +12,6 @@ class BecomeAPartnerTranslate extends Model
     protected $fillable = [
         'become_a_partner_id',
         'language_id',
-        'title',
-        'subtitle',
         'content',
     ];
 

@@ -187,29 +187,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             console.log('Delete button clicked for:', languageName);
             
-            // Check if SweetAlert is available
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: `Do you want to delete "${languageName}"? This action cannot be undone.`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Yes, delete it!',
-                    cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        console.log('SweetAlert confirmed, submitting form...');
-                        submitDeleteForm(deleteUrl);
-                    }
-                });
-            } else {
-                // Fallback to basic confirm
-                console.log('SweetAlert not available, using basic confirm...');
-                if (confirm(`Do you want to delete "${languageName}"? This action cannot be undone.`)) {
-                    submitDeleteForm(deleteUrl);
-                }
+            if (confirm(`Do you want to delete "${languageName}"? This action cannot be undone.`)) {
+                submitDeleteForm(deleteUrl);
             }
         });
     });
@@ -232,19 +211,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Show success message
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Languages reordered successfully.',
-                        icon: 'success',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                } else {
-                    alert('Languages reordered successfully.');
-                }
-                
                 // Update order numbers in the table
                 const rows = sortableList.querySelectorAll('tr[data-language-id]');
                 rows.forEach((row, index) => {
@@ -255,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             } else {
                 console.error('Error reordering languages:', data.message);
+                alert('Error reordering languages: ' + data.message);
             }
         })
         .catch(error => {

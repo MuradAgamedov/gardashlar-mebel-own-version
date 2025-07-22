@@ -123,10 +123,9 @@
                                                         <label for="description_{{ $language->id }}" class="form-label">
                                                             Description <span class="text-danger">*</span>
                                                         </label>
-                                                        <textarea class="form-control @error("translations.{$language->id}.description") is-invalid @enderror" 
+                                                        <textarea class="form-control ckeditor @error("translations.{$language->id}.description") is-invalid @enderror" 
                                                                   id="description_{{ $language->id }}" 
                                                                   name="translations[{{ $language->id }}][description]" 
-                                                                  rows="4" 
                                                                   placeholder="Enter description for {{ $language->lang_code }}">{{ old("translations.{$language->id}.description", $translation->description ?? '') }}</textarea>
                                                         @error("translations.{$language->id}.description")
                                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -218,8 +217,22 @@
 @endpush
 
 @push('scripts')
+<script src="https://cdn.ckeditor.com/ckeditor5/27.1.0/classic/ckeditor.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize CKEditor for each language tab
+    @foreach($languages as $language)
+        ClassicEditor
+            .create(document.querySelector('#description_{{ $language->id }}'), {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', 'undo', 'redo'],
+                height: 400
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    @endforeach
+
+    // Auto-switch to first tab with errors on form submission
     // Auto-switch to first tab with errors on form submission
     const form = document.querySelector('form');
     form.addEventListener('submit', function(e) {

@@ -12,8 +12,6 @@ class BecomeAInvestorTranslate extends Model
     protected $fillable = [
         'become_a_investor_id',
         'language_id',
-        'title',
-        'subtitle',
         'content',
     ];
 
@@ -23,11 +21,11 @@ class BecomeAInvestorTranslate extends Model
     ];
 
     /**
-     * Get the investor that owns this translation
+     * Get the become a investor that owns this translation
      */
-    public function investor()
+    public function becomeAInvestor()
     {
-        return $this->belongsTo(BecomeAInvestor::class, 'become_a_investor_id');
+        return $this->belongsTo(BecomeAInvestor::class);
     }
 
     /**

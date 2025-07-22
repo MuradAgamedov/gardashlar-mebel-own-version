@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class BecomeAPartnerController extends Controller
 {
     /**
-     * Show the form for editing the become a partner section.
+     * Show the form for editing the partner section.
      */
     public function edit()
     {
@@ -22,30 +22,25 @@ class BecomeAPartnerController extends Controller
     }
 
     /**
-     * Update the become a partner section.
+     * Update the partner section.
      */
     public function update(Request $request)
     {
         $languages = Language::all();
-        $becomeAPartner = BecomeAPartner::getFirstOrCreate();
         
         // Translation validation
         foreach ($languages as $language) {
             $request->validate([
-                "translations.{$language->id}.title" => 'required|string|max:255',
-                "translations.{$language->id}.subtitle" => 'required|string|max:255',
                 "translations.{$language->id}.content" => 'required|string|max:5000',
             ], [
-                "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.subtitle.required" => "Subtitle is required for {$language->lang_code}.",
-                "translations.{$language->id}.subtitle.max" => "Subtitle may not be greater than 255 characters for {$language->lang_code}.",
                 "translations.{$language->id}.content.required" => "Content is required for {$language->lang_code}.",
                 "translations.{$language->id}.content.max" => "Content may not be greater than 5000 characters for {$language->lang_code}.",
             ]);
         }
 
         try {
+            $becomeAPartner = BecomeAPartner::getFirstOrCreate();
+
             // Update translations
             foreach ($languages as $language) {
                 $translationData = $request->input("translations.{$language->id}", []);
@@ -53,8 +48,6 @@ class BecomeAPartnerController extends Controller
                 $becomeAPartner->translates()->updateOrCreate(
                     ['language_id' => $language->id],
                     [
-                        'title' => trim($translationData['title'] ?? ''),
-                        'subtitle' => trim($translationData['subtitle'] ?? ''),
                         'content' => trim($translationData['content'] ?? ''),
                     ]
                 );
@@ -69,4 +62,4 @@ class BecomeAPartnerController extends Controller
                 ->withInput();
         }
     }
-}
+} 

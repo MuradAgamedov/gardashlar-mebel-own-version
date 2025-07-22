@@ -122,6 +122,62 @@
                 <h6>Suggestions & Complaints</h6>
               </a>
             </li>
+            <li class="sidebar-list">
+              <a class="sidebar-link" href="{{ route('admin.customer-rights.edit') }}">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#Shield') }}"></use>
+                </svg>
+                <h6>Customer Rights</h6>
+              </a>
+            </li>
+            <li class="sidebar-list">
+              <a class="sidebar-link" href="{{ route('admin.delivery-payment.edit') }}">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#Truck') }}"></use>
+                </svg>
+                <h6>Delivery & Payment</h6>
+              </a>
+            </li>
+            <li class="sidebar-list">
+              <a class="sidebar-link" href="{{ route('admin.warranty-policy.edit') }}">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#Shield') }}"></use>
+                </svg>
+                <h6>Warranty Policy</h6>
+              </a>
+            </li>
+            <li class="sidebar-list">
+              <a class="sidebar-link" href="{{ route('admin.refund-policy.edit') }}">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#RefreshCw') }}"></use>
+                </svg>
+                <h6>Refund Policy</h6>
+              </a>
+            </li>
+            <li class="sidebar-list">
+              <a class="sidebar-link" href="{{ route('admin.faqs.index') }}">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#HelpCircle') }}"></use>
+                </svg>
+                <h6>FAQs</h6>
+              </a>
+            </li>
+            <li class="sidebar-list">
+              <a class="sidebar-link" href="{{ route('admin.company-management.edit') }}">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#Users') }}"></use>
+                </svg>
+                <h6>Company Management</h6>
+              </a>
+            </li>
+            <li class="sidebar-list">
+              <a class="sidebar-link" href="{{ route('admin.vacancies.index') }}">
+                <svg class="stroke-icon">
+                  <use href="{{ asset('admin/assets/svg/iconly-sprite.svg#Briefcase') }}"></use>
+                </svg>
+                <h6>Vacancies</h6>
+              </a>
+            </li>
             </ul>
           </div>
           <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>

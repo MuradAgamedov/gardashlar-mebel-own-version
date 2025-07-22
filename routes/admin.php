@@ -18,6 +18,14 @@ use App\Http\Controllers\Admin\KivCategoryController;
 use App\Http\Controllers\Admin\KivController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SuggestionsComplaintsController;
+use App\Http\Controllers\Admin\VacancyController;
+use App\Http\Controllers\Admin\VacancyRequirementController;
+use App\Http\Controllers\Admin\CustomerRightsController;
+use App\Http\Controllers\Admin\DeliveryPaymentController;
+use App\Http\Controllers\Admin\WarrantyPolicyController;
+use App\Http\Controllers\Admin\RefundPolicyController;
+use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\CompanyManagementController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     
@@ -90,4 +98,40 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('suggestions-complaints/edit', [SuggestionsComplaintsController::class, 'edit'])->name('suggestions-complaints.edit');
     Route::put('suggestions-complaints/update', [SuggestionsComplaintsController::class, 'update'])->name('suggestions-complaints.update');
     
-}); 
+    // Vacancy routes
+    Route::resource('vacancies', VacancyController::class);
+Route::post('vacancies/reorder', [VacancyController::class, 'reorder'])->name('vacancies.reorder');
+    
+    // Vacancy Requirement routes
+    Route::resource('vacancy-requirements', VacancyRequirementController::class);
+    Route::get('vacancy-requirements/create/{vacancy_id}', [VacancyRequirementController::class, 'createForVacancy'])->name('vacancy-requirements.create-for-vacancy');
+    Route::post('vacancy-requirements/reorder', [VacancyRequirementController::class, 'reorder'])->name('vacancy-requirements.reorder');
+    
+    // Customer Rights routes
+    Route::get('customer-rights/edit', [CustomerRightsController::class, 'edit'])->name('customer-rights.edit');
+    Route::put('customer-rights/update', [CustomerRightsController::class, 'update'])->name('customer-rights.update');
+    
+    // Delivery & Payment routes
+    Route::get('delivery-payment/edit', [DeliveryPaymentController::class, 'edit'])->name('delivery-payment.edit');
+    Route::put('delivery-payment/update', [DeliveryPaymentController::class, 'update'])->name('delivery-payment.update');
+    
+    // Warranty Policy routes
+    Route::get('warranty-policy/edit', [WarrantyPolicyController::class, 'edit'])->name('warranty-policy.edit');
+    Route::put('warranty-policy/update', [WarrantyPolicyController::class, 'update'])->name('warranty-policy.update');
+    
+    // Refund Policy routes
+    Route::get('refund-policy/edit', [RefundPolicyController::class, 'edit'])->name('refund-policy.edit');
+    Route::put('refund-policy/update', [RefundPolicyController::class, 'update'])->name('refund-policy.update');
+    
+    // FAQ routes
+    Route::resource('faqs', FaqController::class);
+    Route::post('faqs/reorder', [FaqController::class, 'reorder'])->name('faqs.reorder');
+    
+    // Company Management routes
+    Route::get('company-management/edit', [CompanyManagementController::class, 'edit'])->name('company-management.edit');
+    Route::put('company-management/update', [CompanyManagementController::class, 'update'])->name('company-management.update');
+    
+    // Image Upload route for CKEditor
+    Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');
+    
+});
