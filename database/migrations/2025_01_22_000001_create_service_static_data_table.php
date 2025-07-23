@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('service_static_data', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_id')->constrained()->onDelete('cascade');
             $table->string('card_1_image')->nullable();
             $table->string('card_2_image')->nullable();
             $table->string('card_3_image')->nullable();
@@ -28,4 +27,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('service_static_data');
     }
-};
+}; 

@@ -93,6 +93,7 @@
         </a>
         <ul class="sidebar-submenu">
           <li><a href="{{ route('admin.services.index') }}">Services</a></li>
+          <li><a href="{{ route('admin.service-static-data.edit') }}">Service Static Data</a></li>
           <li><a href="{{ route('admin.individual-project-orders.index') }}">Individual Project Orders</a></li>
         </ul>
       </li>

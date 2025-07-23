@@ -34,6 +34,7 @@ use App\Http\Controllers\Admin\SuggestionController;
 use App\Http\Controllers\Admin\IndividualProjectOrderController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ServiceAdvantageController;
+use App\Http\Controllers\Admin\ServiceStaticDataController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     
@@ -177,6 +178,10 @@ Route::post('vacancies/reorder', [VacancyController::class, 'reorder'])->name('v
     Route::delete('services/{serviceId}/advantages/{advantageId}', [ServiceAdvantageController::class, 'destroy'])->name('service-advantages.destroy');
     Route::post('services/{serviceId}/advantages/reorder', [ServiceAdvantageController::class, 'updateOrder'])->name('service-advantages.reorder');
     Route::post('services/{serviceId}/advantages/{advantageId}/toggle-status', [ServiceAdvantageController::class, 'toggleStatus'])->name('service-advantages.toggle-status');
+    
+    // Service Static Data routes
+    Route::get('service-static-data/edit', [ServiceStaticDataController::class, 'edit'])->name('service-static-data.edit');
+    Route::put('service-static-data/update', [ServiceStaticDataController::class, 'update'])->name('service-static-data.update');
     
     // Image Upload route for CKEditor
     Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');
