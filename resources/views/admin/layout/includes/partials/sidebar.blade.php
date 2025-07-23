@@ -113,6 +113,17 @@
         </ul>
       </li>
 
+      <li class="sidebar-list">
+        <a class="sidebar-link" href="javascript:void(0)">
+          <i class="fas fa-project-diagram"></i>
+          <h6>Projects</h6>
+          <i class="fas fa-chevron-down float-end"></i>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="{{ route('admin.project-categories.index') }}">Project Categories</a></li>
+          <li><a href="{{ route('admin.projects.index') }}">Projects</a></li>
+        </ul>
+      </li>
 
 
       <!-- OTHERS -->

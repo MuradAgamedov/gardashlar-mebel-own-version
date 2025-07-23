@@ -42,6 +42,8 @@ use App\Http\Controllers\Admin\AddressTypeController;
 use App\Http\Controllers\Admin\AddressController;
 use App\Http\Controllers\Admin\EmailController;
 use App\Http\Controllers\Admin\MapController;
+use App\Http\Controllers\Admin\ProjectCategoryController;
+use App\Http\Controllers\Admin\ProjectController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     
@@ -219,6 +221,14 @@ Route::post('vacancies/reorder', [VacancyController::class, 'reorder'])->name('v
     // Map routes
     Route::resource('maps', MapController::class);
     Route::post('maps/reorder', [MapController::class, 'reorder'])->name('maps.reorder');
+    
+    // Project Categories routes
+    Route::resource('project-categories', ProjectCategoryController::class);
+    Route::post('project-categories/reorder', [ProjectCategoryController::class, 'reorder'])->name('project-categories.reorder');
+    
+    // Projects routes
+    Route::resource('projects', ProjectController::class);
+    Route::post('projects/reorder', [ProjectController::class, 'reorder'])->name('projects.reorder');
     
     // Image Upload route for CKEditor
     Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');
