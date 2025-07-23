@@ -46,7 +46,8 @@ use App\Http\Controllers\Admin\ProjectCategoryController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ProjectVideoController;
 use App\Http\Controllers\Admin\ProjectImageController;
-
+use App\Http\Controllers\Admin\ProductCategoryController;
+use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\HomePageProjectController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -243,7 +244,13 @@ Route::post('vacancies/reorder', [VacancyController::class, 'reorder'])->name('v
     Route::post('projects/{project}/images/reorder', [ProjectImageController::class, 'reorder'])->name('projects.images.reorder');
     Route::post('projects/{project}/images/{image}/set-main', [ProjectImageController::class, 'setMainImage'])->name('projects.images.set-main');
     
-
+    // Product Categories routes
+    Route::resource('product-categories', ProductCategoryController::class);
+    Route::post('product-categories/reorder', [ProductCategoryController::class, 'reorder'])->name('product-categories.reorder');
+    
+    // Product Types routes
+    Route::resource('product-types', ProductTypeController::class);
+    Route::post('product-types/reorder', [ProductTypeController::class, 'reorder'])->name('product-types.reorder');
     
     // Home Page Projects routes
     Route::get('home-page-projects/get-by-category', [HomePageProjectController::class, 'getProjectsByCategory'])->name('home-page-projects.get-by-category');

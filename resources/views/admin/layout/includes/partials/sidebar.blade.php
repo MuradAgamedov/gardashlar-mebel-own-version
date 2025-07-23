@@ -113,7 +113,7 @@
         </ul>
       </li>
 
-      <li class="sidebar-list">
+            <li class="sidebar-list">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-project-diagram"></i>
           <h6>Projects</h6>
@@ -122,8 +122,19 @@
         <ul class="sidebar-submenu">
           <li><a href="{{ route('admin.project-categories.index') }}">Project Categories</a></li>
           <li><a href="{{ route('admin.projects.index') }}">Projects</a></li>
-
           <li><a href="{{ route('admin.home-page-projects.index') }}">Home Page Projects</a></li>
+        </ul>
+      </li>
+
+      <li class="sidebar-list">
+        <a class="sidebar-link" href="javascript:void(0)">
+          <i class="fas fa-box"></i>
+          <h6>Products</h6>
+          <i class="fas fa-chevron-down float-end"></i>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="{{ route('admin.product-categories.index') }}">Product Categories</a></li>
+          <li><a href="{{ route('admin.product-types.index') }}">Product Types</a></li>
         </ul>
       </li>
 
