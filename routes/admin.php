@@ -44,6 +44,8 @@ use App\Http\Controllers\Admin\EmailController;
 use App\Http\Controllers\Admin\MapController;
 use App\Http\Controllers\Admin\ProjectCategoryController;
 use App\Http\Controllers\Admin\ProjectController;
+use App\Http\Controllers\Admin\ProjectVideoController;
+use App\Http\Controllers\Admin\ProjectImageController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     
@@ -229,6 +231,15 @@ Route::post('vacancies/reorder', [VacancyController::class, 'reorder'])->name('v
     // Projects routes
     Route::resource('projects', ProjectController::class);
     Route::post('projects/reorder', [ProjectController::class, 'reorder'])->name('projects.reorder');
+    
+    // Project Videos routes
+    Route::resource('projects.videos', ProjectVideoController::class);
+    Route::post('projects/{project}/videos/reorder', [ProjectVideoController::class, 'reorder'])->name('projects.videos.reorder');
+    
+    // Project Images routes
+    Route::resource('projects.images', ProjectImageController::class);
+    Route::post('projects/{project}/images/reorder', [ProjectImageController::class, 'reorder'])->name('projects.images.reorder');
+    Route::post('projects/{project}/images/{image}/set-main', [ProjectImageController::class, 'setMainImage'])->name('projects.images.set-main');
     
     // Image Upload route for CKEditor
     Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');

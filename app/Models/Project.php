@@ -46,6 +46,22 @@ class Project extends Model
     }
 
     /**
+     * Get the videos for this project
+     */
+    public function videos()
+    {
+        return $this->hasMany(ProjectVideo::class);
+    }
+
+    /**
+     * Get the images for this project
+     */
+    public function images()
+    {
+        return $this->hasMany(ProjectImage::class);
+    }
+
+    /**
      * Scope for active projects
      */
     public function scopeActive($query)

@@ -137,6 +137,12 @@
                                                     <a href="{{ route('admin.projects.edit', $project) }}" class="btn btn-sm btn-warning">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
+                                                    <a href="{{ route('admin.projects.videos.index', $project) }}" class="btn btn-sm btn-info">
+                                                        <i class="material-icons-outlined">video_library</i>
+                                                    </a>
+                                                    <a href="{{ route('admin.projects.images.index', $project) }}" class="btn btn-sm btn-success">
+                                                        <i class="material-icons-outlined">image</i>
+                                                    </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
                                                             data-title="{{ $firstTranslation ? $firstTranslation->title : 'Project #' . $project->id }}"
                                                             data-url="{{ route('admin.projects.destroy', $project) }}">
