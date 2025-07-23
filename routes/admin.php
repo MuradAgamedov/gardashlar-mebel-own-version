@@ -47,6 +47,8 @@ use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ProjectVideoController;
 use App\Http\Controllers\Admin\ProjectImageController;
 
+use App\Http\Controllers\Admin\HomePageProjectController;
+
 Route::prefix('admin')->name('admin.')->group(function () {
     
     // Dashboard routes
@@ -240,6 +242,13 @@ Route::post('vacancies/reorder', [VacancyController::class, 'reorder'])->name('v
     Route::resource('projects.images', ProjectImageController::class);
     Route::post('projects/{project}/images/reorder', [ProjectImageController::class, 'reorder'])->name('projects.images.reorder');
     Route::post('projects/{project}/images/{image}/set-main', [ProjectImageController::class, 'setMainImage'])->name('projects.images.set-main');
+    
+
+    
+    // Home Page Projects routes
+    Route::get('home-page-projects/get-by-category', [HomePageProjectController::class, 'getProjectsByCategory'])->name('home-page-projects.get-by-category');
+    Route::resource('home-page-projects', HomePageProjectController::class);
+    Route::post('home-page-projects/reorder', [HomePageProjectController::class, 'reorder'])->name('home-page-projects.reorder');
     
     // Image Upload route for CKEditor
     Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');

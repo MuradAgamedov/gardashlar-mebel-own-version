@@ -9,6 +9,7 @@ use App\Models\ProjectCategory;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 
 class ProjectController extends Controller
@@ -16,10 +17,23 @@ class ProjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $projects = Project::with(['translates.language', 'category.translates'])->ordered()->get();
-        return view('admin.projects.index', compact('projects'));
+        $mainLanguage = Language::getMainLanguage();
+        $categories = ProjectCategory::with(['translates' => function($query) use ($mainLanguage) {
+            $query->where('language_id', $mainLanguage->id);
+        }])->active()->ordered()->get();
+        
+        $query = Project::with(['translates.language', 'category.translates']);
+        
+        // Filter by category if selected
+        if ($request->filled('category_id')) {
+            $query->where('project_category_id', $request->category_id);
+        }
+        
+        $projects = $query->ordered()->get();
+        
+        return view('admin.projects.index', compact('projects', 'categories'));
     }
 
     /**

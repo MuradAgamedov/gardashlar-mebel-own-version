@@ -51,6 +51,38 @@
                             </a>
                         </div>
                     </div>
+                    
+                    <!-- Filter Section -->
+                    <div class="card-body border-bottom">
+                        <form method="GET" action="{{ route('admin.projects.index') }}" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="category_id" class="form-label">Filter by Category</label>
+                                <select class="form-select" id="category_id" name="category_id">
+                                    <option value="">All Categories</option>
+                                    @foreach($categories as $category)
+                                        @php
+                                            $translation = $category->translates->first();
+                                        @endphp
+                                        <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $translation ? $translation->title : 'Category #' . $category->id }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-outline-primary me-2">
+                                    <i class="material-icons-outlined">filter_list</i>
+                                    Filter
+                                </button>
+                                @if(request('category_id'))
+                                    <a href="{{ route('admin.projects.index') }}" class="btn btn-outline-secondary">
+                                        <i class="material-icons-outlined">clear</i>
+                                        Clear
+                                    </a>
+                                @endif
+                            </div>
+                        </form>
+                    </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-hover">

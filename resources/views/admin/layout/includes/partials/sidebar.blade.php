@@ -122,6 +122,8 @@
         <ul class="sidebar-submenu">
           <li><a href="{{ route('admin.project-categories.index') }}">Project Categories</a></li>
           <li><a href="{{ route('admin.projects.index') }}">Projects</a></li>
+
+          <li><a href="{{ route('admin.home-page-projects.index') }}">Home Page Projects</a></li>
         </ul>
       </li>
 
