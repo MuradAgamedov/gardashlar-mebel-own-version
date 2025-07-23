@@ -40,6 +40,20 @@
 
       <li class="sidebar-list">
         <a class="sidebar-link" href="javascript:void(0)">
+          <i class="fas fa-phone"></i>
+          <h6>Contact</h6>
+          <i class="fas fa-chevron-down float-end"></i>
+        </a>
+        <ul class="sidebar-submenu">
+          <li><a href="{{ route('admin.phones.index') }}">Phone</a></li>
+          <li><a href="{{ route('admin.addresses.index') }}">Address</a></li>
+          <li><a href="{{ route('admin.emails.index') }}">Email</a></li>
+          <li><a href="{{ route('admin.maps.index') }}">Map</a></li>
+        </ul>
+      </li>
+
+      <li class="sidebar-list">
+        <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-photo-video"></i>
           <h6>KIV Management</h6>
           <i class="fas fa-chevron-down float-end"></i>
@@ -94,9 +108,12 @@
         <ul class="sidebar-submenu">
           <li><a href="{{ route('admin.services.index') }}">Services</a></li>
           <li><a href="{{ route('admin.service-static-data.edit') }}">Service Static Data</a></li>
+          <li><a href="{{ route('admin.catalogs.index') }}">Catalogs</a></li>
           <li><a href="{{ route('admin.individual-project-orders.index') }}">Individual Project Orders</a></li>
         </ul>
       </li>
+
+
 
       <!-- OTHERS -->
       <li class="sidebar-main-title"><div><h5 class="sidebar-title">Other Sections</h5></div></li>

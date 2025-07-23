@@ -1,0 +1,249 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Catalog;
+use App\Models\Language;
+use App\Services\ImageService;
+use Illuminate\Http\Request;
+
+class CatalogController extends Controller
+{
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $catalogs = Catalog::with('translates.language')->orderBy('order')->get();
+        $languages = Language::all();
+        
+        return view('admin.catalogs.index', compact('catalogs', 'languages'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        $languages = Language::all();
+        return view('admin.catalogs.create', compact('languages'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $languages = Language::all();
+        
+        // Combined validation
+        $validationRules = [
+            'catalog_pdf' => 'required|file|mimes:pdf|max:10240', // 10MB max
+        ];
+        
+        $validationMessages = [
+            'status.boolean' => 'Status must be true or false.',
+            'catalog_pdf.required' => "Catalog PDF is required.",
+            'catalog_pdf.file' => "Catalog PDF must be a file.",
+            'catalog_pdf.mimes' => "Catalog PDF must be a PDF file.",
+            'catalog_pdf.max' => "Catalog PDF may not be greater than 10MB.",
+        ];
+
+        // Add translation validation rules
+        foreach ($languages as $language) {
+            $validationRules["translations.{$language->id}.catalog_year"] = 'required|string|max:255';
+            $validationMessages["translations.{$language->id}.catalog_year.required"] = "Catalog year is required for {$language->lang_code}.";
+            $validationMessages["translations.{$language->id}.catalog_year.max"] = "Catalog year may not be greater than 255 characters for {$language->lang_code}.";
+        }
+
+        $request->validate($validationRules, $validationMessages);
+
+        try {
+            // Handle PDF upload
+            $pdfPath = null;
+            if ($request->hasFile('catalog_pdf')) {
+                $pdfPath = $this->imageService->upload(
+                    $request->file('catalog_pdf'),
+                    'catalogs',
+                    [
+                        'max_size' => 10240, // 10MB
+                        'allowed_types' => ['pdf'],
+                    ]
+                );
+                
+                if (!$pdfPath) {
+                    return redirect()->back()
+                        ->with('error', "Failed to upload PDF.")
+                        ->withInput();
+                }
+            }
+
+            // Create catalog
+            $catalogData = [
+                'status' => $request->input('status', true),
+            ];
+            
+            if ($pdfPath) {
+                $catalogData['catalog_pdf'] = $pdfPath;
+            }
+            
+            $catalog = Catalog::create($catalogData);
+
+            // Create translations
+            foreach ($languages as $language) {
+                $translationData = $request->input("translations.{$language->id}", []);
+                
+                $catalog->translates()->create([
+                    'language_id' => $language->id,
+                    'catalog_year' => trim($translationData['catalog_year'] ?? ''),
+                ]);
+            }
+
+            return redirect()->route('admin.catalogs.index')
+                ->with('success', 'Catalog created successfully!');
+
+        } catch (\Exception $e) {
+            \Log::error('Catalog creation error: ' . $e->getMessage());
+            \Log::error('Request data: ' . json_encode($request->all()));
+            
+            return redirect()->back()
+                ->with('error', 'Error creating catalog: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Catalog $catalog)
+    {
+        $catalog->load('translates.language');
+        $languages = Language::all();
+        
+        return view('admin.catalogs.edit', compact('catalog', 'languages'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Catalog $catalog)
+    {
+        $languages = Language::all();
+        
+        // Combined validation
+        $validationRules = [
+            'catalog_pdf' => 'nullable|file|mimes:pdf|max:10240', // 10MB max
+        ];
+        
+        $validationMessages = [
+            'status.boolean' => 'Status must be true or false.',
+            'catalog_pdf.file' => "Catalog PDF must be a file.",
+            'catalog_pdf.mimes' => "Catalog PDF must be a PDF file.",
+            'catalog_pdf.max' => "Catalog PDF may not be greater than 10MB.",
+        ];
+
+        // Add translation validation rules
+        foreach ($languages as $language) {
+            $validationRules["translations.{$language->id}.catalog_year"] = 'required|string|max:255';
+            $validationMessages["translations.{$language->id}.catalog_year.required"] = "Catalog year is required for {$language->lang_code}.";
+            $validationMessages["translations.{$language->id}.catalog_year.max"] = "Catalog year may not be greater than 255 characters for {$language->lang_code}.";
+        }
+
+        $request->validate($validationRules, $validationMessages);
+
+        try {
+            // Handle PDF upload
+            $pdfPath = null;
+            if ($request->hasFile('catalog_pdf')) {
+                $uploadedPath = $this->imageService->update(
+                    $request->file('catalog_pdf'),
+                    $catalog->catalog_pdf,
+                    'catalogs',
+                    [
+                        'max_size' => 10240, // 10MB
+                        'allowed_types' => ['pdf'],
+                    ]
+                );
+                
+                if ($uploadedPath) {
+                    $pdfPath = $uploadedPath;
+                } else {
+                    return redirect()->back()
+                        ->with('error', "Failed to upload PDF.")
+                        ->withInput();
+                }
+            }
+
+            // Update catalog
+            $catalog->update([
+                'status' => $request->input('status', true),
+                'catalog_pdf' => $pdfPath ?: $catalog->catalog_pdf,
+            ]);
+
+            // Update translations
+            foreach ($languages as $language) {
+                $translationData = $request->input("translations.{$language->id}", []);
+                
+                // Get existing translation
+                $catalog->translates()->updateOrCreate(
+                    ['language_id' => $language->id],
+                    [
+                        'catalog_year' => trim($translationData['catalog_year'] ?? ''),
+                    ]
+                );
+            }
+
+            return redirect()->route('admin.catalogs.index')
+                ->with('success', 'Catalog updated successfully!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error updating catalog: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Catalog $catalog)
+    {
+        try {
+            $catalog->delete();
+            return redirect()->route('admin.catalogs.index')
+                ->with('success', 'Catalog deleted successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error deleting catalog: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Reorder catalogs
+     */
+    public function reorder(Request $request)
+    {
+        $request->validate([
+            'catalogs' => 'required|array',
+            'catalogs.*' => 'required|integer|exists:catalogs,id',
+        ]);
+
+        try {
+            foreach ($request->catalogs as $index => $catalogId) {
+                Catalog::where('id', $catalogId)->update(['order' => $index + 1]);
+            }
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+} 

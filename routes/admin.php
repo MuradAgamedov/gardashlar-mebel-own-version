@@ -35,6 +35,13 @@ use App\Http\Controllers\Admin\IndividualProjectOrderController;
 use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\ServiceAdvantageController;
 use App\Http\Controllers\Admin\ServiceStaticDataController;
+use App\Http\Controllers\Admin\CatalogController;
+use App\Http\Controllers\Admin\PhoneTypeController;
+use App\Http\Controllers\Admin\PhoneController;
+use App\Http\Controllers\Admin\AddressTypeController;
+use App\Http\Controllers\Admin\AddressController;
+use App\Http\Controllers\Admin\EmailController;
+use App\Http\Controllers\Admin\MapController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     
@@ -182,6 +189,36 @@ Route::post('vacancies/reorder', [VacancyController::class, 'reorder'])->name('v
     // Service Static Data routes
     Route::get('service-static-data/edit', [ServiceStaticDataController::class, 'edit'])->name('service-static-data.edit');
     Route::put('service-static-data/update', [ServiceStaticDataController::class, 'update'])->name('service-static-data.update');
+    
+    // Catalog routes
+    Route::resource('catalogs', CatalogController::class);
+    Route::post('catalogs/reorder', [CatalogController::class, 'reorder'])->name('catalogs.reorder');
+    
+    // Phone Type routes
+    Route::resource('phone-types', PhoneTypeController::class);
+    Route::post('phone-types/reorder', [PhoneTypeController::class, 'reorder'])->name('phone-types.reorder');
+    
+    // Phone routes
+    Route::resource('phones', PhoneController::class);
+    Route::post('phones/reorder', [PhoneController::class, 'reorder'])->name('phones.reorder');
+    Route::get('phone-types/{type}/phones/create', [PhoneController::class, 'createForType'])->name('phone-types.phones.create');
+    
+    // Address Type routes
+    Route::resource('address-types', AddressTypeController::class);
+    Route::post('address-types/reorder', [AddressTypeController::class, 'reorder'])->name('address-types.reorder');
+    
+    // Address routes
+    Route::resource('addresses', AddressController::class);
+    Route::post('addresses/reorder', [AddressController::class, 'reorder'])->name('addresses.reorder');
+    Route::get('address-types/{addressType}/addresses/create', [AddressController::class, 'createForType'])->name('address-types.addresses.create');
+    
+    // Email routes
+    Route::resource('emails', EmailController::class);
+    Route::post('emails/reorder', [EmailController::class, 'reorder'])->name('emails.reorder');
+    
+    // Map routes
+    Route::resource('maps', MapController::class);
+    Route::post('maps/reorder', [MapController::class, 'reorder'])->name('maps.reorder');
     
     // Image Upload route for CKEditor
     Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');
