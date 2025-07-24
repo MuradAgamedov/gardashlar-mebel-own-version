@@ -69,7 +69,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('admin.auth')->group(function () {
         // Dashboard routes
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         
         // Language routes
         Route::resource('languages', LanguageController::class);
