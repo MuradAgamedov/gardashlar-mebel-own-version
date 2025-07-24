@@ -52,6 +52,7 @@ use App\Http\Controllers\Admin\ProductPriceFilterController;
 use App\Http\Controllers\Admin\HomePageProjectController;
 use App\Http\Controllers\Admin\HomePageCategoryController;
 use App\Http\Controllers\Admin\ProductPageCategoryController;
+use App\Http\Controllers\Admin\ProductColorController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     
@@ -271,6 +272,9 @@ Route::post('vacancies/reorder', [VacancyController::class, 'reorder'])->name('v
     // Product Page Categories routes
     Route::resource('product-page-categories', ProductPageCategoryController::class);
     Route::post('product-page-categories/reorder', [ProductPageCategoryController::class, 'reorder'])->name('product-page-categories.reorder');
+    
+    // Product Colors routes
+    Route::resource('product-colors', ProductColorController::class);
     
     // Image Upload route for CKEditor
     Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');
