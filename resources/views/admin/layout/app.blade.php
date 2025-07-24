@@ -237,7 +237,7 @@
                 <div class="user-wrap">
                   <div class="user-img"><img src="{{asset('admin/assets/images/profile.png')}}" alt="user"/></div>
                   <div class="user-content">
-                    <h6>Ava Davis</h6>
+                    <h6>{{ Auth::user()->name ?? 'Admin' }}</h6>
                     <p class="mb-0">Admin<i class="fa-solid fa-chevron-down"></i></p>
                   </div>
                 </div>
@@ -259,9 +259,16 @@
                       </svg><a class="ms-2" href="to-do.html">Task</a>
                     </li>
                     <li class="d-flex"> 
-                      <svg class="svg-color">
-                        <use href="../assets/svg/iconly-sprite.svg#Login"></use>
-                      </svg><a class="ms-2" href="login.html">Log Out</a>
+                      <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="border-0 bg-transparent d-flex align-items-center w-100" 
+                                onclick="return confirm('Are you sure you want to logout?')">
+                          <svg class="svg-color">
+                            <use href="../assets/svg/iconly-sprite.svg#Login"></use>
+                          </svg>
+                          <span class="ms-2">Log Out</span>
+                        </button>
+                      </form>
                     </li>
                   </ul>
                 </div>
