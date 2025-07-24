@@ -57,12 +57,20 @@ use App\Http\Controllers\Admin\ProductTagController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductAccordionController;
 use App\Http\Controllers\Admin\ProductImageController;
+use App\Http\Controllers\Admin\AuthController;
+
 
 Route::prefix('admin')->name('admin.')->group(function () {
+    // Auth routes (no middleware)
+    Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     
-    // Dashboard routes
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Protected routes
+    Route::middleware('admin.auth')->group(function () {
+        // Dashboard routes
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Language routes
     Route::resource('languages', LanguageController::class);
@@ -298,8 +306,11 @@ Route::post('products/{product}/accordions/reorder', [ProductAccordionController
 Route::resource('products.images', ProductImageController::class);
 Route::post('products/{product}/images/reorder', [ProductImageController::class, 'reorder'])->name('products.images.reorder');
 Route::post('products/{product}/images/{image}/set-main', [ProductImageController::class, 'setMainImage'])->name('products.images.set-main');
+
+
     
     // Image Upload route for CKEditor
     Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');
     
+    });
 });

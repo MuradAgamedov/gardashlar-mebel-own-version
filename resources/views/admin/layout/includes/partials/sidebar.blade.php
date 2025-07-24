@@ -140,7 +140,8 @@
           <li><a href="{{ route('admin.product-page-categories.index') }}">Product page categories</a></li>
           <li><a href="{{ route('admin.product-colors.index') }}">Product Colors</a></li>
                                   <li><a href="{{ route('admin.product-tags.index') }}">Product Tags</a></li>
-                        <li><a href="{{ route('admin.products.index') }}">Products</a></li>
+          <li><a href="{{ route('admin.products.index') }}">Products</a></li>
+
         </ul>
       </li>
 
@@ -165,6 +166,18 @@
           <li><a href="{{ route('admin.faqs.index') }}">FAQs</a></li>
           <li><a href="{{ route('admin.vacancies.index') }}">Vacancies</a></li>
         </ul>
+      </li>
+
+      <!-- Logout -->
+      <li class="sidebar-list">
+        <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">
+          @csrf
+          <button type="submit" class="sidebar-link border-0 bg-transparent w-100 text-start" 
+                  onclick="return confirm('Are you sure you want to logout?')">
+            <i class="fas fa-sign-out-alt"></i>
+            <h6>Logout</h6>
+          </button>
+        </form>
       </li>
 
     </ul>

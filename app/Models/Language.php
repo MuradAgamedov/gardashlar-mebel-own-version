@@ -13,6 +13,7 @@ class Language extends Model
         'title',
         'lang_code',
         'lang_name',
+        'flag',
         'order',
         'status',
         'is_main_language',
