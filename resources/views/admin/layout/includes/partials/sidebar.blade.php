@@ -137,6 +137,7 @@
           <li><a href="{{ route('admin.product-types.index') }}">Product Types</a></li>
           <li><a href="{{ route('admin.product-price-filters.index') }}">Price Filters</a></li>
           <li><a href="{{ route('admin.home-page-categories.index') }}">Home page catgeories</a></li>
+          <li><a href="{{ route('admin.product-page-categories.index') }}">Product page categories</a></li>
         </ul>
       </li>
 
