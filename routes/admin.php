@@ -59,7 +59,7 @@ use App\Http\Controllers\Admin\ProductAccordionController;
 use App\Http\Controllers\Admin\ProductImageController;
 use App\Http\Controllers\Admin\AuthController;
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('')->name('admin.')->group(function () {
     // Auth routes (no middleware)
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
@@ -69,6 +69,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('admin.auth')->group(function () {
         // Dashboard routes
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         
         // Language routes
         Route::resource('languages', LanguageController::class);
