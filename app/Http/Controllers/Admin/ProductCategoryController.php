@@ -16,8 +16,14 @@ class ProductCategoryController extends Controller
      */
     public function index()
     {
-        $categories = ProductCategory::with('translates.language')->ordered()->get();
-        return view('admin.product-categories.index', compact('categories'));
+        $categories = ProductCategory::with(['translates.language', 'parent.translates.language', 'children.translates.language'])
+            ->ordered()
+            ->get();
+            
+        // Get all categories for parent selection in forms
+        $allCategories = ProductCategory::with('translates.language')->ordered()->get();
+        
+        return view('admin.product-categories.index', compact('categories', 'allCategories'));
     }
 
     /**
@@ -26,7 +32,8 @@ class ProductCategoryController extends Controller
     public function create()
     {
         $languages = Language::active()->orderBy('order')->get();
-        return view('admin.product-categories.create', compact('languages'));
+        $categories = ProductCategory::with('translates.language')->root()->ordered()->get();
+        return view('admin.product-categories.create', compact('languages', 'categories'));
     }
 
     /**
@@ -36,6 +43,7 @@ class ProductCategoryController extends Controller
     {
         // Validate the request
         $request->validate([
+            'parent_id' => 'nullable|exists:product_categories,id',
             'status' => 'nullable',
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
@@ -59,6 +67,7 @@ class ProductCategoryController extends Controller
 
             // Create the category
             $category = ProductCategory::create([
+                'parent_id' => $request->input('parent_id'),
                 'status' => $request->has('status') ? true : false,
                 'image' => $imagePath,
             ]);
@@ -102,7 +111,12 @@ class ProductCategoryController extends Controller
     {
         $productCategory->load('translates.language');
         $languages = Language::active()->orderBy('order')->get();
-        return view('admin.product-categories.edit', compact('productCategory', 'languages'));
+        $categories = ProductCategory::with('translates.language')
+            ->where('id', '!=', $productCategory->id) // Prevent self-selection
+            ->root()
+            ->ordered()
+            ->get();
+        return view('admin.product-categories.edit', compact('productCategory', 'languages', 'categories'));
     }
 
     /**
@@ -112,6 +126,7 @@ class ProductCategoryController extends Controller
     {
         // Validate the request
         $request->validate([
+            'parent_id' => 'nullable|exists:product_categories,id',
             'status' => 'nullable',
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
@@ -140,6 +155,7 @@ class ProductCategoryController extends Controller
 
             // Update the category
             $productCategory->update([
+                'parent_id' => $request->input('parent_id'),
                 'status' => $request->has('status') ? true : false,
                 'image' => $imagePath,
             ]);

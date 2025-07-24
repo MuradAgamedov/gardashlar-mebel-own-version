@@ -59,8 +59,24 @@
                             @csrf
                             @method('PUT')
                             
-                            <!-- Status -->
+                            <!-- Parent Category -->
                             <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Parent Category</label>
+                                    <select class="form-select @error('parent_id') is-invalid @enderror" name="parent_id" id="parent_id">
+                                        <option value="">Select Parent Category (Optional)</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ old('parent_id', $productCategory->parent_id) == $category->id ? 'selected' : '' }}>
+                                                {{ $category->translate() ? $category->translate()->title : 'Untitled' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <small class="form-text text-muted">Leave empty to make this a main category</small>
+                                    @error('parent_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                
                                 <div class="col-md-6">
                                     <label class="form-label">Status</label>
                                     <div class="form-check form-switch">

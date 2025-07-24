@@ -59,6 +59,7 @@
                                         <th width="50">#</th>
                                         <th>Image</th>
                                         <th>Title</th>
+                                        <th>Parent</th>
                                         <th>Slug</th>
                                         <th>SEO Title</th>
                                         <th>Languages</th>
@@ -69,7 +70,7 @@
                                 </thead>
                                 <tbody id="sortable-categories">
                                     @forelse($categories as $category)
-                                        <tr data-id="{{ $category->id }}">
+                                        <tr data-id="{{ $category->id }}" class="{{ $category->parent_id ? 'table-secondary' : '' }}">
                                             <td>
                                                 <div class="drag-handle">
                                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -95,14 +96,37 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">category</i>
+                                                    @if($category->parent_id)
+                                                        <span class="me-2" style="color: #6c757d;">└─</span>
+                                                    @else
+                                                        <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">category</i>
+                                                    @endif
                                                     <div>
                                                         @php
                                                             $firstTranslation = $category->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
+                                                        @if($category->children->count() > 0)
+                                                            <br><small class="text-muted">{{ $category->children->count() }} subcategories</small>
+                                                        @endif
                                                     </div>
                                                 </div>
+                                            </td>
+                                            <td>
+                                                @if($category->parent)
+                                                    @php
+                                                        $parentTranslation = $category->parent->translates->first();
+                                                    @endphp
+                                                    <span class="badge bg-secondary">
+                                                        <i class="material-icons-outlined" style="font-size: 12px;">subdirectory_arrow_right</i>
+                                                        {{ $parentTranslation ? $parentTranslation->title : 'Untitled Parent' }}
+                                                    </span>
+                                                @else
+                                                    <span class="badge bg-success">
+                                                        <i class="material-icons-outlined" style="font-size: 12px;">folder</i>
+                                                        Main Category
+                                                    </span>
+                                                @endif
                                             </td>
                                             <td>
                                                 @if($firstTranslation && $firstTranslation->slug)
@@ -142,11 +166,6 @@
                                                        title="Edit">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
-                                                    <a href="{{ route('admin.product-categories.show', $category) }}" 
-                                                       class="btn btn-sm btn-outline-info" 
-                                                       title="View">
-                                                        <i class="material-icons-outlined">visibility</i>
-                                                    </a>
                                                     <form action="{{ route('admin.product-categories.destroy', $category) }}" 
                                                           method="POST" 
                                                           class="d-inline"
@@ -164,7 +183,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="text-center py-4">
+                                            <td colspan="10" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">category</i>
                                                     <p class="mt-2">No product categories found</p>

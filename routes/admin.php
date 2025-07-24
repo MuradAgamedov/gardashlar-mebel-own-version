@@ -50,6 +50,7 @@ use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\ProductPriceFilterController;
 use App\Http\Controllers\Admin\HomePageProjectController;
+use App\Http\Controllers\Admin\HomePageCategoryController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     
@@ -261,6 +262,10 @@ Route::post('vacancies/reorder', [VacancyController::class, 'reorder'])->name('v
     Route::get('home-page-projects/get-by-category', [HomePageProjectController::class, 'getProjectsByCategory'])->name('home-page-projects.get-by-category');
     Route::resource('home-page-projects', HomePageProjectController::class);
     Route::post('home-page-projects/reorder', [HomePageProjectController::class, 'reorder'])->name('home-page-projects.reorder');
+    
+    // Home Page Categories routes
+    Route::resource('home-page-categories', HomePageCategoryController::class);
+    Route::post('home-page-categories/reorder', [HomePageCategoryController::class, 'reorder'])->name('home-page-categories.reorder');
     
     // Image Upload route for CKEditor
     Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');
