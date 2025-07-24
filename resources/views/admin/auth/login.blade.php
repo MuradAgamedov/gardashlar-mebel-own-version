@@ -43,16 +43,15 @@
         <div class="loader"><span></span><span></span><span></span><span></span><span></span></div>
     </div>
     
-    <!-- login page start-->
+        <!-- login page start-->
     <div class="container-fluid p-0">
-        <div class="row m-0">
-            <div class="col-12 p-0">    
-                <div class="login-card login-dark">
+      <div class="row m-0">
+        <div class="col-12 p-0">    
+          <div class="login-card login-dark" style="background-image: url('{{ asset('GARDASHLAR.png') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
                     <div>
                         <div>
                             <a class="logo" href="{{ route('admin.login') }}">
-                                <img class="img-fluid for-light m-auto" src="{{ asset('admin/assets/images/logo/logo1.png') }}" alt="logo">
-                                <img class="img-fluid for-dark" src="{{ asset('admin/assets/images/logo/logo-dark.png') }}" alt="logo">
+                                <img class="img-fluid m-auto" src="{{ asset('logo.svg') }}" alt="logo" style="max-width: 200px; height: auto;">
                             </a>
                         </div>
                         <div class="login-main"> 

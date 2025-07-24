@@ -8,8 +8,8 @@
 <title>Admiro - Premium Admin Template</title>
 
 <!-- Favicon icon-->
-<link rel="icon" href="{{ asset('admin/assets/images/favicon.png') }}" type="image/x-icon"/>
-<link rel="shortcut icon" href="{{ asset('admin/assets/images/favicon.png') }}" type="image/x-icon"/>
+<link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon"/>
+<link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon"/>
 
 <!-- Google font-->
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
