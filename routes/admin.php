@@ -53,6 +53,10 @@ use App\Http\Controllers\Admin\HomePageProjectController;
 use App\Http\Controllers\Admin\HomePageCategoryController;
 use App\Http\Controllers\Admin\ProductPageCategoryController;
 use App\Http\Controllers\Admin\ProductColorController;
+use App\Http\Controllers\Admin\ProductTagController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductAccordionController;
+use App\Http\Controllers\Admin\ProductImageController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     
@@ -275,6 +279,25 @@ Route::post('vacancies/reorder', [VacancyController::class, 'reorder'])->name('v
     
     // Product Colors routes
     Route::resource('product-colors', ProductColorController::class);
+    
+    // Product Tags routes
+    Route::resource('product-tags', ProductTagController::class);
+Route::post('product-tags/reorder', [ProductTagController::class, 'reorder'])->name('product-tags.reorder');
+Route::post('product-tags/generate-slug', [ProductTagController::class, 'generateSlug'])->name('product-tags.generate-slug');
+
+// Products
+Route::resource('products', ProductController::class);
+Route::post('products/reorder', [ProductController::class, 'reorder'])->name('products.reorder');
+Route::post('products/generate-slug', [ProductController::class, 'generateSlug'])->name('products.generate-slug');
+
+// Product Accordion routes
+Route::resource('products.accordions', ProductAccordionController::class);
+Route::post('products/{product}/accordions/reorder', [ProductAccordionController::class, 'reorder'])->name('products.accordions.reorder');
+
+// Product Images routes
+Route::resource('products.images', ProductImageController::class);
+Route::post('products/{product}/images/reorder', [ProductImageController::class, 'reorder'])->name('products.images.reorder');
+Route::post('products/{product}/images/{image}/set-main', [ProductImageController::class, 'setMainImage'])->name('products.images.set-main');
     
     // Image Upload route for CKEditor
     Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');

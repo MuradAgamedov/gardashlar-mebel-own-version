@@ -139,6 +139,8 @@
           <li><a href="{{ route('admin.home-page-categories.index') }}">Home page catgeories</a></li>
           <li><a href="{{ route('admin.product-page-categories.index') }}">Product page categories</a></li>
           <li><a href="{{ route('admin.product-colors.index') }}">Product Colors</a></li>
+                                  <li><a href="{{ route('admin.product-tags.index') }}">Product Tags</a></li>
+                        <li><a href="{{ route('admin.products.index') }}">Products</a></li>
         </ul>
       </li>
 
