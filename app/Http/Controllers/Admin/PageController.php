@@ -35,6 +35,7 @@ class PageController extends Controller
         // Validate the request
         $request->validate([
             'status' => 'nullable',
+            'keyword' => 'nullable|string|max:255',
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.title' => 'required|string|max:255',
@@ -52,7 +53,8 @@ class PageController extends Controller
         try {
             // Create the page
             $page = Page::create([
-                'status' => $request->has('status') ? true : false
+                'status' => $request->has('status') ? true : false,
+                'keyword' => trim($request->input('keyword', ''))
             ]);
 
             // Create translations for each language
@@ -106,6 +108,7 @@ class PageController extends Controller
         // Validate the request
         $request->validate([
             'status' => 'nullable',
+            'keyword' => 'nullable|string|max:255',
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.title' => 'required|string|max:255',
@@ -123,7 +126,8 @@ class PageController extends Controller
         try {
             // Update the page
             $page->update([
-                'status' => $request->has('status') ? true : false
+                'status' => $request->has('status') ? true : false,
+                'keyword' => trim($request->input('keyword', ''))
             ]);
 
             // Delete existing translations and create new ones

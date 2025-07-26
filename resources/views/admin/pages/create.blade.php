@@ -36,13 +36,24 @@
                             @csrf
                             
                             <div class="row">
-                                <div class="col-md-12 mb-3">
+                                <div class="col-md-6 mb-3">
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" checked>
                                         <label class="form-check-label" for="status">
                                             Active
                                         </label>
                                     </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Keyword</label>
+                                    <input type="text" 
+                                           class="form-control @error('keyword') is-invalid @enderror" 
+                                           name="keyword" 
+                                           value="{{ old('keyword') }}" 
+                                           placeholder="Enter page keyword">
+                                    @error('keyword')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
 
