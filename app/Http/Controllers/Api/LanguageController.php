@@ -16,9 +16,10 @@ class LanguageController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $languages = Cache::remember('api_languages', 3600, function () {
+            $languages = Cache::rememberForever('api_languages', function () {
                 return Language::where('status', true)
                     ->orderBy('order')
+                    ->select(['id', 'title', 'lang_code', 'lang_name', 'is_default', 'order'])
                     ->get();
             });
 
