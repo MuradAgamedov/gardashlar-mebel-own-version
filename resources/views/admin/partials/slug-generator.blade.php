@@ -9,17 +9,14 @@ document.addEventListener('DOMContentLoaded', function() {
         'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
         'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch',
         'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
-        
         // Azerbaijani specific characters
         'ə': 'e', 'ğ': 'gh', 'ü': 'u', 'ş': 'sh', 'ı': 'i', 'ö': 'o', 'ç': 'ch',
-        
         // Uppercase Cyrillic letters
         'А': 'a', 'Б': 'b', 'В': 'v', 'Г': 'g', 'Д': 'd', 'Е': 'e', 'Ё': 'yo',
         'Ж': 'zh', 'З': 'z', 'И': 'i', 'Й': 'y', 'К': 'k', 'Л': 'l', 'М': 'm',
         'Н': 'n', 'О': 'o', 'П': 'p', 'Р': 'r', 'С': 's', 'Т': 't', 'У': 'u',
         'Ф': 'f', 'Х': 'h', 'Ц': 'ts', 'Ч': 'ch', 'Ш': 'sh', 'Щ': 'sch',
         'Ъ': '', 'Ы': 'y', 'Ь': '', 'Э': 'e', 'Ю': 'yu', 'Я': 'ya',
-        
         // Uppercase Azerbaijani specific characters
         'Ə': 'e', 'Ğ': 'gh', 'Ü': 'u', 'Ş': 'sh', 'I': 'i', 'Ö': 'o', 'Ç': 'ch',
     };
@@ -27,42 +24,37 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to generate slug from title with Cyrillic support
     function generateSlug(title) {
         if (!title) return '';
-        
-        // Convert to lowercase
         let slug = title.toLowerCase();
-        
-        // Replace Cyrillic characters with Latin equivalents
         for (let cyrillic in cyrillicMap) {
             slug = slug.replace(new RegExp(cyrillic, 'g'), cyrillicMap[cyrillic]);
         }
-        
-        // Replace special characters and spaces with hyphens
         slug = slug.replace(/[^a-z0-9\s\-]/g, '');
-        
-        // Replace multiple spaces and hyphens with single hyphen
         slug = slug.replace(/[\s\-]+/g, '-');
-        
-        // Remove leading and trailing hyphens
         slug = slug.replace(/^-+|-+$/g, '');
-        
         return slug;
     }
 
-    // Auto-generate slug from title for all title inputs
-    document.querySelectorAll('input[name*="[title]"], input[name*="title"], input[name="title"]').forEach(function(input) {
-        input.addEventListener('input', function() {
-            const title = this.value;
-            const slug = generateSlug(title);
-            
-            // Find corresponding slug input
-            const container = this.closest('.card-body, .form-group, .row, form') || document;
-            const slugInput = container.querySelector('input[name*="[slug]"], input[name*="slug"], input[name="slug"]');
-            
-            if (slugInput && !slugInput.value) {
-                slugInput.value = slug;
-            }
+    // For each title input, update the corresponding slug input for the same language index
+    // Only on create page, not on edit page
+    if (!document.querySelector('.edit-slug-btn')) {
+        document.querySelectorAll('input[name^="translates"][name$="[title]"]').forEach(function(titleInput) {
+            titleInput.addEventListener('input', function() {
+                const match = this.name.match(/translates\[(\d+)\]\[title\]/);
+                if (!match) return;
+                const idx = match[1];
+                const slugInput = document.querySelector('input[name="translates[' + idx + '][slug]"]');
+                if (slugInput && (!slugInput.dataset.touched || slugInput.value === '' || slugInput.value === generateSlug(this.defaultValue))) {
+                    slugInput.value = generateSlug(this.value);
+                }
+            });
         });
-    });
+        // If user manually edits slug, mark it as touched so it won't auto-update anymore
+        document.querySelectorAll('input[name^="translates"][name$="[slug]"]').forEach(function(slugInput) {
+            slugInput.addEventListener('input', function() {
+                this.dataset.touched = 'true';
+            });
+        });
+    }
 });
 </script>
 @endpush 

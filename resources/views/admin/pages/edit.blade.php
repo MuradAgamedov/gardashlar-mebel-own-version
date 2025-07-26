@@ -130,11 +130,19 @@
                                                         
                                                         <div class="col-md-6 mb-3">
                                                             <label class="form-label">Slug *</label>
-                                                            <input type="text" 
-                                                                   class="form-control @error('translates.'.$index.'.slug') is-invalid @enderror" 
-                                                                   name="translates[{{ $index }}][slug]" 
-                                                                   value="{{ old('translates.'.$index.'.slug', $translate->slug ?? '') }}" 
-                                                                   required>
+                                                            <div class="input-group">
+                                                                <input type="text" 
+                                                                       class="form-control @error('translates.'.$index.'.slug') is-invalid @enderror slug-input" 
+                                                                       name="translates[{{ $index }}][slug]" 
+                                                                       value="{{ old('translates.'.$index.'.slug', $translate->slug ?? '') }}" 
+                                                                       readonly
+                                                                       required>
+                                                                <button type="button" 
+                                                                        class="btn btn-outline-secondary edit-slug-btn" 
+                                                                        data-slug-input="translates[{{ $index }}][slug]">
+                                                                    <i class="material-icons-outlined">edit</i>
+                                                                </button>
+                                                            </div>
                                                             @error('translates.'.$index.'.slug')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
@@ -266,6 +274,30 @@ document.addEventListener('DOMContentLoaded', function() {
             firstErrorTab.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     @endif
+
+    // Edit slug functionality
+    document.querySelectorAll('.edit-slug-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const slugInputName = this.getAttribute('data-slug-input');
+            const slugInput = document.querySelector('input[name="' + slugInputName + '"]');
+            
+            if (slugInput) {
+                // Toggle readonly state
+                if (slugInput.readOnly) {
+                    slugInput.readOnly = false;
+                    slugInput.focus();
+                    this.innerHTML = '<i class="material-icons-outlined">lock</i>';
+                    this.classList.remove('btn-outline-secondary');
+                    this.classList.add('btn-outline-warning');
+                } else {
+                    slugInput.readOnly = true;
+                    this.innerHTML = '<i class="material-icons-outlined">edit</i>';
+                    this.classList.remove('btn-outline-warning');
+                    this.classList.add('btn-outline-secondary');
+                }
+            }
+        });
+    });
 });
 </script>
 
