@@ -77,158 +77,151 @@
                             </div>
                         </div>
 
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th width="50">
-                                            <input type="checkbox" id="select-all" class="form-check-input">
-                                        </th>
-                                        <th width="50">#</th>
-                                        <th>Image</th>
-                                        <th>Title</th>
-                                        <th>Parent</th>
-                                        <th>Slug</th>
-                                        <th>SEO Title</th>
-                                        <th>Languages</th>
-                                        <th>Status</th>
-                                        <th>Order</th>
-                                        <th width="150">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="sortable-categories">
-                                    @forelse($categories as $category)
-                                        <tr data-id="{{ $category->id }}" class="{{ $category->parent_id ? 'table-secondary' : '' }}">
-                                            <td>
-                                                <input type="checkbox" 
-                                                       class="form-check-input category-checkbox" 
-                                                       value="{{ $category->id }}">
-                                            </td>
-                                            <td>
-                                                <div class="drag-handle">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <!-- Main Categories Container -->
+                        <div id="sortable-main-categories" class="sortable-container">
+                            @php
+                                $mainCategories = $categories->where('parent_id', null);
+                                $subCategories = $categories->where('parent_id', '!=', null);
+                            @endphp
+
+                            @forelse($mainCategories as $mainCategory)
+                                @php
+                                    $firstTranslation = $mainCategory->translates->first();
+                                    $categorySubs = $subCategories->where('parent_id', $mainCategory->id);
+                                @endphp
+                                
+                                <!-- Main Category Card -->
+                                <div class="category-card" data-id="{{ $mainCategory->id }}">
+                                    <div class="card mb-3">
+                                        <div class="card-header d-flex align-items-center justify-content-between">
+                                            <div class="d-flex align-items-center">
+                                                <div class="drag-handle me-3">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                         <circle cx="8" cy="8" r="1"></circle>
                                                         <circle cx="16" cy="8" r="1"></circle>
                                                         <circle cx="8" cy="16" r="1"></circle>
                                                         <circle cx="16" cy="16" r="1"></circle>
                                                     </svg>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                @if($category->image)
-                                                    <img src="{{ asset('storage/' . $category->image) }}" 
-                                                         alt="Category image" 
-                                                         class="img-thumbnail" 
-                                                         style="width: 50px; height: 50px; object-fit: cover;">
-                                                @else
-                                                    <div class="bg-light d-flex align-items-center justify-content-center" 
-                                                         style="width: 50px; height: 50px;">
-                                                        <i class="material-icons-outlined text-muted">image</i>
-                                                    </div>
-                                                @endif
-                                            </td>
-                                            <td>
                                                 <div class="d-flex align-items-center">
-                                                    @if($category->parent_id)
-                                                        <span class="me-2" style="color: #6c757d;">└─</span>
-                                                    @else
-                                                        <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">category</i>
-                                                    @endif
+                                                    <input type="checkbox" 
+                                                           class="form-check-input category-checkbox me-3" 
+                                                           value="{{ $mainCategory->id }}">
                                                     <div>
-                                                        @php
-                                                            $firstTranslation = $category->translates->first();
-                                                        @endphp
-                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
-                                                        @if($category->children->count() > 0)
-                                                            <br><small class="text-muted">{{ $category->children->count() }} subcategories</small>
-                                                        @endif
+                                                        <h6 class="mb-0">
+                                                            <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">category</i>
+                                                            <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
+                                                        </h6>
+                                                        <div class="d-flex gap-1 mt-1">
+                                                            @foreach($mainCategory->translates as $translate)
+                                                                <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
+                                                            @endforeach
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                @if($category->parent)
-                                                    @php
-                                                        $parentTranslation = $category->parent->translates->first();
-                                                    @endphp
-                                                    <span class="badge bg-secondary">
-                                                        <i class="material-icons-outlined" style="font-size: 12px;">subdirectory_arrow_right</i>
-                                                        {{ $parentTranslation ? $parentTranslation->title : 'Untitled Parent' }}
-                                                    </span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                @if($mainCategory->status)
+                                                    <span class="badge bg-success">Active</span>
                                                 @else
-                                                    <span class="badge bg-success">
-                                                        <i class="material-icons-outlined" style="font-size: 12px;">folder</i>
-                                                        Main Category
-                                                    </span>
+                                                    <span class="badge bg-secondary">Inactive</span>
                                                 @endif
-                                            </td>
-                                            <td>
-                                                @if($firstTranslation && $firstTranslation->slug)
-                                                    <code class="text-primary">{{ $firstTranslation->slug }}</code>
-                                                @else
-                                                    <span class="text-muted">No slug</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($firstTranslation && $firstTranslation->seo_title)
-                                                    <span class="text-info">{{ Str::limit($firstTranslation->seo_title, 30) }}</span>
-                                                @else
-                                                    <span class="text-muted">No SEO title</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <div class="d-flex flex-wrap gap-1">
-                                                    @foreach($category->translates as $translate)
-                                                        <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
-                                                    @endforeach
-                                                </div>
-                                            </td>
-                                            <td>
-                                                @if($category->status)
-                                                    <span class="badge badge-light-success">Active</span>
-                                                @else
-                                                    <span class="badge badge-light-danger">Inactive</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <span class="badge badge-light-info">{{ $category->order }}</span>
-                                            </td>
-                                            <td>
+                                                <span class="badge bg-info">{{ $mainCategory->order }}</span>
                                                 <div class="d-flex gap-2">
-                                                    <a href="{{ route('admin.product-categories.edit', $category) }}" 
-                                                       class="btn btn-sm btn-outline-primary" 
+                                                    <a href="{{ route('admin.product-categories.edit', $mainCategory) }}" 
+                                                       class="btn btn-sm btn-warning" 
                                                        title="Edit">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
-                                                    <form action="{{ route('admin.product-categories.destroy', $category) }}" 
-                                                          method="POST" 
-                                                          class="d-inline"
-                                                          onsubmit="return confirm('Are you sure you want to delete this category?')">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" 
-                                                                class="btn btn-sm btn-outline-danger" 
-                                                                title="Delete">
-                                                            <i class="material-icons-outlined">delete</i>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="11" class="text-center py-4">
-                                                <div class="text-muted">
-                                                    <i class="material-icons-outlined" style="font-size: 48px;">category</i>
-                                                    <p class="mt-2">No product categories found</p>
-                                                    <a href="{{ route('admin.product-categories.create') }}" class="btn btn-primary">
-                                                        Create First Category
+                                                    <a href="{{ route('admin.product-categories.create', ['parent_id' => $mainCategory->id]) }}" 
+                                                       class="btn btn-sm btn-success" 
+                                                       title="Add Subcategory">
+                                                        <i class="material-icons-outlined">add</i>
                                                     </a>
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-danger delete-btn" 
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Untitled' }}"
+                                                            data-url="{{ route('admin.product-categories.destroy', $mainCategory) }}"
+                                                            title="Delete">
+                                                        <i class="material-icons-outlined">delete</i>
+                                                    </button>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Subcategories Container -->
+                                        @if($categorySubs->count() > 0)
+                                            <div class="card-body pt-0">
+                                                <div class="subcategories-container" data-parent-id="{{ $mainCategory->id }}">
+                                                    @foreach($categorySubs as $subCategory)
+                                                        @php
+                                                            $subTranslation = $subCategory->translates->first();
+                                                        @endphp
+                                                        <div class="subcategory-item" data-id="{{ $subCategory->id }}">
+                                                            <div class="d-flex align-items-center justify-content-between p-2 border rounded mb-2 subcategory-indent">
+                                                                <div class="d-flex align-items-center">
+                                                                    <div class="drag-handle-sub me-3">
+                                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                                            <circle cx="8" cy="8" r="1"></circle>
+                                                                            <circle cx="16" cy="8" r="1"></circle>
+                                                                            <circle cx="8" cy="16" r="1"></circle>
+                                                                            <circle cx="16" cy="16" r="1"></circle>
+                                                                        </svg>
+                                                                    </div>
+                                                                    <input type="checkbox" 
+                                                                           class="form-check-input category-checkbox me-3" 
+                                                                           value="{{ $subCategory->id }}">
+                                                                    <div>
+                                                                        <span class="me-2" style="color: #6c757d;">└─</span>
+                                                                        <strong>{{ $subTranslation ? $subTranslation->title : 'No title' }}</strong>
+                                                                        <div class="d-flex gap-1 mt-1">
+                                                                            @foreach($subCategory->translates as $translate)
+                                                                                <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
+                                                                            @endforeach
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    @if($subCategory->status)
+                                                                        <span class="badge bg-success">Active</span>
+                                                                    @else
+                                                                        <span class="badge bg-secondary">Inactive</span>
+                                                                    @endif
+                                                                    <span class="badge bg-info">{{ $subCategory->order }}</span>
+                                                                    <div class="d-flex gap-2">
+                                                                        <a href="{{ route('admin.product-categories.edit', $subCategory) }}" 
+                                                                           class="btn btn-sm btn-warning" 
+                                                                           title="Edit">
+                                                                            <i class="material-icons-outlined">edit</i>
+                                                                        </a>
+                                                                        <button type="button" 
+                                                                                class="btn btn-sm btn-danger delete-btn" 
+                                                                                data-title="{{ $subTranslation ? $subTranslation->title : 'Untitled' }}"
+                                                                                data-url="{{ route('admin.product-categories.destroy', $subCategory) }}"
+                                                                                title="Delete">
+                                                                            <i class="material-icons-outlined">delete</i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="material-icons-outlined" style="font-size: 48px;">category</i>
+                                        <p class="mt-2">No product categories found</p>
+                                        <a href="{{ route('admin.product-categories.create') }}" class="btn btn-primary">
+                                            Create First Category
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
@@ -244,11 +237,73 @@
 </form>
 @endsection
 
+@push('styles')
+<style>
+    .drag-handle {
+        cursor: grab;
+        color: #6c757d;
+        transition: color 0.2s;
+        padding: 3px;
+        border-radius: 3px;
+    }
+    .drag-handle:hover {
+        color: #495057;
+        background-color: #f8f9fa;
+    }
+    .drag-handle:active {
+        cursor: grabbing;
+    }
+    .drag-handle-sub {
+        cursor: grab;
+        color: #6c757d;
+        transition: color 0.2s;
+        padding: 3px;
+        border-radius: 3px;
+    }
+    .drag-handle-sub:hover {
+        color: #495057;
+        background-color: #f8f9fa;
+    }
+    .drag-handle-sub:active {
+        cursor: grabbing;
+    }
+    .sortable-ghost {
+        opacity: 0.5;
+    }
+    .sortable-chosen {
+        background-color: #f8f9fa;
+    }
+    .category-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .category-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .subcategory-indent {
+        margin-left: 30px;
+        padding-left: 20px;
+        border-left: 3px solid #007bff;
+        background-color: #f8f9fa;
+    }
+    .subcategory-item {
+        transition: background-color 0.2s;
+    }
+    .subcategory-item:hover {
+        background-color: #e9ecef;
+    }
+    .subcategories-container {
+        min-height: 20px;
+    }
+</style>
+@endpush
+
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const sortableList = document.getElementById('sortable-categories');
     const selectAllCheckbox = document.getElementById('select-all');
     const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
     const deleteSelectedBtn = document.getElementById('delete-selected-btn');
@@ -256,12 +311,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectedIdsInput = document.getElementById('selected-ids');
     
     // Select all functionality
-    selectAllCheckbox.addEventListener('change', function() {
-        categoryCheckboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            categoryCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateDeleteButton();
         });
-        updateDeleteButton();
-    });
+    }
     
     // Individual checkbox functionality
     categoryCheckboxes.forEach(checkbox => {
@@ -281,6 +338,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updateSelectAllCheckbox() {
+        if (!selectAllCheckbox) return;
+        
         const checkedBoxes = document.querySelectorAll('.category-checkbox:checked');
         const totalBoxes = categoryCheckboxes.length;
         
@@ -312,48 +371,115 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Sortable functionality
-    if (sortableList) {
-        new Sortable(sortableList, {
+    // Drag and drop reordering for main categories
+    const sortableMainList = document.getElementById('sortable-main-categories');
+    if (sortableMainList) {
+        new Sortable(sortableMainList, {
             handle: '.drag-handle',
             animation: 150,
             onEnd: function(evt) {
-                const items = Array.from(sortableList.children).map((item, index) => ({
-                    id: item.dataset.id,
-                    order: index + 1
-                }));
-                
+                const mainCategories = Array.from(sortableMainList.querySelectorAll('.category-card')).map((card, index) => {
+                    return card.getAttribute('data-id');
+                });
+
                 fetch('{{ route("admin.product-categories.reorder") }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
-                    body: JSON.stringify({ items: items.map(item => item.id) })
+                    body: JSON.stringify({ 
+                        items: mainCategories,
+                        type: 'main'
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        // Update order numbers in the table
-                        items.forEach((item, index) => {
-                            const row = sortableList.querySelector(`[data-id="${item.id}"]`);
-                            const orderCell = row.querySelector('td:nth-child(9) .badge');
-                            if (orderCell) {
-                                orderCell.textContent = index + 1;
-                            }
+                    if (!data.success) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message || 'Failed to reorder main categories',
+                            icon: 'error'
                         });
-                    } else {
-                        console.error('Reorder failed:', data.message);
-                        location.reload(); // Reload to restore original order
                     }
                 })
                 .catch(error => {
-                    console.error('Error reordering:', error);
-                    location.reload(); // Reload to restore original order
+                    console.error('Error:', error);
                 });
             }
         });
     }
+
+    // Drag and drop reordering for subcategories within each parent
+    document.querySelectorAll('.subcategories-container').forEach(container => {
+        const subcategoryItems = container.querySelectorAll('.subcategory-item');
+        if (subcategoryItems.length > 1) {
+            new Sortable(container, {
+                handle: '.drag-handle-sub',
+                animation: 150,
+                onEnd: function(evt) {
+                    const subcategoryIds = Array.from(container.querySelectorAll('.subcategory-item')).map(item => {
+                        return item.getAttribute('data-id');
+                    });
+
+                    fetch('{{ route("admin.product-categories.reorder") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({ 
+                            items: subcategoryIds,
+                            type: 'sub'
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: data.message || 'Failed to reorder subcategories',
+                                icon: 'error'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
+            });
+        }
+    });
+
+    // Delete confirmation for all delete buttons
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const title = this.getAttribute('data-title');
+            const url = this.getAttribute('data-url');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Do you want to delete "${title}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = url;
+                    form.innerHTML = `
+                        @csrf
+                        @method('DELETE')
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        });
+    });
 });
 </script>
 @endpush 

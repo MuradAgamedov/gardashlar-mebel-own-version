@@ -231,9 +231,22 @@ class ProductCategoryController extends Controller
     {
         try {
             $items = $request->input('items', []);
+            $type = $request->input('type', 'main'); // 'main' or 'sub'
             
-            foreach ($items as $index => $itemId) {
-                ProductCategory::where('id', $itemId)->update(['order' => $index + 1]);
+            if ($type === 'main') {
+                // Reorder main categories (parent_id = null)
+                foreach ($items as $index => $itemId) {
+                    ProductCategory::where('id', $itemId)
+                        ->whereNull('parent_id')
+                        ->update(['order' => $index + 1]);
+                }
+            } else {
+                // Reorder subcategories (parent_id != null)
+                foreach ($items as $index => $itemId) {
+                    ProductCategory::where('id', $itemId)
+                        ->whereNotNull('parent_id')
+                        ->update(['order' => $index + 1]);
+                }
             }
 
             return response()->json(['success' => true]);
