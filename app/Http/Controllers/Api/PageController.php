@@ -19,9 +19,9 @@ class PageController extends Controller
     public function findByKeyword(Request $request, $keyword): JsonResponse
     {
         try {
-            // Set locale from header
-            $locale = $this->getLocaleFromHeader($request);
-    
+            // Get language_id from header
+            $languageId = $this->getLanguageIdFromHeader($request);
+
             if (!$keyword) {
                 return response()->json([
                     'success' => false,
@@ -29,16 +29,17 @@ class PageController extends Controller
                     'data' => null
                 ], 400);
             }
-    
-            $page = Cache::rememberForever("api_page_keyword_{$keyword}_{$locale}", function () use ($keyword, $locale) {
+
+            // Cache açarını language_id ilə fərqləndir
+            $page = Cache::rememberForever("api_page_keyword_{$keyword}_langid_{$languageId}", function () use ($keyword, $languageId) {
                 return Page::where('status', true)
                     ->where('keyword', $keyword)
-                    ->with(['translates' => function ($q) use ($locale) {
-                        $q->where('locale', $locale);
+                    ->with(['translates' => function ($q) use ($languageId) {
+                        $q->where('language_id', $languageId);
                     }])
                     ->first();
             });
-    
+
             if (!$page) {
                 return response()->json([
                     'success' => false,
@@ -46,12 +47,12 @@ class PageController extends Controller
                     'data' => null
                 ], 404);
             }
-    
+
             return response()->json([
                 'success' => true,
                 'data' => $page
             ], 200);
-    
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -60,5 +61,4 @@ class PageController extends Controller
             ], 500);
         }
     }
-    
 }
