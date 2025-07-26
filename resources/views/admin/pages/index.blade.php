@@ -46,7 +46,6 @@
                             <h5>Pages List</h5>
                             <a href="{{ route('admin.pages.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New Page
                             </a>
                         </div>
                     </div>
