@@ -124,8 +124,7 @@
                                                     role="tab" 
                                                     aria-controls="content-{{ $language->lang_code }}" 
                                                     aria-selected="{{ $index === 0 ? 'true' : 'false' }}">
-                                                <i class="flag-icon flag-icon-{{ $language->lang_code }}"></i>
-                                                {{ $language->title }}
+                                                {{ $language->title }} ({{ $language->lang_code }})
                                             </button>
                                         </li>
                                         @endforeach
