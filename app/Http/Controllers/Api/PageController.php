@@ -33,9 +33,7 @@ class PageController extends Controller
             $page = Cache::rememberForever("api_page_keyword_{$keyword}", function () use ($keyword) {
                 return Page::where('status', true)
                     ->where('keyword', $keyword)
-                    ->with(['translates' => function ($query) {
-                        $query->where('status', true);
-                    }])
+                    ->with(['translates'])
                     ->first();
             });
 
