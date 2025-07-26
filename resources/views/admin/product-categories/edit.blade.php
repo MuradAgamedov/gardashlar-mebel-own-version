@@ -96,6 +96,14 @@
                                                  alt="Current image" 
                                                  class="img-thumbnail" 
                                                  style="max-width: 200px; max-height: 200px;">
+                                            <div class="mt-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="remove_image" name="remove_image" value="1">
+                                                    <label class="form-check-label text-danger" for="remove_image">
+                                                        <i class="material-icons-outlined">delete</i> Remove current image
+                                                    </label>
+                                                </div>
+                                            </div>
                                         </div>
                                     @endif
                                     <input type="file" 
@@ -103,7 +111,13 @@
                                            name="image" 
                                            id="imageInput"
                                            accept="image/*">
-                                    <small class="form-text text-muted">Upload a new image to replace the current one (optional)</small>
+                                    <small class="form-text text-muted">
+                                        @if($productCategory->image)
+                                            Upload a new image to replace the current one, or check the box above to remove it
+                                        @else
+                                            Upload an image for this category (optional)
+                                        @endif
+                                    </small>
                                     @error('image')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -291,6 +305,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const imageInput = document.getElementById('imageInput');
     const imagePreview = document.getElementById('imagePreview');
     const previewImg = document.getElementById('previewImg');
+    const removeImageCheckbox = document.getElementById('remove_image');
 
     imageInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
@@ -301,10 +316,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 imagePreview.style.display = 'block';
             };
             reader.readAsDataURL(file);
+            
+            // Uncheck remove image checkbox when new image is selected
+            if (removeImageCheckbox) {
+                removeImageCheckbox.checked = false;
+            }
         } else {
             imagePreview.style.display = 'none';
         }
     });
+
+    // Handle remove image checkbox
+    if (removeImageCheckbox) {
+        removeImageCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                // Disable file input when remove is checked
+                imageInput.disabled = true;
+                imageInput.value = '';
+                imagePreview.style.display = 'none';
+            } else {
+                // Enable file input when remove is unchecked
+                imageInput.disabled = false;
+            }
+        });
+    }
 
     // Lock all slug inputs by default
     document.querySelectorAll('input.slug-input').forEach(function(input) {

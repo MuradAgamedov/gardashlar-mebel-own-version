@@ -107,15 +107,28 @@
                                                     <input type="checkbox" 
                                                            class="form-check-input category-checkbox me-3" 
                                                            value="{{ $mainCategory->id }}">
-                                                    <div>
-                                                        <h6 class="mb-0">
-                                                            <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">category</i>
-                                                            <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
-                                                        </h6>
-                                                        <div class="d-flex gap-1 mt-1">
-                                                            @foreach($mainCategory->translates as $translate)
-                                                                <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
-                                                            @endforeach
+                                                    <div class="d-flex align-items-center">
+                                                        @if($mainCategory->image)
+                                                            <img src="{{ asset('storage/' . $mainCategory->image) }}" 
+                                                                 alt="{{ $firstTranslation ? $firstTranslation->title : 'Category' }}" 
+                                                                 class="img-thumbnail me-3" 
+                                                                 style="width: 40px; height: 40px; object-fit: cover;">
+                                                        @else
+                                                            <div class="bg-light rounded me-3 d-flex align-items-center justify-content-center" 
+                                                                 style="width: 40px; height: 40px;">
+                                                                <i class="material-icons-outlined text-muted" style="font-size: 20px;">image</i>
+                                                            </div>
+                                                        @endif
+                                                        <div>
+                                                            <h6 class="mb-0">
+                                                                <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">category</i>
+                                                                <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
+                                                            </h6>
+                                                            <div class="d-flex gap-1 mt-1">
+                                                                @foreach($mainCategory->translates as $translate)
+                                                                    <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
+                                                                @endforeach
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -170,13 +183,26 @@
                                                                     <input type="checkbox" 
                                                                            class="form-check-input category-checkbox me-3" 
                                                                            value="{{ $subCategory->id }}">
-                                                                    <div>
+                                                                    <div class="d-flex align-items-center">
                                                                         <span class="me-2" style="color: #6c757d;">└─</span>
-                                                                        <strong>{{ $subTranslation ? $subTranslation->title : 'No title' }}</strong>
-                                                                        <div class="d-flex gap-1 mt-1">
-                                                                            @foreach($subCategory->translates as $translate)
-                                                                                <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
-                                                                            @endforeach
+                                                                        @if($subCategory->image)
+                                                                            <img src="{{ asset('storage/' . $subCategory->image) }}" 
+                                                                                 alt="{{ $subTranslation ? $subTranslation->title : 'Subcategory' }}" 
+                                                                                 class="img-thumbnail me-2" 
+                                                                                 style="width: 30px; height: 30px; object-fit: cover;">
+                                                                        @else
+                                                                            <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center" 
+                                                                                 style="width: 30px; height: 30px;">
+                                                                                <i class="material-icons-outlined text-muted" style="font-size: 16px;">image</i>
+                                                                            </div>
+                                                                        @endif
+                                                                        <div>
+                                                                            <strong>{{ $subTranslation ? $subTranslation->title : 'No title' }}</strong>
+                                                                            <div class="d-flex gap-1 mt-1">
+                                                                                @foreach($subCategory->translates as $translate)
+                                                                                    <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
+                                                                                @endforeach
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>

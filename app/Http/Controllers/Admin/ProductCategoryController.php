@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
 use App\Models\Language;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -82,12 +83,11 @@ class ProductCategoryController extends Controller
         ]);
 
         try {
-            // Handle image upload
+            // Handle image upload using ImageService
             $imagePath = null;
             if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imageName = time() . '_' . $image->getClientOriginalName();
-                $imagePath = $image->storeAs('product-categories', $imageName, 'public');
+                $imageService = new ImageService();
+                $imagePath = $imageService->upload($request->file('image'), 'product-categories');
             }
 
             // Create the category
@@ -194,17 +194,20 @@ class ProductCategoryController extends Controller
         ]);
 
         try {
-            // Handle image upload
+            // Handle image upload using ImageService
             $imagePath = $productCategory->image;
-            if ($request->hasFile('image')) {
-                // Delete old image if exists
-                if ($productCategory->image && Storage::disk('public')->exists($productCategory->image)) {
-                    Storage::disk('public')->delete($productCategory->image);
+            $imageService = new ImageService();
+            
+            // Check if user wants to remove existing image
+            if ($request->has('remove_image') && $request->input('remove_image') == 1) {
+                if ($productCategory->image) {
+                    $imageService->delete($productCategory->image);
                 }
-                
-                $image = $request->file('image');
-                $imageName = time() . '_' . $image->getClientOriginalName();
-                $imagePath = $image->storeAs('product-categories', $imageName, 'public');
+                $imagePath = null;
+            }
+            // Handle new image upload
+            elseif ($request->hasFile('image')) {
+                $imagePath = $imageService->update($request->file('image'), $productCategory->image, 'product-categories');
             }
 
             // Update the category
@@ -259,6 +262,12 @@ class ProductCategoryController extends Controller
     public function destroy(ProductCategory $productCategory)
     {
         try {
+            // Delete associated image using ImageService
+            if ($productCategory->image) {
+                $imageService = new ImageService();
+                $imageService->delete($productCategory->image);
+            }
+            
             $productCategory->delete();
             return redirect()->route('admin.product-categories.index')
                 ->with('success', 'Product category deleted successfully!');
@@ -330,6 +339,16 @@ class ProductCategoryController extends Controller
                 return redirect()->back()->with('error', "Cannot delete categories with subcategories: {$categoryNames}");
             }
 
+            // Delete associated images using ImageService
+            $imageService = new ImageService();
+            $categoriesToDelete = ProductCategory::whereIn('id', $selectedIds)->get();
+            
+            foreach ($categoriesToDelete as $category) {
+                if ($category->image) {
+                    $imageService->delete($category->image);
+                }
+            }
+            
             // Delete the categories
             ProductCategory::whereIn('id', $selectedIds)->delete();
 
