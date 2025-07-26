@@ -7,15 +7,21 @@ use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
+use App\Traits\LocaleFromHeader;
 
 class LanguageController extends Controller
 {
+    use LocaleFromHeader;
+
     /**
      * Get all active languages ordered by order
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         try {
+            // Set locale from header
+            $this->setLocaleFromHeader($request);
+            
             $languages = Cache::rememberForever('api_languages', function () {
                 return Language::where('status', true)
                     ->orderBy('order')
