@@ -250,6 +250,11 @@ class ProductCategoryController extends Controller
         try {
             $selectedIds = $request->input('selected_ids', []);
             
+            // If selected_ids is a JSON string, decode it
+            if (is_string($selectedIds)) {
+                $selectedIds = json_decode($selectedIds, true) ?? [];
+            }
+            
             if (empty($selectedIds)) {
                 return redirect()->back()->with('error', 'No categories selected for deletion.');
             }
