@@ -159,6 +159,7 @@
         </a>
         <ul class="sidebar-submenu">
           <li><a href="{{ route('admin.certificates.index') }}">Certificates</a></li>
+          <li><a href="{{ route('admin.our-goals.index') }}">Our Goals</a></li>
           <li><a href="{{ route('admin.suggest-a-place.edit') }}">Suggest A Place</a></li>
           <li><a href="{{ route('admin.suggestions-complaints.edit') }}">Suggestions & Complaints</a></li>
           <li><a href="{{ route('admin.suggestions.index') }}">Suggestions</a></li>
