@@ -19,9 +19,8 @@ class PageController extends Controller
     public function findByKeyword(Request $request, $keyword): JsonResponse
     {
         try {
-            // Get language_id from header
             $languageId = $this->getLanguageIdFromHeader($request);
-
+    
             if (!$keyword) {
                 return response()->json([
                     'success' => false,
@@ -29,9 +28,10 @@ class PageController extends Controller
                     'data' => null
                 ], 400);
             }
-
-            // Cache açarını language_id ilə fərqləndir
-            $page = Cache::rememberForever("api_page_keyword_{$keyword}_langid_{$languageId}", function () use ($keyword, $languageId) {
+    
+            $cacheKey = "api_page_keyword_{$keyword}_langid_{$languageId}";
+    
+            $page = Cache::rememberForever($cacheKey, function () use ($keyword, $languageId) {
                 return Page::where('status', true)
                     ->where('keyword', $keyword)
                     ->with(['translates' => function ($q) use ($languageId) {
@@ -39,7 +39,7 @@ class PageController extends Controller
                     }])
                     ->first();
             });
-
+    
             if (!$page) {
                 return response()->json([
                     'success' => false,
@@ -47,12 +47,29 @@ class PageController extends Controller
                     'data' => null
                 ], 404);
             }
-
+    
+            // Translate-i birbaşa page içində flat struktura çevirək
+            $translate = $page->translates->first(); // yeganə tərcümə gəlir
+    
+            $responseData = [
+                'id' => $page->id,
+            ];
+    
+            if ($translate) {
+                $responseData = array_merge($responseData, [
+                    'title'           => $translate->title,
+                    'slug'            => $translate->slug,
+                    'seo_title'       => $translate->seo_title,
+                    'seo_keywords'    => $translate->seo_keywords,
+                    'seo_description' => $translate->seo_description,
+                ]);
+            }
+    
             return response()->json([
                 'success' => true,
-                'data' => $page
+                'data' => $responseData
             ], 200);
-
+    
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -61,4 +78,5 @@ class PageController extends Controller
             ], 500);
         }
     }
+    
 }
