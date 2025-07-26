@@ -49,7 +49,7 @@
 
 @stack('styles')
 <style>
-    button {
+    .btn {
         display: flex !important;
     }
 </style>
