@@ -82,7 +82,6 @@ Route::prefix('')->name('admin.')->group(function () {
         
         // Page routes
         Route::resource('pages', PageController::class);
-        Route::post('pages/reorder', [PageController::class, 'reorder'])->name('pages.reorder');
         Route::post('pages/generate-slug', [PageController::class, 'generateSlug'])->name('pages.generate-slug');
         
         // Why Choose Us routes

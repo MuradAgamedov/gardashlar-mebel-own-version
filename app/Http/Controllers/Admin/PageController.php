@@ -191,39 +191,7 @@ class PageController extends Controller
         }
     }
 
-    /**
-     * Reorder pages
-     */
-    public function reorder(Request $request)
-    {
-        try {
-            $request->validate([
-                'pages' => 'required|array',
-                'pages.*.id' => 'required|exists:pages,id',
-                'pages.*.order' => 'required|integer|min:1',
-            ]);
 
-            $pages = $request->input('pages', []);
-            
-            foreach ($pages as $pageData) {
-                $page = Page::find($pageData['id']);
-                if ($page) {
-                    $page->update(['order' => $pageData['order']]);
-                }
-            }
-
-            return response()->json([
-                'success' => true, 
-                'message' => 'Pages reordered successfully'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false, 
-                'message' => 'Error reordering pages: ' . $e->getMessage()
-            ], 500);
-        }
-    }
 
     /**
      * Generate slug from title
