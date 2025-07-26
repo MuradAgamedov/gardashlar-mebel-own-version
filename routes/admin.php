@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\CustomerRightsController;
 use App\Http\Controllers\Admin\DeliveryPaymentController;
 use App\Http\Controllers\Admin\WarrantyPolicyController;
 use App\Http\Controllers\Admin\RefundPolicyController;
+use App\Http\Controllers\Admin\HomePageDiscountController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\CompanyManagementController;
 use App\Http\Controllers\Admin\SiteUsageRulesController;
@@ -162,6 +163,10 @@ Route::prefix('')->name('admin.')->group(function () {
         // Refund Policy routes
         Route::get('refund-policy/edit', [RefundPolicyController::class, 'edit'])->name('refund-policy.edit');
         Route::put('refund-policy/update', [RefundPolicyController::class, 'update'])->name('refund-policy.update');
+        
+        // Home Page Discount routes
+        Route::get('home-page-discount/edit', [HomePageDiscountController::class, 'edit'])->name('home-page-discount.edit');
+        Route::put('home-page-discount/update', [HomePageDiscountController::class, 'update'])->name('home-page-discount.update');
         
         // FAQ routes
         Route::resource('faqs', FaqController::class);

@@ -65,6 +65,8 @@
                                         @error('images.*')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
+                                        <!-- Image preview area -->
+                                        <div id="image-preview-container" class="row mt-3"></div>
                                     </div>
                                 </div>
                                 
@@ -156,6 +158,29 @@ document.addEventListener('DOMContentLoaded', function() {
         if (selectedOption) {
             selectedOption.classList.add('selected');
         }
+    }
+});
+
+// Image preview functionality
+const imagesInput = document.getElementById('images');
+const previewContainer = document.getElementById('image-preview-container');
+
+imagesInput.addEventListener('change', function(event) {
+    previewContainer.innerHTML = '';
+    const files = event.target.files;
+    if (files) {
+        Array.from(files).forEach(file => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const col = document.createElement('div');
+                    col.className = 'col-4 col-md-3 mb-2';
+                    col.innerHTML = `<img src="${e.target.result}" class="img-fluid rounded border" style="max-height:120px;object-fit:cover;" alt="Preview">`;
+                    previewContainer.appendChild(col);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
     }
 });
 </script>

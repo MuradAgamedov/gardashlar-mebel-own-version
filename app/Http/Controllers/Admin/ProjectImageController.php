@@ -8,9 +8,16 @@ use App\Models\ProjectImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Services\ImageService;
 
 class ProjectImageController extends Controller
 {
+    protected $imageService;
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -47,16 +54,14 @@ class ProjectImageController extends Controller
         try {
             // Handle image upload
             if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imageName = time() . '_' . $image->getClientOriginalName();
-                $image->move(public_path('uploads'), $imageName);
+                $imagePath = $this->imageService->upload($request->file('image'), 'projects');
             }
 
             // Get max order
             $maxOrder = $project->images()->max('order') ?? 0;
 
             $projectImage = $project->images()->create([
-                'image' => $imageName,
+                'image' => $imagePath,
                 'is_main_image' => false, // Always false for new images
                 'order' => $maxOrder + 1,
                 'status' => $request->boolean('status', true),
@@ -112,15 +117,11 @@ class ProjectImageController extends Controller
 
             // Handle image upload if new image is provided
             if ($request->hasFile('image')) {
-                // Delete old image
-                if ($image->image && file_exists(public_path('uploads/' . $image->image))) {
-                    unlink(public_path('uploads/' . $image->image));
+                if ($image->image) {
+                    $this->imageService->delete($image->image);
                 }
-
-                $newImage = $request->file('image');
-                $imageName = time() . '_' . $newImage->getClientOriginalName();
-                $newImage->move(public_path('uploads'), $imageName);
-                $data['image'] = $imageName;
+                $imagePath = $this->imageService->upload($request->file('image'), 'projects');
+                $data['image'] = $imagePath;
             }
 
 
@@ -144,9 +145,8 @@ class ProjectImageController extends Controller
     public function destroy(Project $project, ProjectImage $image)
     {
         try {
-            // Delete image file
-            if ($image->image && file_exists(public_path('uploads/' . $image->image))) {
-                unlink(public_path('uploads/' . $image->image));
+            if ($image->image) {
+                $this->imageService->delete($image->image);
             }
 
             $image->delete();

@@ -168,6 +168,7 @@
           <li><a href="{{ route('admin.reports.index') }}">Reports</a></li>
           <li><a href="{{ route('admin.faqs.index') }}">FAQs</a></li>
           <li><a href="{{ route('admin.vacancies.index') }}">Vacancies</a></li>
+          <li><a href="{{ route('admin.home-page-discount.edit') }}">Home Page Discount</a></li>
         </ul>
       </li>
 

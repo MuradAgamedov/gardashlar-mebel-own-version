@@ -6,9 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\CompanyManagement;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Services\ImageService;
 
 class CompanyManagementController extends Controller
 {
+    protected $imageService;
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     /**
      * Display the specified resource.
      */
@@ -74,24 +81,12 @@ class CompanyManagementController extends Controller
                 'upload' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
             ]);
 
-            $file = $request->file('upload');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            
-            // Create directory if it doesn't exist
-            $uploadPath = 'uploads/ckeditor5';
-            if (!file_exists(public_path($uploadPath))) {
-                mkdir(public_path($uploadPath), 0755, true);
-            }
-            
-            $file->move(public_path($uploadPath), $fileName);
-            
-            $url = asset($uploadPath . '/' . $fileName);
-            
-            // CKEditor 5 expects this response format
+            $imagePath = $this->imageService->upload($request->file('upload'), 'ckeditor5');
+            $url = asset($imagePath);
+
             return response()->json([
                 'url' => $url
             ]);
-            
         } catch (\Exception $e) {
             return response()->json([
                 'error' => [
