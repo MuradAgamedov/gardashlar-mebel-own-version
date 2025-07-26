@@ -14,11 +14,21 @@ class ProductCategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $categories = ProductCategory::with(['translates.language', 'parent.translates.language', 'children.translates.language'])
-            ->ordered()
-            ->get();
+        $query = ProductCategory::with(['translates.language', 'parent.translates.language', 'children.translates.language']);
+        
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->whereHas('translates', function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%")
+                  ->orWhere('seo_title', 'like', "%{$search}%");
+            });
+        }
+        
+        $categories = $query->ordered()->get();
             
         // Get all categories for parent selection in forms
         $allCategories = ProductCategory::with('translates.language')->ordered()->get();
@@ -229,6 +239,44 @@ class ProductCategoryController extends Controller
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Delete selected categories
+     */
+    public function deleteSelected(Request $request)
+    {
+        try {
+            $selectedIds = $request->input('selected_ids', []);
+            
+            if (empty($selectedIds)) {
+                return redirect()->back()->with('error', 'No categories selected for deletion.');
+            }
+
+            // Check if any selected category has children
+            $categoriesWithChildren = ProductCategory::whereIn('id', $selectedIds)
+                ->whereHas('children')
+                ->get();
+
+            if ($categoriesWithChildren->isNotEmpty()) {
+                $categoryNames = $categoriesWithChildren->map(function($category) {
+                    $firstTranslation = $category->translates->first();
+                    return $firstTranslation ? $firstTranslation->title : 'Untitled';
+                })->implode(', ');
+                
+                return redirect()->back()->with('error', "Cannot delete categories with subcategories: {$categoryNames}");
+            }
+
+            // Delete the categories
+            ProductCategory::whereIn('id', $selectedIds)->delete();
+
+            return redirect()->route('admin.product-categories.index')
+                ->with('success', count($selectedIds) . ' categories deleted successfully!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error deleting categories: ' . $e->getMessage());
         }
     }
 

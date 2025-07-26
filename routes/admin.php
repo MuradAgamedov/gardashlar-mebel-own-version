@@ -279,6 +279,7 @@ Route::prefix('')->name('admin.')->group(function () {
         // Product Categories routes
         Route::resource('product-categories', ProductCategoryController::class);
         Route::post('product-categories/reorder', [ProductCategoryController::class, 'reorder'])->name('product-categories.reorder');
+        Route::post('product-categories/delete-selected', [ProductCategoryController::class, 'deleteSelected'])->name('product-categories.delete-selected');
         
         // Product Types routes
         Route::resource('product-types', ProductTypeController::class);

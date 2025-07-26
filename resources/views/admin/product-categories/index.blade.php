@@ -45,17 +45,47 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Product Categories</h5>
-                            <a href="{{ route('admin.product-categories.create') }}" class="btn btn-primary">
-                                <i class="material-icons-outlined">add</i>
-                                Add Category
-                            </a>
+                            <div class="d-flex gap-2">
+                                <button type="button" id="delete-selected-btn" class="btn btn-danger" style="display: none;">
+                                    <i class="material-icons-outlined">delete</i>
+                                    Delete Selected
+                                </button>
+                                <a href="{{ route('admin.product-categories.create') }}" class="btn btn-primary">
+                                    <i class="material-icons-outlined">add</i>
+                                    Add Category
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
+                        <!-- Search Form -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <form method="GET" action="{{ route('admin.product-categories.index') }}" class="d-flex">
+                                    <input type="text" 
+                                           name="search" 
+                                           class="form-control me-2" 
+                                           placeholder="Search by title, slug, or SEO title..."
+                                           value="{{ request('search') }}">
+                                    <button type="submit" class="btn btn-outline-primary">
+                                        <i class="material-icons-outlined">search</i>
+                                    </button>
+                                    @if(request('search'))
+                                        <a href="{{ route('admin.product-categories.index') }}" class="btn btn-outline-secondary ms-2">
+                                            <i class="material-icons-outlined">clear</i>
+                                        </a>
+                                    @endif
+                                </form>
+                            </div>
+                        </div>
+
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
+                                        <th width="50">
+                                            <input type="checkbox" id="select-all" class="form-check-input">
+                                        </th>
                                         <th width="50">#</th>
                                         <th>Image</th>
                                         <th>Title</th>
@@ -71,6 +101,11 @@
                                 <tbody id="sortable-categories">
                                     @forelse($categories as $category)
                                         <tr data-id="{{ $category->id }}" class="{{ $category->parent_id ? 'table-secondary' : '' }}">
+                                            <td>
+                                                <input type="checkbox" 
+                                                       class="form-check-input category-checkbox" 
+                                                       value="{{ $category->id }}">
+                                            </td>
                                             <td>
                                                 <div class="drag-handle">
                                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -183,7 +218,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="10" class="text-center py-4">
+                                            <td colspan="11" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">category</i>
                                                     <p class="mt-2">No product categories found</p>
@@ -203,6 +238,12 @@
         </div>
     </div>
 </div>
+
+<!-- Hidden form for delete selected -->
+<form id="delete-selected-form" action="{{ route('admin.product-categories.delete-selected') }}" method="POST" style="display: none;">
+    @csrf
+    <input type="hidden" name="selected_ids" id="selected-ids">
+</form>
 @endsection
 
 @push('scripts')
@@ -210,7 +251,70 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const sortableList = document.getElementById('sortable-categories');
+    const selectAllCheckbox = document.getElementById('select-all');
+    const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
+    const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+    const deleteSelectedForm = document.getElementById('delete-selected-form');
+    const selectedIdsInput = document.getElementById('selected-ids');
     
+    // Select all functionality
+    selectAllCheckbox.addEventListener('change', function() {
+        categoryCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateDeleteButton();
+    });
+    
+    // Individual checkbox functionality
+    categoryCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateDeleteButton();
+            updateSelectAllCheckbox();
+        });
+    });
+    
+    function updateDeleteButton() {
+        const checkedBoxes = document.querySelectorAll('.category-checkbox:checked');
+        if (checkedBoxes.length > 0) {
+            deleteSelectedBtn.style.display = 'inline-block';
+        } else {
+            deleteSelectedBtn.style.display = 'none';
+        }
+    }
+    
+    function updateSelectAllCheckbox() {
+        const checkedBoxes = document.querySelectorAll('.category-checkbox:checked');
+        const totalBoxes = categoryCheckboxes.length;
+        
+        if (checkedBoxes.length === 0) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        } else if (checkedBoxes.length === totalBoxes) {
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+        } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = true;
+        }
+    }
+    
+    // Delete selected functionality
+    deleteSelectedBtn.addEventListener('click', function() {
+        const checkedBoxes = document.querySelectorAll('.category-checkbox:checked');
+        const selectedIds = Array.from(checkedBoxes).map(checkbox => checkbox.value);
+        
+        if (selectedIds.length === 0) {
+            alert('Please select categories to delete.');
+            return;
+        }
+        
+        if (confirm(`Are you sure you want to delete ${selectedIds.length} selected category(ies)?`)) {
+            selectedIdsInput.value = JSON.stringify(selectedIds);
+            deleteSelectedForm.submit();
+        }
+    });
+    
+    // Sortable functionality
     if (sortableList) {
         new Sortable(sortableList, {
             handle: '.drag-handle',
@@ -235,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Update order numbers in the table
                         items.forEach((item, index) => {
                             const row = sortableList.querySelector(`[data-id="${item.id}"]`);
-                            const orderCell = row.querySelector('td:nth-child(7) .badge');
+                            const orderCell = row.querySelector('td:nth-child(9) .badge');
                             if (orderCell) {
                                 orderCell.textContent = index + 1;
                             }
