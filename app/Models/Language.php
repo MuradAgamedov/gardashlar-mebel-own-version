@@ -27,7 +27,7 @@ class Language extends Model
         'order' => 'integer'
     ];
 
-    protected $hidden = ['created_at', 'updated_at', 'lang_name', 'order'];
+    protected $hidden = ['created_at', 'updated_at', 'lang_name', 'order', 'is_main_language', 'flag', 'status'];
     /**
      * Boot method to set default values
      */
