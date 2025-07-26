@@ -122,11 +122,6 @@
                         "required": false,
                         "schema": {
                             "type": "integer",
-                            "enum": [
-                                1,
-                                2,
-                                3
-                            ],
                             "example": 1
                         }
                     }
@@ -216,11 +211,6 @@
                         "required": false,
                         "schema": {
                             "type": "integer",
-                            "enum": [
-                                1,
-                                2,
-                                3
-                            ],
                             "example": 1
                         }
                     }
