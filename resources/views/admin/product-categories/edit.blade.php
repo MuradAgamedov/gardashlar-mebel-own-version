@@ -100,7 +100,7 @@
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" id="remove_image" name="remove_image" value="1">
                                                     <label class="form-check-label text-danger" for="remove_image">
-                                                        <i class="material-icons-outlined">delete</i> Remove current image
+                                                        <i class="material-icons-outlined">delete</i> 
                                                     </label>
                                                 </div>
                                             </div>
