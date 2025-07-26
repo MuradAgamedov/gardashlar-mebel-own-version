@@ -50,6 +50,6 @@
 @stack('styles')
 <style>
     button {
-        display: flex;
+        display: flex !important;
     }
 </style>
