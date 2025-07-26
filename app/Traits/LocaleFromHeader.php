@@ -8,15 +8,15 @@ use App\Models\Language;
 trait LocaleFromHeader
 {
     /**
-     * Get language ID from header (based on locale string like 'az', 'en')
+     * Get language ID directly from header (expects numeric language_id)
      */
     protected function getLanguageIdFromHeader(Request $request): ?int
     {
-        $locale = $request->header('locale');
+        $languageId = (int) $request->header('locale');
 
-        // Yoxla: əgər locale varsa, uyğun language-i tap
-        if ($locale) {
-            $language = Language::where('lang_code', $locale)
+        // Əgər rəqəmsə və status aktivdirsə
+        if ($languageId > 0) {
+            $language = Language::where('id', $languageId)
                 ->where('status', true)
                 ->first();
 
@@ -25,7 +25,7 @@ trait LocaleFromHeader
             }
         }
 
-        // Əgər tapılmadısa, default dili qaytar
+        // Əgər düzgün ID deyilsə, default dilin ID-sini qaytar
         $default = Language::where('is_default', true)
             ->where('status', true)
             ->first();
