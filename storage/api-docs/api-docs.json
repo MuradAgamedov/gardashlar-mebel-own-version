@@ -1,0 +1,186 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Gardashlar Admin API",
+        "description": "Bu sənədləşmə Gardashlar admin panel API-ləri üçündür.",
+        "contact": {
+            "email": "info@gardashlar.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000",
+            "description": "Əsas server"
+        }
+    ],
+    "paths": {
+        "/api/languages": {
+            "get": {
+                "tags": [
+                    "Languages"
+                ],
+                "summary": "Get all active languages",
+                "description": "Returns a list of active languages ordered by 'order' field",
+                "operationId": "getLanguages",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Azərbaycan dili"
+                                                    },
+                                                    "lang_code": {
+                                                        "type": "string",
+                                                        "example": "az"
+                                                    },
+                                                    "lang_name": {
+                                                        "type": "string",
+                                                        "example": "Azerbaijani"
+                                                    },
+                                                    "is_default": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "order": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error retrieving languages"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pages/{keyword}": {
+            "get": {
+                "tags": [
+                    "Pages"
+                ],
+                "summary": "Get a page by keyword",
+                "description": "Returns a translated page by keyword and locale (based on header)",
+                "operationId": "getPageByKeyword",
+                "parameters": [
+                    {
+                        "name": "keyword",
+                        "in": "path",
+                        "description": "The keyword of the page",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Haqqımızda"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "haqqimizda"
+                                                },
+                                                "seo_title": {
+                                                    "type": "string",
+                                                    "example": "Haqqımızda"
+                                                },
+                                                "seo_keywords": {
+                                                    "type": "string",
+                                                    "example": "Haqqımızda, Bizim haqqımızda"
+                                                },
+                                                "seo_description": {
+                                                    "type": "string",
+                                                    "example": "Şirkət haqqında ümumi məlumat"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Keyword parameter is required"
+                    },
+                    "404": {
+                        "description": "Page not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Languages",
+            "description": "Languages"
+        },
+        {
+            "name": "Pages",
+            "description": "Pages"
+        }
+    ]
+}

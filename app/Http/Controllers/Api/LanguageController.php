@@ -8,13 +8,50 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use App\Traits\LocaleFromHeader;
+use OpenApi\Annotations as OA;
 
 class LanguageController extends Controller
 {
     use LocaleFromHeader;
 
     /**
-     * Get all active languages ordered by order
+     * @OA\Get(
+     *     path="/api/languages",
+     *     operationId="getLanguages",
+     *     tags={"Languages"},
+     *     summary="Get all active languages",
+     *     description="Returns a list of active languages ordered by 'order' field",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="title", type="string", example="Azərbaycan dili"),
+     *                     @OA\Property(property="lang_code", type="string", example="az"),
+     *                     @OA\Property(property="lang_name", type="string", example="Azerbaijani"),
+     *                     @OA\Property(property="is_default", type="boolean", example=true),
+     *                     @OA\Property(property="order", type="integer", example=1)
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error retrieving languages")
+     *         )
+     *     )
+     * )
      */
     public function index(Request $request): JsonResponse
     {

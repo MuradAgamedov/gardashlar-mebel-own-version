@@ -8,13 +8,63 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use App\Traits\LocaleFromHeader;
+use OpenApi\Annotations as OA;
 
 class PageController extends Controller
 {
     use LocaleFromHeader;
 
     /**
-     * Get page by keyword
+     * @OA\Get(
+     *     path="/api/pages/{keyword}",
+     *     operationId="getPageByKeyword",
+     *     tags={"Pages"},
+     *     summary="Get a page by keyword",
+     *     description="Returns a translated page by keyword and locale (based on header)",
+     *     @OA\Parameter(
+     *         name="keyword",
+     *         in="path",
+     *         description="The keyword of the page",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Header(
+     *         header="locale",
+     *         description="Language locale code (e.g., az, en, ru)",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=2),
+     *                 @OA\Property(property="title", type="string", example="Haqqımızda"),
+     *                 @OA\Property(property="slug", type="string", example="haqqimizda"),
+     *                 @OA\Property(property="seo_title", type="string", example="Haqqımızda"),
+     *                 @OA\Property(property="seo_keywords", type="string", example="Haqqımızda, Bizim haqqımızda"),
+     *                 @OA\Property(property="seo_description", type="string", example="Şirkət haqqında ümumi məlumat")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Keyword parameter is required"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Page not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error"
+     *     )
+     * )
      */
     public function findByKeyword(Request $request, $keyword): JsonResponse
     {
@@ -66,7 +116,7 @@ class PageController extends Controller
             ]);
 
         } catch (\Throwable $e) {
-            report($e); // Optional: logs the error
+            report($e);
             return response()->json([
                 'success' => false,
                 'message' => 'Error retrieving page.',
