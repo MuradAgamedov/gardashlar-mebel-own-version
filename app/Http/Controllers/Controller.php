@@ -15,7 +15,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Server(
- *     url=L5_SWAGGER_CONST_HOST,
+ *     url=https://admin.gardaslar.coder.az,
  *     description="Əsas server"
  * )
  */
