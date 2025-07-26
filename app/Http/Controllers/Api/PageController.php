@@ -24,7 +24,7 @@ class PageController extends Controller
      *     @OA\Parameter(
      *         name="locale",
      *         in="header",
-     *         description="Language ID (1=Azərbaycan dili, 2=English, 3=Русский)",
+     *         description="Language_id from languages api",
      *         required=false,
      *         @OA\Schema(
      *             type="integer",
@@ -112,7 +112,7 @@ class PageController extends Controller
      *     @OA\Parameter(
      *         name="locale",
      *         in="header",
-     *         description="Language ID (1=Azərbaycan dili, 2=English, 3=Русский)",
+     *         description="Language_id from languages api",
      *         required=false,
      *         @OA\Schema(
      *             type="integer",
