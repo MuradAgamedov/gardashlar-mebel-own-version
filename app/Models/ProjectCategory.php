@@ -12,6 +12,7 @@ class ProjectCategory extends Model
     protected $fillable = [
         'order',
         'status',
+        'image',
     ];
 
     protected $casts = [

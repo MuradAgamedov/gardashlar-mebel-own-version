@@ -9,9 +9,17 @@ use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Services\ImageService;
 
 class ProjectCategoryController extends Controller
 {
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -44,11 +52,18 @@ class ProjectCategoryController extends Controller
             'translations.*.seo_title' => 'nullable|string|max:255',
             'translations.*.seo_keywords' => 'nullable|string',
             'translations.*.seo_description' => 'nullable|string',
+            'translations.*.image_alt_text' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         try {
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $imagePath = $this->imageService->upload($request->file('image'), 'project-categories');
+            }
             $projectCategory = ProjectCategory::create([
                 'status' => $request->input('status', false),
+                'image' => $imagePath,
             ]);
 
             // Create translations
@@ -62,6 +77,7 @@ class ProjectCategoryController extends Controller
                         'seo_title' => $translation['seo_title'] ?? null,
                         'seo_keywords' => $translation['seo_keywords'] ?? null,
                         'seo_description' => $translation['seo_description'] ?? null,
+                        'image_alt_text' => $translation['image_alt_text'] ?? null,
                     ]);
                 }
             }
@@ -101,12 +117,21 @@ class ProjectCategoryController extends Controller
             'translations.*.seo_title' => 'nullable|string|max:255',
             'translations.*.seo_keywords' => 'nullable|string',
             'translations.*.seo_description' => 'nullable|string',
+            'translations.*.image_alt_text' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         try {
-            $projectCategory->update([
+            $data = [
                 'status' => $request->input('status', false),
-            ]);
+            ];
+            if ($request->hasFile('image')) {
+                if ($projectCategory->image) {
+                    $this->imageService->delete($projectCategory->image);
+                }
+                $data['image'] = $this->imageService->upload($request->file('image'), 'project-categories');
+            }
+            $projectCategory->update($data);
 
             // Update or create translations
             foreach ($request->translations as $languageId => $translation) {
@@ -122,6 +147,7 @@ class ProjectCategoryController extends Controller
                             'seo_title' => $translation['seo_title'] ?? null,
                             'seo_keywords' => $translation['seo_keywords'] ?? null,
                             'seo_description' => $translation['seo_description'] ?? null,
+                            'image_alt_text' => $translation['image_alt_text'] ?? null,
                         ]
                     );
                 }

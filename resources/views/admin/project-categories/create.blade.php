@@ -54,9 +54,21 @@
                         <h5>Add New Project Category</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.project-categories.store') }}" method="POST">
+                        <form action="{{ route('admin.project-categories.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             
+                            <!-- Image Upload -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Category Image (optional)</label>
+                                    <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" accept="image/*">
+                                    @error('image')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <div id="image-preview-container" class="mt-2"></div>
+                                </div>
+                            </div>
+
                             <!-- Status -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
@@ -175,6 +187,21 @@
                                                             </div>
                                                         @enderror
                                                     </div>
+                                                    
+                                                    <!-- Image Alt Text -->
+                                                    <div class="col-md-12">
+                                                        <label class="form-label">Image Alt Text</label>
+                                                        <input type="text" 
+                                                               class="form-control @error("translations.{$language->id}.image_alt_text") is-invalid @enderror" 
+                                                               name="translations[{{ $language->id }}][image_alt_text]" 
+                                                               value="{{ old("translations.{$language->id}.image_alt_text") }}" 
+                                                               placeholder="Image alt text for {{ $language->lang_name }}">
+                                                        @error("translations.{$language->id}.image_alt_text")
+                                                            <div class="invalid-feedback">
+                                                                {{ $message }}
+                                                            </div>
+                                                        @enderror
+                                                    </div>
                                                 </div>
                                                 
                                                 <input type="hidden" name="translations[{{ $language->id }}][language_id]" value="{{ $language->id }}">
@@ -231,5 +258,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Image preview for category image
+const imageInput = document.getElementById('image');
+const previewContainer = document.getElementById('image-preview-container');
+if (imageInput) {
+    imageInput.addEventListener('change', function(event) {
+        previewContainer.innerHTML = '';
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewContainer.innerHTML = `<img src="${e.target.result}" class="img-fluid rounded border" style="max-height:120px;object-fit:cover;" alt="Preview">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
 </script>
 @endpush 
