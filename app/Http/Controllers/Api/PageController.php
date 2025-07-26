@@ -20,8 +20,8 @@ class PageController extends Controller
     {
         try {
             // Set locale from header
-            $this->setLocaleFromHeader($request);
-            
+            $locale = $this->getLocaleFromHeader($request);
+    
             if (!$keyword) {
                 return response()->json([
                     'success' => false,
@@ -29,14 +29,16 @@ class PageController extends Controller
                     'data' => null
                 ], 400);
             }
-
-            $page = Cache::rememberForever("api_page_keyword_{$keyword}", function () use ($keyword) {
+    
+            $page = Cache::rememberForever("api_page_keyword_{$keyword}_{$locale}", function () use ($keyword, $locale) {
                 return Page::where('status', true)
                     ->where('keyword', $keyword)
-                    ->with(['translates'])
+                    ->with(['translates' => function ($q) use ($locale) {
+                        $q->where('locale', $locale);
+                    }])
                     ->first();
             });
-
+    
             if (!$page) {
                 return response()->json([
                     'success' => false,
@@ -44,12 +46,12 @@ class PageController extends Controller
                     'data' => null
                 ], 404);
             }
-
+    
             return response()->json([
                 'success' => true,
                 'data' => $page
             ], 200);
-
+    
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -58,4 +60,5 @@ class PageController extends Controller
             ], 500);
         }
     }
+    
 }
