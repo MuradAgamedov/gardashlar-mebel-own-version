@@ -59,7 +59,7 @@
                                 <table class="table">
                                     <thead>
                                         <tr class="border-bottom-secondary border-top-0">
-                                            <th scope="col">ID</th>
+                                            {{-- <th scope="col">ID</th> --}}
                                             <th scope="col">Title</th>
                                             <th scope="col">Slug</th>
                                             <th scope="col">Keyword</th>
@@ -70,7 +70,7 @@
                                     <tbody>
                                         @forelse($pages as $page)
                                         <tr class="border-bottom-{{ $loop->even ? 'info' : 'success' }}">
-                                            <th scope="row">{{ $page->id }}</th>
+                                            {{-- <th scope="row">{{ $page->id }}</th> --}}
                                             <td>
                                                 @if($page->translates->count() > 0)
                                                     {{ $page->translates->first()->title }}
@@ -116,7 +116,7 @@
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="6" class="text-center">No pages found</td>
+                                            <td colspan="5" class="text-center">No pages found</td>
                                         </tr>
                                         @endforelse
                                     </tbody>
