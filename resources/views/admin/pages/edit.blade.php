@@ -224,17 +224,21 @@ window.toggleSlugEdit = function(btn, slugInputName) {
     if (slugInput) {
         // Toggle readonly state
         if (slugInput.readOnly) {
+            // Enable editing - show lock button (warning color)
             slugInput.readOnly = false;
             slugInput.focus();
             btn.innerHTML = '<i class="material-icons-outlined">lock</i>';
-            btn.classList.remove('btn-outline-secondary');
+            btn.classList.remove('btn-outline-secondary', 'btn-secondary', 'btn-outline-warning');
             btn.classList.add('btn-outline-warning');
+            btn.disabled = false;
             console.log('Slug input is now editable'); // Debug log
         } else {
+            // Disable editing - show edit button (disabled gray color)
             slugInput.readOnly = true;
             btn.innerHTML = '<i class="material-icons-outlined">edit</i>';
-            btn.classList.remove('btn-outline-warning');
-            btn.classList.add('btn-outline-secondary');
+            btn.classList.remove('btn-outline-warning', 'btn-outline-secondary');
+            btn.classList.add('btn-secondary');
+            btn.disabled = true;
             console.log('Slug input is now readonly'); // Debug log
         }
     } else {
