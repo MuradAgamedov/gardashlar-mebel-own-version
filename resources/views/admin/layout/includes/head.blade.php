@@ -5,7 +5,7 @@
 <meta name="keywords" content="admin template, Admiro admin template, best javascript admin, dashboard template, bootstrap admin template, responsive admin template, web app"/>
 <meta name="author" content="pixelstrap"/>
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>Admiro - Premium Admin Template</title>
+<title>Gardashlar mebel Admin Panel</title>
 
 <!-- Favicon icon-->
 <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon"/>
