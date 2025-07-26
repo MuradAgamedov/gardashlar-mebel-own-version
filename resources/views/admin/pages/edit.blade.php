@@ -215,6 +215,33 @@
 
 @push('scripts')
 <script>
+// Global function for toggling slug edit - must be defined before DOMContentLoaded
+window.toggleSlugEdit = function(btn, slugInputName) {
+    console.log('toggleSlugEdit called with:', slugInputName); // Debug log
+    const slugInput = document.querySelector('input[name="' + slugInputName + '"]');
+    console.log('Found slug input:', slugInput); // Debug log
+    
+    if (slugInput) {
+        // Toggle readonly state
+        if (slugInput.readOnly) {
+            slugInput.readOnly = false;
+            slugInput.focus();
+            btn.innerHTML = '<i class="material-icons-outlined">lock</i>';
+            btn.classList.remove('btn-outline-secondary');
+            btn.classList.add('btn-outline-warning');
+            console.log('Slug input is now editable'); // Debug log
+        } else {
+            slugInput.readOnly = true;
+            btn.innerHTML = '<i class="material-icons-outlined">edit</i>';
+            btn.classList.remove('btn-outline-warning');
+            btn.classList.add('btn-outline-secondary');
+            console.log('Slug input is now readonly'); // Debug log
+        }
+    } else {
+        console.error('Slug input not found for:', slugInputName); // Debug log
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     // Add visual feedback for active tab
     document.querySelectorAll('#languageTabs .nav-link').forEach(function(tab) {
@@ -274,33 +301,6 @@ document.addEventListener('DOMContentLoaded', function() {
             firstErrorTab.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     @endif
-
-    // Global function for toggling slug edit
-    window.toggleSlugEdit = function(btn, slugInputName) {
-        console.log('toggleSlugEdit called with:', slugInputName); // Debug log
-        const slugInput = document.querySelector('input[name="' + slugInputName + '"]');
-        console.log('Found slug input:', slugInput); // Debug log
-        
-        if (slugInput) {
-            // Toggle readonly state
-            if (slugInput.readOnly) {
-                slugInput.readOnly = false;
-                slugInput.focus();
-                btn.innerHTML = '<i class="material-icons-outlined">lock</i>';
-                btn.classList.remove('btn-outline-secondary');
-                btn.classList.add('btn-outline-warning');
-                console.log('Slug input is now editable'); // Debug log
-            } else {
-                slugInput.readOnly = true;
-                btn.innerHTML = '<i class="material-icons-outlined">edit</i>';
-                btn.classList.remove('btn-outline-warning');
-                btn.classList.add('btn-outline-secondary');
-                console.log('Slug input is now readonly'); // Debug log
-            }
-        } else {
-            console.error('Slug input not found for:', slugInputName); // Debug log
-        }
-    };
 });
 </script>
 
