@@ -24,7 +24,6 @@ class LanguageController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Languages retrieved successfully',
                 'data' => $languages
             ], 200);
 
