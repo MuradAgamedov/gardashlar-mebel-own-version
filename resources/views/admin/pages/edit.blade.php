@@ -139,7 +139,7 @@
                                                                        required>
                                                                 <button type="button" 
                                                                         class="btn btn-outline-secondary edit-slug-btn" 
-                                                                        data-slug-input="translates[{{ $index }}][slug]">
+                                                                        onclick="toggleSlugEdit(this, 'translates[{{ $index }}][slug]')">
                                                                     <i class="material-icons-outlined">edit</i>
                                                                 </button>
                                                             </div>
@@ -275,29 +275,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     @endif
 
-    // Edit slug functionality
-    document.querySelectorAll('.edit-slug-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            const slugInputName = this.getAttribute('data-slug-input');
-            const slugInput = document.querySelector('input[name="' + slugInputName + '"]');
-            
-            if (slugInput) {
-                // Toggle readonly state
-                if (slugInput.readOnly) {
-                    slugInput.readOnly = false;
-                    slugInput.focus();
-                    this.innerHTML = '<i class="material-icons-outlined">lock</i>';
-                    this.classList.remove('btn-outline-secondary');
-                    this.classList.add('btn-outline-warning');
-                } else {
-                    slugInput.readOnly = true;
-                    this.innerHTML = '<i class="material-icons-outlined">edit</i>';
-                    this.classList.remove('btn-outline-warning');
-                    this.classList.add('btn-outline-secondary');
-                }
+    // Global function for toggling slug edit
+    window.toggleSlugEdit = function(btn, slugInputName) {
+        console.log('toggleSlugEdit called with:', slugInputName); // Debug log
+        const slugInput = document.querySelector('input[name="' + slugInputName + '"]');
+        console.log('Found slug input:', slugInput); // Debug log
+        
+        if (slugInput) {
+            // Toggle readonly state
+            if (slugInput.readOnly) {
+                slugInput.readOnly = false;
+                slugInput.focus();
+                btn.innerHTML = '<i class="material-icons-outlined">lock</i>';
+                btn.classList.remove('btn-outline-secondary');
+                btn.classList.add('btn-outline-warning');
+                console.log('Slug input is now editable'); // Debug log
+            } else {
+                slugInput.readOnly = true;
+                btn.innerHTML = '<i class="material-icons-outlined">edit</i>';
+                btn.classList.remove('btn-outline-warning');
+                btn.classList.add('btn-outline-secondary');
+                console.log('Slug input is now readonly'); // Debug log
             }
-        });
-    });
+        } else {
+            console.error('Slug input not found for:', slugInputName); // Debug log
+        }
+    };
 });
 </script>
 
