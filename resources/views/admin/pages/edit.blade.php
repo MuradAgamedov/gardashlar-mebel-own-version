@@ -245,6 +245,12 @@ window.toggleSlugEdit = function(btn, slugInputName) {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Lock all slug inputs by default
+    document.querySelectorAll('input.slug-input').forEach(function(input) {
+        input.disabled = true;
+        input.classList.add('disabled-input-class');
+    });
+
     // Add visual feedback for active tab
     document.querySelectorAll('#languageTabs .nav-link').forEach(function(tab) {
         tab.addEventListener('click', function() {
