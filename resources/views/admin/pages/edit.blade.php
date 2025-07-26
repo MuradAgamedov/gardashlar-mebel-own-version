@@ -226,7 +226,11 @@
 <script>
 // Global function for toggling slug edit - must be defined before DOMContentLoaded
 window.toggleSlugEdit = function(btn, slugInputName) {
+    console.log('toggleSlugEdit called with:', slugInputName);
     const slugInput = document.querySelector('input[name="' + slugInputName + '"]');
+    console.log('Found slug input:', slugInput);
+    console.log('Current readOnly state:', slugInput ? slugInput.readOnly : 'input not found');
+    
     if (slugInput) {
         // Toggle readonly state
         if (slugInput.readOnly) {
@@ -237,6 +241,7 @@ window.toggleSlugEdit = function(btn, slugInputName) {
             btn.innerHTML = '<i class="material-icons-outlined">lock</i>';
             btn.classList.remove('btn-outline-secondary', 'btn-secondary', 'btn-outline-warning');
             btn.classList.add('btn-outline-warning');
+            console.log('Slug input is now editable');
         } else {
             // Disable editing - show edit button (gray color)
             slugInput.readOnly = true;
@@ -244,7 +249,10 @@ window.toggleSlugEdit = function(btn, slugInputName) {
             btn.innerHTML = '<i class="material-icons-outlined">edit</i>';
             btn.classList.remove('btn-outline-warning', 'btn-outline-secondary');
             btn.classList.add('btn-secondary');
+            console.log('Slug input is now readonly');
         }
+    } else {
+        console.error('Slug input not found for:', slugInputName);
     }
 };
 
