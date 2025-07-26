@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pages', function (Blueprint $table) {
+        Schema::table('page_translates', function (Blueprint $table) {
             $table->index('language_id');
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pages', function (Blueprint $table) {
+        Schema::table('page_translates', function (Blueprint $table) {
             $table->dropIndex(['language_id']);
         });
     }
