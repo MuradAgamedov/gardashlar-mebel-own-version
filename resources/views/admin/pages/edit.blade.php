@@ -222,17 +222,19 @@ window.toggleSlugEdit = function(btn, slugInputName) {
     console.log('Found slug input:', slugInput); // Debug log
     
     if (slugInput) {
-        // Toggle readonly state
-        if (slugInput.readOnly) {
+        // Toggle disabled state
+        if (slugInput.disabled) {
             // Enable editing - show lock button (warning color)
-            slugInput.readOnly = false;
+            slugInput.disabled = false;
+            slugInput.classList.remove('disabled-input-class');
             slugInput.focus();
             btn.innerHTML = '<i class="material-icons-outlined">lock</i>';
             btn.classList.remove('btn-outline-secondary', 'btn-secondary', 'btn-outline-warning');
             btn.classList.add('btn-outline-warning');
         } else {
             // Disable editing - show edit button (gray color)
-            slugInput.readOnly = true;
+            slugInput.disabled = true;
+            slugInput.classList.add('disabled-input-class');
             btn.innerHTML = '<i class="material-icons-outlined">edit</i>';
             btn.classList.remove('btn-outline-warning', 'btn-outline-secondary');
             btn.classList.add('btn-secondary');
@@ -358,6 +360,13 @@ document.addEventListener('DOMContentLoaded', function() {
     margin-top: 0.25rem;
     font-size: 0.875em;
     color: #dc3545;
+}
+
+.disabled-input-class {
+    background-color: #e9ecef !important;
+    color: #6c757d !important;
+    cursor: not-allowed !important;
+    pointer-events: none;
 }
 </style>
 @endpush
