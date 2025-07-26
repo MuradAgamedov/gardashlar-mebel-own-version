@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 
 class LanguageController extends Controller
 {
@@ -15,10 +16,11 @@ class LanguageController extends Controller
     public function index(): JsonResponse
     {
         try {
-            $languages = Language::where('status', true)
-                ->orderBy('order')
-                ->select(['id', 'title', 'lang_code', 'lang_name', 'is_default', 'order'])
-                ->get();
+            $languages = Cache::remember('api_languages', 3600, function () {
+                return Language::where('status', true)
+                    ->orderBy('order')
+                    ->get();
+            });
 
             return response()->json([
                 'success' => true,
