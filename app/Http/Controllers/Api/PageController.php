@@ -28,7 +28,6 @@ class PageController extends Controller
      *         required=false,
      *         @OA\Schema(
      *             type="integer",
-     *             enum={1, 2, 3},
      *             example=1
      *         )
      *     ),
@@ -117,7 +116,6 @@ class PageController extends Controller
      *         required=false,
      *         @OA\Schema(
      *             type="integer",
-     *             enum={1, 2, 3},
      *             example=1
      *         )
      *     ),
