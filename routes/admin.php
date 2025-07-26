@@ -61,6 +61,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductAccordionController;
 use App\Http\Controllers\Admin\ProductImageController;
 use App\Http\Controllers\Admin\OurGoalController;
+use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Admin\AuthController;
 
 Route::prefix('')->name('admin.')->group(function () {
@@ -325,6 +326,9 @@ Route::prefix('')->name('admin.')->group(function () {
         // Our Goals routes
         Route::resource('our-goals', OurGoalController::class);
         Route::post('our-goals/reorder', [OurGoalController::class, 'reorder'])->name('our-goals.reorder');
+        
+        // Images routes
+        Route::resource('images', ImageController::class);
         Route::post('products/{product}/images/{image}/set-main', [ProductImageController::class, 'setMainImage'])->name('products.images.set-main');
 
         // Image Upload route for CKEditor
