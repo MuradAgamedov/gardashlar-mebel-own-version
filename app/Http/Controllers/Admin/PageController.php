@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Models\Language;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class PageController extends Controller
 {
@@ -58,13 +57,10 @@ class PageController extends Controller
 
             // Create translations for each language
             foreach ($request->translates as $translate) {
-                // Generate slug if empty using SlugHelper
-                $slug = $translate['slug'] ?: Str::slug($translate['title']);
-                
                 $page->translates()->create([
                     'language_id' => $translate['language_id'],
                     'title' => trim($translate['title']),
-                    'slug' => $slug,
+                    'slug' => trim($translate['slug']),
                     'seo_title' => trim($translate['seo_title'] ?? ''),
                     'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
                     'seo_description' => trim($translate['seo_description'] ?? ''),
@@ -135,13 +131,10 @@ class PageController extends Controller
 
             // Create new translations
             foreach ($request->translates as $translate) {
-                // Generate slug if empty using SlugHelper
-                $slug = $translate['slug'] ?: Str::slug($translate['title']);
-                
                 $page->translates()->create([
                     'language_id' => $translate['language_id'],
                     'title' => trim($translate['title']),
-                    'slug' => $slug,
+                    'slug' => trim($translate['slug']),
                     'seo_title' => trim($translate['seo_title'] ?? ''),
                     'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
                     'seo_description' => trim($translate['seo_description'] ?? ''),
@@ -230,11 +223,12 @@ class PageController extends Controller
                 'page_id' => 'nullable|exists:pages,id',
             ]);
 
-            $title = Str::slug($request->input('title'));
+            $title = $request->input('title');
             $languageId = $request->input('language_id');
             $pageId = $request->input('page_id');
             
-            $slug = Str::slug($title);
+            // Return empty slug - let frontend handle slug generation
+            $slug = '';
 
             return response()->json([
                 'success' => true,
