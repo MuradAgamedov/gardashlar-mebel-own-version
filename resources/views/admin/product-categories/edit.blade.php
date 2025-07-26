@@ -173,13 +173,22 @@
                                                     <label class="form-label">
                                                         Slug <span class="text-danger">*</span>
                                                     </label>
-                                                    <input type="text" 
-                                                           class="form-control @error('translates.'.$index.'.slug') is-invalid @enderror" 
-                                                           name="translates[{{ $index }}][slug]" 
-                                                           value="{{ old('translates.'.$index.'.slug', $translate ? $translate->slug : '') }}"
-                                                           placeholder="Enter slug for {{ $language->title }}">
+                                                    <div class="input-group">
+                                                        <input type="text" 
+                                                               class="form-control @error('translates.'.$index.'.slug') is-invalid @enderror slug-input" 
+                                                               name="translates[{{ $index }}][slug]" 
+                                                               value="{{ old('translates.'.$index.'.slug', $translate ? $translate->slug : '') }}"
+                                                               placeholder="Enter slug for {{ $language->title }}"
+                                                               readonly
+                                                               required>
+                                                        <button type="button" 
+                                                                class="btn btn-outline-secondary edit-slug-btn" 
+                                                                onclick="toggleSlugEdit(this, 'translates[{{ $index }}][slug]')">
+                                                            <i class="material-icons-outlined">edit</i>
+                                                        </button>
+                                                    </div>
                                                     @error('translates.'.$index.'.slug')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                                     @enderror
                                                 </div>
                                             </div>
@@ -291,7 +300,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-
+    // Lock all slug inputs by default
+    document.querySelectorAll('input.slug-input').forEach(function(input) {
+        input.readOnly = true;
+        input.classList.add('disabled-input-class');
+    });
 
     // Add visual feedback for active tab
     document.querySelectorAll('#languageTabs .nav-link').forEach(function(tab) {
@@ -330,5 +343,38 @@ function removeImage() {
     document.getElementById('imageInput').value = '';
     document.getElementById('imagePreview').style.display = 'none';
 }
+
+// Global function to toggle slug edit
+window.toggleSlugEdit = function(button, inputName) {
+    const input = document.querySelector(`input[name="${inputName}"]`);
+    if (!input) return;
+    
+    if (input.readOnly) {
+        // Enable editing
+        input.readOnly = false;
+        input.classList.remove('disabled-input-class');
+        button.classList.remove('btn-secondary');
+        button.classList.add('btn-outline-warning');
+        button.innerHTML = '<i class="material-icons-outlined">lock</i>';
+    } else {
+        // Disable editing
+        input.readOnly = true;
+        input.classList.add('disabled-input-class');
+        button.classList.remove('btn-outline-warning');
+        button.classList.add('btn-secondary');
+        button.innerHTML = '<i class="material-icons-outlined">edit</i>';
+    }
+};
 </script>
-@endpush 
+
+<style>
+.disabled-input-class {
+    background-color: #e9ecef !important;
+    color: #6c757d !important;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+</style>
+@endpush
+
+@include('admin.partials.slug-generator') 

@@ -159,10 +159,11 @@
                                                         Slug <span class="text-danger">*</span>
                                                     </label>
                                                     <input type="text" 
-                                                           class="form-control @error('translates.'.$index.'.slug') is-invalid @enderror" 
+                                                           class="form-control @error('translates.'.$index.'.slug') is-invalid @enderror slug-input" 
                                                            name="translates[{{ $index }}][slug]" 
                                                            value="{{ old('translates.'.$index.'.slug') }}"
-                                                           placeholder="Enter slug for {{ $language->title }}">
+                                                           placeholder="Enter slug for {{ $language->title }}"
+                                                           data-language="{{ $language->lang_code }}">
                                                     @error('translates.'.$index.'.slug')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -276,8 +277,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-
-
     // Add visual feedback for active tab
     document.querySelectorAll('#languageTabs .nav-link').forEach(function(tab) {
         tab.addEventListener('click', function() {
@@ -316,4 +315,6 @@ function removeImage() {
     document.getElementById('imagePreview').style.display = 'none';
 }
 </script>
-@endpush 
+@endpush
+
+@include('admin.partials.slug-generator') 
