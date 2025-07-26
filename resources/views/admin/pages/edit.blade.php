@@ -217,15 +217,12 @@
 <script>
 // Global function for toggling slug edit - must be defined before DOMContentLoaded
 window.toggleSlugEdit = function(btn, slugInputName) {
-    console.log('toggleSlugEdit called with:', slugInputName); // Debug log
     const slugInput = document.querySelector('input[name="' + slugInputName + '"]');
-    console.log('Found slug input:', slugInput); // Debug log
-    
     if (slugInput) {
-        // Toggle disabled state
-        if (slugInput.disabled) {
+        // Toggle readonly state
+        if (slugInput.readOnly) {
             // Enable editing - show lock button (warning color)
-            slugInput.disabled = false;
+            slugInput.readOnly = false;
             slugInput.classList.remove('disabled-input-class');
             slugInput.focus();
             btn.innerHTML = '<i class="material-icons-outlined">lock</i>';
@@ -233,21 +230,19 @@ window.toggleSlugEdit = function(btn, slugInputName) {
             btn.classList.add('btn-outline-warning');
         } else {
             // Disable editing - show edit button (gray color)
-            slugInput.disabled = true;
+            slugInput.readOnly = true;
             slugInput.classList.add('disabled-input-class');
             btn.innerHTML = '<i class="material-icons-outlined">edit</i>';
             btn.classList.remove('btn-outline-warning', 'btn-outline-secondary');
             btn.classList.add('btn-secondary');
         }
-    } else {
-        console.error('Slug input not found for:', slugInputName); // Debug log
     }
 };
 
 document.addEventListener('DOMContentLoaded', function() {
     // Lock all slug inputs by default
     document.querySelectorAll('input.slug-input').forEach(function(input) {
-        input.disabled = true;
+        input.readOnly = true;
         input.classList.add('disabled-input-class');
     });
 
