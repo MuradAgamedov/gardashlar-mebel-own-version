@@ -45,9 +45,14 @@ class PageController extends Controller
             'translates.*.seo_description' => 'nullable|string',
         ], [
             'translates.required' => 'At least one language translation is required.',
+            'translates.*.language_id.required' => 'Language is required.',
+            'translates.*.language_id.exists' => 'Selected language is invalid.',
             'translates.*.title.required' => 'Title is required for all languages.',
+            'translates.*.title.max' => 'Title cannot exceed 255 characters.',
             'translates.*.slug.required' => 'Slug is required for all languages.',
+            'translates.*.slug.max' => 'Slug cannot exceed 255 characters.',
             'translates.*.slug.unique' => 'This slug is already in use.',
+            'keyword.max' => 'Keyword cannot exceed 255 characters.',
         ]);
 
         try {
@@ -118,9 +123,14 @@ class PageController extends Controller
             'translates.*.seo_description' => 'nullable|string',
         ], [
             'translates.required' => 'At least one language translation is required.',
+            'translates.*.language_id.required' => 'Language is required.',
+            'translates.*.language_id.exists' => 'Selected language is invalid.',
             'translates.*.title.required' => 'Title is required for all languages.',
+            'translates.*.title.max' => 'Title cannot exceed 255 characters.',
             'translates.*.slug.required' => 'Slug is required for all languages.',
+            'translates.*.slug.max' => 'Slug cannot exceed 255 characters.',
             'translates.*.slug.unique' => 'This slug is already in use.',
+            'keyword.max' => 'Keyword cannot exceed 255 characters.',
         ]);
 
         try {
