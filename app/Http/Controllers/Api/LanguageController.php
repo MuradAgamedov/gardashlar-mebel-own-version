@@ -56,8 +56,7 @@ class LanguageController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            // Set locale from header
-            $this->setLocaleFromHeader($request);
+      
             
             $languages = Cache::rememberForever('api_languages', function () {
                 return Language::where('status', true)
