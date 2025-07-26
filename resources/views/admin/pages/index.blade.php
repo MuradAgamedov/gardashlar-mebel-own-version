@@ -96,7 +96,13 @@
                                                     <span class="text-muted">No slug</span>
                                                 @endif
                                             </td>
-                                        
+                                            <td>
+                                                @if($page->keyword)
+                                                    <span class="badge badge-light-info">{{ $page->keyword }}</span>
+                                                @else
+                                                    <span class="text-muted">No keyword</span>
+                                                @endif
+                                            </td>
                                             <td>
                                                 @if($page->status)
                                                     <span class="badge badge-light-success">Active</span>
