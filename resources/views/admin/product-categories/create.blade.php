@@ -115,6 +115,9 @@
                                     <label class="form-label">Translations</label>
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
                                         @foreach($languages as $index => $language)
+                                        @php
+                                            $translate = null;
+                                        @endphp
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link {{ $index === 0 ? 'active' : '' }} {{ $errors->has('translates.'.$index.'.*') ? 'border-danger' : '' }}" 
                                                     id="tab-{{ $language->lang_code }}" 
@@ -124,7 +127,16 @@
                                                     role="tab" 
                                                     aria-controls="content-{{ $language->lang_code }}" 
                                                     aria-selected="{{ $index === 0 ? 'true' : 'false' }}">
-                                                {{ $language->title }} ({{ $language->lang_code }})
+                                                <span class="badge badge-light-primary me-2">{{ $language->lang_code }}</span>
+                                                {{ $language->title }}
+                                                @if(old('translates.'.$index.'.title'))
+                                                    <i class="material-icons-outlined text-success ms-1" style="font-size: 14px;">check_circle</i>
+                                                @else
+                                                    <i class="material-icons-outlined text-warning ms-1" style="font-size: 14px;">warning</i>
+                                                @endif
+                                                @if($errors->has('translates.'.$index.'.*'))
+                                                    <i class="material-icons-outlined text-danger ms-1" style="font-size: 14px;">error</i>
+                                                @endif
                                             </button>
                                         </li>
                                         @endforeach
