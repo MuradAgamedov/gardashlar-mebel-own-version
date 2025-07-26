@@ -6,6 +6,7 @@
 <meta name="author" content="pixelstrap"/>
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Gardashlar mebel Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined" rel="stylesheet">
 
 <!-- Favicon icon-->
 <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon"/>
