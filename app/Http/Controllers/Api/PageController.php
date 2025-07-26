@@ -20,13 +20,17 @@ class PageController extends Controller
      *     operationId="getAllPages",
      *     tags={"Pages"},
      *     summary="Get all pages",
-     *     description="Returns all translated pages based on locale (from header)",
+     *     description="Returns all translated pages based on language ID sent via 'locale' header",
      *     @OA\Parameter(
      *         name="locale",
      *         in="header",
-     *         description="Language locale code (e.g., az, en, ru)",
+     *         description="Language ID (1=Azərbaycan dili, 2=English, 3=Русский)",
      *         required=false,
-     *         @OA\Schema(type="string")
+     *         @OA\Schema(
+     *             type="integer",
+     *             enum={1, 2, 3},
+     *             example=1
+     *         )
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -98,20 +102,24 @@ class PageController extends Controller
      *     operationId="getPageByKeyword",
      *     tags={"Pages"},
      *     summary="Get a page by keyword",
-     *     description="Returns a translated page by keyword and locale (based on header)",
+     *     description="Returns a translated page by keyword and language ID from 'locale' header",
      *     @OA\Parameter(
      *         name="keyword",
      *         in="path",
      *         description="The keyword of the page",
      *         required=true,
-     *         @OA\Schema(type="string")
+     *         @OA\Schema(type="string", example="about-us")
      *     ),
      *     @OA\Parameter(
      *         name="locale",
      *         in="header",
-     *         description="Language locale code (e.g., az, en, ru)",
+     *         description="Language ID (1=Azərbaycan dili, 2=English, 3=Русский)",
      *         required=false,
-     *         @OA\Schema(type="string")
+     *         @OA\Schema(
+     *             type="integer",
+     *             enum={1, 2, 3},
+     *             example=1
+     *         )
      *     ),
      *     @OA\Response(
      *         response=200,
