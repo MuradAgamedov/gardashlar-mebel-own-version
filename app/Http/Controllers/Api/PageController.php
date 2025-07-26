@@ -16,6 +16,88 @@ class PageController extends Controller
 
     /**
      * @OA\Get(
+     *     path="/api/pages",
+     *     operationId="getAllPages",
+     *     tags={"Pages"},
+     *     summary="Get all pages",
+     *     description="Returns all translated pages based on locale (from header)",
+     *     @OA\Header(
+     *         header="locale",
+     *         description="Language locale code (e.g., az, en, ru)",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="keyword", type="string", example="about-us"),
+     *                     @OA\Property(property="title", type="string", example="Haqqımızda"),
+     *                     @OA\Property(property="slug", type="string", example="haqqimizda"),
+     *                     @OA\Property(property="seo_title", type="string", example="Haqqımızda"),
+     *                     @OA\Property(property="seo_keywords", type="string", example="Haqqımızda, Bizim haqqımızda"),
+     *                     @OA\Property(property="seo_description", type="string", example="Şirkət haqqında ümumi məlumat")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error"
+     *     )
+     * )
+     * Get all pages
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $languageId = $this->getLanguageIdFromHeader($request);
+            $cacheKey = "api:pages:all:lang:{$languageId}";
+
+            $pages = Cache::rememberForever($cacheKey, function () use ($languageId) {
+                return Page::where('status', true)
+                    ->with(['translates' => fn($q) => $q->where('language_id', $languageId)])
+                    ->get()
+                    ->map(function ($page) {
+                        $translate = $page->translates->first();
+                        
+                        return [
+                            'id'              => $page->id,
+                            'keyword'         => $page->keyword,
+                            'title'           => $translate->title ?? null,
+                            'slug'            => $translate->slug ?? null,
+                            'seo_title'       => $translate->seo_title ?? null,
+                            'seo_keywords'    => $translate->seo_keywords ?? null,
+                            'seo_description' => $translate->seo_description ?? null,
+                        ];
+                    });
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $pages
+            ]);
+
+        } catch (\Throwable $e) {
+            report($e);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving pages.',
+                'data' => []
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Get(
      *     path="/api/pages/{keyword}",
      *     operationId="getPageByKeyword",
      *     tags={"Pages"},
@@ -65,6 +147,7 @@ class PageController extends Controller
      *         description="Internal server error"
      *     )
      * )
+     * Get page by keyword
      */
     public function findByKeyword(Request $request, $keyword): JsonResponse
     {
@@ -116,7 +199,7 @@ class PageController extends Controller
             ]);
 
         } catch (\Throwable $e) {
-            report($e);
+            report($e); // Optional: logs the error
             return response()->json([
                 'success' => false,
                 'message' => 'Error retrieving page.',

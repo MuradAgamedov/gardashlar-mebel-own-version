@@ -9,4 +9,5 @@ use App\Http\Controllers\Api\PageController;
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
 
 // Page API Routes
+Route::get('/pages', [PageController::class, 'index'])->name('api.pages.index');
 Route::get('/pages/{keyword}', [PageController::class, 'findByKeyword'])->name('api.pages.find');
