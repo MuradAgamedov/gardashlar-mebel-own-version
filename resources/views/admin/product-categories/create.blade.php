@@ -65,7 +65,7 @@
                                     <select class="form-select @error('parent_id') is-invalid @enderror" name="parent_id" id="parent_id">
                                         <option value="">Select Parent Category (Optional)</option>
                                         @foreach($categories as $category)
-                                            <option value="{{ $category->id }}" {{ old('parent_id') == $category->id ? 'selected' : '' }}>
+                                            <option value="{{ $category->id }}" {{ (old('parent_id', request('parent_id')) == $category->id) ? 'selected' : '' }}>
                                                 {{ $category->translate() ? $category->translate()->title : 'Untitled' }}
                                             </option>
                                         @endforeach
