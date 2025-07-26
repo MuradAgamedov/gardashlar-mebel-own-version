@@ -21,11 +21,23 @@ class ProductCategoryController extends Controller
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->whereHas('translates', function($q) use ($search) {
+            
+            // Get categories that match the search criteria
+            $matchingCategoryIds = ProductCategory::whereHas('translates', function($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                   ->orWhere('slug', 'like', "%{$search}%")
                   ->orWhere('seo_title', 'like', "%{$search}%");
-            });
+            })->pluck('id');
+            
+            // Get parent IDs of matching subcategories
+            $parentIds = ProductCategory::whereIn('id', $matchingCategoryIds)
+                ->whereNotNull('parent_id')
+                ->pluck('parent_id');
+            
+            // Combine matching categories and their parents
+            $allMatchingIds = $matchingCategoryIds->merge($parentIds)->unique();
+            
+            $query->whereIn('id', $allMatchingIds);
         }
         
         $categories = $query->ordered()->get();
