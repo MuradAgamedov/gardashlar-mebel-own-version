@@ -23,6 +23,17 @@
                 "summary": "Get all active languages",
                 "description": "Returns a list of active languages ordered by 'order' field",
                 "operationId": "getLanguages",
+                "parameters": [
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language locale code (e.g., az, en, ru)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful response",
@@ -95,6 +106,84 @@
                 }
             }
         },
+        "/api/pages": {
+            "get": {
+                "tags": [
+                    "Pages"
+                ],
+                "summary": "Get all pages",
+                "description": "Returns all translated pages based on locale (from header)",
+                "operationId": "getAllPages",
+                "parameters": [
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language locale code (e.g., az, en, ru)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "keyword": {
+                                                        "type": "string",
+                                                        "example": "about-us"
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Haqqımızda"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string",
+                                                        "example": "haqqimizda"
+                                                    },
+                                                    "seo_title": {
+                                                        "type": "string",
+                                                        "example": "Haqqımızda"
+                                                    },
+                                                    "seo_keywords": {
+                                                        "type": "string",
+                                                        "example": "Haqqımızda, Bizim haqqımızda"
+                                                    },
+                                                    "seo_description": {
+                                                        "type": "string",
+                                                        "example": "Şirkət haqqında ümumi məlumat"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
         "/api/pages/{keyword}": {
             "get": {
                 "tags": [
@@ -109,6 +198,15 @@
                         "in": "path",
                         "description": "The keyword of the page",
                         "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language locale code (e.g., az, en, ru)",
+                        "required": false,
                         "schema": {
                             "type": "string"
                         }

@@ -21,8 +21,9 @@ class PageController extends Controller
      *     tags={"Pages"},
      *     summary="Get all pages",
      *     description="Returns all translated pages based on locale (from header)",
-     *     @OA\Header(
-     *         header="locale",
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
      *         description="Language locale code (e.g., az, en, ru)",
      *         required=false,
      *         @OA\Schema(type="string")
@@ -49,12 +50,8 @@ class PageController extends Controller
      *             )
      *         )
      *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error"
-     *     )
+     *     @OA\Response(response=500, description="Internal server error")
      * )
-     * Get all pages
      */
     public function index(Request $request): JsonResponse
     {
@@ -68,7 +65,6 @@ class PageController extends Controller
                     ->get()
                     ->map(function ($page) {
                         $translate = $page->translates->first();
-                        
                         return [
                             'id'              => $page->id,
                             'keyword'         => $page->keyword,
@@ -110,8 +106,9 @@ class PageController extends Controller
      *         required=true,
      *         @OA\Schema(type="string")
      *     ),
-     *     @OA\Header(
-     *         header="locale",
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
      *         description="Language locale code (e.g., az, en, ru)",
      *         required=false,
      *         @OA\Schema(type="string")
@@ -134,20 +131,10 @@ class PageController extends Controller
      *             )
      *         )
      *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Keyword parameter is required"
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Page not found"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error"
-     *     )
+     *     @OA\Response(response=400, description="Keyword parameter is required"),
+     *     @OA\Response(response=404, description="Page not found"),
+     *     @OA\Response(response=500, description="Internal server error")
      * )
-     * Get page by keyword
      */
     public function findByKeyword(Request $request, $keyword): JsonResponse
     {
@@ -199,7 +186,7 @@ class PageController extends Controller
             ]);
 
         } catch (\Throwable $e) {
-            report($e); // Optional: logs the error
+            report($e);
             return response()->json([
                 'success' => false,
                 'message' => 'Error retrieving page.',

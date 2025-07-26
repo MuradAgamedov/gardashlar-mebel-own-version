@@ -21,6 +21,13 @@ class LanguageController extends Controller
      *     tags={"Languages"},
      *     summary="Get all active languages",
      *     description="Returns a list of active languages ordered by 'order' field",
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language locale code (e.g., az, en, ru)",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful response",
@@ -56,9 +63,9 @@ class LanguageController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            // Set locale from header
+            // Set locale from header (if needed)
             $this->setLocaleFromHeader($request);
-            
+
             $languages = Cache::rememberForever('api_languages', function () {
                 return Language::where('status', true)
                     ->orderBy('order')
