@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8000",
+            "url": "https://admin.gardaslar.coder.az",
             "description": "Əsas server"
         }
     ],

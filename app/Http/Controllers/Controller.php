@@ -15,7 +15,7 @@ use OpenApi\Annotations as OA;
  * )
  *
  * @OA\Server(
- *     url=https://admin.gardaslar.coder.az,
+ *     url="https://admin.gardaslar.coder.az",
  *     description="Əsas server"
  * )
  */
