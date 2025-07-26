@@ -23,17 +23,6 @@
                 "summary": "Get all active languages",
                 "description": "Returns a list of active languages ordered by 'order' field",
                 "operationId": "getLanguages",
-                "parameters": [
-                    {
-                        "name": "locale",
-                        "in": "header",
-                        "description": "Language locale code (e.g., az, en, ru)",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Successful response",
