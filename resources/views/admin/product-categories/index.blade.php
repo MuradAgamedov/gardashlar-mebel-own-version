@@ -126,7 +126,6 @@
                                                 @else
                                                     <span class="badge bg-secondary">Inactive</span>
                                                 @endif
-                                                <span class="badge bg-info">{{ $mainCategory->order }}</span>
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.product-categories.edit', $mainCategory) }}" 
                                                        class="btn btn-sm btn-warning" 
