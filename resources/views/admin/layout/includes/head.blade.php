@@ -48,3 +48,8 @@
 <link rel="stylesheet" href="{{ asset('admin/assets/css/style.css') }}"/>
 
 @stack('styles')
+<style>
+    button {
+        display: flex;
+    }
+</style>

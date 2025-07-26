@@ -48,11 +48,9 @@
                             <div class="d-flex gap-2">
                                 <button type="button" id="delete-selected-btn" class="btn btn-danger" style="display: none;">
                                     <i class="material-icons-outlined">delete</i>
-                                    Delete Selected
                                 </button>
                                 <a href="{{ route('admin.product-categories.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
-                                    Add Category
                                 </a>
                             </div>
                         </div>
