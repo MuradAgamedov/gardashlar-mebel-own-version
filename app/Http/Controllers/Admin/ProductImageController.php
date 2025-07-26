@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ProductImage;
 use App\Models\Product;
+use App\Models\ProductColor;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 
@@ -20,11 +21,23 @@ class ProductImageController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Product $product)
+    public function index(Product $product, Request $request)
     {
-        $images = $product->images()->ordered()->get();
+        $query = $product->images()->with('color');
         
-        return view('admin.product-images.index', compact('product', 'images'));
+        // Filter by color
+        if ($request->has('color_id') && $request->color_id !== '') {
+            if ($request->color_id === 'no-color') {
+                $query->whereNull('product_color_id');
+            } else {
+                $query->where('product_color_id', $request->color_id);
+            }
+        }
+        
+        $images = $query->ordered()->get();
+        $colors = \App\Models\ProductColor::all();
+        
+        return view('admin.product-images.index', compact('product', 'images', 'colors'));
     }
 
     /**
@@ -32,7 +45,8 @@ class ProductImageController extends Controller
      */
     public function create(Product $product)
     {
-        return view('admin.product-images.create', compact('product'));
+        $colors = ProductColor::all();
+        return view('admin.product-images.create', compact('product', 'colors'));
     }
 
     /**
@@ -42,7 +56,8 @@ class ProductImageController extends Controller
     {
         $request->validate([
             'images' => 'required|array',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'product_color_id' => 'nullable|exists:product_colors,id'
         ]);
 
         try {
@@ -51,6 +66,7 @@ class ProductImageController extends Controller
                 
                 ProductImage::create([
                     'product_id' => $product->id,
+                    'product_color_id' => $request->input('product_color_id'),
                     'image' => $imagePath,
                     'status' => true
                 ]);
@@ -77,7 +93,8 @@ class ProductImageController extends Controller
      */
     public function edit(Product $product, ProductImage $image)
     {
-        return view('admin.product-images.edit', compact('product', 'image'));
+        $colors = ProductColor::all();
+        return view('admin.product-images.edit', compact('product', 'image', 'colors'));
     }
 
     /**
@@ -87,12 +104,14 @@ class ProductImageController extends Controller
     {
         $request->validate([
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'status' => 'boolean'
+            'status' => 'boolean',
+            'product_color_id' => 'nullable|exists:product_colors,id'
         ]);
 
         try {
             $data = [
-                'status' => $request->boolean('status', true)
+                'status' => $request->boolean('status', true),
+                'product_color_id' => $request->input('product_color_id')
             ];
 
             // Update image if new one is uploaded

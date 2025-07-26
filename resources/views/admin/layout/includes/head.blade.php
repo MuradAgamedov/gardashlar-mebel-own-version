@@ -45,3 +45,5 @@
 <!-- App Main CSS -->
 <link id="color" rel="stylesheet" href="{{ asset('admin/assets/css/color-1.css') }}" media="screen"/>
 <link rel="stylesheet" href="{{ asset('admin/assets/css/style.css') }}"/>
+
+@stack('styles')

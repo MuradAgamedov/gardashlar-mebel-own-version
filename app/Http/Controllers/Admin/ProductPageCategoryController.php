@@ -51,14 +51,12 @@ class ProductPageCategoryController extends Controller
     {
         $request->validate([
             'product_category_id' => 'required|exists:product_categories,id|unique:product_page_categories,product_category_id',
-            'order' => 'nullable|integer|min:0',
             'status' => 'boolean'
         ]);
 
         try {
             ProductPageCategory::create([
                 'product_category_id' => $request->input('product_category_id'),
-                'order' => $request->input('order'),
                 'status' => $request->boolean('status', true)
             ]);
 
@@ -105,14 +103,12 @@ class ProductPageCategoryController extends Controller
     {
         $request->validate([
             'product_category_id' => 'required|exists:product_categories,id|unique:product_page_categories,product_category_id,' . $productPageCategory->id,
-            'order' => 'nullable|integer|min:0',
             'status' => 'boolean'
         ]);
 
         try {
             $productPageCategory->update([
                 'product_category_id' => $request->input('product_category_id'),
-                'order' => $request->input('order'),
                 'status' => $request->boolean('status', true)
             ]);
 

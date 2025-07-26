@@ -88,20 +88,6 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                
-                                <div class="col-md-6">
-                                    <label class="form-label">Order</label>
-                                    <input type="number" 
-                                           class="form-control @error('order') is-invalid @enderror" 
-                                           name="order" 
-                                           value="{{ old('order') }}"
-                                           min="0"
-                                           placeholder="Automatic ordering">
-                                    <small class="form-text text-muted">Leave empty for automatic ordering</small>
-                                    @error('order')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
                             </div>
 
                             <!-- Status -->

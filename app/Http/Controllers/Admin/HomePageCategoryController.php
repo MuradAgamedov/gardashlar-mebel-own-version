@@ -51,14 +51,12 @@ class HomePageCategoryController extends Controller
     {
         $request->validate([
             'product_category_id' => 'required|exists:product_categories,id|unique:home_page_categories,product_category_id',
-            'order' => 'nullable|integer|min:0',
             'status' => 'boolean'
         ]);
 
         try {
             HomePageCategory::create([
                 'product_category_id' => $request->input('product_category_id'),
-                'order' => $request->input('order'),
                 'status' => $request->boolean('status', true)
             ]);
 
@@ -105,14 +103,12 @@ class HomePageCategoryController extends Controller
     {
         $request->validate([
             'product_category_id' => 'required|exists:product_categories,id|unique:home_page_categories,product_category_id,' . $homePageCategory->id,
-            'order' => 'nullable|integer|min:0',
             'status' => 'boolean'
         ]);
 
         try {
             $homePageCategory->update([
                 'product_category_id' => $request->input('product_category_id'),
-                'order' => $request->input('order'),
                 'status' => $request->boolean('status', true)
             ]);
 

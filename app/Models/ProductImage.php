@@ -13,6 +13,7 @@ class ProductImage extends Model
 
     protected $fillable = [
         'product_id',
+        'product_color_id',
         'image',
         'order',
         'is_main',
@@ -80,6 +81,14 @@ class ProductImage extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * Product color relationship
+     */
+    public function color(): BelongsTo
+    {
+        return $this->belongsTo(ProductColor::class, 'product_color_id');
     }
 
     /**

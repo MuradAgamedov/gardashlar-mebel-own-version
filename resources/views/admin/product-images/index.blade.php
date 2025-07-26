@@ -56,6 +56,50 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <!-- Filter Section -->
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-center gap-3">
+                                    <label class="form-label mb-0">Filter by Color:</label>
+                                    <div class="color-filter-container">
+                                        <a href="{{ route('admin.products.images.index', $product) }}" 
+                                           class="color-filter-option {{ !request('color_id') ? 'active' : '' }}"
+                                           title="All Colors">
+                                            <div class="color-filter-circle" style="background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f0f0f0 75%), linear-gradient(-45deg, transparent 75%, #f0f0f0 75%); background-size: 8px 8px; background-position: 0 0, 0 4px, 4px -4px, -4px 0px;">
+                                            </div>
+                                        </a>
+                                        
+                                        <a href="{{ route('admin.products.images.index', $product) }}?color_id=no-color" 
+                                           class="color-filter-option {{ request('color_id') === 'no-color' ? 'active' : '' }}"
+                                           title="No Color">
+                                            <div class="color-filter-circle" style="background: repeating-linear-gradient(45deg, transparent, transparent 2px, #ccc 2px, #ccc 4px);">
+                                            </div>
+                                        </a>
+                                        
+                                        @foreach($colors as $color)
+                                            <a href="{{ route('admin.products.images.index', $product) }}?color_id={{ $color->id }}" 
+                                               class="color-filter-option {{ request('color_id') == $color->id ? 'active' : '' }}"
+                                               title="{{ $color->color_code }}">
+                                                <div class="color-filter-circle" style="background-color: {{ $color->color_code }};"></div>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <small class="text-muted">
+                                    Showing {{ $images->count() }} image(s)
+                                    @if(request('color_id'))
+                                        @if(request('color_id') === 'no-color')
+                                            without color
+                                        @else
+                                            with color: {{ $colors->find(request('color_id'))->color_code ?? '' }}
+                                        @endif
+                                    @endif
+                                </small>
+                            </div>
+                        </div>
+                        
                         @if($images->count() > 0)
                             <div class="row" id="sortable-images">
                                 @foreach($images as $image)
@@ -89,7 +133,7 @@
                                             </div>
                                             
                                             <div class="card-body">
-                                                <div class="d-flex justify-content-between align-items-center">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
                                                     <small class="text-muted">Order: {{ $image->order }}</small>
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input status-toggle" 
@@ -98,6 +142,17 @@
                                                                {{ $image->status ? 'checked' : '' }}>
                                                     </div>
                                                 </div>
+                                                
+                                                @if($image->color)
+                                                    <div class="mb-2">
+                                                        <small class="text-muted">Color:</small>
+                                                        <div class="d-flex align-items-center mt-1">
+                                                            <div class="color-preview me-2" 
+                                                                 style="width: 16px; height: 16px; background-color: {{ $image->color->color_code }}; border-radius: 3px; border: 1px solid #ddd;"></div>
+                                                            <small>{{ $image->color->color_code }}</small>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                                 
                                                 <div class="d-flex gap-1 mt-2">
                                                     @if(!$image->is_main)
@@ -153,6 +208,58 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+.color-filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.color-filter-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #666;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+
+.color-filter-option:hover {
+    background-color: #f8f9fa;
+    color: #333;
+    text-decoration: none;
+}
+
+.color-filter-option.active {
+    background-color: #e3f2fd;
+    border-color: #2196f3;
+    color: #2196f3;
+}
+
+.color-filter-circle {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.color-filter-option.active .color-filter-circle {
+    border-color: #2196f3;
+    box-shadow: 0 0 3px rgba(33, 150, 243, 0.3);
+}
+
+
+</style>
+@endpush
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>

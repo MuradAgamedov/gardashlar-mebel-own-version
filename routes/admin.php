@@ -43,6 +43,8 @@ use App\Http\Controllers\Admin\AddressController;
 use App\Http\Controllers\Admin\EmailController;
 use App\Http\Controllers\Admin\MapController;
 use App\Http\Controllers\Admin\ProjectCategoryController;
+use App\Http\Controllers\Admin\HeroCategoryController;
+use App\Http\Controllers\Admin\HeroProductController;
 use App\Http\Controllers\Admin\ProjectController;
 use App\Http\Controllers\Admin\ProjectVideoController;
 use App\Http\Controllers\Admin\ProjectImageController;
@@ -245,6 +247,15 @@ Route::prefix('')->name('admin.')->group(function () {
         // Project Categories routes
         Route::resource('project-categories', ProjectCategoryController::class);
         Route::post('project-categories/reorder', [ProjectCategoryController::class, 'reorder'])->name('project-categories.reorder');
+        
+        // Hero Categories routes
+        Route::resource('hero-categories', HeroCategoryController::class);
+        Route::post('hero-categories/reorder', [HeroCategoryController::class, 'reorder'])->name('hero-categories.reorder');
+        
+        // Hero Products routes
+        Route::resource('hero-products', HeroProductController::class);
+        Route::post('hero-products/reorder', [HeroProductController::class, 'reorder'])->name('hero-products.reorder');
+        Route::post('hero-products/search-products', [HeroProductController::class, 'searchProducts'])->name('hero-products.search-products');
         
         // Projects routes
         Route::resource('projects', ProjectController::class);

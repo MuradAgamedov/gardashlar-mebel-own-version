@@ -49,7 +49,7 @@
                                         <label class="form-label">Current Image</label>
                                         <div class="mb-3">
                                             <img src="{{ $image->image_url }}" 
-                                                 class="img-fluid rounded" 
+                                                 class="img-fluid rounded current-image" 
                                                  alt="Current Image"
                                                  style="max-height: 300px;">
                                         </div>
@@ -68,6 +68,44 @@
                                             Leave empty to keep current image. Supported formats: JPEG, PNG, JPG, GIF, WEBP. Max size: 2MB.
                                         </div>
                                         @error('image')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    
+                                    <div class="form-group mt-3">
+                                        <label for="product_color_id" class="form-label">
+                                            Product Color
+                                        </label>
+                                        <input type="hidden" 
+                                               name="product_color_id" 
+                                               id="product_color_id" 
+                                               value="{{ old('product_color_id', $image->product_color_id) }}">
+                                        
+                                        <div class="color-selection-container">
+                                            <div class="color-option-circle" 
+                                                 data-value="" 
+                                                 onclick="selectColor('', 'No Color')"
+                                                 title="No Color">
+                                                <div class="color-circle" style="background: repeating-linear-gradient(45deg, transparent, transparent 2px, #ccc 2px, #ccc 4px);">
+                                                    <i class="material-icons-outlined" style="font-size: 16px; color: #999;">close</i>
+                                                </div>
+                                                <small class="color-label">No Color</small>
+                                            </div>
+                                            
+                                            @foreach($colors as $color)
+                                                <div class="color-option-circle" 
+                                                     data-value="{{ $color->id }}" 
+                                                     onclick="selectColor('{{ $color->id }}', '{{ $color->color_code }}')"
+                                                     title="{{ $color->color_code }}">
+                                                    <div class="color-circle" style="background-color: {{ $color->color_code }};"></div>
+                                                    <small class="color-label">{{ $color->color_code }}</small>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        <div class="form-text">
+                                            Select a color to associate with this image (optional).
+                                        </div>
+                                        @error('product_color_id')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -104,4 +142,115 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection
+
+@push('scripts')
+<script>
+function selectColor(value, text) {
+    document.getElementById('product_color_id').value = value;
+    
+    // Update visual selection
+    document.querySelectorAll('.color-option-circle').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    const selectedOption = document.querySelector(`[data-value="${value}"]`);
+    if (selectedOption) {
+        selectedOption.classList.add('selected');
+    }
+}
+
+// Initialize selected color on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const selectedValue = document.getElementById('product_color_id').value;
+    if (selectedValue) {
+        const selectedOption = document.querySelector(`[data-value="${selectedValue}"]`);
+        if (selectedOption) {
+            selectedOption.classList.add('selected');
+        }
+    }
+    
+    // Handle image preview when new image is selected
+    const imageInput = document.getElementById('image');
+    const currentImage = document.querySelector('.current-image');
+    
+    imageInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentImage.src = e.target.result;
+                currentImage.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+});
+</script>
+@endpush
+
+@push('styles')
+<style>
+.color-selection-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.color-option-circle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    min-width: 60px;
+}
+
+.color-option-circle:hover {
+    background-color: #e9ecef;
+}
+
+.color-option-circle.selected {
+    background-color: #d1ecf1;
+    border-color: #17a2b8;
+}
+
+.color-circle {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.color-option-circle.selected .color-circle {
+    border-color: #17a2b8;
+    box-shadow: 0 0 5px rgba(23, 162, 184, 0.5);
+}
+
+.color-label {
+    font-size: 10px;
+    text-align: center;
+    color: #555;
+    max-width: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.color-option-circle.selected .color-label {
+    color: #17a2b8;
+    font-weight: bold;
+}
+</style>
+@endpush 
