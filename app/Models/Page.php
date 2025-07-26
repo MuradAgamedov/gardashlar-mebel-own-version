@@ -9,7 +9,8 @@ class Page extends Model
 {
     protected $fillable = [
         'status',
-        'order'
+        'order',
+        'keyword'
     ];
 
     protected $casts = [
