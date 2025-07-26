@@ -58,12 +58,15 @@ class ProductCategoryController extends Controller
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.title' => 'required|string|max:255',
+            'translates.*.slug' => 'required|string|max:255|unique:product_category_translates,slug',
             'translates.*.seo_title' => 'nullable|string|max:255',
             'translates.*.seo_keywords' => 'nullable|string',
             'translates.*.seo_description' => 'nullable|string',
         ], [
             'translates.required' => 'At least one language translation is required.',
             'translates.*.title.required' => 'Title is required for all languages.',
+            'translates.*.slug.required' => 'Slug is required for all languages.',
+            'translates.*.slug.unique' => 'This slug is already taken. Please choose a different one.',
         ]);
 
         try {
@@ -134,8 +137,11 @@ class ProductCategoryController extends Controller
      */
     public function update(Request $request, ProductCategory $productCategory)
     {
-        // Validate the request
-        $request->validate([
+        // Get existing translations to check if slug has changed
+        $existingTranslations = $productCategory->translates->keyBy('language_id');
+        
+        // Build validation rules dynamically
+        $validationRules = [
             'parent_id' => 'nullable|exists:product_categories,id',
             'status' => 'nullable',
             'translates' => 'required|array|min:1',
@@ -144,9 +150,35 @@ class ProductCategoryController extends Controller
             'translates.*.seo_title' => 'nullable|string|max:255',
             'translates.*.seo_keywords' => 'nullable|string',
             'translates.*.seo_description' => 'nullable|string',
-        ], [
+        ];
+
+        // Add unique validation for slug only if it has changed
+        foreach ($request->translates as $index => $translate) {
+            $languageId = $translate['language_id'];
+            $newSlug = trim($translate['slug'] ?? '');
+            
+            // Check if translation exists and if slug has changed
+            if (isset($existingTranslations[$languageId])) {
+                $existingSlug = $existingTranslations[$languageId]->slug;
+                if ($newSlug !== $existingSlug) {
+                    // Slug has changed, add unique validation
+                    $validationRules["translates.{$index}.slug"] = 'required|string|max:255|unique:product_category_translates,slug';
+                } else {
+                    // Slug hasn't changed, no unique validation needed
+                    $validationRules["translates.{$index}.slug"] = 'required|string|max:255';
+                }
+            } else {
+                // New translation, add unique validation
+                $validationRules["translates.{$index}.slug"] = 'required|string|max:255|unique:product_category_translates,slug';
+            }
+        }
+
+        // Validate the request
+        $request->validate($validationRules, [
             'translates.required' => 'At least one language translation is required.',
             'translates.*.title.required' => 'Title is required for all languages.',
+            'translates.*.slug.required' => 'Slug is required for all languages.',
+            'translates.*.slug.unique' => 'This slug is already taken. Please choose a different one.',
         ]);
 
         try {
