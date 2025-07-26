@@ -22,6 +22,8 @@ class PageTranslate extends Model
         'language_id' => 'integer'
     ];
 
+    protected $hidden = ['created_at', 'updated_at', 'page_id', 'language_id', 'status'];
+
     public function page(): BelongsTo
     {
         return $this->belongsTo(Page::class);

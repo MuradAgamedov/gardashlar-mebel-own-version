@@ -18,6 +18,8 @@ class Page extends Model
         'order' => 'integer'
     ];
 
+    protected $hidden = ['created_at', 'updated_at', 'order', 'status', 'keyword'];
+
     protected static function boot()
     {
         parent::boot();

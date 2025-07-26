@@ -33,7 +33,6 @@ class PageController extends Controller
             $page = Cache::rememberForever("api_page_keyword_{$keyword}", function () use ($keyword) {
                 return Page::where('status', true)
                     ->where('keyword', $keyword)
-                    ->with(['translates'])
                     ->first();
             });
 
@@ -45,9 +44,25 @@ class PageController extends Controller
                 ], 404);
             }
 
+            // Get translation for current locale
+            $currentLocale = $this->getLocaleFromHeader($request);
+            $translation = $page->translates()->where('language_id', function($query) use ($currentLocale) {
+                $query->select('id')->from('languages')->where('lang_code', $currentLocale);
+            })->first();
+
+            // Add translated fields to page object
+            $pageData = $page->toArray();
+            if ($translation) {
+                $pageData['title'] = $translation->title;
+                $pageData['slug'] = $translation->slug;
+                $pageData['content'] = $translation->content;
+                $pageData['meta_title'] = $translation->meta_title;
+                $pageData['meta_description'] = $translation->meta_description;
+            }
+
             return response()->json([
                 'success' => true,
-                'data' => $page
+                'data' => $pageData
             ], 200);
 
         } catch (\Exception $e) {
