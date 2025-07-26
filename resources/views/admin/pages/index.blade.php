@@ -63,7 +63,6 @@
                                             <th scope="col">ID</th>
                                             <th scope="col">Title</th>
                                             <th scope="col">Slug</th>
-                                            <th scope="col">Order</th>
                                             <th scope="col">Status</th>
                                             <th scope="col">Actions</th>
                                         </tr>
@@ -97,7 +96,6 @@
                                                 @endif
                                             </td>
                                         
-                                            <td>{{ $page->order }}</td>
                                             <td>
                                                 @if($page->status)
                                                     <span class="badge badge-light-success">Active</span>
