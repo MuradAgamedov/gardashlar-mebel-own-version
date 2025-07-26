@@ -63,7 +63,6 @@
                                             <th scope="col">ID</th>
                                             <th scope="col">Title</th>
                                             <th scope="col">Slug</th>
-                                            <th scope="col">Languages</th>
                                             <th scope="col">Order</th>
                                             <th scope="col">Status</th>
                                             <th scope="col">Actions</th>
@@ -97,11 +96,7 @@
                                                     <span class="text-muted">No slug</span>
                                                 @endif
                                             </td>
-                                            <td>
-                                                @foreach($page->translates as $translate)
-                                                    <span class="badge badge-light-info me-1">{{ $translate->language->lang_code }}</span>
-                                                @endforeach
-                                            </td>
+                                        
                                             <td>{{ $page->order }}</td>
                                             <td>
                                                 @if($page->status)
