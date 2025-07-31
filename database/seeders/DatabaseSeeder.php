@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             LanguageSeeder::class,
             ProductSeeder::class,
+            ProductColorSeeder::class,
         ]);
     }
 }
