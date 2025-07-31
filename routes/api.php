@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\HomePageCategoryController;
 use App\Http\Controllers\Api\ProductTypeController;
+use App\Http\Controllers\Api\ProductTypeProductController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -19,3 +20,6 @@ Route::get('/homepage-categories', [HomePageCategoryController::class, 'index'])
 
 // ProductType API Routes
 Route::get('/product-types', [ProductTypeController::class, 'index'])->name('api.product-types.index');
+
+// ProductType Products API Routes
+Route::get('/product-types/{productTypeId}/products', [ProductTypeProductController::class, 'index'])->name('api.product-type-products.index');
