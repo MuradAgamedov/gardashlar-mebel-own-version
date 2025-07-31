@@ -137,11 +137,8 @@ class ProductTypeProductController extends Controller
                 ])
                 ->orderBy('order')
                 ->get()
-                ->map(function ($product) use ($productTypeId, $languageId) {
+                ->map(function ($product) use ($languageId) {
                     $translation = $product->translates->first();
-                    $homePageEntry = $product->homePageTypeProducts()
-                        ->where('product_type_id', $productTypeId)
-                        ->first();
                     
                     return [
                         'id' => $product->id,
