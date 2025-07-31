@@ -82,7 +82,7 @@
                                 Page {{ $productColors->currentPage() }} of {{ $productColors->lastPage() }}
                             </div>
                             <button id="delete-selected-colors" class="btn btn-danger btn-sm ms-3" disabled>
-                                <i class="material-icons-outlined">delete</i> Seçilənləri sil
+                                <i class="material-icons-outlined">delete</i> 
                             </button>
                         </div>
                         <div class="table-responsive">
