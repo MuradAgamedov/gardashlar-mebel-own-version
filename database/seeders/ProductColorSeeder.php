@@ -89,7 +89,6 @@ class ProductColorSeeder extends Seeder
         
         foreach ($colors as $index => $color) {
             $productColor = ProductColor::create([
-                'order' => $index + 1,
                 'status' => true
             ]);
             
