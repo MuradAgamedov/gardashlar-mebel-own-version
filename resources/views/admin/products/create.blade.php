@@ -668,9 +668,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function showTypesDropdown() {
+        const searchTerm = typesInput.value.toLowerCase();
         const filteredTypes = availableTypes.filter(type => 
             !selectedTypeIds.includes(type.id) &&
-            type.title.toLowerCase().includes(typesInput.value.toLowerCase())
+            type.title.toLowerCase().includes(searchTerm)
         );
         
         if (filteredTypes.length > 0) {
@@ -759,9 +760,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function showCategoriesDropdown() {
+        const searchTerm = categoriesInput.value.toLowerCase();
         const filteredCategories = availableCategories.filter(category => 
             !selectedCategoryIds.includes(category.id) &&
-            category.title.toLowerCase().includes(categoriesInput.value.toLowerCase())
+            category.title.toLowerCase().includes(searchTerm)
         );
         
         if (filteredCategories.length > 0) {
