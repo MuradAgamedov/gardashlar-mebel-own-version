@@ -82,7 +82,6 @@
                                         <th>Title</th>
                                         <th>Languages</th>
                                         <th>Status</th>
-                                        <th>Order</th>
                                         <th width="150">Actions</th>
                                     </tr>
                                 </thead>
@@ -125,9 +124,6 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <span class="badge badge-light-info">{{ $type->order }}</span>
-                                            </td>
-                                            <td>
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.product-types.edit', $type) }}" 
                                                        class="btn btn-sm btn-outline-primary" 
@@ -156,7 +152,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center py-4">
+                                            <td colspan="5" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">inbox</i>
                                                     <p class="mt-2">No product types found</p>
