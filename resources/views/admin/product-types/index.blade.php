@@ -47,10 +47,9 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Product Types</h5>
-                            <a href="{{ route('admin.product-types.create') }}" class="btn btn-primary">
+                            {{-- <a href="{{ route('admin.product-types.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Type
-                            </a>
+                            </a> --}}
                         </div>
                     </div>
                     <div class="card-body">
@@ -114,7 +113,7 @@
                                                        title="Edit">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
-                                                    <a href="{{ route('admin.product-types.show', $type) }}" 
+                                                    {{-- <a href="{{ route('admin.product-types.show', $type) }}" 
                                                        class="btn btn-sm btn-outline-info" 
                                                        title="View">
                                                         <i class="material-icons-outlined">visibility</i>
@@ -130,7 +129,7 @@
                                                                 title="Delete">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
-                                                    </form>
+                                                    </form> --}}
                                                 </div>
                                             </td>
                                         </tr>
@@ -140,10 +139,10 @@
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">inbox</i>
                                                     <p class="mt-2">No product types found</p>
-                                                    <a href="{{ route('admin.product-types.create') }}" class="btn btn-primary">
+                                                    {{-- <a href="{{ route('admin.product-types.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                         Add First Type
-                                                    </a>
+                                                    </a> --}}
                                                 </div>
                                             </td>
                                         </tr>
