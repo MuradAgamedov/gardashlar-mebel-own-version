@@ -122,17 +122,26 @@
                             <div class="row mb-3">
                                 <div class="col-12">
                                     <label class="form-label">Product Tags</label>
-                                    <select class="form-select select2 @error('product_tags') is-invalid @enderror" 
-                                            name="product_tags[]" 
-                                            multiple>
-                                        @foreach($tags as $tag)
-                                            <option value="{{ $tag->id }}" 
-                                                    {{ in_array($tag->id, old('product_tags', $product->tags->pluck('id')->toArray())) ? 'selected' : '' }}>
-                                                {{ $tag->translate()->title ?? 'No title' }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <small class="form-text text-muted">Select multiple tags</small>
+                                    <div class="custom-tags-container">
+                                        <div class="tags-input-wrapper">
+                                            <div class="selected-tags" id="selectedTags">
+                                                <!-- Selected tags will appear here -->
+                                            </div>
+                                            <input type="text" 
+                                                   class="form-control tags-input" 
+                                                   id="tagsInput" 
+                                                   placeholder="Type to search tags..."
+                                                   autocomplete="off">
+                                            <div class="tags-dropdown" id="tagsDropdown" style="display: none;">
+                                                <!-- Tags will be loaded here -->
+                                            </div>
+                                        </div>
+                                        <input type="hidden" 
+                                               name="product_tags" 
+                                               id="tagsHiddenInput" 
+                                               value="{{ old('product_tags', json_encode($product->tags->pluck('id')->toArray())) }}">
+                                    </div>
+                                    <small class="form-text text-muted">Click on tags to select/deselect</small>
                                     @error('product_tags')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -394,31 +403,191 @@
     margin: 2px;
 }
 
-/* Fix Select2 dropdown z-index */
-.select2-container--open {
-    z-index: 9999 !important;
+/* Custom Tags Styling */
+.custom-tags-container {
+    position: relative;
 }
 
-.select2-dropdown {
-    z-index: 9999 !important;
+.tags-input-wrapper {
+    position: relative;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    background: white;
+    min-height: 38px;
+    padding: 5px;
 }
 
-.select2-results__options {
-    z-index: 9999 !important;
+.selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 5px;
+}
+
+.tag-item {
+    background: #007bff;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.tag-item:hover {
+    background: #0056b3;
+}
+
+.tag-remove {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 5px;
+}
+
+.tags-input {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    min-height: auto;
+}
+
+.tags-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ced4da;
+    border-top: none;
+    border-radius: 0 0 0.375rem 0.375rem;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tag-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.tag-option:hover {
+    background: #f8f9fa;
+}
+
+.tag-option.selected {
+    background: #e3f2fd;
+    color: #1976d2;
 }
 </style>
 @endpush
 
 @push('scripts')
-
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Select2
-    $('.select2').select2({
-        placeholder: 'Select tags...',
-        allowClear: true,
-        width: '100%'
+    // Custom Tags Functionality
+    const tagsInput = document.getElementById('tagsInput');
+    const tagsDropdown = document.getElementById('tagsDropdown');
+    const selectedTags = document.getElementById('selectedTags');
+    const tagsHiddenInput = document.getElementById('tagsHiddenInput');
+    
+    // Available tags data
+    const availableTags = [
+        @foreach($tags as $tag)
+        {
+            id: {{ $tag->id }},
+            title: "{{ $tag->translate()->title ?? 'No title' }}"
+        },
+        @endforeach
+    ];
+    
+    let selectedTagIds = [];
+    
+    // Load old values if any
+    try {
+        const oldValues = JSON.parse(tagsHiddenInput.value);
+        if (Array.isArray(oldValues)) {
+            selectedTagIds = oldValues;
+            renderSelectedTags();
+        }
+    } catch (e) {
+        selectedTagIds = [];
+    }
+    
+    function renderSelectedTags() {
+        selectedTags.innerHTML = '';
+        selectedTagIds.forEach(tagId => {
+            const tag = availableTags.find(t => t.id === tagId);
+            if (tag) {
+                const tagElement = document.createElement('div');
+                tagElement.className = 'tag-item';
+                tagElement.innerHTML = `
+                    ${tag.title}
+                    <button type="button" class="tag-remove" onclick="removeTag(${tagId})">×</button>
+                `;
+                selectedTags.appendChild(tagElement);
+            }
+        });
+        updateHiddenInput();
+    }
+    
+    function removeTag(tagId) {
+        selectedTagIds = selectedTagIds.filter(id => id !== tagId);
+        renderSelectedTags();
+    }
+    
+    function updateHiddenInput() {
+        tagsHiddenInput.value = JSON.stringify(selectedTagIds);
+    }
+    
+    function showDropdown() {
+        const filteredTags = availableTags.filter(tag => 
+            !selectedTagIds.includes(tag.id) &&
+            tag.title.toLowerCase().includes(tagsInput.value.toLowerCase())
+        );
+        
+        if (filteredTags.length > 0) {
+            tagsDropdown.innerHTML = '';
+            filteredTags.forEach(tag => {
+                const option = document.createElement('div');
+                option.className = 'tag-option';
+                option.textContent = tag.title;
+                option.onclick = () => {
+                    selectedTagIds.push(tag.id);
+                    renderSelectedTags();
+                    tagsInput.value = '';
+                    hideDropdown();
+                };
+                tagsDropdown.appendChild(option);
+            });
+            tagsDropdown.style.display = 'block';
+        } else {
+            hideDropdown();
+        }
+    }
+    
+    function hideDropdown() {
+        tagsDropdown.style.display = 'none';
+    }
+    
+    // Event listeners
+    tagsInput.addEventListener('input', showDropdown);
+    tagsInput.addEventListener('focus', showDropdown);
+    
+    document.addEventListener('click', function(e) {
+        if (!tagsInput.contains(e.target) && !tagsDropdown.contains(e.target)) {
+            hideDropdown();
+        }
     });
     
     // Auto-switch tabs on validation errors
@@ -447,6 +616,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Scroll to the error field
         firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+    
+    // Make removeTag function global
+    window.removeTag = removeTag;
 });
 </script>
 @include('admin.partials.slug-generator')
