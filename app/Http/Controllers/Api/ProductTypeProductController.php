@@ -61,7 +61,16 @@ class ProductTypeProductController extends Controller
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="title", type="string", example="Product Name"),
      *                     @OA\Property(property="description", type="string", example="Product description"),
-     *                     @OA\Property(property="slug", type="string", example="product-name")
+     *                     @OA\Property(property="slug", type="string", example="product-name"),
+     *                     @OA\Property(
+     *                         property="types",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=2),
+     *                             @OA\Property(property="title", type="string", example="Ümumi")
+     *                         )
+     *                     )
      *                 )
      *             )
      *         )
@@ -118,9 +127,14 @@ class ProductTypeProductController extends Controller
                     });
                 }
                 
-                return $query->with(['translates' => function($q) use ($languageId) {
-                    $q->where('language_id', $languageId);
-                }])
+                return $query->with([
+                    'translates' => function($q) use ($languageId) {
+                        $q->where('language_id', $languageId);
+                    },
+                    'types.translates' => function($q) use ($languageId) {
+                        $q->where('language_id', $languageId);
+                    }
+                ])
                 ->orderBy('order')
                 ->get()
                 ->map(function ($product) use ($productTypeId, $languageId) {
@@ -134,6 +148,13 @@ class ProductTypeProductController extends Controller
                         'title' => $translation ? $translation->title : 'No title',
                         'description' => $translation ? $translation->description : null,
                         'slug' => $translation ? $translation->slug : null,
+                        'types' => $product->types->map(function($type) {
+                            $typeTranslation = $type->translates->first();
+                            return [
+                                'id' => $type->id,
+                                'title' => $typeTranslation ? $typeTranslation->title : 'No title'
+                            ];
+                        })
                     ];
                 });
             });
