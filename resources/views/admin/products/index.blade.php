@@ -62,7 +62,6 @@
                                         <th>Views</th>
                                         <th>Discount</th>
                                         <th>Status</th>
-                                        <th>Order</th>
                                         <th width="150">Actions</th>
                                     </tr>
                                 </thead>
@@ -137,12 +136,7 @@
                                                     <span class="badge badge-light-danger">Inactive</span>
                                                 @endif
                                             </td>
-                                            <td>
-                                                <span class="badge badge-light-info">
-                                                    <i class="material-icons-outlined" style="font-size: 12px;">sort</i>
-                                                    {{ $product->order }}
-                                                </span>
-                                            </td>
+                                          
                                             <td>
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.products.accordions.index', $product) }}" 
