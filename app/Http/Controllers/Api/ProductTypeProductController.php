@@ -20,20 +20,20 @@ class ProductTypeProductController extends Controller
      * @OA\Get(
      *     path="/api/product-types/{productTypeId}/products",
      *     operationId="getProductsByType",
-     *     tags={"Product Type Products"},
-     *     summary="Get products for a specific product type",
-     *     description="Returns products that belong to a specific product type, with homepage status",
+     *     tags={"Məhsul Növləri"},
+     *     summary="Müəyyən məhsul növü üçün məhsulları əldə et",
+     *     description="Müəyyən məhsul növünə aid olan məhsulları qaytarır, ana səhifə statusu ilə",
      *     @OA\Parameter(
      *         name="productTypeId",
      *         in="path",
-     *         description="The ID of the product type",
+     *         description="Məhsul növünün ID-si",
      *         required=true,
      *         @OA\Schema(type="integer", example=2)
      *     ),
      *     @OA\Parameter(
      *         name="locale",
      *         in="header",
-     *         description="Language_id from languages api",
+     *         description="Dil ID-si (languages API-dən)",
      *         required=false,
      *         @OA\Schema(
      *             type="integer",
@@ -43,13 +43,13 @@ class ProductTypeProductController extends Controller
      *     @OA\Parameter(
      *         name="homepage_only",
      *         in="query",
-     *         description="Return only products that are on homepage for this type",
+     *         description="Yalnız bu növ üçün ana səhifədə olan məhsulları qaytar",
      *         required=false,
      *         @OA\Schema(type="boolean", example=true)
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Successful response",
+     *         description="Uğurlu cavab",
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=true),
@@ -58,18 +58,19 @@ class ProductTypeProductController extends Controller
      *                 type="array",
      *                 @OA\Items(
      *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="title", type="string", example="Product Name"),
-     *                     @OA\Property(property="description", type="string", example="Product description"),
-     *                     @OA\Property(property="slug", type="string", example="product-name"),
-     *                     @OA\Property(property="main_image", type="string", nullable=true, example="https://example.com/uploads/products/image.jpg"),
+     *                     @OA\Property(property="id", type="integer", example=1, description="Məhsul ID-si"),
+     *                     @OA\Property(property="title", type="string", example="Məhsul Adı", description="Məhsulun başlığı"),
+     *                     @OA\Property(property="description", type="string", example="Məhsul təsviri", description="Məhsulun təsviri"),
+     *                     @OA\Property(property="slug", type="string", example="mehsul-adi", description="Məhsulun slug-u"),
+     *                     @OA\Property(property="main_image", type="string", nullable=true, example="https://admin.gardaslar.coder.az/uploads/products/image.jpg", description="Əsas şəklin URL-i"),
      *                     @OA\Property(
      *                         property="types",
      *                         type="array",
+     *                         description="Məhsul növləri",
      *                         @OA\Items(
      *                             type="object",
-     *                             @OA\Property(property="id", type="integer", example=2),
-     *                             @OA\Property(property="title", type="string", example="Ümumi")
+     *                             @OA\Property(property="id", type="integer", example=2, description="Növ ID-si"),
+     *                             @OA\Property(property="title", type="string", example="Ümumi", description="Növün adı")
      *                         )
      *                     )
      *                 )
@@ -78,20 +79,20 @@ class ProductTypeProductController extends Controller
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Product type not found",
+     *         description="Məhsul növü tapılmadı",
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Product type not found")
+     *             @OA\Property(property="message", type="string", example="Məhsul növü tapılmadı")
      *         )
      *     ),
      *     @OA\Response(
      *         response=500,
-     *         description="Internal server error",
+     *         description="Server xətası",
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving products")
+     *             @OA\Property(property="message", type="string", example="Məhsulları əldə etməkdə xəta baş verdi")
      *         )
      *     )
      * )
