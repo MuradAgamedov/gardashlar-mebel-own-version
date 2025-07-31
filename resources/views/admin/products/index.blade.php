@@ -188,7 +188,8 @@
                         
                         @if($products->hasPages())
                             <div class="d-flex justify-content-center mt-4">
-                            {{ $products->links('pagination::bootstrap-5') }}
+                            {{ $products->links('pagination::tailwind') }}
+
                             </div>
                         @endif
                     </div>
