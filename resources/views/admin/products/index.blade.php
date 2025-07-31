@@ -237,7 +237,7 @@
                                                        title="Images">
                                                         <i class="material-icons-outlined">image</i>
                                                     </a>
-                                                    <a href="{{ route('admin.products.edit', $product) }}" 
+                                                    <a href="{{ route('admin.products.edit', $product) }}?page={{ request('page', 1) }}" 
                                                        class="btn btn-sm btn-outline-primary" 
                                                        title="Edit">
                                                         <i class="material-icons-outlined">edit</i>

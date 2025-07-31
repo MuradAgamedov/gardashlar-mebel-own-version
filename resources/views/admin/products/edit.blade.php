@@ -58,6 +58,7 @@
                         <form action="{{ route('admin.products.update', $product) }}" method="POST">
                             @csrf
                             @method('PUT')
+                            <input type="hidden" name="current_page" value="{{ request('page', 1) }}">
                             
                             <!-- Basic Information -->
                             <div class="row mb-3">

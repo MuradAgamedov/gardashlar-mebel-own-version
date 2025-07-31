@@ -257,7 +257,7 @@ class ProductController extends Controller
                 $product->tags()->detach();
             }
 
-            return redirect()->route('admin.products.index')
+            return redirect()->route('admin.products.index', ['page' => $request->input('current_page', 1)])
                 ->with('success', 'Product updated successfully.');
 
         } catch (\Exception $e) {
