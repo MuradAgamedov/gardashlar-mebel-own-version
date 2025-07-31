@@ -91,10 +91,10 @@
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
                                 <div class="d-flex gap-2 w-100">
-                                    <button type="submit" class="btn btn-primary flex-fill">
+                                    <button type="submit" class="btn btn-primary btn-sm">
                                         <i class="material-icons-outlined">search</i>
                                     </button>
-                                    <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
+                                    <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary btn-sm">
                                         <i class="material-icons-outlined">clear</i>
                                     </a>
                                 </div>
