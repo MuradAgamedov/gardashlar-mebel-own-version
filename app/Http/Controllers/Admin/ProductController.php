@@ -125,11 +125,17 @@ class ProductController extends Controller
                 }
             }
 
-            // Attach types
+            // Attach types - if no types selected, automatically assign the first type
             if ($request->has('product_types') && !empty($request->input('product_types'))) {
                 $types = json_decode($request->input('product_types'), true);
                 if (is_array($types)) {
                     $product->types()->attach($types);
+                }
+            } else {
+                // If no types selected, automatically assign the first available type
+                $firstType = ProductType::active()->ordered()->first();
+                if ($firstType) {
+                    $product->types()->attach([$firstType->id]);
                 }
             }
 
