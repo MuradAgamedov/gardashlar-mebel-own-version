@@ -33,7 +33,7 @@ class ProductColorSeeder extends Seeder
             '#FFA500', '#FF8C00', '#FF6347', '#FF7F50', '#FF69B4',
             
             // Pink variations
-            '#FFC0CB', '#FF1493', '#FFB6C1', '#FFC0CB', '#FF69B4',
+            '#FFC0CB', '#FF1493', '#FFB6C1', '#FF69B4', '#FF1493',
             
             // Brown variations
             '#A52A2A', '#8B4513', '#D2691E', '#CD853F', '#DEB887',
@@ -45,12 +45,19 @@ class ProductColorSeeder extends Seeder
             '#FFFFFF', '#F5F5F5', '#F0F8FF', '#F0FFF0', '#FFFACD'
         ];
         
-        foreach ($colors as $colorCode) {
-            ProductColor::create([
-                'color_code' => $colorCode
-            ]);
+        // Remove duplicates and create only unique colors
+        $uniqueColors = array_unique($colors);
+        
+        foreach ($uniqueColors as $colorCode) {
+            // Check if color already exists to avoid duplicates
+            if (!ProductColor::where('color_code', $colorCode)->exists()) {
+                ProductColor::create([
+                    'color_code' => $colorCode
+                ]);
+            }
         }
         
-        $this->command->info('50 product colors created successfully!');
+        $createdCount = count($uniqueColors);
+        $this->command->info("{$createdCount} unique product colors processed successfully!");
     }
 }
