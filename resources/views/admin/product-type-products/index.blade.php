@@ -164,7 +164,7 @@
                                             <td>
                                                 <div class="d-flex gap-2">
                                                     <button type="button" 
-                                                            class="btn btn-sm {{ in_array($product->id, $homePageProductIds) ? 'btn-success' : 'btn-outline-success' }}"
+                                                            class="btn btn-sm btn-icon {{ in_array($product->id, $homePageProductIds) ? 'btn-success' : 'btn-outline-success' }}"
                                                             onclick="toggleHomePage({{ $product->id }})"
                                                             title="{{ in_array($product->id, $homePageProductIds) ? 'Remove from homepage' : 'Add to homepage' }}">
                                                         <i class="material-icons-outlined">
@@ -172,7 +172,7 @@
                                                         </i>
                                                     </button>
                                                     <a href="{{ route('admin.products.edit', $product) }}" 
-                                                       class="btn btn-sm btn-outline-primary" 
+                                                       class="btn btn-sm btn-icon btn-outline-primary" 
                                                        title="Edit Product">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
@@ -218,6 +218,24 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+.btn-icon i {
+    font-size: 16px;
+}
+</style>
+@endpush
 
 @push('scripts')
 <script>
