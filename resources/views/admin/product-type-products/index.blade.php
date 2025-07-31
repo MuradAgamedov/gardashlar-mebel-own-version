@@ -222,17 +222,19 @@
 @push('styles')
 <style>
 .btn-icon {
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 4px !important;
 }
 
 .btn-icon i {
-    font-size: 16px;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    margin: 0 !important;
 }
 </style>
 @endpush
