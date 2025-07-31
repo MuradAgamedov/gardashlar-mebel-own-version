@@ -82,19 +82,19 @@
                                 
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        Product Type <span class="text-danger">*</span>
+                                        Product Types
                                     </label>
-                                    <select class="form-select @error('product_type_id') is-invalid @enderror" 
-                                            name="product_type_id" required>
-                                        <option value="">Select Type</option>
+                                    <select class="form-select @error('product_types') is-invalid @enderror" 
+                                            name="product_types[]" multiple>
                                         @foreach($types as $type)
                                             <option value="{{ $type->id }}" 
-                                                    {{ old('product_type_id', $product->product_type_id) == $type->id ? 'selected' : '' }}>
+                                                    {{ in_array($type->id, old('product_types', $product->types->pluck('id')->toArray())) ? 'selected' : '' }}>
                                                 {{ $type->translate()->title ?? 'No title' }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('product_type_id')
+                                    <small class="form-text text-muted">Hold Ctrl (or Cmd on Mac) to select multiple types</small>
+                                    @error('product_types')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
