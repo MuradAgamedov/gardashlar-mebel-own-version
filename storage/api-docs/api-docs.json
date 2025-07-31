@@ -54,53 +54,14 @@
                                                         "type": "integer",
                                                         "example": 1
                                                     },
-                                                    "order": {
-                                                        "type": "integer",
-                                                        "example": 1
+                                                    "image": {
+                                                        "type": "string",
+                                                        "example": "categories/category1.jpg",
+                                                        "nullable": true
                                                     },
-                                                    "status": {
-                                                        "type": "boolean",
-                                                        "example": true
-                                                    },
-                                                    "product_category": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer",
-                                                                "example": 1
-                                                            },
-                                                            "parent_id": {
-                                                                "type": "integer",
-                                                                "example": null,
-                                                                "nullable": true
-                                                            },
-                                                            "order": {
-                                                                "type": "integer",
-                                                                "example": 1
-                                                            },
-                                                            "status": {
-                                                                "type": "boolean",
-                                                                "example": true
-                                                            },
-                                                            "image": {
-                                                                "type": "string",
-                                                                "example": "categories/category1.jpg",
-                                                                "nullable": true
-                                                            },
-                                                            "title": {
-                                                                "type": "string",
-                                                                "example": "Electronics"
-                                                            },
-                                                            "slug": {
-                                                                "type": "string",
-                                                                "example": "electronics"
-                                                            },
-                                                            "description": {
-                                                                "type": "string",
-                                                                "example": "Electronic products category",
-                                                                "nullable": true
-                                                            }
-                                                        },
-                                                        "type": "object"
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Electronics"
                                                     }
                                                 },
                                                 "type": "object"

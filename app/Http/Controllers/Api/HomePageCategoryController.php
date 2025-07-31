@@ -43,20 +43,8 @@ class HomePageCategoryController extends Controller
      *                 @OA\Items(
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="order", type="integer", example=1),
-     *                     @OA\Property(property="status", type="boolean", example=true),
-     *                     @OA\Property(
-     *                         property="product_category",
-     *                         type="object",
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="parent_id", type="integer", nullable=true, example=null),
-     *                         @OA\Property(property="order", type="integer", example=1),
-     *                         @OA\Property(property="status", type="boolean", example=true),
-     *                         @OA\Property(property="image", type="string", nullable=true, example="categories/category1.jpg"),
-     *                         @OA\Property(property="title", type="string", example="Electronics"),
-     *                         @OA\Property(property="slug", type="string", example="electronics"),
-     *                         @OA\Property(property="description", type="string", nullable=true, example="Electronic products category")
-     *                     )
+     *                     @OA\Property(property="image", type="string", nullable=true, example="categories/category1.jpg"),
+     *                     @OA\Property(property="title", type="string", example="Electronics")
      *                 )
      *             )
      *         )
@@ -88,19 +76,9 @@ class HomePageCategoryController extends Controller
                         $translate = $productCategory->translates->first();
                         
                         return [
-                            'id' => $homePageCategory->id,
-                            'order' => $homePageCategory->order,
-                            'status' => $homePageCategory->status,
-                            'product_category' => [
-                                'id' => $productCategory->id,
-                                'parent_id' => $productCategory->parent_id,
-                                'order' => $productCategory->order,
-                                'status' => $productCategory->status,
-                                'image' => $productCategory->image,
-                                'title' => $translate->title ?? null,
-                                'slug' => $translate->slug ?? null,
-                                'description' => $translate->description ?? null,
-                            ]
+                            'id' => $productCategory->id,
+                            'image' => $productCategory->image,
+                            'title' => $translate->title ?? null,
                         ];
                     });
             });
