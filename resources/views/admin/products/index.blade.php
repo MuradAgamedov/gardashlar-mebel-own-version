@@ -50,7 +50,70 @@
                             </a>
                         </div>
                     </div>
+                    
+                    <!-- Search and Filter Section -->
+                    <div class="card-body border-bottom">
+                        <form method="GET" action="{{ route('admin.products.index') }}" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="search" class="form-label">Search</label>
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       value="{{ request('search') }}" placeholder="Search by title or description...">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="category" class="form-label">Category</label>
+                                <select class="form-select" id="category" name="category">
+                                    <option value="">All Categories</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->translate()->title ?? 'No title' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="type" class="form-label">Type</label>
+                                <select class="form-select" id="type" name="type">
+                                    <option value="">All Types</option>
+                                    @foreach($types as $type)
+                                        <option value="{{ $type->id }}" {{ request('type') == $type->id ? 'selected' : '' }}>
+                                            {{ $type->translate()->title ?? 'No title' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="">All Status</option>
+                                    <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
+                                    <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactive</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <div class="d-flex gap-2 w-100">
+                                    <button type="submit" class="btn btn-primary flex-fill">
+                                        <i class="material-icons-outlined">search</i>
+                                        Search
+                                    </button>
+                                    <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
+                                        <i class="material-icons-outlined">clear</i>
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
                     <div class="card-body">
+                        <!-- Results Summary -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="text-muted">
+                                Showing {{ $products->firstItem() ?? 0 }} to {{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results
+                            </div>
+                            <div class="text-muted">
+                                Page {{ $products->currentPage() }} of {{ $products->lastPage() }}
+                            </div>
+                        </div>
+                        
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
@@ -174,7 +237,12 @@
                                             <td colspan="9" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">inventory_2</i>
-                                                    <p class="mt-2">No products added yet</p>
+                                                    <p class="mt-2">No products found</p>
+                                                    @if(request('search') || request('category') || request('type') || request('status'))
+                                                        <a href="{{ route('admin.products.index') }}" class="btn btn-outline-primary me-2">
+                                                            Clear Filters
+                                                        </a>
+                                                    @endif
                                                     <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
                                                         Add First Product
                                                     </a>
@@ -186,10 +254,58 @@
                             </table>
                         </div>
                         
+                        <!-- Bootstrap Pagination -->
                         @if($products->hasPages())
-                            <div class="d-flex justify-content-center mt-4">
-                            {{ $products->links('pagination::bootstrap-5') }}
-                            </div>
+                            <nav aria-label="Products pagination" class="mt-4">
+                                <ul class="pagination justify-content-center">
+                                    {{-- Previous Page Link --}}
+                                    @if ($products->onFirstPage())
+                                        <li class="page-item disabled">
+                                            <span class="page-link">
+                                                <i class="material-icons-outlined">chevron_left</i>
+                                                Previous
+                                            </span>
+                                        </li>
+                                    @else
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ $products->previousPageUrl() }}" rel="prev">
+                                                <i class="material-icons-outlined">chevron_left</i>
+                                                Previous
+                                            </a>
+                                        </li>
+                                    @endif
+
+                                    {{-- Pagination Elements --}}
+                                    @foreach ($products->getUrlRange(1, $products->lastPage()) as $page => $url)
+                                        @if ($page == $products->currentPage())
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ $page }}</span>
+                                            </li>
+                                        @else
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                            </li>
+                                        @endif
+                                    @endforeach
+
+                                    {{-- Next Page Link --}}
+                                    @if ($products->hasMorePages())
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ $products->nextPageUrl() }}" rel="next">
+                                                Next
+                                                <i class="material-icons-outlined">chevron_right</i>
+                                            </a>
+                                        </li>
+                                    @else
+                                        <li class="page-item disabled">
+                                            <span class="page-link">
+                                                Next
+                                                <i class="material-icons-outlined">chevron_right</i>
+                                            </span>
+                                        </li>
+                                    @endif
+                                </ul>
+                            </nav>
                         @endif
                     </div>
                 </div>

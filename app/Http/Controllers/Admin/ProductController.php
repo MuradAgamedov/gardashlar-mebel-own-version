@@ -17,13 +17,41 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with(['category', 'type', 'translates.language', 'tags'])
-            ->ordered()
-            ->paginate(10);
+        $query = Product::with(['category', 'type', 'translates.language', 'tags']);
         
-        return view('admin.products.index', compact('products'));
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->whereHas('translates', function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+        
+        // Category filter
+        if ($request->filled('category')) {
+            $query->where('product_category_id', $request->input('category'));
+        }
+        
+        // Type filter
+        if ($request->filled('type')) {
+            $query->where('product_type_id', $request->input('type'));
+        }
+        
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+        
+        $products = $query->ordered()->paginate(30);
+        
+        // Get categories and types for filters
+        $categories = ProductCategory::active()->whereNotNull('parent_id')->ordered()->get();
+        $types = ProductType::active()->ordered()->get();
+        
+        return view('admin.products.index', compact('products', 'categories', 'types'));
     }
 
     /**
