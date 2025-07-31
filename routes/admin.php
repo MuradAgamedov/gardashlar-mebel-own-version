@@ -320,6 +320,7 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         Route::resource('products', ProductController::class);
         Route::post('products/reorder', [ProductController::class, 'reorder'])->name('products.reorder');
         Route::post('products/generate-slug', [ProductController::class, 'generateSlug'])->name('products.generate-slug');
+        Route::delete('products/bulk-delete', [ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
 
         // Product Accordion routes
         Route::resource('products.accordions', ProductAccordionController::class);

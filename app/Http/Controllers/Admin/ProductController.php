@@ -280,6 +280,19 @@ class ProductController extends Controller
     }
 
     /**
+     * Bulk delete selected products
+     */
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (!empty($ids)) {
+            Product::whereIn('id', $ids)->delete();
+            return response()->json(['success' => true, 'message' => 'Seçilən məhsullar silindi!']);
+        }
+        return response()->json(['success' => false, 'message' => 'Heç bir məhsul seçilməyib!']);
+    }
+
+    /**
      * Generate slug from title
      */
     public function generateSlug(Request $request)

@@ -111,12 +111,18 @@
                             <div class="text-muted">
                                 Page {{ $products->currentPage() }} of {{ $products->lastPage() }}
                             </div>
+                            <button id="delete-selected-products" class="btn btn-danger btn-sm ms-3" disabled>
+                                <i class="material-icons-outlined">delete</i> Seçilənləri sil
+                            </button>
                         </div>
                         
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
+                                        <th width="30">
+                                            <input type="checkbox" id="select-all-products">
+                                        </th>
                                         <th width="50">#</th>
                                         <th>Title</th>
                                         <th>Category</th>
@@ -130,6 +136,9 @@
                                 <tbody id="sortable-products">
                                     @forelse($products as $product)
                                         <tr data-id="{{ $product->id }}">
+                                            <td>
+                                                <input type="checkbox" class="product-checkbox" value="{{ $product->id }}">
+                                            </td>
                                             <td>
                                                 <div class="drag-handle">
                                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -342,6 +351,46 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         sortableList._sortable = sortable;
     }
+});
+
+// Select all functionality
+const selectAll = document.getElementById('select-all-products');
+const checkboxes = document.querySelectorAll('.product-checkbox');
+const deleteBtn = document.getElementById('delete-selected-products');
+
+if (selectAll) {
+    selectAll.addEventListener('change', function() {
+        checkboxes.forEach(cb => cb.checked = this.checked);
+        toggleDeleteButton();
+    });
+}
+
+checkboxes.forEach(cb => {
+    cb.addEventListener('change', toggleDeleteButton);
+});
+
+function toggleDeleteButton() {
+    let anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+    deleteBtn.disabled = !anyChecked;
+}
+
+deleteBtn.addEventListener('click', function() {
+    let ids = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+    if (ids.length === 0) return;
+    if (!confirm('Seçilən məhsulları silmək istədiyinizə əminsiniz?')) return;
+    fetch("{{ route('admin.products.bulk-delete') }}", {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ ids })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) location.reload();
+        else alert(data.message);
+    });
 });
 </script>
 @endpush 
