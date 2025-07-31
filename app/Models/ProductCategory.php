@@ -50,6 +50,14 @@ class ProductCategory extends Model
     }
 
     /**
+     * Get all products that have this category
+     */
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'product_product_category');
+    }
+
+    /**
      * Get all descendants (children, grandchildren, etc.)
      */
     public function descendants()

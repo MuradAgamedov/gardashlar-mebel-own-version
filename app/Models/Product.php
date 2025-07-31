@@ -10,7 +10,6 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'product_category_id',
         'views_count',
         'order',
         'status',
@@ -25,9 +24,9 @@ class Product extends Model
     ];
 
     // Relationships
-    public function category()
+    public function categories()
     {
-        return $this->belongsTo(ProductCategory::class, 'product_category_id');
+        return $this->belongsToMany(ProductCategory::class, 'product_product_category');
     }
 
     public function types()

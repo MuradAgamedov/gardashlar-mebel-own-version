@@ -19,7 +19,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'types', 'translates.language', 'tags']);
+        $query = Product::with(['categories', 'types', 'translates.language', 'tags']);
         
         // Search functionality
         if ($request->filled('search')) {
@@ -32,7 +32,9 @@ class ProductController extends Controller
         
         // Category filter
         if ($request->filled('category')) {
-            $query->where('product_category_id', $request->input('category'));
+            $query->whereHas('categories', function($q) use ($request) {
+                $q->where('product_categories.id', $request->input('category'));
+            });
         }
         
         // Type filter
@@ -75,7 +77,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'product_category_id' => 'required|exists:product_categories,id',
+            'product_categories' => 'nullable|string',
             'product_types' => 'nullable|string',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
@@ -94,7 +96,6 @@ class ProductController extends Controller
 
         try {
             $product = Product::create([
-                'product_category_id' => $request->input('product_category_id'),
                 'discount_percent' => $request->input('discount_percent', 0),
                 'status' => $request->boolean('status', true)
             ]);
@@ -114,6 +115,14 @@ class ProductController extends Controller
                     'material' => $translation['material'] ?? null,
                     'size' => $translation['size'] ?? null
                 ]);
+            }
+
+            // Attach categories
+            if ($request->has('product_categories') && !empty($request->input('product_categories'))) {
+                $categories = json_decode($request->input('product_categories'), true);
+                if (is_array($categories)) {
+                    $product->categories()->attach($categories);
+                }
             }
 
             // Attach types
@@ -168,7 +177,7 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $request->validate([
-            'product_category_id' => 'required|exists:product_categories,id',
+            'product_categories' => 'nullable|string',
             'product_types' => 'nullable|string',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
@@ -187,7 +196,6 @@ class ProductController extends Controller
 
         try {
             $product->update([
-                'product_category_id' => $request->input('product_category_id'),
                 'discount_percent' => $request->input('discount_percent', 0),
                 'status' => $request->boolean('status', true)
             ]);
@@ -211,6 +219,18 @@ class ProductController extends Controller
                         'size' => $translation['size'] ?? null
                     ]
                 );
+            }
+
+            // Sync categories
+            if ($request->has('product_categories') && !empty($request->input('product_categories'))) {
+                $categories = json_decode($request->input('product_categories'), true);
+                if (is_array($categories)) {
+                    $product->categories()->sync($categories);
+                } else {
+                    $product->categories()->detach();
+                }
+            } else {
+                $product->categories()->detach();
             }
 
             // Sync types

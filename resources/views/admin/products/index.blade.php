@@ -166,9 +166,22 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class="badge badge-light-primary">
-                                                    {{ $product->category->translate()->title ?? 'No category' }}
-                                                </span>
+                                                @if($product->categories->count() > 0)
+                                                    <div class="d-flex flex-wrap gap-1">
+                                                        @foreach($product->categories->take(3) as $category)
+                                                            <span class="badge badge-light-primary">
+                                                                {{ $category->translate()->title ?? 'No title' }}
+                                                            </span>
+                                                        @endforeach
+                                                        @if($product->categories->count() > 3)
+                                                            <span class="badge badge-light-secondary">
+                                                                +{{ $product->categories->count() - 3 }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                @else
+                                                    <span class="badge badge-light-secondary">No categories</span>
+                                                @endif
                                             </td>
                                             <td>
                                                 @if($product->types->count() > 0)
@@ -268,56 +281,9 @@
                         
                         <!-- Bootstrap Pagination -->
                         @if($products->hasPages())
-                            <nav aria-label="Products pagination" class="mt-4">
-                                <ul class="pagination justify-content-center">
-                                    {{-- Previous Page Link --}}
-                                    @if ($products->onFirstPage())
-                                        <li class="page-item disabled">
-                                            <span class="page-link">
-                                                <i class="material-icons-outlined">chevron_left</i>
-                                                Previous
-                                            </span>
-                                        </li>
-                                    @else
-                                        <li class="page-item">
-                                            <a class="page-link" href="{{ $products->previousPageUrl() }}" rel="prev">
-                                                <i class="material-icons-outlined">chevron_left</i>
-                                                Previous
-                                            </a>
-                                        </li>
-                                    @endif
-
-                                    {{-- Pagination Elements --}}
-                                    @foreach ($products->getUrlRange(1, $products->lastPage()) as $page => $url)
-                                        @if ($page == $products->currentPage())
-                                            <li class="page-item active">
-                                                <span class="page-link">{{ $page }}</span>
-                                            </li>
-                                        @else
-                                            <li class="page-item">
-                                                <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                                            </li>
-                                        @endif
-                                    @endforeach
-
-                                    {{-- Next Page Link --}}
-                                    @if ($products->hasMorePages())
-                                        <li class="page-item">
-                                            <a class="page-link" href="{{ $products->nextPageUrl() }}" rel="next">
-                                                Next
-                                                <i class="material-icons-outlined">chevron_right</i>
-                                            </a>
-                                        </li>
-                                    @else
-                                        <li class="page-item disabled">
-                                            <span class="page-link">
-                                                Next
-                                                <i class="material-icons-outlined">chevron_right</i>
-                                            </span>
-                                        </li>
-                                    @endif
-                                </ul>
-                            </nav>
+                            <div class="d-flex justify-content-center mt-4">
+                                {{ $products->links('pagination::bootstrap-5') }}
+                            </div>
                         @endif
                     </div>
                 </div>

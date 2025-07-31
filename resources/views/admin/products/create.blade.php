@@ -61,22 +61,26 @@
                             <!-- Basic Information -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">
-                                        Category <span class="text-danger">*</span>
-                                    </label>
-                                    <select class="form-select @error('product_category_id') is-invalid @enderror" 
-                                            name="product_category_id" required>
-                                        @foreach($categories as $index => $category)
-                                            <option value="{{ $category->id }}" 
-                                                    {{ old('product_category_id', $index === 0 ? $category->id : '') == $category->id ? 'selected' : '' }}>
-                                                {{ $category->translate()->title ?? 'No title' }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('product_category_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <label class="form-label">Product Categories</label>
+                                    <div class="position-relative">
+                                        <input type="text" 
+                                               class="form-control categories-input" 
+                                               id="categoriesInput" 
+                                               placeholder="Type to search categories..."
+                                               autocomplete="off">
+                                        <div class="categories-dropdown" id="categoriesDropdown" style="display: none;">
+                                            <!-- Categories will be loaded here -->
+                                        </div>
+                                    </div>
+                                    <input type="hidden" 
+                                           name="product_categories" 
+                                           id="categoriesHiddenInput" 
+                                           value="{{ old('product_categories', json_encode([$categories->first()->id ?? null])) }}">
                                 </div>
+                                <small class="form-text text-muted">Click on categories to select/deselect. First category is selected by default.</small>
+                                @error('product_categories')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                                 
                                 <div class="col-md-6">
                                     <label class="form-label">Product Types</label>
@@ -708,6 +712,97 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Make removeType function global
     window.removeType = removeType;
+});
+
+// Product Categories Selection
+document.addEventListener('DOMContentLoaded', function() {
+    const categoriesInput = document.getElementById('categoriesInput');
+    const categoriesDropdown = document.getElementById('categoriesDropdown');
+    const categoriesHiddenInput = document.getElementById('categoriesHiddenInput');
+    const selectedCategories = document.createElement('div');
+    selectedCategories.className = 'selected-categories mt-2';
+    categoriesInput.parentNode.appendChild(selectedCategories);
+    
+    let availableCategories = @json($categories->map(function($category) {
+        return [
+            'id' => $category->id,
+            'title' => $category->translate()->title ?? 'No title'
+        ];
+    }));
+    
+    let selectedCategoryIds = JSON.parse(categoriesHiddenInput.value || '[]');
+    
+    function renderSelectedCategories() {
+        selectedCategories.innerHTML = '';
+        selectedCategoryIds.forEach(categoryId => {
+            const category = availableCategories.find(c => c.id === categoryId);
+            if (category) {
+                const categoryElement = document.createElement('div');
+                categoryElement.className = 'tag-item';
+                categoryElement.innerHTML = `
+                    ${category.title}
+                    <button type="button" class="tag-remove" onclick="removeCategory(${categoryId})">×</button>
+                `;
+                selectedCategories.appendChild(categoryElement);
+            }
+        });
+        updateCategoriesHiddenInput();
+    }
+    
+    function removeCategory(categoryId) {
+        selectedCategoryIds = selectedCategoryIds.filter(id => id !== categoryId);
+        renderSelectedCategories();
+    }
+    
+    function updateCategoriesHiddenInput() {
+        categoriesHiddenInput.value = JSON.stringify(selectedCategoryIds);
+    }
+    
+    function showCategoriesDropdown() {
+        const filteredCategories = availableCategories.filter(category => 
+            !selectedCategoryIds.includes(category.id) &&
+            category.title.toLowerCase().includes(categoriesInput.value.toLowerCase())
+        );
+        
+        if (filteredCategories.length > 0) {
+            categoriesDropdown.innerHTML = '';
+            filteredCategories.forEach(category => {
+                const option = document.createElement('div');
+                option.className = 'tag-option';
+                option.textContent = category.title;
+                option.onclick = () => {
+                    selectedCategoryIds.push(category.id);
+                    renderSelectedCategories();
+                    categoriesInput.value = '';
+                    hideCategoriesDropdown();
+                };
+                categoriesDropdown.appendChild(option);
+            });
+            categoriesDropdown.style.display = 'block';
+        } else {
+            hideCategoriesDropdown();
+        }
+    }
+    
+    function hideCategoriesDropdown() {
+        categoriesDropdown.style.display = 'none';
+    }
+    
+    // Event listeners
+    categoriesInput.addEventListener('input', showCategoriesDropdown);
+    categoriesInput.addEventListener('focus', showCategoriesDropdown);
+    
+    document.addEventListener('click', function(e) {
+        if (!categoriesInput.contains(e.target) && !categoriesDropdown.contains(e.target)) {
+            hideCategoriesDropdown();
+        }
+    });
+    
+    // Initialize selected categories
+    renderSelectedCategories();
+    
+    // Make removeCategory function global
+    window.removeCategory = removeCategory;
 });
 </script>
 @include('admin.partials.slug-generator')
