@@ -52,7 +52,7 @@
                             <h5>Products</h5>
                             <a href="{{ route('admin.product-types.index') }}" class="btn btn-secondary">
                                 <i class="material-icons-outlined">arrow_back</i>
-                                Back to Types
+                     
                             </a>
                         </div>
                     </div>
@@ -158,12 +158,10 @@
                                                 @if($product->status)
                                                     <span class="badge badge-light-success">
                                                         <i class="material-icons-outlined me-1" style="font-size: 14px;">check_circle</i>
-                                                        Active
                                                     </span>
                                                 @else
                                                     <span class="badge badge-light-danger">
                                                         <i class="material-icons-outlined me-1" style="font-size: 14px;">cancel</i>
-                                                        Inactive
                                                     </span>
                                                 @endif
                                             </td>
@@ -173,7 +171,7 @@
                                                             class="btn btn-sm action-btn {{ in_array($product->id, $homePageProductIds) ? 'btn-success' : 'btn-outline-success' }}"
                                                             onclick="toggleHomePage({{ $product->id }})"
                                                             title="{{ in_array($product->id, $homePageProductIds) ? 'Remove from homepage' : 'Add to homepage' }}">
-                                                        <i class="material-icons-outlined">
+                                                        <i style="width: 17px" class="material-icons-outlined">
                                                             {{ in_array($product->id, $homePageProductIds) ? 'home' : 'home_outline' }}
                                                         </i>
                                                     </button>
@@ -200,7 +198,6 @@
                                                     @if(request('search'))
                                                         <a href="{{ route('admin.product-type-products.index', $productType) }}" class="btn btn-outline-secondary">
                                                             <i class="material-icons-outlined">clear</i>
-                                                            Clear Search
                                                         </a>
                                                     @endif
                                                 </div>
