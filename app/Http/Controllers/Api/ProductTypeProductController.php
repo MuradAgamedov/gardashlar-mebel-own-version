@@ -61,9 +61,7 @@ class ProductTypeProductController extends Controller
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="title", type="string", example="Product Name"),
      *                     @OA\Property(property="description", type="string", example="Product description"),
-     *                     @OA\Property(property="slug", type="string", example="product-name"),
-     *                     @OA\Property(property="is_on_homepage", type="boolean", example=true),
-     *                     @OA\Property(property="homepage_order", type="integer", example=1)
+     *                     @OA\Property(property="slug", type="string", example="product-name")
      *                 )
      *             )
      *         )

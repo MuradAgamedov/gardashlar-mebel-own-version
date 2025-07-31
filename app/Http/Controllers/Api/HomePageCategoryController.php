@@ -43,7 +43,6 @@ class HomePageCategoryController extends Controller
      *                 @OA\Items(
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="image_url", type="string", nullable=true, example="http://localhost:8000/uploads/categories/category1.jpg"),
      *                     @OA\Property(property="title", type="string", example="Electronics")
      *                 )
      *             )
