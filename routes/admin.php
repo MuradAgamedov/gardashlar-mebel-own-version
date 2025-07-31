@@ -317,10 +317,10 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         Route::post('product-tags/generate-slug', [ProductTagController::class, 'generateSlug'])->name('product-tags.generate-slug');
 
         // Products
-        Route::resource('products', ProductController::class);
+        Route::delete('products/bulk-delete', [ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
         Route::post('products/reorder', [ProductController::class, 'reorder'])->name('products.reorder');
         Route::post('products/generate-slug', [ProductController::class, 'generateSlug'])->name('products.generate-slug');
-        Route::delete('products/bulk-delete', [ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
+        Route::resource('products', ProductController::class);
 
         // Product Accordion routes
         Route::resource('products.accordions', ProductAccordionController::class);
