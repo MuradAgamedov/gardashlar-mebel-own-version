@@ -389,6 +389,19 @@
     padding: 2px 8px;
     margin: 2px;
 }
+
+/* Fix Select2 dropdown z-index */
+.select2-container--open {
+    z-index: 9999 !important;
+}
+
+.select2-dropdown {
+    z-index: 9999 !important;
+}
+
+.select2-results__options {
+    z-index: 9999 !important;
+}
 </style>
 @endpush
 
