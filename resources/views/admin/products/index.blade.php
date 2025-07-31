@@ -47,7 +47,6 @@
                             <h5>Products</h5>
                             <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Product
                             </a>
                         </div>
                     </div>
