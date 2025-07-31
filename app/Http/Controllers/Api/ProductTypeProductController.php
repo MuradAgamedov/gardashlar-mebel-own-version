@@ -136,10 +136,6 @@ class ProductTypeProductController extends Controller
                         'title' => $translation ? $translation->title : 'No title',
                         'description' => $translation ? $translation->description : null,
                         'slug' => $translation ? $translation->slug : null,
-                        'is_on_homepage' => $homePageEntry ? true : false,
-                        'homepage_order' => $homePageEntry ? $homePageEntry->order : null,
-                        'created_at' => $product->created_at,
-                        'updated_at' => $product->updated_at
                     ];
                 });
             });
