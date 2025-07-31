@@ -63,6 +63,16 @@ class ProductTypeProductController extends Controller
      *                     @OA\Property(property="description", type="string", example="Product description"),
      *                     @OA\Property(property="slug", type="string", example="product-name"),
      *                     @OA\Property(
+     *                         property="main_image",
+     *                         type="object",
+     *                         nullable=true,
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="image", type="string", example="uploads/products/image.jpg"),
+     *                         @OA\Property(property="image_url", type="string", example="https://example.com/uploads/products/image.jpg"),
+     *                         @OA\Property(property="is_main", type="boolean", example=true)
+     *                     ),
+     *                     @OA\Property(property="images_count", type="integer", example=5),
+     *                     @OA\Property(
      *                         property="types",
      *                         type="array",
      *                         @OA\Items(
@@ -134,6 +144,9 @@ class ProductTypeProductController extends Controller
                     },
                     'types.translates' => function($q) use ($languageId) {
                         $q->where('language_id', $languageId);
+                    },
+                    'images' => function($q) {
+                        $q->active()->ordered();
                     }
                 ])
                 ->orderBy('order')
@@ -141,11 +154,21 @@ class ProductTypeProductController extends Controller
                 ->map(function ($product) use ($languageId) {
                     $translation = $product->translates->first();
                     
+                    // Get main image (is_main = true) or first image
+                    $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
+                    
                     return [
                         'id' => $product->id,
                         'title' => $translation ? $translation->title : 'No title',
                         'description' => $translation ? $translation->description : null,
                         'slug' => $translation ? $translation->slug : null,
+                        'main_image' => $mainImage ? [
+                            'id' => $mainImage->id,
+                            'image' => $mainImage->image,
+                            'image_url' => $mainImage->image_url,
+                            'is_main' => $mainImage->is_main
+                        ] : null,
+                        'images_count' => $product->images->count(),
                         'types' => $product->types->map(function($type) {
                             $typeTranslation = $type->translates->first();
                             return [
