@@ -119,7 +119,10 @@ class ProductController extends Controller
 
             // Attach types
             if ($request->has('product_types') && !empty($request->input('product_types'))) {
-                $product->types()->attach($request->input('product_types'));
+                $types = json_decode($request->input('product_types'), true);
+                if (is_array($types)) {
+                    $product->types()->attach($types);
+                }
             }
 
             // Attach tags
@@ -213,8 +216,13 @@ class ProductController extends Controller
             }
 
             // Sync types
-            if ($request->has('product_types')) {
-                $product->types()->sync($request->input('product_types', []));
+            if ($request->has('product_types') && !empty($request->input('product_types'))) {
+                $types = json_decode($request->input('product_types'), true);
+                if (is_array($types)) {
+                    $product->types()->sync($types);
+                } else {
+                    $product->types()->detach();
+                }
             } else {
                 $product->types()->detach();
             }

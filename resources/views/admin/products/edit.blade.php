@@ -81,23 +81,26 @@
                                 </div>
                                 
                                 <div class="col-md-6">
-                                    <label class="form-label">
-                                        Product Types
-                                    </label>
-                                    <select class="form-select @error('product_types') is-invalid @enderror" 
-                                            name="product_types[]" multiple>
-                                        @foreach($types as $type)
-                                            <option value="{{ $type->id }}" 
-                                                    {{ in_array($type->id, old('product_types', $product->types->pluck('id')->toArray())) ? 'selected' : '' }}>
-                                                {{ $type->translate()->title ?? 'No title' }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <small class="form-text text-muted">Hold Ctrl (or Cmd on Mac) to select multiple types</small>
-                                    @error('product_types')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                    <label class="form-label">Product Types</label>
+                                    <div class="position-relative">
+                                        <input type="text" 
+                                               class="form-control types-input" 
+                                               id="typesInput" 
+                                               placeholder="Type to search product types..."
+                                               autocomplete="off">
+                                        <div class="types-dropdown" id="typesDropdown" style="display: none;">
+                                            <!-- Types will be loaded here -->
+                                        </div>
+                                    </div>
+                                    <input type="hidden" 
+                                           name="product_types" 
+                                           id="typesHiddenInput" 
+                                           value="{{ old('product_types', json_encode($product->types->pluck('id')->toArray())) }}">
                                 </div>
+                                <small class="form-text text-muted">Click on types to select/deselect</small>
+                                @error('product_types')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <!-- Product Details -->
@@ -619,6 +622,97 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Make removeTag function global
     window.removeTag = removeTag;
+});
+
+// Product Types Selection
+document.addEventListener('DOMContentLoaded', function() {
+    const typesInput = document.getElementById('typesInput');
+    const typesDropdown = document.getElementById('typesDropdown');
+    const typesHiddenInput = document.getElementById('typesHiddenInput');
+    const selectedTypes = document.createElement('div');
+    selectedTypes.className = 'selected-types mt-2';
+    typesInput.parentNode.appendChild(selectedTypes);
+    
+    let availableTypes = @json($types->map(function($type) {
+        return [
+            'id' => $type->id,
+            'title' => $type->translate()->title ?? 'No title'
+        ];
+    }));
+    
+    let selectedTypeIds = JSON.parse(typesHiddenInput.value || '[]');
+    
+    function renderSelectedTypes() {
+        selectedTypes.innerHTML = '';
+        selectedTypeIds.forEach(typeId => {
+            const type = availableTypes.find(t => t.id === typeId);
+            if (type) {
+                const typeElement = document.createElement('div');
+                typeElement.className = 'tag-item';
+                typeElement.innerHTML = `
+                    ${type.title}
+                    <button type="button" class="tag-remove" onclick="removeType(${typeId})">×</button>
+                `;
+                selectedTypes.appendChild(typeElement);
+            }
+        });
+        updateTypesHiddenInput();
+    }
+    
+    function removeType(typeId) {
+        selectedTypeIds = selectedTypeIds.filter(id => id !== typeId);
+        renderSelectedTypes();
+    }
+    
+    function updateTypesHiddenInput() {
+        typesHiddenInput.value = JSON.stringify(selectedTypeIds);
+    }
+    
+    function showTypesDropdown() {
+        const filteredTypes = availableTypes.filter(type => 
+            !selectedTypeIds.includes(type.id) &&
+            type.title.toLowerCase().includes(typesInput.value.toLowerCase())
+        );
+        
+        if (filteredTypes.length > 0) {
+            typesDropdown.innerHTML = '';
+            filteredTypes.forEach(type => {
+                const option = document.createElement('div');
+                option.className = 'tag-option';
+                option.textContent = type.title;
+                option.onclick = () => {
+                    selectedTypeIds.push(type.id);
+                    renderSelectedTypes();
+                    typesInput.value = '';
+                    hideTypesDropdown();
+                };
+                typesDropdown.appendChild(option);
+            });
+            typesDropdown.style.display = 'block';
+        } else {
+            hideTypesDropdown();
+        }
+    }
+    
+    function hideTypesDropdown() {
+        typesDropdown.style.display = 'none';
+    }
+    
+    // Event listeners
+    typesInput.addEventListener('input', showTypesDropdown);
+    typesInput.addEventListener('focus', showTypesDropdown);
+    
+    document.addEventListener('click', function(e) {
+        if (!typesInput.contains(e.target) && !typesDropdown.contains(e.target)) {
+            hideTypesDropdown();
+        }
+    });
+    
+    // Initialize selected types
+    renderSelectedTypes();
+    
+    // Make removeType function global
+    window.removeType = removeType;
 });
 </script>
 @include('admin.partials.slug-generator')
