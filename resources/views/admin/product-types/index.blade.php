@@ -188,6 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
             onEnd: function(evt) {
                 const items = Array.from(tbody.querySelectorAll('tr[data-id]')).map(tr => tr.dataset.id);
                 
+                
                 fetch('{{ route("admin.product-types.reorder") }}', {
                     method: 'POST',
                     headers: {
