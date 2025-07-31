@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\HomePageCategoryController;
+use App\Http\Controllers\Api\ProductTypeController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -15,3 +16,6 @@ Route::get('/pages/{keyword}', [PageController::class, 'findByKeyword'])->name('
 
 // HomePageCategory API Routes
 Route::get('/homepage-categories', [HomePageCategoryController::class, 'index'])->name('api.homepage-categories.index');
+
+// ProductType API Routes
+Route::get('/product-types', [ProductTypeController::class, 'index'])->name('api.product-types.index');
