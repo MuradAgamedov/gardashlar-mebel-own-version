@@ -22,6 +22,8 @@ class ProductCategory extends Model
         'status' => 'boolean',
     ];
 
+    protected $appends = ['image_url'];
+
     /**
      * Get all translations for this product category
      */
@@ -112,6 +114,14 @@ class ProductCategory extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('order');
+    }
+
+    /**
+     * Get the full URL for the image
+     */
+    public function getImageUrlAttribute()
+    {
+        return $this->image ? asset('uploads/' . $this->image) : null;
     }
 
     /**

@@ -77,7 +77,7 @@ class HomePageCategoryController extends Controller
                         
                         return [
                             'id' => $productCategory->id,
-                            'image' => $productCategory->image ? asset('uploads/' . $productCategory->image) : null,
+                            'image' => $productCategory->image_url,
                             'title' => $translate->title ?? null,
                         ];
                     });
