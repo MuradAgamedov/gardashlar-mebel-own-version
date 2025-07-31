@@ -58,8 +58,7 @@ class ProductController extends Controller
             'translations.*.material' => 'nullable|string',
             'translations.*.size' => 'nullable|string',
             'discount_percent' => 'nullable|numeric|min:0|max:100',
-            'product_tags' => 'nullable|array',
-            'product_tags.*' => 'exists:product_tags,id',
+            'product_tags' => 'nullable|string',
             'status' => 'boolean'
         ]);
 
@@ -89,8 +88,11 @@ class ProductController extends Controller
             }
 
             // Attach tags
-            if ($request->has('product_tags')) {
-                $product->tags()->attach($request->input('product_tags'));
+            if ($request->has('product_tags') && !empty($request->input('product_tags'))) {
+                $tags = json_decode($request->input('product_tags'), true);
+                if (is_array($tags)) {
+                    $product->tags()->attach($tags);
+                }
             }
 
             return redirect()->route('admin.products.index')
@@ -143,8 +145,7 @@ class ProductController extends Controller
             'translations.*.material' => 'nullable|string',
             'translations.*.size' => 'nullable|string',
             'discount_percent' => 'nullable|numeric|min:0|max:100',
-            'product_tags' => 'nullable|array',
-            'product_tags.*' => 'exists:product_tags,id',
+            'product_tags' => 'nullable|string',
             'status' => 'boolean'
         ]);
 
@@ -178,7 +179,16 @@ class ProductController extends Controller
             }
 
             // Sync tags
-            $product->tags()->sync($request->input('product_tags', []));
+            if ($request->has('product_tags') && !empty($request->input('product_tags'))) {
+                $tags = json_decode($request->input('product_tags'), true);
+                if (is_array($tags)) {
+                    $product->tags()->sync($tags);
+                } else {
+                    $product->tags()->detach();
+                }
+            } else {
+                $product->tags()->detach();
+            }
 
             return redirect()->route('admin.products.index')
                 ->with('success', 'Product updated successfully.');
