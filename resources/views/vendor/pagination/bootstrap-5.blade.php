@@ -1,10 +1,11 @@
 @push("scripts")
 <style>
     .pagination .active .page-link {
-        color: "white" 
+        color: white !important;
     }
 </style>
 @endpush
+
 
 @if ($paginator->hasPages())
     <nav class="d-flex justify-items-center justify-content-between">
