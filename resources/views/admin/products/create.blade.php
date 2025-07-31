@@ -86,9 +86,9 @@
                                     <select class="form-select @error('product_type_id') is-invalid @enderror" 
                                             name="product_type_id" required>
                                         <option value="">Select Type</option>
-                                        @foreach($types as $type)
+                                        @foreach($types as $index => $type)
                                             <option value="{{ $type->id }}" 
-                                                    {{ old('product_type_id') == $type->id ? 'selected' : '' }}>
+                                                    {{ old('product_type_id', $index === 0 ? $type->id : '') == $type->id ? 'selected' : '' }}>
                                                 {{ $type->translate()->title ?? 'No title' }}
                                             </option>
                                         @endforeach
