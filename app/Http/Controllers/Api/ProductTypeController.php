@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductType;
+use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -21,6 +22,16 @@ class ProductTypeController extends Controller
      *     tags={"Product Types"},
      *     summary="Get all active product types",
      *     description="Returns a list of active product types with translations (id and title only)",
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language_id from languages api",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="integer",
+     *             example=1
+     *         )
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful response",
@@ -52,21 +63,15 @@ class ProductTypeController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $locale = $this->getLocaleFromHeader($request);
+            $languageId = $this->getLanguageIdFromHeader($request);
+            $cacheKey = "api:product-types:lang:{$languageId}";
             
-            $cacheKey = "api_product_types_{$locale}";
-            
-            $productTypes = Cache::rememberForever($cacheKey, function () use ($locale) {
+            $productTypes = Cache::rememberForever($cacheKey, function () use ($languageId) {
                 return ProductType::where('status', true)
-                    ->with(['translates' => function($query) use ($locale) {
-                        $query->whereHas('language', function($q) use ($locale) {
-                            $q->where('lang_code', $locale);
-                        });
-                    }])
                     ->orderBy('order')
                     ->get()
-                    ->map(function ($type) {
-                        $translation = $type->translates->first();
+                    ->map(function ($type) use ($languageId) {
+                        $translation = $type->translate($languageId);
                         return [
                             'id' => $type->id,
                             'title' => $translation ? $translation->title : 'No title'

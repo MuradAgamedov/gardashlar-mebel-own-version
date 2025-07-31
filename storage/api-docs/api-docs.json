@@ -351,6 +351,18 @@
                 "summary": "Get all active product types",
                 "description": "Returns a list of active product types with translations (id and title only)",
                 "operationId": "getProductTypes",
+                "parameters": [
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language_id from languages api",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful response",
