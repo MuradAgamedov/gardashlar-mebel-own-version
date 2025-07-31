@@ -1,3 +1,5 @@
+@stack('scripts')
+
 <!-- jquery -->
 <script src="{{ asset('admin/assets/js/vendors/jquery/jquery.min.js') }}"></script>
 
@@ -62,4 +64,3 @@
 <!-- custom script -->
 <script src="{{ asset('admin/assets/js/script.js') }}"></script>
 
-@stack('scripts')

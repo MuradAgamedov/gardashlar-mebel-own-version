@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // For each title input, update the corresponding slug input for the same language index
     // Only on create page, not on edit page
     if (!document.querySelector('.edit-slug-btn')) {
+        // For translates (used in categories, etc.)
         document.querySelectorAll('input[name^="translates"][name$="[title]"]').forEach(function(titleInput) {
             titleInput.addEventListener('input', function() {
                 const match = this.name.match(/translates\[(\d+)\]\[title\]/);
@@ -48,8 +49,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
+        
+        // For translations (used in products)
+        document.querySelectorAll('input[name^="translations"][name$="[title]"]').forEach(function(titleInput) {
+            titleInput.addEventListener('input', function() {
+                const match = this.name.match(/translations\[(\d+)\]\[title\]/);
+                if (!match) return;
+                const languageId = match[1];
+                const slugInput = document.querySelector('input[name="translations[' + languageId + '][slug]"]');
+                if (slugInput && (!slugInput.dataset.touched || slugInput.value === '' || slugInput.value === generateSlug(this.defaultValue))) {
+                    slugInput.value = generateSlug(this.value);
+                }
+            });
+        });
+        
         // If user manually edits slug, mark it as touched so it won't auto-update anymore
-        document.querySelectorAll('input[name^="translates"][name$="[slug]"]').forEach(function(slugInput) {
+        document.querySelectorAll('input[name^="translates"][name$="[slug]"], input[name^="translations"][name$="[slug]"]').forEach(function(slugInput) {
             slugInput.addEventListener('input', function() {
                 this.dataset.touched = 'true';
             });
