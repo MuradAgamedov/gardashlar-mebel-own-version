@@ -315,8 +315,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-select first type if no type is selected
     const typeSelect = document.getElementById('type');
-    if (typeSelect && !typeSelect.value && typeSelect.options.length > 0) {
-        typeSelect.selectedIndex = 0;
+    if (typeSelect && typeSelect.options.length > 0) {
+        // If no value is selected, select the first option
+        if (!typeSelect.value || typeSelect.value === '') {
+            typeSelect.selectedIndex = 0;
+            // Trigger change event to update any dependent elements
+            typeSelect.dispatchEvent(new Event('change'));
+        }
     }
     const sortableList = document.getElementById('sortable-products');
     
