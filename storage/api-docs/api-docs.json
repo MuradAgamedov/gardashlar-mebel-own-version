@@ -54,11 +54,6 @@
                                                         "type": "integer",
                                                         "example": 1
                                                     },
-                                                    "image_url": {
-                                                        "type": "string",
-                                                        "example": "http://localhost:8000/uploads/categories/category1.jpg",
-                                                        "nullable": true
-                                                    },
                                                     "title": {
                                                         "type": "string",
                                                         "example": "Electronics"
@@ -489,14 +484,6 @@
                                                     "slug": {
                                                         "type": "string",
                                                         "example": "product-name"
-                                                    },
-                                                    "is_on_homepage": {
-                                                        "type": "boolean",
-                                                        "example": true
-                                                    },
-                                                    "homepage_order": {
-                                                        "type": "integer",
-                                                        "example": 1
                                                     }
                                                 },
                                                 "type": "object"
