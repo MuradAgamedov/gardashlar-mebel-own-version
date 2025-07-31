@@ -314,7 +314,6 @@ Route::prefix('')->name('admin.')->group(function () {
         Route::resource('products', ProductController::class);
         Route::post('products/reorder', [ProductController::class, 'reorder'])->name('products.reorder');
         Route::post('products/generate-slug', [ProductController::class, 'generateSlug'])->name('products.generate-slug');
-        Route::get('products/load-more', [ProductController::class, 'loadMore'])->name('products.load-more');
 
         // Product Accordion routes
         Route::resource('products.accordions', ProductAccordionController::class);

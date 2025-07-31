@@ -27,28 +27,6 @@ class ProductController extends Controller
     }
 
     /**
-     * Load more products via AJAX
-     */
-    public function loadMore(Request $request)
-    {
-        $page = $request->input('page', 1);
-        $products = Product::with(['category', 'type', 'translates.language', 'tags'])
-            ->ordered()
-            ->paginate(10, ['*'], 'page', $page);
-        
-        if ($request->ajax()) {
-            return response()->json([
-                'products' => $products->items(),
-                'hasMorePages' => $products->hasMorePages(),
-                'currentPage' => $products->currentPage(),
-                'lastPage' => $products->lastPage()
-            ]);
-        }
-        
-        return view('admin.products.index', compact('products'));
-    }
-
-    /**
      * Show the form for creating a new resource.
      */
     public function create()
