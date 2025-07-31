@@ -75,7 +75,7 @@
                                 <select class="form-select" id="type" name="type">
                                     @if($types->count() > 0)
                                         @foreach($types as $index => $type)
-                                            <option value="{{ $type->id }}" {{ (request('type') == $type->id || (request('type') == '' && $index == 0)) ? 'selected' : '' }}>
+                                            <option value="{{ $type->id }}" {{ (request('type') == $type->id || (empty(request('type')) && $index == 0)) ? 'selected' : '' }}>
                                                 {{ $type->translate()->title ?? 'No title' }}
                                             </option>
                                         @endforeach
@@ -309,6 +309,11 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Auto-select first type if no type is selected
+    const typeSelect = document.getElementById('type');
+    if (typeSelect && !typeSelect.value && typeSelect.options.length > 0) {
+        typeSelect.selectedIndex = 0;
+    }
     const sortableList = document.getElementById('sortable-products');
     
     if (sortableList) {
