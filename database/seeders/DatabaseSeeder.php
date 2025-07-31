@@ -22,7 +22,8 @@ class DatabaseSeeder extends Seeder
 
         // Seed languages
         $this->call([
-            LanguageSeeder::class
+            LanguageSeeder::class,
+            ProductSeeder::class,
         ]);
     }
 }
