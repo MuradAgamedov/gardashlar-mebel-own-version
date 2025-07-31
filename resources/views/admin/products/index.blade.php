@@ -93,7 +93,6 @@
                                 <div class="d-flex gap-2 w-100">
                                     <button type="submit" class="btn btn-primary flex-fill">
                                         <i class="material-icons-outlined">search</i>
-                                        Search
                                     </button>
                                     <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
                                         <i class="material-icons-outlined">clear</i>
