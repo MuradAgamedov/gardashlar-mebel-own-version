@@ -174,7 +174,7 @@
                                                             Title <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
-                                                               class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
+                                                               class="form-control @error("translations.{$language->id}.title") is-invalid @enderror title-input" 
                                                                name="translations[{{ $language->id }}][title]" 
                                                                value="{{ old("translations.{$language->id}.title", $translation ? $translation->title : '') }}" 
                                                                placeholder="Enter product title"
@@ -191,11 +191,12 @@
                                                         </label>
                                                         <div class="input-group">
                                                             <input type="text" 
-                                                                   class="form-control @error("translations.{$language->id}.slug") is-invalid @enderror" 
+                                                                   class="form-control @error("translations.{$language->id}.slug") is-invalid @enderror slug-input" 
                                                                    name="translations[{{ $language->id }}][slug]" 
                                                                    id="slug_{{ $language->id }}"
                                                                    value="{{ old("translations.{$language->id}.slug", $translation ? $translation->slug : '') }}" 
                                                                    placeholder="Enter slug"
+                                                                   data-language="{{ $language->lang_code }}"
                                                                    required>
                                                             <button type="button" 
                                                                     class="btn btn-outline-secondary generate-slug" 
@@ -458,6 +459,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Scroll to the error field
         firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+    });
 });
 </script>
+
+@include('admin.partials.slug-generator')
 @endpush 
