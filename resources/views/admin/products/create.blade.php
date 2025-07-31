@@ -76,11 +76,11 @@
                                            name="product_categories" 
                                            id="categoriesHiddenInput" 
                                            value="{{ old('product_categories', json_encode([$categories->first()->id ?? null])) }}">
+                                    <small class="form-text text-muted">Click on categories to select/deselect. First category is selected by default.</small>
+                                    @error('product_categories')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
-                                <small class="form-text text-muted">Click on categories to select/deselect. First category is selected by default.</small>
-                                @error('product_categories')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
                                 
                                 <div class="col-md-6">
                                     <label class="form-label">Product Types</label>
@@ -98,11 +98,11 @@
                                            name="product_types" 
                                            id="typesHiddenInput" 
                                            value="{{ old('product_types', '[]') }}">
+                                    <small class="form-text text-muted">Click on types to select/deselect</small>
+                                    @error('product_types')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
-                                <small class="form-text text-muted">Click on types to select/deselect</small>
-                                @error('product_types')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
                             </div>
 
                             <!-- Product Details -->

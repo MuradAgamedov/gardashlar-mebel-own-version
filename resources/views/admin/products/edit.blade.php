@@ -77,11 +77,11 @@
                                            name="product_categories" 
                                            id="categoriesHiddenInput" 
                                            value="{{ old('product_categories', json_encode($product->categories->pluck('id')->toArray())) }}">
+                                    <small class="form-text text-muted">Click on categories to select/deselect</small>
+                                    @error('product_categories')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
-                                <small class="form-text text-muted">Click on categories to select/deselect</small>
-                                @error('product_categories')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
                                 
                                 <div class="col-md-6">
                                     <label class="form-label">Product Types</label>
@@ -99,11 +99,11 @@
                                            name="product_types" 
                                            id="typesHiddenInput" 
                                            value="{{ old('product_types', json_encode($product->types->pluck('id')->toArray())) }}">
+                                    <small class="form-text text-muted">Click on types to select/deselect</small>
+                                    @error('product_types')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
-                                <small class="form-text text-muted">Click on types to select/deselect</small>
-                                @error('product_types')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
                             </div>
 
                             <!-- Product Details -->
