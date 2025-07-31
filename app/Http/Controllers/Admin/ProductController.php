@@ -31,7 +31,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = ProductCategory::active()->root()->ordered()->get();
+        $categories = ProductCategory::active()->whereNotNull('parent_id')->ordered()->get();
         $types = ProductType::active()->ordered()->get();
         $tags = ProductTag::active()->ordered()->get();
         $languages = Language::all();
@@ -115,7 +115,7 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $product->load(['translates.language', 'tags']);
-        $categories = ProductCategory::active()->root()->ordered()->get();
+        $categories = ProductCategory::active()->whereNotNull('parent_id')->ordered()->get();
         $types = ProductType::active()->ordered()->get();
         $tags = ProductTag::active()->ordered()->get();
         $languages = Language::all();
