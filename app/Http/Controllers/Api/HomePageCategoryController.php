@@ -43,7 +43,7 @@ class HomePageCategoryController extends Controller
      *                 @OA\Items(
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="image", type="string", nullable=true, example="http://localhost:8000/uploads/categories/category1.jpg"),
+     *                     @OA\Property(property="image_url", type="string", nullable=true, example="http://localhost:8000/uploads/categories/category1.jpg"),
      *                     @OA\Property(property="title", type="string", example="Electronics")
      *                 )
      *             )
@@ -77,7 +77,7 @@ class HomePageCategoryController extends Controller
                         
                         return [
                             'id' => $productCategory->id,
-                            'image' => $productCategory->image_url,
+                            'image_url' => $productCategory->image_url,
                             'title' => $translate->title ?? null,
                         ];
                     });

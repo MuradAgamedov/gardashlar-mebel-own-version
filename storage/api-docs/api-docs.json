@@ -54,7 +54,7 @@
                                                         "type": "integer",
                                                         "example": 1
                                                     },
-                                                    "image": {
+                                                    "image_url": {
                                                         "type": "string",
                                                         "example": "http://localhost:8000/uploads/categories/category1.jpg",
                                                         "nullable": true
