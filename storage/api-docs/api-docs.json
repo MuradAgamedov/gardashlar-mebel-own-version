@@ -417,16 +417,16 @@
         "/api/product-types/{productTypeId}/products": {
             "get": {
                 "tags": [
-                    "Product Type Products"
+                    "Məhsul Növləri"
                 ],
-                "summary": "Get products for a specific product type",
-                "description": "Returns products that belong to a specific product type, with homepage status",
+                "summary": "Müəyyən məhsul növü üçün məhsulları əldə et",
+                "description": "Müəyyən məhsul növünə aid olan məhsulları qaytarır, ana səhifə statusu ilə",
                 "operationId": "getProductsByType",
                 "parameters": [
                     {
                         "name": "productTypeId",
                         "in": "path",
-                        "description": "The ID of the product type",
+                        "description": "Məhsul növünün ID-si",
                         "required": true,
                         "schema": {
                             "type": "integer",
@@ -436,7 +436,7 @@
                     {
                         "name": "locale",
                         "in": "header",
-                        "description": "Language_id from languages api",
+                        "description": "Dil ID-si (languages API-dən)",
                         "required": false,
                         "schema": {
                             "type": "integer",
@@ -446,7 +446,7 @@
                     {
                         "name": "homepage_only",
                         "in": "query",
-                        "description": "Return only products that are on homepage for this type",
+                        "description": "Yalnız bu növ üçün ana səhifədə olan məhsulları qaytar",
                         "required": false,
                         "schema": {
                             "type": "boolean",
@@ -456,7 +456,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful response",
+                        "description": "Uğurlu cavab",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -470,30 +470,43 @@
                                             "items": {
                                                 "properties": {
                                                     "id": {
+                                                        "description": "Məhsul ID-si",
                                                         "type": "integer",
                                                         "example": 1
                                                     },
                                                     "title": {
+                                                        "description": "Məhsulun başlığı",
                                                         "type": "string",
-                                                        "example": "Product Name"
+                                                        "example": "Məhsul Adı"
                                                     },
                                                     "description": {
+                                                        "description": "Məhsulun təsviri",
                                                         "type": "string",
-                                                        "example": "Product description"
+                                                        "example": "Məhsul təsviri"
                                                     },
                                                     "slug": {
+                                                        "description": "Məhsulun slug-u",
                                                         "type": "string",
-                                                        "example": "product-name"
+                                                        "example": "mehsul-adi"
+                                                    },
+                                                    "main_image": {
+                                                        "description": "Əsas şəklin URL-i",
+                                                        "type": "string",
+                                                        "example": "https://admin.gardaslar.coder.az/uploads/products/image.jpg",
+                                                        "nullable": true
                                                     },
                                                     "types": {
+                                                        "description": "Məhsul növləri",
                                                         "type": "array",
                                                         "items": {
                                                             "properties": {
                                                                 "id": {
+                                                                    "description": "Növ ID-si",
                                                                     "type": "integer",
                                                                     "example": 2
                                                                 },
                                                                 "title": {
+                                                                    "description": "Növün adı",
                                                                     "type": "string",
                                                                     "example": "Ümumi"
                                                                 }
@@ -512,7 +525,7 @@
                         }
                     },
                     "404": {
-                        "description": "Product type not found",
+                        "description": "Məhsul növü tapılmadı",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -523,7 +536,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Product type not found"
+                                            "example": "Məhsul növü tapılmadı"
                                         }
                                     },
                                     "type": "object"
@@ -532,7 +545,7 @@
                         }
                     },
                     "500": {
-                        "description": "Internal server error",
+                        "description": "Server xətası",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -543,7 +556,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Error retrieving products"
+                                            "example": "Məhsulları əldə etməkdə xəta baş verdi"
                                         }
                                     },
                                     "type": "object"
@@ -573,8 +586,8 @@
             "description": "Product Types"
         },
         {
-            "name": "Product Type Products",
-            "description": "Product Type Products"
+            "name": "Məhsul Növləri",
+            "description": "Məhsul Növləri"
         }
     ]
 }
