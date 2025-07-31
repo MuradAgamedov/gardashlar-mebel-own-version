@@ -53,3 +53,7 @@
         display: flex !important;
     }
 </style>
+<script>
+console.log('Head script loaded!');
+alert('Head script is working!');
+</script>
