@@ -47,7 +47,6 @@
                             <h5>Product Colors</h5>
                             <a href="{{ route('admin.product-colors.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Color
                             </a>
                         </div>
                     </div>
