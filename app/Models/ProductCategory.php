@@ -121,7 +121,7 @@ class ProductCategory extends Model
      */
     public function getImageUrlAttribute()
     {
-        return $this->image ? asset('uploads/' . $this->image) : null;
+        return $this->image ? Storage::url($this->image) : null;
     }
 
     /**
