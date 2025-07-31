@@ -67,9 +67,9 @@
                                     <select class="form-select @error('product_category_id') is-invalid @enderror" 
                                             name="product_category_id" required>
                                         <option value="">Select Category</option>
-                                        @foreach($categories as $category)
+                                        @foreach($categories as $index => $category)
                                             <option value="{{ $category->id }}" 
-                                                    {{ old('product_category_id') == $category->id ? 'selected' : '' }}>
+                                                    {{ old('product_category_id', $index === 0 ? $category->id : '') == $category->id ? 'selected' : '' }}>
                                                 {{ $category->translate()->title ?? 'No title' }}
                                             </option>
                                         @endforeach
