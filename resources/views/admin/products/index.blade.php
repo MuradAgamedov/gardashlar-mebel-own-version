@@ -74,8 +74,12 @@
                                 <label for="type" class="form-label">Type</label>
                                 <select class="form-select" id="type" name="type">
                                     @if($types->count() > 0)
-                                        @foreach($types as $index => $type)
-                                            <option value="{{ $type->id }}" {{ (request('type') == $type->id || (empty(request('type')) && $index == 0)) ? 'selected' : '' }}>
+                                        @php
+                                            $selectedType = request('type');
+                                            $firstTypeId = $types->first()->id;
+                                        @endphp
+                                        @foreach($types as $type)
+                                            <option value="{{ $type->id }}" {{ ($selectedType == $type->id || (empty($selectedType) && $type->id == $firstTypeId)) ? 'selected' : '' }}>
                                                 {{ $type->translate()->title ?? 'No title' }}
                                             </option>
                                         @endforeach
