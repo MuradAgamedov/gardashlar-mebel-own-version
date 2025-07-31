@@ -117,7 +117,7 @@
                                 Page {{ $products->currentPage() }} of {{ $products->lastPage() }}
                             </div>
                             <button id="delete-selected-products" class="btn btn-danger btn-sm ms-3" disabled>
-                                <i class="material-icons-outlined">delete</i> Seçilənləri sil
+                                <i class="material-icons-outlined">delete</i> 
                             </button>
                         </div>
                         
