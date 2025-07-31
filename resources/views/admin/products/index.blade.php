@@ -76,7 +76,7 @@
         @if($types->count() > 0)
             @foreach($types as $index => $type)
                 <option value="{{ $type->id }}"
-                    {{ (request('type') == $type->id || (request('type') === null && $index === 0)) ? 'selected' : '' }}>
+                    {{ (request()->has('type') ? request('type') == $type->id : $index == 0) ? 'selected' : '' }}>
                     {{ $type->translate()->title ?? 'No title' }}
                 </option>
             @endforeach
