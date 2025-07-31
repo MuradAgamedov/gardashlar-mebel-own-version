@@ -19,7 +19,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'type', 'translates.language', 'tags']);
+        $query = Product::with(['category', 'types', 'translates.language', 'tags']);
         
         // Search functionality
         if ($request->filled('search')) {
@@ -37,7 +37,9 @@ class ProductController extends Controller
         
         // Type filter
         if ($request->filled('type')) {
-            $query->where('product_type_id', $request->input('type'));
+            $query->whereHas('types', function($q) use ($request) {
+                $q->where('product_types.id', $request->input('type'));
+            });
         }
         
         // Status filter
@@ -74,7 +76,8 @@ class ProductController extends Controller
     {
         $request->validate([
             'product_category_id' => 'required|exists:product_categories,id',
-            'product_type_id' => 'nullable|exists:product_types,id',
+            'product_types' => 'nullable|array',
+            'product_types.*' => 'exists:product_types,id',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.title' => 'required|string|max:255',
@@ -93,7 +96,6 @@ class ProductController extends Controller
         try {
             $product = Product::create([
                 'product_category_id' => $request->input('product_category_id'),
-                'product_type_id' => $request->input('product_type_id'),
                 'discount_percent' => $request->input('discount_percent', 0),
                 'status' => $request->boolean('status', true)
             ]);
@@ -113,6 +115,11 @@ class ProductController extends Controller
                     'material' => $translation['material'] ?? null,
                     'size' => $translation['size'] ?? null
                 ]);
+            }
+
+            // Attach types
+            if ($request->has('product_types') && !empty($request->input('product_types'))) {
+                $product->types()->attach($request->input('product_types'));
             }
 
             // Attach tags
@@ -160,7 +167,8 @@ class ProductController extends Controller
     {
         $request->validate([
             'product_category_id' => 'required|exists:product_categories,id',
-            'product_type_id' => 'nullable|exists:product_types,id',
+            'product_types' => 'nullable|array',
+            'product_types.*' => 'exists:product_types,id',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.title' => 'required|string|max:255',
@@ -169,7 +177,6 @@ class ProductController extends Controller
             'translations.*.seo_title' => 'nullable|string|max:255',
             'translations.*.seo_keywords' => 'nullable|string',
             'translations.*.seo_description' => 'nullable|string',
-            'translations.*.weight' => 'nullable',
             'translations.*.material' => 'nullable|string',
             'translations.*.size' => 'nullable|string',
             'discount_percent' => 'nullable|numeric|min:0|max:100',
@@ -180,7 +187,6 @@ class ProductController extends Controller
         try {
             $product->update([
                 'product_category_id' => $request->input('product_category_id'),
-                'product_type_id' => $request->input('product_type_id'),
                 'discount_percent' => $request->input('discount_percent', 0),
                 'status' => $request->boolean('status', true)
             ]);
@@ -204,6 +210,13 @@ class ProductController extends Controller
                         'size' => $translation['size'] ?? null
                     ]
                 );
+            }
+
+            // Sync types
+            if ($request->has('product_types')) {
+                $product->types()->sync($request->input('product_types', []));
+            } else {
+                $product->types()->detach();
             }
 
             // Sync tags

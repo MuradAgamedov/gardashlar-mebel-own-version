@@ -11,7 +11,6 @@ class Product extends Model
 
     protected $fillable = [
         'product_category_id',
-        'product_type_id',
         'views_count',
         'order',
         'status',
@@ -31,9 +30,9 @@ class Product extends Model
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
 
-    public function type()
+    public function types()
     {
-        return $this->belongsTo(ProductType::class, 'product_type_id');
+        return $this->belongsToMany(ProductType::class, 'product_product_type');
     }
 
     public function translates()

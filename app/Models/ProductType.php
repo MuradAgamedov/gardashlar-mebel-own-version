@@ -28,6 +28,14 @@ class ProductType extends Model
     }
 
     /**
+     * Get all products that have this type
+     */
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'product_product_type');
+    }
+
+    /**
      * Get translation for specific language
      */
     public function translate($languageId = null)

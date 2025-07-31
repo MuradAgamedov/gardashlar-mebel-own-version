@@ -171,9 +171,22 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <span class="badge badge-light-info">
-                                                    {{ $product->type->translate()->title ?? 'No type' }}
-                                                </span>
+                                                @if($product->types->count() > 0)
+                                                    <div class="d-flex flex-wrap gap-1">
+                                                        @foreach($product->types->take(3) as $type)
+                                                            <span class="badge badge-light-info">
+                                                                {{ $type->translate()->title ?? 'No title' }}
+                                                            </span>
+                                                        @endforeach
+                                                        @if($product->types->count() > 3)
+                                                            <span class="badge badge-light-secondary">
+                                                                +{{ $product->types->count() - 3 }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                @else
+                                                    <span class="badge badge-light-secondary">No types</span>
+                                                @endif
                                             </td>
                                             <td>
                                                 <span class="badge badge-light-warning">
