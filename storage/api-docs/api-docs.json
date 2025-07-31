@@ -418,6 +418,138 @@
                     }
                 }
             }
+        },
+        "/api/product-types/{productTypeId}/products": {
+            "get": {
+                "tags": [
+                    "Product Type Products"
+                ],
+                "summary": "Get products for a specific product type",
+                "description": "Returns products that belong to a specific product type, with homepage status",
+                "operationId": "getProductsByType",
+                "parameters": [
+                    {
+                        "name": "productTypeId",
+                        "in": "path",
+                        "description": "The ID of the product type",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 2
+                        }
+                    },
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language_id from languages api",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "homepage_only",
+                        "in": "query",
+                        "description": "Return only products that are on homepage for this type",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Product Name"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Product description"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string",
+                                                        "example": "product-name"
+                                                    },
+                                                    "is_on_homepage": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "homepage_order": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product type not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product type not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error retrieving products"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "tags": [
@@ -436,6 +568,10 @@
         {
             "name": "Product Types",
             "description": "Product Types"
+        },
+        {
+            "name": "Product Type Products",
+            "description": "Product Type Products"
         }
     ]
 }
