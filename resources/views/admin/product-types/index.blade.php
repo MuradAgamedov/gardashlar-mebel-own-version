@@ -80,7 +80,6 @@
                                     <tr>
                                         <th width="50">#</th>
                                         <th>Title</th>
-                                        <th>Languages</th>
                                         <th>Status</th>
                                         <th width="150">Actions</th>
                                     </tr>
@@ -109,13 +108,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>
-                                                <div class="d-flex flex-wrap gap-1">
-                                                    @foreach($type->translates as $translate)
-                                                        <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
-                                                    @endforeach
-                                                </div>
-                                            </td>
+                                           
                                             <td>
                                                 @if($type->status)
                                                     <span class="badge badge-light-success">Active</span>
@@ -188,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
             onEnd: function(evt) {
                 const items = Array.from(tbody.querySelectorAll('tr[data-id]')).map(tr => tr.dataset.id);
                 
-                
+
                 fetch('{{ route("admin.product-types.reorder") }}', {
                     method: 'POST',
                     headers: {
