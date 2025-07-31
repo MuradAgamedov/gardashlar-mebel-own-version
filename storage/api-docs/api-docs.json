@@ -15,6 +15,273 @@
         }
     ],
     "paths": {
+        "/api/homepage-categories": {
+            "get": {
+                "tags": [
+                    "HomePageCategories"
+                ],
+                "summary": "Get all active homepage categories",
+                "description": "Returns a list of active homepage categories with their product category details, ordered by 'order' field",
+                "operationId": "getHomePageCategories",
+                "parameters": [
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language_id from languages api",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "order": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "status": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "product_category": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "parent_id": {
+                                                                "type": "integer",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "order": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "status": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            },
+                                                            "image": {
+                                                                "type": "string",
+                                                                "example": "categories/category1.jpg",
+                                                                "nullable": true
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Electronics"
+                                                            },
+                                                            "slug": {
+                                                                "type": "string",
+                                                                "example": "electronics"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Electronic products category",
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error retrieving homepage categories"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/homepage-categories/{id}": {
+            "get": {
+                "tags": [
+                    "HomePageCategories"
+                ],
+                "summary": "Get a specific homepage category",
+                "description": "Returns a specific homepage category with its product category details",
+                "operationId": "getHomePageCategory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "HomePageCategory ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language_id from languages api",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "order": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "status": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "product_category": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "parent_id": {
+                                                            "type": "integer",
+                                                            "example": null,
+                                                            "nullable": true
+                                                        },
+                                                        "order": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "status": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        },
+                                                        "image": {
+                                                            "type": "string",
+                                                            "example": "categories/category1.jpg",
+                                                            "nullable": true
+                                                        },
+                                                        "title": {
+                                                            "type": "string",
+                                                            "example": "Electronics"
+                                                        },
+                                                        "slug": {
+                                                            "type": "string",
+                                                            "example": "electronics"
+                                                        },
+                                                        "description": {
+                                                            "type": "string",
+                                                            "example": "Electronic products category",
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "HomePageCategory not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "HomePageCategory not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error retrieving homepage category"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/languages": {
             "get": {
                 "tags": [
@@ -264,6 +531,10 @@
         }
     },
     "tags": [
+        {
+            "name": "HomePageCategories",
+            "description": "HomePageCategories"
+        },
         {
             "name": "Languages",
             "description": "Languages"
