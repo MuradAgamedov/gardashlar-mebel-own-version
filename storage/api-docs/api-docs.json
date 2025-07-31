@@ -484,6 +484,22 @@
                                                     "slug": {
                                                         "type": "string",
                                                         "example": "product-name"
+                                                    },
+                                                    "types": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 2
+                                                                },
+                                                                "title": {
+                                                                    "type": "string",
+                                                                    "example": "Ümumi"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
                                                     }
                                                 },
                                                 "type": "object"
