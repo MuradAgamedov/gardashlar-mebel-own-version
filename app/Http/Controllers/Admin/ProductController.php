@@ -76,8 +76,7 @@ class ProductController extends Controller
     {
         $request->validate([
             'product_category_id' => 'required|exists:product_categories,id',
-            'product_types' => 'nullable|array',
-            'product_types.*' => 'exists:product_types,id',
+            'product_types' => 'nullable|string',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.title' => 'required|string|max:255',
@@ -170,8 +169,7 @@ class ProductController extends Controller
     {
         $request->validate([
             'product_category_id' => 'required|exists:product_categories,id',
-            'product_types' => 'nullable|array',
-            'product_types.*' => 'exists:product_types,id',
+            'product_types' => 'nullable|string',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.title' => 'required|string|max:255',
