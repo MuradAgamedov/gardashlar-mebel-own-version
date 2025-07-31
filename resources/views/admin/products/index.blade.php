@@ -71,23 +71,21 @@
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <label for="type" class="form-label">Type</label>
-                                <select class="form-select" id="type" name="type">
-                                    @if($types->count() > 0)
-                                        @php
-                                            $selectedType = request('type');
-                                            $firstTypeId = $types->first()->id;
-                                        @endphp
-                                        @foreach($types as $type)
-                                            <option value="{{ $type->id }}" {{ ($selectedType == $type->id || (empty($selectedType) && $type->id == $firstTypeId)) ? 'selected' : '' }}>
-                                                {{ $type->translate()->title ?? 'No title' }}
-                                            </option>
-                                        @endforeach
-                                    @else
-                                        <option value="">No Types Available</option>
-                                    @endif
-                                </select>
-                            </div>
+    <label for="type" class="form-label">Type</label>
+    <select class="form-select" id="type" name="type">
+        @if($types->count() > 0)
+            @foreach($types as $index => $type)
+                <option value="{{ $type->id }}"
+                    {{ (request('type') == $type->id || (request('type') === null && $index === 0)) ? 'selected' : '' }}>
+                    {{ $type->translate()->title ?? 'No title' }}
+                </option>
+            @endforeach
+        @else
+            <option value="">No Types Available</option>
+        @endif
+    </select>
+</div>
+
                             <div class="col-md-2">
                                 <label for="status" class="form-label">Status</label>
                                 <select class="form-select" id="status" name="status">
