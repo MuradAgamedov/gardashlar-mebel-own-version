@@ -12,9 +12,19 @@ class ProductTypeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $types = ProductType::with('translates.language')->ordered()->get();
+        $query = ProductType::with('translates.language');
+        
+        // Search functionality
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->whereHas('translates', function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%');
+            });
+        }
+        
+        $types = $query->ordered()->get();
         return view('admin.product-types.index', compact('types'));
     }
 

@@ -53,6 +53,27 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <!-- Search Form -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <form method="GET" action="{{ route('admin.product-types.index') }}" class="d-flex">
+                                    <input type="text" 
+                                           name="search" 
+                                           class="form-control me-2" 
+                                           placeholder="Search by title..."
+                                           value="{{ request('search') }}">
+                                    <button type="submit" class="btn btn-outline-primary">
+                                        <i class="material-icons-outlined">search</i>
+                                    </button>
+                                    @if(request('search'))
+                                        <a href="{{ route('admin.product-types.index') }}" class="btn btn-outline-secondary ms-2">
+                                            <i class="material-icons-outlined">clear</i>
+                                        </a>
+                                    @endif
+                                </form>
+                            </div>
+                        </div>
+
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
