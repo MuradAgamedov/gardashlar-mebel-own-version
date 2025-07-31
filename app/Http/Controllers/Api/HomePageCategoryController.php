@@ -82,6 +82,7 @@ class HomePageCategoryController extends Controller
                         ];
                     });
             });
+            
 
             return response()->json([
                 'success' => true,
