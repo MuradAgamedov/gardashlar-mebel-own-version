@@ -75,8 +75,8 @@
                                     <input type="hidden" 
                                            name="product_categories" 
                                            id="categoriesHiddenInput" 
-                                           value="{{ old('product_categories', json_encode([$categories->first()->id ?? null])) }}">
-                                    <small class="form-text text-muted">Click on categories to select/deselect. First category is selected by default.</small>
+                                           value="{{ old('product_categories', '[]') }}">
+                                    <small class="form-text text-muted">Click on categories to select/deselect</small>
                                     @error('product_categories')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
