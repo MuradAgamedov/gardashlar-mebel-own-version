@@ -51,6 +51,7 @@ use App\Http\Controllers\Admin\ProjectVideoController;
 use App\Http\Controllers\Admin\ProjectImageController;
 use App\Http\Controllers\Admin\ProductCategoryController;
 use App\Http\Controllers\Admin\ProductTypeController;
+use App\Http\Controllers\Admin\ProductTypeProductController;
 use App\Http\Controllers\Admin\ProductPriceFilterController;
 use App\Http\Controllers\Admin\HomePageProjectController;
 use App\Http\Controllers\Admin\HomePageCategoryController;
@@ -283,6 +284,11 @@ Route::prefix('')->name('admin.')->group(function () {
         
         // Product Types routes
         Route::resource('product-types', ProductTypeController::class);
+
+// Product Type Products routes
+Route::get('product-types/{productType}/products', [ProductTypeProductController::class, 'index'])->name('product-type-products.index');
+Route::post('product-types/{productType}/products/{product}/toggle-homepage', [ProductTypeProductController::class, 'toggleHomePage'])->name('product-type-products.toggle-homepage');
+Route::get('product-types/{productType}/products/search', [ProductTypeProductController::class, 'search'])->name('product-type-products.search');
         Route::post('product-types/reorder', [ProductTypeController::class, 'reorder'])->name('product-types.reorder');
         
         // Product Price Filter routes

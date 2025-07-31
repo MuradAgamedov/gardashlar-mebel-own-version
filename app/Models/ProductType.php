@@ -36,6 +36,14 @@ class ProductType extends Model
     }
 
     /**
+     * Get products that are shown on homepage for this type
+     */
+    public function homePageProducts()
+    {
+        return $this->hasMany(HomePageTypeProduct::class)->with('product');
+    }
+
+    /**
      * Get translation for specific language
      */
     public function translate($languageId = null)

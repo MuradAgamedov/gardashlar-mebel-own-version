@@ -34,6 +34,14 @@ class Product extends Model
         return $this->belongsToMany(ProductType::class, 'product_product_type');
     }
 
+    /**
+     * Get homepage type product entries for this product
+     */
+    public function homePageTypeProducts()
+    {
+        return $this->hasMany(HomePageTypeProduct::class);
+    }
+
     public function translates()
     {
         return $this->hasMany(ProductTranslate::class, 'product_id');

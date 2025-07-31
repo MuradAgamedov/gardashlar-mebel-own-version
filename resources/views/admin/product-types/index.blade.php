@@ -118,6 +118,11 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-2">
+                                                    <a href="{{ route('admin.product-type-products.index', $type) }}" 
+                                                       class="btn btn-sm btn-outline-info" 
+                                                       title="View Products">
+                                                        <i class="material-icons-outlined">inventory_2</i>
+                                                    </a>
                                                     <a href="{{ route('admin.product-types.edit', $type) }}" 
                                                        class="btn btn-sm btn-outline-primary" 
                                                        title="Edit">
