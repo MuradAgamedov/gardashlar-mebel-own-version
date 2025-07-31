@@ -170,7 +170,7 @@
                                             <td>
                                                 <div class="d-flex gap-2">
                                                     <button type="button" 
-                                                            class="btn btn-sm btn-icon {{ in_array($product->id, $homePageProductIds) ? 'btn-success' : 'btn-outline-success' }}"
+                                                            class="btn btn-sm action-btn {{ in_array($product->id, $homePageProductIds) ? 'btn-success' : 'btn-outline-success' }}"
                                                             onclick="toggleHomePage({{ $product->id }})"
                                                             title="{{ in_array($product->id, $homePageProductIds) ? 'Remove from homepage' : 'Add to homepage' }}">
                                                         <i class="material-icons-outlined">
@@ -178,7 +178,7 @@
                                                         </i>
                                                     </button>
                                                     <a href="{{ route('admin.products.edit', $product) }}" 
-                                                       class="btn btn-sm btn-icon btn-outline-primary" 
+                                                       class="btn btn-sm action-btn btn-outline-primary" 
                                                        title="Edit Product">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
@@ -227,20 +227,19 @@
 
 @push('styles')
 <style>
-.btn.btn-icon {
-    width: 32px !important;
-    height: 32px !important;
-    padding: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 4px !important;
+.action-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    text-decoration: none;
 }
 
-.btn.btn-icon i {
-    font-size: 16px !important;
-    line-height: 1 !important;
-    margin: 0 !important;
+.action-btn i {
+    font-size: 16px;
 }
 </style>
 @endpush
