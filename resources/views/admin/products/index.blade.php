@@ -73,12 +73,15 @@
                             <div class="col-md-2">
                                 <label for="type" class="form-label">Type</label>
                                 <select class="form-select" id="type" name="type">
-                                    <option value="">All Types</option>
-                                    @foreach($types as $type)
-                                        <option value="{{ $type->id }}" {{ request('type') == $type->id ? 'selected' : '' }}>
-                                            {{ $type->translate()->title ?? 'No title' }}
-                                        </option>
-                                    @endforeach
+                                    @if($types->count() > 0)
+                                        @foreach($types as $index => $type)
+                                            <option value="{{ $type->id }}" {{ (request('type') == $type->id || (request('type') == '' && $index == 0)) ? 'selected' : '' }}>
+                                                {{ $type->translate()->title ?? 'No title' }}
+                                            </option>
+                                        @endforeach
+                                    @else
+                                        <option value="">No Types Available</option>
+                                    @endif
                                 </select>
                             </div>
                             <div class="col-md-2">
