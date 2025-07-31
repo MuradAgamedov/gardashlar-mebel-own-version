@@ -156,9 +156,15 @@
                                             </td>
                                             <td>
                                                 @if($product->status)
-                                                    <span class="badge badge-light-success">Active</span>
+                                                    <span class="badge badge-light-success">
+                                                        <i class="material-icons-outlined me-1" style="font-size: 14px;">check_circle</i>
+                                                        Active
+                                                    </span>
                                                 @else
-                                                    <span class="badge badge-light-danger">Inactive</span>
+                                                    <span class="badge badge-light-danger">
+                                                        <i class="material-icons-outlined me-1" style="font-size: 14px;">cancel</i>
+                                                        Inactive
+                                                    </span>
                                                 @endif
                                             </td>
                                             <td>
@@ -221,7 +227,7 @@
 
 @push('styles')
 <style>
-.btn-icon {
+.btn.btn-icon {
     width: 32px !important;
     height: 32px !important;
     padding: 0 !important;
@@ -231,7 +237,7 @@
     border-radius: 4px !important;
 }
 
-.btn-icon i {
+.btn.btn-icon i {
     font-size: 16px !important;
     line-height: 1 !important;
     margin: 0 !important;
