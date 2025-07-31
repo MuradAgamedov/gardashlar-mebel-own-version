@@ -225,7 +225,7 @@ function toggleHomePage(productId) {
     const button = event.target.closest('button');
     const icon = button.querySelector('i');
     
-    fetch(`{{ route('admin.product-type-products.toggle-homepage', $productType) }}/${productId}`, {
+    fetch(`{{ route('admin.product-type-products.toggle-homepage', ['productType' => $productType, 'product' => ':productId']) }}`.replace(':productId', productId), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
