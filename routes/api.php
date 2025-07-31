@@ -15,4 +15,3 @@ Route::get('/pages/{keyword}', [PageController::class, 'findByKeyword'])->name('
 
 // HomePageCategory API Routes
 Route::get('/homepage-categories', [HomePageCategoryController::class, 'index'])->name('api.homepage-categories.index');
-Route::get('/homepage-categories/{id}', [HomePageCategoryController::class, 'show'])->name('api.homepage-categories.show');
