@@ -89,7 +89,7 @@ class ProductColorSeeder extends Seeder
         
         foreach ($colors as $index => $color) {
             $productColor = ProductColor::create([
-                'status' => true
+                'color_code' => $color['hex']
             ]);
             
             // Create translations for each language
