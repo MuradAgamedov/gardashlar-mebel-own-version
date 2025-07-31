@@ -309,6 +309,7 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         Route::post('product-page-categories/reorder', [ProductPageCategoryController::class, 'reorder'])->name('product-page-categories.reorder');
         
         // Product Colors routes
+        Route::delete('product-colors/bulk-delete', [ProductColorController::class, 'bulkDelete'])->name('product-colors.bulk-delete');
         Route::resource('product-colors', ProductColorController::class);
         
         // Product Tags routes
