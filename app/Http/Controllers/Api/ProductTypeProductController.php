@@ -99,7 +99,7 @@ class ProductTypeProductController extends Controller
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
-            dd($languageId);
+      
             $homepageOnly = $request->boolean('homepage_only', false);
             
             // Check if product type exists
