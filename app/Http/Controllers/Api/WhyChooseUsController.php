@@ -59,7 +59,6 @@ class WhyChooseUsController extends Controller
      *                     @OA\Items(
      *                         type="object",
      *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="order", type="integer", example=1),
      *                         @OA\Property(property="image_url", type="string", example="https://example.com/slider1.jpg"),
      *                         @OA\Property(property="video_id", type="string", nullable=true, example="tzQmYPOv4A0", description="YouTube video ID extracted from video_link")
      *                     )
@@ -96,7 +95,6 @@ class WhyChooseUsController extends Controller
                     ->map(function ($slider) {
                         return [
                             'id' => $slider->id,
-                            'order' => $slider->order,
                             'image_url' => $slider->image_url,
                             'video_id' => $this->extractYouTubeVideoId($slider->video_link)
                         ];
