@@ -13,14 +13,16 @@ class Product extends Model
         'views_count',
         'order',
         'status',
-        'discount_percent'
+        'discount_percent',
+        'price'
     ];
 
     protected $casts = [
         'views_count' => 'integer',
         'order' => 'integer',
         'status' => 'boolean',
-        'discount_percent' => 'decimal:2'
+        'discount_percent' => 'decimal:2',
+        'price' => 'decimal:2'
     ];
 
     // Relationships

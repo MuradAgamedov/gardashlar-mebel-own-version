@@ -192,7 +192,7 @@ class HeroCategoryController extends Controller
                             'id' => $product->id,
                             'title' => $translate->title ?? null,
                             'slug' => $translate->slug ?? null,
-                            'price' => null, // Price field not found in current schema
+                            'price' => $product->price ?? null,
                             'discount_percent' => $product->discount_percent ?? 0,
                             'main_image_url' => $mainImage ? $mainImage->image_url : null,
                         ];

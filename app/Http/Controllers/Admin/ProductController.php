@@ -89,6 +89,7 @@ class ProductController extends Controller
             'translations.*.seo_description' => 'nullable|string',
             'translations.*.material' => 'nullable|string',
             'translations.*.size' => 'nullable|string',
+            'price' => 'nullable|numeric|min:0',
             'discount_percent' => 'nullable|numeric|min:0|max:100',
             'product_tags' => 'nullable|string',
             'status' => 'boolean'
@@ -96,6 +97,7 @@ class ProductController extends Controller
 
         try {
             $product = Product::create([
+                'price' => $request->input('price'),
                 'discount_percent' => $request->input('discount_percent', 0),
                 'status' => $request->boolean('status', true)
             ]);
@@ -195,6 +197,7 @@ class ProductController extends Controller
             'translations.*.seo_description' => 'nullable|string',
             'translations.*.material' => 'nullable|string',
             'translations.*.size' => 'nullable|string',
+            'price' => 'nullable|numeric|min:0',
             'discount_percent' => 'nullable|numeric|min:0|max:100',
             'product_tags' => 'nullable|string',
             'status' => 'boolean'
@@ -202,6 +205,7 @@ class ProductController extends Controller
 
         try {
             $product->update([
+                'price' => $request->input('price'),
                 'discount_percent' => $request->input('discount_percent', 0),
                 'status' => $request->boolean('status', true)
             ]);
