@@ -124,14 +124,16 @@
                             <!-- Submit Buttons -->
                             <div class="row">
                                 <div class="col-12">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="material-icons-outlined">save</i>
-                                        Add Product
-                                    </button>
-                                    <a href="{{ route('admin.hero-products.index') }}" class="btn btn-secondary">
-                                        <i class="material-icons-outlined">cancel</i>
-                                        Cancel
-                                    </a>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="material-icons-outlined">save</i>
+                                            Add Product
+                                        </button>
+                                        <a href="{{ route('admin.hero-products.index') }}" class="btn btn-secondary">
+                                            <i class="material-icons-outlined">cancel</i>
+                                            Cancel
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </form>
