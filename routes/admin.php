@@ -252,7 +252,7 @@ Route::prefix('')->name('admin.')->group(function () {
         Route::post('maps/reorder', [MapController::class, 'reorder'])->name('maps.reorder');
         
         // Project Categories routes
-        Route::resource('project-categories', ProjectCategoryController::class);
+        Route::resource('project-categories', ProjectCategoryController::class)->except(['show']);
         Route::post('project-categories/reorder', [ProjectCategoryController::class, 'reorder'])->name('project-categories.reorder');
         
         // Hero Categories routes
