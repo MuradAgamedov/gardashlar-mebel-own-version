@@ -28,7 +28,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0">Selected Project Categories for Home Page</h5>
                             <a href="{{ route('admin.home-page-project-categories.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Add Project Category
+                                <i class="fas fa-plus"></i> 
                             </a>
                         </div>
                     </div>
@@ -114,7 +114,7 @@
                                 <h5 class="text-muted">No Project Categories Selected</h5>
                                 <p class="text-muted">Start by adding project categories to display on the home page.</p>
                                 <a href="{{ route('admin.home-page-project-categories.create') }}" class="btn btn-primary">
-                                    <i class="fas fa-plus"></i> Add First Project Category
+                                    <i class="fas fa-plus"></i> 
                                 </a>
                             </div>
                         @endif

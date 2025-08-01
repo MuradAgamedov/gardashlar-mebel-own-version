@@ -117,10 +117,10 @@
                                 <div class="col-12">
                                     <div class="d-flex justify-content-end gap-2">
                                         <a href="{{ route('admin.home-page-project-categories.index') }}" class="btn btn-secondary">
-                                            <i class="fas fa-arrow-left"></i> Back to List
+                                            <i class="fas fa-arrow-left"></i> 
                                         </a>
                                         <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-plus"></i> Add to Home Page
+                                            <i class="fas fa-plus"></i> 
                                         </button>
                                     </div>
                                 </div>
