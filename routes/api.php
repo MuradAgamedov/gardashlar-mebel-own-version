@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ProductTypeProductController;
 use App\Http\Controllers\Api\HeroCategoryController;
 use App\Http\Controllers\Api\WhyChooseUsController;
 use App\Http\Controllers\Api\HomePageDiscountController;
+use App\Http\Controllers\Api\HomePageProjectCategoryController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -36,3 +37,6 @@ Route::get('/why-choose-us', [WhyChooseUsController::class, 'index'])->name('api
 
 // Home Page Discount API Routes
 Route::get('/home-page-discount', [HomePageDiscountController::class, 'index'])->name('api.home-page-discount.index');
+
+// Home Page Project Categories API Routes
+Route::get('/home-page-project-categories', [HomePageProjectCategoryController::class, 'index'])->name('api.home-page-project-categories.index');
