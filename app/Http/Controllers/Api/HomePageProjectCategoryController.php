@@ -62,6 +62,7 @@ class HomePageProjectCategoryController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        dd(1);
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
             $cacheKey = "api:home-page-project-categories:lang:{$languageId}";
