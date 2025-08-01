@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectCategory extends Model
 {
@@ -19,6 +20,8 @@ class ProjectCategory extends Model
         'order' => 'integer',
         'status' => 'boolean',
     ];
+
+    protected $appends = ['image_url'];
 
     /**
      * Get the translations for this project category
@@ -50,6 +53,14 @@ class ProjectCategory extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('order');
+    }
+
+    /**
+     * Get the full URL for the image
+     */
+    public function getImageUrlAttribute()
+    {
+        return $this->image ? env('APP_URL') . Storage::url($this->image) : null;
     }
 
     /**

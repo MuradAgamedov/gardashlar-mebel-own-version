@@ -68,7 +68,7 @@
                                     @enderror
                                     <div id="image-preview-container" class="mt-2">
                                         @if($projectCategory->image)
-                                            <img src="{{ asset($projectCategory->image) }}" class="img-fluid rounded border" style="max-height:120px;object-fit:cover;" alt="Current Image">
+                                            <img src="{{ projectCategory->image_url }}" class="img-fluid rounded border" style="max-height:120px;object-fit:cover;" alt="Current Image">
                                         @endif
                                     </div>
                                 </div>
