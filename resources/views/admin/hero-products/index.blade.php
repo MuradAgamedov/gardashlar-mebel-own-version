@@ -96,15 +96,19 @@
                                                     @php
                                                         $categoryTranslation = $firstCategory->translates->first();
                                                     @endphp
-                                                    <span class="badge bg-secondary">
-                                                        <i class="material-icons-outlined" style="font-size: 12px;">category</i>
-                                                        {{ $categoryTranslation ? $categoryTranslation->title : 'No category' }}
-                                                    </span>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="badge bg-secondary me-2">
+                                                            <i class="material-icons-outlined" style="font-size: 12px;">category</i>
+                                                        </span>
+                                                        <span class="fw-medium">{{ $categoryTranslation ? $categoryTranslation->title : 'No category' }}</span>
+                                                    </div>
                                                 @else
-                                                    <span class="badge bg-warning">
-                                                        <i class="material-icons-outlined" style="font-size: 12px;">warning</i>
-                                                        No Category
-                                                    </span>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="badge bg-warning me-2">
+                                                            <i class="material-icons-outlined" style="font-size: 12px;">warning</i>
+                                                        </span>
+                                                        <span class="text-muted">No Category</span>
+                                                    </div>
                                                 @endif
                                             </td>
                                             <td>
