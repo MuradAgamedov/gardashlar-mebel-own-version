@@ -289,6 +289,96 @@
                 }
             }
         },
+        "/api/home-page-discount": {
+            "get": {
+                "tags": [
+                    "Home Page Sections"
+                ],
+                "summary": "Get Home Page Discount data",
+                "description": "Returns Home Page Discount content with background image and translations",
+                "operationId": "getHomePageDiscount",
+                "parameters": [
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language_id from languages api",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "description": "Home Page Discount content",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "bg_image_url": {
+                                                    "type": "string",
+                                                    "example": "https://example.com/bg-image.jpg",
+                                                    "nullable": true
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Special Discount",
+                                                    "nullable": true
+                                                },
+                                                "subtitle": {
+                                                    "type": "string",
+                                                    "example": "Get up to 50% off",
+                                                    "nullable": true
+                                                },
+                                                "button_link": {
+                                                    "type": "string",
+                                                    "example": "https://example.com/shop",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error retrieving Home Page Discount data"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/languages": {
             "get": {
                 "tags": [
@@ -938,6 +1028,10 @@
         {
             "name": "HomePageCategories",
             "description": "HomePageCategories"
+        },
+        {
+            "name": "Home Page Sections",
+            "description": "Home Page Sections"
         },
         {
             "name": "Languages",
