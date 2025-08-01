@@ -687,6 +687,11 @@
                                                         "type": "string",
                                                         "example": "mehsul-adi"
                                                     },
+                                                    "price": {
+                                                        "description": "Məhsulun qiyməti",
+                                                        "type": "number",
+                                                        "example": 2500
+                                                    },
                                                     "main_image": {
                                                         "description": "Əsas şəklin URL-i",
                                                         "type": "string",

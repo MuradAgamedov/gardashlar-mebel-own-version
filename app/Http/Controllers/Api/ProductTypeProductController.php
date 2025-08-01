@@ -62,6 +62,7 @@ class ProductTypeProductController extends Controller
      *                     @OA\Property(property="title", type="string", example="Məhsul Adı", description="Məhsulun başlığı"),
      *                     @OA\Property(property="description", type="string", example="Məhsul təsviri", description="Məhsulun təsviri"),
      *                     @OA\Property(property="slug", type="string", example="mehsul-adi", description="Məhsulun slug-u"),
+     *                     @OA\Property(property="price", type="number", example=2500.00, description="Məhsulun qiyməti"),
      *                     @OA\Property(property="main_image", type="string", nullable=true, example="https://admin.gardaslar.coder.az/uploads/products/image.jpg", description="Əsas şəklin URL-i"),
      *                     @OA\Property(
      *                         property="types",
@@ -154,6 +155,7 @@ class ProductTypeProductController extends Controller
                         'title' => $translation ? $translation->title : 'No title',
                         'description' => $translation ? $translation->description : null,
                         'slug' => $translation ? $translation->slug : null,
+                        'price' => $product->price,
                         'main_image' => $mainImage ? $mainImage->image_url : null,
                         'types' => $product->types->map(function($type) {
                             $typeTranslation = $type->translates->first();
