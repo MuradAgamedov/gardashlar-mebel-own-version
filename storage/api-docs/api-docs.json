@@ -15,6 +15,82 @@
         }
     ],
     "paths": {
+        "/api/hero-categories": {
+            "get": {
+                "tags": [
+                    "HeroCategories"
+                ],
+                "summary": "Get all active hero categories",
+                "description": "Returns a list of active hero categories with their product category details, ordered by 'order' field",
+                "operationId": "getHeroCategories",
+                "parameters": [
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language_id from languages api",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Electronics"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error retrieving hero categories"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/homepage-categories": {
             "get": {
                 "tags": [
@@ -569,6 +645,10 @@
         }
     },
     "tags": [
+        {
+            "name": "HeroCategories",
+            "description": "HeroCategories"
+        },
         {
             "name": "HomePageCategories",
             "description": "HomePageCategories"
