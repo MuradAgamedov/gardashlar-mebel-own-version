@@ -91,6 +91,128 @@
                 }
             }
         },
+        "/api/hero-categories/{categoryId}/products": {
+            "get": {
+                "tags": [
+                    "HeroCategories"
+                ],
+                "summary": "Get hero products by category ID",
+                "description": "Returns hero products for a specific category with product details including main image, name, slug, price, and discount_percent",
+                "operationId": "getHeroProductsByCategory",
+                "parameters": [
+                    {
+                        "name": "categoryId",
+                        "in": "path",
+                        "description": "Product category ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language_id from languages api",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Product Name"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string",
+                                                        "example": "product-name"
+                                                    },
+                                                    "price": {
+                                                        "type": "number",
+                                                        "example": 99.99
+                                                    },
+                                                    "discount_percent": {
+                                                        "type": "number",
+                                                        "example": 10.5
+                                                    },
+                                                    "main_image_url": {
+                                                        "type": "string",
+                                                        "example": "https://example.com/image.jpg"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Category not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error retrieving hero products"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/homepage-categories": {
             "get": {
                 "tags": [

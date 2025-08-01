@@ -21,6 +21,7 @@ Route::get('/homepage-categories', [HomePageCategoryController::class, 'index'])
 
 // HeroCategory API Routes
 Route::get('/hero-categories', [HeroCategoryController::class, 'index'])->name('api.hero-categories.index');
+Route::get('/hero-categories/{categoryId}/products', [HeroCategoryController::class, 'getProductsByCategory'])->name('api.hero-categories.products');
 
 // ProductType API Routes
 Route::get('/product-types', [ProductTypeController::class, 'index'])->name('api.product-types.index');

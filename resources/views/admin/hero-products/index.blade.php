@@ -47,7 +47,7 @@
                             <h5>Products to Display in Hero Section</h5>
                             <a href="{{ route('admin.hero-products.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Product
+                     
                             </a>
                         </div>
                     </div>
