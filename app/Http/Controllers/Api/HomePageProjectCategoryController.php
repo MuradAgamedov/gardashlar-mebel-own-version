@@ -35,9 +35,7 @@ use OpenApi\Annotations as OA;
  *                 @OA\Items(
  *                     @OA\Property(property="id", type="integer", example=1, description="Layihə kateqoriyasının ID-si"),
  *                     @OA\Property(property="title", type="string", example="Tikinti Layihələri", description="Kateqoriyanın adı"),
- *                     @OA\Property(property="image", type="string", nullable=true, example="project-categories/image.jpg", description="Şəklin yolu"),
- *                     @OA\Property(property="image_url", type="string", nullable=true, example="https://admin.gardaslar.coder.az/storage/project-categories/image.jpg", description="Şəklin tam URL-i"),
- *                     @OA\Property(property="order", type="integer", example=1, description="Sıralama nömrəsi")
+ *                     @OA\Property(property="image_url", type="string", nullable=true, example="https://admin.gardaslar.coder.az/storage/project-categories/image.jpg", description="Şəklin tam URL-i")
  *                 )
  *             )
  *         )
@@ -73,16 +71,20 @@ class HomePageProjectCategoryController extends Controller
                     ->get();
 
                 return $homePageProjectCategories->map(function ($item) use ($languageId) {
+                    // Get translation for the specified language
                     $translation = $item->projectCategory->translates()
                         ->where('language_id', $languageId)
                         ->first();
+                    
+                    // If no translation found, get the first available translation
+                    if (!$translation) {
+                        $translation = $item->projectCategory->translates()->first();
+                    }
 
                     return [
                         'id' => $item->projectCategory->id,
                         'title' => $translation ? $translation->title : null,
-                        'image' => $item->projectCategory->image,
-                        'image_url' => $item->projectCategory->image_url,
-                        'order' => $item->order
+                        'image_url' => $item->projectCategory->image_url
                     ];
                 });
             });
