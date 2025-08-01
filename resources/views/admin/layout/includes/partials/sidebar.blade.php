@@ -13,7 +13,7 @@
         </a>
         <ul class="sidebar-submenu">
           <li><a href="{{ route('admin.languages.index') }}">Languages</a></li>
-          <li><a href="#">Dictionary</a></li>
+          <li><a href="{{ route('admin.dictionaries.index') }}">Dictionary</a></li>
         </ul>
       </li>
       <li class="sidebar-list">

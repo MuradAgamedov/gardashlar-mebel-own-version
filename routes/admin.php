@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LanguageController;
+use App\Http\Controllers\Admin\DictionaryController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\WhyChooseUsController;
 use App\Http\Controllers\Admin\WhyChooseUsSliderController;
@@ -81,6 +82,9 @@ Route::prefix('')->name('admin.')->group(function () {
         // Language routes
         Route::resource('languages', LanguageController::class);
         Route::post('languages/reorder', [LanguageController::class, 'reorder'])->name('languages.reorder');
+        
+        // Dictionary routes
+        Route::resource('dictionaries', DictionaryController::class);
         
         // Page routes
         Route::resource('pages', PageController::class);
