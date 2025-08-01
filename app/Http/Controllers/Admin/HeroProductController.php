@@ -15,7 +15,7 @@ class HeroProductController extends Controller
      */
     public function index()
     {
-        $heroProducts = HeroProduct::with('product.translates.language', 'product.category.translates.language')
+        $heroProducts = HeroProduct::with('product.translates.language', 'product.categories.translates.language')
             ->ordered()
             ->get();
             
@@ -139,7 +139,7 @@ class HeroProductController extends Controller
         $search = $request->input('search');
         $excludeIds = $request->input('exclude_ids', []);
 
-        $products = Product::with(['translates.language', 'category.translates.language'])
+        $products = Product::with(['translates.language', 'categories.translates.language'])
             ->whereHas('translates', function ($query) use ($search) {
                 $query->where('title', 'like', '%' . $search . '%');
             })
@@ -152,7 +152,8 @@ class HeroProductController extends Controller
         $results = [];
         foreach ($products as $product) {
             $firstTranslation = $product->translates->first();
-            $categoryTranslation = $product->category->translates->first();
+            $firstCategory = $product->categories->first();
+            $categoryTranslation = $firstCategory ? $firstCategory->translates->first() : null;
             
             $results[] = [
                 'id' => $product->id,

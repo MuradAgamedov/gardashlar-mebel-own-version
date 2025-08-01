@@ -99,7 +99,11 @@
                                                         {{ $heroProduct->product->translates->first() ? $heroProduct->product->translates->first()->title : 'No title' }}
                                                     </h6>
                                                     <small class="text-muted" id="selected_product_category">
-                                                        {{ $heroProduct->product->category && $heroProduct->product->category->translates->first() ? $heroProduct->product->category->translates->first()->title : 'No category' }}
+                                                        @php
+                                                            $firstCategory = $heroProduct->product->categories->first();
+                                                            $categoryTranslation = $firstCategory ? $firstCategory->translates->first() : null;
+                                                        @endphp
+                                                        {{ $categoryTranslation ? $categoryTranslation->title : 'No category' }}
                                                     </small>
                                                 </div>
                                             </div>

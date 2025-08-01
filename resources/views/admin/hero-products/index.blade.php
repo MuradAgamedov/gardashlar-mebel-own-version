@@ -89,9 +89,12 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                @if($heroProduct->product->category)
+                                                @php
+                                                    $firstCategory = $heroProduct->product->categories->first();
+                                                @endphp
+                                                @if($firstCategory)
                                                     @php
-                                                        $categoryTranslation = $heroProduct->product->category->translates->first();
+                                                        $categoryTranslation = $firstCategory->translates->first();
                                                     @endphp
                                                     <span class="badge bg-secondary">
                                                         <i class="material-icons-outlined" style="font-size: 12px;">category</i>
