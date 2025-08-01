@@ -61,7 +61,7 @@ class WhyChooseUsController extends Controller
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="order", type="integer", example=1),
      *                         @OA\Property(property="image_url", type="string", example="https://example.com/slider1.jpg"),
-     *                         @OA\Property(property="video_link", type="string", nullable=true, example="https://youtube.com/watch?v=...")
+     *                         @OA\Property(property="video_id", type="string", nullable=true, example="tzQmYPOv4A0", description="YouTube video ID extracted from video_link")
      *                     )
      *                 )
      *             )
@@ -98,7 +98,7 @@ class WhyChooseUsController extends Controller
                             'id' => $slider->id,
                             'order' => $slider->order,
                             'image_url' => $slider->image_url,
-                            'video_link' => $slider->video_link
+                            'video_id' => $this->extractYouTubeVideoId($slider->video_link)
                         ];
                     });
                 
@@ -127,5 +127,34 @@ class WhyChooseUsController extends Controller
                 'data' => []
             ], 500);
         }
+    }
+
+    /**
+     * Extract YouTube video ID from various YouTube URL formats
+     *
+     * @param string|null $url
+     * @return string|null
+     */
+    private function extractYouTubeVideoId(?string $url): ?string
+    {
+        if (empty($url)) {
+            return null;
+        }
+
+        // YouTube URL patterns
+        $patterns = [
+            '/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/',
+            '/youtu\.be\/([a-zA-Z0-9_-]+)/',
+            '/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/',
+            '/youtube\.com\/v\/([a-zA-Z0-9_-]+)/',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $url, $matches)) {
+                return $matches[1];
+            }
+        }
+
+        return null;
     }
 } 

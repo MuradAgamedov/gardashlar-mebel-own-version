@@ -855,9 +855,10 @@
                                                                 "type": "string",
                                                                 "example": "https://example.com/slider1.jpg"
                                                             },
-                                                            "video_link": {
+                                                            "video_id": {
+                                                                "description": "YouTube video ID extracted from video_link",
                                                                 "type": "string",
-                                                                "example": "https://youtube.com/watch?v=...",
+                                                                "example": "tzQmYPOv4A0",
                                                                 "nullable": true
                                                             }
                                                         },
