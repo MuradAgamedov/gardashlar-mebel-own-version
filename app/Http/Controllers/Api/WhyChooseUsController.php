@@ -50,7 +50,14 @@ class WhyChooseUsController extends Controller
      *                     @OA\Property(property="second_icon_url", type="string", example="https://example.com/icon2.png"),
      *                     @OA\Property(property="third_icon_url", type="string", example="https://example.com/icon3.png"),
      *                     @OA\Property(property="fourth_icon_url", type="string", example="https://example.com/icon4.png"),
-     *                     @OA\Property(property="content", type="string", example="Why choose us content...")
+     *                     @OA\Property(property="first_title", type="string", nullable=true, example="Quality Service"),
+     *                     @OA\Property(property="first_description", type="string", nullable=true, example="We provide high quality services"),
+     *                     @OA\Property(property="second_title", type="string", nullable=true, example="Fast Delivery"),
+     *                     @OA\Property(property="second_description", type="string", nullable=true, example="Quick and reliable delivery"),
+     *                     @OA\Property(property="third_title", type="string", nullable=true, example="24/7 Support"),
+     *                     @OA\Property(property="third_description", type="string", nullable=true, example="Round the clock customer support"),
+     *                     @OA\Property(property="fourth_title", type="string", nullable=true, example="Best Prices"),
+     *                     @OA\Property(property="fourth_description", type="string", nullable=true, example="Competitive pricing for all services")
      *                 ),
      *                 @OA\Property(
      *                     property="sliders",
@@ -107,7 +114,14 @@ class WhyChooseUsController extends Controller
                         'second_icon_url' => $whyChooseUs->second_icon_url,
                         'third_icon_url' => $whyChooseUs->third_icon_url,
                         'fourth_icon_url' => $whyChooseUs->fourth_icon_url,
-                        'content' => $translation ? $translation->content : null
+                        'first_title' => $translation ? $translation->first_title : null,
+                        'first_description' => $translation ? $translation->first_description : null,
+                        'second_title' => $translation ? $translation->second_title : null,
+                        'second_description' => $translation ? $translation->second_description : null,
+                        'third_title' => $translation ? $translation->third_title : null,
+                        'third_description' => $translation ? $translation->third_description : null,
+                        'fourth_title' => $translation ? $translation->fourth_title : null,
+                        'fourth_description' => $translation ? $translation->fourth_description : null
                     ],
                     'sliders' => $sliders
                 ];

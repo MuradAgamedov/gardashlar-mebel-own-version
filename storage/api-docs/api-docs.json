@@ -831,9 +831,45 @@
                                                             "type": "string",
                                                             "example": "https://example.com/icon4.png"
                                                         },
-                                                        "content": {
+                                                        "first_title": {
                                                             "type": "string",
-                                                            "example": "Why choose us content..."
+                                                            "example": "Quality Service",
+                                                            "nullable": true
+                                                        },
+                                                        "first_description": {
+                                                            "type": "string",
+                                                            "example": "We provide high quality services",
+                                                            "nullable": true
+                                                        },
+                                                        "second_title": {
+                                                            "type": "string",
+                                                            "example": "Fast Delivery",
+                                                            "nullable": true
+                                                        },
+                                                        "second_description": {
+                                                            "type": "string",
+                                                            "example": "Quick and reliable delivery",
+                                                            "nullable": true
+                                                        },
+                                                        "third_title": {
+                                                            "type": "string",
+                                                            "example": "24/7 Support",
+                                                            "nullable": true
+                                                        },
+                                                        "third_description": {
+                                                            "type": "string",
+                                                            "example": "Round the clock customer support",
+                                                            "nullable": true
+                                                        },
+                                                        "fourth_title": {
+                                                            "type": "string",
+                                                            "example": "Best Prices",
+                                                            "nullable": true
+                                                        },
+                                                        "fourth_description": {
+                                                            "type": "string",
+                                                            "example": "Competitive pricing for all services",
+                                                            "nullable": true
                                                         }
                                                     },
                                                     "type": "object"
