@@ -34,7 +34,7 @@
                             @method('PUT')
                             
                             <div class="row">
-                                <div class="col-md-8">
+                                <div class="col-md-12">
                                     <!-- Current Category Info -->
                                     <div class="mb-4">
                                         <label class="form-label">Current Project Category</label>
@@ -105,65 +105,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-4">
-                                    <!-- Info Card -->
-                                    <div class="card bg-light">
-                                        <div class="card-body">
-                                            <h6 class="card-title">
-                                                <i class="fas fa-info-circle text-primary"></i>
-                                                Information
-                                            </h6>
-                                            <ul class="list-unstyled mb-0">
-                                                <li class="mb-2">
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-sort text-warning"></i>
-                                                        Current order: {{ $homePageProjectCategory->order }}
-                                                    </small>
-                                                </li>
-                                                <li class="mb-2">
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-calendar text-info"></i>
-                                                        Created: {{ $homePageProjectCategory->created_at->format('M d, Y') }}
-                                                    </small>
-                                                </li>
-                                                <li class="mb-2">
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-edit text-success"></i>
-                                                        Last updated: {{ $homePageProjectCategory->updated_at->format('M d, Y') }}
-                                                    </small>
-                                                </li>
-                                                <li>
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-exclamation-triangle text-warning"></i>
-                                                        Order can be changed by dragging in the list
-                                                    </small>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
 
-                                    <!-- Quick Actions -->
-                                    <div class="card mt-3">
-                                        <div class="card-body">
-                                            <h6 class="card-title">
-                                                <i class="fas fa-bolt text-warning"></i>
-                                                Quick Actions
-                                            </h6>
-                                            <div class="d-grid gap-2">
-                                                <a href="{{ route('admin.project-categories.edit', $homePageProjectCategory->projectCategory->id) }}" 
-                                                   class="btn btn-outline-primary btn-sm" target="_blank">
-                                                    <i class="fas fa-external-link-alt"></i>
-                                                    Edit Project Category
-                                                </a>
-                                                <a href="{{ route('admin.home-page-project-categories.index') }}" 
-                                                   class="btn btn-outline-secondary btn-sm">
-                                                    <i class="fas fa-list"></i>
-                                                    Back to List
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
 
                             <!-- Action Buttons -->

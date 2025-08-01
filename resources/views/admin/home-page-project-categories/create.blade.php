@@ -33,7 +33,7 @@
                             @csrf
                             
                             <div class="row">
-                                <div class="col-md-8">
+                                <div class="col-md-12">
                                     <!-- Project Category Selection -->
                                     <div class="mb-3">
                                         <label for="project_category_id" class="form-label">Project Category <span class="text-danger">*</span></label>
@@ -73,43 +73,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-4">
-                                    <!-- Info Card -->
-                                    <div class="card bg-light">
-                                        <div class="card-body">
-                                            <h6 class="card-title">
-                                                <i class="fas fa-info-circle text-primary"></i>
-                                                Information
-                                            </h6>
-                                            <ul class="list-unstyled mb-0">
-                                                <li class="mb-2">
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-check-circle text-success"></i>
-                                                        Selected categories will appear on the home page
-                                                    </small>
-                                                </li>
-                                                <li class="mb-2">
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-sort text-warning"></i>
-                                                        Order can be changed later by dragging
-                                                    </small>
-                                                </li>
-                                                <li class="mb-2">
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-toggle-on text-info"></i>
-                                                        Status can be toggled on/off
-                                                    </small>
-                                                </li>
-                                                <li>
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-exclamation-triangle text-warning"></i>
-                                                        Only active project categories are available
-                                                    </small>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
+
                             </div>
 
                             <!-- Action Buttons -->
