@@ -55,6 +55,7 @@ use App\Http\Controllers\Admin\ProductTypeProductController;
 use App\Http\Controllers\Admin\ProductPriceFilterController;
 use App\Http\Controllers\Admin\HomePageProjectController;
 use App\Http\Controllers\Admin\HomePageCategoryController;
+use App\Http\Controllers\Admin\HomePageProjectCategoryController;
 use App\Http\Controllers\Admin\ProductPageCategoryController;
 use App\Http\Controllers\Admin\ProductColorController;
 use App\Http\Controllers\Admin\ProductTagController;
@@ -303,6 +304,10 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         // Home Page Categories routes
         Route::resource('home-page-categories', HomePageCategoryController::class);
         Route::post('home-page-categories/reorder', [HomePageCategoryController::class, 'reorder'])->name('home-page-categories.reorder');
+        
+        // Home Page Project Categories routes
+        Route::resource('home-page-project-categories', HomePageProjectCategoryController::class)->except(['show']);
+        Route::post('home-page-project-categories/reorder', [HomePageProjectCategoryController::class, 'reorder'])->name('home-page-project-categories.reorder');
         
         // Product Page Categories routes
         Route::resource('product-page-categories', ProductPageCategoryController::class);
