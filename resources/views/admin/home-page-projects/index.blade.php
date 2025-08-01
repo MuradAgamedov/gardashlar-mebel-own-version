@@ -48,7 +48,6 @@
                             <h5>Projects on Home Page</h5>
                             <a href="{{ route('admin.home-page-projects.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Project
                             </a>
                         </div>
                     </div>
@@ -138,7 +137,6 @@
                                                     <p class="mt-2">No projects added to home page yet</p>
                                                     <a href="{{ route('admin.home-page-projects.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Project
                                                     </a>
                                                 </div>
                                             </td>
