@@ -539,7 +539,7 @@
         "/api/product-types": {
             "get": {
                 "tags": [
-                    "Product Types"
+                    "Məhsul Növləri"
                 ],
                 "summary": "Get all active product types",
                 "description": "Returns a list of active product types with translations (id and title only)",
@@ -692,6 +692,11 @@
                                                         "type": "number",
                                                         "example": 2500
                                                     },
+                                                    "view_count": {
+                                                        "description": "Məhsulun baxış sayı",
+                                                        "type": "integer",
+                                                        "example": 42
+                                                    },
                                                     "main_image": {
                                                         "description": "Əsas şəklin URL-i",
                                                         "type": "string",
@@ -769,6 +774,127 @@
                     }
                 }
             }
+        },
+        "/api/why-choose-us": {
+            "get": {
+                "tags": [
+                    "Why Choose Us"
+                ],
+                "summary": "Get Why Choose Us data with sliders",
+                "description": "Returns Why Choose Us content and active sliders",
+                "operationId": "getWhyChooseUs",
+                "parameters": [
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language_id from languages api",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "why_choose_us": {
+                                                    "description": "Why Choose Us content",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "first_icon_url": {
+                                                            "type": "string",
+                                                            "example": "https://example.com/icon1.png"
+                                                        },
+                                                        "second_icon_url": {
+                                                            "type": "string",
+                                                            "example": "https://example.com/icon2.png"
+                                                        },
+                                                        "third_icon_url": {
+                                                            "type": "string",
+                                                            "example": "https://example.com/icon3.png"
+                                                        },
+                                                        "fourth_icon_url": {
+                                                            "type": "string",
+                                                            "example": "https://example.com/icon4.png"
+                                                        },
+                                                        "content": {
+                                                            "type": "string",
+                                                            "example": "Why choose us content..."
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "sliders": {
+                                                    "description": "Active sliders",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "order": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "image_url": {
+                                                                "type": "string",
+                                                                "example": "https://example.com/slider1.jpg"
+                                                            },
+                                                            "video_link": {
+                                                                "type": "string",
+                                                                "example": "https://youtube.com/watch?v=...",
+                                                                "nullable": true
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error retrieving Why Choose Us data"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "tags": [
@@ -789,12 +915,12 @@
             "description": "Pages"
         },
         {
-            "name": "Product Types",
-            "description": "Product Types"
-        },
-        {
             "name": "Məhsul Növləri",
             "description": "Məhsul Növləri"
+        },
+        {
+            "name": "Why Choose Us",
+            "description": "Why Choose Us"
         }
     ]
 }

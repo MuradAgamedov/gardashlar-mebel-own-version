@@ -19,7 +19,7 @@ class ProductTypeController extends Controller
      * @OA\Get(
      *     path="/api/product-types",
      *     operationId="getProductTypes",
-     *     tags={"Product Types"},
+     *     tags={"Məhsul Növləri"},
      *     summary="Get all active product types",
      *     description="Returns a list of active product types with translations (id and title only)",
      *     @OA\Parameter(
