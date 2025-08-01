@@ -47,7 +47,6 @@
                             <h5>Categories to Display on Home Page</h5>
                             <a href="{{ route('admin.home-page-categories.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Category
                             </a>
                         </div>
                     </div>
@@ -147,7 +146,6 @@
                                                     <i class="material-icons-outlined" style="font-size: 48px;">category</i>
                                                     <p class="mt-2">No categories selected for home page</p>
                                                     <a href="{{ route('admin.home-page-categories.create') }}" class="btn btn-primary">
-                                                        Add First Category
                                                     </a>
                                                 </div>
                                             </td>
