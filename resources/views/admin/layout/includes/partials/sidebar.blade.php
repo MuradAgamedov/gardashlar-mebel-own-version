@@ -122,7 +122,6 @@
         <ul class="sidebar-submenu">
           <li><a href="{{ route('admin.project-categories.index') }}">Project Categories</a></li>
           <li><a href="{{ route('admin.projects.index') }}">Projects</a></li>
-          <li><a href="{{ route('admin.home-page-projects.index') }}">Home Page Projects</a></li>
         </ul>
       </li>
 
@@ -136,7 +135,6 @@
           <li><a href="{{ route('admin.product-categories.index') }}">Product Categories</a></li>
           <li><a href="{{ route('admin.product-types.index') }}">Product Types</a></li>
           <li><a href="{{ route('admin.product-price-filters.index') }}">Price Filters</a></li>
-          <li><a href="{{ route('admin.home-page-categories.index') }}">Home page catgeories</a></li>
           <li><a href="{{ route('admin.product-page-categories.index') }}">Product page categories</a></li>
           <li><a href="{{ route('admin.hero-categories.index') }}">Hero Categories</a></li>
           <li><a href="{{ route('admin.hero-products.index') }}">Hero Products</a></li>
@@ -170,7 +168,19 @@
           <li><a href="{{ route('admin.reports.index') }}">Reports</a></li>
           <li><a href="{{ route('admin.faqs.index') }}">FAQs</a></li>
           <li><a href="{{ route('admin.vacancies.index') }}">Vacancies</a></li>
+        </ul>
+      </li>
+
+      <li class="sidebar-list">
+        <a class="sidebar-link" href="javascript:void(0)">
+          <i class="fas fa-home"></i>
+          <h6>Home Page Sections</h6>
+          <i class="fas fa-chevron-down float-end"></i>
+        </a>
+        <ul class="sidebar-submenu">
           <li><a href="{{ route('admin.home-page-discount.edit') }}">Home Page Discount</a></li>
+          <li><a href="{{ route('admin.home-page-projects.index') }}">Home Page Projects</a></li>
+          <li><a href="{{ route('admin.home-page-categories.index') }}">Home Page Categories</a></li>
         </ul>
       </li>
 
