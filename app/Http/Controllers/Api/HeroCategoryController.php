@@ -176,7 +176,7 @@ class HeroCategoryController extends Controller
                     ->with([
                         'product.translates' => fn($q) => $q->where('language_id', $languageId),
                         'product.images' => fn($q) => $q->where('is_main', true)->active(),
-                        'product.categories' => fn($q) => $q->where('id', $categoryId)
+                        'product.categories' => fn($q) => $q->where('product_categories.id', $categoryId)
                     ])
                     ->get()
                     ->filter(function ($heroProduct) use ($categoryId) {
