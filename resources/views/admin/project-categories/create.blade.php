@@ -217,11 +217,9 @@
                                     <div class="d-flex gap-2">
                                         <button type="submit" class="btn btn-primary">
                                             <i class="material-icons-outlined">save</i>
-                                            Create Project Category
                                         </button>
                                         <a href="{{ route('admin.project-categories.index') }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">cancel</i>
-                                            Cancel
                                         </a>
                                     </div>
                                 </div>
