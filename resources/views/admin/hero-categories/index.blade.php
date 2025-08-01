@@ -47,7 +47,7 @@
                             <h5>Categories to Display in Hero Section</h5>
                             <a href="{{ route('admin.hero-categories.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Category
+                       
                             </a>
                         </div>
                     </div>
@@ -60,7 +60,6 @@
                                         <th>Category</th>
                                         <th>Parent</th>
                                         <th>Status</th>
-                                        <th>Order</th>
                                         <th width="150">Actions</th>
                                     </tr>
                                 </thead>
@@ -115,9 +114,7 @@
                                                     <span class="badge badge-light-danger">Inactive</span>
                                                 @endif
                                             </td>
-                                            <td>
-                                                <span class="badge badge-light-info">{{ $heroCategory->order }}</span>
-                                            </td>
+                                      
                                             <td>
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.hero-categories.edit', $heroCategory) }}" 
