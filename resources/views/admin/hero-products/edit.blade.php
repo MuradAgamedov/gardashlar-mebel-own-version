@@ -94,17 +94,22 @@
                                         <div class="card-body">
                                             <div class="d-flex align-items-center">
                                                 <i class="material-icons-outlined text-success me-2">check_circle</i>
-                                                <div>
+                                                <div class="flex-grow-1">
                                                     <h6 class="mb-1" id="selected_product_title">
                                                         {{ $heroProduct->product->translates->first() ? $heroProduct->product->translates->first()->title : 'No title' }}
                                                     </h6>
-                                                    <small class="text-muted" id="selected_product_category">
-                                                        @php
-                                                            $firstCategory = $heroProduct->product->categories->first();
-                                                            $categoryTranslation = $firstCategory ? $firstCategory->translates->first() : null;
-                                                        @endphp
-                                                        {{ $categoryTranslation ? $categoryTranslation->title : 'No category' }}
-                                                    </small>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <span class="badge bg-secondary" id="selected_product_category_badge">
+                                                            <i class="material-icons-outlined" style="font-size: 12px;">category</i>
+                                                            <span id="selected_product_category">
+                                                                @php
+                                                                    $firstCategory = $heroProduct->product->categories->first();
+                                                                    $categoryTranslation = $firstCategory ? $firstCategory->translates->first() : null;
+                                                                @endphp
+                                                                {{ $categoryTranslation ? $categoryTranslation->title : 'No category' }}
+                                                            </span>
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
