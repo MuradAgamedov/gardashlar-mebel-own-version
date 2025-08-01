@@ -88,7 +88,6 @@
                                                 @if($slider->video_link)
                                                     <a href="{{ $slider->video_link }}" target="_blank" class="text-primary">
                                                         <i class="material-icons-outlined">play_circle</i>
-                                                        View Video
                                                     </a>
                                                 @else
                                                     <span class="text-muted">No video</span>
