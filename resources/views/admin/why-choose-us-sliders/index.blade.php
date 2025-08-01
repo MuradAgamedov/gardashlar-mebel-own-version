@@ -130,7 +130,6 @@
                                 <p class="text-muted">Create your first slider to get started.</p>
                                 <a href="{{ route('admin.why-choose-us-sliders.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
-                                    Add First Slider
                                 </a>
                             </div>
                         @endif
