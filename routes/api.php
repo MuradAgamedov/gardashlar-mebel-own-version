@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\HomePageCategoryController;
 use App\Http\Controllers\Api\ProductTypeController;
 use App\Http\Controllers\Api\ProductTypeProductController;
+use App\Http\Controllers\Api\HeroCategoryController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -17,6 +18,9 @@ Route::get('/pages/{keyword}', [PageController::class, 'findByKeyword'])->name('
 
 // HomePageCategory API Routes
 Route::get('/homepage-categories', [HomePageCategoryController::class, 'index'])->name('api.homepage-categories.index');
+
+// HeroCategory API Routes
+Route::get('/hero-categories', [HeroCategoryController::class, 'index'])->name('api.hero-categories.index');
 
 // ProductType API Routes
 Route::get('/product-types', [ProductTypeController::class, 'index'])->name('api.product-types.index');
