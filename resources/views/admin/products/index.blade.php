@@ -218,7 +218,7 @@
                                             <td>
                                                 <span class="badge badge-light-warning">
                                                     <i class="material-icons-outlined" style="font-size: 12px;">visibility</i>
-                                                    {{ $product->views_count }}
+                                                    {{ $product->view_count ?? 0 }}
                                                 </span>
                                             </td>
                                             <td>

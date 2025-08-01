@@ -10,7 +10,7 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'views_count',
+        'view_count',
         'order',
         'status',
         'discount_percent',
@@ -18,7 +18,7 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'views_count' => 'integer',
+        'view_count' => 'integer',
         'order' => 'integer',
         'status' => 'boolean',
         'discount_percent' => 'decimal:2',
