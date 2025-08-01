@@ -46,7 +46,6 @@
                             <h5>Slider List</h5>
                             <a href="{{ route('admin.why-choose-us-sliders.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New Slider
                             </a>
                         </div>
                     </div>

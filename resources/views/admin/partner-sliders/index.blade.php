@@ -33,7 +33,6 @@
                             <h5>Partner Sliders</h5>
                             <a href="{{ route('admin.partner-sliders.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New Slider
                             </a>
                         </div>
                     </div>
@@ -125,7 +124,6 @@
                                                     <p class="mt-2">No partner sliders found</p>
                                                     <a href="{{ route('admin.partner-sliders.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Slider
                                                     </a>
                                                 </div>
                                             </td>
