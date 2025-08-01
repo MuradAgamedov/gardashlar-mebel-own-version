@@ -47,7 +47,6 @@
                             <h5>Project Categories</h5>
                             <a href="{{ route('admin.project-categories.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Project Category
                             </a>
                         </div>
                     </div>
@@ -128,7 +127,6 @@
                                                     <p class="mt-2">No project categories found</p>
                                                     <a href="{{ route('admin.project-categories.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Project Category
                                                     </a>
                                                 </div>
                                             </td>
