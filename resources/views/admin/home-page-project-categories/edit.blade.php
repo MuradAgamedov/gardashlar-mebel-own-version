@@ -55,9 +55,13 @@
                                                         @endif
                                                     </div>
                                                     <div class="col-md-9">
-                                                        <h6 class="mb-2">{{ $homePageProjectCategory->projectCategory->translate()?->title ?? 'No Title' }}</h6>
-                                                        @if($homePageProjectCategory->projectCategory->translate()?->description)
-                                                            <p class="text-muted mb-2">{{ $homePageProjectCategory->projectCategory->translate()?->description }}</p>
+                                                        @php
+                                                            $firstTranslation = $homePageProjectCategory->projectCategory->translates->first();
+                                                            $title = $firstTranslation ? $firstTranslation->title : 'No title';
+                                                        @endphp
+                                                        <h6 class="mb-2">{{ $title }}</h6>
+                                                        @if($firstTranslation && $firstTranslation->description)
+                                                            <p class="text-muted mb-2">{{ $firstTranslation->description }}</p>
                                                         @endif
                                                         <div class="d-flex gap-2">
                                                             <span class="badge badge-info">Order: {{ $homePageProjectCategory->order }}</span>
@@ -77,14 +81,18 @@
                                     <div class="mb-3">
                                         <label for="project_category_id" class="form-label">Change Project Category</label>
                                         <select name="project_category_id" id="project_category_id" class="form-select @error('project_category_id') is-invalid @enderror">
-                                            @foreach($projectCategories as $category)
-                                                <option value="{{ $category->id }}" 
-                                                        {{ old('project_category_id', $homePageProjectCategory->project_category_id) == $category->id ? 'selected' : '' }}
-                                                        data-image="{{ $category->image_url }}"
-                                                        data-description="{{ $category->translate()?->description ?? '' }}">
-                                                    {{ $category->translate()?->title ?? 'No Title' }}
-                                                </option>
-                                            @endforeach
+                                                                                    @foreach($projectCategories as $category)
+                                            @php
+                                                $firstTranslation = $category->translates->first();
+                                                $title = $firstTranslation ? $firstTranslation->title : 'No title';
+                                            @endphp
+                                            <option value="{{ $category->id }}" 
+                                                    {{ old('project_category_id', $homePageProjectCategory->project_category_id) == $category->id ? 'selected' : '' }}
+                                                    data-image="{{ $category->image_url }}"
+                                                    data-description="{{ $firstTranslation ? $firstTranslation->description : '' }}">
+                                                {{ $title }}
+                                            </option>
+                                        @endforeach
                                         </select>
                                         @error('project_category_id')
                                             <div class="invalid-feedback">{{ $message }}</div>

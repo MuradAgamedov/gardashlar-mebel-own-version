@@ -73,9 +73,13 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    <strong>{{ $item->projectCategory->translate()?->title ?? 'No Title' }}</strong>
-                                                    @if($item->projectCategory->translate()?->description)
-                                                        <br><small class="text-muted">{{ Str::limit($item->projectCategory->translate()?->description, 100) }}</small>
+                                                    @php
+                                                        $firstTranslation = $item->projectCategory->translates->first();
+                                                        $title = $firstTranslation ? $firstTranslation->title : 'No title';
+                                                    @endphp
+                                                    <strong>{{ $title }}</strong>
+                                                    @if($firstTranslation && $firstTranslation->description)
+                                                        <br><small class="text-muted">{{ Str::limit($firstTranslation->description, 100) }}</small>
                                                     @endif
                                                 </td>
                                                 <td>

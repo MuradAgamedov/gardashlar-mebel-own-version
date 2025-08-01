@@ -39,14 +39,18 @@
                                         <label for="project_category_id" class="form-label">Project Category <span class="text-danger">*</span></label>
                                         <select name="project_category_id" id="project_category_id" class="form-select @error('project_category_id') is-invalid @enderror" required>
                                             <option value="">Select a project category</option>
-                                            @foreach($projectCategories as $category)
-                                                <option value="{{ $category->id }}" 
-                                                        {{ old('project_category_id') == $category->id ? 'selected' : '' }}
-                                                        data-image="{{ $category->image_url }}"
-                                                        data-description="{{ $category->translate()?->description ?? '' }}">
-                                                    {{ $category->translate()?->title ?? 'No Title' }}
-                                                </option>
-                                            @endforeach
+                                                                                    @foreach($projectCategories as $category)
+                                            @php
+                                                $firstTranslation = $category->translates->first();
+                                                $title = $firstTranslation ? $firstTranslation->title : 'No title';
+                                            @endphp
+                                            <option value="{{ $category->id }}" 
+                                                    {{ old('project_category_id') == $category->id ? 'selected' : '' }}
+                                                    data-image="{{ $category->image_url }}"
+                                                    data-description="{{ $firstTranslation ? $firstTranslation->description : '' }}">
+                                                {{ $title }}
+                                            </option>
+                                        @endforeach
                                         </select>
                                         @error('project_category_id')
                                             <div class="invalid-feedback">{{ $message }}</div>
