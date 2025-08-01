@@ -90,16 +90,7 @@
                                 </div>
                             </div>
 
-                            <!-- Order Info -->
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Current Order</label>
-                                    <input type="text" class="form-control" value="{{ $projectCategory->order }}" readonly>
-                                    <small class="form-text text-muted">
-                                        Order can be changed by dragging and dropping in the project categories list.
-                                    </small>
-                                </div>
-                            </div>
+
 
                             <!-- Language Tabs -->
                             <div class="row mb-3">
