@@ -1,0 +1,147 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Currency;
+use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+
+class CurrencyController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(): View
+    {
+        $currencies = Currency::ordered()->get();
+        return view('admin.currencies.index', compact('currencies'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(): View
+    {
+        return view('admin.currencies.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'code' => 'required|string|max:3|unique:currencies,code',
+            'course' => 'required|numeric|min:0.0001|max:999999.9999',
+        ]);
+
+        try {
+            // Get the highest order and add 1 for new item
+            $maxOrder = Currency::max('order') ?? 0;
+            
+            Currency::create([
+                'code' => strtoupper($request->code),
+                'course' => $request->course,
+                'order' => $maxOrder + 1,
+                'status' => $request->has('status')
+            ]);
+
+            return redirect()->route('admin.currencies.index')
+                ->with('success', 'Currency created successfully.');
+
+        } catch (\Exception $e) {
+            return back()->withInput()
+                ->with('error', 'Error creating currency: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Currency $currency): View
+    {
+        return view('admin.currencies.edit', compact('currency'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Currency $currency): RedirectResponse
+    {
+        $request->validate([
+            'code' => 'required|string|max:3|unique:currencies,code,' . $currency->id,
+            'course' => 'required|numeric|min:0.0001|max:999999.9999',
+        ]);
+
+        try {
+            $currency->update([
+                'code' => strtoupper($request->code),
+                'course' => $request->course,
+                'status' => $request->has('status')
+            ]);
+
+            return redirect()->route('admin.currencies.index')
+                ->with('success', 'Currency updated successfully.');
+
+        } catch (\Exception $e) {
+            return back()->withInput()
+                ->with('error', 'Error updating currency: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Currency $currency): RedirectResponse
+    {
+        try {
+            $currency->delete();
+            return redirect()->route('admin.currencies.index')
+                ->with('success', 'Currency deleted successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error deleting currency: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Reorder currencies
+     */
+    public function reorder(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'orders' => 'required|array',
+            'orders.*' => 'integer|exists:currencies,id'
+        ]);
+
+        try {
+            foreach ($request->orders as $order => $id) {
+                Currency::where('id', $id)->update(['order' => $order]);
+            }
+
+            return redirect()->route('admin.currencies.index')
+                ->with('success', 'Currencies reordered successfully.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error reordering currencies: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Toggle status
+     */
+    public function toggleStatus(Currency $currency): RedirectResponse
+    {
+        try {
+            $currency->update(['status' => !$currency->status]);
+            
+            $status = $currency->status ? 'enabled' : 'disabled';
+            return redirect()->route('admin.currencies.index')
+                ->with('success', "Currency {$status} successfully.");
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error updating currency status: ' . $e->getMessage());
+        }
+    }
+}

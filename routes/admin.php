@@ -67,6 +67,7 @@ use App\Http\Controllers\Admin\OurGoalController;
 use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Admin\SimpleImageController;
 use App\Http\Controllers\Admin\SocialNetworkController;
+use App\Http\Controllers\Admin\CurrencyController;
 use App\Http\Controllers\Admin\AuthController;
 
 Route::prefix('')->name('admin.')->group(function () {
@@ -357,6 +358,11 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         Route::resource('social-networks', SocialNetworkController::class);
         Route::post('social-networks/reorder', [SocialNetworkController::class, 'reorder'])->name('social-networks.reorder');
         Route::post('social-networks/{socialNetwork}/toggle-status', [SocialNetworkController::class, 'toggleStatus'])->name('social-networks.toggle-status');
+
+        // Currencies routes
+        Route::resource('currencies', CurrencyController::class);
+        Route::post('currencies/reorder', [CurrencyController::class, 'reorder'])->name('currencies.reorder');
+        Route::post('currencies/{currency}/toggle-status', [CurrencyController::class, 'toggleStatus'])->name('currencies.toggle-status');
 
         // Image Upload route for CKEditor
         Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');
