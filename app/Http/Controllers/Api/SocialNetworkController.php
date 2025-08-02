@@ -112,13 +112,8 @@ class SocialNetworkController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'id' => $socialNetwork->id,
                 'type' => $socialNetwork->type,
-                'name' => $socialNetwork->display_name,
-                'icon' => $socialNetwork->display_icon,
-                'url' => $socialNetwork->url,
-                'order' => $socialNetwork->order,
-                'color' => $socialNetwork->color
+                'url' => $socialNetwork->url
             ]
         ]);
     }
@@ -180,13 +175,8 @@ class SocialNetworkController extends Controller
                 ->keyBy('type')
                 ->map(function ($socialNetwork) {
                     return [
-                        'id' => $socialNetwork->id,
                         'type' => $socialNetwork->type,
-                        'name' => $socialNetwork->display_name,
-                        'icon' => $socialNetwork->display_icon,
-                        'url' => $socialNetwork->url,
-                        'order' => $socialNetwork->order,
-                        'color' => $socialNetwork->color
+                        'url' => $socialNetwork->url
                     ];
                 });
         });
