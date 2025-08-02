@@ -66,6 +66,7 @@ use App\Http\Controllers\Admin\ProductImageController;
 use App\Http\Controllers\Admin\OurGoalController;
 use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Admin\SimpleImageController;
+use App\Http\Controllers\Admin\SocialNetworkController;
 use App\Http\Controllers\Admin\AuthController;
 
 Route::prefix('')->name('admin.')->group(function () {
@@ -351,6 +352,11 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         
         // Simple Images routes
         Route::resource('simple-images', SimpleImageController::class);
+
+        // Social Networks routes
+        Route::resource('social-networks', SocialNetworkController::class);
+        Route::post('social-networks/reorder', [SocialNetworkController::class, 'reorder'])->name('social-networks.reorder');
+        Route::post('social-networks/{socialNetwork}/toggle-status', [SocialNetworkController::class, 'toggleStatus'])->name('social-networks.toggle-status');
 
         // Image Upload route for CKEditor
         Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');
