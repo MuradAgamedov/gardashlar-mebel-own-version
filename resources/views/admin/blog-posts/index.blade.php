@@ -90,7 +90,6 @@
                                         <th width="80">Image</th>
                                         <th>Title</th>
                                         <th>Category</th>
-                                        <th width="120">Languages</th>
                                         <th>Status</th>
                                         <th>Published At</th>
                                         <th width="150">Actions</th>
@@ -141,15 +140,7 @@
                                                     <span class="text-muted">No category</span>
                                                 @endif
                                             </td>
-                                            <td>
-                                                <div class="d-flex flex-wrap gap-1">
-                                                    @foreach($blogPost->translates as $translate)
-                                                        <span class="badge bg-primary" title="{{ $translate->language->lang_name }}">
-                                                            {{ strtoupper($translate->language->lang_code) }}
-                                                        </span>
-                                                    @endforeach
-                                                </div>
-                                            </td>
+
                                             <td>
                                                 @if($blogPost->status)
                                                     <span class="badge bg-success">Active</span>
@@ -179,7 +170,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="text-center py-4">
+                                            <td colspan="7" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">article</i>
                                                     <p class="mt-2">No blog posts found</p>
