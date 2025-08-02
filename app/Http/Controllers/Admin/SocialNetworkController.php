@@ -58,7 +58,7 @@ class SocialNetworkController extends Controller
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error creating social network. Please try again.');
+                ->with('error', 'Error creating social network: ' . $e->getMessage());
         }
     }
 
@@ -81,7 +81,6 @@ class SocialNetworkController extends Controller
             'name' => 'nullable|string|max:255',
             'icon' => 'nullable|string|max:255',
             'url' => 'required|url|max:500',
-            'status' => 'nullable|boolean'
         ]);
 
         try {
@@ -98,7 +97,7 @@ class SocialNetworkController extends Controller
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error updating social network. Please try again.');
+                ->with('error', 'Error updating social network: ' . $e->getMessage());
         }
     }
 
