@@ -51,11 +51,9 @@
                                                          <div class="d-flex gap-2">
                                  <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadImageModal">
                                      <i class="material-icons-outlined">add_photo_alternate</i>
-                                     Upload Image
                                  </button>
                                  <a href="{{ route('admin.blog-posts.index') }}" class="btn btn-secondary">
                                      <i class="material-icons-outlined">arrow_back</i>
-                                     Back to Blog Posts
                                  </a>
                              </div>
                         </div>
@@ -100,7 +98,6 @@
                                     <p>Upload your first image to get started.</p>
                                                                          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadImageModal">
                                          <i class="material-icons-outlined">add_photo_alternate</i>
-                                         Upload Image
                                      </button>
                                 </div>
                             </div>
