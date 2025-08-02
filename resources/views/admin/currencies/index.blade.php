@@ -89,8 +89,10 @@
                                                     @csrf
                                                     <button type="submit" 
                                                             class="btn btn-sm {{ $currency->status ? 'btn-success' : 'btn-secondary' }}"
-                                                            title="{{ $currency->status ? 'Active' : 'Inactive' }}">
+                                                            title="{{ $currency->status ? 'Active' : 'Inactive' }}"
+                                                            onclick="return confirm('Are you sure you want to {{ $currency->status ? 'deactivate' : 'activate' }} this currency?')">
                                                         <i class="material-icons-outlined">{{ $currency->status ? 'check_circle' : 'cancel' }}</i>
+                                                        <span class="ms-1">{{ $currency->status ? 'Active' : 'Inactive' }}</span>
                                                     </button>
                                                 </form>
                                             </td>

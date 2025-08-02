@@ -65,6 +65,27 @@ class UpdateCurrencyRates extends Command
             $createdCount = 0;
             $errors = [];
 
+            // First, ensure AZN exists and is at the top
+            $aznCurrency = Currency::where('code', 'AZN')->first();
+            if (!$aznCurrency) {
+                Currency::create([
+                    'code' => 'AZN',
+                    'course' => 1.0000,
+                    'order' => 0,
+                    'status' => true
+                ]);
+                $createdCount++;
+                $this->line("Created: AZN = 1.0000");
+            } else {
+                // Update AZN course to 1.0000 and ensure it's at the top
+                $aznCurrency->update([
+                    'course' => 1.0000,
+                    'order' => 0
+                ]);
+                $updatedCount++;
+                $this->line("Updated: AZN = 1.0000 (set to top)");
+            }
+
             // Process foreign currencies (Xarici valyutalar)
             foreach ($xml->ValType as $valType) {
                 $type = (string)$valType['Type'];
@@ -88,14 +109,14 @@ class UpdateCurrencyRates extends Command
                             $currency = Currency::where('code', $code)->first();
 
                             if ($currency) {
-                                // Update existing currency
+                                // Update existing currency (keep existing order)
                                 $currency->update([
                                     'course' => $rate
                                 ]);
                                 $updatedCount++;
                                 $this->line("Updated: {$code} = {$rate}");
                             } else {
-                                // Create new currency
+                                // Create new currency (after AZN)
                                 $maxOrder = Currency::max('order') ?? 0;
                                 Currency::create([
                                     'code' => $code,
