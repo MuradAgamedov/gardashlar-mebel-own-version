@@ -48,7 +48,6 @@
                             <h5>Address Types</h5>
                             <a href="{{ route('admin.address-types.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Address Type
                             </a>
                         </div>
                     </div>
@@ -95,7 +94,7 @@
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <a href="{{ route('admin.address-types.addresses.create', $addressType->id) }}" class="btn btn-sm btn-success">
-                                                        <i class="material-icons-outlined">add</i> Add Address
+                                                        <i class="material-icons-outlined">add</i> 
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
                                                             data-title="{{ $firstTranslation ? $firstTranslation->title : 'Address Type #' . $addressType->id }}"
@@ -175,7 +174,6 @@
                                         <p class="mt-2">No address types found</p>
                                         <a href="{{ route('admin.address-types.create') }}" class="btn btn-primary">
                                             <i class="material-icons-outlined">add</i>
-                                            Add First Address Type
                                         </a>
                                     </div>
                                 </div>
