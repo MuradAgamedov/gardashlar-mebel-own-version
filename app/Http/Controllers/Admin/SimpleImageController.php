@@ -45,11 +45,15 @@ class SimpleImageController extends Controller
     {
         $request->validate([
             'keyword' => 'required|string|max:255|unique:simple_images',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.image_go_url' => 'nullable|string|max:255',
             'translations.*.image_alt_text' => 'nullable|string|max:255',
+        ], [
+            'image.required' => 'Image is required.',
+            'image.image' => 'The file must be an image.',
+            'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
         ]);
 
         try {
@@ -57,7 +61,7 @@ class SimpleImageController extends Controller
             
             if (!$imagePath) {
                 return back()->withInput()
-                    ->with('error', 'Error occurred.');
+                    ->with('error', 'Failed to upload image. Please try again.');
             }
 
             $simpleImage = SimpleImage::create([
@@ -80,7 +84,7 @@ class SimpleImageController extends Controller
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error occurred.');
+                ->with('error', 'Error creating image. Please try again.');
         }
     }
 
@@ -106,6 +110,9 @@ class SimpleImageController extends Controller
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.image_go_url' => 'nullable|string|max:255',
             'translations.*.image_alt_text' => 'nullable|string|max:255',
+        ], [
+            'image.image' => 'The file must be an image.',
+            'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
         ]);
 
         try {
@@ -124,7 +131,7 @@ class SimpleImageController extends Controller
                 
                 if (!$imagePath) {
                     return back()->withInput()
-                        ->with('error', 'Error occurred.');
+                        ->with('error', 'Failed to upload image. Please try again.');
                 }
                 
                 $data['image_path'] = $imagePath;
@@ -151,7 +158,7 @@ class SimpleImageController extends Controller
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error occurred.');
+                ->with('error', 'Error updating image. Please try again.');
         }
     }
 
@@ -171,7 +178,7 @@ class SimpleImageController extends Controller
             return redirect()->route('admin.simple-images.index')
                 ->with('success', 'Image deleted successfully.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred.');
+            return back()->with('error', 'Error deleting image. Please try again.');
         }
     }
 }
