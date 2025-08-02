@@ -35,8 +35,6 @@ class SocialNetworkController extends Controller
     {
         $request->validate([
             'type' => 'required|string|max:255',
-            'name' => 'nullable|string|max:255',
-            'icon' => 'nullable|string|max:255',
             'url' => 'required|url|max:500',
         ]);
 
@@ -78,8 +76,6 @@ class SocialNetworkController extends Controller
     {
         $request->validate([
             'type' => 'required|string|max:255',
-            'name' => 'nullable|string|max:255',
-            'icon' => 'nullable|string|max:255',
             'url' => 'required|url|max:500',
         ]);
 

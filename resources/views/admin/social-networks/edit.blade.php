@@ -85,41 +85,7 @@
                                 </div>
                             </div>
 
-                            <!-- Custom Name -->
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">
-                                        Custom Name <span class="text-muted">(Optional)</span>
-                                    </label>
-                                    <input type="text" 
-                                           class="form-control @error('name') is-invalid @enderror" 
-                                           name="name" 
-                                           value="{{ old('name', $socialNetwork->name) }}" 
-                                           placeholder="Enter custom name (leave empty to use default)">
-                                    <small class="form-text text-muted">Leave empty to use the default name from the selected type</small>
-                                    @error('name')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <!-- Custom Icon -->
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">
-                                        Custom Icon <span class="text-muted">(Optional)</span>
-                                    </label>
-                                    <input type="text" 
-                                           class="form-control @error('icon') is-invalid @enderror" 
-                                           name="icon" 
-                                           value="{{ old('icon', $socialNetwork->icon) }}" 
-                                           placeholder="Enter custom icon class (e.g., fab fa-facebook)">
-                                    <small class="form-text text-muted">Leave empty to use the default icon from the selected type</small>
-                                    @error('icon')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
+                            
 
                             <!-- URL -->
                             <div class="row mb-3">
