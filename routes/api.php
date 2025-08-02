@@ -12,9 +12,15 @@ use App\Http\Controllers\Api\WhyChooseUsController;
 use App\Http\Controllers\Api\HomePageDiscountController;
 use App\Http\Controllers\Api\HomePageProjectCategoryController;
 use App\Http\Controllers\Api\SimpleImageController;
+use App\Http\Controllers\Api\DictionaryController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
+
+// Dictionary API Routes
+Route::get('/dictionaries', [DictionaryController::class, 'index'])->name('api.dictionaries.index');
+Route::get('/dictionaries/{keyword}', [DictionaryController::class, 'show'])->name('api.dictionaries.show');
+Route::post('/dictionaries/by-keywords', [DictionaryController::class, 'getByKeywordsArray'])->name('api.dictionaries.by-keywords');
 
 // Page API Routes
 Route::get('/pages', [PageController::class, 'index'])->name('api.pages.index');
