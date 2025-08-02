@@ -70,6 +70,7 @@ use App\Http\Controllers\Admin\SocialNetworkController;
 use App\Http\Controllers\Admin\CurrencyController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BlogCategoryController;
+use App\Http\Controllers\Admin\BlogPostController;
 
 Route::prefix('')->name('admin.')->group(function () {
     // Auth routes (no middleware)
