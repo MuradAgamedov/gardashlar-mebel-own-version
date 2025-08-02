@@ -93,12 +93,10 @@
                              <div class="col-md-3 d-flex align-items-end">
                                  <button type="submit" class="btn btn-outline-primary me-2">
                                      <i class="material-icons-outlined">filter_list</i>
-                                     Filter
                                  </button>
                                  @if(request('category_id') || request('status') || request('search'))
                                      <a href="{{ route('admin.blog-posts.index') }}" class="btn btn-outline-secondary">
                                          <i class="material-icons-outlined">clear</i>
-                                         Clear
                                      </a>
                                  @endif
                              </div>
