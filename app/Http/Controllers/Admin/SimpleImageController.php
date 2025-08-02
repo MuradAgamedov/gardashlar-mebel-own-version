@@ -101,7 +101,7 @@ class SimpleImageController extends Controller
     {
         $request->validate([
             'keyword' => 'required|string|max:255|unique:simple_images,keyword,' . $simpleImage->id,
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.image_go_url' => 'nullable|string|max:255',
