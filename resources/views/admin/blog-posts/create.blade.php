@@ -149,9 +149,9 @@
                                                     <label for="translations[{{ $language->id }}][description]" class="form-label">
                                                         Description ({{ strtoupper($language->lang_code) }}) <span class="text-danger">*</span>
                                                     </label>
-                                                    <textarea class="form-control @error("translations.{$language->id}.description") is-invalid @enderror" 
+                                                    <textarea class="form-control ckeditor @error("translations.{$language->id}.description") is-invalid @enderror" 
                                                               name="translations[{{ $language->id }}][description]" 
-                                                              rows="6" required>{{ old("translations.{$language->id}.description") }}</textarea>
+                                                              id="description_{{ $language->id }}" required>{{ old("translations.{$language->id}.description") }}</textarea>
                                                     @error("translations.{$language->id}.description")
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -284,4 +284,23 @@
         border-color: #dee2e6 #dee2e6 #fff;
     }
 </style>
+@endpush
+
+@push('scripts')
+<script src="https://cdn.ckeditor.com/ckeditor5/27.1.0/classic/ckeditor.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize CKEditor for each description field
+    @foreach($languages as $language)
+        ClassicEditor
+            .create(document.querySelector('#description_{{ $language->id }}'), {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', 'undo', 'redo'],
+                language: '{{ $language->lang_code }}'
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    @endforeach
+});
+</script>
 @endpush 
