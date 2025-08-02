@@ -92,7 +92,7 @@
                                                             title="{{ $currency->status ? 'Active' : 'Inactive' }}"
                                                             onclick="return confirm('Are you sure you want to {{ $currency->status ? 'deactivate' : 'activate' }} this currency?')">
                                                         <i class="material-icons-outlined">{{ $currency->status ? 'check_circle' : 'cancel' }}</i>
-                                                        <span class="ms-1">{{ $currency->status ? 'Active' : 'Inactive' }}</span>
+                                     
                                                     </button>
                                                 </form>
                                             </td>
