@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             ProductColorSeeder::class,
             ProductPriceSeeder::class,
             BlogCategorySeeder::class,
+            BlogPostSeeder::class, // Added this line
         ]);
     }
 }
