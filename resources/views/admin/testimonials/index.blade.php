@@ -46,7 +46,6 @@
                             <h5>All Testimonials</h5>
                             <a href="{{ route('admin.testimonials.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New Testimonial
                             </a>
                         </div>
                     </div>
