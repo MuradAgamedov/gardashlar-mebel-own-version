@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\HomePageDiscountController;
 use App\Http\Controllers\Api\HomePageProjectCategoryController;
 use App\Http\Controllers\Api\SimpleImageController;
 use App\Http\Controllers\Api\DictionaryController;
+use App\Http\Controllers\Api\SocialNetworkController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -52,3 +53,7 @@ Route::get('/home-page-project-categories', [HomePageProjectCategoryController::
 Route::get('/simple-images', [SimpleImageController::class, 'index'])->name('api.simple-images.index');
 Route::get('/simple-images/{keyword}', [SimpleImageController::class, 'show'])->name('api.simple-images.show');
 Route::post('/simple-images/by-keywords', [SimpleImageController::class, 'getByKeywordsArray'])->name('api.simple-images.by-keywords');
+
+// Social Networks API Routes
+Route::get('/social-networks', [SocialNetworkController::class, 'index'])->name('api.social-networks.index');
+Route::get('/social-networks/{type}', [SocialNetworkController::class, 'show'])->name('api.social-networks.show');

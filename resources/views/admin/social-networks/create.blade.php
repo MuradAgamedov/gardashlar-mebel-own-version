@@ -138,34 +138,15 @@
                                 </div>
                             </div>
 
-                            <!-- Order -->
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">
-                                        Order <span class="text-muted">(Optional)</span>
-                                    </label>
-                                    <input type="number" 
-                                           class="form-control @error('order') is-invalid @enderror" 
-                                           name="order" 
-                                           value="{{ old('order', 0) }}" 
-                                           min="0" 
-                                           placeholder="Enter display order">
-                                    <small class="form-text text-muted">Lower numbers appear first</small>
-                                    @error('order')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <!-- Status -->
+                                                         <!-- Status -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        <input class="form-check-input" 
-                                               type="checkbox" 
-                                               name="status" 
-                                               id="status" 
-                                               {{ old('status') ? 'checked' : '' }}>
+                                                                                 <input class="form-check-input" 
+                                                type="checkbox" 
+                                                name="status" 
+                                                id="status" 
+                                                {{ old('status', true) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
                                             Active
                                         </label>

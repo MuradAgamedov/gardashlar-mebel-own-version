@@ -38,17 +38,19 @@ class SocialNetworkController extends Controller
             'name' => 'nullable|string|max:255',
             'icon' => 'nullable|string|max:255',
             'url' => 'required|url|max:500',
-            'order' => 'nullable|integer|min:0',
             'status' => 'boolean'
         ]);
 
         try {
+            // Get the highest order and add 1 for new item
+            $maxOrder = SocialNetwork::max('order') ?? 0;
+            
             SocialNetwork::create([
                 'type' => $request->type,
                 'name' => $request->name,
                 'icon' => $request->icon,
                 'url' => $request->url,
-                'order' => $request->order ?? 0,
+                'order' => $maxOrder + 1,
                 'status' => $request->has('status')
             ]);
 
@@ -80,7 +82,6 @@ class SocialNetworkController extends Controller
             'name' => 'nullable|string|max:255',
             'icon' => 'nullable|string|max:255',
             'url' => 'required|url|max:500',
-            'order' => 'nullable|integer|min:0',
             'status' => 'boolean'
         ]);
 
@@ -90,7 +91,6 @@ class SocialNetworkController extends Controller
                 'name' => $request->name,
                 'icon' => $request->icon,
                 'url' => $request->url,
-                'order' => $request->order ?? 0,
                 'status' => $request->has('status')
             ]);
 
