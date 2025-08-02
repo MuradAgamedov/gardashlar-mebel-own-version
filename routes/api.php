@@ -17,6 +17,8 @@ use App\Http\Controllers\Api\SocialNetworkController;
 use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\PartnerSliderController;
 use App\Http\Controllers\Api\TestimonialController;
+use App\Http\Controllers\Api\BlogPostController;
+use App\Http\Controllers\Api\BlogCategoryController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -79,3 +81,10 @@ Route::get('/partners/with-all-translations', [PartnerSliderController::class, '
 Route::get('/testimonials', [TestimonialController::class, 'index'])->name('api.testimonials.index');
 Route::get('/testimonials/{id}', [TestimonialController::class, 'show'])->name('api.testimonials.show');
 Route::get('/testimonials-with-translations', [TestimonialController::class, 'withTranslations'])->name('api.testimonials.with-translations');
+
+// Blog Posts API Routes
+Route::get('/blog-posts', [BlogPostController::class, 'index'])->name('api.blog-posts.index');
+Route::get('/blog-posts/{slug}', [BlogPostController::class, 'show'])->name('api.blog-posts.show');
+
+// Blog Categories API Routes
+Route::get('/blog-categories', [BlogCategoryController::class, 'index'])->name('api.blog-categories.index');
