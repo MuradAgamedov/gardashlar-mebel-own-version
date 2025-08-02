@@ -87,7 +87,6 @@
                                         <th>Title</th>
                                         <th>Slug</th>
                                         <th>Status</th>
-                                        <th>Order</th>
                                         <th width="150">Actions</th>
                                     </tr>
                                 </thead>
@@ -129,7 +128,6 @@
                                                     <span class="badge bg-secondary">Inactive</span>
                                                 @endif
                                             </td>
-                                            <td>{{ $projectCategory->order }}</td>
                                             <td>
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.project-categories.edit', $projectCategory) }}" class="btn btn-sm btn-warning">

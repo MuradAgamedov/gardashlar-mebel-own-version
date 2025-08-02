@@ -94,7 +94,7 @@
                                     <label for="card_image" class="form-label">Card Image</label>
                                     @if($blogPost->card_image)
                                         <div class="mb-2">
-                                            <img src="{{ asset('uploads/' . $blogPost->card_image) }}" 
+                                            <img src="{{ asset('storage/' . $blogPost->card_image) }}" 
                                                  alt="Current Card Image" 
                                                  class="img-thumbnail" 
                                                  style="max-width: 200px;">
@@ -116,7 +116,7 @@
                                     <label for="inner_banner_image" class="form-label">Inner Banner Image</label>
                                     @if($blogPost->inner_banner_image)
                                         <div class="mb-2">
-                                            <img src="{{ asset('uploads/' . $blogPost->inner_banner_image) }}" 
+                                            <img src="{{ asset('storage/' . $blogPost->inner_banner_image) }}" 
                                                  alt="Current Inner Banner Image" 
                                                  class="img-thumbnail" 
                                                  style="max-width: 200px;">

@@ -103,7 +103,7 @@
                                             </td>
                                             <td>
                                                 @if($blogPost->card_image)
-                                                    <img src="{{ asset('uploads/' . $blogPost->card_image) }}" 
+                                                    <img src="{{ asset('storage/' . $blogPost->card_image) }}" 
                                                          alt="Blog Post Image" 
                                                          class="img-thumbnail" 
                                                          style="width: 50px; height: 50px; object-fit: cover;">
