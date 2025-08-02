@@ -48,7 +48,7 @@ class BlogPostController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'blog_category_id' => 'required|exists:blog_categories,id',
             'status' => 'boolean',
             'published_at' => 'nullable|date',
@@ -65,12 +65,28 @@ class BlogPostController extends Controller
             'translations.*.seo_title' => 'nullable|string|max:255',
             'translations.*.seo_keywords' => 'nullable|string',
             'translations.*.seo_description' => 'nullable|string',
+        ], [
+            'blog_category_id.required' => 'Category is required.',
+            'blog_category_id.exists' => 'Selected category does not exist.',
+            'translations.required' => 'At least one translation is required.',
+            'translations.*.title.required' => 'Title is required for all languages.',
+            'translations.*.title.max' => 'Title cannot exceed 255 characters.',
+            'translations.*.slug.required' => 'Slug is required for all languages.',
+            'translations.*.slug.max' => 'Slug cannot exceed 255 characters.',
+            'translations.*.slug.unique' => 'Slug must be unique.',
+            'translations.*.description.required' => 'Description is required for all languages.',
+            'card_image.image' => 'Card image must be a valid image file.',
+            'card_image.mimes' => 'Card image must be a JPEG, PNG, JPG, GIF, or WEBP file.',
+            'card_image.max' => 'Card image size cannot exceed 2MB.',
+            'inner_banner_image.image' => 'Inner banner image must be a valid image file.',
+            'inner_banner_image.mimes' => 'Inner banner image must be a JPEG, PNG, JPG, GIF, or WEBP file.',
+            'inner_banner_image.max' => 'Inner banner image size cannot exceed 2MB.',
         ]);
 
         try {
             $data = [
                 'blog_category_id' => $request->blog_category_id,
-                'status' => $request->input('status', false),
+                'status' => $request->input('status', true),
                 'published_at' => $request->published_at,
             ];
 
@@ -144,7 +160,7 @@ class BlogPostController extends Controller
      */
     public function update(Request $request, BlogPost $blogPost)
     {
-        $request->validate([
+        $validated = $request->validate([
             'blog_category_id' => 'required|exists:blog_categories,id',
             'status' => 'boolean',
             'published_at' => 'nullable|date',
@@ -161,12 +177,28 @@ class BlogPostController extends Controller
             'translations.*.seo_title' => 'nullable|string|max:255',
             'translations.*.seo_keywords' => 'nullable|string',
             'translations.*.seo_description' => 'nullable|string',
+        ], [
+            'blog_category_id.required' => 'Category is required.',
+            'blog_category_id.exists' => 'Selected category does not exist.',
+            'translations.required' => 'At least one translation is required.',
+            'translations.*.title.required' => 'Title is required for all languages.',
+            'translations.*.title.max' => 'Title cannot exceed 255 characters.',
+            'translations.*.slug.required' => 'Slug is required for all languages.',
+            'translations.*.slug.max' => 'Slug cannot exceed 255 characters.',
+            'translations.*.slug.unique' => 'Slug must be unique.',
+            'translations.*.description.required' => 'Description is required for all languages.',
+            'card_image.image' => 'Card image must be a valid image file.',
+            'card_image.mimes' => 'Card image must be a JPEG, PNG, JPG, GIF, or WEBP file.',
+            'card_image.max' => 'Card image size cannot exceed 2MB.',
+            'inner_banner_image.image' => 'Inner banner image must be a valid image file.',
+            'inner_banner_image.mimes' => 'Inner banner image must be a JPEG, PNG, JPG, GIF, or WEBP file.',
+            'inner_banner_image.max' => 'Inner banner image size cannot exceed 2MB.',
         ]);
 
         try {
             $data = [
                 'blog_category_id' => $request->blog_category_id,
-                'status' => $request->input('status', false),
+                'status' => $request->input('status', true),
                 'published_at' => $request->published_at,
             ];
 
