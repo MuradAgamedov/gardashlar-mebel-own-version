@@ -48,11 +48,9 @@
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
                                     <i class="material-icons-outlined">delete</i>
-                                    Delete Selected
                                 </button>
                                 <a href="{{ route('admin.blog-posts.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
-                                    Add Blog Post
                                 </a>
                             </div>
                         </div>
@@ -185,7 +183,6 @@
                                                     <p class="mt-2">No blog posts found</p>
                                                     <a href="{{ route('admin.blog-posts.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Blog Post
                                                     </a>
                                                 </div>
                                             </td>
