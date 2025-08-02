@@ -202,7 +202,6 @@
                                         </a>
                                         <button type="submit" class="btn btn-primary" id="submitBtn">
                                             <i class="material-icons-outlined">save</i>
-                                            <span id="submitText">Update Image</span>
                                         </button>
                                     </div>
                                 </div>

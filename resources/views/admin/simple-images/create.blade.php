@@ -180,7 +180,6 @@
                                         </a>
                                         <button type="submit" class="btn btn-primary" id="submitBtn">
                                             <i class="material-icons-outlined">add</i>
-                                            <span id="submitText">Add Image</span>
                                         </button>
                                     </div>
                                 </div>
