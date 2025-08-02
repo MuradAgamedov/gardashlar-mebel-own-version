@@ -60,6 +60,7 @@
                                         <th>Full Name</th>
                                         <th>Position</th>
                                         <th width="80">Status</th>
+                                        <th>Languages</th>
                                         <th width="150">Actions</th>
                                     </tr>
                                 </thead>
@@ -104,18 +105,18 @@
                                                 {{ $firstTranslation ? $firstTranslation->position : 'No translation' }}
                                             </td>
                                             <td>
-                                                <div class="d-flex gap-1">
-                                                    @foreach($testimonial->translates as $translate)
-                                                        <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
-                                                    @endforeach
-                                                </div>
-                                            </td>
-                                            <td>
                                                 @if($testimonial->status)
                                                     <span class="badge bg-success">Active</span>
                                                 @else
                                                     <span class="badge bg-secondary">Inactive</span>
                                                 @endif
+                                            </td>
+                                            <td>
+                                                <div class="d-flex gap-1">
+                                                    @foreach($testimonial->translates as $translate)
+                                                        <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
+                                                    @endforeach
+                                                </div>
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-2">
