@@ -52,13 +52,13 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
-                                        <th>Keyword</th>
-                                        <th>Image</th>
-                                        <th>Translations</th>
-                                        <th width="150">Actions</th>
+                                        <th style="width: 20%;">Keyword</th>
+                                        <th style="width: 15%;">Image</th>
+                                        <th style="width: 45%;">Go URLs</th>
+                                        <th style="width: 20%;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -66,34 +66,59 @@
                                         <tr>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">image</i>
-                                                    <strong>{{ $image->keyword }}</strong>
+                                                    <i class="material-icons-outlined text-primary me-2" style="font-size: 18px;">tag</i>
+                                                    <div>
+                                                        <strong class="text-dark">{{ $image->keyword }}</strong>
+                                                        <br>
+                                                        <small class="text-muted">ID: {{ $image->id }}</small>
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td>
                                                 @if($image->image_path)
-                                                    <img src="{{ asset('storage/' . $image->image_path) }}" 
-                                                         alt="{{ $image->keyword }}" 
-                                                         class="img-thumbnail" 
-                                                         style="max-width: 100px; max-height: 100px;">
+                                                    <div class="position-relative">
+                                                        <img src="{{ asset('storage/' . $image->image_path) }}" 
+                                                             alt="{{ $image->keyword }}" 
+                                                             class="img-thumbnail" 
+                                                             style="max-width: 80px; max-height: 80px; object-fit: cover;">
+                                                        <a href="{{ asset('storage/' . $image->image_path) }}" 
+                                                           target="_blank" 
+                                                           class="position-absolute top-0 end-0 bg-primary text-white rounded-circle p-1"
+                                                           style="width: 20px; height: 20px; font-size: 10px; text-decoration: none;">
+                                                            <i class="material-icons-outlined" style="font-size: 12px;">open_in_new</i>
+                                                        </a>
+                                                    </div>
                                                 @else
-                                                    <span class="text-muted">No image</span>
+                                                    <div class="text-center">
+                                                        <i class="material-icons-outlined text-muted" style="font-size: 40px;">image_not_supported</i>
+                                                        <br>
+                                                        <small class="text-muted">No image</small>
+                                                    </div>
                                                 @endif
                                             </td>
                                             <td>
-                                                <div class="d-flex flex-wrap gap-2">
+                                                <div class="d-flex flex-column gap-1">
                                                     @foreach($image->translates as $translation)
-                                                        <span class="badge bg-light text-dark">
-                                                            <small>{{ $translation->language->lang_code }}:</small>
-                                                            {{ Str::limit($translation->image_go_url, 30) }}
-                                                        </span>
+                                                        <div class="d-flex align-items-center">
+                                                            <span class="badge bg-primary me-2" style="min-width: 30px;">
+                                                                {{ strtoupper($translation->language->lang_code) }}
+                                                            </span>
+                                                            <a href="{{ $translation->image_go_url }}" 
+                                                               target="_blank" 
+                                                               class="text-decoration-none text-primary"
+                                                               title="{{ $translation->image_go_url }}">
+                                                                {{ Str::limit($translation->image_go_url, 40) }}
+                                                                <i class="material-icons-outlined" style="font-size: 14px;">open_in_new</i>
+                                                            </a>
+                                                        </div>
                                                     @endforeach
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="btn-group" role="group">
+                                                <div class="d-flex gap-1">
                                                     <a href="{{ route('admin.simple-images.edit', $image->id) }}" 
-                                                       class="btn btn-sm btn-outline-primary">
+                                                       class="btn btn-sm btn-outline-primary" 
+                                                       title="Edit">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <form action="{{ route('admin.simple-images.destroy', $image->id) }}" 
@@ -102,7 +127,9 @@
                                                           style="display: inline;">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <button type="submit" 
+                                                                class="btn btn-sm btn-outline-danger" 
+                                                                title="Delete">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
                                                     </form>
