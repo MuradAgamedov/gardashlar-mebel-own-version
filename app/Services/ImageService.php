@@ -24,6 +24,7 @@ class ImageService
                 'disk' => 'public',
                 'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
                 'generate_unique_name' => true,
+                'max_size' => 2 * 1024 * 1024, // 2MB
             ];
 
             $options = array_merge($defaultOptions, $options);
@@ -33,6 +34,16 @@ class ImageService
                 throw new \Exception('File validation failed. Check file type and validity.');
             }
 
+            // Check disk availability
+            if (!Storage::disk($options['disk'])->exists($path)) {
+                // Try to create directory
+                try {
+                    Storage::disk($options['disk'])->makeDirectory($path);
+                } catch (\Exception $e) {
+                    throw new \Exception('Unable to create upload directory. Check storage permissions.');
+                }
+            }
+
             // Generate filename
             $filename = $this->generateFilename($file, $options['generate_unique_name']);
 
@@ -40,13 +51,24 @@ class ImageService
             $filePath = $file->storeAs($path, $filename, $options['disk']);
 
             if ($filePath) {
+                // Verify file was actually stored
+                if (!Storage::disk($options['disk'])->exists($filePath)) {
+                    throw new \Exception('File was not properly stored. Check storage permissions.');
+                }
+                
                 return $filePath;
             }
 
             throw new \Exception('File storage failed. File path is null.');
 
         } catch (\Exception $e) {
-            \Log::error('Image upload failed: ' . $e->getMessage());
+            \Log::error('Image upload failed: ' . $e->getMessage(), [
+                'file' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'mime_type' => $file->getMimeType(),
+                'path' => $path,
+                'options' => $options
+            ]);
             throw new \Exception('Image upload failed: ' . $e->getMessage());
         }
     }
@@ -62,11 +84,18 @@ class ImageService
     {
         try {
             if (Storage::disk($disk)->exists($path)) {
-                return Storage::disk($disk)->delete($path);
+                $result = Storage::disk($disk)->delete($path);
+                if (!$result) {
+                    \Log::warning('Failed to delete image file: ' . $path);
+                }
+                return $result;
             }
             return true; // File doesn't exist, consider it deleted
         } catch (\Exception $e) {
-            \Log::error('Image delete failed: ' . $e->getMessage());
+            \Log::error('Image delete failed: ' . $e->getMessage(), [
+                'path' => $path,
+                'disk' => $disk
+            ]);
             return false;
         }
     }
@@ -102,13 +131,52 @@ class ImageService
     {
         // Check if file is valid
         if (!$file->isValid()) {
-            throw new \Exception('File is not valid. Error: ' . $file->getError());
+            $errorMessages = [
+                UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
+                UPLOAD_ERR_FORM_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form.',
+                UPLOAD_ERR_PARTIAL => 'The uploaded file was only partially uploaded.',
+                UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
+                UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder.',
+                UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
+                UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.',
+            ];
+            
+            $errorMessage = $errorMessages[$file->getError()] ?? 'Unknown upload error occurred.';
+            throw new \Exception('File is not valid. Error: ' . $errorMessage);
         }
 
-        // Check file type
+        // Check file size
+        if ($file->getSize() > $options['max_size']) {
+            throw new \Exception('File size exceeds limit. Maximum allowed: ' . $this->formatBytes($options['max_size']) . '. Got: ' . $this->formatBytes($file->getSize()));
+        }
+
+        // Check file type by extension
         $extension = strtolower($file->getClientOriginalExtension());
         if (!in_array($extension, $options['allowed_types'])) {
             throw new \Exception('File type not allowed. Allowed types: ' . implode(', ', $options['allowed_types']) . '. Got: ' . $extension);
+        }
+
+        // Check MIME type
+        $mimeType = $file->getMimeType();
+        $allowedMimeTypes = [
+            'image/jpeg',
+            'image/png', 
+            'image/gif',
+            'image/webp'
+        ];
+        
+        if (!in_array($mimeType, $allowedMimeTypes)) {
+            throw new \Exception('Invalid MIME type. Allowed types: ' . implode(', ', $allowedMimeTypes) . '. Got: ' . $mimeType);
+        }
+
+        // Additional image validation
+        try {
+            $imageInfo = getimagesize($file->getPathname());
+            if ($imageInfo === false) {
+                throw new \Exception('Unable to read image file. File may be corrupted.');
+            }
+        } catch (\Exception $e) {
+            throw new \Exception('Image validation failed: ' . $e->getMessage());
         }
 
         return true;
@@ -163,5 +231,18 @@ class ImageService
         return Storage::disk($disk)->exists($path);
     }
 
-
+    /**
+     * Format bytes to human readable format
+     *
+     * @param int $bytes
+     * @return string
+     */
+    private function formatBytes(int $bytes): string
+    {
+        if ($bytes === 0) return '0 Bytes';
+        $k = 1024;
+        $sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        $i = floor(log($bytes) / log($k));
+        return round($bytes / pow($k, $i), 2) . ' ' . $sizes[$i];
+    }
 } 

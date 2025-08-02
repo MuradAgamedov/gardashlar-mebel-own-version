@@ -45,7 +45,7 @@ class SimpleImageController extends Controller
     {
         $request->validate([
             'keyword' => 'required|string|max:255|unique:simple_images',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.image_go_url' => 'nullable|string|max:255',
@@ -54,14 +54,44 @@ class SimpleImageController extends Controller
             'image.required' => 'Image is required.',
             'image.image' => 'The file must be an image.',
             'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
+            'image.max' => 'Image size must not exceed 2MB.',
         ]);
 
         try {
-            $imagePath = $this->imageService->upload($request->file('image'), 'simple-images');
+            // Additional file validation
+            $file = $request->file('image');
+            
+            if (!$file->isValid()) {
+                $errorMessages = [
+                    UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
+                    UPLOAD_ERR_FORM_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form.',
+                    UPLOAD_ERR_PARTIAL => 'The uploaded file was only partially uploaded.',
+                    UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
+                    UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder.',
+                    UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
+                    UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.',
+                ];
+                
+                $errorMessage = $errorMessages[$file->getError()] ?? 'Unknown upload error occurred.';
+                return back()->withInput()->with('error', 'File upload failed: ' . $errorMessage);
+            }
+
+            // Check file size manually (additional safety)
+            if ($file->getSize() > 2 * 1024 * 1024) {
+                return back()->withInput()->with('error', 'File size exceeds 2MB limit. Please choose a smaller image.');
+            }
+
+            // Check file type manually
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!in_array($file->getMimeType(), $allowedTypes)) {
+                return back()->withInput()->with('error', 'Invalid file type. Please upload a JPG, PNG, GIF, or WebP image.');
+            }
+
+            $imagePath = $this->imageService->upload($file, 'simple-images');
             
             if (!$imagePath) {
                 return back()->withInput()
-                    ->with('error', 'Failed to upload image. ImageService returned false.');
+                    ->with('error', 'Failed to upload image. Please check server storage permissions and try again.');
             }
 
             $simpleImage = SimpleImage::create([
@@ -83,6 +113,7 @@ class SimpleImageController extends Controller
                 ->with('success', 'Image created successfully.');
 
         } catch (\Exception $e) {
+            \Log::error('SimpleImage store error: ' . $e->getMessage());
             return back()->withInput()
                 ->with('error', 'Error creating image: ' . $e->getMessage());
         }
@@ -105,7 +136,7 @@ class SimpleImageController extends Controller
     {
         $request->validate([
             'keyword' => 'required|string|max:255|unique:simple_images,keyword,' . $simpleImage->id,
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.image_go_url' => 'nullable|string|max:255',
@@ -113,6 +144,7 @@ class SimpleImageController extends Controller
         ], [
             'image.image' => 'The file must be an image.',
             'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
+            'image.max' => 'Image size must not exceed 2MB.',
         ]);
 
         try {
@@ -121,17 +153,46 @@ class SimpleImageController extends Controller
             ];
 
             if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                
+                // Additional file validation
+                if (!$file->isValid()) {
+                    $errorMessages = [
+                        UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
+                        UPLOAD_ERR_FORM_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form.',
+                        UPLOAD_ERR_PARTIAL => 'The uploaded file was only partially uploaded.',
+                        UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
+                        UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder.',
+                        UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
+                        UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.',
+                    ];
+                    
+                    $errorMessage = $errorMessages[$file->getError()] ?? 'Unknown upload error occurred.';
+                    return back()->withInput()->with('error', 'File upload failed: ' . $errorMessage);
+                }
+
+                // Check file size manually (additional safety)
+                if ($file->getSize() > 2 * 1024 * 1024) {
+                    return back()->withInput()->with('error', 'File size exceeds 2MB limit. Please choose a smaller image.');
+                }
+
+                // Check file type manually
+                $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!in_array($file->getMimeType(), $allowedTypes)) {
+                    return back()->withInput()->with('error', 'Invalid file type. Please upload a JPG, PNG, GIF, or WebP image.');
+                }
+
                 // Delete old image
                 if ($simpleImage->image_path) {
                     $this->imageService->delete($simpleImage->image_path);
                 }
                 
                 // Upload new image
-                $imagePath = $this->imageService->upload($request->file('image'), 'simple-images');
+                $imagePath = $this->imageService->upload($file, 'simple-images');
                 
                 if (!$imagePath) {
                     return back()->withInput()
-                        ->with('error', 'Failed to upload image. ImageService returned false.');
+                        ->with('error', 'Failed to upload image. Please check server storage permissions and try again.');
                 }
                 
                 $data['image_path'] = $imagePath;
@@ -157,6 +218,7 @@ class SimpleImageController extends Controller
                 ->with('success', 'Image updated successfully.');
 
         } catch (\Exception $e) {
+            \Log::error('SimpleImage update error: ' . $e->getMessage());
             return back()->withInput()
                 ->with('error', 'Error updating image: ' . $e->getMessage());
         }
@@ -178,6 +240,7 @@ class SimpleImageController extends Controller
             return redirect()->route('admin.simple-images.index')
                 ->with('success', 'Image deleted successfully.');
         } catch (\Exception $e) {
+            \Log::error('SimpleImage destroy error: ' . $e->getMessage());
             return back()->with('error', 'Error deleting image: ' . $e->getMessage());
         }
     }
