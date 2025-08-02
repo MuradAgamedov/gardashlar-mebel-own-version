@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\HomePageProjectCategoryController;
 use App\Http\Controllers\Api\SimpleImageController;
 use App\Http\Controllers\Api\DictionaryController;
 use App\Http\Controllers\Api\SocialNetworkController;
+use App\Http\Controllers\Api\CurrencyController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -59,3 +60,10 @@ Route::get('/social-networks', [SocialNetworkController::class, 'index'])->name(
 Route::get('/social-networks/available-types', [SocialNetworkController::class, 'getAvailableTypes'])->name('api.social-networks.available-types');
 Route::get('/social-networks/{type}', [SocialNetworkController::class, 'show'])->name('api.social-networks.show');
 Route::post('/social-networks/by-types', [SocialNetworkController::class, 'getByTypesArray'])->name('api.social-networks.by-types');
+
+// Currencies API Routes
+Route::get('/currencies', [CurrencyController::class, 'index'])->name('api.currencies.index');
+Route::get('/currencies/available-codes', [CurrencyController::class, 'getAvailableCodes'])->name('api.currencies.available-codes');
+Route::get('/currencies/{code}', [CurrencyController::class, 'show'])->name('api.currencies.show');
+Route::post('/currencies/by-codes', [CurrencyController::class, 'getByCodesArray'])->name('api.currencies.by-codes');
+Route::post('/currencies/convert', [CurrencyController::class, 'convert'])->name('api.currencies.convert');
