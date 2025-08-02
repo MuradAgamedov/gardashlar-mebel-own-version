@@ -48,14 +48,16 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Blog Images - {{ $blogPost->translate()->title ?? 'No title' }}</h5>
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadImageModal">
-                                    <i class="material-icons-outlined">add_photo_alternate</i>
-                                </button>
-                                <a href="{{ route('admin.blog-posts.index') }}" class="btn btn-secondary">
-                                    <i class="material-icons-outlined">arrow_back</i>
-                                </a>
-                            </div>
+                                                         <div class="d-flex gap-2">
+                                 <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadImageModal">
+                                     <i class="material-icons-outlined">add_photo_alternate</i>
+                                     Upload Image
+                                 </button>
+                                 <a href="{{ route('admin.blog-posts.index') }}" class="btn btn-secondary">
+                                     <i class="material-icons-outlined">arrow_back</i>
+                                     Back to Blog Posts
+                                 </a>
+                             </div>
                         </div>
                     </div>
                     
@@ -96,9 +98,10 @@
                                     <i class="material-icons-outlined" style="font-size: 64px;">photo_library</i>
                                     <h5 class="mt-3">No images found</h5>
                                     <p>Upload your first image to get started.</p>
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadImageModal">
-                                        <i class="material-icons-outlined">add_photo_alternate</i>
-                                    </button>
+                                                                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadImageModal">
+                                         <i class="material-icons-outlined">add_photo_alternate</i>
+                                         Upload Image
+                                     </button>
                                 </div>
                             </div>
                         @endif
@@ -164,10 +167,10 @@
                         @enderror
                         <small class="form-text text-muted">Max size: 2MB. Supported formats: JPEG, PNG, JPG, GIF, WEBP</small>
                     </div>
-                    <div class="mt-2">
-                        <img id="editImagePreview" src="" alt="Image Preview" 
-                             class="img-thumbnail" style="max-width: 100%;">
-                    </div>
+                                         <div class="mt-2">
+                         <img id="editImagePreview" src="" alt="Image Preview" 
+                              class="img-thumbnail" style="max-width: 100%; display: none;">
+                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -234,8 +237,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     editImagePreview.src = e.target.result;
+                    editImagePreview.style.display = 'block';
                 };
                 reader.readAsDataURL(file);
+            } else {
+                editImagePreview.style.display = 'none';
             }
         });
     }
@@ -262,23 +268,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify({ images: items })
                 })
                 .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: data.message,
-                            icon: 'success',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: data.message,
-                            icon: 'error'
-                        });
-                    }
-                })
+                                 .then(data => {
+                     if (!data.success) {
+                         Swal.fire({
+                             title: 'Error!',
+                             text: data.message,
+                             icon: 'error'
+                         });
+                     }
+                 })
                 .catch(error => {
                     console.error('Error:', error);
                     Swal.fire({
@@ -328,6 +326,7 @@ function editImage(imageId, currentImageUrl) {
     
     editImageForm.action = '{{ route("admin.blog-posts.images.update", [$blogPost, ":imageId"]) }}'.replace(':imageId', imageId);
     editImagePreview.src = currentImageUrl;
+    editImagePreview.style.display = 'block';
     
     const editImageModal = new bootstrap.Modal(document.getElementById('editImageModal'));
     editImageModal.show();
