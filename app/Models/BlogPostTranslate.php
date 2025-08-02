@@ -13,6 +13,7 @@ class BlogPostTranslate extends Model
         'blog_post_id',
         'language_id',
         'title',
+        'slug',
         'description',
         'card_image_alt_text',
         'card_description',

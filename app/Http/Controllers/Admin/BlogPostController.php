@@ -57,6 +57,7 @@ class BlogPostController extends Controller
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.title' => 'required|string|max:255',
+            'translations.*.slug' => 'required|string|max:255|unique:blog_post_translates,slug',
             'translations.*.description' => 'required|string',
             'translations.*.card_image_alt_text' => 'nullable|string|max:255',
             'translations.*.card_description' => 'nullable|string',
@@ -88,10 +89,22 @@ class BlogPostController extends Controller
             // Create translations
             foreach ($request->translations as $languageId => $translation) {
                 if (!empty($translation['title'])) {
+                    // Generate slug from title
+                    $slug = Str::slug($translation['title']);
+                    $originalSlug = $slug;
+                    $counter = 1;
+                    
+                    // Check if slug already exists
+                    while (BlogPostTranslate::where('slug', $slug)->exists()) {
+                        $slug = $originalSlug . '-' . $counter;
+                        $counter++;
+                    }
+                    
                     BlogPostTranslate::create([
                         'blog_post_id' => $blogPost->id,
                         'language_id' => $languageId,
                         'title' => $translation['title'],
+                        'slug' => $slug,
                         'description' => $translation['description'],
                         'card_image_alt_text' => $translation['card_image_alt_text'] ?? null,
                         'card_description' => $translation['card_description'] ?? null,
@@ -140,6 +153,7 @@ class BlogPostController extends Controller
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.title' => 'required|string|max:255',
+            'translations.*.slug' => 'required|string|max:255|unique:blog_post_translates,slug,' . $blogPost->id . ',blog_post_id',
             'translations.*.description' => 'required|string',
             'translations.*.card_image_alt_text' => 'nullable|string|max:255',
             'translations.*.card_description' => 'nullable|string',
@@ -177,6 +191,19 @@ class BlogPostController extends Controller
             // Update or create translations
             foreach ($request->translations as $languageId => $translation) {
                 if (!empty($translation['title'])) {
+                    // Generate slug from title
+                    $slug = Str::slug($translation['title']);
+                    $originalSlug = $slug;
+                    $counter = 1;
+                    
+                    // Check if slug already exists (excluding current translation)
+                    while (BlogPostTranslate::where('slug', $slug)
+                        ->where('blog_post_id', '!=', $blogPost->id)
+                        ->exists()) {
+                        $slug = $originalSlug . '-' . $counter;
+                        $counter++;
+                    }
+                    
                     BlogPostTranslate::updateOrCreate(
                         [
                             'blog_post_id' => $blogPost->id,
@@ -184,6 +211,7 @@ class BlogPostController extends Controller
                         ],
                         [
                             'title' => $translation['title'],
+                            'slug' => $slug,
                             'description' => $translation['description'],
                             'card_image_alt_text' => $translation['card_image_alt_text'] ?? null,
                             'card_description' => $translation['card_description'] ?? null,

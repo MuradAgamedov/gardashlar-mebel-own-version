@@ -167,8 +167,24 @@
                                                     </label>
                                                     <input type="text" class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
                                                            name="translations[{{ $language->id }}][title]" 
+                                                           id="title_{{ $language->id }}"
                                                            value="{{ old("translations.{$language->id}.title", $translation->title ?? '') }}" required>
                                                     @error("translations.{$language->id}.title")
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-3">
+                                                <div class="col-md-12">
+                                                    <label for="translations[{{ $language->id }}][slug]" class="form-label">
+                                                        Slug ({{ strtoupper($language->lang_code) }}) <span class="text-danger">*</span>
+                                                    </label>
+                                                    <input type="text" class="form-control @error("translations.{$language->id}.slug") is-invalid @enderror" 
+                                                           name="translations[{{ $language->id }}][slug]" 
+                                                           id="slug_{{ $language->id }}"
+                                                           value="{{ old("translations.{$language->id}.slug", $translation->slug ?? '') }}" required>
+                                                    @error("translations.{$language->id}.slug")
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
@@ -360,6 +376,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup image previews
     setupImagePreview('card_image', 'card_image_preview');
     setupImagePreview('inner_banner_image', 'inner_banner_image_preview');
+
+    // Auto-generate slug from title
+    function setupSlugGeneration() {
+        @foreach($languages as $language)
+            const titleInput{{ $language->id }} = document.getElementById('title_{{ $language->id }}');
+            const slugInput{{ $language->id }} = document.getElementById('slug_{{ $language->id }}');
+            
+            if (titleInput{{ $language->id }} && slugInput{{ $language->id }}) {
+                titleInput{{ $language->id }}.addEventListener('input', function() {
+                    const title = this.value;
+                    const slug = title.toLowerCase()
+                        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+                        .replace(/\s+/g, '-') // Replace spaces with hyphens
+                        .replace(/-+/g, '-') // Replace multiple hyphens with single
+                        .trim('-'); // Remove leading/trailing hyphens
+                    slugInput{{ $language->id }}.value = slug;
+                });
+            }
+        @endforeach
+    }
+
+    setupSlugGeneration();
 });
 </script>
 @endpush 
