@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\HeroCategoryController;
 use App\Http\Controllers\Api\WhyChooseUsController;
 use App\Http\Controllers\Api\HomePageDiscountController;
 use App\Http\Controllers\Api\HomePageProjectCategoryController;
+use App\Http\Controllers\Api\SimpleImageController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -40,3 +41,8 @@ Route::get('/home-page-discount', [HomePageDiscountController::class, 'index'])-
 
 // Home Page Project Categories API Routes
 Route::get('/home-page-project-categories', [HomePageProjectCategoryController::class, 'index'])->name('api.home-page-project-categories.index');
+
+// Simple Images API Routes
+Route::get('/simple-images', [SimpleImageController::class, 'index'])->name('api.simple-images.index');
+Route::get('/simple-images/{keyword}', [SimpleImageController::class, 'show'])->name('api.simple-images.show');
+Route::get('/simple-images/keywords/{keywords}', [SimpleImageController::class, 'getByKeywords'])->name('api.simple-images.keywords');
