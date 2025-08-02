@@ -140,7 +140,7 @@
                                 <div class="col-md-6">
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" value="1" 
-                                               {{ old('status', $blogPost->status) ? 'checked' : '' }}>
+                                               {{ old('status', $blogPost->status ? '1' : '') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">Active</label>
                                     </div>
                                 </div>

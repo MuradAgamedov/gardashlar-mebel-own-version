@@ -86,7 +86,7 @@ class BlogPostController extends Controller
         try {
             $data = [
                 'blog_category_id' => $request->blog_category_id,
-                'status' => $request->input('status', true),
+                'status' => $request->has('status'),
                 'published_at' => $request->published_at,
             ];
 
@@ -187,7 +187,7 @@ class BlogPostController extends Controller
         try {
             $data = [
                 'blog_category_id' => $request->blog_category_id,
-                'status' => $request->input('status', true),
+                'status' => $request->has('status'),
                 'published_at' => $request->published_at,
             ];
 
