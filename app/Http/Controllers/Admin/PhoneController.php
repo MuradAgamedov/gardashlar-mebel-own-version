@@ -136,6 +136,12 @@ class PhoneController extends Controller
      */
     public function destroy(Phone $phone)
     {
+        // Check if phone type ID is 3 - if so, prevent deletion
+        if ($phone->phone_type_id == 3) {
+            return redirect()->back()
+                ->with('error', 'This phone cannot be deleted as it belongs to a protected phone type.');
+        }
+
         try {
             $phone->delete();
             return redirect()->route('admin.phones.index')
