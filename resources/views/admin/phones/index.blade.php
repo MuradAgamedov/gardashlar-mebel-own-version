@@ -141,6 +141,7 @@
                                                                          <a href="{{ route('admin.phones.edit', $phone) }}" class="btn btn-sm btn-warning" style="padding: 2px 6px;">
                                                                              <i class="material-icons-outlined" style="font-size: 14px;">edit</i>
                                                                          </a>
+                                                                         @dd($phone->phone_type_id != 3)
                                                                          @if($phone->phone_type_id != 3)
                                                                              <button type="button" class="btn btn-sm btn-danger delete-btn" 
                                                                                      style="padding: 2px 6px;"
