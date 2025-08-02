@@ -200,4 +200,24 @@ class ProjectCategoryController extends Controller
             return response()->json(['success' => false, 'message' => 'Error reordering project categories'], 500);
         }
     }
+
+    /**
+     * Bulk delete project categories
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'required|integer|exists:project_categories,id',
+        ]);
+
+        try {
+            $deletedCount = ProjectCategory::whereIn('id', $request->ids)->delete();
+            
+            return redirect()->route('admin.project-categories.index')
+                ->with('success', "{$deletedCount} project category(ies) deleted successfully!");
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error deleting project categories: ' . $e->getMessage());
+        }
+    }
 }

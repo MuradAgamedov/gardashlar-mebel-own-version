@@ -277,6 +277,11 @@ Route::prefix('')->name('admin.')->group(function () {
         Route::resource('projects', ProjectController::class);
         Route::post('projects/reorder', [ProjectController::class, 'reorder'])->name('projects.reorder');
         
+        // Project Categories routes
+        Route::resource('project-categories', ProjectCategoryController::class);
+        Route::post('project-categories/reorder', [ProjectCategoryController::class, 'reorder'])->name('project-categories.reorder');
+        Route::post('project-categories/bulk-delete', [ProjectCategoryController::class, 'bulkDelete'])->name('project-categories.bulk-delete');
+        
         // Project Videos routes
         Route::resource('projects.videos', ProjectVideoController::class);
         Route::post('projects/{project}/videos/reorder', [ProjectVideoController::class, 'reorder'])->name('projects.videos.reorder');
