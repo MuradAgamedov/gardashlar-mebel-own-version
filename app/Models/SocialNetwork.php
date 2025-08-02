@@ -156,4 +156,63 @@ class SocialNetwork extends Model
     {
         return $query->orderBy('order');
     }
+
+    /**
+     * Get social networks by types
+     */
+    public static function getByTypes(array $types)
+    {
+        return self::active()
+            ->whereIn('type', $types)
+            ->ordered()
+            ->get();
+    }
+
+    /**
+     * Get social network by type
+     */
+    public static function getByType(string $type)
+    {
+        return self::active()
+            ->where('type', $type)
+            ->first();
+    }
+
+    /**
+     * Check if social network exists by type
+     */
+    public static function existsByType(string $type): bool
+    {
+        return self::active()->where('type', $type)->exists();
+    }
+
+    /**
+     * Get all available types
+     */
+    public static function getAvailableTypes(): array
+    {
+        return self::active()->pluck('type')->toArray();
+    }
+
+    /**
+     * Get social networks as array for frontend
+     */
+    public static function getForFrontend(): array
+    {
+        return self::active()
+            ->ordered()
+            ->get()
+            ->map(function ($socialNetwork) {
+                return [
+                    'id' => $socialNetwork->id,
+                    'type' => $socialNetwork->type,
+                    'name' => $socialNetwork->display_name,
+                    'icon' => $socialNetwork->display_icon,
+                    'url' => $socialNetwork->url,
+                    'order' => $socialNetwork->order,
+                    'color' => $socialNetwork->color
+                ];
+            })
+            ->toArray();
+    }
 }

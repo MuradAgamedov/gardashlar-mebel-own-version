@@ -45,20 +45,7 @@ class SocialNetworkController extends Controller
         $cacheKey = 'social_networks_active';
         
         $socialNetworks = Cache::remember($cacheKey, 3600, function () {
-            return SocialNetwork::active()
-                ->ordered()
-                ->get()
-                ->map(function ($socialNetwork) {
-                    return [
-                        'id' => $socialNetwork->id,
-                        'type' => $socialNetwork->type,
-                        'name' => $socialNetwork->display_name,
-                        'icon' => $socialNetwork->display_icon,
-                        'url' => $socialNetwork->url,
-                        'order' => $socialNetwork->order,
-                        'color' => $socialNetwork->color
-                    ];
-                });
+            return SocialNetwork::getForFrontend();
         });
 
         return response()->json([
@@ -112,9 +99,7 @@ class SocialNetworkController extends Controller
         $cacheKey = "social_network_{$type}";
         
         $socialNetwork = Cache::remember($cacheKey, 3600, function () use ($type) {
-            return SocialNetwork::active()
-                ->where('type', $type)
-                ->first();
+            return SocialNetwork::getByType($type);
         });
 
         if (!$socialNetwork) {
@@ -135,6 +120,110 @@ class SocialNetworkController extends Controller
                 'order' => $socialNetwork->order,
                 'color' => $socialNetwork->color
             ]
+        ]);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/social-networks/by-types",
+     *     summary="Get social networks by array of types",
+     *     tags={"Social Networks"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="types", type="array", @OA\Items(type="string"), example={"facebook", "instagram", "twitter"})
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Social networks by types",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object", example={
+     *                 "facebook": {
+     *                     "id": 1,
+     *                     "type": "facebook",
+     *                     "name": "Facebook",
+     *                     "icon": "fab fa-facebook",
+     *                     "url": "https://facebook.com/company",
+     *                     "order": 1,
+     *                     "color": "#1877F2"
+     *                 },
+     *                 "instagram": {
+     *                     "id": 2,
+     *                     "type": "instagram",
+     *                     "name": "Instagram",
+     *                     "icon": "fab fa-instagram",
+     *                     "url": "https://instagram.com/company",
+     *                     "order": 2,
+     *                     "color": "#E4405F"
+     *                 }
+     *             })
+     *         )
+     *     )
+     * )
+     */
+    public function getByTypesArray(Request $request): JsonResponse
+    {
+        $request->validate([
+            'types' => 'required|array',
+            'types.*' => 'string'
+        ]);
+
+        $types = $request->types;
+        $cacheKey = 'social_networks_by_types_' . md5(serialize($types));
+        
+        $socialNetworks = Cache::remember($cacheKey, 3600, function () use ($types) {
+            return SocialNetwork::getByTypes($types)
+                ->keyBy('type')
+                ->map(function ($socialNetwork) {
+                    return [
+                        'id' => $socialNetwork->id,
+                        'type' => $socialNetwork->type,
+                        'name' => $socialNetwork->display_name,
+                        'icon' => $socialNetwork->display_icon,
+                        'url' => $socialNetwork->url,
+                        'order' => $socialNetwork->order,
+                        'color' => $socialNetwork->color
+                    ];
+                });
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $socialNetworks
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/social-networks/available-types",
+     *     summary="Get all available social network types",
+     *     tags={"Social Networks"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Available social network types",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="string"), example={"facebook", "instagram", "twitter"})
+     *         )
+     *     )
+     * )
+     */
+    public function getAvailableTypes(): JsonResponse
+    {
+        $cacheKey = 'social_networks_available_types';
+        
+        $types = Cache::remember($cacheKey, 3600, function () {
+            return SocialNetwork::getAvailableTypes();
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $types
         ]);
     }
 }

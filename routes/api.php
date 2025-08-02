@@ -56,4 +56,6 @@ Route::post('/simple-images/by-keywords', [SimpleImageController::class, 'getByK
 
 // Social Networks API Routes
 Route::get('/social-networks', [SocialNetworkController::class, 'index'])->name('api.social-networks.index');
+Route::get('/social-networks/available-types', [SocialNetworkController::class, 'getAvailableTypes'])->name('api.social-networks.available-types');
 Route::get('/social-networks/{type}', [SocialNetworkController::class, 'show'])->name('api.social-networks.show');
+Route::post('/social-networks/by-types', [SocialNetworkController::class, 'getByTypesArray'])->name('api.social-networks.by-types');
