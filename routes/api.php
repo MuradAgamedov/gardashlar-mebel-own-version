@@ -70,6 +70,6 @@ Route::post('/currencies/by-codes', [CurrencyController::class, 'getByCodesArray
 Route::post('/currencies/convert', [CurrencyController::class, 'convert'])->name('api.currencies.convert');
 
 // Partner Sliders API Routes
-Route::get('/partner-sliders', [PartnerSliderController::class, 'index'])->name('api.partner-sliders.index');
-Route::get('/partner-sliders/{id}', [PartnerSliderController::class, 'show'])->name('api.partner-sliders.show');
-Route::get('/partner-sliders/with-all-translations', [PartnerSliderController::class, 'withAllTranslations'])->name('api.partner-sliders.with-all-translations');
+Route::get('/partners', [PartnerSliderController::class, 'index'])->name('api.partner-sliders.index');
+Route::get('/partners/{id}', [PartnerSliderController::class, 'show'])->name('api.partner-sliders.show');
+Route::get('/partners/with-all-translations', [PartnerSliderController::class, 'withAllTranslations'])->name('api.partner-sliders.with-all-translations');
