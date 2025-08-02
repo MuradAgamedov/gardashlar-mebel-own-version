@@ -49,7 +49,6 @@
                 <ul class="mb-0">
                     <li>Check if the image file is not corrupted</li>
                     <li>Ensure the image is in JPG, PNG, GIF, or WebP format</li>
-                    <li>Make sure the file size is less than 2MB</li>
                     <li>Try uploading a different image file</li>
                     <li>Check server storage permissions</li>
                 </ul>
@@ -128,7 +127,7 @@
                                            name="image" 
                                            accept="image/jpeg,image/png,image/gif,image/webp"
                                            id="imageInput">
-                                    <small class="form-text text-muted">Leave empty to keep current image. Supported formats: JPG, PNG, GIF, WebP. Max size: 2MB</small>
+                                    <small class="form-text text-muted">Leave empty to keep current image. Supported formats: JPG, PNG, GIF, WebP</small>
                                     <div id="fileInfo" class="mt-2 d-none">
                                         <small class="text-info">
                                             <span id="fileName"></span> (<span id="fileSize"></span>)
@@ -228,9 +227,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitText = document.getElementById('submitText');
     const form = document.getElementById('imageUploadForm');
 
-    // File size validation (2MB = 2 * 1024 * 1024 bytes)
-    const MAX_FILE_SIZE = 2 * 1024 * 1024;
-
     imageInput.addEventListener('change', function() {
         const file = this.files[0];
         
@@ -239,15 +235,6 @@ document.addEventListener('DOMContentLoaded', function() {
             fileName.textContent = file.name;
             fileSize.textContent = formatFileSize(file.size);
             fileInfo.classList.remove('d-none');
-
-            // Validate file size
-            if (file.size > MAX_FILE_SIZE) {
-                alert('File size exceeds 2MB limit. Please choose a smaller image.');
-                this.value = '';
-                fileInfo.classList.add('d-none');
-                imagePreview.classList.add('d-none');
-                return;
-            }
 
             // Validate file type
             const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];

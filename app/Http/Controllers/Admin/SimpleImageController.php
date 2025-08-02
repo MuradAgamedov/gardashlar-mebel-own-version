@@ -45,7 +45,7 @@ class SimpleImageController extends Controller
     {
         $request->validate([
             'keyword' => 'required|string|max:255|unique:simple_images',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.image_go_url' => 'nullable|string|max:255',
@@ -54,7 +54,6 @@ class SimpleImageController extends Controller
             'image.required' => 'Image is required.',
             'image.image' => 'The file must be an image.',
             'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
-            'image.max' => 'Image size must not exceed 2MB.',
         ]);
 
         try {
@@ -76,22 +75,30 @@ class SimpleImageController extends Controller
                 return back()->withInput()->with('error', 'File upload failed: ' . $errorMessage);
             }
 
-            // Check file size manually (additional safety)
-            if ($file->getSize() > 2 * 1024 * 1024) {
-                return back()->withInput()->with('error', 'File size exceeds 2MB limit. Please choose a smaller image.');
-            }
-
             // Check file type manually
             $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
             if (!in_array($file->getMimeType(), $allowedTypes)) {
                 return back()->withInput()->with('error', 'Invalid file type. Please upload a JPG, PNG, GIF, or WebP image.');
             }
 
-            $imagePath = $this->imageService->upload($file, 'simple-images');
-            
-            if (!$imagePath) {
+            try {
+                $imagePath = $this->imageService->upload($file, 'simple-images');
+                
+                if (!$imagePath) {
+                    return back()->withInput()
+                        ->with('error', 'Failed to upload image. Please check server storage permissions and try again.');
+                }
+            } catch (\Exception $uploadException) {
+                // Log the specific upload error
+                \Log::error('Image upload error in store: ' . $uploadException->getMessage(), [
+                    'file' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                    'mime_type' => $file->getMimeType(),
+                    'error' => $uploadException->getMessage()
+                ]);
+                
                 return back()->withInput()
-                    ->with('error', 'Failed to upload image. Please check server storage permissions and try again.');
+                    ->with('error', 'Image upload failed: ' . $uploadException->getMessage());
             }
 
             $simpleImage = SimpleImage::create([
@@ -136,7 +143,7 @@ class SimpleImageController extends Controller
     {
         $request->validate([
             'keyword' => 'required|string|max:255|unique:simple_images,keyword,' . $simpleImage->id,
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.image_go_url' => 'nullable|string|max:255',
@@ -144,7 +151,6 @@ class SimpleImageController extends Controller
         ], [
             'image.image' => 'The file must be an image.',
             'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
-            'image.max' => 'Image size must not exceed 2MB.',
         ]);
 
         try {
@@ -171,11 +177,6 @@ class SimpleImageController extends Controller
                     return back()->withInput()->with('error', 'File upload failed: ' . $errorMessage);
                 }
 
-                // Check file size manually (additional safety)
-                if ($file->getSize() > 2 * 1024 * 1024) {
-                    return back()->withInput()->with('error', 'File size exceeds 2MB limit. Please choose a smaller image.');
-                }
-
                 // Check file type manually
                 $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
                 if (!in_array($file->getMimeType(), $allowedTypes)) {
@@ -188,11 +189,24 @@ class SimpleImageController extends Controller
                 }
                 
                 // Upload new image
-                $imagePath = $this->imageService->upload($file, 'simple-images');
-                
-                if (!$imagePath) {
+                try {
+                    $imagePath = $this->imageService->upload($file, 'simple-images');
+                    
+                    if (!$imagePath) {
+                        return back()->withInput()
+                            ->with('error', 'Failed to upload image. Please check server storage permissions and try again.');
+                    }
+                } catch (\Exception $uploadException) {
+                    // Log the specific upload error
+                    \Log::error('Image upload error in update: ' . $uploadException->getMessage(), [
+                        'file' => $file->getClientOriginalName(),
+                        'size' => $file->getSize(),
+                        'mime_type' => $file->getMimeType(),
+                        'error' => $uploadException->getMessage()
+                    ]);
+                    
                     return back()->withInput()
-                        ->with('error', 'Failed to upload image. Please check server storage permissions and try again.');
+                        ->with('error', 'Image upload failed: ' . $uploadException->getMessage());
                 }
                 
                 $data['image_path'] = $imagePath;

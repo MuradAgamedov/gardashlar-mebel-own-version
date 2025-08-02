@@ -24,7 +24,6 @@ class ImageService
                 'disk' => 'public',
                 'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
                 'generate_unique_name' => true,
-                'max_size' => 2 * 1024 * 1024, // 2MB
             ];
 
             $options = array_merge($defaultOptions, $options);
@@ -143,11 +142,6 @@ class ImageService
             
             $errorMessage = $errorMessages[$file->getError()] ?? 'Unknown upload error occurred.';
             throw new \Exception('File is not valid. Error: ' . $errorMessage);
-        }
-
-        // Check file size
-        if ($file->getSize() > $options['max_size']) {
-            throw new \Exception('File size exceeds limit. Maximum allowed: ' . $this->formatBytes($options['max_size']) . '. Got: ' . $this->formatBytes($file->getSize()));
         }
 
         // Check file type by extension
