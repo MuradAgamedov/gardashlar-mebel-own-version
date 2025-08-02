@@ -38,7 +38,7 @@ class SocialNetworkController extends Controller
             'name' => 'nullable|string|max:255',
             'icon' => 'nullable|string|max:255',
             'url' => 'required|url|max:500',
-            'status' => 'boolean'
+            'status' => 'nullable|boolean'
         ]);
 
         try {
@@ -82,7 +82,7 @@ class SocialNetworkController extends Controller
             'name' => 'nullable|string|max:255',
             'icon' => 'nullable|string|max:255',
             'url' => 'required|url|max:500',
-            'status' => 'boolean'
+            'status' => 'nullable|boolean'
         ]);
 
         try {
