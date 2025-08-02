@@ -22,7 +22,6 @@ class ImageService
             // Default options
             $defaultOptions = [
                 'disk' => 'public',
-                'max_size' => 2048, // 2MB
                 'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
                 'generate_unique_name' => true,
             ];
@@ -103,11 +102,6 @@ class ImageService
     {
         // Check if file is valid
         if (!$file->isValid()) {
-            return false;
-        }
-
-        // Check file size
-        if ($file->getSize() > ($options['max_size'] * 1024)) {
             return false;
         }
 
