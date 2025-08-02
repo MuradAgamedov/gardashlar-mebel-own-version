@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\DictionaryController;
 use App\Http\Controllers\Api\SocialNetworkController;
 use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\PartnerSliderController;
+use App\Http\Controllers\Api\TestimonialController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -73,3 +74,8 @@ Route::post('/currencies/convert', [CurrencyController::class, 'convert'])->name
 Route::get('/partners', [PartnerSliderController::class, 'index'])->name('api.partner-sliders.index');
 Route::get('/partners/{id}', [PartnerSliderController::class, 'show'])->name('api.partner-sliders.show');
 Route::get('/partners/with-all-translations', [PartnerSliderController::class, 'withAllTranslations'])->name('api.partner-sliders.with-all-translations');
+
+// Testimonials API Routes
+Route::get('/testimonials', [TestimonialController::class, 'index'])->name('api.testimonials.index');
+Route::get('/testimonials/{id}', [TestimonialController::class, 'show'])->name('api.testimonials.show');
+Route::get('/testimonials-with-translations', [TestimonialController::class, 'withTranslations'])->name('api.testimonials.with-translations');
