@@ -7,25 +7,22 @@ use App\Models\PartnerSlider;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Traits\LocaleFromHeader;
 
 class PartnerSliderController extends Controller
 {
+    use LocaleFromHeader;
+
     /**
      * Get all active partner sliders with translations
      */
     public function index(Request $request): JsonResponse
     {
         try {
-            // Get language from header or use default
-            $languageCode = $request->header('Accept-Language', 'az');
-            $language = Language::where('lang_code', $languageCode)->first();
-            
-            if (!$language) {
-                $language = Language::where('is_default', true)->first();
-            }
+            $languageId = $this->getLanguageIdFromHeader($request);
 
-            $sliders = PartnerSlider::with(['translates' => function($query) use ($language) {
-                $query->where('language_id', $language->id);
+            $sliders = PartnerSlider::with(['translates' => function($query) use ($languageId) {
+                $query->where('language_id', $languageId);
             }])
             ->active()
             ->ordered()
@@ -60,16 +57,10 @@ class PartnerSliderController extends Controller
     public function show(Request $request, $id): JsonResponse
     {
         try {
-            // Get language from header or use default
-            $languageCode = $request->header('Accept-Language', 'az');
-            $language = Language::where('lang_code', $languageCode)->first();
-            
-            if (!$language) {
-                $language = Language::where('is_default', true)->first();
-            }
+            $languageId = $this->getLanguageIdFromHeader($request);
 
-            $slider = PartnerSlider::with(['translates' => function($query) use ($language) {
-                $query->where('language_id', $language->id);
+            $slider = PartnerSlider::with(['translates' => function($query) use ($languageId) {
+                $query->where('language_id', $languageId);
             }])
             ->active()
             ->find($id);
