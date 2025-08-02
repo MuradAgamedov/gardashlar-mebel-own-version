@@ -38,6 +38,24 @@ class SimpleImage extends Model
     }
 
     /**
+     * Get translated image_go_url for specific language
+     */
+    public function translateUrl(int $languageId = null): ?string
+    {
+        $translation = $this->translate($languageId);
+        return $translation ? $translation->image_go_url : null;
+    }
+
+    /**
+     * Get translated image_alt_text for specific language
+     */
+    public function translateAltText(int $languageId = null): ?string
+    {
+        $translation = $this->translate($languageId);
+        return $translation ? $translation->image_alt_text : null;
+    }
+
+    /**
      * Get image URL
      */
     public function getImageUrlAttribute()

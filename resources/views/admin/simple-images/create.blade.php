@@ -109,7 +109,7 @@
                                                             {{ $language->title }}
                                                         </label>
                                                     </div>
-                                                    <div class="col-md-10">
+                                                    <div class="col-md-5">
                                                         <input type="text" 
                                                                class="form-control @error('translations.' . $language->id . '.image_go_url') is-invalid @enderror" 
                                                                name="translations[{{ $language->id }}][image_go_url]" 
@@ -118,6 +118,16 @@
                                                                required>
                                                         <input type="hidden" name="translations[{{ $language->id }}][language_id]" value="{{ $language->id }}">
                                                         @error('translations.' . $language->id . '.image_go_url')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <input type="text" 
+                                                               class="form-control @error('translations.' . $language->id . '.image_alt_text') is-invalid @enderror" 
+                                                               name="translations[{{ $language->id }}][image_alt_text]" 
+                                                               value="{{ old('translations.' . $language->id . '.image_alt_text') }}" 
+                                                               placeholder="Enter image alt text for {{ $language->title }}">
+                                                        @error('translations.' . $language->id . '.image_alt_text')
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>

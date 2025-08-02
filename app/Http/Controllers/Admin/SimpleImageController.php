@@ -49,6 +49,7 @@ class SimpleImageController extends Controller
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.image_go_url' => 'required|string|max:255',
+            'translations.*.image_alt_text' => 'nullable|string|max:255',
         ]);
 
         try {
@@ -71,6 +72,7 @@ class SimpleImageController extends Controller
                         'simple_image_id' => $simpleImage->id,
                         'language_id' => $languageId,
                         'image_go_url' => $translation['image_go_url'],
+                        'image_alt_text' => $translation['image_alt_text'] ?? null,
                     ]);
                 }
             }
@@ -105,6 +107,7 @@ class SimpleImageController extends Controller
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.image_go_url' => 'required|string|max:255',
+            'translations.*.image_alt_text' => 'nullable|string|max:255',
         ]);
 
         try {
@@ -141,6 +144,7 @@ class SimpleImageController extends Controller
                         ],
                         [
                             'image_go_url' => $translation['image_go_url'],
+                            'image_alt_text' => $translation['image_alt_text'] ?? null,
                         ]
                     );
                 }

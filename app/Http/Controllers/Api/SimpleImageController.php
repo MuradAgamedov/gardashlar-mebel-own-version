@@ -159,7 +159,8 @@ class SimpleImageController extends Controller
                     'id' => $image->id,
                     'keyword' => $image->keyword,
                     'image_url' => $image->image_url,
-                    'image_go_url' => $translate->image_go_url ?? null
+                    'image_go_url' => $translate->image_go_url ?? null,
+                    'image_alt_text' => $translate->image_alt_text ?? null
                 ]
             ], 200);
 
@@ -245,7 +246,8 @@ class SimpleImageController extends Controller
                     return [
                         $image->keyword => [
                             'image_url' => $image->image_url,
-                            'image_go_url' => $translate->image_go_url ?? null
+                            'image_go_url' => $translate->image_go_url ?? null,
+                            'image_alt_text' => $translate->image_alt_text ?? null
                         ]
                     ];
                 });

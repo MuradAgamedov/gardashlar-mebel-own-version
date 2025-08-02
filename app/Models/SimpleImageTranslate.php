@@ -12,7 +12,8 @@ class SimpleImageTranslate extends Model
     protected $fillable = [
         'simple_image_id',
         'language_id',
-        'image_go_url'
+        'image_go_url',
+        'image_alt_text'
     ];
 
     protected $hidden = ['created_at', 'updated_at'];
