@@ -119,27 +119,29 @@
             <form action="{{ route('admin.blog-posts.images.store', $blogPost) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title" id="uploadImageModalLabel">Upload New Image</h5>
+                                         <h5 class="modal-title" id="uploadImageModalLabel">Upload New Images</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="image" class="form-label">Select Image</label>
-                        <input type="file" class="form-control @error('image') is-invalid @enderror" 
-                               id="image" name="image" accept="image/*" required>
-                        @error('image')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <small class="form-text text-muted">Max size: 2MB. Supported formats: JPEG, PNG, JPG, GIF, WEBP</small>
-                    </div>
-                    <div class="mt-2">
-                        <img id="imagePreview" src="" alt="Image Preview" 
-                             class="img-thumbnail" style="max-width: 100%; display: none;">
-                    </div>
+                                         <div class="mb-3">
+                         <label for="images" class="form-label">Select Images</label>
+                         <input type="file" class="form-control @error('images') is-invalid @enderror" 
+                                id="images" name="images[]" accept="image/*" multiple required>
+                         @error('images')
+                             <div class="invalid-feedback">{{ $message }}</div>
+                         @enderror
+                         @error('images.*')
+                             <div class="invalid-feedback">{{ $message }}</div>
+                         @enderror
+                         <small class="form-text text-muted">Max size: 2MB per image. Supported formats: JPEG, PNG, JPG, GIF, WEBP</small>
+                     </div>
+                     <div class="mt-2" id="imagePreviews">
+                         <!-- Image previews will be shown here -->
+                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Upload Image</button>
+                                         <button type="submit" class="btn btn-primary">Upload Images</button>
                 </div>
             </form>
         </div>
@@ -207,21 +209,29 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Image preview for upload
-    const imageInput = document.getElementById('image');
-    const imagePreview = document.getElementById('imagePreview');
+    const imageInput = document.getElementById('images');
+    const imagePreviews = document.getElementById('imagePreviews');
     
     if (imageInput) {
         imageInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    imagePreview.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            } else {
-                imagePreview.style.display = 'none';
+            const files = e.target.files;
+            imagePreviews.innerHTML = ''; // Clear previous previews
+            
+            if (files.length > 0) {
+                Array.from(files).forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const previewDiv = document.createElement('div');
+                        previewDiv.className = 'mb-2';
+                        previewDiv.innerHTML = `
+                            <img src="${e.target.result}" alt="Image Preview ${index + 1}" 
+                                 class="img-thumbnail" style="max-width: 100px; max-height: 100px; object-fit: cover;">
+                            <small class="d-block text-muted">${file.name}</small>
+                        `;
+                        imagePreviews.appendChild(previewDiv);
+                    };
+                    reader.readAsDataURL(file);
+                });
             }
         });
     }

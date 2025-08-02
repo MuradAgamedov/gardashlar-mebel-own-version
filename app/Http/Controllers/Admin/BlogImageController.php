@@ -34,27 +34,36 @@ class BlogImageController extends Controller
     public function store(Request $request, BlogPost $blogPost)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'images' => 'required|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ], [
-            'image.required' => 'Image is required.',
-            'image.image' => 'File must be a valid image.',
-            'image.mimes' => 'Image must be a JPEG, PNG, JPG, GIF, or WEBP file.',
-            'image.max' => 'Image size cannot exceed 2MB.',
+            'images.required' => 'At least one image is required.',
+            'images.*.image' => 'Each file must be a valid image.',
+            'images.*.mimes' => 'Each image must be a JPEG, PNG, JPG, GIF, or WEBP file.',
+            'images.*.max' => 'Each image size cannot exceed 2MB.',
         ]);
 
         try {
-            $imageUrl = $this->imageService->upload($request->file('image'), 'blog-images');
+            $uploadedCount = 0;
             
-            BlogImage::create([
-                'blog_post_id' => $blogPost->id,
-                'image_url' => $imageUrl,
-            ]);
+            foreach ($request->file('images') as $image) {
+                $imageUrl = $this->imageService->upload($image, 'blog-images');
+                
+                BlogImage::create([
+                    'blog_post_id' => $blogPost->id,
+                    'image_url' => $imageUrl,
+                ]);
+                
+                $uploadedCount++;
+            }
 
+            $message = $uploadedCount === 1 ? 'Image uploaded successfully!' : "{$uploadedCount} images uploaded successfully!";
+            
             return redirect()->route('admin.blog-posts.images.index', $blogPost)
-                ->with('success', 'Image uploaded successfully!');
+                ->with('success', $message);
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error uploading image: ' . $e->getMessage());
+            return back()->with('error', 'Error uploading images: ' . $e->getMessage());
         }
     }
 
