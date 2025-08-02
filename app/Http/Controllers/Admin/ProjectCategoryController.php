@@ -73,7 +73,7 @@ class ProjectCategoryController extends Controller
                         'project_category_id' => $projectCategory->id,
                         'language_id' => $languageId,
                         'title' => $translation['title'],
-                        'slug' => Str::slug($translation['slug']),
+                        'slug' => $translation['slug'],
                         'seo_title' => $translation['seo_title'] ?? null,
                         'seo_keywords' => $translation['seo_keywords'] ?? null,
                         'seo_description' => $translation['seo_description'] ?? null,
@@ -143,7 +143,7 @@ class ProjectCategoryController extends Controller
                         ],
                         [
                             'title' => $translation['title'],
-                            'slug' => Str::slug($translation['slug']),
+                            'slug' => $translation['slug'],
                             'seo_title' => $translation['seo_title'] ?? null,
                             'seo_keywords' => $translation['seo_keywords'] ?? null,
                             'seo_description' => $translation['seo_description'] ?? null,
