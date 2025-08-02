@@ -185,15 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Partner sliders reordered successfully!',
-                            icon: 'success',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-                    } else {
+                    if (!data.success) {
                         Swal.fire({
                             title: 'Error!',
                             text: data.message || 'Failed to reorder partner sliders',

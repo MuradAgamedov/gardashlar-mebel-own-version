@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\SimpleImageController;
 use App\Http\Controllers\Api\DictionaryController;
 use App\Http\Controllers\Api\SocialNetworkController;
 use App\Http\Controllers\Api\CurrencyController;
+use App\Http\Controllers\Api\PartnerSliderController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -67,3 +68,8 @@ Route::get('/currencies/available-codes', [CurrencyController::class, 'getAvaila
 Route::get('/currencies/{code}', [CurrencyController::class, 'show'])->name('api.currencies.show');
 Route::post('/currencies/by-codes', [CurrencyController::class, 'getByCodesArray'])->name('api.currencies.by-codes');
 Route::post('/currencies/convert', [CurrencyController::class, 'convert'])->name('api.currencies.convert');
+
+// Partner Sliders API Routes
+Route::get('/partner-sliders', [PartnerSliderController::class, 'index'])->name('api.partner-sliders.index');
+Route::get('/partner-sliders/{id}', [PartnerSliderController::class, 'show'])->name('api.partner-sliders.show');
+Route::get('/partner-sliders/with-all-translations', [PartnerSliderController::class, 'withAllTranslations'])->name('api.partner-sliders.with-all-translations');
