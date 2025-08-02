@@ -171,6 +171,7 @@
           <li><a href="{{ route('admin.reports.index') }}">Reports</a></li>
           <li><a href="{{ route('admin.faqs.index') }}">FAQs</a></li>
           <li><a href="{{ route('admin.vacancies.index') }}">Vacancies</a></li>
+          <li><a href="{{ route('admin.blog-categories.index') }}">Blog Categories</a></li>
         </ul>
       </li>
 

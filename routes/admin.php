@@ -69,6 +69,7 @@ use App\Http\Controllers\Admin\SimpleImageController;
 use App\Http\Controllers\Admin\SocialNetworkController;
 use App\Http\Controllers\Admin\CurrencyController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\BlogCategoryController;
 
 Route::prefix('')->name('admin.')->group(function () {
     // Auth routes (no middleware)
@@ -365,6 +366,10 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         Route::post('currencies/{currency}/toggle-status', [CurrencyController::class, 'toggleStatus'])->name('currencies.toggle-status');
         Route::post('currencies/bulk-delete', [CurrencyController::class, 'bulkDelete'])->name('currencies.bulk-delete');
         Route::post('currencies/bulk-toggle-status', [CurrencyController::class, 'bulkToggleStatus'])->name('currencies.bulk-toggle-status');
+
+        // Blog Categories routes
+        Route::resource('blog-categories', BlogCategoryController::class);
+        Route::post('blog-categories/reorder', [BlogCategoryController::class, 'reorder'])->name('blog-categories.reorder');
 
         // Image Upload route for CKEditor
         Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');
