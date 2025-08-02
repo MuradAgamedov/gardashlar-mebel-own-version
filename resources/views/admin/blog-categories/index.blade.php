@@ -56,7 +56,6 @@
                                     <tr>
                                         <th width="50">Order</th>
                                         <th>Title</th>
-                                        <th>Languages</th>
                                         <th width="80">Status</th>
                                         <th width="150">Actions</th>
                                     </tr>
@@ -74,19 +73,12 @@
                                                     </svg>
                                                 </div>
                                             </td>
-                                            <td>
-                                                @php
-                                                    $firstTranslation = $category->translates->first();
-                                                @endphp
-                                                {{ $firstTranslation ? $firstTranslation->title : 'No translation' }}
-                                            </td>
-                                            <td>
-                                                <div class="d-flex gap-1">
-                                                    @foreach($category->translates as $translate)
-                                                        <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
-                                                    @endforeach
-                                                </div>
-                                            </td>
+                                                                                         <td>
+                                                 @php
+                                                     $firstTranslation = $category->translates->first();
+                                                 @endphp
+                                                 {{ $firstTranslation ? $firstTranslation->title : 'No translation' }}
+                                             </td>
                                             <td>
                                                 @if($category->status)
                                                     <span class="badge bg-success">Active</span>
@@ -107,9 +99,9 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="5" class="text-center py-4">
+                                                                             @empty
+                                         <tr>
+                                             <td colspan="4" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">category</i>
                                                     <p class="mt-2">No blog categories found</p>
