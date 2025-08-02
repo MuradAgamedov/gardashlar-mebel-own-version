@@ -96,11 +96,13 @@
                                                     <a href="{{ route('admin.phone-types.phones.create', $phoneType->id) }}" class="btn btn-sm btn-success">
                                                         <i class="material-icons-outlined">add</i> 
                                                     </a>
-                                                    <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Phone Type #' . $phoneType->id }}"
-                                                            data-url="{{ route('admin.phone-types.destroy', $phoneType) }}">
-                                                        <i class="material-icons-outlined">delete</i>
-                                                    </button>
+                                                    @if($phoneType->id != 3)
+                                                        <button type="button" class="btn btn-sm btn-danger delete-btn" 
+                                                                data-title="{{ $firstTranslation ? $firstTranslation->title : 'Phone Type #' . $phoneType->id }}"
+                                                                data-url="{{ route('admin.phone-types.destroy', $phoneType) }}">
+                                                            <i class="material-icons-outlined">delete</i>
+                                                        </button>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -137,20 +139,16 @@
                                                                     @else
                                                                         <span class="badge bg-secondary" style="font-size: 10px;">Inactive</span>
                                                                     @endif
-                                                                                                                                         <div class="d-flex gap-1">
-                                                                         <a href="{{ route('admin.phones.edit', $phone) }}" class="btn btn-sm btn-warning" style="padding: 2px 6px;">
-                                                                             <i class="material-icons-outlined" style="font-size: 14px;">edit</i>
-                                                                         </a>
-                                                                        
-                                                                         @if($phone->phone_type_id != 3)
-                                                                             <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                                                     style="padding: 2px 6px;"
-                                                                                     data-title="{{ $phone->phone }}"
-                                                                                     data-url="{{ route('admin.phones.destroy', $phone) }}">
-                                                                                 <i class="material-icons-outlined" style="font-size: 14px;">delete</i>
-                                                                             </button>
-                                                                         @endif
-                                                                     </div>
+                                                                                                                                                                                                                  <div class="d-flex gap-1">
+                                                                          @if($phone->phone_type_id != 3)
+                                                                              <button type="button" class="btn btn-sm btn-danger delete-btn" 
+                                                                                      style="padding: 2px 6px;"
+                                                                                      data-title="{{ $phone->phone }}"
+                                                                                      data-url="{{ route('admin.phones.destroy', $phone) }}">
+                                                                                  <i class="material-icons-outlined" style="font-size: 14px;">delete</i>
+                                                                              </button>
+                                                                          @endif
+                                                                      </div>
                                                                 </div>
                                                             </div>
                                                         </div>
