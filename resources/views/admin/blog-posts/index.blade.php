@@ -90,7 +90,7 @@
                                         <th width="80">Image</th>
                                         <th>Title</th>
                                         <th>Category</th>
-                                        <th>Languages</th>
+                                        <th width="120">Languages</th>
                                         <th>Status</th>
                                         <th>Published At</th>
                                         <th width="150">Actions</th>
@@ -142,9 +142,11 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <div class="d-flex gap-1">
+                                                <div class="d-flex flex-wrap gap-1">
                                                     @foreach($blogPost->translates as $translate)
-                                                        <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
+                                                        <span class="badge bg-primary" title="{{ $translate->language->lang_name }}">
+                                                            {{ strtoupper($translate->language->lang_code) }}
+                                                        </span>
                                                     @endforeach
                                                 </div>
                                             </td>
