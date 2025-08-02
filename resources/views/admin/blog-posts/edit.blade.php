@@ -95,6 +95,10 @@
                                     @error('card_image')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
+                                    <div class="mt-2">
+                                        <img id="card_image_preview" src="" alt="Card Image Preview" 
+                                             class="img-thumbnail" style="max-width: 200px; display: none;">
+                                    </div>
                                 </div>
                                 
                                 <div class="col-md-6">
@@ -113,6 +117,10 @@
                                     @error('inner_banner_image')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
+                                    <div class="mt-2">
+                                        <img id="inner_banner_image_preview" src="" alt="Inner Banner Image Preview" 
+                                             class="img-thumbnail" style="max-width: 200px; display: none;">
+                                    </div>
                                 </div>
                             </div>
 
@@ -326,6 +334,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error(error);
             });
     @endforeach
+
+    // Image preview functionality
+    function setupImagePreview(inputId, previewId) {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        
+        if (input && preview) {
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.style.display = 'none';
+                }
+            });
+        }
+    }
+
+    // Setup image previews
+    setupImagePreview('card_image', 'card_image_preview');
+    setupImagePreview('inner_banner_image', 'inner_banner_image_preview');
 });
 </script>
 @endpush 
