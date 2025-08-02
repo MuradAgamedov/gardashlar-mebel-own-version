@@ -56,28 +56,62 @@
                         </div>
                     </div>
                     
-                    <!-- Search and Filter Section -->
-                    <div class="card-body border-bottom">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label for="searchInput" class="form-label">Search Blog Posts</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="searchInput" placeholder="Search blog posts...">
-                                    <button class="btn btn-outline-secondary" type="button" id="searchBtn">
-                                        <i class="material-icons-outlined">search</i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="col-md-4 d-flex align-items-end justify-content-end">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="selectAll">
-                                    <label class="form-check-label" for="selectAll">
-                                        Select All
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                         <!-- Search and Filter Section -->
+                     <div class="card-body border-bottom">
+                         <form method="GET" action="{{ route('admin.blog-posts.index') }}" class="row g-3">
+                             <div class="col-md-2">
+                                 <label for="category_id" class="form-label">Filter by Category</label>
+                                 <select class="form-select" id="category_id" name="category_id">
+                                     <option value="">All Categories</option>
+                                     @foreach($categories as $category)
+                                         @php
+                                             $categoryTranslation = $category->translates->first();
+                                         @endphp
+                                         <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                             {{ $categoryTranslation ? $categoryTranslation->title : 'No title' }}
+                                         </option>
+                                     @endforeach
+                                 </select>
+                             </div>
+                             <div class="col-md-2">
+                                 <label for="status" class="form-label">Filter by Status</label>
+                                 <select class="form-select" id="status" name="status">
+                                     <option value="">All Status</option>
+                                     <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Active</option>
+                                     <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Inactive</option>
+                                 </select>
+                             </div>
+                             <div class="col-md-2">
+                                 <label for="searchInput" class="form-label">Search Blog Posts</label>
+                                 <div class="input-group">
+                                     <input type="text" class="form-control" id="searchInput" name="search" placeholder="Search blog posts..." value="{{ request('search') }}">
+                                     <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                                         <i class="material-icons-outlined">search</i>
+                                     </button>
+                                 </div>
+                             </div>
+                             <div class="col-md-3 d-flex align-items-end">
+                                 <button type="submit" class="btn btn-outline-primary me-2">
+                                     <i class="material-icons-outlined">filter_list</i>
+                                     Filter
+                                 </button>
+                                 @if(request('category_id') || request('status') || request('search'))
+                                     <a href="{{ route('admin.blog-posts.index') }}" class="btn btn-outline-secondary">
+                                         <i class="material-icons-outlined">clear</i>
+                                         Clear
+                                     </a>
+                                 @endif
+                             </div>
+                             <div class="col-md-3 d-flex align-items-end justify-content-end">
+                                 <div class="form-check">
+                                     <input class="form-check-input" type="checkbox" id="selectAll">
+                                     <label class="form-check-label" for="selectAll">
+                                         Select All
+                                     </label>
+                                 </div>
+                             </div>
+                         </form>
+                     </div>
                     
                     <div class="card-body">
                         <div class="table-responsive">
@@ -205,33 +239,21 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Search functionality
-    const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchBtn');
-    const blogPostRows = document.querySelectorAll('.blog-post-row');
+         // Search functionality - now handled by backend
+     const searchInput = document.getElementById('searchInput');
+     const searchBtn = document.getElementById('searchBtn');
 
-    function performSearch() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        
-        blogPostRows.forEach(row => {
-            const title = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-            const category = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
-            const status = row.querySelector('td:nth-child(6)').textContent.toLowerCase();
-            
-            if (title.includes(searchTerm) || category.includes(searchTerm) || status.includes(searchTerm)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    }
-
-    searchBtn.addEventListener('click', performSearch);
-    searchInput.addEventListener('keyup', function(e) {
-        if (e.key === 'Enter') {
-            performSearch();
-        }
-    });
+     searchBtn.addEventListener('click', function() {
+         // Submit the form to trigger backend search
+         searchInput.closest('form').submit();
+     });
+     
+     searchInput.addEventListener('keyup', function(e) {
+         if (e.key === 'Enter') {
+             // Submit the form to trigger backend search
+             this.closest('form').submit();
+         }
+     });
 
     // Select all functionality
     const selectAllCheckbox = document.getElementById('selectAll');

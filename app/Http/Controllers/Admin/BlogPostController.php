@@ -23,13 +23,43 @@ class BlogPostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $blogPosts = BlogPost::with(['category.translates', 'translates.language'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = BlogPost::with(['category.translates', 'translates.language']);
 
-        return view('admin.blog-posts.index', compact('blogPosts'));
+        // Filter by category
+        if ($request->filled('category_id')) {
+            $query->where('blog_category_id', $request->category_id);
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Search by title
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->whereHas('translates', function($q) use ($searchTerm) {
+                $q->where('title', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('card_description', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->whereHas('translates', function($q) use ($searchTerm) {
+                $q->where('title', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('description', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('card_description', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        $blogPosts = $query->orderBy('created_at', 'desc')->get();
+        $categories = BlogCategory::with('translates')->active()->ordered()->get();
+
+        return view('admin.blog-posts.index', compact('blogPosts', 'categories'));
     }
 
     /**
