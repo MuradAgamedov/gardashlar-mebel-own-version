@@ -48,7 +48,6 @@
                             <h5>Phone Types</h5>
                             <a href="{{ route('admin.phone-types.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Phone Type
                             </a>
                         </div>
                     </div>
@@ -95,7 +94,7 @@
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <a href="{{ route('admin.phone-types.phones.create', $phoneType->id) }}" class="btn btn-sm btn-success">
-                                                        <i class="material-icons-outlined">add</i> Add Phone
+                                                        <i class="material-icons-outlined">add</i> 
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
                                                             data-title="{{ $firstTranslation ? $firstTranslation->title : 'Phone Type #' . $phoneType->id }}"
@@ -170,7 +169,6 @@
                                         <p class="mt-2">No phone types found</p>
                                         <a href="{{ route('admin.phone-types.create') }}" class="btn btn-primary">
                                             <i class="material-icons-outlined">add</i>
-                                            Add First Phone Type
                                         </a>
                                     </div>
                                 </div>
