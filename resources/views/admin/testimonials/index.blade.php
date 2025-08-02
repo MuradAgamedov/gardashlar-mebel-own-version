@@ -59,7 +59,6 @@
                                         <th width="80">Company</th>
                                         <th>Full Name</th>
                                         <th>Position</th>
-                                        <th>Languages</th>
                                         <th width="80">Status</th>
                                         <th width="150">Actions</th>
                                     </tr>
