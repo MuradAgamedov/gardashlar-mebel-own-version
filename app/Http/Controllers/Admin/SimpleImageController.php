@@ -48,7 +48,7 @@ class SimpleImageController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.image_go_url' => 'required|string|max:255',
+            'translations.*.image_go_url' => 'nullable|string|max:255',
             'translations.*.image_alt_text' => 'nullable|string|max:255',
         ]);
 
@@ -67,14 +67,12 @@ class SimpleImageController extends Controller
 
             // Create translations
             foreach ($request->translations as $languageId => $translation) {
-                if (!empty($translation['image_go_url'])) {
-                    SimpleImageTranslate::create([
-                        'simple_image_id' => $simpleImage->id,
-                        'language_id' => $languageId,
-                        'image_go_url' => $translation['image_go_url'],
-                        'image_alt_text' => $translation['image_alt_text'] ?? null,
-                    ]);
-                }
+                SimpleImageTranslate::create([
+                    'simple_image_id' => $simpleImage->id,
+                    'language_id' => $languageId,
+                    'image_go_url' => $translation['image_go_url'] ?? null,
+                    'image_alt_text' => $translation['image_alt_text'] ?? null,
+                ]);
             }
 
             return redirect()->route('admin.simple-images.index')
@@ -106,7 +104,7 @@ class SimpleImageController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.image_go_url' => 'required|string|max:255',
+            'translations.*.image_go_url' => 'nullable|string|max:255',
             'translations.*.image_alt_text' => 'nullable|string|max:255',
         ]);
 
@@ -136,18 +134,16 @@ class SimpleImageController extends Controller
 
             // Update or create translations
             foreach ($request->translations as $languageId => $translation) {
-                if (!empty($translation['image_go_url'])) {
-                    SimpleImageTranslate::updateOrCreate(
-                        [
-                            'simple_image_id' => $simpleImage->id,
-                            'language_id' => $languageId,
-                        ],
-                        [
-                            'image_go_url' => $translation['image_go_url'],
-                            'image_alt_text' => $translation['image_alt_text'] ?? null,
-                        ]
-                    );
-                }
+                SimpleImageTranslate::updateOrCreate(
+                    [
+                        'simple_image_id' => $simpleImage->id,
+                        'language_id' => $languageId,
+                    ],
+                    [
+                        'image_go_url' => $translation['image_go_url'] ?? null,
+                        'image_alt_text' => $translation['image_alt_text'] ?? null,
+                    ]
+                );
             }
 
             return redirect()->route('admin.simple-images.index')

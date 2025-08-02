@@ -148,8 +148,7 @@
                                                                class="form-control @error('translations.' . $language->id . '.image_go_url') is-invalid @enderror" 
                                                                name="translations[{{ $language->id }}][image_go_url]" 
                                                                value="{{ old('translations.' . $language->id . '.image_go_url', $translations->get($language->id)?->image_go_url) }}" 
-                                                               placeholder="Enter image go URL for {{ $language->title }}" 
-                                                               required>
+                                                               placeholder="Enter image go URL for {{ $language->title }}">
                                                         <input type="hidden" name="translations[{{ $language->id }}][language_id]" value="{{ $language->id }}">
                                                         @error('translations.' . $language->id . '.image_go_url')
                                                             <div class="invalid-feedback">{{ $message }}</div>

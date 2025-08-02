@@ -160,7 +160,6 @@
         <ul class="sidebar-submenu">
           <li><a href="{{ route('admin.certificates.index') }}">Certificates</a></li>
           <li><a href="{{ route('admin.our-goals.index') }}">Our Goals</a></li>
-          <li><a href="{{ route('admin.images.index') }}">Images</a></li>
           <li><a href="{{ route('admin.simple-images.index') }}">Simple Images</a></li>
           <li><a href="{{ route('admin.currencies.index') }}">Currencies</a></li>
           <li><a href="{{ route('admin.suggest-a-place.edit') }}">Suggest A Place</a></li>
