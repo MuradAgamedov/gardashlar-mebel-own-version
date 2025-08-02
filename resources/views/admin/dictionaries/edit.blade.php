@@ -119,11 +119,9 @@
                                     <div class="d-flex justify-content-end gap-2">
                                         <a href="{{ route('admin.dictionaries.index') }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">arrow_back</i>
-                                            Back
                                         </a>
                                         <button type="submit" class="btn btn-primary">
                                             <i class="material-icons-outlined">save</i>
-                                            Update Dictionary Item
                                         </button>
                                     </div>
                                 </div>

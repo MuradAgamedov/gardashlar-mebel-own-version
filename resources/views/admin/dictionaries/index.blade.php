@@ -47,7 +47,6 @@
                             <h5>Dictionary Items</h5>
                             <a href="{{ route('admin.dictionaries.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New Item
                             </a>
                         </div>
                     </div>
@@ -107,7 +106,6 @@
                                                 <p class="text-muted">Start by adding dictionary items for translations.</p>
                                                 <a href="{{ route('admin.dictionaries.create') }}" class="btn btn-primary">
                                                     <i class="material-icons-outlined">add</i>
-                                                    Add First Item
                                                 </a>
                                             </td>
                                         </tr>
