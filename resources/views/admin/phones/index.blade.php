@@ -93,16 +93,14 @@
                                                     <a href="{{ route('admin.phone-types.edit', $phoneType) }}" class="btn btn-sm btn-warning">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
-                                                    <a href="{{ route('admin.phone-types.phones.create', $phoneType->id) }}" class="btn btn-sm btn-success">
-                                                        <i class="material-icons-outlined">add</i> 
-                                                    </a>
-                                                    @if($phoneType->id != 3)
-                                                        <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                                data-title="{{ $firstTranslation ? $firstTranslation->title : 'Phone Type #' . $phoneType->id }}"
-                                                                data-url="{{ route('admin.phone-types.destroy', $phoneType) }}">
-                                                            <i class="material-icons-outlined">delete</i>
-                                                        </button>
-                                                    @endif
+                                                                                                         <a href="{{ route('admin.phone-types.phones.create', $phoneType->id) }}" class="btn btn-sm btn-success">
+                                                         <i class="material-icons-outlined">add</i> 
+                                                     </a>
+                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
+                                                             data-title="{{ $firstTranslation ? $firstTranslation->title : 'Phone Type #' . $phoneType->id }}"
+                                                             data-url="{{ route('admin.phone-types.destroy', $phoneType) }}">
+                                                         <i class="material-icons-outlined">delete</i>
+                                                     </button>                                                    
                                                 </div>
                                             </div>
                                         </div>
