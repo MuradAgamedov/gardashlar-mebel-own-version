@@ -86,7 +86,6 @@
                                         <th width="50">#</th>
                                         <th>Title</th>
                                         <th>Slug</th>
-                                        <th>Languages</th>
                                         <th>Status</th>
                                         <th>Order</th>
                                         <th width="150">Actions</th>
@@ -122,13 +121,7 @@
                                             <td>
                                                 <code>{{ $firstTranslation ? $firstTranslation->slug : 'No slug' }}</code>
                                             </td>
-                                            <td>
-                                                <div class="d-flex gap-1">
-                                                    @foreach($projectCategory->translates as $translate)
-                                                        <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
-                                                    @endforeach
-                                                </div>
-                                            </td>
+                                         
                                             <td>
                                                 @if($projectCategory->status)
                                                     <span class="badge bg-success">Active</span>
