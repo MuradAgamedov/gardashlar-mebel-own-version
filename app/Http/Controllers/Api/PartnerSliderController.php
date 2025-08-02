@@ -35,12 +35,8 @@ class PartnerSliderController extends Controller
                 
                 return [
                     'id' => $slider->id,
-                    'order' => $slider->order,
-                    'status' => $slider->status,
                     'image_url' => $slider->image_url,
                     'title' => $translation ? $translation->title : null,
-                    'created_at' => $slider->created_at,
-                    'updated_at' => $slider->updated_at,
                 ];
             });
 
@@ -89,12 +85,8 @@ class PartnerSliderController extends Controller
 
             $data = [
                 'id' => $slider->id,
-                'order' => $slider->order,
-                'status' => $slider->status,
                 'image_url' => $slider->image_url,
                 'title' => $translation ? $translation->title : null,
-                'created_at' => $slider->created_at,
-                'updated_at' => $slider->updated_at,
             ];
 
             return response()->json([
@@ -133,12 +125,8 @@ class PartnerSliderController extends Controller
 
                     return [
                         'id' => $slider->id,
-                        'order' => $slider->order,
-                        'status' => $slider->status,
                         'image_url' => $slider->image_url,
                         'translations' => $translations,
-                        'created_at' => $slider->created_at,
-                        'updated_at' => $slider->updated_at,
                     ];
                 });
 
