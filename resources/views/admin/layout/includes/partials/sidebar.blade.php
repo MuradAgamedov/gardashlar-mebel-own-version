@@ -171,6 +171,16 @@
           <li><a href="{{ route('admin.reports.index') }}">Reports</a></li>
           <li><a href="{{ route('admin.faqs.index') }}">FAQs</a></li>
           <li><a href="{{ route('admin.vacancies.index') }}">Vacancies</a></li>
+        </ul>
+      </li>
+
+      <li class="sidebar-list">
+        <a class="sidebar-link" href="javascript:void(0)">
+          <i class="fas fa-blog"></i>
+          <h6>Blogs</h6>
+          <i class="fas fa-chevron-down float-end"></i>
+        </a>
+        <ul class="sidebar-submenu">
           <li><a href="{{ route('admin.blog-categories.index') }}">Blog Categories</a></li>
         </ul>
       </li>
