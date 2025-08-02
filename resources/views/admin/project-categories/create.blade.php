@@ -238,23 +238,7 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-generate slug from title for each language
-    @foreach($languages as $language)
-        const titleInput{{ $language->id }} = document.getElementById('title_{{ $language->id }}');
-        const slugInput{{ $language->id }} = document.getElementById('slug_{{ $language->id }}');
-        
-        if (titleInput{{ $language->id }} && slugInput{{ $language->id }}) {
-            titleInput{{ $language->id }}.addEventListener('input', function() {
-                const title = this.value;
-                const slug = title.toLowerCase()
-                    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-                    .replace(/\s+/g, '-') // Replace spaces with hyphens
-                    .replace(/-+/g, '-') // Replace multiple hyphens with single
-                    .trim('-'); // Remove leading/trailing hyphens
-                slugInput{{ $language->id }}.value = slug;
-            });
-        }
-    @endforeach
+
 });
 
 // Image preview for category image
@@ -274,4 +258,6 @@ if (imageInput) {
     });
 }
 </script>
-@endpush 
+@endpush
+
+@include('admin.partials.slug-generator') 

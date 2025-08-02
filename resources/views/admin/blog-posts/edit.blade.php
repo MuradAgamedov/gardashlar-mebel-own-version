@@ -390,27 +390,9 @@ document.addEventListener('DOMContentLoaded', function() {
     setupImagePreview('card_image', 'card_image_preview');
     setupImagePreview('inner_banner_image', 'inner_banner_image_preview');
 
-    // Auto-generate slug from title
-    function setupSlugGeneration() {
-        @foreach($languages as $language)
-            const titleInput{{ $language->id }} = document.getElementById('title_{{ $language->id }}');
-            const slugInput{{ $language->id }} = document.getElementById('slug_{{ $language->id }}');
-            
-            if (titleInput{{ $language->id }} && slugInput{{ $language->id }}) {
-                titleInput{{ $language->id }}.addEventListener('input', function() {
-                    const title = this.value;
-                    const slug = title.toLowerCase()
-                        .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-                        .replace(/\s+/g, '-') // Replace spaces with hyphens
-                        .replace(/-+/g, '-') // Replace multiple hyphens with single
-                        .trim('-'); // Remove leading/trailing hyphens
-                    slugInput{{ $language->id }}.value = slug;
-                });
-            }
-        @endforeach
-    }
 
-    setupSlugGeneration();
 });
 </script>
-@endpush 
+@endpush
+
+@include('admin.partials.slug-generator') 
