@@ -61,7 +61,7 @@ class SimpleImageController extends Controller
             
             if (!$imagePath) {
                 return back()->withInput()
-                    ->with('error', 'Failed to upload image. Please try again.');
+                    ->with('error', 'Failed to upload image. ImageService returned false.');
             }
 
             $simpleImage = SimpleImage::create([
@@ -84,7 +84,7 @@ class SimpleImageController extends Controller
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error creating image. Please try again.');
+                ->with('error', 'Error creating image: ' . $e->getMessage());
         }
     }
 
@@ -131,7 +131,7 @@ class SimpleImageController extends Controller
                 
                 if (!$imagePath) {
                     return back()->withInput()
-                        ->with('error', 'Failed to upload image. Please try again.');
+                        ->with('error', 'Failed to upload image. ImageService returned false.');
                 }
                 
                 $data['image_path'] = $imagePath;
@@ -158,7 +158,7 @@ class SimpleImageController extends Controller
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error updating image. Please try again.');
+                ->with('error', 'Error updating image: ' . $e->getMessage());
         }
     }
 
@@ -178,7 +178,7 @@ class SimpleImageController extends Controller
             return redirect()->route('admin.simple-images.index')
                 ->with('success', 'Image deleted successfully.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting image. Please try again.');
+            return back()->with('error', 'Error deleting image: ' . $e->getMessage());
         }
     }
 }

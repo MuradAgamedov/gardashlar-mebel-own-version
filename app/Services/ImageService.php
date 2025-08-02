@@ -30,7 +30,7 @@ class ImageService
 
             // Validate file
             if (!$this->validateFile($file, $options)) {
-                return false;
+                throw new \Exception('File validation failed. Check file type and validity.');
             }
 
             // Generate filename
@@ -43,11 +43,11 @@ class ImageService
                 return $filePath;
             }
 
-            return false;
+            throw new \Exception('File storage failed. File path is null.');
 
         } catch (\Exception $e) {
             \Log::error('Image upload failed: ' . $e->getMessage());
-            return false;
+            throw new \Exception('Image upload failed: ' . $e->getMessage());
         }
     }
 
@@ -102,13 +102,13 @@ class ImageService
     {
         // Check if file is valid
         if (!$file->isValid()) {
-            return false;
+            throw new \Exception('File is not valid. Error: ' . $file->getError());
         }
 
         // Check file type
         $extension = strtolower($file->getClientOriginalExtension());
         if (!in_array($extension, $options['allowed_types'])) {
-            return false;
+            throw new \Exception('File type not allowed. Allowed types: ' . implode(', ', $options['allowed_types']) . '. Got: ' . $extension);
         }
 
         return true;
