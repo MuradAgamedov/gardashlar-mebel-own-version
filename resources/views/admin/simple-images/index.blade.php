@@ -57,6 +57,7 @@
                                     <tr>
                                         <th>Keyword</th>
                                         <th>Image</th>
+                                        <th>Translations</th>
                                         <th width="150">Actions</th>
                                     </tr>
                                 </thead>
@@ -80,6 +81,16 @@
                                                 @endif
                                             </td>
                                             <td>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    @foreach($image->translates as $translation)
+                                                        <span class="badge bg-light text-dark">
+                                                            <small>{{ $translation->language->lang_code }}:</small>
+                                                            {{ Str::limit($translation->image_go_url, 30) }}
+                                                        </span>
+                                                    @endforeach
+                                                </div>
+                                            </td>
+                                            <td>
                                                 <div class="btn-group" role="group">
                                                     <a href="{{ route('admin.simple-images.edit', $image->id) }}" 
                                                        class="btn btn-sm btn-outline-primary">
@@ -100,7 +111,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="3" class="text-center py-5">
+                                            <td colspan="4" class="text-center py-5">
                                                 <i class="material-icons-outlined" style="font-size: 48px; color: #6c757d;">image</i>
                                                 <h5 class="text-muted mt-3">No Simple Images</h5>
                                                 <p class="text-muted">Start by adding simple images with keywords.</p>

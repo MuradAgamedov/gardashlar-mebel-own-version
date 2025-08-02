@@ -129,6 +129,39 @@
                                 </div>
                             </div>
 
+                            <!-- Translations -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Translations</label>
+                                    <div class="card border">
+                                        <div class="card-body">
+                                            @foreach($languages as $language)
+                                                <div class="row mb-3">
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">
+                                                            <span class="badge bg-primary">{{ strtoupper($language->lang_code) }}</span>
+                                                            {{ $language->title }}
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <input type="text" 
+                                                               class="form-control @error('translations.' . $language->id . '.image_go_url') is-invalid @enderror" 
+                                                               name="translations[{{ $language->id }}][image_go_url]" 
+                                                               value="{{ old('translations.' . $language->id . '.image_go_url', $translations->get($language->id)?->image_go_url) }}" 
+                                                               placeholder="Enter image go URL for {{ $language->title }}" 
+                                                               required>
+                                                        <input type="hidden" name="translations[{{ $language->id }}][language_id]" value="{{ $language->id }}">
+                                                        @error('translations.' . $language->id . '.image_go_url')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Action Buttons -->
                             <div class="row">
                                 <div class="col-12">

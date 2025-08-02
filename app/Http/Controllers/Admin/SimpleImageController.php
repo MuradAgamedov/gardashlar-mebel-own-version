@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SimpleImage;
+use App\Models\SimpleImageTranslate;
+use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -23,7 +25,7 @@ class SimpleImageController extends Controller
      */
     public function index(): View
     {
-        $images = SimpleImage::all();
+        $images = SimpleImage::with('translates.language')->get();
         return view('admin.simple-images.index', compact('images'));
     }
 
@@ -32,7 +34,8 @@ class SimpleImageController extends Controller
      */
     public function create(): View
     {
-        return view('admin.simple-images.create');
+        $languages = Language::active()->orderBy('order')->get();
+        return view('admin.simple-images.create', compact('languages'));
     }
 
     /**
@@ -43,6 +46,9 @@ class SimpleImageController extends Controller
         $request->validate([
             'keyword' => 'required|string|max:255|unique:simple_images',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'translations' => 'required|array',
+            'translations.*.language_id' => 'required|exists:languages,id',
+            'translations.*.image_go_url' => 'required|string|max:255',
         ]);
 
         try {
@@ -53,10 +59,21 @@ class SimpleImageController extends Controller
                     ->with('error', 'Error uploading image. Please try again.');
             }
 
-            SimpleImage::create([
+            $simpleImage = SimpleImage::create([
                 'keyword' => $request->keyword,
                 'image_path' => $imagePath,
             ]);
+
+            // Create translations
+            foreach ($request->translations as $languageId => $translation) {
+                if (!empty($translation['image_go_url'])) {
+                    SimpleImageTranslate::create([
+                        'simple_image_id' => $simpleImage->id,
+                        'language_id' => $languageId,
+                        'image_go_url' => $translation['image_go_url'],
+                    ]);
+                }
+            }
 
             return redirect()->route('admin.simple-images.index')
                 ->with('success', 'Image created successfully.');
@@ -72,7 +89,9 @@ class SimpleImageController extends Controller
      */
     public function edit(SimpleImage $simpleImage): View
     {
-        return view('admin.simple-images.edit', compact('simpleImage'));
+        $languages = Language::active()->orderBy('order')->get();
+        $translations = $simpleImage->translates->keyBy('language_id');
+        return view('admin.simple-images.edit', compact('simpleImage', 'languages', 'translations'));
     }
 
     /**
@@ -83,6 +102,9 @@ class SimpleImageController extends Controller
         $request->validate([
             'keyword' => 'required|string|max:255|unique:simple_images,keyword,' . $simpleImage->id,
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'translations' => 'required|array',
+            'translations.*.language_id' => 'required|exists:languages,id',
+            'translations.*.image_go_url' => 'required|string|max:255',
         ]);
 
         try {
@@ -108,6 +130,21 @@ class SimpleImageController extends Controller
             }
 
             $simpleImage->update($data);
+
+            // Update or create translations
+            foreach ($request->translations as $languageId => $translation) {
+                if (!empty($translation['image_go_url'])) {
+                    SimpleImageTranslate::updateOrCreate(
+                        [
+                            'simple_image_id' => $simpleImage->id,
+                            'language_id' => $languageId,
+                        ],
+                        [
+                            'image_go_url' => $translation['image_go_url'],
+                        ]
+                    );
+                }
+            }
 
             return redirect()->route('admin.simple-images.index')
                 ->with('success', 'Image updated successfully.');

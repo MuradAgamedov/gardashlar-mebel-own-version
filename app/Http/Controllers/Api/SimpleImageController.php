@@ -53,14 +53,19 @@ class SimpleImageController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $images = Cache::rememberForever('api_simple_images', function () {
-                return SimpleImage::select(['id', 'keyword', 'image_path'])
+            $languageId = $this->getLanguageIdFromHeader($request);
+            $cacheKey = "api:simple_images:all:lang:{$languageId}";
+
+            $images = Cache::rememberForever($cacheKey, function () use ($languageId) {
+                return SimpleImage::with(['translates' => fn($q) => $q->where('language_id', $languageId)])
                     ->get()
                     ->map(function ($image) {
+                        $translate = $image->translates->first();
                         return [
                             'id' => $image->id,
                             'keyword' => $image->keyword,
-                            'image_url' => $image->image_url
+                            'image_url' => $image->image_url,
+                            'image_go_url' => $translate->image_go_url ?? null
                         ];
                     });
             });
@@ -132,7 +137,11 @@ class SimpleImageController extends Controller
     public function show(Request $request, string $keyword): JsonResponse
     {
         try {
-            $image = SimpleImage::where('keyword', $keyword)->first();
+            $languageId = $this->getLanguageIdFromHeader($request);
+            
+            $image = SimpleImage::where('keyword', $keyword)
+                ->with(['translates' => fn($q) => $q->where('language_id', $languageId)])
+                ->first();
 
             if (!$image) {
                 return response()->json([
@@ -142,12 +151,15 @@ class SimpleImageController extends Controller
                 ], 404);
             }
 
+            $translate = $image->translates->first();
+
             return response()->json([
                 'success' => true,
                 'data' => [
                     'id' => $image->id,
                     'keyword' => $image->keyword,
-                    'image_url' => $image->image_url
+                    'image_url' => $image->image_url,
+                    'image_go_url' => $translate->image_go_url ?? null
                 ]
             ], 200);
 
@@ -222,12 +234,20 @@ class SimpleImageController extends Controller
                 'keywords.*' => 'string'
             ]);
 
+            $languageId = $this->getLanguageIdFromHeader($request);
             $keywords = $request->input('keywords');
             
             $images = SimpleImage::whereIn('keyword', $keywords)
+                ->with(['translates' => fn($q) => $q->where('language_id', $languageId)])
                 ->get()
                 ->mapWithKeys(function ($image) {
-                    return [$image->keyword => $image->image_url];
+                    $translate = $image->translates->first();
+                    return [
+                        $image->keyword => [
+                            'image_url' => $image->image_url,
+                            'image_go_url' => $translate->image_go_url ?? null
+                        ]
+                    ];
                 });
 
             return response()->json([

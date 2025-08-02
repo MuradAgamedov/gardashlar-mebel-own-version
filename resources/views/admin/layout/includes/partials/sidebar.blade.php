@@ -180,7 +180,6 @@
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.home-page-discount.edit') }}">Home Page Discount</a></li>
           <li><a href="{{ route('admin.home-page-projects.index') }}">Home Page Projects</a></li>
           <li><a href="{{ route('admin.home-page-categories.index') }}">Home Page Categories</a></li>
         </ul>
