@@ -49,6 +49,7 @@
           <li><a href="{{ route('admin.addresses.index') }}">Address</a></li>
           <li><a href="{{ route('admin.emails.index') }}">Email</a></li>
           <li><a href="{{ route('admin.maps.index') }}">Map</a></li>
+          <li><a href="{{ route('admin.social-networks.index') }}">Social Networks</a></li>
         </ul>
       </li>
 
@@ -161,7 +162,6 @@
           <li><a href="{{ route('admin.our-goals.index') }}">Our Goals</a></li>
           <li><a href="{{ route('admin.images.index') }}">Images</a></li>
           <li><a href="{{ route('admin.simple-images.index') }}">Simple Images</a></li>
-          <li><a href="{{ route('admin.social-networks.index') }}">Social Networks</a></li>
           <li><a href="{{ route('admin.suggest-a-place.edit') }}">Suggest A Place</a></li>
           <li><a href="{{ route('admin.suggestions-complaints.edit') }}">Suggestions & Complaints</a></li>
           <li><a href="{{ route('admin.suggestions.index') }}">Suggestions</a></li>
