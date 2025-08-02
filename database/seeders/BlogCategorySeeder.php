@@ -23,22 +23,22 @@ class BlogCategorySeeder extends Seeder
                 'status' => true,
                 'translations' => [
                     'az' => [
-                        'title' => 'Texnologiya',
-                        'seo_title' => 'Texnologiya Blog Kategoriyası',
-                        'seo_keywords' => 'texnologiya, blog, yeni texnologiyalar, IT',
-                        'seo_description' => 'Texnologiya sahəsində ən son yeniliklər və xəbərlər'
+                        'title' => 'Mebel Dizaynı',
+                        'seo_title' => 'Mebel Dizaynı Blog Kategoriyası',
+                        'seo_keywords' => 'mebel dizaynı, interyer, ev mebeli, ofis mebeli',
+                        'seo_description' => 'Mebel dizaynı sahəsində ən son trendlər və ideyalar'
                     ],
                     'en' => [
-                        'title' => 'Technology',
-                        'seo_title' => 'Technology Blog Category',
-                        'seo_keywords' => 'technology, blog, new technologies, IT',
-                        'seo_description' => 'Latest news and updates in technology field'
+                        'title' => 'Furniture Design',
+                        'seo_title' => 'Furniture Design Blog Category',
+                        'seo_keywords' => 'furniture design, interior, home furniture, office furniture',
+                        'seo_description' => 'Latest trends and ideas in furniture design'
                     ],
                     'ru' => [
-                        'title' => 'Технологии',
-                        'seo_title' => 'Категория блога Технологии',
-                        'seo_keywords' => 'технологии, блог, новые технологии, IT',
-                        'seo_description' => 'Последние новости и обновления в области технологий'
+                        'title' => 'Дизайн Мебели',
+                        'seo_title' => 'Категория блога Дизайн Мебели',
+                        'seo_keywords' => 'дизайн мебели, интерьер, домашняя мебель, офисная мебель',
+                        'seo_description' => 'Последние тренды и идеи в дизайне мебели'
                     ]
                 ]
             ],
@@ -47,22 +47,22 @@ class BlogCategorySeeder extends Seeder
                 'status' => true,
                 'translations' => [
                     'az' => [
-                        'title' => 'Biznes',
-                        'seo_title' => 'Biznes Blog Kategoriyası',
-                        'seo_keywords' => 'biznes, iqtisadiyyat, investisiya, sahibkarlıq',
-                        'seo_description' => 'Biznes və iqtisadiyyat sahəsində faydalı məlumatlar'
+                        'title' => 'Mebel Materialları',
+                        'seo_title' => 'Mebel Materialları Blog Kategoriyası',
+                        'seo_keywords' => 'mebel materialları, ağac, taxta, metal, dəri',
+                        'seo_description' => 'Mebel istehsalında istifadə olunan materiallar haqqında məlumat'
                     ],
                     'en' => [
-                        'title' => 'Business',
-                        'seo_title' => 'Business Blog Category',
-                        'seo_keywords' => 'business, economy, investment, entrepreneurship',
-                        'seo_description' => 'Useful information in business and economy field'
+                        'title' => 'Furniture Materials',
+                        'seo_title' => 'Furniture Materials Blog Category',
+                        'seo_keywords' => 'furniture materials, wood, timber, metal, leather',
+                        'seo_description' => 'Information about materials used in furniture production'
                     ],
                     'ru' => [
-                        'title' => 'Бизнес',
-                        'seo_title' => 'Категория блога Бизнес',
-                        'seo_keywords' => 'бизнес, экономика, инвестиции, предпринимательство',
-                        'seo_description' => 'Полезная информация в области бизнеса и экономики'
+                        'title' => 'Материалы для Мебели',
+                        'seo_title' => 'Категория блога Материалы для Мебели',
+                        'seo_keywords' => 'материалы для мебели, дерево, металл, кожа',
+                        'seo_description' => 'Информация о материалах, используемых в производстве мебели'
                     ]
                 ]
             ],
@@ -71,22 +71,22 @@ class BlogCategorySeeder extends Seeder
                 'status' => true,
                 'translations' => [
                     'az' => [
-                        'title' => 'Sağlamlıq',
-                        'seo_title' => 'Sağlamlıq Blog Kategoriyası',
-                        'seo_keywords' => 'sağlamlıq, tibb, həkim, müalicə',
-                        'seo_description' => 'Sağlamlıq və tibb sahəsində məsləhətlər'
+                        'title' => 'Mebel Qayğısı',
+                        'seo_title' => 'Mebel Qayğısı Blog Kategoriyası',
+                        'seo_keywords' => 'mebel qayğısı, təmizlik, baxım, təmir',
+                        'seo_description' => 'Mebel qayğısı və baxımı haqqında məsləhətlər'
                     ],
                     'en' => [
-                        'title' => 'Health',
-                        'seo_title' => 'Health Blog Category',
-                        'seo_keywords' => 'health, medicine, doctor, treatment',
-                        'seo_description' => 'Advice in health and medicine field'
+                        'title' => 'Furniture Care',
+                        'seo_title' => 'Furniture Care Blog Category',
+                        'seo_keywords' => 'furniture care, cleaning, maintenance, repair',
+                        'seo_description' => 'Tips on furniture care and maintenance'
                     ],
                     'ru' => [
-                        'title' => 'Здоровье',
-                        'seo_title' => 'Категория блога Здоровье',
-                        'seo_keywords' => 'здоровье, медицина, врач, лечение',
-                        'seo_description' => 'Советы в области здоровья и медицины'
+                        'title' => 'Уход за Мебелью',
+                        'seo_title' => 'Категория блога Уход за Мебелью',
+                        'seo_keywords' => 'уход за мебелью, чистка, обслуживание, ремонт',
+                        'seo_description' => 'Советы по уходу и обслуживанию мебели'
                     ]
                 ]
             ],
@@ -95,22 +95,22 @@ class BlogCategorySeeder extends Seeder
                 'status' => true,
                 'translations' => [
                     'az' => [
-                        'title' => 'İdman',
-                        'seo_title' => 'İdman Blog Kategoriyası',
-                        'seo_keywords' => 'idman, futbol, basketbol, yarış',
-                        'seo_description' => 'İdman sahəsində ən son xəbərlər və nəticələr'
+                        'title' => 'Mebel İstehsalı',
+                        'seo_title' => 'Mebel İstehsalı Blog Kategoriyası',
+                        'seo_keywords' => 'mebel istehsalı, fabrik, emalatxana, texnologiya',
+                        'seo_description' => 'Mebel istehsal prosesləri və texnologiyaları'
                     ],
                     'en' => [
-                        'title' => 'Sports',
-                        'seo_title' => 'Sports Blog Category',
-                        'seo_keywords' => 'sports, football, basketball, competition',
-                        'seo_description' => 'Latest news and results in sports field'
+                        'title' => 'Furniture Manufacturing',
+                        'seo_title' => 'Furniture Manufacturing Blog Category',
+                        'seo_keywords' => 'furniture manufacturing, factory, workshop, technology',
+                        'seo_description' => 'Furniture production processes and technologies'
                     ],
                     'ru' => [
-                        'title' => 'Спорт',
-                        'seo_title' => 'Категория блога Спорт',
-                        'seo_keywords' => 'спорт, футбол, баскетбол, соревнования',
-                        'seo_description' => 'Последние новости и результаты в области спорта'
+                        'title' => 'Производство Мебели',
+                        'seo_title' => 'Категория блога Производство Мебели',
+                        'seo_keywords' => 'производство мебели, фабрика, мастерская, технология',
+                        'seo_description' => 'Процессы и технологии производства мебели'
                     ]
                 ]
             ],
@@ -119,22 +119,22 @@ class BlogCategorySeeder extends Seeder
                 'status' => true,
                 'translations' => [
                     'az' => [
-                        'title' => 'Mədəniyyət',
-                        'seo_title' => 'Mədəniyyət Blog Kategoriyası',
-                        'seo_keywords' => 'mədəniyyət, sənət, musiqi, kino',
-                        'seo_description' => 'Mədəniyyət və sənət sahəsində yeniliklər'
+                        'title' => 'Mebel Trendləri',
+                        'seo_title' => 'Mebel Trendləri Blog Kategoriyası',
+                        'seo_keywords' => 'mebel trendləri, yeni moda, stil, dizayn',
+                        'seo_description' => 'Mebel sahəsində ən son trendlər və moda'
                     ],
                     'en' => [
-                        'title' => 'Culture',
-                        'seo_title' => 'Culture Blog Category',
-                        'seo_keywords' => 'culture, art, music, cinema',
-                        'seo_description' => 'Updates in culture and art field'
+                        'title' => 'Furniture Trends',
+                        'seo_title' => 'Furniture Trends Blog Category',
+                        'seo_keywords' => 'furniture trends, new fashion, style, design',
+                        'seo_description' => 'Latest trends and fashion in furniture'
                     ],
                     'ru' => [
-                        'title' => 'Культура',
-                        'seo_title' => 'Категория блога Культура',
-                        'seo_keywords' => 'культура, искусство, музыка, кино',
-                        'seo_description' => 'Обновления в области культуры и искусства'
+                        'title' => 'Тренды Мебели',
+                        'seo_title' => 'Категория блога Тренды Мебели',
+                        'seo_keywords' => 'тренды мебели, новая мода, стиль, дизайн',
+                        'seo_description' => 'Последние тренды и мода в мебели'
                     ]
                 ]
             ]

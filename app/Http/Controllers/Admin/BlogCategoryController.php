@@ -197,4 +197,24 @@ class BlogCategoryController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Bulk delete blog categories
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'required|integer|exists:blog_categories,id',
+        ]);
+
+        try {
+            $deletedCount = BlogCategory::whereIn('id', $request->ids)->delete();
+            
+            return redirect()->route('admin.blog-categories.index')
+                ->with('success', "{$deletedCount} blog category(ies) deleted successfully!");
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error deleting blog categories: ' . $e->getMessage());
+        }
+    }
 }
