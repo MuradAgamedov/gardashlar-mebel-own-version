@@ -54,6 +54,11 @@ class BlogPost extends Model
                     });
     }
 
+    public function images()
+    {
+        return $this->hasMany(BlogImage::class)->ordered();
+    }
+
     protected static function boot()
     {
         parent::boot();
