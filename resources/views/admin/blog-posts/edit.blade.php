@@ -303,6 +303,8 @@
                                                     @enderror
                                                 </div>
                                             </div>
+                                            
+                                            <input type="hidden" name="translations[{{ $language->id }}][language_id]" value="{{ $language->id }}">
                                         </div>
                                     @endforeach
                                 </div>
