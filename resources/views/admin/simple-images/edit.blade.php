@@ -30,7 +30,7 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">Validation Errors:</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -42,8 +42,25 @@
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">Upload Error:</h6>
                 <p class="mb-0">{{ session('error') }}</p>
+                <hr>
+                <p class="mb-0"><strong>Possible solutions:</strong></p>
+                <ul class="mb-0">
+                    <li>Check if the image file is not corrupted</li>
+                    <li>Ensure the image is in JPG, PNG, GIF, or WebP format</li>
+                    <li>Make sure the file size is less than 2MB</li>
+                    <li>Try uploading a different image file</li>
+                    <li>Check server storage permissions</li>
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <h6 class="alert-heading">Success:</h6>
+                <p class="mb-0">{{ session('success') }}</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
@@ -55,7 +72,7 @@
                         <h5>Edit Simple Image</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.simple-images.update', $simpleImage->id) }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('admin.simple-images.update', $simpleImage->id) }}" method="POST" enctype="multipart/form-data" id="imageUploadForm">
                             @csrf
                             @method('PUT')
                             
@@ -109,8 +126,14 @@
                                     <input type="file" 
                                            class="form-control @error('image') is-invalid @enderror" 
                                            name="image" 
-                                           accept="image/*">
+                                           accept="image/jpeg,image/png,image/gif,image/webp"
+                                           id="imageInput">
                                     <small class="form-text text-muted">Leave empty to keep current image. Supported formats: JPG, PNG, GIF, WebP. Max size: 2MB</small>
+                                    <div id="fileInfo" class="mt-2 d-none">
+                                        <small class="text-info">
+                                            <span id="fileName"></span> (<span id="fileSize"></span>)
+                                        </small>
+                                    </div>
                                     @error('image')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -178,8 +201,9 @@
                                         <a href="{{ route('admin.simple-images.index') }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">arrow_back</i>
                                         </a>
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary" id="submitBtn">
                                             <i class="material-icons-outlined">save</i>
+                                            <span id="submitText">Update Image</span>
                                         </button>
                                     </div>
                                 </div>
@@ -194,13 +218,48 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const imageInput = document.querySelector('input[name="image"]');
+    const imageInput = document.querySelector('#imageInput');
     const imagePreview = document.getElementById('imagePreview');
     const previewImg = document.getElementById('previewImg');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitText = document.getElementById('submitText');
+    const form = document.getElementById('imageUploadForm');
+
+    // File size validation (2MB = 2 * 1024 * 1024 bytes)
+    const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
     imageInput.addEventListener('change', function() {
         const file = this.files[0];
+        
         if (file) {
+            // Show file info
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.classList.remove('d-none');
+
+            // Validate file size
+            if (file.size > MAX_FILE_SIZE) {
+                alert('File size exceeds 2MB limit. Please choose a smaller image.');
+                this.value = '';
+                fileInfo.classList.add('d-none');
+                imagePreview.classList.add('d-none');
+                return;
+            }
+
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Invalid file type. Please choose a JPG, PNG, GIF, or WebP image.');
+                this.value = '';
+                fileInfo.classList.add('d-none');
+                imagePreview.classList.add('d-none');
+                return;
+            }
+
+            // Show preview
             const reader = new FileReader();
             reader.onload = function(e) {
                 previewImg.src = e.target.result;
@@ -208,9 +267,30 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             reader.readAsDataURL(file);
         } else {
+            fileInfo.classList.add('d-none');
             imagePreview.classList.add('d-none');
         }
     });
+
+    // Form submission handling
+    form.addEventListener('submit', function(e) {
+        const file = imageInput.files[0];
+        
+        if (file) {
+            // Show loading state
+            submitBtn.disabled = true;
+            submitText.textContent = 'Uploading...';
+            submitBtn.innerHTML = '<i class="material-icons-outlined">hourglass_empty</i> Uploading...';
+        }
+    });
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
 });
 </script>
 @endsection 
