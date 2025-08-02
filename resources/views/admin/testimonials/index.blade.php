@@ -139,7 +139,6 @@
                                                     <p class="mt-2">No testimonials found</p>
                                                     <a href="{{ route('admin.testimonials.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Testimonial
                                                     </a>
                                                 </div>
                                             </td>
