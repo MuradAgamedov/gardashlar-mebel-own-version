@@ -65,6 +65,7 @@ use App\Http\Controllers\Admin\ProductAccordionController;
 use App\Http\Controllers\Admin\ProductImageController;
 use App\Http\Controllers\Admin\OurGoalController;
 use App\Http\Controllers\Admin\ImageController;
+use App\Http\Controllers\Admin\SimpleImageController;
 use App\Http\Controllers\Admin\AuthController;
 
 Route::prefix('')->name('admin.')->group(function () {
@@ -347,6 +348,9 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         // Images routes
         Route::resource('images', ImageController::class);
         Route::post('products/{product}/images/{image}/set-main', [ProductImageController::class, 'setMainImage'])->name('products.images.set-main');
+        
+        // Simple Images routes
+        Route::resource('simple-images', SimpleImageController::class);
 
         // Image Upload route for CKEditor
         Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');
