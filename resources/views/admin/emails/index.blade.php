@@ -47,7 +47,6 @@
                             <h5>Emails</h5>
                             <a href="{{ route('admin.emails.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Email
                             </a>
                         </div>
                     </div>
@@ -111,7 +110,6 @@
                                                     <p class="mt-2">No emails found</p>
                                                     <a href="{{ route('admin.emails.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Email
                                                     </a>
                                                 </div>
                                             </td>

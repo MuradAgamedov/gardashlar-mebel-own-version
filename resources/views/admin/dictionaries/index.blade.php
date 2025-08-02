@@ -8,7 +8,10 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Dictionary</h3>
+                    <h3>
+                        <i class="material-icons-outlined">translate</i>
+                        Dictionary Management
+                    </h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +20,10 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Dictionary</li>
+                        <li class="breadcrumb-item active">
+                            <i class="material-icons-outlined">translate</i>
+                            Dictionary Management
+                        </li>
                     </ol>
                 </div>
             </div>
@@ -44,9 +50,13 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Dictionary Items</h5>
+                            <h5>
+                                <i class="material-icons-outlined">translate</i>
+                                Dictionary Items
+                            </h5>
                             <a href="{{ route('admin.dictionaries.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
+                                Add New Item
                             </a>
                         </div>
                     </div>
@@ -55,9 +65,18 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Keyword</th>
-                                        <th>Translations</th>
-                                        <th width="150">Actions</th>
+                                        <th width="200">
+                                            <i class="material-icons-outlined">key</i>
+                                            Keyword
+                                        </th>
+                                        <th>
+                                            <i class="material-icons-outlined">translate</i>
+                                            Translations
+                                        </th>
+                                        <th width="150">
+                                            <i class="material-icons-outlined">settings</i>
+                                            Actions
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -71,12 +90,19 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex flex-wrap gap-2">
-                                                    @foreach($dictionary->translates as $translation)
-                                                        <span class="badge bg-light text-dark">
-                                                            <small>{{ $translation->language->lang_code }}:</small>
-                                                            {{ Str::limit($translation->value, 30) }}
+                                                    @if($dictionary->translates->count() > 0)
+                                                        @foreach($dictionary->translates as $translation)
+                                                            <span class="badge bg-primary text-white">
+                                                                <strong>{{ $translation->language->lang_code }}:</strong>
+                                                                {{ Str::limit($translation->value, 30) }}
+                                                            </span>
+                                                        @endforeach
+                                                    @else
+                                                        <span class="badge bg-warning text-dark">
+                                                            <i class="material-icons-outlined" style="font-size: 12px;">warning</i>
+                                                            No translations
                                                         </span>
-                                                    @endforeach
+                                                    @endif
                                                 </div>
                                             </td>
                                             <td>
@@ -101,12 +127,15 @@
                                     @empty
                                         <tr>
                                             <td colspan="3" class="text-center py-5">
-                                                <i class="material-icons-outlined" style="font-size: 48px; color: #6c757d;">translate</i>
-                                                <h5 class="text-muted mt-3">No Dictionary Items</h5>
-                                                <p class="text-muted">Start by adding dictionary items for translations.</p>
-                                                <a href="{{ route('admin.dictionaries.create') }}" class="btn btn-primary">
-                                                    <i class="material-icons-outlined">add</i>
-                                                </a>
+                                                <div class="text-muted">
+                                                    <i class="material-icons-outlined" style="font-size: 64px; color: #6c757d;">translate</i>
+                                                    <h5 class="mt-3">No Dictionary Items Found</h5>
+                                                    <p>Start by adding dictionary items for translations.</p>
+                                                    <a href="{{ route('admin.dictionaries.create') }}" class="btn btn-primary">
+                                                        <i class="material-icons-outlined">add</i>
+                                                        Add First Item
+                                                    </a>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforelse
@@ -119,4 +148,33 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection
+
+@push('styles')
+<style>
+    .badge {
+        font-size: 0.85em;
+        padding: 0.5em 0.75em;
+    }
+    .table th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+    }
+    .table th i {
+        margin-right: 5px;
+        vertical-align: middle;
+    }
+    .card-header h5 i {
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    .page-title h3 i {
+        margin-right: 10px;
+        vertical-align: middle;
+    }
+    .breadcrumb-item.active i {
+        margin-right: 5px;
+        vertical-align: middle;
+    }
+</style>
+@endpush 
