@@ -218,5 +218,23 @@ class ProjectController extends Controller
         }
     }
 
+    /**
+     * Bulk delete projects
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'required|integer|exists:projects,id',
+        ]);
 
+        try {
+            $deletedCount = Project::whereIn('id', $request->ids)->delete();
+            
+            return redirect()->route('admin.projects.index')
+                ->with('success', "{$deletedCount} project(s) deleted successfully!");
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error deleting projects: ' . $e->getMessage());
+        }
+    }
 }

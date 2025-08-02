@@ -56,6 +56,14 @@ class BlogCategory extends Model
     }
 
     /**
+     * Get all blog posts in this category
+     */
+    public function blogPosts()
+    {
+        return $this->hasMany(BlogPost::class);
+    }
+
+    /**
      * Boot method for auto-incrementing order
      */
     protected static function boot()

@@ -276,6 +276,7 @@ Route::prefix('')->name('admin.')->group(function () {
         // Projects routes
         Route::resource('projects', ProjectController::class);
         Route::post('projects/reorder', [ProjectController::class, 'reorder'])->name('projects.reorder');
+        Route::post('projects/bulk-delete', [ProjectController::class, 'bulkDelete'])->name('projects.bulk-delete');
         
         // Project Categories routes
         Route::resource('project-categories', ProjectCategoryController::class);
@@ -376,6 +377,10 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         Route::resource('blog-categories', BlogCategoryController::class);
         Route::post('blog-categories/reorder', [BlogCategoryController::class, 'reorder'])->name('blog-categories.reorder');
         Route::post('blog-categories/bulk-delete', [BlogCategoryController::class, 'bulkDelete'])->name('blog-categories.bulk-delete');
+        
+        // Blog Posts routes
+        Route::resource('blog-posts', BlogPostController::class);
+        Route::post('blog-posts/bulk-delete', [BlogPostController::class, 'bulkDelete'])->name('blog-posts.bulk-delete');
 
         // Image Upload route for CKEditor
         Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');

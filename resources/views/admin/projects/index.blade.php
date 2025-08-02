@@ -45,17 +45,23 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Projects</h5>
-                            <a href="{{ route('admin.projects.create') }}" class="btn btn-primary">
-                                <i class="material-icons-outlined">add</i>
-                                Add Project
-                            </a>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
+                                    <i class="material-icons-outlined">delete</i>
+                                    Delete Selected
+                                </button>
+                                <a href="{{ route('admin.projects.create') }}" class="btn btn-primary">
+                                    <i class="material-icons-outlined">add</i>
+                                    Add Project
+                                </a>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Filter Section -->
                     <div class="card-body border-bottom">
                         <form method="GET" action="{{ route('admin.projects.index') }}" class="row g-3">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="category_id" class="form-label">Filter by Category</label>
                                 <select class="form-select" id="category_id" name="category_id">
                                     <option value="">All Categories</option>
@@ -69,7 +75,16 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-4 d-flex align-items-end">
+                            <div class="col-md-3">
+                                <label for="searchInput" class="form-label">Search Projects</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="searchInput" placeholder="Search projects...">
+                                    <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                                        <i class="material-icons-outlined">search</i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
                                 <button type="submit" class="btn btn-outline-primary me-2">
                                     <i class="material-icons-outlined">filter_list</i>
                                     Filter
@@ -81,6 +96,14 @@
                                     </a>
                                 @endif
                             </div>
+                            <div class="col-md-3 d-flex align-items-end justify-content-end">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="selectAll">
+                                    <label class="form-check-label" for="selectAll">
+                                        Select All
+                                    </label>
+                                </div>
+                            </div>
                         </form>
                     </div>
                     <div class="card-body">
@@ -88,6 +111,9 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
+                                        <th width="50">
+                                            <input type="checkbox" class="form-check-input" id="headerCheckbox">
+                                        </th>
                                         <th width="50">#</th>
                                         <th>Title</th>
                                         <th>Slug</th>
@@ -101,7 +127,10 @@
                                 </thead>
                                 <tbody id="sortable-projects">
                                     @forelse($projects as $project)
-                                        <tr data-id="{{ $project->id }}">
+                                        <tr data-id="{{ $project->id }}" class="project-row">
+                                            <td>
+                                                <input type="checkbox" class="form-check-input project-checkbox" value="{{ $project->id }}">
+                                            </td>
                                             <td>
                                                 <div class="drag-handle">
                                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -185,7 +214,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="9" class="text-center py-4">
+                                            <td colspan="10" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">work</i>
                                                     <p class="mt-2">No projects found</p>
@@ -239,6 +268,127 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const projectRows = document.querySelectorAll('.project-row');
+
+    function performSearch() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        
+        projectRows.forEach(row => {
+            const title = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+            const slug = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+            const company = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+            const category = row.querySelector('td:nth-child(6)').textContent.toLowerCase();
+            const status = row.querySelector('td:nth-child(8)').textContent.toLowerCase();
+            
+            if (title.includes(searchTerm) || slug.includes(searchTerm) || company.includes(searchTerm) || category.includes(searchTerm) || status.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    searchBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+
+    // Select all functionality
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const headerCheckbox = document.getElementById('headerCheckbox');
+    const projectCheckboxes = document.querySelectorAll('.project-checkbox');
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+
+    function updateDeleteButton() {
+        const checkedBoxes = document.querySelectorAll('.project-checkbox:checked');
+        if (checkedBoxes.length > 0) {
+            deleteSelectedBtn.style.display = 'inline-block';
+        } else {
+            deleteSelectedBtn.style.display = 'none';
+        }
+    }
+
+    function updateSelectAllState() {
+        const checkedBoxes = document.querySelectorAll('.project-checkbox:checked');
+        const totalBoxes = projectCheckboxes.length;
+        
+        if (checkedBoxes.length === 0) {
+            selectAllCheckbox.checked = false;
+            headerCheckbox.checked = false;
+        } else if (checkedBoxes.length === totalBoxes) {
+            selectAllCheckbox.checked = true;
+            headerCheckbox.checked = true;
+        } else {
+            selectAllCheckbox.checked = false;
+            headerCheckbox.checked = false;
+        }
+    }
+
+    selectAllCheckbox.addEventListener('change', function() {
+        projectCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateDeleteButton();
+        updateSelectAllState();
+    });
+
+    headerCheckbox.addEventListener('change', function() {
+        projectCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateDeleteButton();
+        updateSelectAllState();
+    });
+
+    projectCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateDeleteButton();
+            updateSelectAllState();
+        });
+    });
+
+    // Delete selected functionality
+    deleteSelectedBtn.addEventListener('click', function() {
+        const checkedBoxes = document.querySelectorAll('.project-checkbox:checked');
+        const selectedIds = Array.from(checkedBoxes).map(checkbox => checkbox.value);
+        
+        if (selectedIds.length === 0) {
+            Swal.fire({
+                title: 'Warning!',
+                text: 'Please select at least one project to delete.',
+                icon: 'warning'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `Do you want to delete ${selectedIds.length} selected project(s)?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete them!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ route("admin.projects.bulk-delete") }}';
+                form.innerHTML = `
+                    @csrf
+                    ${selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('')}
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    });
+
     // Drag and drop reordering for projects
     const sortableList = document.getElementById('sortable-projects');
     if (sortableList) {

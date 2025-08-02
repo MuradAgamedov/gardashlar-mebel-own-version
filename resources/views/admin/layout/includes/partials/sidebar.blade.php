@@ -180,9 +180,10 @@
           <h6>Blogs</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
-        <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.blog-categories.index') }}">Blog Categories</a></li>
-        </ul>
+                      <ul class="sidebar-submenu">
+                <li><a href="{{ route('admin.blog-categories.index') }}">Blog Categories</a></li>
+                <li><a href="{{ route('admin.blog-posts.index') }}">Blog Posts</a></li>
+              </ul>
       </li>
 
       <li class="sidebar-list">
