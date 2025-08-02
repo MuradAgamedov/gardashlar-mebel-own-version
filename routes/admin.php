@@ -370,7 +370,7 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         // Blog Categories routes
         Route::resource('blog-categories', BlogCategoryController::class);
         Route::post('blog-categories/reorder', [BlogCategoryController::class, 'reorder'])->name('blog-categories.reorder');
-        Route::delete('blog-categories/bulk-delete', [BlogCategoryController::class, 'bulkDelete'])->name('blog-categories.bulk-delete');
+        Route::post('blog-categories/bulk-delete', [BlogCategoryController::class, 'bulkDelete'])->name('blog-categories.bulk-delete');
 
         // Image Upload route for CKEditor
         Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');

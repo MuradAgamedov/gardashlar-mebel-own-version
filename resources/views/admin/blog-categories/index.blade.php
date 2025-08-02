@@ -45,9 +45,10 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>All Blog Categories</h5>
                             <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
-                                    <i class="material-icons-outlined">delete</i>
-                                </button>
+                                                                 <button type="button" class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
+                                     <i class="material-icons-outlined">delete</i>
+                                     Delete Selected
+                                 </button>
                                 <a href="{{ route('admin.blog-categories.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
                                 </a>
@@ -265,14 +266,13 @@ document.addEventListener('DOMContentLoaded', function() {
             confirmButtonText: 'Yes, delete them!'
         }).then((result) => {
             if (result.isConfirmed) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ route("admin.blog-categories.bulk-delete") }}';
-                form.innerHTML = `
-                    @csrf
-                    @method('DELETE')
-                    ${selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('')}
-                `;
+                                 const form = document.createElement('form');
+                 form.method = 'POST';
+                 form.action = '{{ route("admin.blog-categories.bulk-delete") }}';
+                 form.innerHTML = `
+                     @csrf
+                     ${selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('')}
+                 `;
                 document.body.appendChild(form);
                 form.submit();
             }
