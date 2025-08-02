@@ -4,36 +4,31 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Testimonial;
+use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class TestimonialController extends Controller
 {
+    use LocaleFromHeader;
+
     /**
      * Display a listing of active testimonials.
      */
     public function index(Request $request): JsonResponse
     {
         try {
+            $languageId = $this->getLanguageIdFromHeader($request);
+            
             $query = Testimonial::with(['translates.language'])
                 ->where('status', true)
                 ->orderBy('order');
 
-            // Filter by language if provided
-            if ($request->has('lang')) {
-                $langCode = $request->get('lang');
-                $query->whereHas('translates.language', function ($q) use ($langCode) {
-                    $q->where('lang_code', $langCode);
-                });
-            }
-
             $testimonials = $query->get();
 
-            $formattedTestimonials = $testimonials->map(function ($testimonial) use ($request) {
-                $langCode = $request->get('lang', 'az'); // Default to Azerbaijani
-                
-                // Get translation for the requested language
-                $translation = $testimonial->translates->firstWhere('language.lang_code', $langCode);
+            $formattedTestimonials = $testimonials->map(function ($testimonial) use ($languageId) {
+                // Get translation for the language from header
+                $translation = $testimonial->translates->where('language_id', $languageId)->first();
                 
                 // If no translation found for requested language, get the first available
                 if (!$translation) {
@@ -72,14 +67,14 @@ class TestimonialController extends Controller
     public function show(Request $request, $id): JsonResponse
     {
         try {
+            $languageId = $this->getLanguageIdFromHeader($request);
+            
             $testimonial = Testimonial::with(['translates.language'])
                 ->where('status', true)
                 ->findOrFail($id);
 
-            $langCode = $request->get('lang', 'az'); // Default to Azerbaijani
-            
-            // Get translation for the requested language
-            $translation = $testimonial->translates->firstWhere('language.lang_code', $langCode);
+            // Get translation for the language from header
+            $translation = $testimonial->translates->where('language_id', $languageId)->first();
             
             // If no translation found for requested language, get the first available
             if (!$translation) {
