@@ -45,4 +45,4 @@ Route::get('/home-page-project-categories', [HomePageProjectCategoryController::
 // Simple Images API Routes
 Route::get('/simple-images', [SimpleImageController::class, 'index'])->name('api.simple-images.index');
 Route::get('/simple-images/{keyword}', [SimpleImageController::class, 'show'])->name('api.simple-images.show');
-Route::get('/simple-images/keywords/{keywords}', [SimpleImageController::class, 'getByKeywords'])->name('api.simple-images.keywords');
+Route::post('/simple-images/by-keywords', [SimpleImageController::class, 'getByKeywordsArray'])->name('api.simple-images.by-keywords');

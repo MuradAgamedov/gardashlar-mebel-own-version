@@ -161,18 +161,23 @@ class SimpleImageController extends Controller
     }
 
     /**
-     * @OA\Get(
-     *     path="/api/simple-images/keywords/{keywords}",
-     *     operationId="getSimpleImagesByKeywords",
+     * @OA\Post(
+     *     path="/api/simple-images/by-keywords",
+     *     operationId="getSimpleImagesByKeywordsArray",
      *     tags={"Simple Images"},
-     *     summary="Get multiple simple images by keywords",
-     *     description="Returns multiple simple images by comma-separated keywords",
-     *     @OA\Parameter(
-     *         name="keywords",
-     *         in="path",
+     *     summary="Get multiple simple images by keywords array",
+     *     description="Returns multiple simple images by array of keywords",
+     *     @OA\RequestBody(
      *         required=true,
-     *         description="Comma-separated image keywords",
-     *         @OA\Schema(type="string", example="hero_image,logo,banner")
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(
+     *                 property="keywords",
+     *                 type="array",
+     *                 @OA\Items(type="string"),
+     *                 example={"hero_image", "logo", "banner"}
+     *             )
+     *         )
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -182,13 +187,20 @@ class SimpleImageController extends Controller
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(
      *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="keyword", type="string", example="hero_image"),
-     *                     @OA\Property(property="image_url", type="string", example="http://example.com/storage/simple-images/hero_image.jpg")
-     *                 )
+     *                 type="object",
+     *                 @OA\Property(property="hero_image", type="string", example="http://example.com/storage/simple-images/hero_image.jpg"),
+     *                 @OA\Property(property="logo", type="string", example="http://example.com/storage/simple-images/logo.jpg"),
+     *                 @OA\Property(property="banner", type="string", example="http://example.com/storage/simple-images/banner.jpg")
      *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Keywords array is required")
      *         )
      *     ),
      *     @OA\Response(
@@ -202,12 +214,17 @@ class SimpleImageController extends Controller
      *     )
      * )
      */
-    public function getByKeywords(Request $request, string $keywords): JsonResponse
+    public function getByKeywordsArray(Request $request): JsonResponse
     {
         try {
-            $keywordArray = array_map('trim', explode(',', $keywords));
+            $request->validate([
+                'keywords' => 'required|array',
+                'keywords.*' => 'string'
+            ]);
+
+            $keywords = $request->input('keywords');
             
-            $images = SimpleImage::whereIn('keyword', $keywordArray)
+            $images = SimpleImage::whereIn('keyword', $keywords)
                 ->get()
                 ->mapWithKeys(function ($image) {
                     return [$image->keyword => $image->image_url];
@@ -218,6 +235,12 @@ class SimpleImageController extends Controller
                 'data' => $images
             ], 200);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error: ' . $e->getMessage(),
+                'data' => []
+            ], 400);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
