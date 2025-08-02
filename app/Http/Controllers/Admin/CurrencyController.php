@@ -144,4 +144,52 @@ class CurrencyController extends Controller
             return back()->with('error', 'Error updating currency status: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Bulk delete currencies
+     */
+    public function bulkDelete(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:currencies,id'
+        ]);
+
+        try {
+            $deletedCount = Currency::whereIn('id', $request->ids)->delete();
+            
+            return redirect()->route('admin.currencies.index')
+                ->with('success', "{$deletedCount} currency(ies) deleted successfully.");
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error deleting currencies: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Bulk toggle status currencies
+     */
+    public function bulkToggleStatus(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:currencies,id'
+        ]);
+
+        try {
+            $currencies = Currency::whereIn('id', $request->ids)->get();
+            $updatedCount = 0;
+
+            foreach ($currencies as $currency) {
+                $currency->update(['status' => !$currency->status]);
+                $updatedCount++;
+            }
+            
+            return redirect()->route('admin.currencies.index')
+                ->with('success', "{$updatedCount} currency(ies) status toggled successfully.");
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error toggling currency status: ' . $e->getMessage());
+        }
+    }
 }
