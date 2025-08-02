@@ -57,7 +57,7 @@ class SimpleImageController extends Controller
             
             if (!$imagePath) {
                 return back()->withInput()
-                    ->with('error', 'Error uploading image. Please try again.');
+                    ->with('error', 'Error occurred.');
             }
 
             $simpleImage = SimpleImage::create([
@@ -80,7 +80,7 @@ class SimpleImageController extends Controller
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error creating image. Please try again.');
+                ->with('error', 'Error occurred.');
         }
     }
 
@@ -124,7 +124,7 @@ class SimpleImageController extends Controller
                 
                 if (!$imagePath) {
                     return back()->withInput()
-                        ->with('error', 'Error uploading image. Please try again.');
+                        ->with('error', 'Error occurred.');
                 }
                 
                 $data['image_path'] = $imagePath;
@@ -151,7 +151,7 @@ class SimpleImageController extends Controller
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error updating image. Please try again.');
+                ->with('error', 'Error occurred.');
         }
     }
 
@@ -171,7 +171,7 @@ class SimpleImageController extends Controller
             return redirect()->route('admin.simple-images.index')
                 ->with('success', 'Image deleted successfully.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting image. Please try again.');
+            return back()->with('error', 'Error occurred.');
         }
     }
 }
