@@ -24,7 +24,6 @@ class AdministrationController extends Controller
      */
     public function index()
     {
-        dd(1);
         $administrations = Administration::with('translates.language')->ordered()->get();
         return view('admin.administrations.index', compact('administrations'));
     }
