@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\AboutController;
 use App\Http\Controllers\Api\AdministrationController;
+use App\Http\Controllers\Api\OurGoalController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -108,3 +109,4 @@ Route::get('/abouts', [AboutController::class, 'index'])->name('api.abouts.index
 
 // Administrations API Routes
 Route::get('/administrations', [AdministrationController::class, 'index'])->name('api.administrations.index');
+Route::get('/our-goals', [OurGoalController::class, 'index'])->name('api.our-goals.index');

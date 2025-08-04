@@ -58,9 +58,7 @@
                                         <th width="50">#</th>
                                         <th>Title</th>
                                         <th>Description</th>
-                                        <th>Languages</th>
                                         <th>Status</th>
-                                        <th>Order</th>
                                         <th width="150">Actions</th>
                                     </tr>
                                 </thead>
@@ -94,20 +92,12 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="d-flex gap-1">
-                                                    @foreach($ourGoal->translates as $translate)
-                                                        <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
-                                                    @endforeach
-                                                </div>
-                                            </td>
-                                            <td>
                                                 @if($ourGoal->status)
                                                     <span class="badge bg-success">Active</span>
                                                 @else
                                                     <span class="badge bg-secondary">Inactive</span>
                                                 @endif
                                             </td>
-                                            <td>{{ $ourGoal->order }}</td>
                                             <td>
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.our-goals.edit', $ourGoal) }}" class="btn btn-sm btn-warning">
@@ -123,7 +113,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center py-4">
+                                            <td colspan="5" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">flag</i>
                                                     <p class="mt-2">No our goals found</p>
