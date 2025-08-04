@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\BlogPostController;
 use App\Http\Controllers\Api\BlogCategoryController;
 use App\Http\Controllers\Api\PhoneController;
 use App\Http\Controllers\Api\EmailController;
+use App\Http\Controllers\Api\AddressController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -96,3 +97,9 @@ Route::get('/general-phones', [PhoneController::class, 'generalPhones'])->name('
 
 // Emails API Routes
 Route::get('/emails', [EmailController::class, 'index'])->name('api.emails.index');
+
+// Addresses API Routes
+Route::get('/addresses', [AddressController::class, 'index'])->name('api.addresses.index');
+
+// Addresses API Routes
+Route::get('/addresses', [AddressController::class, 'index'])->name('api.addresses.index');
