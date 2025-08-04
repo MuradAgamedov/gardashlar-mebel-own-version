@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\PhoneController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\AboutController;
+use App\Http\Controllers\Api\AdministrationController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -104,3 +105,6 @@ Route::get('/addresses', [AddressController::class, 'index'])->name('api.address
 
 // Abouts API Routes
 Route::get('/abouts', [AboutController::class, 'index'])->name('api.abouts.index');
+
+// Administrations API Routes
+Route::get('/administrations', [AdministrationController::class, 'index'])->name('api.administrations.index');
