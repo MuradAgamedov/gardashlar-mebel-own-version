@@ -30,13 +30,7 @@ class DictionaryController extends Controller
             });
         }
         
-        // Language filter
-        if ($request->filled('language')) {
-            $languageId = $request->language;
-            $query->whereHas('translates', function($translateQuery) use ($languageId) {
-                $translateQuery->where('language_id', $languageId);
-            });
-        }
+
         
         $dictionaries = $query->get();
         $languages = Language::active()->orderBy('order')->get();
