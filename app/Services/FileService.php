@@ -24,7 +24,6 @@ class FileService
                 'disk' => 'public',
                 'allowed_types' => ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt'],
                 'generate_unique_name' => true,
-                'max_size' => 10240, // 10MB default
             ];
 
             $options = array_merge($defaultOptions, $options);
@@ -145,10 +144,7 @@ class FileService
             throw new \Exception('File is not valid. Error: ' . $errorMessage);
         }
 
-        // Check file size
-        if (isset($options['max_size']) && $file->getSize() > ($options['max_size'] * 1024)) {
-            throw new \Exception('File size exceeds maximum allowed size of ' . $this->formatBytes($options['max_size'] * 1024));
-        }
+
 
         // Check file type by extension
         $extension = strtolower($file->getClientOriginalExtension());

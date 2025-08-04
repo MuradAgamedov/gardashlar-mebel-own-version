@@ -46,7 +46,7 @@ class CatalogController extends Controller
         
         // Combined validation
         $validationRules = [
-            'catalog_pdf' => 'required|file|mimes:pdf|max:10240', // 10MB max
+            'catalog_pdf' => 'required|file|mimes:pdf',
         ];
         
         $validationMessages = [
@@ -54,7 +54,6 @@ class CatalogController extends Controller
             'catalog_pdf.required' => "Catalog PDF is required.",
             'catalog_pdf.file' => "Catalog PDF must be a file.",
             'catalog_pdf.mimes' => "Catalog PDF must be a PDF file.",
-            'catalog_pdf.max' => "Catalog PDF may not be greater than 10MB.",
         ];
 
         // Add translation validation rules
@@ -74,7 +73,6 @@ class CatalogController extends Controller
                     $request->file('catalog_pdf'),
                     'catalogs',
                     [
-                        'max_size' => 10240, // 10MB
                         'allowed_types' => ['pdf'],
                     ]
                 );
@@ -140,14 +138,13 @@ class CatalogController extends Controller
         
         // Combined validation
         $validationRules = [
-            'catalog_pdf' => 'nullable|file|mimes:pdf|max:10240', // 10MB max
+            'catalog_pdf' => 'nullable|file|mimes:pdf',
         ];
         
         $validationMessages = [
             'status.boolean' => 'Status must be true or false.',
             'catalog_pdf.file' => "Catalog PDF must be a file.",
             'catalog_pdf.mimes' => "Catalog PDF must be a PDF file.",
-            'catalog_pdf.max' => "Catalog PDF may not be greater than 10MB.",
         ];
 
         // Add translation validation rules
@@ -168,7 +165,6 @@ class CatalogController extends Controller
                     $catalog->catalog_pdf,
                     'catalogs',
                     [
-                        'max_size' => 10240, // 10MB
                         'allowed_types' => ['pdf'],
                     ]
                 );
