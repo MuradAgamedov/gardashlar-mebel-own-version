@@ -57,7 +57,6 @@
                                         <th width="100">Image</th>
                                         <th>Title</th>
                                         <th>Date</th>
-                                        <th>Languages</th>
                                         <th width="80">Status</th>
                                         <th width="150">Actions</th>
                                     </tr>
@@ -93,13 +92,7 @@
                                             <td>
                                                 {{ $certificate->date }}
                                             </td>
-                                            <td>
-                                                <div class="d-flex gap-1">
-                                                    @foreach($certificate->translates as $translate)
-                                                        <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
-                                                    @endforeach
-                                                </div>
-                                            </td>
+                                         
                                             <td>
                                                 @if($certificate->status)
                                                     <span class="badge bg-success">Active</span>
