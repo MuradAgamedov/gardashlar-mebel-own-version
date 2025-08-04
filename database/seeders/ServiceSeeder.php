@@ -18,7 +18,7 @@ class ServiceSeeder extends Seeder
         $azLanguage = Language::where('lang_code', 'az')->first();
         $enLanguage = Language::where('lang_code', 'en')->first();
 
-        if (!$azLanguage || !$ruLanguage || !$enLanguage) {
+        if (!$azLanguage || !$enLanguage) {
             $this->command->error('Languages not found. Please run LanguageSeeder first.');
             return;
         }
@@ -36,14 +36,7 @@ class ServiceSeeder extends Seeder
                         'seo_keywords' => 'mebel istehsalı, yüksək keyfiyyət, qardaşlar mebel',
                         'seo_description' => 'Yüksək keyfiyyətli mebel istehsalı xidməti. Qardaşlar Mebel QSC ilə keyfiyyətli və dayanıqlı mebellər.'
                     ],
-                    'ru' => [
-                        'title' => 'Производство Мебели',
-                        'card_description' => 'Производство высококачественной мебели',
-                        'main_description' => 'Как Qardaşlar Mebel QSC, мы предлагаем производство мебели по самым высоким стандартам качества. С современными технологиями и опытными мастерами мы всегда превосходим ожидания наших клиентов.',
-                        'seo_title' => 'Производство Мебели - Qardaşlar Mebel QSC',
-                        'seo_keywords' => 'производство мебели, высокое качество, qardaşlar mebel',
-                        'seo_description' => 'Услуги по производству высококачественной мебели. Качественная и долговечная мебель с Qardaşlar Mebel QSC.'
-                    ],
+                    
                     'en' => [
                         'title' => 'Furniture Manufacturing',
                         'card_description' => 'High-quality furniture manufacturing',
@@ -66,14 +59,7 @@ class ServiceSeeder extends Seeder
                         'seo_keywords' => 'mebel satışı, geniş çeşid, ev mebelleri, ofis mebelleri',
                         'seo_description' => 'Geniş mebel çeşidi və peşəkar satış xidməti. Ev və ofis üçün keyfiyyətli mebellər.'
                     ],
-                    'ru' => [
-                        'title' => 'Продажа Мебели',
-                        'card_description' => 'Широкий ассортимент мебели и услуги продаж',
-                        'main_description' => 'Мы предлагаем нашим клиентам самый широкий ассортимент мебели. Все виды мебели для дома, офиса и коммерческих помещений. Наша профессиональная команда продаж поможет вам сделать лучший выбор.',
-                        'seo_title' => 'Продажа Мебели - Qardaşlar Mebel QSC',
-                        'seo_keywords' => 'продажа мебели, широкий ассортимент, домашняя мебель, офисная мебель',
-                        'seo_description' => 'Широкий ассортимент мебели и профессиональные услуги продаж. Качественная мебель для дома и офиса.'
-                    ],
+                    
                     'en' => [
                         'title' => 'Furniture Sales',
                         'card_description' => 'Wide furniture range and sales service',
@@ -96,14 +82,7 @@ class ServiceSeeder extends Seeder
                         'seo_keywords' => 'mebel dizaynı, peşəkar dizayn, fərdi həllər',
                         'seo_description' => 'Peşəkar mebel dizayn xidməti. Fərdi ehtiyaclara uyğun funksional və gözəl həllər.'
                     ],
-                    'ru' => [
-                        'title' => 'Дизайн Мебели',
-                        'card_description' => 'Профессиональные услуги дизайна мебели',
-                        'main_description' => 'Мы предлагаем современные и функциональные услуги дизайна мебели. Наша команда дизайнеров создает решения, соответствующие вашим индивидуальным потребностям. Как функциональность, так и эстетическая красота.',
-                        'seo_title' => 'Дизайн Мебели - Qardaşlar Mebel QSC',
-                        'seo_keywords' => 'дизайн мебели, профессиональный дизайн, индивидуальные решения',
-                        'seo_description' => 'Профессиональные услуги дизайна мебели. Функциональные и красивые решения для индивидуальных потребностей.'
-                    ],
+                    
                     'en' => [
                         'title' => 'Furniture Design',
                         'card_description' => 'Professional furniture design service',
