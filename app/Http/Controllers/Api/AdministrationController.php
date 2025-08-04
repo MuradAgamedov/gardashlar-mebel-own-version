@@ -43,7 +43,7 @@ class AdministrationController extends Controller
      *                     @OA\Property(property="image_url", type="string", example="https://example.com/storage/administrations/image.jpg", nullable=true),
      *                     @OA\Property(property="title", type="string", example="John Doe"),
      *                     @OA\Property(property="position", type="string", example="CEO"),
-     *                     @OA\Property(property="order", type="integer", example=1)
+    
      *                 )
      *             )
      *         )
@@ -81,8 +81,7 @@ class AdministrationController extends Controller
                         'id' => $administration->id,
                         'image_url' => $administration->image ? asset('storage/' . $administration->image) : null,
                         'title' => $translation ? $translation->title : '',
-                        'position' => $translation ? $translation->position : '',
-                        'order' => $administration->order
+                        'position' => $translation ? $translation->position : ''
                     ];
                 });
             });
