@@ -208,7 +208,7 @@ class ServiceAdvantageSeeder extends Seeder
 
         foreach ($advantages as $serviceAdvantageData) {
             // Find the service by title
-            $service = $services->first(function($service) use ($serviceAdvantageData) {
+            $service = $services->first(function($service) use ($serviceAdvantageData, $azLanguage) {
                 $translation = $service->translate($azLanguage->id);
                 return $translation && $translation->title === $serviceAdvantageData['service_title'];
             });
