@@ -204,6 +204,12 @@ class FaqController extends Controller
     public function deleteSelected(Request $request)
     {
         try {
+            \Log::info('Delete Selected FAQs Request', [
+                'method' => $request->method(),
+                'ids' => $request->input('ids'),
+                'all_data' => $request->all()
+            ]);
+            
             $ids = json_decode($request->input('ids'), true);
             
             if (empty($ids)) {

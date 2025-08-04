@@ -3,6 +3,10 @@
 @section('title', 'FAQs')
 
 @section('content')
+<!-- Debug CSRF Token -->
+<div style="display: none;">
+    CSRF Token: {{ csrf_token() }}
+</div>
 <div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
@@ -159,6 +163,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if CSRF token is available
+    const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfTokenMeta) {
+        console.error('CSRF token meta tag not found!');
+        return;
+    }
+    
+    const csrfToken = csrfTokenMeta.getAttribute('content');
+    if (!csrfToken) {
+        console.error('CSRF token content is empty!');
+        return;
+    }
     // Initialize Sortable for FAQs table
     const faqsTbody = document.getElementById('sortable-faqs');
     if (faqsTbody) {
@@ -188,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-CSRF-TOKEN': csrfToken
                     },
                     body: JSON.stringify({ faqs: orderData })
                 })
@@ -247,20 +263,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (confirm(`Are you sure you want to delete ${selectedIds.length} selected FAQ(s)?`)) {
+            console.log('CSRF Token:', csrfToken);
+            console.log('Selected IDs:', selectedIds);
             // Create a form and submit it
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = '{{ route("admin.faqs.delete-selected") }}';
+            form.action = '{{ route("admin.faqs.delete-selected.post") }}';
             
             const csrfToken = document.createElement('input');
             csrfToken.type = 'hidden';
             csrfToken.name = '_token';
-            csrfToken.value = '{{ csrf_token() }}';
-            
-            const methodField = document.createElement('input');
-            methodField.type = 'hidden';
-            methodField.name = '_method';
-            methodField.value = 'DELETE';
+            csrfToken.value = csrfToken;
             
             const idsField = document.createElement('input');
             idsField.type = 'hidden';
@@ -268,7 +281,6 @@ document.addEventListener('DOMContentLoaded', function() {
             idsField.value = JSON.stringify(selectedIds);
             
             form.appendChild(csrfToken);
-            form.appendChild(methodField);
             form.appendChild(idsField);
             document.body.appendChild(form);
             form.submit();
@@ -292,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const csrfToken = document.createElement('input');
                 csrfToken.type = 'hidden';
                 csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
+                csrfToken.value = csrfToken;
                 
                 const methodField = document.createElement('input');
                 methodField.type = 'hidden';

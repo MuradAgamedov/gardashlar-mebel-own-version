@@ -185,7 +185,8 @@ Route::prefix('')->name('admin.')->group(function () {
         // FAQ routes
         Route::resource('faqs', FaqController::class);
         Route::post('faqs/reorder', [FaqController::class, 'reorder'])->name('faqs.reorder');
-        Route::post('faqs/delete-selected', [FaqController::class, 'deleteSelected'])->name('faqs.delete-selected');
+        Route::delete('faqs/delete-selected', [FaqController::class, 'deleteSelected'])->name('faqs.delete-selected');
+        Route::post('faqs/delete-selected', [FaqController::class, 'deleteSelected'])->name('faqs.delete-selected.post');
         
         // Company Management routes
         Route::get('company-management/edit', [CompanyManagementController::class, 'edit'])->name('company-management.edit');
