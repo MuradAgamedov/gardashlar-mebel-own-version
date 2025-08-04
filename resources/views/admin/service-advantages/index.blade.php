@@ -162,10 +162,11 @@
 
                             <div class="row mt-3">
                                 <div class="col-md-12">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="material-icons-outlined">save</i>
-                                        Create Advantage
-                                    </button>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary" title="Create Advantage">
+                                            <i class="material-icons-outlined">save</i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </form>

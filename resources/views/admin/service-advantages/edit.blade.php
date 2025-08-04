@@ -147,14 +147,14 @@
 
                             <div class="row mt-3">
                                 <div class="col-md-12">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="material-icons-outlined">save</i>
-                                        Update Advantage
-                                    </button>
-                                    <a href="{{ route('admin.service-advantages.index', $service->id) }}" class="btn btn-secondary">
-                                        <i class="material-icons-outlined">cancel</i>
-                                        Cancel
-                                    </a>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary" title="Update Advantage">
+                                            <i class="material-icons-outlined">save</i>
+                                        </button>
+                                        <a href="{{ route('admin.service-advantages.index', $service->id) }}" class="btn btn-secondary" title="Cancel">
+                                            <i class="material-icons-outlined">cancel</i>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </form>
