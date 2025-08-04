@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\OurGoalController;
 use App\Http\Controllers\Api\CertificateController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\ServiceStaticDataController;
+use App\Http\Controllers\Api\IndividualProjectOrderController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -120,3 +121,6 @@ Route::get('/services', [ServiceController::class, 'index'])->name('api.services
 
 // Service Static Data API Routes
 Route::get('/service-static-data', [ServiceStaticDataController::class, 'index'])->name('api.service-static-data.index');
+
+// Individual Project Orders API Routes
+Route::get('/individual-project-orders', [IndividualProjectOrderController::class, 'index'])->name('api.individual-project-orders.index');

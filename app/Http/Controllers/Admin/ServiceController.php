@@ -13,9 +13,21 @@ class ServiceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $services = Service::with('translates.language')->orderBy('order')->get();
+        $query = Service::with('translates.language');
+        
+        // Search functionality
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->whereHas('translates', function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('card_description', 'like', "%{$search}%")
+                  ->orWhere('main_description', 'like', "%{$search}%");
+            });
+        }
+        
+        $services = $query->orderBy('order')->get();
         $languages = Language::active()->orderBy('order')->get();
         
         return view('admin.services.index', compact('services', 'languages'));
@@ -213,6 +225,31 @@ class ServiceController extends Controller
 
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Delete selected services.
+     */
+    public function deleteSelected(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:services,id'
+        ]);
+
+        try {
+            // Delete translations first
+            \App\Models\ServiceTranslate::whereIn('service_id', $request->ids)->delete();
+            
+            // Delete services
+            Service::whereIn('id', $request->ids)->delete();
+
+            return redirect()->route('admin.services.index')
+                ->with('success', count($request->ids) . ' service(s) deleted successfully.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error occurred: ' . $e->getMessage());
         }
     }
 } 

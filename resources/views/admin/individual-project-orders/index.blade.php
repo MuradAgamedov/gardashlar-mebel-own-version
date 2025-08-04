@@ -44,9 +44,55 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Individual Project Orders List</h5>
-                            <a href="{{ route('admin.individual-project-orders.create') }}" class="btn btn-primary">
-                                <i class="material-icons-outlined">add</i>
-                            </a>
+                            <div class="d-flex gap-2">
+                                <button type="button" id="deleteSelectedBtn" class="btn btn-danger" style="display: none;">
+                                    <i class="material-icons-outlined">delete</i>
+                                    Delete Selected
+                                </button>
+                                <a href="{{ route('admin.individual-project-orders.create') }}" class="btn btn-primary">
+                                    <i class="material-icons-outlined">add</i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        @if(request('search'))
+                            <div class="mt-2">
+                                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                    <i class="material-icons-outlined">info</i>
+                                    <strong>Search Results:</strong>
+                                    <span class="badge bg-primary me-2">Title/Description: "{{ request('search') }}"</span>
+                                    <span class="badge bg-secondary">{{ $individualProjectOrders->count() }} result(s)</span>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        <!-- Search Form -->
+                        <div class="mt-3">
+                            <form action="{{ route('admin.individual-project-orders.index') }}" method="GET" class="row g-3">
+                                <div class="col-md-10">
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="material-icons-outlined">search</i>
+                                        </span>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               name="search" 
+                                               value="{{ request('search') }}"
+                                               placeholder="Search by title or description...">
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="submit" class="btn btn-outline-primary" title="Search" style="width: 50px; height: 50px;">
+                                        <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">search</i>
+                                    </button>
+                                </div>
+                                <div class="col-md-1">
+                                    <a href="{{ route('admin.individual-project-orders.index') }}" class="btn btn-outline-secondary" title="Clear" style="width: 50px; height: 50px;">
+                                        <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">clear</i>
+                                    </a>
+                                </div>
+                            </form>
                         </div>
                     </div>
                     <div class="card-body">
@@ -55,17 +101,22 @@
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
+                                            <th width="50">
+                                                <input type="checkbox" id="selectAll" class="form-check-input">
+                                            </th>
                                             <th width="50">#</th>
                                             <th>Title</th>
                                             <th>Description</th>
                                             <th>Status</th>
-                                            <th>Order</th>
                                             <th width="200">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="sortable-list">
                                         @foreach($individualProjectOrders as $order)
                                             <tr data-id="{{ $order->id }}" class="sortable-item">
+                                                <td>
+                                                    <input type="checkbox" class="form-check-input item-checkbox" value="{{ $order->id }}">
+                                                </td>
                                                 <td>
                                                     <div class="drag-handle">
                                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -97,7 +148,7 @@
                                                         <span class="badge bg-danger">Inactive</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ $order->order }}</td>
+                                                <td style="display: none;">{{ $order->order }}</td>
                                                 <td>
                                                     <div class="btn-group" role="group">
                                                         <a href="{{ route('admin.individual-project-orders.edit', $order->id) }}" 
@@ -140,6 +191,73 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Select All functionality
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+
+    selectAllCheckbox.addEventListener('change', function() {
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateDeleteButton();
+    });
+
+    itemCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateDeleteButton();
+            updateSelectAll();
+        });
+    });
+
+    function updateDeleteButton() {
+        const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+        if (checkedBoxes.length > 0) {
+            deleteSelectedBtn.style.display = 'inline-flex';
+        } else {
+            deleteSelectedBtn.style.display = 'none';
+        }
+    }
+
+    function updateSelectAll() {
+        const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+        const totalBoxes = itemCheckboxes.length;
+        selectAllCheckbox.checked = checkedBoxes.length === totalBoxes;
+        selectAllCheckbox.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < totalBoxes;
+    }
+
+    // Delete Selected functionality
+    deleteSelectedBtn.addEventListener('click', function() {
+        const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+        if (checkedBoxes.length === 0) return;
+
+        const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
+        
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `Are you sure you want to delete ${checkedBoxes.length} selected item(s)?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ route("admin.individual-project-orders.delete-selected") }}';
+                form.innerHTML = `
+                    @csrf
+                    @method('DELETE')
+                    ${selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('')}
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    });
+
     // Initialize Sortable
     const sortableList = document.getElementById('sortable-list');
     if (sortableList) {

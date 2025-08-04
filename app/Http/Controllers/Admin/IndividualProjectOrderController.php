@@ -14,9 +14,20 @@ class IndividualProjectOrderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $individualProjectOrders = IndividualProjectOrder::with('translates.language')->ordered()->get();
+        $query = IndividualProjectOrder::with('translates.language');
+        
+        // Search functionality
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->whereHas('translates', function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+        
+        $individualProjectOrders = $query->ordered()->get();
 
         return view('admin.individual-project-orders.index', compact('individualProjectOrders'));
     }
@@ -177,6 +188,36 @@ class IndividualProjectOrderController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Delete selected individual project orders.
+     */
+    public function deleteSelected(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:individual_project_orders,id'
+        ]);
+
+        try {
+            DB::beginTransaction();
+            
+            // Delete translations first
+            IndividualProjectOrderTranslate::whereIn('individual_project_order_id', $request->ids)->delete();
+            
+            // Delete individual project orders
+            IndividualProjectOrder::whereIn('id', $request->ids)->delete();
+            
+            DB::commit();
+
+            return redirect()->route('admin.individual-project-orders.index')
+                ->with('success', count($request->ids) . ' individual project order(s) deleted successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Error occurred: ' . $e->getMessage());
         }
     }
 }
