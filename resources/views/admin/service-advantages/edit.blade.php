@@ -48,12 +48,17 @@
                                     <input type="file" 
                                            class="form-control @error('icon') is-invalid @enderror" 
                                            name="icon" 
+                                           id="iconInput"
                                            accept="image/*">
                                     @error('icon')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
+                                    <div id="iconPreview" class="mt-2" style="display: none;">
+                                        <img id="previewImage" src="" alt="Icon Preview" style="max-width: 100px; max-height: 100px; border: 1px solid #ddd; border-radius: 4px;">
+                                        <small class="text-muted d-block">New icon preview</small>
+                                    </div>
                                     @if($advantage->icon_url)
-                                        <div class="mt-2">
+                                        <div class="mt-2" id="currentIcon">
                                             <img src="{{ $advantage->icon_url }}" alt="Current Icon" style="max-width: 100px; max-height: 100px;">
                                             <small class="text-muted d-block">Current icon</small>
                                         </div>
@@ -159,4 +164,108 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Icon preview functionality
+    const iconInput = document.getElementById('iconInput');
+    const iconPreview = document.getElementById('iconPreview');
+    const previewImage = document.getElementById('previewImage');
+    const currentIcon = document.getElementById('currentIcon');
+    
+    if (iconInput) {
+        iconInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    iconPreview.style.display = 'block';
+                    
+                    // Hide current icon when new one is selected
+                    if (currentIcon) {
+                        currentIcon.style.display = 'none';
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                iconPreview.style.display = 'none';
+                
+                // Show current icon when no new file is selected
+                if (currentIcon) {
+                    currentIcon.style.display = 'block';
+                }
+            }
+        });
+    }
+    
+    // Show validation errors on page load if they exist
+    const invalidInputs = document.querySelectorAll('.is-invalid');
+    invalidInputs.forEach(function(input) {
+        const feedback = input.nextElementSibling;
+        if (feedback && feedback.classList.contains('invalid-feedback')) {
+            feedback.style.display = 'block';
+        }
+    });
+    
+    // Form validation - show errors when form is submitted
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            let hasErrors = false;
+            
+            // Clear previous error states
+            document.querySelectorAll('.is-invalid').forEach(function(input) {
+                input.classList.remove('is-invalid');
+            });
+            document.querySelectorAll('.invalid-feedback').forEach(function(feedback) {
+                feedback.style.display = 'none';
+            });
+            
+            // Validate translations
+            const languageTabs = document.querySelectorAll('.tab-pane');
+            languageTabs.forEach(function(tab, index) {
+                const titleInput = tab.querySelector('input[name*="[title]"]');
+                const descriptionInput = tab.querySelector('textarea[name*="[description]"]');
+                
+                if (titleInput && !titleInput.value.trim()) {
+                    titleInput.classList.add('is-invalid');
+                    const feedback = titleInput.nextElementSibling;
+                    if (feedback && feedback.classList.contains('invalid-feedback')) {
+                        feedback.textContent = 'Title is required.';
+                        feedback.style.display = 'block';
+                    }
+                    hasErrors = true;
+                }
+                
+                if (descriptionInput && !descriptionInput.value.trim()) {
+                    descriptionInput.classList.add('is-invalid');
+                    const feedback = descriptionInput.nextElementSibling;
+                    if (feedback && feedback.classList.contains('invalid-feedback')) {
+                        feedback.textContent = 'Description is required.';
+                        feedback.style.display = 'block';
+                    }
+                    hasErrors = true;
+                }
+            });
+            
+            if (hasErrors) {
+                e.preventDefault();
+                // Show the first tab with errors
+                const firstInvalidTab = document.querySelector('.tab-pane .is-invalid').closest('.tab-pane');
+                if (firstInvalidTab) {
+                    const tabId = firstInvalidTab.id;
+                    const tabButton = document.querySelector(`[data-bs-target="#${tabId}"]`);
+                    if (tabButton) {
+                        tabButton.click();
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+@endpush
+
 @endsection 

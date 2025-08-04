@@ -78,6 +78,7 @@
                                     @enderror
                                     <div id="iconPreview" class="mt-2" style="display: none;">
                                         <img id="previewImage" src="" alt="Icon Preview" style="max-width: 100px; max-height: 100px; border: 1px solid #ddd; border-radius: 4px;">
+                                        <small class="text-muted d-block">New icon preview</small>
                                     </div>
                                 </div>
                                 
