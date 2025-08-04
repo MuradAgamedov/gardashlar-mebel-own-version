@@ -185,19 +185,17 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Order</th>
                                         <th>Icon</th>
                                         <th>Status</th>
                                         <th>Title</th>
                                         <th>Description</th>
-                                        <th>Languages</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-advantages">
                                     @forelse($advantages as $advantage)
                                         <tr data-id="{{ $advantage->id }}">
-                                            <td>
+                                            <td style="display: none;">
                                                 <i class="fas fa-grip-vertical drag-handle" style="cursor: move;"></i>
                                                 {{ $advantage->order }}
                                             </td>
@@ -228,11 +226,7 @@
                                                     No description
                                                 @endif
                                             </td>
-                                            <td>
-                                                @foreach($advantage->translates as $translate)
-                                                    <span class="badge bg-primary me-1">{{ $translate->language->title }}</span>
-                                                @endforeach
-                                            </td>
+
                                             <td>
                                                 <div class="btn-group" role="group">
                                                     <a href="{{ route('admin.service-advantages.edit', [$service->id, $advantage->id]) }}" 
@@ -253,7 +247,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center">No advantages found.</td>
+                                            <td colspan="5" class="text-center">No advantages found.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
