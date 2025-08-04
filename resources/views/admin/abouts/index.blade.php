@@ -60,7 +60,6 @@
                                             <th>Title</th>
                                             <th>Date</th>
                                             <th>Status</th>
-                                            <th>Order</th>
                                             <th width="200">Actions</th>
                                         </tr>
                                     </thead>
@@ -110,7 +109,7 @@
                                                         <span class="badge bg-danger">Inactive</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ $about->order }}</td>
+
                                                 <td>
                                                     <div class="btn-group" role="group">
                                                         <a href="{{ route('admin.abouts.edit', $about->id) }}" 
@@ -173,14 +172,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Update order numbers in the table
-                        const rows = sortableList.querySelectorAll('.sortable-item');
-                        rows.forEach((row, index) => {
-                            const orderCell = row.querySelector('td:nth-child(6)');
-                            if (orderCell) {
-                                orderCell.textContent = index + 1;
-                            }
-                        });
+                        // Order updated successfully
+                        console.log('Order updated successfully');
                     }
                 })
                 .catch(error => {
