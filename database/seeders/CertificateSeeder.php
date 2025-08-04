@@ -18,7 +18,7 @@ class CertificateSeeder extends Seeder
         $azLanguage = Language::where('lang_code', 'az')->first();
         $enLanguage = Language::where('lang_code', 'en')->first();
 
-        if (!$azLanguage || !$ruLanguage || !$enLanguage) {
+        if (!$azLanguage || !$enLanguage) {
             $this->command->error('Languages not found. Please run LanguageSeeder first.');
             return;
         }
