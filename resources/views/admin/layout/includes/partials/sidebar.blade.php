@@ -35,6 +35,8 @@
           <li><a href="{{ route('admin.why-choose-us.edit') }}">Why Choose Us</a></li>
           <li><a href="{{ route('admin.why-choose-us-sliders.index') }}">Why Choose Us Slider</a></li>
           <li><a href="{{ route('admin.testimonials.index') }}">Testimonials</a></li>
+          <li><a href="{{ route('admin.home-page-projects.index') }}">Home Page Projects</a></li>
+          <li><a href="{{ route('admin.home-page-categories.index') }}">Home Page Categories</a></li>
         </ul>
       </li>
 
@@ -186,17 +188,7 @@
               </ul>
       </li>
 
-      <li class="sidebar-list">
-        <a class="sidebar-link" href="javascript:void(0)">
-          <i class="fas fa-home"></i>
-          <h6>Home Page Sections</h6>
-          <i class="fas fa-chevron-down float-end"></i>
-        </a>
-        <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.home-page-projects.index') }}">Home Page Projects</a></li>
-          <li><a href="{{ route('admin.home-page-categories.index') }}">Home Page Categories</a></li>
-        </ul>
-      </li>
+
 
 
 
