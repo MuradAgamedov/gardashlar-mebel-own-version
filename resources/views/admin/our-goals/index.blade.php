@@ -129,7 +129,6 @@
                                                     <p class="mt-2">No our goals found</p>
                                                     <a href="{{ route('admin.our-goals.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Our Goal
                                                     </a>
                                                 </div>
                                             </td>
