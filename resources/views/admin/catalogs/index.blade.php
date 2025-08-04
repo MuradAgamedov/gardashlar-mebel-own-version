@@ -58,7 +58,6 @@
                                         <th width="50">Order</th>
                                         <th>Catalog Year</th>
                                         <th>PDF</th>
-                                        <th>Languages</th>
                                         <th width="80">Status</th>
                                         <th width="150">Actions</th>
                                     </tr>
@@ -84,21 +83,14 @@
                                             </td>
                                             <td>
                                                 @if($catalog->catalog_pdf)
-                                                    <a href="{{ asset('storage/' . $catalog->catalog_pdf) }}" target="_blank" class="btn btn-sm btn-info">
-                                                        <i class="material-icons-outlined">file_present</i>
-                                                        View PDF
+                                                    <a href="{{ asset('storage/' . $catalog->catalog_pdf) }}" target="_blank" class="btn btn-sm btn-outline-primary" title="View PDF">
+                                                        <i class="material-icons-outlined">visibility</i>
                                                     </a>
                                                 @else
                                                     <span class="text-muted">No PDF</span>
                                                 @endif
                                             </td>
-                                            <td>
-                                                <div class="d-flex gap-1">
-                                                    @foreach($catalog->translates as $translate)
-                                                        <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
-                                                    @endforeach
-                                                </div>
-                                            </td>
+                                           
                                             <td>
                                                 @if($catalog->status)
                                                     <span class="badge bg-success">Active</span>
