@@ -34,7 +34,7 @@ class PhoneController extends Controller
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="phone", type="string", example="+994501234567"),
-     *                     @OA\Property(property="order", type="integer", example=1)
+     *
      *                 )
      *             )
      *         )
@@ -56,7 +56,7 @@ class PhoneController extends Controller
             $cacheKey = 'api_general_phones';
             
             $phones = Cache::rememberForever($cacheKey, function () {
-                return Phone::select(['id', 'phone', 'order'])
+                return Phone::select(['id', 'phone'])
                     ->where('phone_type_id', 3)
                     ->where('status', true)
                     ->orderBy('order')
