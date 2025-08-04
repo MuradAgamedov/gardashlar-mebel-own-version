@@ -83,8 +83,8 @@
                                             </td>
                                             <td>
                                                 @if($catalog->catalog_pdf)
-                                                    <a href="{{ asset('storage/' . $catalog->catalog_pdf) }}" target="_blank" class="btn btn-sm btn-outline-primary" title="View PDF">
-                                                        <i class="material-icons-outlined">visibility</i>
+                                                    <a href="{{ asset('storage/' . $catalog->catalog_pdf) }}" target="_blank" class="btn btn-sm btn-outline-primary p-1" title="View PDF" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
+                                                        <i class="material-icons-outlined" style="font-size: 16px;">visibility</i>
                                                     </a>
                                                 @else
                                                     <span class="text-muted">No PDF</span>

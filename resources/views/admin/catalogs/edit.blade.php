@@ -218,13 +218,7 @@ function previewPDF(input) {
             return;
         }
         
-        // Check file size (10MB)
-        if (file.size > 10 * 1024 * 1024) {
-            alert('File size must be less than 10MB.');
-            input.value = '';
-            previewDiv.style.display = 'none';
-            return;
-        }
+
         
         nameSpan.textContent = file.name;
         previewDiv.style.display = 'block';
