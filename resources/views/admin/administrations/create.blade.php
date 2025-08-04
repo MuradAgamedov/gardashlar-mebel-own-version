@@ -85,49 +85,69 @@
 
                             <hr>
 
-                            <h6 class="mb-3">Translations</h6>
-                            
-                            @foreach($languages as $language)
-                                <div class="card mb-3">
-                                    <div class="card-header">
-                                        <h6 class="mb-0">
-                                            <span class="badge bg-primary me-2">{{ strtoupper($language->lang_code) }}</span>
-                                            {{ $language->name }}
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
+                            <!-- Language Tabs -->
+                            <ul class="nav nav-tabs" id="languageTabs" role="tablist">
+                                @foreach($languages as $index => $language)
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link {{ $index === 0 ? 'active' : '' }}" 
+                                                id="tab-{{ $language->id }}" 
+                                                data-bs-toggle="tab" 
+                                                data-bs-target="#content-{{ $language->id }}" 
+                                                type="button" 
+                                                role="tab"
+                                                @if($errors->has("translates.{$language->id}.*"))
+                                                    style="border-color: #dc3545; color: #dc3545;"
+                                                @endif>
+                                            {{ $language->lang_code }}
+                                            @if($errors->has("translates.{$language->id}.*"))
+                                                <i class="material-icons-outlined text-danger ms-1" style="font-size: 16px;">error</i>
+                                            @endif
+                                        </button>
+                                    </li>
+                                @endforeach
+                            </ul>
+
+                            <!-- Tab Content -->
+                            <div class="tab-content mt-3" id="languageTabContent">
+                                @foreach($languages as $index => $language)
+                                    <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" 
+                                         id="content-{{ $language->id }}" 
+                                         role="tabpanel" 
+                                         aria-labelledby="tab-{{ $language->id }}">
+                                        
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label for="title_{{ $language->id }}" class="form-label">Title *</label>
-                                                    <input type="text" class="form-control @error('translates.'.$language->id.'.title') is-invalid @enderror" 
-                                                           id="title_{{ $language->id }}" 
+                                                    <label class="form-label">Title *</label>
+                                                    <input type="text" class="form-control @error("translates.{$language->id}.title") is-invalid @enderror" 
                                                            name="translates[{{ $language->id }}][title]" 
-                                                           value="{{ old('translates.'.$language->id.'.title') }}" 
+                                                           value="{{ old("translates.{$language->id}.title") }}"
+                                                           placeholder="Enter title"
                                                            required>
-                                                    @error('translates.'.$language->id.'.title')
+                                                    @error("translates.{$language->id}.title")
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label for="position_{{ $language->id }}" class="form-label">Position *</label>
-                                                    <input type="text" class="form-control @error('translates.'.$language->id.'.position') is-invalid @enderror" 
-                                                           id="position_{{ $language->id }}" 
+                                                    <label class="form-label">Position *</label>
+                                                    <input type="text" class="form-control @error("translates.{$language->id}.position") is-invalid @enderror" 
                                                            name="translates[{{ $language->id }}][position]" 
-                                                           value="{{ old('translates.'.$language->id.'.position') }}" 
+                                                           value="{{ old("translates.{$language->id}.position") }}"
+                                                           placeholder="Enter position"
                                                            required>
-                                                    @error('translates.'.$language->id.'.position')
+                                                    @error("translates.{$language->id}.position")
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
                                             </div>
                                         </div>
+                                        
                                         <input type="hidden" name="translates[{{ $language->id }}][language_id]" value="{{ $language->id }}">
                                     </div>
-                                </div>
-                            @endforeach
+                                @endforeach
+                            </div>
 
                             <div class="d-flex justify-content-end gap-2">
                                 <a href="{{ route('admin.administrations.index') }}" class="btn btn-secondary">
