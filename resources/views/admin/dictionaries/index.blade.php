@@ -89,13 +89,11 @@
                                 <div class="col-md-2">
                                     <button type="submit" class="btn btn-outline-primary w-100">
                                         <i class="material-icons-outlined">search</i>
-                                        Search
                                     </button>
                                 </div>
                                 <div class="col-md-2">
                                     <a href="{{ route('admin.dictionaries.index') }}" class="btn btn-outline-secondary w-100">
                                         <i class="material-icons-outlined">clear</i>
-                                        Clear
                                     </a>
                                 </div>
                             </form>
