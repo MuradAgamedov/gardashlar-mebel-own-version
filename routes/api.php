@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\AdministrationController;
 use App\Http\Controllers\Api\OurGoalController;
 use App\Http\Controllers\Api\CertificateController;
 use App\Http\Controllers\Api\ServiceController;
+use App\Http\Controllers\Api\ServiceStaticDataController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -116,3 +117,6 @@ Route::get('/certificates', [CertificateController::class, 'index'])->name('api.
 
 // Services API Routes
 Route::get('/services', [ServiceController::class, 'index'])->name('api.services.index');
+
+// Service Static Data API Routes
+Route::get('/service-static-data', [ServiceStaticDataController::class, 'index'])->name('api.service-static-data.index');
