@@ -48,10 +48,22 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>FAQs List</h5>
-                            <a href="{{ route('admin.faqs.create') }}" class="btn btn-primary">
-                                <i class="material-icons-outlined">add</i>
-                                Add New FAQ
-                            </a>
+                            <div class="d-flex gap-2">
+                                <form class="d-flex gap-2" method="GET" action="{{ route('admin.faqs.index') }}">
+                                    <input type="text" name="search" class="form-control" placeholder="Search questions..." value="{{ request('search') }}" style="width: 300px;">
+                                    <button type="submit" class="btn btn-outline-primary" title="Search" style="width: 50px; height: 50px;">
+                                        <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">search</i>
+                                    </button>
+                                    @if(request('search'))
+                                        <a href="{{ route('admin.faqs.index') }}" class="btn btn-outline-secondary" title="Clear" style="width: 50px; height: 50px;">
+                                            <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">clear</i>
+                                        </a>
+                                    @endif
+                                </form>
+                                <a href="{{ route('admin.faqs.create') }}" class="btn btn-primary" title="Add New FAQ" style="width: 50px; height: 50px;">
+                                    <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">add</i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -60,7 +72,7 @@
                                 <table class="table table-bordered">
                                     <thead class="table-light">
                                         <tr>
-                                            <th width="50">Order</th>
+                                            <th style="display: none;">Order</th>
                                             <th>Question</th>
                                             <th>Status</th>
                                             <th width="150">Actions</th>
@@ -73,7 +85,7 @@
                                                     ?? $faq->translates->first();
                                             @endphp
                                             <tr data-id="{{ $faq->id }}">
-                                                <td class="drag-handle" style="cursor: move;">
+                                                <td class="drag-handle" style="cursor: move; display: none;">
                                                     <div class="d-flex align-items-center">
                                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                             <path d="M8 6C8 7.10457 7.10457 8 6 8C4.89543 8 4 7.10457 4 6C4 4.89543 4.89543 4 6 4C7.10457 4 8 4.89543 8 6Z" fill="#6c757d"/>
@@ -121,9 +133,8 @@
                                 <i class="material-icons-outlined" style="font-size: 64px; opacity: 0.3;">help</i>
                                 <h5 class="mt-3">No FAQs found</h5>
                                 <p>Start by adding your first FAQ.</p>
-                                <a href="{{ route('admin.faqs.create') }}" class="btn btn-primary">
-                                    <i class="material-icons-outlined">add</i>
-                                    Add First FAQ
+                                <a href="{{ route('admin.faqs.create') }}" class="btn btn-primary" title="Add First FAQ" style="width: 50px; height: 50px;">
+                                    <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">add</i>
                                 </a>
                             </div>
                         @endif

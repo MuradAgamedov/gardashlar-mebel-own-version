@@ -12,9 +12,20 @@ class FaqController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $faqs = Faq::with(['translates.language'])->ordered()->get();
+        $query = Faq::with(['translates.language']);
+        
+        // Search functionality
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = $request->search;
+            $query->whereHas('translates', function($q) use ($searchTerm) {
+                $q->where('question', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('answer', 'like', '%' . $searchTerm . '%');
+            });
+        }
+        
+        $faqs = $query->ordered()->get();
         return view('admin.faqs.index', compact('faqs'));
     }
 
