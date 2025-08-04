@@ -32,7 +32,6 @@
                             <h5>All Services</h5>
                             <a href="{{ route('admin.services.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New Service
                             </a>
                         </div>
                     </div>
