@@ -40,7 +40,7 @@ class AboutController extends Controller
      *                 @OA\Items(
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="image", type="string", example="abouts/image.jpg"),
+     *                     @OA\Property(property="image_url", type="string", example="https://example.com/storage/abouts/image.jpg", nullable=true),
      *                     @OA\Property(property="date", type="string", example="2024", nullable=true),
      *                     @OA\Property(property="title", type="string", example="About Us"),
      *                     @OA\Property(property="description", type="string", example="We are a leading company..."),
@@ -80,7 +80,7 @@ class AboutController extends Controller
                     
                     return [
                         'id' => $about->id,
-                        'image' => $about->image,
+                        'image_url' => $about->image ? asset('storage/' . $about->image) : null,
                         'date' => $about->date,
                         'title' => $translation ? $translation->title : '',
                         'description' => $translation ? $translation->description : '',
