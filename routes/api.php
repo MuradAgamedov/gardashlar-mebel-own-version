@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\TestimonialController;
 use App\Http\Controllers\Api\BlogPostController;
 use App\Http\Controllers\Api\BlogCategoryController;
 use App\Http\Controllers\Api\PhoneController;
+use App\Http\Controllers\Api\EmailController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -92,3 +93,6 @@ Route::get('/blog-categories', [BlogCategoryController::class, 'index'])->name('
 
 // Phones API Routes
 Route::get('/general-phones', [PhoneController::class, 'generalPhones'])->name('api.general-phones');
+
+// Emails API Routes
+Route::get('/emails', [EmailController::class, 'index'])->name('api.emails.index');

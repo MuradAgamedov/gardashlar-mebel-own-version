@@ -10,15 +10,25 @@ class Email extends Model
     use HasFactory;
 
     protected $fillable = [
+        'email_type_id',
         'email',
         'order',
         'status',
     ];
 
     protected $casts = [
+        'email_type_id' => 'integer',
         'order' => 'integer',
         'status' => 'boolean',
     ];
+
+    /**
+     * Get the email type that owns this email
+     */
+    public function emailType()
+    {
+        return $this->belongsTo(EmailType::class);
+    }
 
     /**
      * Scope for active emails
