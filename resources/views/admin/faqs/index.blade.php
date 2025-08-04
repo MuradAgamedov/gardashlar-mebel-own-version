@@ -270,17 +270,17 @@ document.addEventListener('DOMContentLoaded', function() {
             form.method = 'POST';
             form.action = '{{ route("admin.faqs.delete-selected.post") }}';
             
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            csrfToken.value = csrfToken;
+            const csrfTokenInput = document.createElement('input');
+            csrfTokenInput.type = 'hidden';
+            csrfTokenInput.name = '_token';
+            csrfTokenInput.value = csrfToken;
             
             const idsField = document.createElement('input');
             idsField.type = 'hidden';
             idsField.name = 'ids';
             idsField.value = JSON.stringify(selectedIds);
             
-            form.appendChild(csrfToken);
+            form.appendChild(csrfTokenInput);
             form.appendChild(idsField);
             document.body.appendChild(form);
             form.submit();
@@ -301,17 +301,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 form.method = 'POST';
                 form.action = deleteUrl;
                 
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = csrfToken;
+                const csrfTokenInput2 = document.createElement('input');
+                csrfTokenInput2.type = 'hidden';
+                csrfTokenInput2.name = '_token';
+                csrfTokenInput2.value = csrfToken;
                 
                 const methodField = document.createElement('input');
                 methodField.type = 'hidden';
                 methodField.name = '_method';
                 methodField.value = 'DELETE';
                 
-                form.appendChild(csrfToken);
+                form.appendChild(csrfTokenInput2);
                 form.appendChild(methodField);
                 document.body.appendChild(form);
                 form.submit();
