@@ -5,16 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Catalog;
 use App\Models\Language;
-use App\Services\ImageService;
+use App\Services\FileService;
 use Illuminate\Http\Request;
 
 class CatalogController extends Controller
 {
-    protected $imageService;
+    protected $fileService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(FileService $fileService)
     {
-        $this->imageService = $imageService;
+        $this->fileService = $fileService;
     }
 
     /**
@@ -70,7 +70,7 @@ class CatalogController extends Controller
             // Handle PDF upload
             $pdfPath = null;
             if ($request->hasFile('catalog_pdf')) {
-                $pdfPath = $this->imageService->upload(
+                $pdfPath = $this->fileService->upload(
                     $request->file('catalog_pdf'),
                     'catalogs',
                     [
@@ -163,7 +163,7 @@ class CatalogController extends Controller
             // Handle PDF upload
             $pdfPath = null;
             if ($request->hasFile('catalog_pdf')) {
-                $uploadedPath = $this->imageService->update(
+                $uploadedPath = $this->fileService->update(
                     $request->file('catalog_pdf'),
                     $catalog->catalog_pdf,
                     'catalogs',
@@ -217,6 +217,11 @@ class CatalogController extends Controller
     public function destroy(Catalog $catalog)
     {
         try {
+            // Delete the PDF file if it exists
+            if ($catalog->catalog_pdf) {
+                $this->fileService->delete($catalog->catalog_pdf);
+            }
+            
             $catalog->delete();
             return redirect()->route('admin.catalogs.index')
                 ->with('success', 'Catalog deleted successfully!');

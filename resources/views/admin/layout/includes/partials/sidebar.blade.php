@@ -150,8 +150,9 @@
           <li><a href="{{ route('admin.hero-products.index') }}">Hero Products</a></li>
 
           <li><a href="{{ route('admin.product-colors.index') }}">Product Colors</a></li>
-                                  <li><a href="{{ route('admin.product-tags.index') }}">Product Tags</a></li>
+          <li><a href="{{ route('admin.product-tags.index') }}">Product Tags</a></li>
           <li><a href="{{ route('admin.products.index') }}">Products</a></li>
+          <li><a href="{{ route('admin.catalogs.index') }}">Catalogs</a></li>
 
         </ul>
       </li>
