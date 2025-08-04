@@ -56,8 +56,67 @@
                             </h5>
                             <a href="{{ route('admin.dictionaries.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New Item
                             </a>
+                        </div>
+                        
+                        @if(request('search') || request('language'))
+                            <div class="mt-2">
+                                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                    <i class="material-icons-outlined">info</i>
+                                    <strong>Search Results:</strong>
+                                    @if(request('search'))
+                                        <span class="badge bg-primary me-2">Keyword/Translation: "{{ request('search') }}"</span>
+                                    @endif
+                                    @if(request('language'))
+                                        @php
+                                            $selectedLanguage = $languages->where('id', request('language'))->first();
+                                        @endphp
+                                        <span class="badge bg-success me-2">Language: {{ $selectedLanguage?->name ?? 'Unknown' }}</span>
+                                    @endif
+                                    <span class="badge bg-secondary">{{ $dictionaries->count() }} result(s)</span>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        <!-- Search Form -->
+                        <div class="mt-3">
+                            <form action="{{ route('admin.dictionaries.index') }}" method="GET" class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="material-icons-outlined">search</i>
+                                        </span>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               name="search" 
+                                               value="{{ request('search') }}"
+                                               placeholder="Search by keyword or translation...">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <select name="language" class="form-select">
+                                        <option value="">All Languages</option>
+                                        @foreach($languages ?? [] as $language)
+                                            <option value="{{ $language->id }}" {{ request('language') == $language->id ? 'selected' : '' }}>
+                                                {{ $language->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-outline-primary w-100">
+                                        <i class="material-icons-outlined">search</i>
+                                        Search
+                                    </button>
+                                </div>
+                                <div class="col-md-2">
+                                    <a href="{{ route('admin.dictionaries.index') }}" class="btn btn-outline-secondary w-100">
+                                        <i class="material-icons-outlined">clear</i>
+                                        Clear
+                                    </a>
+                                </div>
+                            </form>
                         </div>
                     </div>
                     <div class="card-body">
@@ -133,7 +192,6 @@
                                                     <p>Start by adding dictionary items for translations.</p>
                                                     <a href="{{ route('admin.dictionaries.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Item
                                                     </a>
                                                 </div>
                                             </td>

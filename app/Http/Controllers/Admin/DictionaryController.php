@@ -15,10 +15,33 @@ class DictionaryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $dictionaries = Dictionary::with('translates.language')->get();
-        return view('admin.dictionaries.index', compact('dictionaries'));
+        $query = Dictionary::with('translates.language');
+        
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('keyword', 'like', "%{$search}%")
+                  ->orWhereHas('translates', function($translateQuery) use ($search) {
+                      $translateQuery->where('value', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        // Language filter
+        if ($request->filled('language')) {
+            $languageId = $request->language;
+            $query->whereHas('translates', function($translateQuery) use ($languageId) {
+                $translateQuery->where('language_id', $languageId);
+            });
+        }
+        
+        $dictionaries = $query->get();
+        $languages = Language::active()->orderBy('order')->get();
+        
+        return view('admin.dictionaries.index', compact('dictionaries', 'languages'));
     }
 
     /**
