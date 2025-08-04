@@ -16,7 +16,6 @@ class ServiceSeeder extends Seeder
     {
         // Get languages
         $azLanguage = Language::where('lang_code', 'az')->first();
-        $ruLanguage = Language::where('lang_code', 'ru')->first();
         $enLanguage = Language::where('lang_code', 'en')->first();
 
         if (!$azLanguage || !$ruLanguage || !$enLanguage) {
