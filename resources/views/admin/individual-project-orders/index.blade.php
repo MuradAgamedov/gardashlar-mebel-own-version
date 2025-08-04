@@ -46,7 +46,6 @@
                             <h5>Individual Project Orders List</h5>
                             <a href="{{ route('admin.individual-project-orders.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New
                             </a>
                         </div>
                     </div>
@@ -125,7 +124,6 @@
                                 <p class="text-muted">Click the button below to add the first individual project order.</p>
                                 <a href="{{ route('admin.individual-project-orders.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
-                                    Add First Order
                                 </a>
                             </div>
                         @endif

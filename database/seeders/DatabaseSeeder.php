@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class,
             ServiceAdvantageSeeder::class,
             ServiceStaticDataSeeder::class,
+            IndividualProjectOrderSeeder::class,
         ]);
     }
 }
