@@ -54,18 +54,16 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Order</th>
                                         <th>Status</th>
                                         <th>Title</th>
                                         <th>Card Description</th>
-                                        <th>Languages</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-services">
                                     @forelse($services as $service)
                                         <tr data-id="{{ $service->id }}">
-                                            <td>
+                                            <td style="display: none;">
                                                 <i class="fas fa-grip-vertical drag-handle" style="cursor: move;"></i>
                                                 {{ $service->order }}
                                             </td>
@@ -88,11 +86,6 @@
                                                 @else
                                                     No description
                                                 @endif
-                                            </td>
-                                            <td>
-                                                @foreach($service->translates as $translate)
-                                                    <span class="badge bg-primary me-1">{{ $translate->language->title }}</span>
-                                                @endforeach
                                             </td>
                                             <td>
                                                 <div class="btn-group" role="group">
@@ -118,7 +111,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center">No services found.</td>
+                                            <td colspan="4" class="text-center">No services found.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
