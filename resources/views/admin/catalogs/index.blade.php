@@ -47,7 +47,6 @@
                             <h5>All Catalogs</h5>
                             <a href="{{ route('admin.catalogs.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New Catalog
                             </a>
                         </div>
                     </div>
@@ -128,7 +127,6 @@
                                                     <p class="mt-2">No catalogs found</p>
                                                     <a href="{{ route('admin.catalogs.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Catalog
                                                     </a>
                                                 </div>
                                             </td>

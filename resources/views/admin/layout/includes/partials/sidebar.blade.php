@@ -199,13 +199,35 @@
 </aside>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('Sidebar script loaded');
+  
   const dropdowns = document.querySelectorAll('.sidebar-link[href="javascript:void(0)"]');
-  dropdowns.forEach(link => {
+  console.log('Found dropdowns:', dropdowns.length);
+  
+  dropdowns.forEach((link, index) => {
     link.addEventListener('click', () => {
+      console.log('Dropdown clicked:', index);
       const submenu = link.nextElementSibling;
-      submenu.classList.toggle('open');
+      if (submenu && submenu.classList.contains('sidebar-submenu')) {
+        submenu.classList.toggle('open');
+        console.log('Submenu toggled:', submenu.classList.contains('open'));
+      }
     });
   });
+  
+  // Auto-open Services section if we're on catalogs page
+  const currentPath = window.location.pathname;
+  if (currentPath.includes('/catalogs')) {
+    const servicesLink = document.querySelector('a[href="javascript:void(0)"] h6');
+    if (servicesLink && servicesLink.textContent.trim() === 'Services') {
+      const servicesDropdown = servicesLink.closest('.sidebar-list');
+      const submenu = servicesDropdown.querySelector('.sidebar-submenu');
+      if (submenu) {
+        submenu.classList.add('open');
+        console.log('Services submenu auto-opened');
+      }
+    }
+  }
 });
 </script>
 
@@ -213,8 +235,26 @@ document.addEventListener('DOMContentLoaded', () => {
 .sidebar-submenu {
   display: none;
   padding-left: 20px;
+  background-color: rgba(0,0,0,0.05);
+  border-radius: 5px;
+  margin: 5px 0;
 }
 .sidebar-submenu.open {
-  display: block;
+  display: block !important;
+}
+.sidebar-submenu li {
+  padding: 8px 15px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.sidebar-submenu li:last-child {
+  border-bottom: none;
+}
+.sidebar-submenu a {
+  color: #666;
+  text-decoration: none;
+  font-size: 14px;
+}
+.sidebar-submenu a:hover {
+  color: #007bff;
 }
 </style>
