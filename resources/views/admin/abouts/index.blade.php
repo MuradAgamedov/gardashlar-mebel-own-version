@@ -46,7 +46,6 @@
                             <h5>About Us List</h5>
                             <a href="{{ route('admin.abouts.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New
                             </a>
                         </div>
                     </div>
@@ -138,7 +137,6 @@
                                 <p class="text-muted">Click the button below to add the first about information.</p>
                                 <a href="{{ route('admin.abouts.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
-                                    Add First Information
                                 </a>
                             </div>
                         @endif
