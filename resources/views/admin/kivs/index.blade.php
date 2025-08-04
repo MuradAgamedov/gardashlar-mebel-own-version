@@ -94,7 +94,6 @@
                                                 @if($kiv->video_link)
                                                     <a href="{{ $kiv->video_link }}" target="_blank" class="text-decoration-none">
                                                         <i class="material-icons-outlined">play_circle</i>
-                                                        View Video
                                                     </a>
                                                 @else
                                                     <span class="text-muted">No video link</span>

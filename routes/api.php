@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\PartnerSliderController;
 use App\Http\Controllers\Api\TestimonialController;
 use App\Http\Controllers\Api\BlogPostController;
 use App\Http\Controllers\Api\BlogCategoryController;
+use App\Http\Controllers\Api\PhoneController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -88,3 +89,8 @@ Route::get('/blog-posts/{slug}', [BlogPostController::class, 'show'])->name('api
 
 // Blog Categories API Routes
 Route::get('/blog-categories', [BlogCategoryController::class, 'index'])->name('api.blog-categories.index');
+
+// Phones API Routes
+Route::get('/phones', [PhoneController::class, 'index'])->name('api.phones.index');
+Route::get('/phones/{phoneTypeId}', [PhoneController::class, 'getByType'])->name('api.phones.by-type');
+Route::get('/general-phones', [PhoneController::class, 'generalPhones'])->name('api.general-phones');
