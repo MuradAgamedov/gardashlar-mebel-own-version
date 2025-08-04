@@ -21,13 +21,13 @@ class AddressController extends Controller
      *     operationId="getAddresses",
      *     tags={"Addresses"},
      *     summary="Get all addresses",
-     *     description="Returns a list of all active addresses with their types, translated based on Accept-Language header",
+     *     description="Returns a list of all active addresses with their types, translated based on locale header",
      *     @OA\Parameter(
-     *         name="Accept-Language",
+     *         name="locale",
      *         in="header",
-     *         description="Language code (e.g., az, en, ru)",
+     *         description="Language ID (e.g., 1 for Azerbaijani, 2 for English)",
      *         required=false,
-     *         @OA\Schema(type="string", example="az")
+     *         @OA\Schema(type="integer", example=1)
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -61,11 +61,10 @@ class AddressController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            // Get language from header
-            $language = $this->getLanguageFromHeader($request);
-            $languageId = $language ? $language->id : 1; // Default to Azerbaijani
+            // Get language ID from header using trait
+            $languageId = $this->getLanguageIdFromHeader($request);
             
-            $cacheKey = "api_addresses_{$language->lang_code}";
+            $cacheKey = "api_addresses_{$languageId}";
             
             $addresses = Cache::rememberForever($cacheKey, function () use ($languageId) {
                 return Address::with(['addressType.translates' => function($query) use ($languageId) {
@@ -100,18 +99,5 @@ class AddressController extends Controller
                 'data' => []
             ], 500);
         }
-    }
-
-    /**
-     * Get language from Accept-Language header
-     */
-    private function getLanguageFromHeader(Request $request)
-    {
-        $acceptLanguage = $request->header('Accept-Language', 'az');
-        $langCode = substr($acceptLanguage, 0, 2);
-        
-        return Language::where('lang_code', $langCode)
-            ->where('status', true)
-            ->first() ?? Language::where('is_default', true)->first();
     }
 } 
