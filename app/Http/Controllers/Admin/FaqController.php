@@ -200,4 +200,25 @@ class FaqController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
+
+    public function deleteSelected(Request $request)
+    {
+        try {
+            $ids = json_decode($request->input('ids'), true);
+            
+            if (empty($ids)) {
+                return redirect()->back()->with('error', 'No FAQs selected for deletion.');
+            }
+            
+            // Delete FAQs and their translations
+            Faq::whereIn('id', $ids)->delete();
+            
+            return redirect()->route('admin.faqs.index')
+                ->with('success', count($ids) . ' FAQ(s) deleted successfully!');
+                
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error deleting FAQs: ' . $e->getMessage());
+        }
+    }
 }

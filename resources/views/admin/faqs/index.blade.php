@@ -60,6 +60,9 @@
                                         </a>
                                     @endif
                                 </form>
+                                <button type="button" id="deleteSelectedBtn" class="btn btn-danger" title="Delete Selected" style="width: 50px; height: 50px; display: none;">
+                                    <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">delete</i>
+                                </button>
                                 <a href="{{ route('admin.faqs.create') }}" class="btn btn-primary" title="Add New FAQ" style="width: 50px; height: 50px;">
                                     <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">add</i>
                                 </a>
@@ -73,6 +76,9 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th style="display: none;">Order</th>
+                                            <th width="50">
+                                                <input type="checkbox" id="selectAll" class="form-check-input">
+                                            </th>
                                             <th>Question</th>
                                             <th>Status</th>
                                             <th width="150">Actions</th>
@@ -97,6 +103,9 @@
                                                         </svg>
                                                         <span class="ms-1">{{ $faq->order }}</span>
                                                     </div>
+                                                </td>
+                                                <td>
+                                                    <input type="checkbox" class="form-check-input faq-checkbox" value="{{ $faq->id }}">
                                                 </td>
                                                 <td>
                                                     {{ $mainTranslation->question ?? 'N/A' }}
@@ -197,6 +206,74 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Select All functionality
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const faqCheckboxes = document.querySelectorAll('.faq-checkbox');
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+
+    selectAllCheckbox.addEventListener('change', function() {
+        faqCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateDeleteButtonVisibility();
+    });
+
+    faqCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateDeleteButtonVisibility();
+            
+            // Update select all checkbox
+            const checkedBoxes = document.querySelectorAll('.faq-checkbox:checked');
+            const totalBoxes = document.querySelectorAll('.faq-checkbox');
+            selectAllCheckbox.checked = checkedBoxes.length === totalBoxes.length;
+            selectAllCheckbox.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < totalBoxes.length;
+        });
+    });
+
+    function updateDeleteButtonVisibility() {
+        const checkedBoxes = document.querySelectorAll('.faq-checkbox:checked');
+        deleteSelectedBtn.style.display = checkedBoxes.length > 0 ? 'block' : 'none';
+    }
+
+    // Delete Selected functionality
+    deleteSelectedBtn.addEventListener('click', function() {
+        const checkedBoxes = document.querySelectorAll('.faq-checkbox:checked');
+        const selectedIds = Array.from(checkedBoxes).map(checkbox => checkbox.value);
+        
+        if (selectedIds.length === 0) {
+            alert('Please select at least one FAQ to delete.');
+            return;
+        }
+        
+        if (confirm(`Are you sure you want to delete ${selectedIds.length} selected FAQ(s)?`)) {
+            // Create a form and submit it
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route("admin.faqs.delete-selected") }}';
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            
+            const methodField = document.createElement('input');
+            methodField.type = 'hidden';
+            methodField.name = '_method';
+            methodField.value = 'DELETE';
+            
+            const idsField = document.createElement('input');
+            idsField.type = 'hidden';
+            idsField.name = 'ids';
+            idsField.value = JSON.stringify(selectedIds);
+            
+            form.appendChild(csrfToken);
+            form.appendChild(methodField);
+            form.appendChild(idsField);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
 
     // Delete FAQ functionality
     const deleteButtons = document.querySelectorAll('.delete-faq-btn');

@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\CertificateController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\ServiceStaticDataController;
 use App\Http\Controllers\Api\IndividualProjectOrderController;
+use App\Http\Controllers\Api\FaqController;
 
 
 // Language API Routes
@@ -126,4 +127,5 @@ Route::get('/service-static-data', [ServiceStaticDataController::class, 'index']
 // Individual Project Orders API Routes
 Route::get('/individual-project-orders', [IndividualProjectOrderController::class, 'index'])->name('api.individual-project-orders.index');
 
-
+// FAQs API Routes
+Route::get('/faqs', [FaqController::class, 'index'])->name('api.faqs.index');
