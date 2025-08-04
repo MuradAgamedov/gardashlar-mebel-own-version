@@ -74,7 +74,7 @@
                         <!-- Search Form -->
                         <div class="mt-3">
                             <form action="{{ route('admin.dictionaries.index') }}" method="GET" class="row g-3">
-                                <div class="col-md-8">
+                                <div class="col-md-10">
                                     <div class="input-group">
                                         <span class="input-group-text">
                                             <i class="material-icons-outlined">search</i>
@@ -86,14 +86,14 @@
                                                placeholder="Search by keyword or translation in any language...">
                                     </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <button type="submit" class="btn btn-outline-primary w-100">
-                                        <i class="material-icons-outlined">search</i>
+                                <div class="col-md-1">
+                                    <button type="submit" class="btn btn-outline-primary" title="Search" style="width: 50px; height: 50px;">
+                                        <i class="material-icons-outlined" style="font-size: 24px;">search</i>
                                     </button>
                                 </div>
-                                <div class="col-md-2">
-                                    <a href="{{ route('admin.dictionaries.index') }}" class="btn btn-outline-secondary w-100">
-                                        <i class="material-icons-outlined">clear</i>
+                                <div class="col-md-1">
+                                    <a href="{{ route('admin.dictionaries.index') }}" class="btn btn-outline-secondary" title="Clear" style="width: 50px; height: 50px;">
+                                        <i class="material-icons-outlined" style="font-size: 24px;">clear</i>
                                     </a>
                                 </div>
                             </form>
