@@ -128,4 +128,3 @@ Route::get('/individual-project-orders', [IndividualProjectOrderController::clas
 
 // Individual Projects API Routes
 Route::get('/individual-projects', [IndividualProjectController::class, 'index'])->name('api.individual-projects.index');
-Route::get('/individual-projects/{id}', [IndividualProjectController::class, 'show'])->name('api.individual-projects.show');
