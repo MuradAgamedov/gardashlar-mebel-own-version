@@ -47,7 +47,6 @@
                             <h5>Our Goals</h5>
                             <a href="{{ route('admin.our-goals.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Our Goal
                             </a>
                         </div>
                     </div>
