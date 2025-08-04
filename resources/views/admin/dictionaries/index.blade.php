@@ -88,12 +88,12 @@
                                 </div>
                                 <div class="col-md-1">
                                     <button type="submit" class="btn btn-outline-primary" title="Search" style="width: 50px; height: 50px;">
-                                        <i class="material-icons-outlined" style="font-size: 24px; line-height: 0;">search</i>
+                                        <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">search</i>
                                     </button>
                                 </div>
                                 <div class="col-md-1">
                                     <a href="{{ route('admin.dictionaries.index') }}" class="btn btn-outline-secondary" title="Clear" style="width: 50px; height: 50px;">
-                                        <i class="material-icons-outlined" style="font-size: 24px; line-height: 0;">clear</i>
+                                        <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">clear</i>
                                     </a>
                                 </div>
                             </form>
