@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\CompanyManagementController;
 use App\Http\Controllers\Admin\SiteUsageRulesController;
 use App\Http\Controllers\Admin\PrivacyPolicyController;
 use App\Http\Controllers\Admin\AboutController;
+use App\Http\Controllers\Admin\AdministrationController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\SuggestionController;
 use App\Http\Controllers\Admin\IndividualProjectOrderController;
@@ -199,7 +200,10 @@ Route::prefix('')->name('admin.')->group(function () {
         
         // About routes
         Route::resource('abouts', AboutController::class);
-        Route::post('abouts/reorder', [AboutController::class, 'reorder'])->name('abouts.reorder');
+Route::post('abouts/reorder', [AboutController::class, 'reorder'])->name('abouts.reorder');
+
+Route::resource('administrations', AdministrationController::class);
+Route::post('administrations/reorder', [AdministrationController::class, 'reorder'])->name('administrations.reorder');
 
         // Company routes
         Route::resource('companies', CompanyController::class);

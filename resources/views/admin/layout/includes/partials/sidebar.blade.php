@@ -168,6 +168,7 @@
           <li><a href="{{ route('admin.suggestions-complaints.edit') }}">Suggestions & Complaints</a></li>
           <li><a href="{{ route('admin.suggestions.index') }}">Suggestions</a></li>
           <li><a href="{{ route('admin.abouts.index') }}">About us</a></li>
+          <li><a href="{{ route('admin.administrations.index') }}">Administrations</a></li>
           <li><a href="{{ route('admin.companies.index') }}">Companies</a></li>
           <li><a href="{{ route('admin.company-management.edit') }}">Company Management</a></li>
           <li><a href="{{ route('admin.reports.index') }}">Reports</a></li>
