@@ -61,10 +61,10 @@
                                     </div>
                                     
                                     <div class="mb-3">
-                                        <label class="form-label">Date *</label>
+                                        <label class="form-label">Date</label>
                                         <input type="text" class="form-control @error('date') is-invalid @enderror" 
                                                name="date" value="{{ old('date', $about->date) }}" 
-                                               placeholder="Example: 2024" required>
+                                               placeholder="Example: 2024">
                                         @error('date')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror

@@ -45,7 +45,7 @@ class AboutController extends Controller
     {
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'date' => 'required|string|max:255',
+            'date' => 'nullable|string|max:255',
             'translates' => 'required|array',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.title' => 'required|string|max:255',
@@ -108,7 +108,7 @@ class AboutController extends Controller
     {
         $request->validate([
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'date' => 'required|string|max:255',
+            'date' => 'nullable|string|max:255',
             'translates' => 'required|array',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.title' => 'required|string|max:255',
