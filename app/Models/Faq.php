@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Faq extends Model
 {
@@ -11,20 +12,47 @@ class Faq extends Model
 
     protected $fillable = [
         'order',
-        'status',
+        'status'
     ];
 
     protected $casts = [
         'status' => 'boolean',
+        'order' => 'integer'
     ];
 
-    public function translates()
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($faq) {
+            if (!isset($faq->order)) {
+                $maxOrder = static::max('order');
+                $faq->order = $maxOrder + 1;
+            }
+        });
+    }
+
+    public function translates(): HasMany
     {
         return $this->hasMany(FaqTranslate::class);
     }
 
+    public function translate($languageId = null)
+    {
+        if (!$languageId) {
+            $languageId = \App\Models\Language::getMainLanguage()->id;
+        }
+        
+        return $this->translates()->where('language_id', $languageId);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', true);
+    }
+
     public function scopeOrdered($query)
     {
-        return $query->orderBy('order', 'asc');
+        return $query->orderBy('order');
     }
 }
