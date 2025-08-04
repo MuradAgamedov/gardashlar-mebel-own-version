@@ -91,6 +91,4 @@ Route::get('/blog-posts/{slug}', [BlogPostController::class, 'show'])->name('api
 Route::get('/blog-categories', [BlogCategoryController::class, 'index'])->name('api.blog-categories.index');
 
 // Phones API Routes
-Route::get('/phones', [PhoneController::class, 'index'])->name('api.phones.index');
-Route::get('/phones/{phoneTypeId}', [PhoneController::class, 'getByType'])->name('api.phones.by-type');
 Route::get('/general-phones', [PhoneController::class, 'generalPhones'])->name('api.general-phones');
