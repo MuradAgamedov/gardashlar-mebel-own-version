@@ -23,7 +23,7 @@ class FileService
             $defaultOptions = [
                 'disk' => 'public',
                 'allowed_types' => ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt'],
-                'generate_unique_name' => true,
+                'generate_unique_name' => false, // Keep original filename
             ];
 
             $options = array_merge($defaultOptions, $options);
@@ -45,6 +45,12 @@ class FileService
 
             // Generate filename
             $filename = $this->generateFilename($file, $options['generate_unique_name']);
+
+            // Check if file already exists
+            $fullPath = $path . '/' . $filename;
+            if (Storage::disk($options['disk'])->exists($fullPath)) {
+                throw new \Exception('File with this name already exists: ' . $filename);
+            }
 
             // Store file
             $filePath = $file->storeAs($path, $filename, $options['disk']);
@@ -171,13 +177,13 @@ class FileService
     }
 
     /**
-     * Generate unique filename
+     * Generate filename
      *
      * @param UploadedFile $file
      * @param bool $unique
      * @return string
      */
-    private function generateFilename(UploadedFile $file, bool $unique = true): string
+    private function generateFilename(UploadedFile $file, bool $unique = false): string
     {
         $extension = strtolower($file->getClientOriginalExtension());
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
@@ -185,7 +191,8 @@ class FileService
         if ($unique) {
             $filename = Str::slug($originalName) . '_' . time() . '_' . Str::random(8) . '.' . $extension;
         } else {
-            $filename = Str::slug($originalName) . '.' . $extension;
+            // Keep original filename, just clean it for URL safety
+            $filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $originalName) . '.' . $extension;
         }
 
         return $filename;

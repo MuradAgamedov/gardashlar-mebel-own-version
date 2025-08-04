@@ -74,6 +74,7 @@ class CatalogController extends Controller
                     'catalogs',
                     [
                         'allowed_types' => ['pdf'],
+                        'generate_unique_name' => false, // Keep original filename
                     ]
                 );
                 
@@ -166,6 +167,7 @@ class CatalogController extends Controller
                     'catalogs',
                     [
                         'allowed_types' => ['pdf'],
+                        'generate_unique_name' => false, // Keep original filename
                     ]
                 );
                 
