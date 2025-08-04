@@ -33,7 +33,6 @@
                             <h5>Certificates</h5>
                             <a href="{{ route('admin.certificates.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New Certificate
                             </a>
                         </div>
                     </div>
@@ -129,7 +128,6 @@
                                                     <p class="mt-2">No certificates found</p>
                                                     <a href="{{ route('admin.certificates.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Certificate
                                                     </a>
                                                 </div>
                                             </td>
