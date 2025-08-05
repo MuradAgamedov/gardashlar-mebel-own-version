@@ -147,21 +147,20 @@ class ServiceController extends Controller
                 'status' => $request->has('status') ? true : false
             ]);
 
-            // Delete existing translations and create new ones
-            $service->translates()->delete();
-
-            // Create new translations
+            // Update or create translations
             foreach ($request->translates as $translate) {
-                $service->translates()->create([
-                    'language_id' => $translate['language_id'],
-                    'title' => trim($translate['title']),
-                    'slug' => trim($translate['slug'] ?? ''),
-                    'card_description' => trim($translate['card_description']),
-                    'main_description' => trim($translate['main_description']),
-                    'seo_title' => trim($translate['seo_title'] ?? ''),
-                    'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
-                    'seo_description' => trim($translate['seo_description'] ?? ''),
-                ]);
+                $service->translates()->updateOrCreate(
+                    ['language_id' => $translate['language_id']],
+                    [
+                        'title' => trim($translate['title']),
+                        'slug' => trim($translate['slug'] ?? ''),
+                        'card_description' => trim($translate['card_description']),
+                        'main_description' => trim($translate['main_description']),
+                        'seo_title' => trim($translate['seo_title'] ?? ''),
+                        'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
+                        'seo_description' => trim($translate['seo_description'] ?? ''),
+                    ]
+                );
             }
 
             return redirect()->route('admin.services.index')
