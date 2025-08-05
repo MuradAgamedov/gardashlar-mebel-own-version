@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\CatalogController;
 use App\Http\Controllers\Api\MapController;
 use App\Http\Controllers\Api\ContactMessageController;
 use App\Http\Controllers\Api\BecomeAPartnerController;
+use App\Http\Controllers\Api\BecomeAInvestorController;
 
 
 // Language API Routes
@@ -147,3 +148,6 @@ Route::post('/contact-messages', [ContactMessageController::class, 'store'])->na
 
 // Become A Partner API Routes
 Route::get('/become-a-partner', [BecomeAPartnerController::class, 'index'])->name('api.become-a-partner.index');
+
+// Become A Investor API Routes
+Route::get('/become-a-investor', [BecomeAInvestorController::class, 'index'])->name('api.become-a-investor.index');

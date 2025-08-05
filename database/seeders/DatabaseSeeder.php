@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
             FaqSeeder::class,
             PhoneAndPhoneTypeSeeder::class,
             BecomeAPartnerSeeder::class,
+            BecomeAInvestorSeeder::class,
         ]);
     }
 }
