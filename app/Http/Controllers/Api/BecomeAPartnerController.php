@@ -1,0 +1,153 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\BecomeAPartner;
+use App\Models\BecomeAPartnerAdvantage;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
+use OpenApi\Annotations as OA;
+
+/**
+ * @OA\Tag(
+ *     name="Become A Partner",
+ *     description="API Endpoints for Become A Partner"
+ * )
+ */
+class BecomeAPartnerController extends Controller
+{
+    /**
+     * @OA\Get(
+     *     path="/api/become-a-partner",
+     *     operationId="getBecomeAPartner",
+     *     tags={"Become A Partner"},
+     *     summary="Get become a partner data with advantages",
+     *     description="Returns become a partner information with all active advantages",
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language ID (1=En, 3=Az)",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=3)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Become a partner data retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="title", type="string", example="Become Our Partner"),
+     *                 @OA\Property(property="description", type="string", example="Join our team and grow together..."),
+     *                 @OA\Property(property="image", type="string", example="https://example.com/storage/become-a-partner/image.jpg"),
+     *                 @OA\Property(
+     *                     property="advantages",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="icon", type="string", example="https://example.com/storage/become-a-partner-advantages/icon.svg"),
+     *                         @OA\Property(property="title", type="string", example="Quality Products"),
+     *                         @OA\Property(property="description", type="string", example="We offer the best quality products...")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Become a partner data not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Become a partner data not found"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error retrieving become a partner data"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $languageId = $request->header('locale', 3); // Default to Azerbaijani
+            $cacheKey = "api_become_a_partner_{$languageId}";
+            
+            $data = Cache::rememberForever($cacheKey, function () use ($languageId) {
+                // Get become a partner data
+                $becomeAPartner = BecomeAPartner::first();
+                
+                if (!$becomeAPartner) {
+                    return null;
+                }
+                
+                // Get translation for become a partner
+                $translation = $becomeAPartner->translates()
+                    ->where('language_id', $languageId)
+                    ->first();
+                
+                // Get active advantages with translations
+                $advantages = BecomeAPartnerAdvantage::with(['translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }])
+                ->where('status', true)
+                ->orderBy('order')
+                ->get()
+                ->map(function ($advantage) {
+                    $translation = $advantage->translates->first();
+                    return [
+                        'id' => $advantage->id,
+                        'icon' => $advantage->icon ? asset('storage/' . $advantage->icon) : null,
+                        'title' => $translation ? $translation->title : '',
+                        'description' => $translation ? $translation->description : '',
+                        'icon_alt_text' => $translation ? $translation->icon_alt_text : ''
+                    ];
+                });
+                
+                return [
+                    'id' => $becomeAPartner->id,
+                    'title' => $translation ? $translation->title : '',
+                    'description' => $translation ? $translation->description : '',
+                    'image' => $becomeAPartner->image ? asset('storage/' . $becomeAPartner->image) : null,
+                    'advantages' => $advantages
+                ];
+            });
+            
+            if (!$data) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Become a partner data not found',
+                    'data' => null
+                ], 404);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Become a partner data retrieved successfully',
+                'data' => $data
+            ], 200);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving become a partner data: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
+    }
+}

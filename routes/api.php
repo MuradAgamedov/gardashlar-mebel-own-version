@@ -33,6 +33,7 @@ use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\CatalogController;
 use App\Http\Controllers\Api\MapController;
 use App\Http\Controllers\Api\ContactMessageController;
+use App\Http\Controllers\Api\BecomeAPartnerController;
 
 
 // Language API Routes
@@ -143,3 +144,6 @@ Route::get('/maps', [MapController::class, 'index'])->name('api.maps.index');
 
 // Contact Messages API Routes (Frontend only)
 Route::post('/contact-messages', [ContactMessageController::class, 'store'])->name('api.contact-messages.store');
+
+// Become A Partner API Routes
+Route::get('/become-a-partner', [BecomeAPartnerController::class, 'index'])->name('api.become-a-partner.index');
