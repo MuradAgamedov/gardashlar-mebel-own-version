@@ -154,7 +154,6 @@
                                         <th width="50">Order</th>
                                         <th width="80">Icon</th>
                                         <th>Title</th>
-                                        <th>Languages</th>
                                         <th width="80">Status</th>
                                         <th width="150">Actions</th>
                                     </tr>
