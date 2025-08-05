@@ -20,16 +20,12 @@ class PhoneTypeSeeder extends Seeder
                 'status' => true,
                 'translations' => [
                     [
-                        'language_id' => 1, // Azərbaycan
+                        'language_id' => 3, // Azərbaycan
                         'name' => 'Əsas'
                     ],
                     [
-                        'language_id' => 2, // English
+                        'language_id' => 1, // English
                         'name' => 'Main'
-                    ],
-                    [
-                        'language_id' => 3, // Русский
-                        'name' => 'Основной'
                     ]
                 ]
             ],
