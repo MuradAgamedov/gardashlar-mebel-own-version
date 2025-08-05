@@ -32,6 +32,7 @@ use App\Http\Controllers\Api\IndividualProjectOrderController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\CatalogController;
 use App\Http\Controllers\Api\MapController;
+use App\Http\Controllers\Api\ContactMessageController;
 
 
 // Language API Routes
@@ -139,3 +140,6 @@ Route::get('/catalogs/{id}', [CatalogController::class, 'show'])->name('api.cata
 
 // Maps API Routes
 Route::get('/maps', [MapController::class, 'index'])->name('api.maps.index');
+
+// Contact Messages API Routes (Frontend only)
+Route::post('/contact-messages', [ContactMessageController::class, 'store'])->name('api.contact-messages.store');
