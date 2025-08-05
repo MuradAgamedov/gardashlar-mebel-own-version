@@ -43,9 +43,7 @@ class BecomeAPartnerController extends Controller
      *                 property="data",
      *                 type="object",
      *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="title", type="string", example="Become Our Partner"),
-     *                 @OA\Property(property="description", type="string", example="Join our team and grow together..."),
-     *                 @OA\Property(property="image", type="string", example="https://example.com/storage/become-a-partner/image.jpg"),
+     *                 @OA\Property(property="content", type="string", example="Join our team and grow together..."),
      *                 @OA\Property(
      *                     property="advantages",
      *                     type="array",
@@ -121,9 +119,7 @@ class BecomeAPartnerController extends Controller
                 
                 return [
                     'id' => $becomeAPartner->id,
-                    'title' => $translation ? $translation->title : '',
-                    'description' => $translation ? $translation->description : '',
-                    'image' => $becomeAPartner->image ? asset('storage/' . $becomeAPartner->image) : null,
+                    'content' => $translation ? $translation->content : '',
                     'advantages' => $advantages
                 ];
             });
