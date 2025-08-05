@@ -34,16 +34,12 @@ class PhoneTypeSeeder extends Seeder
                 'status' => true,
                 'translations' => [
                     [
-                        'language_id' => 1, // Azərbaycan
+                        'language_id' => 3, // Azərbaycan
                         'name' => 'Satış'
                     ],
                     [
-                        'language_id' => 2, // English
+                        'language_id' => 1, // English
                         'name' => 'Sales'
-                    ],
-                    [
-                        'language_id' => 3, // Русский
-                        'name' => 'Продажи'
                     ]
                 ]
             ],
@@ -52,16 +48,12 @@ class PhoneTypeSeeder extends Seeder
                 'status' => true,
                 'translations' => [
                     [
-                        'language_id' => 1, // Azərbaycan
+                        'language_id' => 3, // Azərbaycan
                         'name' => 'Dəstək'
                     ],
                     [
-                        'language_id' => 2, // English
+                        'language_id' => 1, // English
                         'name' => 'Support'
-                    ],
-                    [
-                        'language_id' => 3, // Русский
-                        'name' => 'Поддержка'
                     ]
                 ]
             ]

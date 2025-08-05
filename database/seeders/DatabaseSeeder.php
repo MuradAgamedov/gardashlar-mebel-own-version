@@ -34,8 +34,7 @@ class DatabaseSeeder extends Seeder
             ServiceStaticDataSeeder::class,
             IndividualProjectOrderSeeder::class,
             FaqSeeder::class,
-            PhoneTypeSeeder::class,
-            PhoneSeeder::class,
+            PhoneAndPhoneTypeSeeder::class,
         ]);
     }
 }
