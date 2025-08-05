@@ -59,11 +59,11 @@
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger" 
                                                 onclick="return confirm('Are you sure you want to delete this message?')">
-                                            <i class="material-icons-outlined">delete</i> Delete
+                                            <i class="material-icons-outlined">delete</i>
                                         </button>
                                     </form>
                                     <a href="{{ route('admin.contact-messages.index') }}" class="btn btn-secondary">
-                                        <i class="material-icons-outlined">arrow_back</i> Back
+                                        <i class="material-icons-outlined">arrow_back</i> 
                                     </a>
                                 </div>
                             </div>
