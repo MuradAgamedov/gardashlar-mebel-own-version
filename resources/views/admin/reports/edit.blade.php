@@ -51,15 +51,7 @@
 
                             <!-- File Upload Section -->
                             <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <label for="image" class="form-label">Image</label>
-                                    <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" accept="image/*">
-                                    @error('image')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="form-text text-muted">Supported formats: JPG, JPEG, PNG, GIF, WEBP. Max size: 2MB</small>
-                                </div>
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <label for="pdf" class="form-label">PDF File</label>
                                     <input type="file" class="form-control @error('pdf') is-invalid @enderror" id="pdf" name="pdf" accept=".pdf">
                                     @error('pdf')
@@ -71,20 +63,7 @@
 
                             <!-- Current Files Display -->
                             <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <div id="image-preview" class="mt-3">
-                                        @if($report->image_url)
-                                            <img id="preview-image" src="{{ $report->image_url }}" alt="Current Image" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
-                                            <p class="text-muted mt-2">Current image</p>
-                                        @else
-                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 200px; height: 150px;">
-                                                <i class="material-icons-outlined text-muted">image</i>
-                                            </div>
-                                            <p class="text-muted mt-2">No image uploaded</p>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="mt-3">
                                         @if($report->pdf_url)
                                             <a href="{{ $report->pdf_url }}" target="_blank" class="btn btn-outline-primary">
@@ -245,37 +224,6 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Image preview functionality
-    const imageInput = document.getElementById('image');
-    const imagePreview = document.getElementById('image-preview');
-    const previewImage = document.getElementById('preview-image');
-
-    imageInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                if (previewImage) {
-                    previewImage.src = e.target.result;
-                } else {
-                    // Create new image element if it doesn't exist
-                    const newImage = document.createElement('img');
-                    newImage.id = 'preview-image';
-                    newImage.src = e.target.result;
-                    newImage.alt = 'Image Preview';
-                    newImage.className = 'img-thumbnail';
-                    newImage.style = 'max-width: 200px; max-height: 150px;';
-                    
-                    imagePreview.innerHTML = '';
-                    imagePreview.appendChild(newImage);
-                    imagePreview.appendChild(document.createElement('p')).textContent = 'New image preview';
-                    imagePreview.querySelector('p').className = 'text-muted mt-2';
-                }
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
     // Auto-switch to first tab with errors on form submission
     const form = document.querySelector('form');
     form.addEventListener('submit', function(e) {

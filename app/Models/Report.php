@@ -13,7 +13,6 @@ class Report extends Model
     protected $fillable = [
         'order',
         'status',
-        'image',
         'pdf',
     ];
 
@@ -23,7 +22,6 @@ class Report extends Model
     ];
 
     protected $appends = [
-        'image_url',
         'pdf_url',
     ];
 
@@ -63,16 +61,7 @@ class Report extends Model
         return $query->orderBy('order');
     }
 
-    /**
-     * Get image URL attribute
-     */
-    public function getImageUrlAttribute()
-    {
-        if ($this->image) {
-            return app(ImageService::class)->getUrl($this->image);
-        }
-        return null;
-    }
+
 
     /**
      * Get PDF URL attribute
@@ -102,9 +91,6 @@ class Report extends Model
 
         // Delete associated files on deletion
         static::deleting(function ($report) {
-            if ($report->image) {
-                app(ImageService::class)->delete($report->image);
-            }
             if ($report->pdf) {
                 \Storage::disk('public')->delete($report->pdf);
             }

@@ -5,18 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Report;
 use App\Models\Language;
-use App\Services\ImageService;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ReportController extends Controller
 {
-    protected $imageService;
 
-    public function __construct(ImageService $imageService)
-    {
-        $this->imageService = $imageService;
-    }
 
     /**
      * Display a listing of the resource.
@@ -47,13 +42,9 @@ class ReportController extends Controller
         
         // Base validation
         $request->validate([
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
             'pdf' => 'nullable|file|mimes:pdf|max:10240', // 10MB max for PDF
             'status' => 'boolean',
         ], [
-            'image.image' => 'Image must be an image file.',
-            'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
-            'image.max' => 'Image may not be greater than 2MB.',
             'pdf.mimes' => 'PDF must be a file of type: pdf.',
             'pdf.max' => 'PDF may not be greater than 10MB.',
             'status.boolean' => 'Status must be true or false.',
@@ -71,24 +62,7 @@ class ReportController extends Controller
             ]);
         }
 
-        // Handle image upload
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $this->imageService->upload(
-                $request->file('image'),
-                'reports',
-                [
-                    'max_size' => 2048,
-                    'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                ]
-            );
-            
-            if (!$imagePath) {
-                return redirect()->back()
-                    ->with('error', 'Failed to upload image.')
-                    ->withInput();
-            }
-        }
+
 
         // Handle PDF upload
         $pdfPath = null;
@@ -98,7 +72,6 @@ class ReportController extends Controller
 
         // Create report
         $report = Report::create([
-            'image' => $imagePath,
             'pdf' => $pdfPath,
             'status' => $request->input('status'),
         ]);
@@ -138,13 +111,9 @@ class ReportController extends Controller
         
         // Base validation
         $request->validate([
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
             'pdf' => 'nullable|file|mimes:pdf|max:10240', // 10MB max for PDF
             'status' => 'boolean',
         ], [
-            'image.image' => 'Image must be an image file.',
-            'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
-            'image.max' => 'Image may not be greater than 2MB.',
             'pdf.mimes' => 'PDF must be a file of type: pdf.',
             'pdf.max' => 'PDF may not be greater than 10MB.',
             'status.boolean' => 'Status must be true or false.',
@@ -162,27 +131,7 @@ class ReportController extends Controller
             ]);
         }
 
-        // Handle image upload
-        $imageData = [];
-        if ($request->hasFile('image')) {
-            $uploadedPath = $this->imageService->update(
-                $request->file('image'),
-                $report->image,
-                'reports',
-                [
-                    'max_size' => 2048,
-                    'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                ]
-            );
-            
-            if ($uploadedPath) {
-                $imageData['image'] = $uploadedPath;
-            } else {
-                return redirect()->back()
-                    ->with('error', 'Failed to upload image.')
-                    ->withInput();
-            }
-        }
+
 
         // Handle PDF upload
         $pdfData = [];
@@ -197,7 +146,7 @@ class ReportController extends Controller
         }
 
         // Update report
-        $report->update(array_merge($imageData, $pdfData, [
+        $report->update(array_merge($pdfData, [
             'status' => $request->input('status'),
         ]));
 

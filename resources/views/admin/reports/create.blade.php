@@ -50,15 +50,7 @@
 
                             <!-- File Upload Section -->
                             <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <label for="image" class="form-label">Image</label>
-                                    <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" accept="image/*">
-                                    @error('image')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <small class="form-text text-muted">Supported formats: JPG, JPEG, PNG, GIF, WEBP. Max size: 2MB</small>
-                                </div>
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <label for="pdf" class="form-label">PDF File</label>
                                     <input type="file" class="form-control @error('pdf') is-invalid @enderror" id="pdf" name="pdf" accept=".pdf">
                                     @error('pdf')
@@ -68,14 +60,7 @@
                                 </div>
                             </div>
 
-                            <!-- Image Preview -->
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <div id="image-preview" class="mt-3" style="display: none;">
-                                        <img id="preview-image" src="" alt="Image Preview" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
-                                    </div>
-                                </div>
-                            </div>
+
 
                             <!-- Status Section -->
                             <div class="row mb-4">
@@ -208,25 +193,6 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Image preview functionality
-    const imageInput = document.getElementById('image');
-    const imagePreview = document.getElementById('image-preview');
-    const previewImage = document.getElementById('preview-image');
-
-    imageInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewImage.src = e.target.result;
-                imagePreview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        } else {
-            imagePreview.style.display = 'none';
-        }
-    });
-
     // Auto-switch to first tab with errors on form submission
     const form = document.querySelector('form');
     form.addEventListener('submit', function(e) {
