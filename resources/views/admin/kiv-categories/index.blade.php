@@ -55,7 +55,6 @@
                                     <tr>
                                         <th width="50">Order</th>
                                         <th>Title</th>
-                                        <th>Languages</th>
                                         <th>KIV Count</th>
                                         <th width="80">Status</th>
                                         <th width="150">Actions</th>
@@ -85,13 +84,7 @@
                                                     @endif
                                                 </div>
                                             </td>
-                                            <td>
-                                                <div class="d-flex gap-1">
-                                                    @foreach($category->translates as $translate)
-                                                        <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
-                                                    @endforeach
-                                                </div>
-                                            </td>
+                                       
                                             <td>
                                                 <span class="badge bg-info">{{ $category->kivs->count() }}</span>
                                             </td>
