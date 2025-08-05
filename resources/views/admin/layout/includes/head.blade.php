@@ -53,4 +53,25 @@
     .btn {
         display: flex !important;
     }
+    
+    /* Message color fix */
+    .alert {
+        color: #000 !important;
+    }
+    
+    .alert-success {
+        color: #000 !important;
+    }
+    
+    .alert-danger {
+        color: #000 !important;
+    }
+    
+    .alert-warning {
+        color: #000 !important;
+    }
+    
+    .alert-info {
+        color: #000 !important;
+    }
 </style>
