@@ -82,10 +82,18 @@ class ContactMessageController extends Controller
      */
     public function deleteSelected(Request $request)
     {
-        $ids = json_decode($request->input('ids'), true);
+        $ids = $request->input('ids');
         
-        if ($ids && is_array($ids)) {
-            ContactMessage::whereIn('id', $ids)->delete();
+        // If ids is already an array, use it directly
+        if (is_array($ids)) {
+            $idsArray = $ids;
+        } else {
+            // If it's a JSON string, decode it
+            $idsArray = json_decode($ids, true);
+        }
+        
+        if ($idsArray && is_array($idsArray) && !empty($idsArray)) {
+            ContactMessage::whereIn('id', $idsArray)->delete();
             return response()->json(['success' => true, 'message' => 'Selected messages deleted successfully']);
         }
 
