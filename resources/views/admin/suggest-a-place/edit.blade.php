@@ -132,6 +132,38 @@
                                                         @enderror
                                                     </div>
 
+                                                    <!-- Second Title -->
+                                                    <div class="col-md-12 mb-3">
+                                                        <label for="second_title_{{ $language->id }}" class="form-label">
+                                                            Second Title <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="text" 
+                                                               class="form-control @error("translations.{$language->id}.second_title") is-invalid @enderror" 
+                                                               id="second_title_{{ $language->id }}" 
+                                                               name="translations[{{ $language->id }}][second_title]" 
+                                                               value="{{ old("translations.{$language->id}.second_title", $translation->second_title ?? '') }}" 
+                                                               placeholder="Enter second title for {{ $language->lang_code }}">
+                                                        @error("translations.{$language->id}.second_title")
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+
+                                                    <!-- Second Title Subtitle -->
+                                                    <div class="col-md-12 mb-3">
+                                                        <label for="second_title_subtitle_{{ $language->id }}" class="form-label">
+                                                            Second Title Subtitle <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="text" 
+                                                               class="form-control @error("translations.{$language->id}.second_title_subtitle") is-invalid @enderror" 
+                                                               id="second_title_subtitle_{{ $language->id }}" 
+                                                               name="translations[{{ $language->id }}][second_title_subtitle]" 
+                                                               value="{{ old("translations.{$language->id}.second_title_subtitle", $translation->second_title_subtitle ?? '') }}" 
+                                                               placeholder="Enter second title subtitle for {{ $language->lang_code }}">
+                                                        @error("translations.{$language->id}.second_title_subtitle")
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+
                                               
                                                 </div>
                                             </div>
@@ -146,11 +178,9 @@
                                     <div class="d-flex gap-2">
                                         <button type="submit" class="btn btn-primary">
                                             <i class="material-icons-outlined">save</i>
-                                            Update Section
                                         </button>
                                         <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">cancel</i>
-                                            Cancel
                                         </a>
                                     </div>
                                 </div>
