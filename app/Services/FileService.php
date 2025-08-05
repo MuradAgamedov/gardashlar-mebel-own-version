@@ -46,10 +46,16 @@ class FileService
             // Generate filename
             $filename = $this->generateFilename($file, $options['generate_unique_name']);
 
-            // Check if file already exists
+            // Check if file already exists and generate unique name if needed
             $fullPath = $path . '/' . $filename;
-            if (Storage::disk($options['disk'])->exists($fullPath)) {
-                throw new \Exception('File with this name already exists: ' . $filename);
+            $counter = 1;
+            $originalFilename = $filename;
+            
+            while (Storage::disk($options['disk'])->exists($fullPath)) {
+                $pathInfo = pathinfo($originalFilename);
+                $filename = $pathInfo['filename'] . '_' . $counter . '.' . $pathInfo['extension'];
+                $fullPath = $path . '/' . $filename;
+                $counter++;
             }
 
             // Store file
