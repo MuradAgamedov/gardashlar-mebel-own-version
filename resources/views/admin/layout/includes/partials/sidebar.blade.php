@@ -23,6 +23,19 @@
         </a>
       </li>
 
+      <li class="sidebar-list">
+        <a class="sidebar-link" href="{{ route('admin.contact-messages.index') }}">
+          <i class="fas fa-envelope"></i>
+          <h6>Contact Messages</h6>
+          @php
+            $unreadCount = \App\Models\ContactMessage::where('is_read', false)->count();
+          @endphp
+          @if($unreadCount > 0)
+            <span class="badge bg-danger ms-2">{{ $unreadCount }}</span>
+          @endif
+        </a>
+      </li>
+
       <!-- CONTENT MANAGEMENT -->
       <li class="sidebar-main-title"><div><h5 class="sidebar-title">Content Management</h5></div></li>
       <li class="sidebar-list">
@@ -52,7 +65,6 @@
           <li><a href="{{ route('admin.emails.index') }}">Email</a></li>
           <li><a href="{{ route('admin.maps.index') }}">Map</a></li>
           <li><a href="{{ route('admin.social-networks.index') }}">Social Networks</a></li>
-          <li><a href="{{ route('admin.contact-messages.index') }}">Contact Messages</a></li>
         </ul>
       </li>
 
