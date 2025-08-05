@@ -68,7 +68,6 @@
                                         @if($report->pdf_url)
                                             <a href="{{ $report->pdf_url }}" target="_blank" class="btn btn-outline-primary">
                                                 <i class="material-icons-outlined">file_present</i>
-                                                View Current PDF
                                             </a>
                                             <p class="text-muted mt-2">Current PDF file</p>
                                         @else
