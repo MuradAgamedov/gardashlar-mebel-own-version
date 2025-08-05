@@ -53,6 +53,7 @@ class ServiceController extends Controller
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.title' => 'required|string|max:255',
+            'translates.*.slug' => 'nullable|string|max:255',
             'translates.*.card_description' => 'required|string',
             'translates.*.main_description' => 'required|string',
             'translates.*.seo_title' => 'nullable|string|max:255',
@@ -76,6 +77,7 @@ class ServiceController extends Controller
                 $service->translates()->create([
                     'language_id' => $translate['language_id'],
                     'title' => trim($translate['title']),
+                    'slug' => trim($translate['slug'] ?? ''),
                     'card_description' => trim($translate['card_description']),
                     'main_description' => trim($translate['main_description']),
                     'seo_title' => trim($translate['seo_title'] ?? ''),
@@ -126,6 +128,7 @@ class ServiceController extends Controller
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.title' => 'required|string|max:255',
+            'translates.*.slug' => 'nullable|string|max:255',
             'translates.*.card_description' => 'required|string',
             'translates.*.main_description' => 'required|string',
             'translates.*.seo_title' => 'nullable|string|max:255',
@@ -152,6 +155,7 @@ class ServiceController extends Controller
                 $service->translates()->create([
                     'language_id' => $translate['language_id'],
                     'title' => trim($translate['title']),
+                    'slug' => trim($translate['slug'] ?? ''),
                     'card_description' => trim($translate['card_description']),
                     'main_description' => trim($translate['main_description']),
                     'seo_title' => trim($translate['seo_title'] ?? ''),

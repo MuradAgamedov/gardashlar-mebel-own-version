@@ -88,7 +88,7 @@ class ServiceController extends Controller
                         
                         return [
                             'id' => $service->id,
-                            'slug' => $service->slug,
+                            'slug' => $translation ? $translation->slug : null,
                             'title' => $translation ? $translation->title : 'No title',
                             'card_description' => $translation ? $translation->card_description : 'No description'
                         ];

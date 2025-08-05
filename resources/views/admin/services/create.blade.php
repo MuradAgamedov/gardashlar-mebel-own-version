@@ -89,6 +89,18 @@
                                                             </div>
                                                             
                                                             <div class="col-md-12 mb-3">
+                                                                <label class="form-label">Slug</label>
+                                                                <input type="text" 
+                                                                       class="form-control @error('translates.'.$index.'.slug') is-invalid @enderror" 
+                                                                       name="translates[{{ $index }}][slug]" 
+                                                                       value="{{ old('translates.'.$index.'.slug') }}"
+                                                                       placeholder="Enter slug">
+                                                                @error('translates.'.$index.'.slug')
+                                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                                @enderror
+                                                            </div>
+                                                            
+                                                            <div class="col-md-12 mb-3">
                                                                 <label class="form-label">Card Description *</label>
                                                                 <textarea class="form-control @error('translates.'.$index.'.card_description') is-invalid @enderror" 
                                                                           name="translates[{{ $index }}][card_description]" 
@@ -171,4 +183,6 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection
+
+@include('admin.partials.slug-generator') 

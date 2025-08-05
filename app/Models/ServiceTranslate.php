@@ -14,6 +14,7 @@ class ServiceTranslate extends Model
         'service_id',
         'language_id',
         'title',
+        'slug',
         'card_description',
         'main_description',
         'seo_title',
