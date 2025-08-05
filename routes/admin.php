@@ -224,7 +224,7 @@ Route::delete('individual-project-orders/delete-selected', [IndividualProjectOrd
         // Service routes
         Route::resource('services', ServiceController::class);
         Route::post('services/reorder', [ServiceController::class, 'updateOrder'])->name('services.reorder');
-Route::delete('services/delete-selected', [ServiceController::class, 'deleteSelected'])->name('services.delete-selected');
+Route::post('services/delete-selected', [ServiceController::class, 'deleteSelected'])->name('services.delete-selected');
         Route::post('services/{id}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('services.toggle-status');
         
         // Service Advantages routes
