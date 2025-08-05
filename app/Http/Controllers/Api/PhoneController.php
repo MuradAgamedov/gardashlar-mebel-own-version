@@ -20,7 +20,7 @@ class PhoneController extends Controller
      *     operationId="getGeneralPhones",
      *     tags={"Phones"},
      *     summary="Get general phones",
-     *     description="Returns a list of phone numbers with phone_type_id = 3, ordered by 'order' field",
+     *     description="Returns a list of phone numbers with phone_type_id != 3 (excluding support phones), ordered by 'order' field",
      *     @OA\Response(
      *         response=200,
      *         description="Successful response",
@@ -57,7 +57,7 @@ class PhoneController extends Controller
             
             $phones = Cache::rememberForever($cacheKey, function () {
                 return Phone::select(['id', 'phone'])
-                    ->where('phone_type_id', 3)
+                    ->where('phone_type_id', '!=', 3)
                     ->where('status', true)
                     ->orderBy('order')
                     ->get();
