@@ -120,7 +120,7 @@
                             <div class="col-12">
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Message:</label>
-                                    <div class="border rounded p-3 bg-light">
+                                    <div style="color: black" class="border rounded p-3 bg-light">
                                         {!! nl2br(e($becomeAPartnerForm->message)) !!}
                                     </div>
                                 </div>
