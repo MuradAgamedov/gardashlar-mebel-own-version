@@ -44,6 +44,7 @@ class ServiceController extends Controller
      *                 @OA\Items(
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="slug", type="string", example="mebel-istehsali"),
      *                     @OA\Property(property="title", type="string", example="Mebel İstehsalı"),
      *                     @OA\Property(property="card_description", type="string", example="Yüksək keyfiyyətli mebel istehsalı")
      *                 )
@@ -87,6 +88,7 @@ class ServiceController extends Controller
                         
                         return [
                             'id' => $service->id,
+                            'slug' => $service->slug,
                             'title' => $translation ? $translation->title : 'No title',
                             'card_description' => $translation ? $translation->card_description : 'No description'
                         ];
