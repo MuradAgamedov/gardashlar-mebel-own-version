@@ -77,13 +77,9 @@ class ReportController extends Controller
                     
                     return [
                         'id' => $report->id,
-                        'order' => $report->order,
-                        'status' => $report->status,
                         'pdf_url' => $report->pdf_url,
                         'title' => $translation ? $translation->title : null,
                         'description' => $translation ? $translation->description : null,
-                        'created_at' => $report->created_at,
-                        'updated_at' => $report->updated_at,
                     ];
                 });
             });
