@@ -82,7 +82,7 @@ class PhoneTypeSeeder extends Seeder
                 PhoneTypeTranslate::create([
                     'phone_type_id' => $phoneType->id,
                     'language_id' => $translation['language_id'],
-                    'name' => $translation['name']
+                    'title' => $translation['name']
                 ]);
             }
         }
