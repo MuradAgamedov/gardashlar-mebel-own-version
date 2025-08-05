@@ -125,7 +125,8 @@ Route::post('become-a-partner-advantages/delete-selected', [BecomeAPartnerAdvant
         
         // Become A Investor Advantages routes
         Route::resource('become-a-investor-advantages', BecomeAInvestorAdvantageController::class);
-        Route::post('become-a-investor-advantages/reorder', [BecomeAInvestorAdvantageController::class, 'reorder'])->name('become-a-investor-advantages.reorder');
+Route::post('become-a-investor-advantages/reorder', [BecomeAInvestorAdvantageController::class, 'reorder'])->name('become-a-investor-advantages.reorder');
+Route::post('become-a-investor-advantages/delete-selected', [BecomeAInvestorAdvantageController::class, 'deleteSelected'])->name('become-a-investor-advantages.delete-selected');
         
         // Partner Slider routes
         Route::resource('partner-sliders', PartnerSliderController::class);

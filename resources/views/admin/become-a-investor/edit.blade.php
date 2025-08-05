@@ -141,9 +141,14 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>The Advantages To Become A Investor</h5>
-                            <a href="{{ route('admin.become-a-investor-advantages.create') }}" class="btn btn-primary">
-                                <i class="material-icons-outlined">add</i>
-                            </a>
+                            <div class="d-flex gap-2">
+                                <button type="button" id="deleteSelectedAdvantagesBtn" class="btn btn-danger" style="display: none;">
+                                    <i class="material-icons-outlined">delete</i>
+                                </button>
+                                <a href="{{ route('admin.become-a-investor-advantages.create') }}" class="btn btn-primary">
+                                    <i class="material-icons-outlined">add</i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -151,6 +156,9 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
+                                        <th width="50">
+                                            <input type="checkbox" id="selectAllAdvantages" class="form-check-input">
+                                        </th>
                                         <th width="50">Order</th>
                                         <th width="80">Icon</th>
                                         <th>Title</th>
@@ -167,6 +175,9 @@
                                             $firstTranslation = $advantage->translates->first();
                                         @endphp
                                         <tr data-id="{{ $advantage->id }}">
+                                            <td>
+                                                <input type="checkbox" class="form-check-input advantage-checkbox" value="{{ $advantage->id }}">
+                                            </td>
                                             <td>
                                                 <div class="drag-handle">
                                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -212,7 +223,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center py-4">
+                                            <td colspan="7" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">trending_up</i>
                                                     <p class="mt-2">No advantages found</p>
@@ -351,6 +362,71 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Select All functionality for advantages
+    const selectAllAdvantagesCheckbox = document.getElementById('selectAllAdvantages');
+    const advantageCheckboxes = document.querySelectorAll('.advantage-checkbox');
+    const deleteSelectedAdvantagesBtn = document.getElementById('deleteSelectedAdvantagesBtn');
+
+    selectAllAdvantagesCheckbox.addEventListener('change', function() {
+        advantageCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateDeleteSelectedAdvantagesButton();
+    });
+
+    advantageCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateDeleteSelectedAdvantagesButton();
+            updateSelectAllAdvantages();
+        });
+    });
+
+    function updateDeleteSelectedAdvantagesButton() {
+        const checkedBoxes = document.querySelectorAll('.advantage-checkbox:checked');
+        if (checkedBoxes.length > 0) {
+            deleteSelectedAdvantagesBtn.style.display = 'inline-flex';
+        } else {
+            deleteSelectedAdvantagesBtn.style.display = 'none';
+        }
+    }
+
+    function updateSelectAllAdvantages() {
+        const checkedBoxes = document.querySelectorAll('.advantage-checkbox:checked');
+        const totalBoxes = advantageCheckboxes.length;
+        selectAllAdvantagesCheckbox.checked = checkedBoxes.length === totalBoxes;
+        selectAllAdvantagesCheckbox.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < totalBoxes;
+    }
+
+    // Delete Selected Advantages functionality
+    deleteSelectedAdvantagesBtn.addEventListener('click', function() {
+        const checkedBoxes = document.querySelectorAll('.advantage-checkbox:checked');
+        if (checkedBoxes.length === 0) return;
+
+        const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
+        
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `Do you want to delete ${checkedBoxes.length} selected advantage(s)?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete them!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ route("admin.become-a-investor-advantages.delete-selected") }}';
+                form.innerHTML = `
+                    @csrf
+                    ${selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('')}
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    });
 
     // Delete confirmation for advantages
     document.querySelectorAll('.delete-btn').forEach(button => {

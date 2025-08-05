@@ -251,4 +251,29 @@ class BecomeAInvestorAdvantageController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Delete selected advantages
+     */
+    public function deleteSelected(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:become_a_investor_advantages,id'
+        ]);
+
+        try {
+            // Delete translations first
+            \App\Models\BecomeAInvestorAdvantageTranslate::whereIn('become_a_investor_advantage_id', $request->ids)->delete();
+            
+            // Delete advantages
+            BecomeAInvestorAdvantage::whereIn('id', $request->ids)->delete();
+
+            return redirect()->route('admin.become-a-investor.edit')
+                ->with('success', count($request->ids) . ' advantage(s) deleted successfully.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+        }
+    }
 }
