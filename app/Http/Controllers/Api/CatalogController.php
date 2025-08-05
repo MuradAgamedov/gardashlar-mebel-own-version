@@ -42,8 +42,7 @@ class CatalogController extends Controller
      *                 type="array",
      *                 @OA\Items(
      *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="catalog_year", type="string", example="2024-2029")
+     *                     @OA\Property(property="id", type="integer", example=1)
      *                 )
      *             )
      *         )
@@ -84,7 +83,6 @@ class CatalogController extends Controller
                 
                 return [
                     'id' => $catalog->id,
-                    'catalog_year' => $translation ? $translation->catalog_year : null,
                 ];
             });
             
@@ -126,7 +124,6 @@ class CatalogController extends Controller
      *                 property="data",
      *                 type="object",
      *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="catalog_year", type="string", example="2024-2029"),
      *                 @OA\Property(property="catalog_pdf", type="string", example="https://example.com/storage/catalogs/catalog.pdf", nullable=true),
      *                 @OA\Property(property="pdf_filename", type="string", example="catalog.pdf", nullable=true)
      *             )
@@ -167,7 +164,6 @@ class CatalogController extends Controller
             
             $data = [
                 'id' => $catalog->id,
-                'catalog_year' => $translation ? $translation->catalog_year : null,
                 'catalog_pdf' => $catalog->catalog_pdf ? asset('storage/' . $catalog->catalog_pdf) : null,
                 'pdf_filename' => $catalog->catalog_pdf ? basename($catalog->catalog_pdf) : null,
             ];
