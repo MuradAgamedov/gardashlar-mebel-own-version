@@ -21,6 +21,13 @@ class PhoneController extends Controller
      *     tags={"Phones"},
      *     summary="Get general phones",
      *     description="Returns a list of phone numbers with phone_type_id != 3 (excluding support phones), ordered by 'order' field",
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language ID (1=En, 3=Az)",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=3)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful response",
@@ -33,8 +40,16 @@ class PhoneController extends Controller
      *                 @OA\Items(
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="phone", type="string", example="+994501234567"),
-     *
+     *                     @OA\Property(property="type", type="string", example="Əsas"),
+     *                     @OA\Property(
+     *                         property="phones",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=1),
+     *                             @OA\Property(property="phone", type="string", example="+994501234567")
+     *                         )
+     *                     )
      *                 )
      *             )
      *         )
@@ -53,19 +68,37 @@ class PhoneController extends Controller
     public function generalPhones(Request $request): JsonResponse
     {
         try {
-            $cacheKey = 'api_general_phones';
+            $languageId = $this->getLanguageIdFromHeader($request);
+            $cacheKey = "api_general_phones_{$languageId}";
             
-            $phones = Cache::rememberForever($cacheKey, function () {
-                return Phone::select(['id', 'phone'])
-                    ->where('phone_type_id', '!=', 3)
-                    ->where('status', true)
-                    ->orderBy('order')
-                    ->get();
+            $phoneTypes = Cache::rememberForever($cacheKey, function () use ($languageId) {
+                return \App\Models\PhoneType::with(['translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }, 'phones' => function($query) {
+                    $query->where('status', true)->orderBy('order');
+                }])
+                ->where('id', '!=', 3)
+                ->where('status', true)
+                ->orderBy('order')
+                ->get()
+                ->map(function ($phoneType) {
+                    $translation = $phoneType->translates->first();
+                    return [
+                        'id' => $phoneType->id,
+                        'type' => $translation ? $translation->title : '',
+                        'phones' => $phoneType->phones->map(function ($phone) {
+                            return [
+                                'id' => $phone->id,
+                                'phone' => $phone->phone
+                            ];
+                        })
+                    ];
+                });
             });
 
             return response()->json([
                 'success' => true,
-                'data' => $phones
+                'data' => $phoneTypes
             ], 200);
 
         } catch (\Exception $e) {
