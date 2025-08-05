@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             IndividualProjectOrderSeeder::class,
             FaqSeeder::class,
             PhoneAndPhoneTypeSeeder::class,
+            BecomeAPartnerSeeder::class,
         ]);
     }
 }
