@@ -116,7 +116,8 @@ Route::prefix('')->name('admin.')->group(function () {
         
         // Become A Partner Advantages routes
         Route::resource('become-a-partner-advantages', BecomeAPartnerAdvantageController::class);
-        Route::post('become-a-partner-advantages/reorder', [BecomeAPartnerAdvantageController::class, 'reorder'])->name('become-a-partner-advantages.reorder');
+Route::post('become-a-partner-advantages/reorder', [BecomeAPartnerAdvantageController::class, 'reorder'])->name('become-a-partner-advantages.reorder');
+Route::post('become-a-partner-advantages/delete-selected', [BecomeAPartnerAdvantageController::class, 'deleteSelected'])->name('become-a-partner-advantages.delete-selected');
         
         // Become A Investor routes
         Route::get('become-a-investor/edit', [BecomeAInvestorController::class, 'edit'])->name('become-a-investor.edit');
