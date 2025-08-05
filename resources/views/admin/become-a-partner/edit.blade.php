@@ -154,7 +154,6 @@
                                         <th width="50">Order</th>
                                         <th width="80">Icon</th>
                                         <th>Title</th>
-                                        <th>Languages</th>
                                         <th width="80">Status</th>
                                         <th width="150">Actions</th>
                                     </tr>
@@ -190,13 +189,7 @@
                                             <td>
                                                 {{ $firstTranslation ? $firstTranslation->title : 'No translation' }}
                                             </td>
-                                            <td>
-                                                <div class="d-flex gap-1">
-                                                    @foreach($advantage->translates as $translate)
-                                                        <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
-                                                    @endforeach
-                                                </div>
-                                            </td>
+                                          
                                             <td>
                                                 @if($advantage->status)
                                                     <span class="badge bg-success">Active</span>
