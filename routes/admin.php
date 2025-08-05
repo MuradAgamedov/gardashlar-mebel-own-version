@@ -73,6 +73,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\BlogImageController;
+use App\Http\Controllers\Admin\ContactMessageController;
 
 Route::prefix('')->name('admin.')->group(function () {
     // Auth routes (no middleware)
@@ -370,6 +371,11 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         
         // Simple Images routes
         Route::resource('simple-images', SimpleImageController::class);
+
+        // Contact Messages routes
+        Route::resource('contact-messages', ContactMessageController::class)->only(['index', 'show', 'destroy']);
+        Route::post('contact-messages/delete-selected', [ContactMessageController::class, 'deleteSelected'])->name('contact-messages.delete-selected');
+        Route::post('contact-messages/{id}/mark-as-read', [ContactMessageController::class, 'markAsRead'])->name('contact-messages.mark-as-read');
 
         // Social Networks routes
         Route::resource('social-networks', SocialNetworkController::class);

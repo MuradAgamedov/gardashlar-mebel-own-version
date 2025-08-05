@@ -52,6 +52,7 @@
           <li><a href="{{ route('admin.emails.index') }}">Email</a></li>
           <li><a href="{{ route('admin.maps.index') }}">Map</a></li>
           <li><a href="{{ route('admin.social-networks.index') }}">Social Networks</a></li>
+          <li><a href="{{ route('admin.contact-messages.index') }}">Contact Messages</a></li>
         </ul>
       </li>
 
