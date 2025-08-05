@@ -33,7 +33,6 @@
                             <h5>KIV Categories</h5>
                             <a href="{{ route('admin.kiv-categories.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New Category
                             </a>
                         </div>
                     </div>
@@ -125,7 +124,6 @@
                                                     <p class="mt-2">No KIV categories found</p>
                                                     <a href="{{ route('admin.kiv-categories.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Category
                                                     </a>
                                                 </div>
                                             </td>
