@@ -34,16 +34,10 @@ class SuggestAPlaceController extends Controller
             $request->validate([
                 "translations.{$language->id}.title" => 'required|string|max:255',
                 "translations.{$language->id}.description" => 'required|string',
-                "translations.{$language->id}.second_title" => 'required|string|max:255',
-                "translations.{$language->id}.second_title_subtitle" => 'required|string|max:255',
             ], [
                 "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
                 "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
                 "translations.{$language->id}.description.required" => "Description is required for {$language->lang_code}.",
-                "translations.{$language->id}.second_title.required" => "Second title is required for {$language->lang_code}.",
-                "translations.{$language->id}.second_title.max" => "Second title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.second_title_subtitle.required" => "Second title subtitle is required for {$language->lang_code}.",
-                "translations.{$language->id}.second_title_subtitle.max" => "Second title subtitle may not be greater than 255 characters for {$language->lang_code}.",
             ]);
         }
 
@@ -57,8 +51,6 @@ class SuggestAPlaceController extends Controller
                     [
                         'title' => trim($translationData['title'] ?? ''),
                         'description' => trim($translationData['description'] ?? ''),
-                        'second_title' => trim($translationData['second_title'] ?? ''),
-                        'second_title_subtitle' => trim($translationData['second_title_subtitle'] ?? ''),
                     ]
                 );
             }
