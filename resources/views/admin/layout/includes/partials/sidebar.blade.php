@@ -62,6 +62,19 @@
           </a>
         </li>
 
+        <li class="sidebar-list">
+          <a class="sidebar-link" href="{{ route('admin.suggest-a-place-forms.index') }}">
+            <i class="fas fa-map-marker-alt"></i>
+            <h6>Place Forms</h6>
+            @php
+              $unreadPlaceForms = \App\Models\SuggestAPlaceForm::where('is_read', false)->count();
+            @endphp
+            @if($unreadPlaceForms > 0)
+              <span class="badge bg-danger ms-2">{{ $unreadPlaceForms }}</span>
+            @endif
+          </a>
+        </li>
+
       <!-- CONTENT MANAGEMENT -->
       <li class="sidebar-main-title"><div><h5 class="sidebar-title">Content Management</h5></div></li>
       <li class="sidebar-list">

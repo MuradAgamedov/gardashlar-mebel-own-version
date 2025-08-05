@@ -1,0 +1,87 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\SuggestAPlaceForm;
+use Illuminate\Http\Request;
+
+class SuggestAPlaceFormController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = SuggestAPlaceForm::query();
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name_surname', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('mobile', 'like', "%{$search}%")
+                  ->orWhere('address', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by read status
+        if ($request->filled('status')) {
+            if ($request->status === 'unread') {
+                $query->unread();
+            } elseif ($request->status === 'read') {
+                $query->read();
+            }
+        }
+
+        $forms = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        return view('admin.suggest-a-place-forms.index', compact('forms'));
+    }
+
+    public function show(SuggestAPlaceForm $suggestAPlaceForm)
+    {
+        // Mark as read if not already read
+        if (!$suggestAPlaceForm->is_read) {
+            $suggestAPlaceForm->markAsRead();
+        }
+
+        return view('admin.suggest-a-place-forms.show', compact('suggestAPlaceForm'));
+    }
+
+    public function destroy(SuggestAPlaceForm $suggestAPlaceForm)
+    {
+        try {
+            $suggestAPlaceForm->delete();
+            return redirect()->route('admin.suggest-a-place-forms.index')
+                ->with('success', 'Form deleted successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error deleting form: ' . $e->getMessage());
+        }
+    }
+
+    public function markAsRead($id)
+    {
+        try {
+            $form = SuggestAPlaceForm::findOrFail($id);
+            $form->markAsRead();
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteSelected(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:suggest_a_place_forms,id'
+        ]);
+
+        try {
+            SuggestAPlaceForm::whereIn('id', $request->ids)->delete();
+            return redirect()->route('admin.suggest-a-place-forms.index')
+                ->with('success', count($request->ids) . ' form(s) deleted successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+        }
+    }
+}

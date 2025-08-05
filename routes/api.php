@@ -39,6 +39,7 @@ use App\Http\Controllers\Api\SuggestAPlaceController;
 use App\Http\Controllers\Api\KivController;
 use App\Http\Controllers\Api\BecomeAPartnerFormController;
 use App\Http\Controllers\Api\BecomeAInvestorFormController;
+use App\Http\Controllers\Api\SuggestAPlaceFormController;
 
 
 // Language API Routes
@@ -167,3 +168,6 @@ Route::post('/become-a-partner-form', [BecomeAPartnerFormController::class, 'sto
 
 // Become A Investor Form API Routes
 Route::post('/become-a-investor-form', [BecomeAInvestorFormController::class, 'store'])->name('api.become-a-investor-form.store');
+
+// Suggest A Place Form API Routes
+Route::post('/suggest-a-place-form', [SuggestAPlaceFormController::class, 'store'])->name('api.suggest-a-place-form.store');
