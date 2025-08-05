@@ -104,6 +104,7 @@ Route::get('/blog-categories', [BlogCategoryController::class, 'index'])->name('
 
 // Phones API Routes
 Route::get('/general-phones', [PhoneController::class, 'generalPhones'])->name('api.general-phones');
+Route::get('/phones', [PhoneController::class, 'phones'])->name('api.phones');
 
 // Emails API Routes
 Route::get('/emails', [EmailController::class, 'index'])->name('api.emails.index');
