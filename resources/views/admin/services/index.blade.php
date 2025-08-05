@@ -227,7 +227,6 @@ document.addEventListener('DOMContentLoaded', function() {
             form.action = '{{ route("admin.services.delete-selected") }}';
             form.innerHTML = `
                 @csrf
-                @method('DELETE')
                 ${selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('')}
             `;
             document.body.appendChild(form);
