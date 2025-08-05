@@ -37,6 +37,7 @@ use App\Http\Controllers\Api\BecomeAPartnerController;
 use App\Http\Controllers\Api\BecomeAInvestorController;
 use App\Http\Controllers\Api\SuggestAPlaceController;
 use App\Http\Controllers\Api\KivController;
+use App\Http\Controllers\Api\BecomeAPartnerFormController;
 
 
 // Language API Routes
@@ -159,3 +160,6 @@ Route::get('/suggest-a-place', [SuggestAPlaceController::class, 'index'])->name(
 
 // KIVs API Routes
 Route::get('/kivs', [KivController::class, 'index'])->name('api.kivs.index');
+
+// Become A Partner Form API Routes
+Route::post('/become-a-partner-form', [BecomeAPartnerFormController::class, 'store'])->name('api.become-a-partner-form.store');

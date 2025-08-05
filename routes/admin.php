@@ -74,6 +74,7 @@ use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\BlogImageController;
 use App\Http\Controllers\Admin\ContactMessageController;
+use App\Http\Controllers\Admin\BecomeAPartnerFormController;
 
 Route::prefix('')->name('admin.')->group(function () {
     // Auth routes (no middleware)
@@ -375,9 +376,14 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         Route::resource('simple-images', SimpleImageController::class);
 
         // Contact Messages routes
-        Route::resource('contact-messages', ContactMessageController::class)->only(['index', 'show', 'destroy']);
-        Route::post('contact-messages/delete-selected', [ContactMessageController::class, 'deleteSelected'])->name('contact-messages.delete-selected');
-        Route::post('contact-messages/{id}/mark-as-read', [ContactMessageController::class, 'markAsRead'])->name('contact-messages.mark-as-read');
+Route::resource('contact-messages', ContactMessageController::class)->only(['index', 'show', 'destroy']);
+Route::post('contact-messages/delete-selected', [ContactMessageController::class, 'deleteSelected'])->name('contact-messages.delete-selected');
+Route::post('contact-messages/{id}/mark-as-read', [ContactMessageController::class, 'markAsRead'])->name('contact-messages.mark-as-read');
+
+// Become A Partner Forms routes
+Route::resource('become-a-partner-forms', BecomeAPartnerFormController::class)->only(['index', 'show', 'destroy']);
+Route::post('become-a-partner-forms/delete-selected', [BecomeAPartnerFormController::class, 'deleteSelected'])->name('become-a-partner-forms.delete-selected');
+Route::post('become-a-partner-forms/{id}/mark-as-read', [BecomeAPartnerFormController::class, 'markAsRead'])->name('become-a-partner-forms.mark-as-read');
 
         // Social Networks routes
         Route::resource('social-networks', SocialNetworkController::class);

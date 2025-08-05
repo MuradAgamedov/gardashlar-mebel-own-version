@@ -23,18 +23,31 @@
         </a>
       </li>
 
-      <li class="sidebar-list">
-        <a class="sidebar-link" href="{{ route('admin.contact-messages.index') }}">
-          <i class="fas fa-envelope"></i>
-          <h6>Contact Messages</h6>
-          @php
-            $unreadCount = \App\Models\ContactMessage::where('is_read', false)->count();
-          @endphp
-          @if($unreadCount > 0)
-            <span class="badge bg-danger ms-2">{{ $unreadCount }}</span>
-          @endif
-        </a>
-      </li>
+              <li class="sidebar-list">
+          <a class="sidebar-link" href="{{ route('admin.contact-messages.index') }}">
+            <i class="fas fa-envelope"></i>
+            <h6>Contact Messages</h6>
+            @php
+              $unreadCount = \App\Models\ContactMessage::where('is_read', false)->count();
+            @endphp
+            @if($unreadCount > 0)
+              <span class="badge bg-danger ms-2">{{ $unreadCount }}</span>
+            @endif
+          </a>
+        </li>
+
+        <li class="sidebar-list">
+          <a class="sidebar-link" href="{{ route('admin.become-a-partner-forms.index') }}">
+            <i class="fas fa-handshake"></i>
+            <h6>Partner Forms</h6>
+            @php
+              $unreadPartnerForms = \App\Models\BecomeAPartnerForm::where('is_read', false)->count();
+            @endphp
+            @if($unreadPartnerForms > 0)
+              <span class="badge bg-danger ms-2">{{ $unreadPartnerForms }}</span>
+            @endif
+          </a>
+        </li>
 
       <!-- CONTENT MANAGEMENT -->
       <li class="sidebar-main-title"><div><h5 class="sidebar-title">Content Management</h5></div></li>
