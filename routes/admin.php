@@ -75,6 +75,7 @@ use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\BlogImageController;
 use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\BecomeAPartnerFormController;
+use App\Http\Controllers\Admin\BecomeAInvestorFormController;
 
 Route::prefix('')->name('admin.')->group(function () {
     // Auth routes (no middleware)
@@ -381,9 +382,14 @@ Route::post('contact-messages/delete-selected', [ContactMessageController::class
 Route::post('contact-messages/{id}/mark-as-read', [ContactMessageController::class, 'markAsRead'])->name('contact-messages.mark-as-read');
 
 // Become A Partner Forms routes
-Route::resource('become-a-partner-forms', BecomeAPartnerFormController::class)->only(['index', 'show', 'destroy']);
-Route::post('become-a-partner-forms/delete-selected', [BecomeAPartnerFormController::class, 'deleteSelected'])->name('become-a-partner-forms.delete-selected');
-Route::post('become-a-partner-forms/{id}/mark-as-read', [BecomeAPartnerFormController::class, 'markAsRead'])->name('become-a-partner-forms.mark-as-read');
+        Route::resource('become-a-partner-forms', BecomeAPartnerFormController::class)->only(['index', 'show', 'destroy']);
+        Route::post('become-a-partner-forms/delete-selected', [BecomeAPartnerFormController::class, 'deleteSelected'])->name('become-a-partner-forms.delete-selected');
+        Route::post('become-a-partner-forms/{id}/mark-as-read', [BecomeAPartnerFormController::class, 'markAsRead'])->name('become-a-partner-forms.mark-as-read');
+        
+        // Become A Investor Form routes
+        Route::resource('become-a-investor-forms', BecomeAInvestorFormController::class)->only(['index', 'show', 'destroy']);
+        Route::post('become-a-investor-forms/delete-selected', [BecomeAInvestorFormController::class, 'deleteSelected'])->name('become-a-investor-forms.delete-selected');
+        Route::post('become-a-investor-forms/{id}/mark-as-read', [BecomeAInvestorFormController::class, 'markAsRead'])->name('become-a-investor-forms.mark-as-read');
 
         // Social Networks routes
         Route::resource('social-networks', SocialNetworkController::class);

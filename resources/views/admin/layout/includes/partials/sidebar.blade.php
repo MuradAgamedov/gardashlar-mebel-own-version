@@ -49,6 +49,19 @@
           </a>
         </li>
 
+        <li class="sidebar-list">
+          <a class="sidebar-link" href="{{ route('admin.become-a-investor-forms.index') }}">
+            <i class="fas fa-chart-line"></i>
+            <h6>Investor Forms</h6>
+            @php
+              $unreadInvestorForms = \App\Models\BecomeAInvestorForm::where('is_read', false)->count();
+            @endphp
+            @if($unreadInvestorForms > 0)
+              <span class="badge bg-danger ms-2">{{ $unreadInvestorForms }}</span>
+            @endif
+          </a>
+        </li>
+
       <!-- CONTENT MANAGEMENT -->
       <li class="sidebar-main-title"><div><h5 class="sidebar-title">Content Management</h5></div></li>
       <li class="sidebar-list">
