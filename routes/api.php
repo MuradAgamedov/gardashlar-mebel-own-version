@@ -133,3 +133,4 @@ Route::get('/faqs', [FaqController::class, 'index'])->name('api.faqs.index');
 
 // Catalogs API Routes
 Route::get('/catalogs', [CatalogController::class, 'index'])->name('api.catalogs.index');
+Route::get('/catalogs/{id}', [CatalogController::class, 'show'])->name('api.catalogs.show');
