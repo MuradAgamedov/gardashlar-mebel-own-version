@@ -145,7 +145,6 @@
                             <h5>The Advantages To Become A Investor</h5>
                             <a href="{{ route('admin.become-a-investor-advantages.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New Advantage
                             </a>
                         </div>
                     </div>
@@ -228,7 +227,6 @@
                                                     <p class="mt-2">No advantages found</p>
                                                     <a href="{{ route('admin.become-a-investor-advantages.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Advantage
                                                     </a>
                                                 </div>
                                             </td>
