@@ -33,7 +33,6 @@
                             <h5>Reports</h5>
                             <a href="{{ route('admin.reports.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New Report
                             </a>
                         </div>
                     </div>
@@ -141,7 +140,6 @@
                                                     <p class="mt-2">No reports found</p>
                                                     <a href="{{ route('admin.reports.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Report
                                                     </a>
                                                 </div>
                                             </td>
