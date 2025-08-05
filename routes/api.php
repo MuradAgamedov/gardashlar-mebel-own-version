@@ -139,4 +139,3 @@ Route::get('/catalogs/{id}', [CatalogController::class, 'show'])->name('api.cata
 
 // Maps API Routes
 Route::get('/maps', [MapController::class, 'index'])->name('api.maps.index');
-Route::get('/maps/{id}', [MapController::class, 'show'])->name('api.maps.show');
