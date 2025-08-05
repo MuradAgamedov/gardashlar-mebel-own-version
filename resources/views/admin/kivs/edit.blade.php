@@ -126,11 +126,9 @@
                                     <div class="d-flex gap-2">
                                         <button type="submit" class="btn btn-primary">
                                             <i class="material-icons-outlined">save</i>
-                                            Update KIV
                                         </button>
                                         <a href="{{ route('admin.kivs.index') }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">cancel</i>
-                                            Cancel
                                         </a>
                                     </div>
                                 </div>

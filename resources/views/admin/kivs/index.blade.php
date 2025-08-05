@@ -33,7 +33,6 @@
                             <h5>KIVs</h5>
                             <a href="{{ route('admin.kivs.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New KIV
                             </a>
                         </div>
                     </div>
@@ -127,7 +126,6 @@
                                                     <p class="mt-2">No KIVs found</p>
                                                     <a href="{{ route('admin.kivs.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First KIV
                                                     </a>
                                                 </div>
                                             </td>
