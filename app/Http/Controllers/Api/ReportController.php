@@ -63,7 +63,7 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         try {
-            $languageId = $this->getLanguageId($request);
+            $languageId = $this->getLanguageIdFromHeader($request);
             
             $reports = Cache::remember("reports_{$languageId}", 3600, function () use ($languageId) {
                 return Report::with(['translates' => function ($query) use ($languageId) {
