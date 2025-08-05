@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\ServiceStaticDataController;
 use App\Http\Controllers\Api\IndividualProjectOrderController;
 use App\Http\Controllers\Api\FaqController;
+use App\Http\Controllers\Api\CatalogController;
 
 
 // Language API Routes
@@ -129,3 +130,6 @@ Route::get('/individual-project-orders', [IndividualProjectOrderController::clas
 
 // FAQs API Routes
 Route::get('/faqs', [FaqController::class, 'index'])->name('api.faqs.index');
+
+// Catalogs API Routes
+Route::get('/catalogs', [CatalogController::class, 'index'])->name('api.catalogs.index');
