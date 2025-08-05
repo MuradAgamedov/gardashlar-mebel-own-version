@@ -35,6 +35,7 @@ use App\Http\Controllers\Api\MapController;
 use App\Http\Controllers\Api\ContactMessageController;
 use App\Http\Controllers\Api\BecomeAPartnerController;
 use App\Http\Controllers\Api\BecomeAInvestorController;
+use App\Http\Controllers\Api\SuggestAPlaceController;
 
 
 // Language API Routes
@@ -151,3 +152,6 @@ Route::get('/become-a-partner', [BecomeAPartnerController::class, 'index'])->nam
 
 // Become A Investor API Routes
 Route::get('/become-a-investor', [BecomeAInvestorController::class, 'index'])->name('api.become-a-investor.index');
+
+// Suggest A Place API Routes
+Route::get('/suggest-a-place', [SuggestAPlaceController::class, 'index'])->name('api.suggest-a-place.index');
