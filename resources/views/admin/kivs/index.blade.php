@@ -49,6 +49,33 @@
                             </div>
                         @endif
 
+                        <!-- Filter Section -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <form method="GET" action="{{ route('admin.kivs.index') }}" class="d-flex gap-2">
+                                    <select name="category_id" class="form-select">
+                                        <option value="">All Categories</option>
+                                        @foreach($categories as $category)
+                                            @php
+                                                $categoryTranslation = $category->translates->first();
+                                            @endphp
+                                            <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                                {{ $categoryTranslation ? $categoryTranslation->title : 'Unknown Category' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="material-icons-outlined">filter_list</i>
+                                    </button>
+                                    @if(request('category_id'))
+                                        <a href="{{ route('admin.kivs.index') }}" class="btn btn-secondary">
+                                            <i class="material-icons-outlined">clear</i>
+                                        </a>
+                                    @endif
+                                </form>
+                            </div>
+                        </div>
+
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>

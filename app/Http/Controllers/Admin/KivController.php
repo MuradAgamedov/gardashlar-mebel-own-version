@@ -20,9 +20,16 @@ class KivController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $kivs = Kiv::with('category.translates')->orderBy('order')->get();
+        $query = Kiv::with('category.translates');
+        
+        // Category filter
+        if ($request->filled('category_id')) {
+            $query->where('kiv_category_id', $request->category_id);
+        }
+        
+        $kivs = $query->orderBy('order')->get();
         $categories = KivCategory::with('translates')->orderBy('order')->get();
         
         return view('admin.kivs.index', compact('kivs', 'categories'));
