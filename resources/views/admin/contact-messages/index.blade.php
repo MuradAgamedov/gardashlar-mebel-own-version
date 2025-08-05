@@ -44,7 +44,7 @@
                             <div class="col-md-6">
                                 <div class="d-flex justify-content-end gap-2">
                                     <button type="button" class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
-                                        <i class="material-icons-outlined">delete</i> Delete Selected
+                                        <i class="material-icons-outlined">delete</i> 
                                     </button>
                                 </div>
                             </div>
