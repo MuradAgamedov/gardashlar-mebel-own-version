@@ -98,4 +98,5 @@ class CatalogController extends Controller
                 'data' => $data
             ]);
         });
+    }
 }
