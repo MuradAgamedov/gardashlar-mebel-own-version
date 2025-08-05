@@ -36,6 +36,7 @@ use App\Http\Controllers\Api\ContactMessageController;
 use App\Http\Controllers\Api\BecomeAPartnerController;
 use App\Http\Controllers\Api\BecomeAInvestorController;
 use App\Http\Controllers\Api\SuggestAPlaceController;
+use App\Http\Controllers\Api\KivController;
 
 
 // Language API Routes
@@ -155,3 +156,6 @@ Route::get('/become-a-investor', [BecomeAInvestorController::class, 'index'])->n
 
 // Suggest A Place API Routes
 Route::get('/suggest-a-place', [SuggestAPlaceController::class, 'index'])->name('api.suggest-a-place.index');
+
+// KIVs API Routes
+Route::get('/kivs', [KivController::class, 'index'])->name('api.kivs.index');
