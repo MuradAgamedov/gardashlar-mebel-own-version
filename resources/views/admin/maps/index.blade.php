@@ -47,7 +47,6 @@
                             <h5>Maps</h5>
                             <a href="{{ route('admin.maps.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Map
                             </a>
                         </div>
                     </div>
@@ -116,7 +115,6 @@
                                                     <p class="mt-2">No maps found</p>
                                                     <a href="{{ route('admin.maps.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Map
                                                     </a>
                                                 </div>
                                             </td>
