@@ -76,7 +76,7 @@
                                 <div class="mb-4">
                                     <h6 class="text-muted mb-2">Message:</h6>
                                     <div class="border rounded p-3 bg-light">
-                                        <p class="mb-0">{{ $message->message }}</p>
+                                        <p style="color: black" class="mb-0">{{ $message->message }}</p>
                                     </div>
                                 </div>
 
@@ -156,29 +156,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Quick Actions -->
-                                <div class="card border mt-3">
-                                    <div class="card-header">
-                                        <h6 class="mb-0">Quick Actions</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="d-grid gap-2">
-                                            <a href="mailto:{{ $message->email }}?subject=Re: Your message from {{ config('app.name') }}" 
-                                               class="btn btn-primary">
-                                                <i class="material-icons-outlined">reply</i> Reply via Email
-                                            </a>
-                                            
-                                            @if(!$message->is_read)
-                                                <form method="POST" action="{{ route('admin.contact-messages.mark-as-read', $message->id) }}">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-success w-100">
-                                                        <i class="material-icons-outlined">mark_email_read</i> Mark as Read
-                                                    </button>
-                                                </form>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
+
                             </div>
                         </div>
                     </div>
