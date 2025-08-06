@@ -205,6 +205,20 @@
                                                         @enderror
                                                     </div>
                                                 </div>
+                                                
+                                                <div class="row mt-3">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Salary</label>
+                                                        <input type="text" 
+                                                               class="form-control @error("translations.{$language->id}.salary") is-invalid @enderror" 
+                                                               name="translations[{{ $language->id }}][salary]" 
+                                                               value="{{ old("translations.{$language->id}.salary", $translation->salary ?? '') }}"
+                                                               placeholder="Enter salary for {{ $language->lang_code }}">
+                                                        @error("translations.{$language->id}.salary")
+                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
 
                                                 <!-- SEO Section -->
                                                 <div class="row mt-3">

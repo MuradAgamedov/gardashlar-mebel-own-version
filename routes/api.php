@@ -187,3 +187,4 @@ Route::post('/suggestions-complaints-form', [SuggestionsComplaintsFormController
 
 // Vacancies API Routes
 Route::get('/vacancies', [VacancyController::class, 'index'])->name('api.vacancies.index');
+Route::get('/vacancies/{slug}', [VacancyController::class, 'show'])->name('api.vacancies.show');
