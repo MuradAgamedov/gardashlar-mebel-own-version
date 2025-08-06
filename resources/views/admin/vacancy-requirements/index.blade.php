@@ -202,14 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Show success message
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Order Updated!',
-                            text: 'Requirements order has been updated successfully.',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
+                        // Order updated successfully - no alert needed
                     } else {
                         console.error('Reorder failed:', data.message);
                         alert('Error reordering requirements: ' + (data.message || 'Unknown error'));
