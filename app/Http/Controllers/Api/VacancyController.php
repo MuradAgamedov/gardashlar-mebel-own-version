@@ -100,12 +100,7 @@ class VacancyController extends Controller
                         'title' => $translation ? $translation->title : '',
                         'slug' => $translation ? $translation->slug : '',
                         'position' => $translation ? $translation->position : '',
-                        'last_apply_date' => $vacancy->last_apply_date->format('Y-m-d'),
-                        'email' => $vacancy->email,
-                        'address' => $vacancy->address,
-                        'experience' => $translation ? $translation->experience : '',
-                        'work_schedule' => $translation ? $translation->work_schedule : '',
-                        'is_expired' => $vacancy->is_expired
+                        'last_apply_date' => $vacancy->last_apply_date->format('Y-m-d')
                     ];
                 });
             });
