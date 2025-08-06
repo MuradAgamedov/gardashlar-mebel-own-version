@@ -45,9 +45,10 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Bütün Tövsiyyələr</h5>
                             <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
-                                    <i class="material-icons-outlined">delete</i>
-                                </button>
+                                                                 <button type="button" class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
+                                     <i class="material-icons-outlined">delete</i>
+                                     Seçilənləri Sil
+                                 </button>
                                 <a href="{{ route('admin.suggestions.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
                                 </a>
@@ -289,18 +290,17 @@ document.addEventListener('DOMContentLoaded', function() {
             confirmButtonText: 'Bəli, sil!',
             cancelButtonText: 'Ləğv et'
         }).then((result) => {
-            if (result.isConfirmed) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ route("admin.suggestions.deleteSelected") }}';
-                form.innerHTML = `
-                    @csrf
-                    @method('DELETE')
-                    ${selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('')}
-                `;
-                document.body.appendChild(form);
-                form.submit();
-            }
+                         if (result.isConfirmed) {
+                 const form = document.createElement('form');
+                 form.method = 'POST';
+                 form.action = '{{ route("admin.suggestions.deleteSelected") }}';
+                 form.innerHTML = `
+                     @csrf
+                     ${selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('')}
+                 `;
+                 document.body.appendChild(form);
+                 form.submit();
+             }
         });
     });
 

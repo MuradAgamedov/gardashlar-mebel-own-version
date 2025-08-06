@@ -221,7 +221,7 @@ Route::post('administrations/reorder', [AdministrationController::class, 'reorde
         // Suggestion routes
         Route::resource('suggestions', SuggestionController::class);
 Route::post('suggestions/reorder', [SuggestionController::class, 'reorder'])->name('suggestions.reorder');
-Route::delete('suggestions/delete-selected', [SuggestionController::class, 'deleteSelected'])->name('suggestions.deleteSelected');
+Route::post('suggestions/delete-selected', [SuggestionController::class, 'deleteSelected'])->name('suggestions.deleteSelected');
         
         // Individual Project Order routes
         Route::resource('individual-project-orders', IndividualProjectOrderController::class);
