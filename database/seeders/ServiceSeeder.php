@@ -22,231 +22,231 @@ class ServiceSeeder extends Seeder
         // Sample services data
         $services = [
             [
-                'slug' => 'web-development',
+                'slug' => 'construction-services',
                 'status' => true,
                 'order' => 1,
                 'translations' => [
                     'az' => [
-                        'title' => 'Veb İnkişaf',
-                        'card_description' => 'Müasir və funksional veb saytlar yaradırıq',
-                        'main_description' => 'Biz müasir texnologiyalardan istifadə edərək yüksək keyfiyyətli veb saytlar yaradırıq. Responsive dizayn, SEO optimizasiyası və istifadəçi dostu interfeys təmin edirik.',
-                        'seo_title' => 'Veb İnkişaf Xidmətləri',
-                        'seo_keywords' => 'veb inkişaf, sayt yaratma, web development',
-                        'seo_description' => 'Professional veb inkişaf xidmətləri'
+                        'title' => 'Tikinti Xidmətləri',
+                        'card_description' => 'Keyfiyyətli tikinti və inşaat işləri',
+                        'main_description' => 'Biz müasir texnologiyalardan istifadə edərək yüksək keyfiyyətli tikinti xidmətləri təmin edirik. Yaşayış və ticarət binaları, infrastruktur layihələri və s.',
+                        'seo_title' => 'Tikinti Xidmətləri',
+                        'seo_keywords' => 'tikinti, inşaat, bina, layihə',
+                        'seo_description' => 'Professional tikinti xidmətləri'
                     ],
                     'en' => [
-                        'title' => 'Web Development',
-                        'card_description' => 'We create modern and functional websites',
-                        'main_description' => 'We create high-quality websites using modern technologies. We provide responsive design, SEO optimization and user-friendly interface.',
-                        'seo_title' => 'Web Development Services',
-                        'seo_keywords' => 'web development, website creation',
-                        'seo_description' => 'Professional web development services'
+                        'title' => 'Construction Services',
+                        'card_description' => 'Quality construction and building services',
+                        'main_description' => 'We provide high-quality construction services using modern technologies. Residential and commercial buildings, infrastructure projects and more.',
+                        'seo_title' => 'Construction Services',
+                        'seo_keywords' => 'construction, building, project',
+                        'seo_description' => 'Professional construction services'
                     ],
                     'ru' => [
-                        'title' => 'Веб-разработка',
-                        'card_description' => 'Создаем современные и функциональные веб-сайты',
-                        'main_description' => 'Мы создаем качественные веб-сайты, используя современные технологии. Обеспечиваем адаптивный дизайн, SEO-оптимизацию и удобный интерфейс.',
-                        'seo_title' => 'Услуги веб-разработки',
-                        'seo_keywords' => 'веб-разработка, создание сайтов',
-                        'seo_description' => 'Профессиональные услуги веб-разработки'
+                        'title' => 'Строительные услуги',
+                        'card_description' => 'Качественные строительные услуги',
+                        'main_description' => 'Мы предоставляем качественные строительные услуги, используя современные технологии. Жилые и коммерческие здания, инфраструктурные проекты и многое другое.',
+                        'seo_title' => 'Строительные услуги',
+                        'seo_keywords' => 'строительство, здание, проект',
+                        'seo_description' => 'Профессиональные строительные услуги'
                     ]
                 ],
                 'advantages' => [
                     [
-                        'icon' => 'services/icons/responsive-design.svg',
+                        'icon' => 'services/icons/quality-assurance.svg',
                         'status' => true,
                         'order' => 1,
                         'translations' => [
                             'az' => [
-                                'title' => 'Responsive Dizayn',
-                                'icon_alt_text' => 'Responsive dizayn ikonu',
-                                'description' => 'Bütün cihazlarda mükəmməl görünən saytlar'
+                                'title' => 'Keyfiyyət Təminatı',
+                                'icon_alt_text' => 'Keyfiyyət təminatı ikonu',
+                                'description' => 'Yüksək keyfiyyət standartları'
                             ],
                             'en' => [
-                                'title' => 'Responsive Design',
-                                'icon_alt_text' => 'Responsive design icon',
-                                'description' => 'Websites that look perfect on all devices'
+                                'title' => 'Quality Assurance',
+                                'icon_alt_text' => 'Quality assurance icon',
+                                'description' => 'High quality standards'
                             ],
                             'ru' => [
-                                'title' => 'Адаптивный дизайн',
-                                'icon_alt_text' => 'Иконка адаптивного дизайна',
-                                'description' => 'Сайты, которые отлично выглядят на всех устройствах'
+                                'title' => 'Контроль качества',
+                                'icon_alt_text' => 'Иконка контроля качества',
+                                'description' => 'Высокие стандарты качества'
                             ]
                         ]
                     ],
                     [
-                        'icon' => 'services/icons/seo-optimization.svg',
+                        'icon' => 'services/icons/modern-technology.svg',
                         'status' => true,
                         'order' => 2,
                         'translations' => [
                             'az' => [
-                                'title' => 'SEO Optimizasiyası',
-                                'icon_alt_text' => 'SEO optimizasiyası ikonu',
-                                'description' => 'Axtarış motorlarında yüksək sıralama'
+                                'title' => 'Müasir Texnologiya',
+                                'icon_alt_text' => 'Müasir texnologiya ikonu',
+                                'description' => 'Ən son texnologiyalardan istifadə'
                             ],
                             'en' => [
-                                'title' => 'SEO Optimization',
-                                'icon_alt_text' => 'SEO optimization icon',
-                                'description' => 'High ranking in search engines'
+                                'title' => 'Modern Technology',
+                                'icon_alt_text' => 'Modern technology icon',
+                                'description' => 'Using latest technologies'
                             ],
                             'ru' => [
-                                'title' => 'SEO-оптимизация',
-                                'icon_alt_text' => 'Иконка SEO-оптимизации',
-                                'description' => 'Высокий рейтинг в поисковых системах'
+                                'title' => 'Современные технологии',
+                                'icon_alt_text' => 'Иконка современных технологий',
+                                'description' => 'Использование новейших технологий'
                             ]
                         ]
                     ]
                 ]
             ],
             [
-                'slug' => 'mobile-app-development',
+                'slug' => 'renovation-services',
                 'status' => true,
                 'order' => 2,
                 'translations' => [
                     'az' => [
-                        'title' => 'Mobil Tətbiq İnkişafı',
-                        'card_description' => 'iOS və Android üçün mobil tətbiqlər',
-                        'main_description' => 'iOS və Android platformaları üçün yüksək keyfiyyətli mobil tətbiqlər yaradırıq. Native və cross-platform həllər təklif edirik.',
-                        'seo_title' => 'Mobil Tətbiq İnkişafı',
-                        'seo_keywords' => 'mobil tətbiq, iOS, Android, app development',
-                        'seo_description' => 'Professional mobil tətbiq inkişafı xidmətləri'
+                        'title' => 'Təmir və Yeniləmə',
+                        'card_description' => 'Binaların təmiri və yenilənməsi',
+                        'main_description' => 'Mövcud binaların təmiri, yenilənməsi və modernləşdirilməsi xidmətləri. Daxili və xarici təmir işləri.',
+                        'seo_title' => 'Təmir və Yeniləmə Xidmətləri',
+                        'seo_keywords' => 'təmir, yeniləmə, bina təmiri',
+                        'seo_description' => 'Professional təmir və yeniləmə xidmətləri'
                     ],
                     'en' => [
-                        'title' => 'Mobile App Development',
-                        'card_description' => 'Mobile applications for iOS and Android',
-                        'main_description' => 'We create high-quality mobile applications for iOS and Android platforms. We offer native and cross-platform solutions.',
-                        'seo_title' => 'Mobile App Development',
-                        'seo_keywords' => 'mobile app, iOS, Android, app development',
-                        'seo_description' => 'Professional mobile app development services'
+                        'title' => 'Renovation Services',
+                        'card_description' => 'Building repair and renovation',
+                        'main_description' => 'Repair, renovation and modernization services for existing buildings. Interior and exterior renovation works.',
+                        'seo_title' => 'Renovation Services',
+                        'seo_keywords' => 'renovation, repair, building renovation',
+                        'seo_description' => 'Professional renovation services'
                     ],
                     'ru' => [
-                        'title' => 'Разработка мобильных приложений',
-                        'card_description' => 'Мобильные приложения для iOS и Android',
-                        'main_description' => 'Мы создаем качественные мобильные приложения для платформ iOS и Android. Предлагаем нативные и кроссплатформенные решения.',
-                        'seo_title' => 'Разработка мобильных приложений',
-                        'seo_keywords' => 'мобильное приложение, iOS, Android, разработка приложений',
-                        'seo_description' => 'Профессиональные услуги разработки мобильных приложений'
+                        'title' => 'Услуги по ремонту и реконструкции',
+                        'card_description' => 'Ремонт и реконструкция зданий',
+                        'main_description' => 'Услуги по ремонту, реконструкции и модернизации существующих зданий. Внутренние и внешние ремонтные работы.',
+                        'seo_title' => 'Услуги по ремонту и реконструкции',
+                        'seo_keywords' => 'ремонт, реконструкция, ремонт зданий',
+                        'seo_description' => 'Профессиональные услуги по ремонту и реконструкции'
                     ]
                 ],
                 'advantages' => [
                     [
-                        'icon' => 'services/icons/native-development.svg',
+                        'icon' => 'services/icons/interior-design.svg',
                         'status' => true,
                         'order' => 1,
                         'translations' => [
                             'az' => [
-                                'title' => 'Native İnkişaf',
-                                'icon_alt_text' => 'Native inkişaf ikonu',
-                                'description' => 'Platforma xüsusi funksionallıq'
+                                'title' => 'Daxili Dizayn',
+                                'icon_alt_text' => 'Daxili dizayn ikonu',
+                                'description' => 'Müasir daxili dizayn həlləri'
                             ],
                             'en' => [
-                                'title' => 'Native Development',
-                                'icon_alt_text' => 'Native development icon',
-                                'description' => 'Platform-specific functionality'
+                                'title' => 'Interior Design',
+                                'icon_alt_text' => 'Interior design icon',
+                                'description' => 'Modern interior design solutions'
                             ],
                             'ru' => [
-                                'title' => 'Нативная разработка',
-                                'icon_alt_text' => 'Иконка нативной разработки',
-                                'description' => 'Платформо-специфичная функциональность'
+                                'title' => 'Дизайн интерьера',
+                                'icon_alt_text' => 'Иконка дизайна интерьера',
+                                'description' => 'Современные решения дизайна интерьера'
                             ]
                         ]
                     ],
                     [
-                        'icon' => 'services/icons/cross-platform.svg',
+                        'icon' => 'services/icons/expert-team.svg',
                         'status' => true,
                         'order' => 2,
                         'translations' => [
                             'az' => [
-                                'title' => 'Cross-Platform',
-                                'icon_alt_text' => 'Cross-platform ikonu',
-                                'description' => 'Bir kod ilə çoxlu platformalar'
+                                'title' => 'Ekspert Komanda',
+                                'icon_alt_text' => 'Ekspert komanda ikonu',
+                                'description' => 'Təcrübəli mütəxəssislər'
                             ],
                             'en' => [
-                                'title' => 'Cross-Platform',
-                                'icon_alt_text' => 'Cross-platform icon',
-                                'description' => 'Multiple platforms with one code'
+                                'title' => 'Expert Team',
+                                'icon_alt_text' => 'Expert team icon',
+                                'description' => 'Experienced specialists'
                             ],
                             'ru' => [
-                                'title' => 'Кроссплатформенность',
-                                'icon_alt_text' => 'Иконка кроссплатформенности',
-                                'description' => 'Множество платформ с одним кодом'
+                                'title' => 'Команда экспертов',
+                                'icon_alt_text' => 'Иконка команды экспертов',
+                                'description' => 'Опытные специалисты'
                             ]
                         ]
                     ]
                 ]
             ],
             [
-                'slug' => 'ui-ux-design',
+                'slug' => 'project-management',
                 'status' => true,
                 'order' => 3,
                 'translations' => [
                     'az' => [
-                        'title' => 'UI/UX Dizayn',
-                        'card_description' => 'İstifadəçi təcrübəsi və interfeys dizaynı',
-                        'main_description' => 'İstifadəçi təcrübəsini əsas götürərək gözəl və funksional interfeyslər yaradırıq. İstifadəçi araşdırması və prototipləşdirmə xidmətləri təmin edirik.',
-                        'seo_title' => 'UI/UX Dizayn Xidmətləri',
-                        'seo_keywords' => 'UI dizayn, UX dizayn, istifadəçi təcrübəsi',
-                        'seo_description' => 'Professional UI/UX dizayn xidmətləri'
+                        'title' => 'Layihə İdarəetməsi',
+                        'card_description' => 'Tikinti layihələrinin idarə edilməsi',
+                        'main_description' => 'Tikinti layihələrinin tam idarə edilməsi xidmətləri. Planlaşdırma, koordinasiya və nəzarət.',
+                        'seo_title' => 'Layihə İdarəetməsi Xidmətləri',
+                        'seo_keywords' => 'layihə idarəetməsi, tikinti layihəsi',
+                        'seo_description' => 'Professional layihə idarəetməsi xidmətləri'
                     ],
                     'en' => [
-                        'title' => 'UI/UX Design',
-                        'card_description' => 'User experience and interface design',
-                        'main_description' => 'We create beautiful and functional interfaces focusing on user experience. We provide user research and prototyping services.',
-                        'seo_title' => 'UI/UX Design Services',
-                        'seo_keywords' => 'UI design, UX design, user experience',
-                        'seo_description' => 'Professional UI/UX design services'
+                        'title' => 'Project Management',
+                        'card_description' => 'Construction project management',
+                        'main_description' => 'Complete construction project management services. Planning, coordination and supervision.',
+                        'seo_title' => 'Project Management Services',
+                        'seo_keywords' => 'project management, construction project',
+                        'seo_description' => 'Professional project management services'
                     ],
                     'ru' => [
-                        'title' => 'UI/UX дизайн',
-                        'card_description' => 'Дизайн пользовательского опыта и интерфейса',
-                        'main_description' => 'Мы создаем красивые и функциональные интерфейсы, ориентируясь на пользовательский опыт. Предоставляем услуги пользовательских исследований и прототипирования.',
-                        'seo_title' => 'Услуги UI/UX дизайна',
-                        'seo_keywords' => 'UI дизайн, UX дизайн, пользовательский опыт',
-                        'seo_description' => 'Профессиональные услуги UI/UX дизайна'
+                        'title' => 'Управление проектами',
+                        'card_description' => 'Управление строительными проектами',
+                        'main_description' => 'Полные услуги по управлению строительными проектами. Планирование, координация и надзор.',
+                        'seo_title' => 'Услуги управления проектами',
+                        'seo_keywords' => 'управление проектами, строительный проект',
+                        'seo_description' => 'Профессиональные услуги управления проектами'
                     ]
                 ],
                 'advantages' => [
                     [
-                        'icon' => 'services/icons/user-research.svg',
+                        'icon' => 'services/icons/planning.svg',
                         'status' => true,
                         'order' => 1,
                         'translations' => [
                             'az' => [
-                                'title' => 'İstifadəçi Araşdırması',
-                                'icon_alt_text' => 'İstifadəçi araşdırması ikonu',
-                                'description' => 'Hədəf auditoriyanı anlamaq'
+                                'title' => 'Planlaşdırma',
+                                'icon_alt_text' => 'Planlaşdırma ikonu',
+                                'description' => 'Detallı planlaşdırma və analiz'
                             ],
                             'en' => [
-                                'title' => 'User Research',
-                                'icon_alt_text' => 'User research icon',
-                                'description' => 'Understanding target audience'
+                                'title' => 'Planning',
+                                'icon_alt_text' => 'Planning icon',
+                                'description' => 'Detailed planning and analysis'
                             ],
                             'ru' => [
-                                'title' => 'Пользовательские исследования',
-                                'icon_alt_text' => 'Иконка пользовательских исследований',
-                                'description' => 'Понимание целевой аудитории'
+                                'title' => 'Планирование',
+                                'icon_alt_text' => 'Иконка планирования',
+                                'description' => 'Детальное планирование и анализ'
                             ]
                         ]
                     ],
                     [
-                        'icon' => 'services/icons/prototyping.svg',
+                        'icon' => 'services/icons/supervision.svg',
                         'status' => true,
                         'order' => 2,
                         'translations' => [
                             'az' => [
-                                'title' => 'Prototipləşdirmə',
-                                'icon_alt_text' => 'Prototipləşdirmə ikonu',
-                                'description' => 'İnteraktiv prototiplər yaratmaq'
+                                'title' => 'Nəzarət',
+                                'icon_alt_text' => 'Nəzarət ikonu',
+                                'description' => 'Davamlı nəzarət və hesabat'
                             ],
                             'en' => [
-                                'title' => 'Prototyping',
-                                'icon_alt_text' => 'Prototyping icon',
-                                'description' => 'Creating interactive prototypes'
+                                'title' => 'Supervision',
+                                'icon_alt_text' => 'Supervision icon',
+                                'description' => 'Continuous monitoring and reporting'
                             ],
                             'ru' => [
-                                'title' => 'Прототипирование',
-                                'icon_alt_text' => 'Иконка прототипирования',
-                                'description' => 'Создание интерактивных прототипов'
+                                'title' => 'Надзор',
+                                'icon_alt_text' => 'Иконка надзора',
+                                'description' => 'Постоянный мониторинг и отчетность'
                             ]
                         ]
                     ]
