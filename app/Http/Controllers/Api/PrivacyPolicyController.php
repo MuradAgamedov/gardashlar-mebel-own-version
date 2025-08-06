@@ -91,7 +91,7 @@ class PrivacyPolicyController extends Controller
             $privacyPolicyData = [
                 'id' => $privacyPolicy->id,
                 'content' => $translation ? $translation->content : '',
-                'language_id' => $languageId,
+                'language_id' => (int)$languageId,
                 'language_code' => $language->lang_code
             ];
 
