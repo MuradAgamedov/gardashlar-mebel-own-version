@@ -46,6 +46,7 @@ use App\Http\Controllers\Api\SuggestionsComplaintsFormController;
 use App\Http\Controllers\Api\VacancyController;
 use App\Http\Controllers\Api\PrivacyPolicyController;
 use App\Http\Controllers\Api\CustomerRightsController;
+use App\Http\Controllers\Api\DeliveryPaymentController;
 
 
 // Language API Routes
@@ -196,3 +197,6 @@ Route::get('/privacy-policy', [PrivacyPolicyController::class, 'index'])->name('
 
 // Customer Rights API Routes
 Route::get('/customer-rights', [CustomerRightsController::class, 'index'])->name('api.customer-rights.index');
+
+// Delivery Payment API Routes
+Route::get('/delivery-payment', [DeliveryPaymentController::class, 'index'])->name('api.delivery-payment.index');

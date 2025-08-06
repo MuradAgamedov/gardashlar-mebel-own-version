@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DeliveryPayment;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class DeliveryPaymentController extends Controller
 {
@@ -61,6 +62,12 @@ class DeliveryPaymentController extends Controller
                         'content' => trim($translationData['content'] ?? ''),
                     ]
                 );
+            }
+
+            // Clear cache for all languages
+            $languages = Language::getActiveLanguages();
+            foreach ($languages as $language) {
+                Cache::forget("delivery_payment_{$language->id}");
             }
 
             return redirect()->back()
