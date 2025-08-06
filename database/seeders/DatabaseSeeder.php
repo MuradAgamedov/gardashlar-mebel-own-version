@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             BecomeAPartnerSeeder::class,
             BecomeAInvestorSeeder::class,
             ReportSeeder::class,
+            VacancySeeder::class,
         ]);
     }
 }
