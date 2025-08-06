@@ -72,6 +72,27 @@
                                     </select>
                                 </form>
                             </div>
+                            <div class="col-md-3">
+                                <form method="GET" action="{{ route('admin.become-a-investor-forms.index') }}">
+                                    @if(request('search'))
+                                        <input type="hidden" name="search" value="{{ request('search') }}">
+                                    @endif
+                                    @if(request('status'))
+                                        <input type="hidden" name="status" value="{{ request('status') }}">
+                                    @endif
+                                    <select name="service_id" class="form-select" onchange="this.form.submit()">
+                                        <option value="">All Services</option>
+                                        @foreach(\App\Models\Service::active()->with('translates')->get() as $service)
+                                            @php
+                                                $translation = $service->translates->first();
+                                            @endphp
+                                            <option value="{{ $service->id }}" {{ request('service_id') == $service->id ? 'selected' : '' }}>
+                                                {{ $translation ? $translation->title : 'Service #' . $service->id }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </form>
+                            </div>
                         </div>
 
                         <div class="table-responsive">
@@ -84,6 +105,7 @@
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Mobile</th>
+                                        <th>Service</th>
                                         <th>File</th>
                                         <th width="100">Status</th>
                                         <th width="120">Date</th>
@@ -99,6 +121,18 @@
                                             <td>{{ $form->name }}</td>
                                             <td>{{ $form->email }}</td>
                                             <td>{{ $form->mobile }}</td>
+                                            <td>
+                                                @if($form->service)
+                                                    @php
+                                                        $serviceTranslation = $form->service->translates->first();
+                                                    @endphp
+                                                    <span class="badge bg-primary">
+                                                        {{ $serviceTranslation ? $serviceTranslation->title : 'Service #' . $form->service->id }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-muted">No service</span>
+                                                @endif
+                                            </td>
                                             <td>
                                                 @if($form->file)
                                                     <a href="{{ $form->file_url }}" target="_blank" class="btn btn-sm btn-info">
@@ -135,7 +169,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="text-center py-4">
+                                            <td colspan="9" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">inbox</i>
                                                     <p class="mt-2">No forms found</p>

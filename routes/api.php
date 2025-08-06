@@ -179,8 +179,8 @@ Route::get('/kivs', [KivController::class, 'index'])->name('api.kivs.index');
 // Become A Partner Form API Routes
 Route::post('/become-a-partner-form', [BecomeAPartnerFormController::class, 'store'])->name('api.become-a-partner-form.store');
 
-// Become A Investor Form API Routes
-Route::post('/become-a-investor-form', [BecomeAInvestorFormController::class, 'store'])->name('api.become-a-investor-form.store');
+// Become A Investor Forms API Routes
+Route::post('/become-a-investor-forms', [BecomeAInvestorFormController::class, 'store'])->name('api.become-a-investor-forms.store');
 
 // Suggest A Place Form API Routes
 Route::post('/suggest-a-place-form', [SuggestAPlaceFormController::class, 'store'])->name('api.suggest-a-place-form.store');

@@ -10,6 +10,7 @@ class BecomeAInvestorForm extends Model
     use HasFactory;
 
     protected $fillable = [
+        'service_id',
         'name',
         'mobile',
         'email',
@@ -20,6 +21,7 @@ class BecomeAInvestorForm extends Model
     ];
 
     protected $casts = [
+        'service_id' => 'integer',
         'is_read' => 'boolean',
         'read_at' => 'datetime'
     ];
@@ -50,5 +52,10 @@ class BecomeAInvestorForm extends Model
     public function getFileNameAttribute()
     {
         return $this->file ? basename($this->file) : null;
+    }
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
     }
 }
