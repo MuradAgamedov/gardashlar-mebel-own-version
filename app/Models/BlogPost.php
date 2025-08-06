@@ -59,6 +59,17 @@ class BlogPost extends Model
         return $this->hasMany(BlogImage::class)->ordered();
     }
 
+    // Accessors
+    public function getCardImageUrlAttribute()
+    {
+        return $this->card_image ? asset('storage/' . $this->card_image) : null;
+    }
+
+    public function getInnerBannerImageUrlAttribute()
+    {
+        return $this->inner_banner_image ? asset('storage/' . $this->inner_banner_image) : null;
+    }
+
     protected static function boot()
     {
         parent::boot();

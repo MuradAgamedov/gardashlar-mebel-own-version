@@ -115,7 +115,10 @@ class BlogPostController extends Controller
 
             $blogPosts = Cache::remember($cacheKey, 3600, function () use ($languageId, $page, $perPage, $categoryId) {
                 $query = BlogPost::published()
-                    ->with(['translates' => fn($q) => $q->where('language_id', $languageId)])
+                    ->with([
+                        'translates' => fn($q) => $q->where('language_id', $languageId),
+                        'images'
+                    ])
                     ->orderBy('published_at', 'desc');
 
                 // Filter by category if provided
@@ -133,8 +136,18 @@ class BlogPostController extends Controller
                     'id' => $blogPost->id,
                     'title' => $translate->title ?? null,
                     'slug' => $translate->slug ?? null,
-                    'card_image_url' => $blogPost->card_image ? asset('storage/' . $blogPost->card_image) : null,
+                    'card_image' => $blogPost->card_image,
+                    'card_image_url' => $blogPost->card_image_url,
                     'card_description' => $translate->card_description ?? null,
+                    'images' => $blogPost->images->map(function ($image) {
+                        return [
+                            'id' => $image->id,
+                            'image' => $image->image,
+                            'image_url' => $image->image ? asset('storage/' . $image->image) : null,
+                            'alt_text' => $image->alt_text,
+                            'order' => $image->order
+                        ];
+                    })
                 ];
             });
 
