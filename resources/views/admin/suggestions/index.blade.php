@@ -46,7 +46,6 @@
                             <h5>Bütün Tövsiyyələr</h5>
                             <a href="{{ route('admin.suggestions.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Yeni Tövsiyyə
                             </a>
                         </div>
                     </div>
@@ -129,7 +128,6 @@
                                                     <p class="mt-2">Tövsiyyə tapılmadı</p>
                                                     <a href="{{ route('admin.suggestions.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        İlk Tövsiyyəni Əlavə Et
                                                     </a>
                                                 </div>
                                             </td>
