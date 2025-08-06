@@ -41,6 +41,7 @@ use App\Http\Controllers\Api\BecomeAPartnerFormController;
 use App\Http\Controllers\Api\BecomeAInvestorFormController;
 use App\Http\Controllers\Api\SuggestAPlaceFormController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\SuggestionsComplaintsController;
 
 
 // Language API Routes
@@ -175,3 +176,6 @@ Route::post('/suggest-a-place-form', [SuggestAPlaceFormController::class, 'store
 
 // Reports API Routes
 Route::get('/reports', [ReportController::class, 'index'])->name('api.reports.index');
+
+// Suggestions & Complaints API Routes
+Route::get('/suggestions-complaints', [SuggestionsComplaintsController::class, 'index'])->name('api.suggestions-complaints.index');
