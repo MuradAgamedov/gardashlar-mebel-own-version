@@ -165,8 +165,7 @@ class VacancyController extends Controller
      *                 @OA\Property(property="salary", type="string", example="1000-1500 AZN"),
      *                 @OA\Property(property="email", type="string", example="hr@company.com"),
      *                 @OA\Property(property="address", type="string", example="Bakı şəhəri"),
-     *                 @OA\Property(property="last_apply_date", type="string", format="date", example="2024-12-31"),
-     *                 @OA\Property(property="requirements", type="array", @OA\Items(type="object"))
+     *                 @OA\Property(property="last_apply_date", type="string", format="date", example="2024-12-31")
      *             )
      *         )
      *     ),
@@ -218,24 +217,6 @@ class VacancyController extends Controller
 
             $translation = $vacancy->translates->first();
 
-            // Get requirements for this vacancy
-            $requirements = $vacancy->requirements()
-                ->with(['translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                }])
-                ->active()
-                ->ordered()
-                ->get()
-                ->map(function ($requirement) {
-                    $reqTranslation = $requirement->translates->first();
-                    return [
-                        'id' => $requirement->id,
-                        'title' => $reqTranslation ? $reqTranslation->title : '',
-                        'description' => $reqTranslation ? $reqTranslation->description : '',
-                        'order' => $requirement->order
-                    ];
-                });
-
             $vacancyData = [
                 'id' => $vacancy->id,
                 'title' => $translation ? $translation->title : '',
@@ -246,8 +227,7 @@ class VacancyController extends Controller
                 'salary' => $translation ? $translation->salary : '',
                 'email' => $vacancy->email,
                 'address' => $vacancy->address,
-                'last_apply_date' => $vacancy->last_apply_date->format('Y-m-d'),
-                'requirements' => $requirements
+                'last_apply_date' => $vacancy->last_apply_date->format('Y-m-d')
             ];
 
             return response()->json([
