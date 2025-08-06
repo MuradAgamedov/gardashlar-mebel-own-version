@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CustomerRights;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class CustomerRightsController extends Controller
 {
@@ -61,6 +62,12 @@ class CustomerRightsController extends Controller
                         'content' => trim($translationData['content'] ?? ''),
                     ]
                 );
+            }
+
+            // Clear cache for all languages
+            $languages = Language::getActiveLanguages();
+            foreach ($languages as $language) {
+                Cache::forget("customer_rights_{$language->id}");
             }
 
             return redirect()->back()
