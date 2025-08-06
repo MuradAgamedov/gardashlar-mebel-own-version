@@ -8,6 +8,7 @@ use App\Models\SuggestionTranslate;
 use App\Models\Language;
 use App\Services\ImageService;
 use App\Services\FileService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -89,6 +90,13 @@ class SuggestionController extends Controller
             }
 
             DB::commit();
+
+            // Clear cache for all languages
+            $languages = Language::getActiveLanguages();
+            foreach ($languages as $language) {
+                Cache::forget("suggestions_{$language->id}");
+                Cache::forget("suggestion_{$suggestion->id}_{$language->id}");
+            }
 
             return redirect()->route('admin.suggestions.index')
                 ->with('success', 'Tövsiyyə uğurla əlavə edildi.');
@@ -182,6 +190,13 @@ class SuggestionController extends Controller
 
             DB::commit();
 
+            // Clear cache for all languages
+            $languages = Language::getActiveLanguages();
+            foreach ($languages as $language) {
+                Cache::forget("suggestions_{$language->id}");
+                Cache::forget("suggestion_{$suggestion->id}_{$language->id}");
+            }
+
             return redirect()->route('admin.suggestions.index')
                 ->with('success', 'Tövsiyyə uğurla yeniləndi.');
 
@@ -211,6 +226,13 @@ class SuggestionController extends Controller
 
             $suggestion->delete();
 
+            // Clear cache for all languages
+            $languages = Language::getActiveLanguages();
+            foreach ($languages as $language) {
+                Cache::forget("suggestions_{$language->id}");
+                Cache::forget("suggestion_{$suggestion->id}_{$language->id}");
+            }
+
             return redirect()->route('admin.suggestions.index')
                 ->with('success', 'Tövsiyyə uğurla silindi.');
 
@@ -234,9 +256,59 @@ class SuggestionController extends Controller
                 Suggestion::where('id', $id)->update(['order' => $order + 1]);
             }
 
+            // Clear cache for all languages
+            $languages = Language::getActiveLanguages();
+            foreach ($languages as $language) {
+                Cache::forget("suggestions_{$language->id}");
+            }
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Delete selected suggestions
+     */
+    public function deleteSelected(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'required|integer|exists:suggestions,id'
+        ]);
+
+        try {
+            $suggestions = Suggestion::whereIn('id', $request->input('ids'))->get();
+            
+            foreach ($suggestions as $suggestion) {
+                // Delete image
+                if ($suggestion->image) {
+                    $this->imageService->delete($suggestion->image);
+                }
+
+                // Delete PDF
+                if ($suggestion->pdf) {
+                    $this->fileService->delete($suggestion->pdf);
+                }
+
+                $suggestion->delete();
+            }
+
+            // Clear cache for all languages
+            $languages = Language::getActiveLanguages();
+            foreach ($languages as $language) {
+                Cache::forget("suggestions_{$language->id}");
+                foreach ($request->input('ids') as $id) {
+                    Cache::forget("suggestion_{$id}_{$language->id}");
+                }
+            }
+
+            return redirect()->route('admin.suggestions.index')
+                ->with('success', count($request->input('ids')) . ' tövsiyyə uğurla silindi.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
         }
     }
 }

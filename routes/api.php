@@ -51,6 +51,7 @@ use App\Http\Controllers\Api\WarrantyPolicyController;
 use App\Http\Controllers\Api\RefundPolicyController;
 use App\Http\Controllers\Api\CompanyManagementController;
 use App\Http\Controllers\Api\SiteUsageRulesController;
+use App\Http\Controllers\Api\SuggestionController;
 
 
 // Language API Routes
@@ -216,3 +217,7 @@ Route::get('/company-management', [CompanyManagementController::class, 'index'])
 
 // Site Usage Rules API Routes
 Route::get('/site-usage-rules', [SiteUsageRulesController::class, 'index'])->name('api.site-usage-rules.index');
+
+// Suggestions API Routes
+Route::get('/suggestions', [SuggestionController::class, 'index'])->name('api.suggestions.index');
+Route::get('/suggestions/{id}', [SuggestionController::class, 'show'])->name('api.suggestions.show');
