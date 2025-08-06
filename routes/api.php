@@ -47,6 +47,10 @@ use App\Http\Controllers\Api\VacancyController;
 use App\Http\Controllers\Api\PrivacyPolicyController;
 use App\Http\Controllers\Api\CustomerRightsController;
 use App\Http\Controllers\Api\DeliveryPaymentController;
+use App\Http\Controllers\Api\WarrantyPolicyController;
+use App\Http\Controllers\Api\RefundPolicyController;
+use App\Http\Controllers\Api\CompanyManagementController;
+use App\Http\Controllers\Api\SiteUsageRulesController;
 
 
 // Language API Routes
@@ -200,3 +204,15 @@ Route::get('/customer-rights', [CustomerRightsController::class, 'index'])->name
 
 // Delivery Payment API Routes
 Route::get('/delivery-payment', [DeliveryPaymentController::class, 'index'])->name('api.delivery-payment.index');
+
+// Warranty Policy API Routes
+Route::get('/warranty-policy', [WarrantyPolicyController::class, 'index'])->name('api.warranty-policy.index');
+
+// Refund Policy API Routes
+Route::get('/refund-policy', [RefundPolicyController::class, 'index'])->name('api.refund-policy.index');
+
+// Company Management API Routes
+Route::get('/company-management', [CompanyManagementController::class, 'index'])->name('api.company-management.index');
+
+// Site Usage Rules API Routes
+Route::get('/site-usage-rules', [SiteUsageRulesController::class, 'index'])->name('api.site-usage-rules.index');

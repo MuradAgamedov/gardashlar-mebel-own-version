@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\CompanyManagement;
+use App\Models\Language;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+
+class CompanyManagementController extends Controller
+{
+    /**
+     * @OA\Get(
+     *     path="/api/company-management",
+     *     summary="Get company management content",
+     *     description="Returns company management content with translated content based on header language",
+     *     tags={"Company Management"},
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language ID (1=Az, 2=En, 3=Ru)",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Company management retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Company management retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="content", type="string", example="<p>Şirkət idarəetməsi məzmunu...</p>")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Company management not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Company management not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error retrieving company management")
+     *         )
+     *     )
+     * )
+     */
+    public function index(Request $request)
+    {
+        try {
+            // Get language ID from header
+            $languageId = $request->header('locale', 1); // Default to Azerbaijani (1)
+            
+            // Validate language ID
+            $language = Language::find($languageId);
+            if (!$language) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid language ID'
+                ], 400);
+            }
+
+            // Get company management with cache
+            $companyManagement = Cache::rememberForever("company_management_{$languageId}", function () use ($languageId) {
+                return CompanyManagement::with(['translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }])->first();
+            });
+
+            if (!$companyManagement) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Company management not found'
+                ], 404);
+            }
+
+            $translation = $companyManagement->translates->first();
+
+            $companyManagementData = [
+                'id' => $companyManagement->id,
+                'content' => $translation ? $translation->content : ''
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Company management retrieved successfully',
+                'data' => $companyManagementData
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving company management: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+} 

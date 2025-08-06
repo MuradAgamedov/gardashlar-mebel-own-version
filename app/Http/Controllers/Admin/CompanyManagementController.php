@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CompanyManagement;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use App\Services\ImageService;
 
 class CompanyManagementController extends Controller
@@ -59,6 +60,12 @@ class CompanyManagementController extends Controller
                         ]
                     );
                 }
+            }
+
+            // Clear cache for all languages
+            $languages = Language::getActiveLanguages();
+            foreach ($languages as $language) {
+                Cache::forget("company_management_{$language->id}");
             }
 
             return redirect()->back()
