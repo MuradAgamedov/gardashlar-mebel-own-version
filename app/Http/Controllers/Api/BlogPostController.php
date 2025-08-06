@@ -115,10 +115,7 @@ class BlogPostController extends Controller
 
             $blogPosts = Cache::remember($cacheKey, 3600, function () use ($languageId, $page, $perPage, $categoryId) {
                 $query = BlogPost::published()
-                    ->with([
-                        'translates' => fn($q) => $q->where('language_id', $languageId),
-                        'images'
-                    ])
+                    ->with(['translates' => fn($q) => $q->where('language_id', $languageId)])
                     ->orderBy('published_at', 'desc');
 
                 // Filter by category if provided
@@ -139,15 +136,6 @@ class BlogPostController extends Controller
                     'card_image' => $blogPost->card_image,
                     'card_image_url' => $blogPost->card_image_url,
                     'card_description' => $translate->card_description ?? null,
-                    'images' => $blogPost->images->map(function ($image) {
-                        return [
-                            'id' => $image->id,
-                            'image' => $image->image,
-                            'image_url' => $image->image ? asset('storage/' . $image->image) : null,
-                            'alt_text' => $image->alt_text,
-                            'order' => $image->order
-                        ];
-                    })
                 ];
             });
 
@@ -253,7 +241,8 @@ class BlogPostController extends Controller
                 return BlogPost::published()
                     ->with([
                         'translates' => fn($q) => $q->where('language_id', $languageId),
-                        'category.translates' => fn($q) => $q->where('language_id', $languageId)
+                        'category.translates' => fn($q) => $q->where('language_id', $languageId),
+                        'images'
                     ])
                     ->whereHas('translates', function($q) use ($slug) {
                         $q->where('slug', $slug);
@@ -283,7 +272,16 @@ class BlogPostController extends Controller
                 'category' => [
                     'id' => $blogPost->category->id,
                     'title' => $categoryTranslate->title ?? null,
-                ]
+                ],
+                'images' => $blogPost->images->map(function ($image) {
+                    return [
+                        'id' => $image->id,
+                        'image' => $image->image,
+                        'image_url' => $image->image ? asset('storage/' . $image->image) : null,
+                        'alt_text' => $image->alt_text,
+                        'order' => $image->order
+                    ];
+                })
             ];
 
             return response()->json([
