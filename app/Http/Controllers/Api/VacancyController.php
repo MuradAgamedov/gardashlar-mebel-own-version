@@ -103,7 +103,7 @@ class VacancyController extends Controller
                         ->active()
                         ->ordered()
                         ->get()
-                        ->map(function ($requirement) {
+                        ->map(function ($requirement) use ($languageId) {
                             $reqTranslation = $requirement->translates->first();
                             return [
                                 'id' => $requirement->id,
