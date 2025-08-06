@@ -90,6 +90,7 @@ class VacancyController extends Controller
                 $vacancy->translates()->create([
                     'language_id' => $language->id,
                     'title' => trim($translationData['title'] ?? ''),
+                    'slug' => trim($translationData['slug'] ?? ''),
                     'position' => trim($translationData['position'] ?? ''),
                     'experience' => trim($translationData['experience'] ?? ''),
                     'work_schedule' => trim($translationData['work_schedule'] ?? ''),
@@ -183,6 +184,7 @@ class VacancyController extends Controller
                     ['language_id' => $language->id],
                     [
                         'title' => trim($translationData['title'] ?? ''),
+                        'slug' => trim($translationData['slug'] ?? ''),
                         'position' => trim($translationData['position'] ?? ''),
                         'experience' => trim($translationData['experience'] ?? ''),
                         'work_schedule' => trim($translationData['work_schedule'] ?? ''),

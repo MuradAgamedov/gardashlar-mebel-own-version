@@ -13,6 +13,7 @@ class VacancyTranslate extends Model
         'vacancy_id',
         'language_id',
         'title',
+        'slug',
         'position',
         'experience',
         'work_schedule',
