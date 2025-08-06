@@ -8,6 +8,7 @@ use App\Models\PrivacyPolicyTranslate;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class PrivacyPolicyController extends Controller
 {
@@ -74,6 +75,12 @@ class PrivacyPolicyController extends Controller
 
             DB::commit();
             \Log::info('Privacy Policy updated successfully');
+
+            // Clear cache for all languages
+            $languages = Language::getActiveLanguages();
+            foreach ($languages as $language) {
+                Cache::forget("privacy_policy_{$language->id}");
+            }
 
             return redirect()->route('admin.privacy-policy.edit')
                 ->with('success', 'Gizlilik siyasəti uğurla yeniləndi.');

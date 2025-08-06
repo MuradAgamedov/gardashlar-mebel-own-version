@@ -44,6 +44,7 @@ use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SuggestionsComplaintsController;
 use App\Http\Controllers\Api\SuggestionsComplaintsFormController;
 use App\Http\Controllers\Api\VacancyController;
+use App\Http\Controllers\Api\PrivacyPolicyController;
 
 
 // Language API Routes
@@ -188,3 +189,6 @@ Route::post('/suggestions-complaints-form', [SuggestionsComplaintsFormController
 // Vacancies API Routes
 Route::get('/vacancies', [VacancyController::class, 'index'])->name('api.vacancies.index');
 Route::get('/vacancies/{slug}', [VacancyController::class, 'show'])->name('api.vacancies.show');
+
+// Privacy Policy API Routes
+Route::get('/privacy-policy', [PrivacyPolicyController::class, 'index'])->name('api.privacy-policy.index');
