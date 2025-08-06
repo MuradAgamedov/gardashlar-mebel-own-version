@@ -214,10 +214,7 @@ class BlogPostController extends Controller
      *                     @OA\Items(
      *                         type="object",
      *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="image", type="string", example="uploads/blogs/images/image1.jpg"),
-     *                         @OA\Property(property="image_url", type="string", example="https://example.com/storage/uploads/blogs/images/image1.jpg"),
-     *                         @OA\Property(property="alt_text", type="string", example="Blog image description"),
-     *                         @OA\Property(property="order", type="integer", example=1)
+     *                         @OA\Property(property="image_url", type="string", example="https://example.com/storage/uploads/blogs/images/image1.jpg")
      *                     )
      *                 )
      *             )
@@ -288,10 +285,7 @@ class BlogPostController extends Controller
                 'images' => $blogPost->images->map(function ($image) {
                     return [
                         'id' => $image->id,
-                        'image' => $image->image_url,
-                        'image_url' => $image->image_url ? asset('storage/' . $image->image_url) : null,
-                        'alt_text' => null,
-                        'order' => $image->order
+                        'image_url' => $image->image_url ? asset('storage/' . $image->image_url) : null
                     ];
                 })
             ];
