@@ -104,7 +104,9 @@
                                                       id="editor-{{ $language->id }}"
                                                       rows="15"
                                                       placeholder="Gizlilik siyasəti məzmununu daxil edin"
-                                                      required>{{ old("translates.{$language->id}.content", $translate?->content) }}</textarea>
+                                                      required
+                                                      style="display: none;">{{ old("translates.{$language->id}.content", $translate?->content) }}</textarea>
+                                            <div id="ckeditor-container-{{ $language->id }}"></div>
                                             @error("translates.{$language->id}.content")
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
@@ -150,6 +152,15 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Form action:', form.action);
             console.log('Form method:', form.method);
             
+            // Update all CKEditor content to textareas before submit
+            document.querySelectorAll('.ckeditor').forEach(function(textarea) {
+                if (textarea.editor) {
+                    console.log('Updating CKEditor content for:', textarea.name);
+                    textarea.editor.updateSourceElement();
+                    console.log('CKEditor content updated');
+                }
+            });
+            
             // Check if form data is valid
             const formData = new FormData(form);
             console.log('Form data:');
@@ -163,8 +174,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize CKEditor for each textarea
     document.querySelectorAll('.ckeditor').forEach(function(textarea) {
+        const containerId = 'ckeditor-container-' + textarea.id.replace('editor-', '');
+        const container = document.getElementById(containerId);
+        
         ClassicEditor
-            .create(textarea, {
+            .create(container, {
                 toolbar: {
                     items: [
                         'undo', 'redo',
@@ -182,13 +196,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 placeholder: 'Gizlilik siyasəti məzmununu daxil edin...'
             })
             .then(editor => {
-                // Update textarea value before form submission
-                const form = textarea.closest('form');
-                form.addEventListener('submit', function() {
-                    console.log('Updating CKEditor content for:', textarea.name);
-                    editor.updateSourceElement();
-                    console.log('CKEditor content updated');
-                });
+                // Store editor reference
+                textarea.editor = editor;
+                
+                // Set initial content
+                editor.setData(textarea.value);
             })
             .catch(error => {
                 console.error(error);
