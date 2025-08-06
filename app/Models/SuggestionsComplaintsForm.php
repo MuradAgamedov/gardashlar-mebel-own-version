@@ -16,7 +16,8 @@ class SuggestionsComplaintsForm extends Model
         'mobile',
         'email',
         'file',
-        'message'
+        'message',
+        'is_read'
     ];
 
     protected $casts = [

@@ -77,6 +77,7 @@ use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\BecomeAPartnerFormController;
 use App\Http\Controllers\Admin\BecomeAInvestorFormController;
 use App\Http\Controllers\Admin\SuggestAPlaceFormController;
+use App\Http\Controllers\Admin\SuggestionsComplaintsFormController;
 
 Route::prefix('')->name('admin.')->group(function () {
     // Auth routes (no middleware)
@@ -396,6 +397,11 @@ Route::post('contact-messages/{id}/mark-as-read', [ContactMessageController::cla
         Route::resource('suggest-a-place-forms', SuggestAPlaceFormController::class)->only(['index', 'show', 'destroy']);
         Route::post('suggest-a-place-forms/delete-selected', [SuggestAPlaceFormController::class, 'deleteSelected'])->name('suggest-a-place-forms.delete-selected');
         Route::post('suggest-a-place-forms/{id}/mark-as-read', [SuggestAPlaceFormController::class, 'markAsRead'])->name('suggest-a-place-forms.mark-as-read');
+        
+        // Suggestions & Complaints Forms routes
+        Route::resource('suggestions-complaints-forms', SuggestionsComplaintsFormController::class)->only(['index', 'show', 'destroy']);
+        Route::post('suggestions-complaints-forms/delete-selected', [SuggestionsComplaintsFormController::class, 'deleteSelected'])->name('suggestions-complaints-forms.delete-selected');
+        Route::post('suggestions-complaints-forms/{id}/mark-as-read', [SuggestionsComplaintsFormController::class, 'markAsRead'])->name('suggestions-complaints-forms.mark-as-read');
 
         // Social Networks routes
         Route::resource('social-networks', SocialNetworkController::class);

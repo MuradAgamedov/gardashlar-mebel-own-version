@@ -225,6 +225,14 @@
           <li><a href="{{ route('admin.currencies.index') }}">Currencies</a></li>
           <li><a href="{{ route('admin.suggest-a-place.edit') }}">Suggest A Place</a></li>
           <li><a href="{{ route('admin.suggestions-complaints.edit') }}">Suggestions & Complaints</a></li>
+          <li><a href="{{ route('admin.suggestions-complaints-forms.index') }}">Suggestions & Complaints Forms
+            @php
+              $unreadSuggestionsForms = \App\Models\SuggestionsComplaintsForm::where('is_read', false)->count();
+            @endphp
+            @if($unreadSuggestionsForms > 0)
+              <span class="badge bg-danger ms-2">{{ $unreadSuggestionsForms }}</span>
+            @endif
+          </a></li>
           <li><a href="{{ route('admin.suggestions.index') }}">Suggestions</a></li>
           <li><a href="{{ route('admin.abouts.index') }}">About us</a></li>
           <li><a href="{{ route('admin.administrations.index') }}">Administrations</a></li>
