@@ -57,7 +57,7 @@
                         <h5>Gizlilik Siyasətini Redaktə Et</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.privacy-policy.update') }}" method="POST">
+                        <form action="{{ route('admin.privacy-policy.update') }}" method="POST" id="privacyPolicyForm">
                             @csrf
                             @method('PUT')
                             
@@ -142,6 +142,25 @@
 <script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Form submit event listener
+    const form = document.getElementById('privacyPolicyForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            console.log('Form submit event triggered');
+            console.log('Form action:', form.action);
+            console.log('Form method:', form.method);
+            
+            // Check if form data is valid
+            const formData = new FormData(form);
+            console.log('Form data:');
+            for (let [key, value] of formData.entries()) {
+                console.log(key + ': ' + value);
+            }
+            
+            // Don't prevent default - let it submit normally
+        });
+    }
+    
     // Initialize CKEditor for each textarea
     document.querySelectorAll('.ckeditor').forEach(function(textarea) {
         ClassicEditor
@@ -166,7 +185,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update textarea value before form submission
                 const form = textarea.closest('form');
                 form.addEventListener('submit', function() {
+                    console.log('Updating CKEditor content for:', textarea.name);
                     editor.updateSourceElement();
+                    console.log('CKEditor content updated');
                 });
             })
             .catch(error => {

@@ -34,6 +34,9 @@ class PrivacyPolicyController extends Controller
     {
         // Debug: Check what we're receiving
         \Log::info('Privacy Policy Update Request:', $request->all());
+        \Log::info('Request Method:', ['method' => $request->method()]);
+        \Log::info('Request URL:', ['url' => $request->url()]);
+        \Log::info('CSRF Token:', ['token' => $request->input('_token')]);
         
         $request->validate([
             'translates' => 'required|array',
