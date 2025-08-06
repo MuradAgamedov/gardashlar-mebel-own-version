@@ -119,11 +119,9 @@
                                     <div class="d-flex gap-2">
                                         <button type="submit" class="btn btn-primary">
                                             <i class="material-icons-outlined">save</i>
-                                            Yadda Saxla
                                         </button>
                                         <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">cancel</i>
-                                            Ləğv Et
                                         </a>
                                     </div>
                                 </div>
