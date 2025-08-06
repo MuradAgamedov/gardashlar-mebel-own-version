@@ -60,7 +60,7 @@
                                 <div class="col-md-12">
                                     <h6 class="mb-3">Media</h6>
                                     <div class="row">
-                                        <div class="col-md-6 mb-3">
+                                        <div class="col-md-4 mb-3">
                                             <label class="form-label">Şəkil *</label>
                                             <div class="image-upload-container">
                                                 <input type="file" 
@@ -75,6 +75,28 @@
                                                 <div class="form-text">Maksimum ölçü: 2MB. Formatlar: JPEG, PNG, JPG, GIF</div>
                                                 <div class="image-preview mt-2" id="image-preview"></div>
                                             </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Fayl</label>
+                                            <input type="file" 
+                                                   class="form-control @error('file') is-invalid @enderror" 
+                                                   name="file" 
+                                                   accept=".doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar">
+                                            @error('file')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                            <div class="form-text">Maksimum ölçü: 10MB. Formatlar: DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, ZIP, RAR</div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">PDF</label>
+                                            <input type="file" 
+                                                   class="form-control @error('pdf') is-invalid @enderror" 
+                                                   name="pdf" 
+                                                   accept=".pdf">
+                                            @error('pdf')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                            <div class="form-text">Maksimum ölçü: 10MB. Format: PDF</div>
                                         </div>
                                     </div>
                                 </div>

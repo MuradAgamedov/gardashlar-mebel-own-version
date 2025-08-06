@@ -13,7 +13,9 @@ class Suggestion extends Model
     protected $fillable = [
         'image',
         'order',
-        'status'
+        'status',
+        'file',
+        'pdf'
     ];
 
     protected $casts = [

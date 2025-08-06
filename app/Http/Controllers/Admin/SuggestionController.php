@@ -7,6 +7,7 @@ use App\Models\Suggestion;
 use App\Models\SuggestionTranslate;
 use App\Models\Language;
 use App\Services\ImageService;
+use App\Services\FileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -14,10 +15,12 @@ use Illuminate\Support\Facades\Storage;
 class SuggestionController extends Controller
 {
     protected $imageService;
+    protected $fileService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(ImageService $imageService, FileService $fileService)
     {
         $this->imageService = $imageService;
+        $this->fileService = $fileService;
     }
 
     /**
@@ -48,6 +51,8 @@ class SuggestionController extends Controller
     {
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'file' => 'nullable|file|mimes:doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar|max:10240',
+            'pdf' => 'nullable|file|mimes:pdf|max:10240',
             'status' => 'boolean',
             'translates' => 'required|array',
             'translates.*.language_id' => 'required|exists:languages,id',
@@ -61,9 +66,23 @@ class SuggestionController extends Controller
             // Upload image
             $imagePath = $this->imageService->upload($request->file('image'), 'suggestions');
 
+            // Upload file if provided
+            $filePath = null;
+            if ($request->hasFile('file')) {
+                $filePath = $this->fileService->upload($request->file('file'), 'suggestions/files');
+            }
+
+            // Upload PDF if provided
+            $pdfPath = null;
+            if ($request->hasFile('pdf')) {
+                $pdfPath = $this->fileService->upload($request->file('pdf'), 'suggestions/pdfs');
+            }
+
             // Create suggestion
             $suggestion = Suggestion::create([
                 'image' => $imagePath,
+                'file' => $filePath,
+                'pdf' => $pdfPath,
                 'status' => $request->input('status', true),
             ]);
 
@@ -117,6 +136,8 @@ class SuggestionController extends Controller
 
         $request->validate([
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'file' => 'nullable|file|mimes:doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar|max:10240',
+            'pdf' => 'nullable|file|mimes:pdf|max:10240',
             'status' => 'boolean',
             'translates' => 'required|array',
             'translates.*.language_id' => 'required|exists:languages,id',
@@ -137,6 +158,30 @@ class SuggestionController extends Controller
                 // Upload new image
                 $imagePath = $this->imageService->upload($request->file('image'), 'suggestions');
                 $suggestion->image = $imagePath;
+            }
+
+            // Handle file upload
+            if ($request->hasFile('file')) {
+                // Delete old file
+                if ($suggestion->file) {
+                    $this->fileService->delete($suggestion->file);
+                }
+                
+                // Upload new file
+                $filePath = $this->fileService->upload($request->file('file'), 'suggestions/files');
+                $suggestion->file = $filePath;
+            }
+
+            // Handle PDF upload
+            if ($request->hasFile('pdf')) {
+                // Delete old PDF
+                if ($suggestion->pdf) {
+                    $this->fileService->delete($suggestion->pdf);
+                }
+                
+                // Upload new PDF
+                $pdfPath = $this->fileService->upload($request->file('pdf'), 'suggestions/pdfs');
+                $suggestion->pdf = $pdfPath;
             }
 
             $suggestion->status = $request->input('status', true);
@@ -178,6 +223,16 @@ class SuggestionController extends Controller
             // Delete image
             if ($suggestion->image) {
                 $this->imageService->delete($suggestion->image);
+            }
+
+            // Delete file
+            if ($suggestion->file) {
+                $this->fileService->delete($suggestion->file);
+            }
+
+            // Delete PDF
+            if ($suggestion->pdf) {
+                $this->fileService->delete($suggestion->pdf);
             }
 
             $suggestion->delete();
