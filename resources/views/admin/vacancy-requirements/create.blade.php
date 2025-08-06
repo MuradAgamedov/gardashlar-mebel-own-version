@@ -373,20 +373,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     } else {
                         console.error('Reorder failed:', data.message);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: 'Error reordering requirements: ' + (data.message || 'Unknown error')
-                        });
+                        alert('Error reordering requirements: ' + (data.message || 'Unknown error'));
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: 'Error reordering requirements. Please try again.'
-                    });
+                    alert('Error reordering requirements. Please try again.');
                 });
             }
         });
