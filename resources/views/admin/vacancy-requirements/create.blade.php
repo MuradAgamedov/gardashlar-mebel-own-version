@@ -358,18 +358,35 @@ document.addEventListener('DOMContentLoaded', function() {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    body: JSON.stringify({ requirements: orderData })
+                    body: JSON.stringify({ requirements: orderData.map(item => item.id) })
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (!data.success) {
+                    if (data.success) {
+                        // Show success message
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Order Updated!',
+                            text: 'Requirements order has been updated successfully.',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    } else {
                         console.error('Reorder failed:', data.message);
-                        alert('Error reordering requirements: ' + data.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Error reordering requirements: ' + (data.message || 'Unknown error')
+                        });
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Error reordering requirements. Please try again.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Error reordering requirements. Please try again.'
+                    });
                 });
             }
         });

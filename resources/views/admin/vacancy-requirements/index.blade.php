@@ -201,13 +201,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (!data.success) {
+                    if (data.success) {
+                        // Show success message
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Order Updated!',
+                            text: 'Requirements order has been updated successfully.',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    } else {
                         console.error('Reorder failed:', data.message);
-                        alert('Error reordering requirements: ' + data.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Error reordering requirements: ' + (data.message || 'Unknown error')
+                        });
                     }
                 })
                 .catch(error => {
                     console.error('Reorder error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Error reordering requirements. Please try again.'
+                    });
                 });
             }
         });
