@@ -99,14 +99,11 @@
                                         
                                         <div class="mb-3">
                                             <label class="form-label">Məzmun *</label>
-                                                                                         <textarea class="form-control ckeditor @error("translates.{$language->id}.content") is-invalid @enderror" 
+                                                                                                                                      <textarea class="form-control ckeditor @error("translates.{$language->id}.content") is-invalid @enderror" 
                                                        name="translates[{{ $language->id }}][content]" 
                                                        id="editor-{{ $language->id }}"
                                                        rows="15"
-                                                       placeholder="Gizlilik siyasəti məzmununu daxil edin"
-                                                       required
-                                                       style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0;">{{ old("translates.{$language->id}.content", $translate?->content) }}</textarea>
-                                            <div id="ckeditor-container-{{ $language->id }}"></div>
+                                                       placeholder="Gizlilik siyasəti məzmununu daxil edin">{{ old("translates.{$language->id}.content", $translate?->content) }}</textarea>
                                             @error("translates.{$language->id}.content")
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
@@ -144,68 +141,41 @@
 <script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Form submit event listener
-    const form = document.getElementById('privacyPolicyForm');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            console.log('Form submit event triggered');
-            console.log('Form action:', form.action);
-            console.log('Form method:', form.method);
-            
-                         // Update all CKEditor content to textareas before submit
-             document.querySelectorAll('.ckeditor').forEach(function(textarea) {
-                 if (textarea.editor) {
-                     console.log('Updating CKEditor content for:', textarea.name);
-                     const content = textarea.editor.getData();
-                     textarea.value = content;
-                     console.log('CKEditor content updated:', content.substring(0, 100) + '...');
-                 }
-             });
-            
-            // Check if form data is valid
-            const formData = new FormData(form);
-            console.log('Form data:');
-            for (let [key, value] of formData.entries()) {
-                console.log(key + ': ' + value);
-            }
-            
-            // Don't prevent default - let it submit normally
-        });
-    }
+    // Remove required attribute from CKEditor textareas to prevent focus issues
+    document.querySelectorAll('.ckeditor').forEach(textarea => {
+        textarea.removeAttribute('required');
+    });
     
-    // Initialize CKEditor for each textarea
-    document.querySelectorAll('.ckeditor').forEach(function(textarea) {
-        const containerId = 'ckeditor-container-' + textarea.id.replace('editor-', '');
-        const container = document.getElementById(containerId);
-        
+    // Initialize CKEditor for all textareas with ckeditor class
+    const textareas = document.querySelectorAll('.ckeditor');
+    const editors = {};
+    
+    textareas.forEach((textarea, index) => {
         ClassicEditor
-            .create(container, {
-                toolbar: {
-                    items: [
-                        'undo', 'redo',
-                        '|', 'heading',
-                        '|', 'bold', 'italic', 'underline', 'strikethrough',
-                        '|', 'fontColor', 'fontBackgroundColor',
-                        '|', 'link', 'blockQuote', 'insertTable',
-                        '|', 'bulletedList', 'numberedList',
-                        '|', 'outdent', 'indent',
-                        '|', 'alignment',
-                        '|', 'removeFormat'
-                    ]
-                },
-                language: 'az',
-                placeholder: 'Gizlilik siyasəti məzmununu daxil edin...'
+            .create(textarea, {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', 'undo', 'redo'],
+                placeholder: textarea.getAttribute('placeholder'),
+                language: 'az'
             })
             .then(editor => {
-                // Store editor reference
-                textarea.editor = editor;
-                
-                // Set initial content
-                editor.setData(textarea.value);
+                editors[textarea.name] = editor;
             })
             .catch(error => {
-                console.error(error);
+                console.error('CKEditor error:', error);
             });
+    });
+    
+    // Update form data before submit using getData() method
+    document.querySelector('form').addEventListener('submit', function() {
+        Object.entries(editors).forEach(([name, editor]) => {
+            if (editor && editor.getData) {
+                const data = editor.getData();
+                const textarea = document.querySelector(`[name="${name}"]`);
+                if (textarea) {
+                    textarea.value = data;
+                }
+            }
+        });
     });
 });
 </script>
