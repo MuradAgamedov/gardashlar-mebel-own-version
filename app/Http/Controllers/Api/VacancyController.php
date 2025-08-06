@@ -231,8 +231,7 @@ class VacancyController extends Controller
                     return [
                         'id' => $requirement->id,
                         'title' => $reqTranslation ? $reqTranslation->title : '',
-                        'description' => $reqTranslation ? $reqTranslation->description : '',
-                        'order' => $requirement->order
+                        'description' => $reqTranslation ? $reqTranslation->description : ''
                     ];
                 });
 
