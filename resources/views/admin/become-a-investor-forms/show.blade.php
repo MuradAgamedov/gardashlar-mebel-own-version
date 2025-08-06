@@ -63,33 +63,7 @@
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Service:</label>
-                                    <p class="form-control-static">
-                                        @if($becomeAInvestorForm->service)
-                                            @php
-                                                $serviceTranslation = $becomeAInvestorForm->service->translates->first();
-                                            @endphp
-                                            <span class="badge bg-primary">
-                                                {{ $serviceTranslation ? $serviceTranslation->title : 'Service #' . $becomeAInvestorForm->service->id }}
-                                            </span>
-                                        @else
-                                            <span class="text-muted">No service</span>
-                                        @endif
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Mobile:</label>
-                                    <p class="form-control-static">
-                                        <a href="tel:{{ $becomeAInvestorForm->mobile }}">{{ $becomeAInvestorForm->mobile }}</a>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+
 
                         <div class="row">
                             <div class="col-md-6">

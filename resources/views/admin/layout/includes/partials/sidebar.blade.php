@@ -63,6 +63,19 @@
         </li>
 
         <li class="sidebar-list">
+          <a class="sidebar-link" href="{{ route('admin.service-forms.index') }}">
+            <i class="fas fa-cogs"></i>
+            <h6>Service Forms</h6>
+            @php
+              $unreadServiceForms = \App\Models\ServiceForm::where('is_read', false)->count();
+            @endphp
+            @if($unreadServiceForms > 0)
+              <span class="badge bg-danger ms-2">{{ $unreadServiceForms }}</span>
+            @endif
+          </a>
+        </li>
+
+        <li class="sidebar-list">
           <a class="sidebar-link" href="{{ route('admin.suggest-a-place-forms.index') }}">
             <i class="fas fa-map-marker-alt"></i>
             <h6>Place Forms</h6>

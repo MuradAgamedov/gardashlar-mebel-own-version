@@ -10,7 +10,7 @@ class BecomeAInvestorFormController extends Controller
 {
     public function index(Request $request)
     {
-        $query = BecomeAInvestorForm::with('service.translates');
+        $query = BecomeAInvestorForm::query();
 
         // Search functionality
         if ($request->filled('search')) {
@@ -31,11 +31,6 @@ class BecomeAInvestorFormController extends Controller
             }
         }
 
-        // Filter by service
-        if ($request->filled('service_id')) {
-            $query->where('service_id', $request->service_id);
-        }
-
         $forms = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return view('admin.become-a-investor-forms.index', compact('forms'));
@@ -47,8 +42,6 @@ class BecomeAInvestorFormController extends Controller
         if (!$becomeAInvestorForm->is_read) {
             $becomeAInvestorForm->markAsRead();
         }
-
-        $becomeAInvestorForm->load('service.translates');
 
         return view('admin.become-a-investor-forms.show', compact('becomeAInvestorForm'));
     }

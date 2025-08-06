@@ -35,8 +35,7 @@ class BecomeAInvestorFormController extends Controller
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
      *             @OA\Schema(
-     *                 required={"name", "mobile", "email", "message", "service_id"},
-     *                 @OA\Property(property="service_id", type="integer", example=1, description="Service ID"),
+     *                 required={"name", "mobile", "email", "message"},
      *                 @OA\Property(property="name", type="string", example="John Doe", description="Full name"),
      *                 @OA\Property(property="mobile", type="string", example="+994501234567", description="Mobile number"),
      *                 @OA\Property(property="email", type="string", format="email", example="john@example.com", description="Email address"),
@@ -54,7 +53,7 @@ class BecomeAInvestorFormController extends Controller
      *             @OA\Property(property="message", type="string", example="Form submitted successfully"),
      *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="service_id", type="integer", example=1),
+     *
      *                 @OA\Property(property="name", type="string", example="John Doe"),
      *                 @OA\Property(property="mobile", type="string", example="+994501234567"),
      *                 @OA\Property(property="email", type="string", example="john@example.com"),
@@ -90,15 +89,12 @@ class BecomeAInvestorFormController extends Controller
         try {
             // Validate request
             $validator = Validator::make($request->all(), [
-                'service_id' => 'required|integer|exists:services,id',
                 'name' => 'required|string|max:255',
                 'mobile' => 'required|string|max:20',
                 'email' => 'required|email|max:255',
                 'message' => 'required|string|max:1000',
                 'file' => 'nullable|file|max:10240|mimes:pdf,doc,docx'
             ], [
-                'service_id.required' => 'Service ID is required',
-                'service_id.exists' => 'Selected service does not exist',
                 'name.required' => 'Name is required',
                 'mobile.required' => 'Mobile number is required',
                 'email.required' => 'Email is required',
@@ -116,14 +112,7 @@ class BecomeAInvestorFormController extends Controller
                 ], 422);
             }
 
-            // Check if service exists and is active
-            $service = Service::active()->find($request->service_id);
-            if (!$service) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Selected service is not available'
-                ], 422);
-            }
+
 
             // Handle file upload
             $filePath = null;
@@ -133,7 +122,6 @@ class BecomeAInvestorFormController extends Controller
 
             // Create form submission
             $form = BecomeAInvestorForm::create([
-                'service_id' => $request->service_id,
                 'name' => $request->name,
                 'mobile' => $request->mobile,
                 'email' => $request->email,
@@ -147,7 +135,6 @@ class BecomeAInvestorFormController extends Controller
                 'message' => 'Form submitted successfully',
                 'data' => [
                     'id' => $form->id,
-                    'service_id' => $form->service_id,
                     'name' => $form->name,
                     'mobile' => $form->mobile,
                     'email' => $form->email,

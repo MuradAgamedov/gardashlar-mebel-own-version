@@ -39,6 +39,7 @@ use App\Http\Controllers\Api\SuggestAPlaceController;
 use App\Http\Controllers\Api\KivController;
 use App\Http\Controllers\Api\BecomeAPartnerFormController;
 use App\Http\Controllers\Api\BecomeAInvestorFormController;
+use App\Http\Controllers\Api\ServiceFormController;
 use App\Http\Controllers\Api\SuggestAPlaceFormController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SuggestionsComplaintsController;
@@ -181,6 +182,9 @@ Route::post('/become-a-partner-form', [BecomeAPartnerFormController::class, 'sto
 
 // Become A Investor Forms API Routes
 Route::post('/become-a-investor-forms', [BecomeAInvestorFormController::class, 'store'])->name('api.become-a-investor-forms.store');
+
+// Service Forms API Routes
+Route::post('/service-forms', [ServiceFormController::class, 'store'])->name('api.service-forms.store');
 
 // Suggest A Place Form API Routes
 Route::post('/suggest-a-place-form', [SuggestAPlaceFormController::class, 'store'])->name('api.suggest-a-place-form.store');

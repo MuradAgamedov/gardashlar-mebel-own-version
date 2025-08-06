@@ -76,6 +76,7 @@ use App\Http\Controllers\Admin\BlogImageController;
 use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\BecomeAPartnerFormController;
 use App\Http\Controllers\Admin\BecomeAInvestorFormController;
+use App\Http\Controllers\Admin\ServiceFormController;
 use App\Http\Controllers\Admin\SuggestAPlaceFormController;
 use App\Http\Controllers\Admin\SuggestionsComplaintsFormController;
 
@@ -392,6 +393,15 @@ Route::post('contact-messages/{id}/mark-as-read', [ContactMessageController::cla
         // Become A Investor Form routes
         Route::resource('become-a-investor-forms', BecomeAInvestorFormController::class)->only(['index', 'show', 'destroy']);
         Route::post('become-a-investor-forms/delete-selected', [BecomeAInvestorFormController::class, 'deleteSelected'])->name('become-a-investor-forms.delete-selected');
+
+// Service Forms Routes
+Route::resource('service-forms', ServiceFormController::class)->names([
+    'index' => 'service-forms.index',
+    'show' => 'service-forms.show',
+    'destroy' => 'service-forms.destroy'
+]);
+Route::post('service-forms/{id}/mark-as-read', [ServiceFormController::class, 'markAsRead'])->name('service-forms.markAsRead');
+Route::post('service-forms/delete-selected', [ServiceFormController::class, 'deleteSelected'])->name('service-forms.deleteSelected');
         Route::post('become-a-investor-forms/{id}/mark-as-read', [BecomeAInvestorFormController::class, 'markAsRead'])->name('become-a-investor-forms.mark-as-read');
         
         // Suggest A Place Form routes
