@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('language_id')->constrained('languages')->onDelete('cascade');
             $table->string('title');
             $table->text('description');
+            $table->string('form_title');
+            $table->text('form_description');
             $table->timestamps();
             $table->foreign('suggestions_complaints_id', 'fk_suggestions_complaints_translate_id')
                   ->references('id')
