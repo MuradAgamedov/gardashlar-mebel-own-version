@@ -133,8 +133,10 @@
 
                             <div class="row mt-4">
                                 <div class="col-12">
-                                    <button type="submit" class="btn btn-primary">Update Suggestions & Complaints</button>
-                                    <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">Cancel</a>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary">Update Suggestions & Complaints</button>
+                                        <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">Cancel</a>
+                                    </div>
                                 </div>
                             </div>
                         </form>
