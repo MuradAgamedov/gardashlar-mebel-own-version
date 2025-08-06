@@ -219,7 +219,7 @@ class ServiceController extends Controller
                     
                     return [
                         'id' => $advantage->id,
-                        'icon' => $advantage->icon,
+                        'icon' => $advantage->icon ? asset('storage/' . $advantage->icon) : '',
                         'title' => $advantageTranslation ? $advantageTranslation->title : '',
                         'icon_alt_text' => $advantageTranslation ? $advantageTranslation->icon_alt_text : '',
                         'description' => $advantageTranslation ? $advantageTranslation->description : ''
