@@ -43,6 +43,7 @@ use App\Http\Controllers\Api\SuggestAPlaceFormController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SuggestionsComplaintsController;
 use App\Http\Controllers\Api\SuggestionsComplaintsFormController;
+use App\Http\Controllers\Api\VacancyController;
 
 
 // Language API Routes
@@ -183,3 +184,6 @@ Route::get('/suggestions-complaints', [SuggestionsComplaintsController::class, '
 
 // Suggestions & Complaints Form API Routes
 Route::post('/suggestions-complaints-form', [SuggestionsComplaintsFormController::class, 'store'])->name('api.suggestions-complaints-form.store');
+
+// Vacancies API Routes
+Route::get('/vacancies', [VacancyController::class, 'index'])->name('api.vacancies.index');
