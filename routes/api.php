@@ -143,6 +143,7 @@ Route::get('/certificates', [CertificateController::class, 'index'])->name('api.
 
 // Services API Routes
 Route::get('/services', [ServiceController::class, 'index'])->name('api.services.index');
+Route::get('/services/{slug}', [ServiceController::class, 'show'])->name('api.services.show');
 
 // Service Static Data API Routes
 Route::get('/service-static-data', [ServiceStaticDataController::class, 'index'])->name('api.service-static-data.index');
