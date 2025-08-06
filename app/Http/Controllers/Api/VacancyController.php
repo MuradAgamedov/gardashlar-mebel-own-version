@@ -96,6 +96,7 @@ class VacancyController extends Controller
                     $translation = $vacancy->translates->first();
 
                     return [
+                        'id' => $vacancy->id,
                         'title' => $translation ? $translation->title : '',
                         'slug' => $translation ? $translation->slug : '',
                         'position' => $translation ? $translation->position : '',
