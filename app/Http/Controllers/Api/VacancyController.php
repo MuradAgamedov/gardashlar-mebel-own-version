@@ -92,7 +92,7 @@ class VacancyController extends Controller
                 ->notExpired()
                 ->ordered()
                 ->get()
-                ->map(function ($vacancy) {
+                ->map(function ($vacancy) use ($languageId) {
                     $translation = $vacancy->translates->first();
                     
                     // Get requirements for this vacancy
