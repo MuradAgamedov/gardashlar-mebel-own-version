@@ -14,7 +14,6 @@ class Suggestion extends Model
         'image',
         'order',
         'status',
-        'file',
         'pdf'
     ];
 

@@ -58,7 +58,7 @@
                                         <th width="80">Şəkil</th>
                                         <th>Başlıq</th>
                                         <th>Dillər</th>
-                                        <th width="100">Fayllar</th>
+                                        <th width="80">PDF</th>
                                         <th width="80">Status</th>
                                         <th width="150">Əməliyyatlar</th>
                                     </tr>
@@ -103,17 +103,11 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-1">
-                                                    @if($suggestion->file)
-                                                        <a href="{{ asset('storage/' . $suggestion->file) }}" target="_blank" class="btn btn-sm btn-outline-primary" title="Faylı yüklə">
-                                                            <i class="material-icons-outlined" style="font-size: 16px;">download</i>
-                                                        </a>
-                                                    @endif
                                                     @if($suggestion->pdf)
                                                         <a href="{{ asset('storage/' . $suggestion->pdf) }}" target="_blank" class="btn btn-sm btn-outline-danger" title="PDF yüklə">
                                                             <i class="material-icons-outlined" style="font-size: 16px;">picture_as_pdf</i>
                                                         </a>
-                                                    @endif
-                                                    @if(!$suggestion->file && !$suggestion->pdf)
+                                                    @else
                                                         <span class="text-muted">-</span>
                                                     @endif
                                                 </div>

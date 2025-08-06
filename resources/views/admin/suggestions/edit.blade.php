@@ -61,7 +61,7 @@
                                 <div class="col-md-12">
                                     <h6 class="mb-3">Media</h6>
                                     <div class="row">
-                                        <div class="col-md-4 mb-3">
+                                        <div class="col-md-6 mb-3">
                                             <label class="form-label">Şəkil</label>
                                             <div class="image-upload-container">
                                                 <input type="file" 
@@ -89,30 +89,7 @@
                                                 <div class="image-preview mt-2" id="image-preview"></div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label class="form-label">Fayl</label>
-                                            <input type="file" 
-                                                   class="form-control @error('file') is-invalid @enderror" 
-                                                   name="file" 
-                                                   accept=".doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar">
-                                            @error('file')
-                                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                            @enderror
-                                            <div class="form-text">Maksimum ölçü: 10MB. Formatlar: DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, ZIP, RAR</div>
-                                            
-                                            @if($suggestion->file)
-                                                <div class="mt-2">
-                                                    <label class="form-label">Mövcud Fayl:</label>
-                                                    <div class="current-file">
-                                                        <a href="{{ asset('storage/' . $suggestion->file) }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                                            <i class="material-icons-outlined">download</i>
-                                                            Faylı Yüklə
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        </div>
-                                        <div class="col-md-4 mb-3">
+                                        <div class="col-md-6 mb-3">
                                             <label class="form-label">PDF</label>
                                             <input type="file" 
                                                    class="form-control @error('pdf') is-invalid @enderror" 
