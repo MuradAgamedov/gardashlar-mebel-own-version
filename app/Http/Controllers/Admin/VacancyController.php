@@ -105,7 +105,7 @@ class VacancyController extends Controller
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error creating vacancy: ' . $e->getMessage())
+                ->withErrors(['error' => 'Error creating vacancy: ' . $e->getMessage()])
                 ->withInput();
         }
     }
@@ -200,7 +200,7 @@ class VacancyController extends Controller
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating vacancy: ' . $e->getMessage())
+                ->withErrors(['error' => 'Error updating vacancy: ' . $e->getMessage()])
                 ->withInput();
         }
     }

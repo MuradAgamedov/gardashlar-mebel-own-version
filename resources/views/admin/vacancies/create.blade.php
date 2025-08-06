@@ -280,6 +280,14 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Auto-switch to first tab with errors on page load
+    const tabsWithErrors = document.querySelectorAll('.nav-link .fa-exclamation-triangle.text-danger');
+    if (tabsWithErrors.length > 0) {
+        const firstErrorTab = tabsWithErrors[0].closest('.nav-link');
+        const tab = new bootstrap.Tab(firstErrorTab);
+        tab.show();
+    }
+
     // Auto-switch to first tab with errors on form submission
     const form = document.querySelector('form');
     form.addEventListener('submit', function(e) {
@@ -289,7 +297,21 @@ document.addEventListener('DOMContentLoaded', function() {
             const firstErrorTab = tabsWithErrors[0].closest('.nav-link');
             const tab = new bootstrap.Tab(firstErrorTab);
             tab.show();
+            
+            // Scroll to first error field
+            const firstErrorField = document.querySelector('.is-invalid');
+            if (firstErrorField) {
+                firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
+    });
+
+    // Highlight error fields on focus
+    document.querySelectorAll('.is-invalid').forEach(function(field) {
+        field.addEventListener('focus', function() {
+            this.style.borderColor = '#dc3545';
+            this.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+        });
     });
 });
 </script>
@@ -300,6 +322,26 @@ document.addEventListener('DOMContentLoaded', function() {
     margin-top: 0.25rem;
     font-size: 0.875em;
     color: #dc3545;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.nav-link .fa-exclamation-triangle.text-danger {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.form-control.is-invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
 }
 </style>
 @endpush 
