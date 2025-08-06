@@ -29,7 +29,7 @@ class PolicyPagesSeeder extends Seeder
         $languages = Language::all();
 
         // Privacy Policy
-        $privacyPolicy = PrivacyPolicy::firstOrCreate(['status' => true]);
+        $privacyPolicy = PrivacyPolicy::firstOrCreate();
         foreach ($languages as $language) {
             PrivacyPolicyTranslate::firstOrCreate(
                 [
@@ -43,7 +43,7 @@ class PolicyPagesSeeder extends Seeder
         }
 
         // Customer Rights
-        $customerRights = CustomerRights::firstOrCreate(['status' => true]);
+        $customerRights = CustomerRights::firstOrCreate();
         foreach ($languages as $language) {
             CustomerRightsTranslate::firstOrCreate(
                 [
@@ -57,7 +57,7 @@ class PolicyPagesSeeder extends Seeder
         }
 
         // Delivery Payment
-        $deliveryPayment = DeliveryPayment::firstOrCreate(['status' => true]);
+        $deliveryPayment = DeliveryPayment::firstOrCreate();
         foreach ($languages as $language) {
             DeliveryPaymentTranslate::firstOrCreate(
                 [
@@ -71,7 +71,7 @@ class PolicyPagesSeeder extends Seeder
         }
 
         // Warranty Policy
-        $warrantyPolicy = WarrantyPolicy::firstOrCreate(['status' => true]);
+        $warrantyPolicy = WarrantyPolicy::firstOrCreate();
         foreach ($languages as $language) {
             WarrantyPolicyTranslate::firstOrCreate(
                 [
@@ -85,7 +85,7 @@ class PolicyPagesSeeder extends Seeder
         }
 
         // Refund Policy
-        $refundPolicy = RefundPolicy::firstOrCreate(['status' => true]);
+        $refundPolicy = RefundPolicy::firstOrCreate();
         foreach ($languages as $language) {
             RefundPolicyTranslate::firstOrCreate(
                 [
@@ -99,7 +99,7 @@ class PolicyPagesSeeder extends Seeder
         }
 
         // Company Management
-        $companyManagement = CompanyManagement::firstOrCreate(['status' => true]);
+        $companyManagement = CompanyManagement::firstOrCreate();
         foreach ($languages as $language) {
             CompanyManagementTranslate::firstOrCreate(
                 [
@@ -113,7 +113,7 @@ class PolicyPagesSeeder extends Seeder
         }
 
         // Site Usage Rules
-        $siteUsageRules = SiteUsageRules::firstOrCreate(['status' => true]);
+        $siteUsageRules = SiteUsageRules::firstOrCreate();
         foreach ($languages as $language) {
             SiteUsageRulesTranslate::firstOrCreate(
                 [
