@@ -47,7 +47,6 @@
                             <div class="d-flex gap-2">
                                                                  <button type="button" class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
                                      <i class="material-icons-outlined">delete</i>
-                                     Seçilənləri Sil
                                  </button>
                                 <a href="{{ route('admin.suggestions.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
