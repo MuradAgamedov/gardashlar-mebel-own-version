@@ -33,9 +33,7 @@ class PrivacyPolicyController extends Controller
      *                 property="data",
      *                 type="object",
      *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="content", type="string", example="<p>Gizlilik siyasəti məzmunu...</p>"),
-     *                 @OA\Property(property="language_id", type="integer", example=1),
-     *                 @OA\Property(property="language_code", type="string", example="az")
+     *                 @OA\Property(property="content", type="string", example="<p>Gizlilik siyasəti məzmunu...</p>")
      *             )
      *         )
      *     ),
@@ -90,9 +88,7 @@ class PrivacyPolicyController extends Controller
 
             $privacyPolicyData = [
                 'id' => $privacyPolicy->id,
-                'content' => $translation ? $translation->content : '',
-                'language_id' => (int)$languageId,
-                'language_code' => $language->lang_code
+                'content' => $translation ? $translation->content : ''
             ];
 
             return response()->json([
