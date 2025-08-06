@@ -75,12 +75,9 @@ class SuggestionsComplaintsController extends Controller
             $cacheKey = "api_suggestions_complaints_{$languageId}";
             
             $suggestionsComplaints = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                $item = SuggestionsComplaints::with(['translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                }])
-                ->getFirstOrCreate();
+                $item = SuggestionsComplaints::getFirstOrCreate();
                 
-                $translation = $item->translates->first();
+                $translation = $item->translates()->where('language_id', $languageId)->first();
                 
                 return [
                     'id' => $item->id,
