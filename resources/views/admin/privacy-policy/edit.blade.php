@@ -99,13 +99,13 @@
                                         
                                         <div class="mb-3">
                                             <label class="form-label">Məzmun *</label>
-                                            <textarea class="form-control ckeditor @error("translates.{$language->id}.content") is-invalid @enderror" 
-                                                      name="translates[{{ $language->id }}][content]" 
-                                                      id="editor-{{ $language->id }}"
-                                                      rows="15"
-                                                      placeholder="Gizlilik siyasəti məzmununu daxil edin"
-                                                      required
-                                                      style="display: none;">{{ old("translates.{$language->id}.content", $translate?->content) }}</textarea>
+                                                                                         <textarea class="form-control ckeditor @error("translates.{$language->id}.content") is-invalid @enderror" 
+                                                       name="translates[{{ $language->id }}][content]" 
+                                                       id="editor-{{ $language->id }}"
+                                                       rows="15"
+                                                       placeholder="Gizlilik siyasəti məzmununu daxil edin"
+                                                       required
+                                                       style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0;">{{ old("translates.{$language->id}.content", $translate?->content) }}</textarea>
                                             <div id="ckeditor-container-{{ $language->id }}"></div>
                                             @error("translates.{$language->id}.content")
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -152,14 +152,15 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Form action:', form.action);
             console.log('Form method:', form.method);
             
-            // Update all CKEditor content to textareas before submit
-            document.querySelectorAll('.ckeditor').forEach(function(textarea) {
-                if (textarea.editor) {
-                    console.log('Updating CKEditor content for:', textarea.name);
-                    textarea.editor.updateSourceElement();
-                    console.log('CKEditor content updated');
-                }
-            });
+                         // Update all CKEditor content to textareas before submit
+             document.querySelectorAll('.ckeditor').forEach(function(textarea) {
+                 if (textarea.editor) {
+                     console.log('Updating CKEditor content for:', textarea.name);
+                     const content = textarea.editor.getData();
+                     textarea.value = content;
+                     console.log('CKEditor content updated:', content.substring(0, 100) + '...');
+                 }
+             });
             
             // Check if form data is valid
             const formData = new FormData(form);
