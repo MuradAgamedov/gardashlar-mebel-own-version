@@ -32,7 +32,6 @@ class DatabaseSeeder extends Seeder
             BlogPostSeeder::class, // Added this line
             CertificateSeeder::class,
             ServiceSeeder::class,
-            ServiceAdvantageSeeder::class,
             ServiceStaticDataSeeder::class,
             IndividualProjectOrderSeeder::class,
             FaqSeeder::class,
