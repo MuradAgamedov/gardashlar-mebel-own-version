@@ -94,40 +94,13 @@ class VacancyController extends Controller
                 ->get()
                 ->map(function ($vacancy) use ($languageId) {
                     $translation = $vacancy->translates->first();
-                    
-                    // Get requirements for this vacancy
-                    $requirements = $vacancy->requirements()
-                        ->with(['translates' => function($query) use ($languageId) {
-                            $query->where('language_id', $languageId);
-                        }])
-                        ->active()
-                        ->ordered()
-                        ->get()
-                        ->map(function ($requirement) use ($languageId) {
-                            $reqTranslation = $requirement->translates->first();
-                            return [
-                                'id' => $requirement->id,
-                                'title' => $reqTranslation ? $reqTranslation->title : '',
-                                'description' => $reqTranslation ? $reqTranslation->description : '',
-                                'order' => $requirement->order,
-                                'status' => $requirement->status
-                            ];
-                        });
 
                     return [
-                        'id' => $vacancy->id,
                         'title' => $translation ? $translation->title : '',
                         'slug' => $translation ? $translation->slug : '',
                         'position' => $translation ? $translation->position : '',
                         'experience' => $translation ? $translation->experience : '',
-                        'work_schedule' => $translation ? $translation->work_schedule : '',
-                        'email' => $vacancy->email,
-                        'address' => $vacancy->address,
-                        'last_apply_date' => $vacancy->last_apply_date->format('Y-m-d'),
-                        'order' => $vacancy->order,
-                        'status' => $vacancy->status,
-                        'is_expired' => $vacancy->is_expired,
-                        'requirements' => $requirements
+                        'last_apply_date' => $vacancy->last_apply_date->format('Y-m-d')
                     ];
                 });
             });
