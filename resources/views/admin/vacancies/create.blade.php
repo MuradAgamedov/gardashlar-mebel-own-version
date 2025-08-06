@@ -145,6 +145,20 @@
                                                     </div>
                                                     
                                                     <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Slug</label>
+                                                        <input type="text" 
+                                                               class="form-control @error("translations.{$language->id}.slug") is-invalid @enderror" 
+                                                               name="translations[{{ $language->id }}][slug]" 
+                                                               value="{{ old("translations.{$language->id}.slug") }}"
+                                                               placeholder="Auto-generated slug for {{ $language->lang_code }}">
+                                                        @error("translations.{$language->id}.slug")
+                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="row mt-3">
+                                                    <div class="col-md-6 mb-3">
                                                         <label class="form-label">Position <span class="text-danger">*</span></label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.position") is-invalid @enderror" 
@@ -262,6 +276,8 @@
     </div>
 </div>
 @endsection
+
+@include('admin.partials.slug-generator')
 
 @push('scripts')
 <script>
