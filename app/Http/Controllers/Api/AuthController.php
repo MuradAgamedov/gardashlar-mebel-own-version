@@ -33,6 +33,7 @@ class AuthController extends Controller
             'email' => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'password_confirmation' => 'required|string|min:6',
+            'otp_code' => 'required|string|size:6',
         ], [
             'full_name.required' => 'Ad və soyad məcburidir',
             'phone.nullable' => 'Telefon nömrəsi seçimlidir',
@@ -43,6 +44,8 @@ class AuthController extends Controller
             'password.min' => 'Şifrə ən azı 6 simvol olmalıdır',
             'password.confirmed' => 'Şifrə təkrarı düzgün deyil',
             'password_confirmation.required' => 'Şifrə təkrarı məcburidir',
+            'otp_code.required' => 'OTP kodu məcburidir',
+            'otp_code.size' => 'OTP kodu 6 simvol olmalıdır',
         ]);
 
         // Custom validation: either phone or email must be provided
@@ -57,6 +60,24 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'Validation failed',
                 'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Verify OTP
+        $otpVerified = false;
+        if (!empty($request->email)) {
+            $otpVerified = $this->emailService->verifyOTP($request->email, $request->otp_code);
+        } elseif (!empty($request->phone)) {
+            $otpVerified = $this->phoneService->verifyOTP($request->phone, $request->otp_code);
+        }
+
+        if (!$otpVerified) {
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP kodu düzgün deyil və ya vaxtı keçib',
+                'errors' => [
+                    'otp_code' => ['OTP kodu düzgün deyil və ya vaxtı keçib']
+                ]
             ], 422);
         }
 
