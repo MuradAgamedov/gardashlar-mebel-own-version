@@ -53,6 +53,7 @@ use App\Http\Controllers\Api\RefundPolicyController;
 use App\Http\Controllers\Api\CompanyManagementController;
 use App\Http\Controllers\Api\SiteUsageRulesController;
 use App\Http\Controllers\Api\SuggestionController;
+use App\Http\Controllers\Api\AuthController;
 
 
 // Language API Routes
@@ -226,3 +227,7 @@ Route::get('/site-usage-rules', [SiteUsageRulesController::class, 'index'])->nam
 // Suggestions API Routes
 Route::get('/suggestions', [SuggestionController::class, 'index'])->name('api.suggestions.index');
 Route::get('/suggestions/{id}', [SuggestionController::class, 'show'])->name('api.suggestions.show');
+
+// Auth API Routes
+Route::post('/register', [AuthController::class, 'register'])->name('api.auth.register');
+Route::post('/send-otp', [AuthController::class, 'sendOTP'])->name('api.auth.send-otp');
