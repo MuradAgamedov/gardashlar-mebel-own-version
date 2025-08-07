@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\OtpCode;
+use App\Mail\OTPMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -32,12 +33,10 @@ class EmailService
                 'is_used' => false
             ]);
 
-            // For now, we'll just log the OTP
-            // In production, you would send actual email
-            \Log::info("OTP sent to email: {$email}, OTP: {$otp}");
+            // Send actual email
+            Mail::to($email)->send(new OTPMail($otp));
             
-            // TODO: Implement actual email sending
-            // Mail::to($email)->send(new OTPMail($otp));
+            \Log::info("OTP sent to email: {$email}, OTP: {$otp}");
             
             return true;
         } catch (\Exception $e) {

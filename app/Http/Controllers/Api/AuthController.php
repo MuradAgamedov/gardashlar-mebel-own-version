@@ -86,26 +86,33 @@ class AuthController extends Controller
                 $contactInfo = $request->phone;
             }
 
+            // If OTP sending failed, delete the user and return error
+            if (!$otpSent) {
+                $user->delete(); // Delete the created user
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP kodu göndərilə bilmədi. Zəhmət olmasa yenidən cəhd edin.',
+                    'errors' => [
+                        'otp' => ['OTP kodu göndərilə bilmədi']
+                    ]
+                ], 500);
+            }
+
             $response = [
                 'success' => true,
-                'message' => 'İstifadəçi uğurla qeydiyyatdan keçdi',
+                'message' => 'İstifadəçi uğurla qeydiyyatdan keçdi və OTP kodu göndərildi',
                 'data' => [
                     'user' => [
                         'id' => $user->id,
                         'full_name' => $user->full_name,
                         'phone' => $user->phone,
                         'email' => $user->email,
-                    ]
+                    ],
+                    'otp_sent' => true,
+                    'contact_type' => $contactType,
+                    'contact_info' => $contactInfo
                 ]
             ];
-
-            // Add OTP info to response if sent successfully
-            if ($otpSent) {
-                $response['data']['otp_sent'] = true;
-                $response['data']['contact_type'] = $contactType;
-                $response['data']['contact_info'] = $contactInfo;
-                $response['message'] .= ' və OTP kodu göndərildi';
-            }
 
             return response()->json($response, 201);
 
