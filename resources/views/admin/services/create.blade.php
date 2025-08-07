@@ -113,7 +113,7 @@
                                                             
                                                             <div class="col-md-12 mb-3">
                                                                 <label class="form-label">Main Description *</label>
-                                                                <textarea class="form-control @error('translates.'.$index.'.main_description') is-invalid @enderror" 
+                                                                <textarea class="form-control ckeditor @error('translates.'.$index.'.main_description') is-invalid @enderror" 
                                                                           name="translates[{{ $index }}][main_description]" 
                                                                           rows="5" 
                                                                           placeholder="Enter main description">{{ old('translates.'.$index.'.main_description') }}</textarea>
