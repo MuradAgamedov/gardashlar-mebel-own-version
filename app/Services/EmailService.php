@@ -33,16 +33,23 @@ class EmailService
                 'is_used' => false
             ]);
 
+            \Log::info("Attempting to send OTP to email: {$email}, OTP: {$otp}");
+            
             // Send actual email
             Mail::to($email)->send(new OTPMail($otp));
             
-            \Log::info("OTP sent to email: {$email}, OTP: {$otp}");
+            \Log::info("OTP email sent successfully to: {$email}, OTP: {$otp}");
             
             return true;
         } catch (\Exception $e) {
             \Log::error("Failed to send OTP to email: {$email}", [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
+            
+            // Also log to console for immediate debugging
+            error_log("Email sending failed for {$email}: " . $e->getMessage());
+            
             return false;
         }
     }
@@ -55,17 +62,19 @@ class EmailService
         $otpRecord = OtpCode::findValidOtp($email, 'email');
         
         if (!$otpRecord) {
+            \Log::warning("No valid OTP found for email: {$email}");
             return false;
         }
 
         if ($otpRecord->otp_code !== $otp) {
+            \Log::warning("Invalid OTP for email: {$email}, provided: {$otp}, expected: {$otpRecord->otp_code}");
             return false;
         }
 
         // Mark OTP as used
         $otpRecord->markAsUsed();
         
-        \Log::info("OTP verified for email: {$email}, OTP: {$otp}");
+        \Log::info("OTP verified successfully for email: {$email}, OTP: {$otp}");
         return true;
     }
 } 
