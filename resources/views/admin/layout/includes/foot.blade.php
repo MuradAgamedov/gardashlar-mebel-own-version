@@ -61,6 +61,9 @@
 <script src="{{ asset('admin/assets/js/sweetalert/sweetalert2.min.js') }}"></script>
 <script src="{{ asset('admin/assets/js/sweetalert/sweetalert-custom.js') }}"></script>
 
+<!-- CKEditor -->
+<script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
+
 <!-- custom script -->
 <script src="{{ asset('admin/assets/js/script.js') }}"></script>
 

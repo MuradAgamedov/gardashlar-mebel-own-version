@@ -123,6 +123,17 @@
                                                             </div>
                                                             
                                                             <div class="col-md-12 mb-3">
+                                                                <label class="form-label">Form Top Text</label>
+                                                                <textarea class="form-control ckeditor @error('translates.'.$index.'.form_top_text') is-invalid @enderror" 
+                                                                          name="translates[{{ $index }}][form_top_text]" 
+                                                                          rows="5" 
+                                                                          placeholder="Enter form top text">{{ old('translates.'.$index.'.form_top_text') }}</textarea>
+                                                                @error('translates.'.$index.'.form_top_text')
+                                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                                @enderror
+                                                            </div>
+                                                            
+                                                            <div class="col-md-12 mb-3">
                                                                 <label class="form-label">SEO Title</label>
                                                                 <input type="text" 
                                                                        class="form-control @error('translates.'.$index.'.seo_title') is-invalid @enderror" 
@@ -185,4 +196,30 @@
 </div>
 @endsection
 
-@include('admin.partials.slug-generator') 
+@include('admin.partials.slug-generator')
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize CKEditor for all ckeditor textareas
+    const ckeditorElements = document.querySelectorAll('.ckeditor');
+    ckeditorElements.forEach(function(element) {
+        ClassicEditor
+            .create(element, {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', 'undo', 'redo'],
+                heading: {
+                    options: [
+                        { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                        { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                        { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+                        { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
+                    ]
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+});
+</script>
+@endpush 

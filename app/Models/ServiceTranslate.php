@@ -19,7 +19,8 @@ class ServiceTranslate extends Model
         'main_description',
         'seo_title',
         'seo_keywords',
-        'seo_description'
+        'seo_description',
+        'form_top_text'
     ];
 
     protected $casts = [
