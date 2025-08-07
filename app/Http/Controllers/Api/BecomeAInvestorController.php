@@ -23,9 +23,53 @@ class BecomeAInvestorController extends Controller
      *     summary="Get become a investor data with advantages",
      *     description="Returns become a investor information with all active advantages",
      *     @OA\Parameter(name="locale", in="header", description="Language ID (1=En, 3=Az)", required=true, @OA\Schema(type="integer", example=3)),
-     *     @OA\Response(response=200, description="Successful response", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=true), @OA\Property(property="message", type="string", example="Become a investor data retrieved successfully"), @OA\Property(property="data", type="object", @OA\Property(property="id", type="integer", example=1), @OA\Property(property="content", type="string", example="Invest in our company and grow your wealth..."), @OA\Property(property="advantages", type="array", @OA\Items(type="object", @OA\Property(property="id", type="integer", example=1), @OA\Property(property="icon", type="string", example="https://example.com/storage/become-a-investor-advantages/icon.svg"), @OA\Property(property="title", type="string", example="High Returns"), @OA\Property(property="description", type="string", example="Get high returns on your investment..."), @OA\Property(property="icon_alt_text", type="string", example="High returns icon"))))),
-     *     @OA\Response(response=404, description="Become a investor data not found", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=false), @OA\Property(property="message", type="string", example="Become a investor data not found"), @OA\Property(property="data", type="object"))),
-     *     @OA\Response(response=500, description="Internal server error", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=false), @OA\Property(property="message", type="string", example="Error retrieving become a investor data"), @OA\Property(property="data", type="object")))
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Become a investor data retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="content", type="string", example="Invest in our company and grow your wealth..."),
+     *                 @OA\Property(
+     *                     property="advantages",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="icon", type="string", example="https://example.com/storage/become-a-investor-advantages/icon.svg"),
+     *                         @OA\Property(property="title", type="string", example="High Returns"),
+     *                         @OA\Property(property="description", type="string", example="Get high returns on your investment..."),
+     *                         @OA\Property(property="icon_alt_text", type="string", example="High returns icon")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Become a investor data not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Become a investor data not found"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error retrieving become a investor data"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     )
      * )
      */
     public function index(Request $request): JsonResponse

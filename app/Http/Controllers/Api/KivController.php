@@ -22,10 +22,40 @@ class KivController extends Controller
      *     tags={"KIVs"},
      *     summary="Get KIVs grouped by categories",
      *     description="Returns KIVs organized by categories with translations",
-     *     @OA\Parameter(name="locale", in="header", description="Language ID (1=En, 3=Az)", required=true, @OA\Schema(type="integer", example=3)),
-     *     @OA\Response(response=200, description="Successful response", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=true), @OA\Property(property="message", type="string", example="KIVs retrieved successfully"), @OA\Property(property="data", type="array", @OA\Items(type="object", @OA\Property(property="id", type="integer", example=1), @OA\Property(property="title", type="string", example="Category Title"), @OA\Property(property="kivs", type="array", @OA\Items(type="object", @OA\Property(property="id", type="integer", example=1), @OA\Property(property="image", type="string", example="https://example.com/storage/kivs/image.jpg"), @OA\Property(property="video_id", type="string", example="RACNuuviPcM"), @OA\Property(property="video_link", type="string", example="https://www.youtube.com/watch?v=RACNuuviPcM"))))))),
-     *     @OA\Response(response=404, description="No KIVs found", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=false), @OA\Property(property="message", type="string", example="No KIVs found"), @OA\Property(property="data", type="array"))),
-     *     @OA\Response(response=500, description="Internal server error", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=false), @OA\Property(property="message", type="string", example="Error retrieving KIVs"), @OA\Property(property="data", type="array")))
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language ID (1=En, 3=Az)",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=3)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="KIVs retrieved successfully"),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No KIVs found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="No KIVs found"),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error retrieving KIVs"),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
      * )
      */
     public function index(Request $request): JsonResponse

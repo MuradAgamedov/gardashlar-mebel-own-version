@@ -232,3 +232,9 @@ Route::get('/suggestions/{id}', [SuggestionController::class, 'show'])->name('ap
 Route::post('/register', [AuthController::class, 'register'])->name('api.auth.register');
 Route::post('/send-otp', [AuthController::class, 'sendOTP'])->name('api.auth.send-otp');
 Route::post('/verify-otp', [AuthController::class, 'verifyOTP'])->name('api.auth.verify-otp');
+Route::post('/login', [AuthController::class, 'login'])->name('api.auth.login');
+
+// Protected routes (require authentication)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('api.auth.logout');
+});
