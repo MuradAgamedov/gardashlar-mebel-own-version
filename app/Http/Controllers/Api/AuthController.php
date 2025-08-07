@@ -33,7 +33,6 @@ class AuthController extends Controller
             'email' => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'password_confirmation' => 'required|string|min:6',
-            'otp_code' => 'required|string|size:6',
         ], [
             'full_name.required' => 'Ad və soyad məcburidir',
             'phone.nullable' => 'Telefon nömrəsi seçimlidir',
@@ -44,8 +43,6 @@ class AuthController extends Controller
             'password.min' => 'Şifrə ən azı 6 simvol olmalıdır',
             'password.confirmed' => 'Şifrə təkrarı düzgün deyil',
             'password_confirmation.required' => 'Şifrə təkrarı məcburidir',
-            'otp_code.required' => 'OTP kodu məcburidir',
-            'otp_code.size' => 'OTP kodu 6 simvol olmalıdır',
         ]);
 
         // Custom validation: either phone or email must be provided
@@ -63,25 +60,8 @@ class AuthController extends Controller
             ], 422);
         }
 
-        // Verify OTP
-        $otpVerified = false;
-        if (!empty($request->email)) {
-            $otpVerified = $this->emailService->verifyOTP($request->email, $request->otp_code);
-        } elseif (!empty($request->phone)) {
-            $otpVerified = $this->phoneService->verifyOTP($request->phone, $request->otp_code);
-        }
-
-        if (!$otpVerified) {
-            return response()->json([
-                'success' => false,
-                'message' => 'OTP kodu düzgün deyil və ya vaxtı keçib',
-                'errors' => [
-                    'otp_code' => ['OTP kodu düzgün deyil və ya vaxtı keçib']
-                ]
-            ], 422);
-        }
-
         try {
+            // Create user first
             $user = User::create([
                 'full_name' => $request->full_name,
                 'phone' => $request->phone,
@@ -89,7 +69,24 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
             ]);
 
-            return response()->json([
+            // Send OTP automatically after registration
+            $otpSent = false;
+            $contactType = '';
+            $contactInfo = '';
+
+            if (!empty($request->email)) {
+                $otp = $this->emailService->generateOTP();
+                $otpSent = $this->emailService->sendOTP($request->email, $otp);
+                $contactType = 'email';
+                $contactInfo = $request->email;
+            } elseif (!empty($request->phone)) {
+                $otp = $this->phoneService->generateOTP();
+                $otpSent = $this->phoneService->sendOTP($request->phone, $otp);
+                $contactType = 'phone';
+                $contactInfo = $request->phone;
+            }
+
+            $response = [
                 'success' => true,
                 'message' => 'İstifadəçi uğurla qeydiyyatdan keçdi',
                 'data' => [
@@ -100,7 +97,17 @@ class AuthController extends Controller
                         'email' => $user->email,
                     ]
                 ]
-            ], 201);
+            ];
+
+            // Add OTP info to response if sent successfully
+            if ($otpSent) {
+                $response['data']['otp_sent'] = true;
+                $response['data']['contact_type'] = $contactType;
+                $response['data']['contact_info'] = $contactInfo;
+                $response['message'] .= ' və OTP kodu göndərildi';
+            }
+
+            return response()->json($response, 201);
 
         } catch (\Exception $e) {
             return response()->json([
