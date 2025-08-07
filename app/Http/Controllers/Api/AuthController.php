@@ -138,6 +138,12 @@ class AuthController extends Controller
             return response()->json($response, 201);
 
         } catch (\Exception $e) {
+            \Log::error('Registration error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $request->all()
+            ]);
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Qeydiyyat zamanı xəta baş verdi',
