@@ -33,7 +33,6 @@ class AuthController extends Controller
             'email' => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'password_confirmation' => 'required|string|min:6',
-            'otp_code' => 'required|string|size:6',
         ], [
             'full_name.required' => 'Ad və soyad məcburidir',
             'phone.nullable' => 'Telefon nömrəsi seçimlidir',
@@ -44,8 +43,6 @@ class AuthController extends Controller
             'password.min' => 'Şifrə ən azı 6 simvol olmalıdır',
             'password.confirmed' => 'Şifrə təkrarı düzgün deyil',
             'password_confirmation.required' => 'Şifrə təkrarı məcburidir',
-            'otp_code.required' => 'OTP kodu məcburidir',
-            'otp_code.size' => 'OTP kodu 6 simvol olmalıdır',
         ]);
 
         // Custom validation: either phone or email must be provided
@@ -60,24 +57,6 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => 'Validation failed',
                 'errors' => $validator->errors()
-            ], 422);
-        }
-
-        // Verify OTP
-        $otpVerified = false;
-        if (!empty($request->email)) {
-            $otpVerified = $this->emailService->verifyOTP($request->email, $request->otp_code);
-        } elseif (!empty($request->phone)) {
-            $otpVerified = $this->phoneService->verifyOTP($request->phone, $request->otp_code);
-        }
-
-        if (!$otpVerified) {
-            return response()->json([
-                'success' => false,
-                'message' => 'OTP kodu düzgün deyil və ya vaxtı keçib',
-                'errors' => [
-                    'otp_code' => ['OTP kodu düzgün deyil və ya vaxtı keçib']
-                ]
             ], 422);
         }
 
@@ -180,6 +159,82 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'OTP göndərilməsi zamanı xəta baş verdi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Verify OTP
+     */
+    public function verifyOTP(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email',
+            'otp_code' => 'required|string|size:6',
+        ], [
+            'phone.nullable' => 'Telefon nömrəsi seçimlidir',
+            'email.nullable' => 'Email ünvanı seçimlidir',
+            'email.email' => 'Düzgün email ünvanı daxil edin',
+            'otp_code.required' => 'OTP kodu məcburidir',
+            'otp_code.size' => 'OTP kodu 6 simvol olmalıdır',
+        ]);
+
+        // Custom validation: either phone or email must be provided
+        $validator->after(function ($validator) use ($request) {
+            if (empty($request->phone) && empty($request->email)) {
+                $validator->errors()->add('contact_info', 'Telefon nömrəsi və ya email ünvanından ən azı biri məcburidir');
+            }
+        });
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $otpVerified = false;
+            $contactType = '';
+            $contactInfo = '';
+
+            if (!empty($request->email)) {
+                $otpVerified = $this->emailService->verifyOTP($request->email, $request->otp_code);
+                $contactType = 'email';
+                $contactInfo = $request->email;
+            } elseif (!empty($request->phone)) {
+                $otpVerified = $this->phoneService->verifyOTP($request->phone, $request->otp_code);
+                $contactType = 'phone';
+                $contactInfo = $request->phone;
+            }
+
+            if ($otpVerified) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'OTP kodu uğurla təsdiqləndi',
+                    'data' => [
+                        'contact_type' => $contactType,
+                        'contact_info' => $contactInfo,
+                        'verified' => true
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP kodu düzgün deyil və ya vaxtı keçib',
+                    'errors' => [
+                        'otp_code' => ['OTP kodu düzgün deyil və ya vaxtı keçib']
+                    ]
+                ], 422);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP təsdiqləməsi zamanı xəta baş verdi',
                 'error' => $e->getMessage()
             ], 500);
         }

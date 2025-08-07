@@ -231,3 +231,4 @@ Route::get('/suggestions/{id}', [SuggestionController::class, 'show'])->name('ap
 // Auth API Routes
 Route::post('/register', [AuthController::class, 'register'])->name('api.auth.register');
 Route::post('/send-otp', [AuthController::class, 'sendOTP'])->name('api.auth.send-otp');
+Route::post('/verify-otp', [AuthController::class, 'verifyOTP'])->name('api.auth.verify-otp');
