@@ -101,10 +101,13 @@ class AuthController extends Controller
                     $otpSent = false;
                 }
             } elseif (!empty($request->phone)) {
-                $otp = $this->phoneService->generateOTP();
-                $otpSent = $this->phoneService->sendOTP($request->phone, $otp);
-                $contactType = 'phone';
-                $contactInfo = $request->phone;
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Telefon nömrəsi ilə qeydiyyat hələ mövcud deyil',
+                    'errors' => [
+                        'phone' => ['Telefon nömrəsi ilə qeydiyyat hələ mövcud deyil']
+                    ]
+                ], 422);
             }
 
             // If OTP sending failed, delete the user and return error
@@ -197,19 +200,13 @@ class AuthController extends Controller
                     ]);
                 }
             } elseif (!empty($request->phone)) {
-                $otp = $this->phoneService->generateOTP();
-                $sent = $this->phoneService->sendOTP($request->phone, $otp);
-                
-                if ($sent) {
-                    return response()->json([
-                        'success' => true,
-                        'message' => 'OTP kodu telefon nömrəsinə göndərildi',
-                        'data' => [
-                            'contact_type' => 'phone',
-                            'contact_info' => $request->phone
-                        ]
-                    ]);
-                }
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Telefon nömrəsi ilə OTP göndərilməsi hələ mövcud deyil',
+                    'errors' => [
+                        'phone' => ['Telefon nömrəsi ilə OTP göndərilməsi hələ mövcud deyil']
+                    ]
+                ], 422);
             }
 
             return response()->json([
@@ -268,9 +265,13 @@ class AuthController extends Controller
                 $contactType = 'email';
                 $contactInfo = $request->email;
             } elseif (!empty($request->phone)) {
-                $otpVerified = $this->phoneService->verifyOTP($request->phone, $request->otp_code);
-                $contactType = 'phone';
-                $contactInfo = $request->phone;
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Telefon nömrəsi ilə OTP təsdiqləməsi hələ mövcud deyil',
+                    'errors' => [
+                        'phone' => ['Telefon nömrəsi ilə OTP təsdiqləməsi hələ mövcud deyil']
+                    ]
+                ], 422);
             }
 
             if ($otpVerified) {
