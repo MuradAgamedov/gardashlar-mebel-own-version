@@ -35,7 +35,7 @@ class EmailService
 
             \Log::info("Attempting to send OTP to email: {$email}, OTP: {$otp}");
             
-            // Send actual email
+            // Send actual email - same as TestEmail command
             Mail::to($email)->send(new OTPMail($otp));
             
             \Log::info("OTP email sent successfully to: {$email}, OTP: {$otp}");

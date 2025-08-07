@@ -27,6 +27,12 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        // Debug: Log incoming request data
+        \Log::info('Registration request received', [
+            'data' => $request->all(),
+            'headers' => $request->headers->all()
+        ]);
+
         $validator = Validator::make($request->all(), [
             'full_name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
@@ -75,10 +81,25 @@ class AuthController extends Controller
             $contactInfo = '';
 
             if (!empty($request->email)) {
-                $otp = $this->emailService->generateOTP();
-                $otpSent = $this->emailService->sendOTP($request->email, $otp);
-                $contactType = 'email';
-                $contactInfo = $request->email;
+                $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+                try {
+                    // Store OTP in database
+                    \App\Models\OtpCode::create([
+                        'contact_info' => $request->email,
+                        'contact_type' => 'email',
+                        'otp_code' => $otp,
+                        'expires_at' => \Carbon\Carbon::now()->addMinutes(10),
+                        'is_used' => false
+                    ]);
+                    
+                    // Send email directly like TestEmail command
+                    \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OTPMail($otp));
+                    $otpSent = true;
+                    $contactType = 'email';
+                    $contactInfo = $request->email;
+                } catch (\Exception $e) {
+                    $otpSent = false;
+                }
             } elseif (!empty($request->phone)) {
                 $otp = $this->phoneService->generateOTP();
                 $otpSent = $this->phoneService->sendOTP($request->phone, $otp);
