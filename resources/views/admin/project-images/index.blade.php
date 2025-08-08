@@ -143,24 +143,35 @@
 @push('styles')
 <style>
     .drag-handle {
-        cursor: grab;
+        cursor: grab !important;
         color: #6c757d;
         transition: all 0.2s ease;
-        background: rgba(255, 255, 255, 0.9) !important;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-        padding: 4px !important;
-        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.95) !important;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        padding: 6px !important;
+        border-radius: 6px;
         backdrop-filter: blur(4px);
+        z-index: 10;
+        position: relative;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
     }
     .drag-handle:hover {
         color: #495057;
         background: rgba(255, 255, 255, 1) !important;
-        transform: scale(1.05);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        cursor: grabbing !important;
     }
     .drag-handle:active {
-        cursor: grabbing;
+        cursor: grabbing !important;
         transform: scale(0.95);
+        background: rgba(255, 255, 255, 0.8) !important;
+    }
+    .drag-handle * {
+        pointer-events: none;
     }
     .sortable-ghost {
         opacity: 0.5;
@@ -203,15 +214,59 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing sortable...');
+    
     // Drag and drop reordering for images
     const sortableContainer = document.getElementById('sortable-images');
+    console.log('Sortable container:', sortableContainer);
+    
     if (sortableContainer) {
-        new Sortable(sortableContainer, {
+        // Check if Sortable is available
+        if (typeof Sortable === 'undefined') {
+            console.error('Sortable.js is not loaded!');
+            // Fallback: Add click handlers to drag handles
+            document.querySelectorAll('.drag-handle').forEach(handle => {
+                handle.addEventListener('click', function() {
+                    Swal.fire({
+                        title: 'Drag & Drop Not Available',
+                        text: 'Please refresh the page to enable drag and drop functionality.',
+                        icon: 'info'
+                    });
+                });
+            });
+            return;
+        }
+        
+        console.log('Initializing Sortable with container:', sortableContainer);
+        
+        // Check if drag handles exist
+        const dragHandles = sortableContainer.querySelectorAll('.drag-handle');
+        console.log('Found drag handles:', dragHandles.length);
+        
+        if (dragHandles.length === 0) {
+            console.error('No drag handles found!');
+            return;
+        }
+        
+        // Test drag handle functionality
+        dragHandles.forEach((handle, index) => {
+            handle.addEventListener('click', function(e) {
+                console.log('Drag handle clicked:', index);
+            });
+        });
+        
+        const sortable = new Sortable(sortableContainer, {
             handle: '.drag-handle',
             animation: 150,
             ghostClass: 'sortable-ghost',
             chosenClass: 'sortable-chosen',
+            forceFallback: false,
+            fallbackClass: 'sortable-fallback',
+            onStart: function(evt) {
+                console.log('Drag started:', evt);
+            },
             onEnd: function(evt) {
+                console.log('Drag ended:', evt);
                 const images = Array.from(sortableContainer.querySelectorAll('[data-id]')).map((item, index) => {
                     return item.getAttribute('data-id');
                 });
