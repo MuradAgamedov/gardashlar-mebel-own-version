@@ -56,7 +56,6 @@
                             </h5>
                             <a href="{{ route('admin.projects.images.create', $project) }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Image
                             </a>
                         </div>
                     </div>
@@ -127,7 +126,6 @@
                                             <p class="mb-4">Start by adding some images to showcase this project</p>
                                             <a href="{{ route('admin.projects.images.create', $project) }}" class="btn btn-primary">
                                                 <i class="material-icons-outlined">add</i>
-                                                Add First Image
                                             </a>
                                         </div>
                                     </div>
