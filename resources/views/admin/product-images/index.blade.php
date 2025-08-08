@@ -257,6 +257,49 @@
     box-shadow: 0 0 3px rgba(33, 150, 243, 0.3);
 }
 
+/* Drag handle styling */
+.drag-handle {
+    cursor: grab !important;
+    color: #6c757d;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    padding: 6px !important;
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
+    z-index: 10;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.drag-handle:hover {
+    color: #495057;
+    background: rgba(255, 255, 255, 1) !important;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    cursor: grabbing !important;
+}
+
+.drag-handle:active {
+    cursor: grabbing !important;
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.8) !important;
+}
+
+.drag-handle * {
+    pointer-events: none;
+}
+
+.sortable-ghost {
+    opacity: 0.5;
+}
+
+.sortable-chosen {
+    transform: rotate(5deg);
+}
 
 </style>
 @endpush
@@ -265,13 +308,39 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing product images sortable...');
+    
     const sortableContainer = document.getElementById('sortable-images');
+    console.log('Product images sortable container:', sortableContainer);
     
     if (sortableContainer) {
-        new Sortable(sortableContainer, {
+        // Check if Sortable is available
+        if (typeof Sortable === 'undefined') {
+            console.error('Sortable.js is not loaded!');
+            return;
+        }
+        
+        // Check if drag handles exist
+        const dragHandles = sortableContainer.querySelectorAll('.drag-handle');
+        console.log('Found product image drag handles:', dragHandles.length);
+        
+        if (dragHandles.length === 0) {
+            console.error('No drag handles found!');
+            return;
+        }
+        
+        const sortable = new Sortable(sortableContainer, {
             handle: '.drag-handle',
             animation: 150,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            forceFallback: false,
+            fallbackClass: 'sortable-fallback',
+            onStart: function(evt) {
+                console.log('Product image drag started:', evt);
+            },
             onEnd: function(evt) {
+                console.log('Product image drag ended:', evt);
                 const items = Array.from(sortableContainer.children).map((item, index) => ({
                     id: item.dataset.id,
                     order: index + 1
@@ -281,14 +350,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({ items: items.map(item => item.id) })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
-                        // Update order numbers
+                        // Update order numbers silently
                         items.forEach((item, index) => {
                             const card = sortableContainer.querySelector(`[data-id="${item.id}"]`);
                             const orderText = card.querySelector('.text-muted');
@@ -296,10 +371,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                 orderText.textContent = `Order: ${item.order}`;
                             }
                         });
+                        console.log('Product images reordered successfully');
+                    } else {
+                        console.error('Failed to reorder product images:', data.error);
                     }
                 })
                 .catch(error => {
-                    console.error('Error reordering images:', error);
+                    console.error('Error reordering product images:', error);
                 });
             }
         });

@@ -271,16 +271,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     return item.getAttribute('data-id');
                 });
 
-                // Show loading state
-                const loadingToast = Swal.fire({
-                    title: 'Updating order...',
-                    text: 'Please wait while we save the new order',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-
                 fetch('{{ route("admin.projects.images.reorder", $project) }}', {
                     method: 'POST',
                     headers: {
@@ -297,9 +287,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     return response.json();
                 })
                 .then(data => {
-                    loadingToast.close();
                     if (data.success) {
-                        // Update order numbers in the UI
+                        // Update order numbers in the UI silently
                         images.forEach((imageId, index) => {
                             const item = sortableContainer.querySelector(`[data-id="${imageId}"]`);
                             if (item) {
@@ -309,30 +298,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                 }
                             }
                         });
-                        
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Image order updated successfully',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
+                        console.log('Project images reordered successfully');
                     } else {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to reorder images',
-                            icon: 'error'
-                        });
+                        console.error('Failed to reorder project images:', data.message);
                     }
                 })
                 .catch(error => {
-                    loadingToast.close();
-                    console.error('Error:', error);
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Failed to update image order. Please try again.',
-                        icon: 'error'
-                    });
+                    console.error('Error reordering project images:', error);
                 });
             }
         });
