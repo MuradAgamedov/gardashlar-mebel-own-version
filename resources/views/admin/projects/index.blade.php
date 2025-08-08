@@ -117,9 +117,7 @@
                                         <th>Slug</th>
                                         <th>Company</th>
                                         <th>Category</th>
-                                        <th>Languages</th>
                                         <th>Status</th>
-                                        <th>Order</th>
                                         <th width="150">Actions</th>
                                     </tr>
                                 </thead>
@@ -176,13 +174,7 @@
                                                     <span class="text-muted">No category</span>
                                                 @endif
                                             </td>
-                                            <td>
-                                                <div class="d-flex gap-1">
-                                                    @foreach($project->translates as $translate)
-                                                        <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
-                                                    @endforeach
-                                                </div>
-                                            </td>
+                                         
                                             <td>
                                                 @if($project->status)
                                                     <span class="badge bg-success">Active</span>
@@ -190,7 +182,6 @@
                                                     <span class="badge bg-secondary">Inactive</span>
                                                 @endif
                                             </td>
-                                            <td>{{ $project->order }}</td>
                                             <td>
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.projects.edit', $project) }}" class="btn btn-sm btn-warning">
