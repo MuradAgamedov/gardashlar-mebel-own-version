@@ -52,16 +52,19 @@ class ProjectSeeder extends Seeder
                     [
                         'az' => [
                             'title' => 'Lüks Divan Kolleksiyası',
+                            'company_name' => 'Gardashlar Mebel',
                             'slug' => 'luks-divan-kolleksiyasi',
                             'description' => 'Lüks divan kolleksiyası ilə yaşayış otağınızı transformasiya edin. Eksklüziv materiallar və unikal dizayn elementləri.'
                         ],
                         'en' => [
                             'title' => 'Luxury Sofa Collection',
+                            'company_name' => 'Gardashlar Furniture',
                             'slug' => 'luxury-sofa-collection',
                             'description' => 'Transform your living room with our luxury sofa collection. Exclusive materials and unique design elements.'
                         ],
                         'ru' => [
                             'title' => 'Коллекция люксовых диванов',
+                            'company_name' => 'Gardashlar Мебель',
                             'slug' => 'kollektsiya-lyuksovykh-divanov',
                             'description' => 'Преобразуйте свою гостиную с нашей коллекцией люксовых диванов. Эксклюзивные материалы и уникальные дизайнерские элементы.'
                         ]
@@ -75,16 +78,19 @@ class ProjectSeeder extends Seeder
                     [
                         'az' => [
                             'title' => 'Modern Yemək Masası Dizaynı',
+                            'company_name' => 'Gardashlar Mebel',
                             'slug' => 'modern-yemek-masasi-dizayni',
                             'description' => 'Modern yemək masası dizaynı ilə ailə yeməklərinizi daha xüsusi edin. Funksional və estetik həllər.'
                         ],
                         'en' => [
                             'title' => 'Modern Dining Table Design',
+                            'company_name' => 'Gardashlar Furniture',
                             'slug' => 'modern-dining-table-design',
                             'description' => 'Make your family meals more special with modern dining table design. Functional and aesthetic solutions.'
                         ],
                         'ru' => [
                             'title' => 'Современный дизайн обеденного стола',
+                            'company_name' => 'Gardashlar Мебель',
                             'slug' => 'sovremennyy-dizayn-obedennogo-stola',
                             'description' => 'Сделайте ваши семейные обеды более особенными с современным дизайном обеденного стола. Функциональные и эстетичные решения.'
                         ]
@@ -92,16 +98,19 @@ class ProjectSeeder extends Seeder
                     [
                         'az' => [
                             'title' => 'Ofis Masaları Kolleksiyası',
+                            'company_name' => 'Gardashlar Mebel',
                             'slug' => 'ofis-masalari-kolleksiyasi',
                             'description' => 'Professional ofis mühiti üçün funksional və rahat masalar. Məhsuldarlığı artırır.'
                         ],
                         'en' => [
                             'title' => 'Office Tables Collection',
+                            'company_name' => 'Gardashlar Furniture',
                             'slug' => 'office-tables-collection',
                             'description' => 'Functional and comfortable tables for professional office environment. Increases productivity.'
                         ],
                         'ru' => [
                             'title' => 'Коллекция офисных столов',
+                            'company_name' => 'Gardashlar Мебель',
                             'slug' => 'kollektsiya-ofisnykh-stolov',
                             'description' => 'Функциональные и удобные столы для профессиональной офисной среды. Повышает продуктивность.'
                         ]
@@ -115,16 +124,19 @@ class ProjectSeeder extends Seeder
                     [
                         'az' => [
                             'title' => 'Modern Mətbəx Dizaynı',
+                            'company_name' => 'Gardashlar Mebel',
                             'slug' => 'modern-mtbx-dizayni',
                             'description' => 'Modern mətbəx mebelləri ilə funksional və gözəl mətbəx yaradın. Hər detal düşünülmüşdür.'
                         ],
                         'en' => [
                             'title' => 'Modern Kitchen Design',
+                            'company_name' => 'Gardashlar Furniture',
                             'slug' => 'modern-kitchen-design',
                             'description' => 'Create a functional and beautiful kitchen with modern kitchen furniture. Every detail is thought out.'
                         ],
                         'ru' => [
                             'title' => 'Современный дизайн кухни',
+                            'company_name' => 'Gardashlar Мебель',
                             'slug' => 'sovremennyy-dizayn-kukhni',
                             'description' => 'Создайте функциональную и красивую кухню с современной кухонной мебелью. Каждая деталь продумана.'
                         ]
@@ -132,16 +144,19 @@ class ProjectSeeder extends Seeder
                     [
                         'az' => [
                             'title' => 'Lüks Mətbəx Kolleksiyası',
+                            'company_name' => 'Gardashlar Mebel',
                             'slug' => 'luks-mtbx-kolleksiyasi',
                             'description' => 'Lüks mətbəx mebelləri ilə evinizin ən mühüm hissəsini transformasiya edin.'
                         ],
                         'en' => [
                             'title' => 'Luxury Kitchen Collection',
+                            'company_name' => 'Gardashlar Furniture',
                             'slug' => 'luxury-kitchen-collection',
                             'description' => 'Transform the most important part of your home with luxury kitchen furniture.'
                         ],
                         'ru' => [
                             'title' => 'Коллекция люксовых кухонь',
+                            'company_name' => 'Gardashlar Мебель',
                             'slug' => 'kollektsiya-lyuksovykh-kukhon',
                             'description' => 'Преобразуйте самую важную часть вашего дома с люксовой кухонной мебелью.'
                         ]
@@ -155,16 +170,19 @@ class ProjectSeeder extends Seeder
                     [
                         'az' => [
                             'title' => 'Modern Ofis Dizaynı',
+                            'company_name' => 'Gardashlar Mebel',
                             'slug' => 'modern-ofis-dizayni',
                             'description' => 'Modern ofis mebelləri ilə professional iş mühiti yaradın. Məhsuldarlıq və rahatlıq birlikdə.'
                         ],
                         'en' => [
                             'title' => 'Modern Office Design',
+                            'company_name' => 'Gardashlar Furniture',
                             'slug' => 'modern-office-design',
                             'description' => 'Create a professional work environment with modern office furniture. Productivity and comfort together.'
                         ],
                         'ru' => [
                             'title' => 'Современный дизайн офиса',
+                            'company_name' => 'Gardashlar Мебель',
                             'slug' => 'sovremennyy-dizayn-ofisa',
                             'description' => 'Создайте профессиональную рабочую среду с современной офисной мебелью. Продуктивность и комфорт вместе.'
                         ]
@@ -172,16 +190,19 @@ class ProjectSeeder extends Seeder
                     [
                         'az' => [
                             'title' => 'Korporativ Ofis Həlləri',
+                            'company_name' => 'Gardashlar Mebel',
                             'slug' => 'korporativ-ofis-hllri',
                             'description' => 'Böyük şirkətlər üçün korporativ ofis mebelləri. Funksional və professional dizayn.'
                         ],
                         'en' => [
                             'title' => 'Corporate Office Solutions',
+                            'company_name' => 'Gardashlar Furniture',
                             'slug' => 'corporate-office-solutions',
                             'description' => 'Corporate office furniture for large companies. Functional and professional design.'
                         ],
                         'ru' => [
                             'title' => 'Корпоративные офисные решения',
+                            'company_name' => 'Gardashlar Мебель',
                             'slug' => 'korporativnye-ofisnye-resheniya',
                             'description' => 'Корпоративная офисная мебель для крупных компаний. Функциональный и профессиональный дизайн.'
                         ]
@@ -214,6 +235,7 @@ class ProjectSeeder extends Seeder
                             'project_id' => $project->id,
                             'language_id' => $language->id,
                             'title' => $projectTranslations[$langCode]['title'],
+                            'company_name' => $projectTranslations[$langCode]['company_name'],
                             'slug' => $projectTranslations[$langCode]['slug'],
                             'description' => $projectTranslations[$langCode]['description']
                         ]);
