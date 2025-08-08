@@ -32,16 +32,19 @@ class ProjectSeeder extends Seeder
                     [
                         'az' => [
                             'title' => 'Modern Yumşaq Mebel Dizaynı',
+                            'company_name' => 'Gardashlar Mebel',
                             'slug' => 'modern-yumsaq-mebel-dizayni',
                             'description' => 'Bu layihədə müasir yumşaq mebel dizaynı ilə rahat və funksional yaşayış məkanı yaradılmışdır. Yüksək keyfiyyətli materiallar və professional dizayn həlləri istifadə edilmişdir.'
                         ],
                         'en' => [
                             'title' => 'Modern Soft Furniture Design',
+                            'company_name' => 'Gardashlar Furniture',
                             'slug' => 'modern-soft-furniture-design',
                             'description' => 'This project features modern soft furniture design creating a comfortable and functional living space. High-quality materials and professional design solutions were used.'
                         ],
                         'ru' => [
                             'title' => 'Современный дизайн мягкой мебели',
+                            'company_name' => 'Gardashlar Мебель',
                             'slug' => 'sovremennyy-dizayn-myagkoy-mebeli',
                             'description' => 'В этом проекте представлен современный дизайн мягкой мебели, создающий комфортное и функциональное жилое пространство. Использованы высококачественные материалы и профессиональные дизайнерские решения.'
                         ]
