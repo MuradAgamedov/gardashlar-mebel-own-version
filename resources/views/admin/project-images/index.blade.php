@@ -98,17 +98,17 @@
                                                 @endif
                                             </div>
                                             <div class="d-flex gap-2">
-                                                <a href="{{ route('admin.projects.images.edit', [$project, $image]) }}" class="btn btn-sm btn-warning flex-fill">
+                                                <a href="{{ route('admin.projects.images.edit', [$project, $image]) }}" class="btn btn-sm btn-warning action-btn">
                                                     <i class="material-icons-outlined">edit</i>
                                                 </a>
                                                 @if(!$image->is_main_image)
-                                                    <button type="button" class="btn btn-sm btn-primary set-main-btn flex-fill" 
+                                                    <button type="button" class="btn btn-sm btn-primary set-main-btn action-btn" 
                                                             data-title="Image #{{ $image->id }}"
                                                             data-url="{{ route('admin.projects.images.set-main', [$project, $image]) }}">
                                                         <i class="material-icons-outlined">star</i>
                                                     </button>
                                                 @endif
-                                                <button type="button" class="btn btn-sm btn-danger delete-btn flex-fill" 
+                                                <button type="button" class="btn btn-sm btn-danger delete-btn action-btn" 
                                                         data-title="Image #{{ $image->id }}"
                                                         data-url="{{ route('admin.projects.images.destroy', [$project, $image]) }}">
                                                     <i class="material-icons-outlined">delete</i>
@@ -158,6 +158,32 @@
     }
     .sortable-chosen {
         transform: rotate(5deg);
+    }
+    
+    /* Action button styling */
+    .action-btn {
+        min-width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+    
+    .action-btn .material-icons-outlined {
+        font-size: 18px;
+        line-height: 1;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .action-btn:active {
+        transform: translateY(0);
     }
 </style>
 @endpush
