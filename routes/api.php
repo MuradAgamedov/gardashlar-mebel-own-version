@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\HeroCategoryController;
 use App\Http\Controllers\Api\WhyChooseUsController;
 use App\Http\Controllers\Api\HomePageDiscountController;
 use App\Http\Controllers\Api\HomePageProjectCategoryController;
+use App\Http\Controllers\Api\ProjectCategoryController;
 use App\Http\Controllers\Api\SimpleImageController;
 use App\Http\Controllers\Api\DictionaryController;
 use App\Http\Controllers\Api\SocialNetworkController;
@@ -89,6 +90,9 @@ Route::get('/home-page-discount', [HomePageDiscountController::class, 'index'])-
 
 // Home Page Project Categories API Routes
 Route::get('/home-page-project-categories', [HomePageProjectCategoryController::class, 'index'])->name('api.home-page-project-categories.index');
+
+// Project Categories API Routes
+Route::get('/project-categories', [ProjectCategoryController::class, 'index'])->name('api.project-categories.index');
 
 // Simple Images API Routes
 Route::get('/simple-images', [SimpleImageController::class, 'index'])->name('api.simple-images.index');

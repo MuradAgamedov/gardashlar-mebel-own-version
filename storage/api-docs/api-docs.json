@@ -4737,6 +4737,88 @@
                 }
             }
         },
+        "/project-categories": {
+            "get": {
+                "tags": [
+                    "ProjectCategories"
+                ],
+                "summary": "Get all project categories",
+                "description": "Returns all active project categories with title and slug",
+                "operationId": "getAllProjectCategories",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Language code (az, en, ru)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "az"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Soft Furniture Designs"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string",
+                                                        "example": "soft-furniture-designs"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error occurred while getting project categories"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/refund-policy": {
             "get": {
                 "tags": [
@@ -7407,6 +7489,10 @@
         {
             "name": "Maps",
             "description": "API Endpoints for Maps"
+        },
+        {
+            "name": "ProjectCategories",
+            "description": "Project categories API endpoints"
         },
         {
             "name": "Reports",
