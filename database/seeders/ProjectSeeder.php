@@ -27,7 +27,7 @@ class ProjectSeeder extends Seeder
         $projectData = [
             // Yumşaq mebellər kateqoriyası üçün layihələr
             [
-                'category_slug' => 'yumaq-mebellr',
+                'category_id' => 1,
                 'projects' => [
                     [
                         'az' => [
@@ -73,7 +73,7 @@ class ProjectSeeder extends Seeder
             ],
             // Masalar kateqoriyası üçün layihələr
             [
-                'category_slug' => 'masalar',
+                'category_id' => 2,
                 'projects' => [
                     [
                         'az' => [
@@ -119,7 +119,7 @@ class ProjectSeeder extends Seeder
             ],
             // Mətbəx mebelləri kateqoriyası üçün layihələr
             [
-                'category_slug' => 'mtbx-mebellri',
+                'category_id' => 3,
                 'projects' => [
                     [
                         'az' => [
@@ -165,7 +165,7 @@ class ProjectSeeder extends Seeder
             ],
             // Ofis mebelleri kateqoriyası üçün layihələr
             [
-                'category_slug' => 'ofis-mebelleri',
+                'category_id' => 4,
                 'projects' => [
                     [
                         'az' => [
@@ -212,10 +212,10 @@ class ProjectSeeder extends Seeder
         ];
 
         foreach ($projectData as $categoryData) {
-            $category = $projectCategories->where('translates.slug', $categoryData['category_slug'])->first();
+            $category = $projectCategories->find($categoryData['category_id']);
             
             if (!$category) {
-                $this->command->warn("Category with slug '{$categoryData['category_slug']}' not found. Skipping...");
+                $this->command->warn("Category with ID '{$categoryData['category_id']}' not found. Skipping...");
                 continue;
             }
 
@@ -258,7 +258,7 @@ class ProjectSeeder extends Seeder
                     ]);
                 }
 
-                $this->command->info("Created project: {$projectTranslations['az']['title']} for category: {$categoryData['category_slug']}");
+                $this->command->info("Created project: {$projectTranslations['az']['title']} for category ID: {$categoryData['category_id']}");
             }
         }
 
