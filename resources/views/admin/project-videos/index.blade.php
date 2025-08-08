@@ -56,7 +56,6 @@
                             </h5>
                             <a href="{{ route('admin.projects.videos.create', $project) }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Video
                             </a>
                         </div>
                     </div>
@@ -124,7 +123,6 @@
                                                     <p class="mt-2">No videos found for this project</p>
                                                     <a href="{{ route('admin.projects.videos.create', $project) }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Video
                                                     </a>
                                                 </div>
                                             </td>
