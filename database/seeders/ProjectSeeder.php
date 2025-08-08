@@ -205,7 +205,7 @@ class ProjectSeeder extends Seeder
 
                 // Create translations
                 foreach ($languages as $language) {
-                    $langCode = $language->code;
+                    $langCode = $language->lang_code;
                     if (isset($projectTranslations[$langCode])) {
                         ProjectTranslate::create([
                             'project_id' => $project->id,
