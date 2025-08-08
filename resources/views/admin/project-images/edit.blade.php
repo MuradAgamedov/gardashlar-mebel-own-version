@@ -95,7 +95,7 @@
                                         </div>
                                     @enderror
                                     <small class="form-text text-muted">
-                                        Leave empty to keep the current image. Supported formats: JPEG, PNG, JPG, GIF. Maximum size: 2MB
+                                        Leave empty to keep the current image. Supported formats: JPEG, PNG, JPG, GIF, WebP. Maximum size: 2MB
                                     </small>
                                     <div id="selectedFileName" class="mt-2"></div>
                                 </div>

@@ -41,7 +41,7 @@ class ProjectImageController extends Controller
     public function store(Request $request, Project $project)
     {
         $validator = Validator::make($request->all(), [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'status' => 'boolean',
         ]);
 
@@ -100,7 +100,7 @@ class ProjectImageController extends Controller
     public function update(Request $request, Project $project, ProjectImage $image)
     {
         $validator = Validator::make($request->all(), [
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'status' => 'boolean',
         ]);
 

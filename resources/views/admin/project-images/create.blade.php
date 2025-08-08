@@ -84,7 +84,7 @@
                                         </div>
                                     @enderror
                                     <small class="form-text text-muted">
-                                        Supported formats: JPEG, PNG, JPG, GIF. Maximum size: 2MB
+                                        Supported formats: JPEG, PNG, JPG, GIF, WebP. Maximum size: 2MB
                                     </small>
                                     <div id="selectedFileName" class="mt-2"></div>
                                 </div>
