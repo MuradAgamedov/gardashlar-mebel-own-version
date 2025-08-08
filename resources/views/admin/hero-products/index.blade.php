@@ -150,7 +150,6 @@
                                                     <i class="material-icons-outlined" style="font-size: 48px;">inventory_2</i>
                                                     <p class="mt-2">No products selected for hero section</p>
                                                     <a href="{{ route('admin.hero-products.create') }}" class="btn btn-primary">
-                                                        Add First Product
                                                     </a>
                                                 </div>
                                             </td>

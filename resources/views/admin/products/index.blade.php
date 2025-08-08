@@ -283,7 +283,6 @@
                                                         </a>
                                                     @endif
                                                     <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
-                                                        Add First Product
                                                     </a>
                                                 </div>
                                             </td>

@@ -132,7 +132,6 @@
                                                 <p class="text-muted">Start by adding project categories to display on the home page.</p>
                                                 <a href="{{ route('admin.home-page-project-categories.create') }}" class="btn btn-primary">
                                                     <i class="material-icons-outlined">add</i>
-                                                    Add First Project Category
                                                 </a>
                                             </td>
                                         </tr>
