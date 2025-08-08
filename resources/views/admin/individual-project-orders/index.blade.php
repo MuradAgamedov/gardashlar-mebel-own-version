@@ -47,7 +47,6 @@
                             <div class="d-flex gap-2">
                                 <button type="button" id="deleteSelectedBtn" class="btn btn-danger" style="display: none;">
                                     <i class="material-icons-outlined">delete</i>
-                                    Delete Selected
                                 </button>
                                 <a href="{{ route('admin.individual-project-orders.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
