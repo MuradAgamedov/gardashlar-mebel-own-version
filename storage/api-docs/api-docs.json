@@ -4772,6 +4772,10 @@
                                             "type": "array",
                                             "items": {
                                                 "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
                                                     "title": {
                                                         "type": "string",
                                                         "example": "Soft Furniture Designs"

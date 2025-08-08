@@ -36,7 +36,7 @@ class ProjectCategoryController extends Controller
      *         description="Successful response",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="array", @OA\Items(type="object", @OA\Property(property="title", type="string", example="Soft Furniture Designs"), @OA\Property(property="slug", type="string", example="soft-furniture-designs")))
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object", @OA\Property(property="id", type="integer", example=1), @OA\Property(property="title", type="string", example="Soft Furniture Designs"), @OA\Property(property="slug", type="string", example="soft-furniture-designs")))
      *         )
      *     ),
      *     @OA\Response(
@@ -76,6 +76,7 @@ class ProjectCategoryController extends Controller
                     }
 
                     return [
+                        'id' => $category->id,
                         'title' => $translation ? $translation->title : null,
                         'slug' => $translation ? $translation->slug : null
                     ];
