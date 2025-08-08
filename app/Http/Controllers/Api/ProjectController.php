@@ -152,4 +152,172 @@ class ProjectController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * @OA\Get(
+     *     path="/project/{slug}",
+     *     operationId="getProjectBySlug",
+     *     tags={"Projects"},
+     *     summary="Get project details by slug",
+     *     description="Returns detailed information about a specific project including images, videos, and translations",
+     *     @OA\Parameter(
+     *         name="slug",
+     *         in="path",
+     *         description="Project slug",
+     *         required=true,
+     *         @OA\Schema(type="string", example="modern-soft-furniture-design")
+     *     ),
+     *     @OA\Parameter(
+     *         name="Accept-Language",
+     *         in="header",
+     *         description="Language code (az, en, ru)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="az")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object", 
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="title", type="string", example="Modern Soft Furniture Design"),
+     *                 @OA\Property(property="slug", type="string", example="modern-soft-furniture-design"),
+     *                 @OA\Property(property="company_name", type="string", example="Gardashlar Furniture"),
+     *                 @OA\Property(property="description", type="string", example="Modern soft furniture design description"),
+     *                 @OA\Property(property="category", type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="title", type="string", example="Yumşaq Mebellər")
+     *                 ),
+     *                 @OA\Property(property="images", type="array", @OA\Items(type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="image_url", type="string", example="https://example.com/storage/projects/image.jpg"),
+     *                     @OA\Property(property="is_main_image", type="boolean", example=true),
+     *                     @OA\Property(property="order", type="integer", example=1)
+     *                 )),
+     *                 @OA\Property(property="videos", type="array", @OA\Items(type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="video_link", type="string", example="https://youtube.com/watch?v=example"),
+     *                     @OA\Property(property="order", type="integer", example=1)
+     *                 ))
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Project not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Project not found"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error occurred while getting project"),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function getBySlug(Request $request, string $slug): JsonResponse
+    {
+        try {
+            $languageId = $this->getLanguageIdFromHeader($request);
+            $cacheKey = "api:project:details:{$slug}:lang:{$languageId}";
+            
+            $data = Cache::rememberForever($cacheKey, function () use ($slug, $languageId) {
+                // Find the project by slug
+                $project = Project::with([
+                    'translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'category.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'images' => function($query) {
+                        $query->where('status', true)->orderBy('order');
+                    },
+                    'videos' => function($query) {
+                        $query->where('status', true)->orderBy('order');
+                    }
+                ])
+                ->whereHas('translates', function($query) use ($slug) {
+                    $query->where('slug', $slug);
+                })
+                ->active()
+                ->first();
+
+                if (!$project) {
+                    return null;
+                }
+
+                // Get translation for the specified language
+                $translation = $project->translates()
+                    ->where('language_id', $languageId)
+                    ->first();
+                
+                // If no translation found, get the first available translation
+                if (!$translation) {
+                    $translation = $project->translates()->first();
+                }
+
+                // Get category translation
+                $categoryTranslation = $project->category->translates()
+                    ->where('language_id', $languageId)
+                    ->first();
+                
+                if (!$categoryTranslation) {
+                    $categoryTranslation = $project->category->translates()->first();
+                }
+
+                return [
+                    'id' => $project->id,
+                    'title' => $translation ? $translation->title : null,
+                    'slug' => $translation ? $translation->slug : null,
+                    'company_name' => $translation ? $translation->company_name : null,
+                    'description' => $translation ? $translation->description : null,
+                    'category' => [
+                        'id' => $project->category->id,
+                        'title' => $categoryTranslation ? $categoryTranslation->title : null,
+                        'slug' => $categoryTranslation ? $categoryTranslation->slug : null
+                    ],
+                    'images' => $project->images->map(function ($image) {
+                        return [
+                            'id' => $image->id,
+                            'image_url' => $image->image_url,
+                            'is_main_image' => $image->is_main_image,
+                            'order' => $image->order
+                        ];
+                    }),
+                    'videos' => $project->videos->map(function ($video) {
+                        return [
+                            'id' => $video->id,
+                            'video_link' => $video->video_link,
+                            'order' => $video->order
+                        ];
+                    })
+                ];
+            });
+
+            if ($data === null) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Layihə tapılmadı',
+                    'data' => null
+                ], 404);
+            }
+
+            return response()->json(['success' => true, 'data' => $data], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Layihə əldə edilərkən xəta baş verdi: ' . $e->getMessage(), 
+                'data' => null
+            ], 500);
+        }
+    }
 }
