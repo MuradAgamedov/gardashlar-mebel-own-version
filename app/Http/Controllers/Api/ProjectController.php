@@ -24,13 +24,27 @@ class ProjectController extends Controller
      *     operationId="getProjectsByCategorySlug",
      *     tags={"Projects"},
      *     summary="Get projects by category slug",
-     *     description="Returns all active projects for a specific category with title, slug, company name and main image",
+     *     description="Returns paginated active projects for a specific category with title, slug, company name and main image",
      *     @OA\Parameter(
      *         name="slug",
      *         in="path",
      *         description="Project category slug",
      *         required=true,
      *         @OA\Schema(type="string", example="yumaq-mebellr")
+     *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number for pagination",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1, default=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Number of items per page",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=9, default=9)
      *     ),
      *     @OA\Parameter(
      *         name="Accept-Language",
@@ -50,7 +64,15 @@ class ProjectController extends Controller
      *                 @OA\Property(property="slug", type="string", example="modern-sofa-design"),
      *                 @OA\Property(property="company_name", type="string", example="Gardashlar Furniture"),
      *                 @OA\Property(property="main_image", type="string", example="https://example.com/storage/projects/image.jpg")
-     *             ))
+     *             )),
+     *             @OA\Property(property="pagination", type="object",
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="per_page", type="integer", example=9),
+     *                 @OA\Property(property="total", type="integer", example=18),
+     *                 @OA\Property(property="last_page", type="integer", example=2),
+     *                 @OA\Property(property="from", type="integer", example=1),
+     *                 @OA\Property(property="to", type="integer", example=9)
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -77,9 +99,11 @@ class ProjectController extends Controller
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
-            $cacheKey = "api:projects:category:{$slug}:lang:{$languageId}";
+            $page = $request->get('page', 1);
+            $perPage = $request->get('per_page', 9);
+            $cacheKey = "api:projects:category:{$slug}:lang:{$languageId}:page:{$page}:per_page:{$perPage}";
             
-            $data = Cache::rememberForever($cacheKey, function () use ($slug, $languageId) {
+            $data = Cache::rememberForever($cacheKey, function () use ($slug, $languageId, $page, $perPage) {
                 // Find the project category by slug
                 $category = ProjectCategory::with(['translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
@@ -94,8 +118,8 @@ class ProjectController extends Controller
                     return null;
                 }
 
-                // Get projects for this category
-                $projects = Project::with([
+                // Get projects for this category with pagination
+                $projectsQuery = Project::with([
                     'translates' => function($query) use ($languageId) {
                         $query->where('language_id', $languageId);
                     },
@@ -105,10 +129,13 @@ class ProjectController extends Controller
                 ])
                 ->where('project_category_id', $category->id)
                 ->active()
-                ->ordered()
-                ->get();
+                ->ordered();
 
-                return $projects->map(function ($project) use ($languageId) {
+                // Apply pagination
+                $projects = $projectsQuery->paginate($perPage, ['*'], 'page', $page);
+
+                // Transform the data
+                $transformedData = $projects->getCollection()->map(function ($project) use ($languageId) {
                     // Get translation for the specified language
                     $translation = $project->translates()
                         ->where('language_id', $languageId)
@@ -133,22 +160,43 @@ class ProjectController extends Controller
                     // Filter out items without title or slug
                     return !empty($item['title']) && !empty($item['slug']);
                 })->values();
+
+                // Create pagination info
+                $pagination = [
+                    'current_page' => $projects->currentPage(),
+                    'per_page' => $projects->perPage(),
+                    'total' => $projects->total(),
+                    'last_page' => $projects->lastPage(),
+                    'from' => $projects->firstItem(),
+                    'to' => $projects->lastItem()
+                ];
+
+                return [
+                    'data' => $transformedData,
+                    'pagination' => $pagination
+                ];
             });
 
             if ($data === null) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Kateqoriya tapılmadı',
-                    'data' => []
+                    'data' => [],
+                    'pagination' => null
                 ], 404);
             }
 
-            return response()->json(['success' => true, 'data' => $data], 200);
+            return response()->json([
+                'success' => true, 
+                'data' => $data['data'], 
+                'pagination' => $data['pagination']
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false, 
                 'message' => 'Layihələr əldə edilərkən xəta baş verdi: ' . $e->getMessage(), 
-                'data' => []
+                'data' => [],
+                'pagination' => null
             ], 500);
         }
     }
