@@ -145,13 +145,22 @@
     .drag-handle {
         cursor: grab;
         color: #6c757d;
-        transition: color 0.2s;
+        transition: all 0.2s ease;
+        background: rgba(255, 255, 255, 0.9) !important;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 4px !important;
+        border-radius: 4px;
+        backdrop-filter: blur(4px);
     }
     .drag-handle:hover {
         color: #495057;
+        background: rgba(255, 255, 255, 1) !important;
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
     .drag-handle:active {
         cursor: grabbing;
+        transform: scale(0.95);
     }
     .sortable-ghost {
         opacity: 0.5;
@@ -200,22 +209,60 @@ document.addEventListener('DOMContentLoaded', function() {
         new Sortable(sortableContainer, {
             handle: '.drag-handle',
             animation: 150,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
             onEnd: function(evt) {
                 const images = Array.from(sortableContainer.querySelectorAll('[data-id]')).map((item, index) => {
                     return item.getAttribute('data-id');
+                });
+
+                // Show loading state
+                const loadingToast = Swal.fire({
+                    title: 'Updating order...',
+                    text: 'Please wait while we save the new order',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
                 });
 
                 fetch('{{ route("admin.projects.images.reorder", $project) }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({ items: images })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    if (!data.success) {
+                    loadingToast.close();
+                    if (data.success) {
+                        // Update order numbers in the UI
+                        images.forEach((imageId, index) => {
+                            const item = sortableContainer.querySelector(`[data-id="${imageId}"]`);
+                            if (item) {
+                                const orderElement = item.querySelector('.text-muted');
+                                if (orderElement) {
+                                    orderElement.textContent = `Order: ${index + 1}`;
+                                }
+                            }
+                        });
+                        
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Image order updated successfully',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } else {
                         Swal.fire({
                             title: 'Error!',
                             text: data.message || 'Failed to reorder images',
@@ -224,7 +271,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 })
                 .catch(error => {
+                    loadingToast.close();
                     console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to update image order. Please try again.',
+                        icon: 'error'
+                    });
                 });
             }
         });

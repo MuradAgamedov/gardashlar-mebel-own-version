@@ -189,15 +189,35 @@ class ProjectImageController extends Controller
     public function reorder(Request $request, Project $project)
     {
         try {
+            $request->validate([
+                'items' => 'required|array|min:1',
+                'items.*' => 'required|integer|exists:project_images,id'
+            ]);
+
             $items = $request->input('items', []);
             
-            foreach ($items as $index => $itemId) {
+            // Verify all images belong to this project
+            $projectImageIds = $project->images()->pluck('id')->toArray();
+            $validItems = array_intersect($items, $projectImageIds);
+            
+            if (count($validItems) !== count($items)) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Some images do not belong to this project'
+                ]);
+            }
+            
+            foreach ($validItems as $index => $itemId) {
                 $project->images()->where('id', $itemId)->update(['order' => $index + 1]);
             }
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            \Log::error('Error reordering project images: ' . $e->getMessage());
+            return response()->json([
+                'success' => false, 
+                'message' => 'Error reordering images: ' . $e->getMessage()
+            ]);
         }
     }
 }
