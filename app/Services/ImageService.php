@@ -23,7 +23,7 @@ class ImageService
             $defaultOptions = [
                 'disk' => 'public',
                 'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                'generate_unique_name' => true,
+                'generate_unique_name' => true, // Həmişə unikal ad yarat
             ];
 
             $options = array_merge($defaultOptions, $options);
@@ -189,8 +189,12 @@ class ImageService
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         
         if ($unique) {
-            $filename = Str::slug($originalName) . '_' . time() . '_' . Str::random(8) . '.' . $extension;
+            // Daha oxunaqlı format: original_name_timestamp_random.ext
+            $randomNumber = mt_rand(1000, 9999); // 4 rəqəmli random ədəd
+            $timestamp = time();
+            $filename = Str::slug($originalName) . '_' . $timestamp . '_' . $randomNumber . '.' . $extension;
         } else {
+            // Sadə format: original_name.ext
             $filename = Str::slug($originalName) . '.' . $extension;
         }
 
