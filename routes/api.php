@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\WhyChooseUsController;
 use App\Http\Controllers\Api\HomePageDiscountController;
 use App\Http\Controllers\Api\HomePageProjectCategoryController;
 use App\Http\Controllers\Api\ProjectCategoryController;
+use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\SimpleImageController;
 use App\Http\Controllers\Api\DictionaryController;
 use App\Http\Controllers\Api\SocialNetworkController;
@@ -93,6 +94,9 @@ Route::get('/home-page-project-categories', [HomePageProjectCategoryController::
 
 // Project Categories API Routes
 Route::get('/project-categories', [ProjectCategoryController::class, 'index'])->name('api.project-categories.index');
+
+// Projects API Routes
+Route::get('/projects/{slug}', [ProjectController::class, 'getByCategorySlug'])->name('api.projects.by-category');
 
 // Simple Images API Routes
 Route::get('/simple-images', [SimpleImageController::class, 'index'])->name('api.simple-images.index');
