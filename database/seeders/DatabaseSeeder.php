@@ -40,6 +40,7 @@ class DatabaseSeeder extends Seeder
             BecomeAInvestorSeeder::class,
             ReportSeeder::class,
             VacancySeeder::class,
+            ProjectSeeder::class,
         ]);
     }
 } 
