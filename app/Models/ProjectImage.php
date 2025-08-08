@@ -29,6 +29,10 @@ class ProjectImage extends Model
 
     public function getImageUrlAttribute()
     {
-        return asset('uploads/' . $this->image);
+        if (!$this->image) {
+            return null;
+        }
+        
+        return Storage::disk('public')->url($this->image);
     }
 }
