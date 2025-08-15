@@ -46,6 +46,12 @@ class ProductDetailsValuesDetailController extends Controller
             'translates.*.value' => 'required|string',
         ]);
 
+        // Check for duplicate language IDs
+        $languageIds = collect($request->translates)->pluck('language_id');
+        if ($languageIds->count() !== $languageIds->unique()->count()) {
+            return back()->withErrors(['translates' => 'Eyni dil üçün birdən çox record əlavə edə bilməzsiniz.'])->withInput();
+        }
+
         // Create detail
         $detail = ProductDetailsValuesDetail::create([
             'product_detail_value_id' => $detailValue->id,
@@ -96,6 +102,12 @@ class ProductDetailsValuesDetailController extends Controller
             'translates.*.keyword' => 'required|string|max:255',
             'translates.*.value' => 'required|string',
         ]);
+
+        // Check for duplicate language IDs
+        $languageIds = collect($request->translates)->pluck('language_id');
+        if ($languageIds->count() !== $languageIds->unique()->count()) {
+            return back()->withErrors(['translates' => 'Eyni dil üçün birdən çox record əlavə edə bilməzsiniz.'])->withInput();
+        }
 
         // Delete existing translations
         $detail->translates()->delete();
