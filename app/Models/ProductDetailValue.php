@@ -14,6 +14,10 @@ class ProductDetailValue extends Model
         'order',
     ];
 
+    protected $casts = [
+        'order' => 'integer',
+    ];
+
     /**
      * Get the product that owns this detail value
      */
@@ -21,10 +25,6 @@ class ProductDetailValue extends Model
     {
         return $this->belongsTo(Product::class);
     }
-
-    protected $casts = [
-        'order' => 'integer',
-    ];
 
     /**
      * Get all translations for this product detail value
@@ -63,7 +63,7 @@ class ProductDetailValue extends Model
 
         static::creating(function ($value) {
             if (!isset($value->order)) {
-                $maxOrder = static::max('order');
+                $maxOrder = static::where('product_id', $value->product_id)->max('order');
                 $value->order = $maxOrder + 1;
             }
         });

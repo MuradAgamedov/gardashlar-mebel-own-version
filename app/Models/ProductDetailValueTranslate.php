@@ -13,6 +13,7 @@ class ProductDetailValueTranslate extends Model
         'product_detail_value_id',
         'language_id',
         'keyword',
+        'value',
     ];
 
     /**
@@ -29,5 +30,13 @@ class ProductDetailValueTranslate extends Model
     public function language()
     {
         return $this->belongsTo(Language::class);
+    }
+
+    /**
+     * Get the product through the detail value
+     */
+    public function product()
+    {
+        return $this->hasOneThrough(Product::class, ProductDetailValue::class, 'id', 'id', 'product_detail_value_id', 'product_id');
     }
 }

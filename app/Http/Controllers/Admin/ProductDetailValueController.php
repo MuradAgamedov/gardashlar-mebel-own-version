@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Models\ProductDetail;
-use App\Models\ProductDetailTranslate;
+use App\Models\ProductDetailValue;
+use App\Models\ProductDetailValueTranslate;
 use App\Models\Language;
 use Illuminate\Http\Request;
 
@@ -16,7 +16,7 @@ class ProductDetailValueController extends Controller
      */
     public function index(Product $product)
     {
-        $detailValues = ProductDetail::with(['translates.language'])->where('product_id', $product->id)->ordered()->get();
+        $detailValues = ProductDetailValue::with(['translates.language'])->where('product_id', $product->id)->ordered()->get();
         return view('admin.product-detail-values.index', compact('product', 'detailValues'));
     }
 
@@ -41,16 +41,16 @@ class ProductDetailValueController extends Controller
             'translates.*.value' => 'required|string',
         ]);
 
-        // Create product detail
-        $productDetail = ProductDetail::create([
+        // Create product detail value
+        $productDetailValue = ProductDetailValue::create([
             'product_id' => $product->id,
-            'order' => ProductDetail::where('product_id', $product->id)->max('order') + 1
+            'order' => ProductDetailValue::where('product_id', $product->id)->max('order') + 1
         ]);
 
         // Create translations
         foreach ($request->translates as $translate) {
-            ProductDetailTranslate::create([
-                'product_detail_id' => $productDetail->id,
+            ProductDetailValueTranslate::create([
+                'product_detail_value_id' => $productDetailValue->id,
                 'language_id' => $translate['language_id'],
                 'keyword' => $translate['keyword'],
                 'value' => $translate['value'],
@@ -64,7 +64,7 @@ class ProductDetailValueController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product, ProductDetail $detailValue)
+    public function edit(Product $product, ProductDetailValue $detailValue)
     {
         $languages = Language::all();
         $detailValue->load(['translates.language']);
@@ -74,7 +74,7 @@ class ProductDetailValueController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product, ProductDetail $detailValue)
+    public function update(Request $request, Product $product, ProductDetailValue $detailValue)
     {
         $request->validate([
             'translates' => 'required|array|min:1',
@@ -88,8 +88,8 @@ class ProductDetailValueController extends Controller
 
         // Create new translations
         foreach ($request->translates as $translate) {
-            ProductDetailTranslate::create([
-                'product_detail_id' => $detailValue->id,
+            ProductDetailValueTranslate::create([
+                'product_detail_value_id' => $detailValue->id,
                 'language_id' => $translate['language_id'],
                 'keyword' => $translate['keyword'],
                 'value' => $translate['value'],
@@ -103,7 +103,7 @@ class ProductDetailValueController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product, ProductDetail $detailValue)
+    public function destroy(Product $product, ProductDetailValue $detailValue)
     {
         $detailValue->translates()->delete();
         $detailValue->delete();
@@ -119,11 +119,11 @@ class ProductDetailValueController extends Controller
     {
         $request->validate([
             'items' => 'required|array',
-            'items.*' => 'exists:product_details,id'
+            'items.*' => 'exists:product_detail_values,id'
         ]);
 
         foreach ($request->items as $index => $id) {
-            ProductDetail::where('id', $id)->update(['order' => $index + 1]);
+            ProductDetailValue::where('id', $id)->update(['order' => $index + 1]);
         }
 
         return response()->json(['success' => true]);
@@ -136,10 +136,10 @@ class ProductDetailValueController extends Controller
     {
         $request->validate([
             'ids' => 'required|array',
-            'ids.*' => 'exists:product_details,id'
+            'ids.*' => 'exists:product_detail_values,id'
         ]);
 
-        $detailValues = ProductDetail::whereIn('id', $request->ids)->get();
+        $detailValues = ProductDetailValue::whereIn('id', $request->ids)->get();
         
         foreach ($detailValues as $detailValue) {
             $detailValue->translates()->delete();
