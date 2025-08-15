@@ -64,6 +64,7 @@ use App\Http\Controllers\Admin\ProductTagController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductAccordionController;
 use App\Http\Controllers\Admin\ProductImageController;
+use App\Http\Controllers\Admin\ProductDetailController;
 use App\Http\Controllers\Admin\OurGoalController;
 use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Admin\SimpleImageController;
