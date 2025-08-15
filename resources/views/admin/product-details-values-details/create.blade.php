@@ -70,15 +70,15 @@
                                     <div class="card">
                                         <div class="card-header">
                                             <div class="d-flex justify-content-between align-items-center">
-                                                <h6 class="mb-0">Details</h6>
-                                                <button type="button" class="btn btn-sm btn-primary" onclick="addDetail()">
-                                                    <i class="material-icons-outlined">add</i> Add Detail
+                                                <h6 class="mb-0">Details by Language</h6>
+                                                <button type="button" class="btn btn-sm btn-primary" onclick="addKeywordValuePair()">
+                                                    <i class="material-icons-outlined">add</i> Add Keyword & Value
                                                 </button>
                                             </div>
                                         </div>
                                         <div class="card-body">
-                                            <div id="details-container">
-                                                <!-- Details will be added here -->
+                                            <div id="translations-container">
+                                                <!-- Translation tabs will be added here -->
                                             </div>
                                         </div>
                                     </div>
@@ -106,24 +106,80 @@
 
 @push('scripts')
 <script>
-let detailIndex = 0;
+let translationIndex = 0;
 
-// Add initial detail
+// Add initial language tabs
 document.addEventListener('DOMContentLoaded', function() {
-    addDetail();
+    createLanguageTabs();
+    // Add initial keyword-value pair to the first language
+    setTimeout(() => {
+        addKeywordValuePair();
+    }, 100);
 });
 
-function addDetail() {
-    const container = document.getElementById('details-container');
+function createLanguageTabs() {
+    const container = document.getElementById('translations-container');
     
-    const detailDiv = document.createElement('div');
-    detailDiv.className = 'detail-item border rounded p-4 mb-4';
-    detailDiv.id = `detail-${detailIndex}`;
+    // Create tab navigation
+    const tabNav = document.createElement('ul');
+    tabNav.className = 'nav nav-tabs mb-3';
+    tabNav.id = 'language-tabs';
     
-    detailDiv.innerHTML = `
+    // Create tab content container
+    const tabContent = document.createElement('div');
+    tabContent.className = 'tab-content';
+    tabContent.id = 'language-tab-content';
+    
+    // Create tabs for each language
+    @foreach($languages as $index => $language)
+        const tabButton{{ $index }} = document.createElement('li');
+        tabButton{{ $index }}.className = 'nav-item';
+        tabButton{{ $index }}.innerHTML = `
+            <button class="nav-link {{ $index === 0 ? 'active' : '' }}" 
+                    id="tab-{{ $language->id }}" 
+                    data-bs-toggle="tab" 
+                    data-bs-target="#content-{{ $language->id }}" 
+                    type="button" 
+                    role="tab">
+                {{ $language->lang_code }}
+            </button>
+        `;
+        
+        const tabPane{{ $index }} = document.createElement('div');
+        tabPane{{ $index }}.className = 'tab-pane fade {{ $index === 0 ? 'show active' : '' }}';
+        tabPane{{ $index }}.id = 'content-{{ $language->id }}';
+        tabPane{{ $index }}.innerHTML = `
+            <div class="p-3">
+                <div id="pairs-{{ $language->id }}">
+                    <!-- Keyword & Value pairs will be added here -->
+                </div>
+            </div>
+        `;
+        
+        tabNav.appendChild(tabButton{{ $index }});
+        tabContent.appendChild(tabPane{{ $index }});
+    @endforeach
+    
+    container.appendChild(tabNav);
+    container.appendChild(tabContent);
+}
+
+function addKeywordValuePair() {
+    // Get active tab
+    const activeTab = document.querySelector('.nav-link.active');
+    if (!activeTab) return;
+    
+    const languageId = activeTab.getAttribute('data-bs-target').replace('#content-', '');
+    const pairsContainer = document.getElementById(`pairs-${languageId}`);
+    
+    const pairDiv = document.createElement('div');
+    pairDiv.className = 'keyword-value-pair border rounded p-3 mb-3';
+    pairDiv.id = `pair-${translationIndex}`;
+    
+    pairDiv.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="mb-0">Detail ${detailIndex + 1}</h6>
-            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeDetail(${detailIndex})">
+            <h6 class="mb-0">Pair ${translationIndex + 1}</h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeKeywordValuePair(${translationIndex})">
                 <i class="material-icons-outlined">delete</i>
             </button>
         </div>
@@ -131,31 +187,20 @@ function addDetail() {
         <div class="row">
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label class="form-label">Language <span class="text-danger">*</span></label>
-                    <select class="form-select" name="translates[${detailIndex}][language_id]" required>
-                        <option value="">Select Language</option>
-                        @foreach($languages as $language)
-                            <option value="{{ $language->id }}">{{ $language->lang_code }}</option>
-                        @endforeach
-                    </select>
+                    <label class="form-label">Keyword <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" 
+                           name="translates[${translationIndex}][keyword]" 
+                           placeholder="Enter keyword"
+                           required>
+                    <input type="hidden" name="translates[${translationIndex}][language_id]" value="${languageId}">
                 </div>
             </div>
             
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label class="form-label">Keyword <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" 
-                           name="translates[${detailIndex}][keyword]" 
-                           placeholder="Enter keyword"
-                           required>
-                </div>
-            </div>
-            
-            <div class="col-12">
-                <div class="mb-3">
                     <label class="form-label">Value <span class="text-danger">*</span></label>
                     <textarea class="form-control" 
-                              name="translates[${detailIndex}][value]" 
+                              name="translates[${translationIndex}][value]" 
                               placeholder="Enter value"
                               rows="3"
                               required></textarea>
@@ -164,64 +209,63 @@ function addDetail() {
         </div>
     `;
     
-    container.appendChild(detailDiv);
-    detailIndex++;
+    pairsContainer.appendChild(pairDiv);
+    translationIndex++;
 }
 
-function removeDetail(index) {
-    const detailDiv = document.getElementById(`detail-${index}`);
-    if (detailDiv) {
-        detailDiv.remove();
+function removeKeywordValuePair(index) {
+    const pairDiv = document.getElementById(`pair-${index}`);
+    if (pairDiv) {
+        pairDiv.remove();
     }
     
-    // Reindex remaining details
-    const details = document.querySelectorAll('.detail-item');
-    details.forEach((detail, newIndex) => {
-        detail.id = `detail-${newIndex}`;
-        detail.querySelector('h6').textContent = `Detail ${newIndex + 1}`;
+    // Reindex remaining pairs
+    const pairs = document.querySelectorAll('.keyword-value-pair');
+    pairs.forEach((pair, newIndex) => {
+        pair.id = `pair-${newIndex}`;
+        pair.querySelector('h6').textContent = `Pair ${newIndex + 1}`;
         
         // Update form field names
-        const languageSelect = detail.querySelector('select[name*="[language_id]"]');
-        const keywordInput = detail.querySelector('input[name*="[keyword]"]');
-        const valueTextarea = detail.querySelector('textarea[name*="[value]"]');
+        const keywordInput = pair.querySelector('input[name*="[keyword]"]');
+        const valueTextarea = pair.querySelector('textarea[name*="[value]"]');
+        const languageInput = pair.querySelector('input[name*="[language_id]"]');
         
-        if (languageSelect) languageSelect.name = `translates[${newIndex}][language_id]`;
         if (keywordInput) keywordInput.name = `translates[${newIndex}][keyword]`;
         if (valueTextarea) valueTextarea.name = `translates[${newIndex}][value]`;
+        if (languageInput) languageInput.name = `translates[${newIndex}][language_id]`;
         
         // Update remove button onclick
-        const removeBtn = detail.querySelector('button[onclick*="removeDetail"]');
-        if (removeBtn) removeBtn.setAttribute('onclick', `removeDetail(${newIndex})`);
+        const removeBtn = pair.querySelector('button[onclick*="removeKeywordValuePair"]');
+        if (removeBtn) removeBtn.setAttribute('onclick', `removeKeywordValuePair(${newIndex})`);
     });
     
-    detailIndex = details.length;
+    translationIndex = pairs.length;
 }
 
 // Form validation before submit
 document.getElementById('createDetailForm').addEventListener('submit', function(e) {
-    const details = document.querySelectorAll('.detail-item');
-    if (details.length === 0) {
+    const pairs = document.querySelectorAll('.keyword-value-pair');
+    if (pairs.length === 0) {
         e.preventDefault();
-        alert('Zəhmət olmasa ən azı bir detail əlavə edin.');
+        alert('Zəhmət olmasa ən azı bir keyword-value pair əlavə edin.');
         return false;
     }
     
     // Check if all required fields are filled
     let isValid = true;
     
-    details.forEach(detail => {
-        const language = detail.querySelector('select[name*="[language_id]"]').value;
-        const keyword = detail.querySelector('input[name*="[keyword]"]').value.trim();
-        const value = detail.querySelector('textarea[name*="[value]"]').value.trim();
+    pairs.forEach(pair => {
+        const keyword = pair.querySelector('input[name*="[keyword]"]').value.trim();
+        const value = pair.querySelector('textarea[name*="[value]"]').value.trim();
         
-        if (!language || !keyword || !value) {
+        if (!keyword || !value) {
             isValid = false;
         }
     });
     
     if (!isValid) {
         e.preventDefault();
-        alert('Zəhmət olmasa bütün tələb olunan sahələri doldurun.');
+        alert('Zəhmət olmasa bütün tələb olunan sahələri doldurun (keyword və value).');
         return false;
     }
     
@@ -232,12 +276,12 @@ document.getElementById('createDetailForm').addEventListener('submit', function(
 </script>
 
 <style>
-.detail-item {
+.keyword-value-pair {
     background-color: #f8f9fa;
     border-left: 4px solid #007bff !important;
 }
 
-.detail-item:hover {
+.keyword-value-pair:hover {
     background-color: #e9ecef;
 }
 </style>
