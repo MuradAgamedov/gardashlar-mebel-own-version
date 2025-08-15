@@ -9,6 +9,13 @@ class ProductDetailsValuesDetailTranslate extends Model
 {
     use HasFactory;
 
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'product_details_values_details_translates';
+
     protected $fillable = [
         'product_details_values_detail_id',
         'language_id',
