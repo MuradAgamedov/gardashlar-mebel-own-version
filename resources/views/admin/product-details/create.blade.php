@@ -51,7 +51,7 @@
                                 <div class="col-md-12">
                                     <div class="alert alert-info">
                                         <i class="material-icons-outlined">info</i>
-                                        <strong>Instructions:</strong> Use the buttons below to add input fields. First button adds 2 inputs, second button adds 3 inputs with ability to add more combinations.
+                                        <strong>Instructions:</strong> Use the buttons below to add input fields. First button adds 2 inputs, second button adds keyword with multiple keyvalue-value pairs.
                                     </div>
                                 </div>
                             </div>
@@ -69,7 +69,7 @@
                                             <i class="material-icons-outlined">add</i> Add Two Inputs (Key + Value)
                                         </button>
                                         <button type="button" class="btn btn-primary" id="addThreeInputs">
-                                            <i class="material-icons-outlined">add_circle</i> Add Three Inputs (Keyword + ValueKeyword + Value)
+                                            <i class="material-icons-outlined">add_circle</i> Add Keyword with KeyValue-Value Pairs
                                         </button>
                                         <button type="button" class="btn btn-warning" id="clearAllInputs">
                                             <i class="material-icons-outlined">clear_all</i> Clear All
@@ -223,7 +223,7 @@
     cursor: not-allowed;
 }
 
-.three-inputs-container {
+.keyword-container {
     border: 1px solid #dee2e6;
     border-radius: 6px;
     padding: 15px;
@@ -231,23 +231,23 @@
     background: white;
 }
 
-.three-inputs-header {
+.keyword-header {
     display: flex;
-    justify-content: space-between;
+    justify-content-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     padding-bottom: 8px;
     border-bottom: 1px solid #e9ecef;
 }
 
-.three-inputs-title {
+.keyword-title {
     font-weight: 500;
     color: #495057;
     margin: 0;
     font-size: 14px;
 }
 
-.remove-three-inputs {
+.remove-keyword {
     background: #dc3545;
     border: none;
     color: white;
@@ -258,8 +258,58 @@
     font-size: 12px;
 }
 
-.remove-three-inputs:hover {
+.remove-keyword:hover {
     background: #c82333;
+}
+
+.keyvalue-value-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.keyvalue-field {
+    flex: 1;
+}
+
+.value-field {
+    flex: 1;
+}
+
+.remove-keyvalue-value {
+    background: #6c757d;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+.remove-keyvalue-value:hover {
+    background: #5a6268;
+}
+
+.add-keyvalue-value-btn {
+    background: #17a2b8;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+.add-keyvalue-value-btn:hover {
+    background: #138496;
 }
 </style>
 @endpush
@@ -282,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function() {
         addInputGroup(2);
     });
 
-    // Add three inputs (Keyword + ValueKeyword + Value)
+    // Add keyword with keyvalue-value pairs
     addThreeBtn.addEventListener('click', function() {
         addInputGroup(3);
     });
@@ -344,17 +394,9 @@ document.addEventListener('DOMContentLoaded', function() {
             inputsContainer.appendChild(keyRow);
             inputsContainer.appendChild(valueRow);
         } else if (inputCount === 3) {
-            // Keyword + ValueKeyword + Value with ability to add more
-            const addMoreBtn = document.createElement('button');
-            addMoreBtn.type = 'button';
-            addMoreBtn.className = 'add-more-btn';
-            addMoreBtn.innerHTML = '<i class="material-icons-outlined">add</i> Add More Combinations';
-            addMoreBtn.onclick = () => addThreeInputsCombination(inputsContainer, wrapper);
-
-            // Add initial three inputs combination
-            const initialCombination = createThreeInputsCombination();
-            inputsContainer.appendChild(initialCombination);
-            inputsContainer.appendChild(addMoreBtn);
+            // Keyword with multiple keyvalue-value pairs
+            const keywordContainer = createKeywordContainer();
+            inputsContainer.appendChild(keywordContainer);
         }
 
         wrapper.appendChild(counter);
@@ -364,33 +406,32 @@ document.addEventListener('DOMContentLoaded', function() {
         return wrapper;
     }
 
-    // Create three inputs combination
-    function createThreeInputsCombination() {
-        const combinationDiv = document.createElement('div');
-        combinationDiv.className = 'three-inputs-container';
+    // Create keyword container
+    function createKeywordContainer() {
+        const keywordDiv = document.createElement('div');
+        keywordDiv.className = 'keyword-container';
 
         const header = document.createElement('div');
-        header.className = 'three-inputs-header';
+        header.className = 'keyword-header';
 
         const title = document.createElement('h6');
-        title.className = 'three-inputs-title';
-        title.textContent = 'Combination';
+        title.className = 'keyword-title';
+        title.textContent = 'Keyword Group';
 
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';
-        removeBtn.className = 'remove-three-inputs';
-        removeBtn.textContent = 'Remove';
-        removeBtn.onclick = () => removeThreeInputsCombination(combinationDiv);
+        removeBtn.className = 'remove-keyword';
+        removeBtn.textContent = 'Remove Keyword';
+        removeBtn.onclick = () => removeKeywordContainer(keywordDiv);
 
         header.appendChild(title);
         header.appendChild(removeBtn);
 
-        const inputsRow = document.createElement('div');
-        inputsRow.className = 'input-row';
-
         // Keyword input
-        const keywordDiv = document.createElement('div');
-        keywordDiv.className = 'input-field';
+        const keywordRow = document.createElement('div');
+        keywordRow.className = 'input-row';
+        const keywordField = document.createElement('div');
+        keywordField.className = 'input-field';
         const keywordLabel = document.createElement('label');
         keywordLabel.className = 'form-label';
         keywordLabel.textContent = 'Keyword';
@@ -398,29 +439,59 @@ document.addEventListener('DOMContentLoaded', function() {
         keywordInput.type = 'text';
         keywordInput.className = 'form-control';
         keywordInput.name = `translates[${totalInputs}][keyword]`;
-        keywordInput.placeholder = 'Enter keyword';
+        keywordInput.placeholder = 'Enter keyword (e.g., specifications)';
         keywordInput.required = true;
-        keywordDiv.appendChild(keywordLabel);
-        keywordDiv.appendChild(keywordInput);
+        keywordField.appendChild(keywordLabel);
+        keywordField.appendChild(keywordInput);
+        keywordRow.appendChild(keywordField);
 
-        // ValueKeyword input
-        const valueKeywordDiv = document.createElement('div');
-        valueKeywordDiv.className = 'input-field';
-        const valueKeywordLabel = document.createElement('label');
-        valueKeywordLabel.className = 'form-label';
-        valueKeywordLabel.textContent = 'Value Keyword';
-        const valueKeywordInput = document.createElement('input');
-        valueKeywordInput.type = 'text';
-        valueKeywordInput.className = 'form-control';
-        valueKeywordInput.name = `translates[${totalInputs}][valuekeyword]`;
-        valueKeywordInput.placeholder = 'Enter value keyword';
-        valueKeywordInput.required = true;
-        valueKeywordDiv.appendChild(valueKeywordLabel);
-        valueKeywordDiv.appendChild(valueKeywordInput);
+        // KeyValue-Value pairs container
+        const pairsContainer = document.createElement('div');
+        pairsContainer.className = 'pairs-container';
+
+        // Add initial keyvalue-value pair
+        const initialPair = createKeyValuePair();
+        pairsContainer.appendChild(initialPair);
+
+        // Add more pairs button
+        const addMorePairsBtn = document.createElement('button');
+        addMorePairsBtn.type = 'button';
+        addMorePairsBtn.className = 'add-keyvalue-value-btn';
+        addMorePairsBtn.innerHTML = '<i class="material-icons-outlined">add</i> Add More KeyValue-Value Pairs';
+        addMorePairsBtn.onclick = () => addKeyValuePair(pairsContainer, keywordDiv);
+
+        keywordDiv.appendChild(header);
+        keywordDiv.appendChild(keywordRow);
+        keywordDiv.appendChild(pairsContainer);
+        keywordDiv.appendChild(addMorePairsBtn);
+
+        totalInputs++;
+        return keywordDiv;
+    }
+
+    // Create keyvalue-value pair
+    function createKeyValuePair() {
+        const pairDiv = document.createElement('div');
+        pairDiv.className = 'keyvalue-value-row';
+
+        // KeyValue input
+        const keyvalueDiv = document.createElement('div');
+        keyvalueDiv.className = 'keyvalue-field';
+        const keyvalueLabel = document.createElement('label');
+        keyvalueLabel.className = 'form-label';
+        keyvalueLabel.textContent = 'KeyValue';
+        const keyvalueInput = document.createElement('input');
+        keyvalueInput.type = 'text';
+        keyvalueInput.className = 'form-control';
+        keyvalueInput.name = `translates[${totalInputs}][keyvalue]`;
+        keyvalueInput.placeholder = 'Enter keyvalue (e.g., size, color)';
+        keyvalueInput.required = true;
+        keyvalueDiv.appendChild(keyvalueLabel);
+        keyvalueDiv.appendChild(keyvalueInput);
 
         // Value input
         const valueDiv = document.createElement('div');
-        valueDiv.className = 'input-field';
+        valueDiv.className = 'value-field';
         const valueLabel = document.createElement('label');
         valueLabel.className = 'form-label';
         valueLabel.textContent = 'Value';
@@ -428,38 +499,50 @@ document.addEventListener('DOMContentLoaded', function() {
         valueInput.type = 'text';
         valueInput.className = 'form-control';
         valueInput.name = `translates[${totalInputs}][value]`;
-        valueInput.placeholder = 'Enter value';
+        valueInput.placeholder = 'Enter value (e.g., large, white)';
         valueInput.required = true;
         valueDiv.appendChild(valueLabel);
         valueDiv.appendChild(valueInput);
 
-        inputsRow.appendChild(keywordDiv);
-        inputsRow.appendChild(valueKeywordDiv);
-        inputsRow.appendChild(valueDiv);
+        // Remove button
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-keyvalue-value';
+        removeBtn.textContent = 'Remove';
+        removeBtn.onclick = () => removeKeyValuePair(pairDiv);
 
-        combinationDiv.appendChild(header);
-        combinationDiv.appendChild(inputsRow);
+        pairDiv.appendChild(keyvalueDiv);
+        pairDiv.appendChild(valueDiv);
+        pairDiv.appendChild(removeBtn);
 
         totalInputs++;
-        return combinationDiv;
+        return pairDiv;
     }
 
-    // Add more three inputs combination
-    function addThreeInputsCombination(container, groupWrapper) {
-        const newCombination = createThreeInputsCombination();
-        container.insertBefore(newCombination, container.lastElementChild);
-        updateGroupCounter(groupWrapper);
+    // Add more keyvalue-value pairs
+    function addKeyValuePair(container, keywordContainer) {
+        const newPair = createKeyValuePair();
+        container.appendChild(newPair);
+        updateGroupCounter(keywordContainer.closest('.input-group-wrapper'));
     }
 
-    // Remove three inputs combination
-    function removeThreeInputsCombination(combinationDiv) {
-        if (combinationDiv.parentElement.children.length > 2) { // 2 because of the add more button
-            combinationDiv.remove();
+    // Remove keyvalue-value pair
+    function removeKeyValuePair(pairDiv) {
+        if (pairDiv.parentElement.children.length > 1) {
+            pairDiv.remove();
             totalInputs--;
             updateAllGroupCounters();
         } else {
-            alert('At least one combination must remain.');
+            alert('At least one KeyValue-Value pair must remain.');
         }
+    }
+
+    // Remove keyword container
+    function removeKeywordContainer(keywordDiv) {
+        const pairs = keywordDiv.querySelectorAll('.keyvalue-value-row');
+        totalInputs -= (pairs.length + 1); // +1 for keyword input
+        keywordDiv.remove();
+        updateAllGroupCounters();
     }
 
     // Create input row
@@ -511,7 +594,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Remove input group
     function removeInputGroup(wrapper) {
         if (container.children.length > 1) {
-            const rows = wrapper.querySelectorAll('.input-row, .three-inputs-container');
+            const rows = wrapper.querySelectorAll('.input-row, .keyword-container');
             totalInputs -= rows.length;
             wrapper.remove();
             updateSubmitButton();
@@ -529,7 +612,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateAllGroupCounters() {
         document.querySelectorAll('.input-group-wrapper').forEach(group => {
             const counter = group.querySelector('.input-counter');
-            const rows = group.querySelectorAll('.input-row, .three-inputs-container');
+            const rows = group.querySelectorAll('.input-row, .keyword-container');
             counter.textContent = rows.length;
         });
     }
