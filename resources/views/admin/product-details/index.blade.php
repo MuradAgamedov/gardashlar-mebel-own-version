@@ -54,7 +54,7 @@
                                     <i class="material-icons-outlined">add</i> 
                                 </a>
                                 <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
-                                    <i class="material-icons-outlined">arrow_back</i> Back to Products
+                                    <i class="material-icons-outlined">arrow_back</i> 
                                 </a>
                             </div>
                         </div>
