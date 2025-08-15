@@ -81,7 +81,7 @@
                                              </th>
                                              <th width="50">#</th>
                                              <th>Keywords</th>
-                                             <th width="80">Details</th>
+                                             
                                              <th width="150">Actions</th>
                                          </tr>
                                      </thead>
@@ -111,14 +111,7 @@
                                                          </div>
                                                      @endforeach
                                                  </td>
-                                                 <td>
-                                                     <a href="#" 
-                                                        class="btn btn-sm btn-outline-secondary" 
-                                                        title="View Details"
-                                                        onclick="viewDetails({{ $detailValue->id }})">
-                                                         <i class="material-icons-outlined">visibility</i>
-                                                     </a>
-                                                 </td>
+                                                 
                                                                                                  <td>
                                                      <div class="d-flex gap-2">
                                                          <a href="{{ route('admin.products.detail-values.edit', [$product, $detailValue]) }}" 
@@ -127,12 +120,12 @@
                                                              <i class="material-icons-outlined">edit</i>
                                                          </a>
                                                          
-                                                         <a href="#" 
-                                                            class="btn btn-sm btn-outline-info" 
-                                                            title="View Values"
-                                                            onclick="viewDetailValues({{ $detailValue->id }})">
-                                                             <i class="material-icons-outlined">visibility</i>
-                                                         </a>
+                                                                                                                   <a href="#" 
+                                                             class="btn btn-sm btn-outline-info" 
+                                                             title="View Details"
+                                                             onclick="viewDetails({{ $detailValue->id }})">
+                                                              <i class="material-icons-outlined">visibility</i>
+                                                          </a>
                                                          
                                                          <form action="{{ route('admin.products.detail-values.destroy', [$product, $detailValue]) }}" 
                                                                method="POST" 
@@ -171,76 +164,13 @@
     </div>
 </div>
 
-<!-- Detail Values Modal -->
-<div class="modal fade" id="detailValuesModal" tabindex="-1" aria-labelledby="detailValuesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="detailValuesModalLabel">Detail Values</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="detailValuesModalBody">
-                <!-- Content will be loaded here -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
-// View Detail Values Function
-function viewDetailValues(detailValueId) {
-    // Find the detail value data from the table
-    const row = document.querySelector(`tr[data-id="${detailValueId}"]`);
-    if (!row) return;
-    
-    // Get all translations
-    const translations = [];
-    const translationRows = row.querySelectorAll('td:nth-child(4) .mb-2');
-    translationRows.forEach(translationRow => {
-        const langCode = translationRow.querySelector('.badge')?.textContent || 'N/A';
-        const keywordText = translationRow.querySelector('span:last-child')?.textContent || 'No keyword';
-        translations.push({ langCode, keyword: keywordText });
-    });
-    
-    // Create modal content
-    const modalBody = document.getElementById('detailValuesModalBody');
-    modalBody.innerHTML = `
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h6 class="mb-0">Detail Value Information</h6>
-                    </div>
-                                         <div class="card-body">
-                         <div class="row">
-                             <div class="col-12">
-                                 <label class="form-label fw-bold">Translations:</label>
-                                 <div class="mt-2">
-                                     ${translations.map(trans => `
-                                         <div class="d-flex align-items-center mb-2 p-2 border rounded">
-                                             <span class="badge bg-primary me-3">${trans.langCode}</span>
-                                             <span class="fw-medium">${trans.keyword}</span>
-                                         </div>
-                                     `).join('')}
-                                 </div>
-                             </div>
-                         </div>
-                     </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Show the modal
-    const modal = new bootstrap.Modal(document.getElementById('detailValuesModal'));
-    modal.show();
-}
+
 
 // View Details Function
 function viewDetails(detailValueId) {
