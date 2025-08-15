@@ -130,18 +130,23 @@ class ProductDetailValueController extends Controller
      */
     public function bulkDelete(Request $request, Product $product)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:product_detail_values,id'
-        ]);
+        try {
+            $request->validate([
+                'ids' => 'required|array',
+                'ids.*' => 'exists:product_detail_values,id'
+            ]);
 
-        $detailValues = ProductDetailValue::whereIn('id', $request->ids)->get();
-        
-        foreach ($detailValues as $detailValue) {
-            $detailValue->translates()->delete();
-            $detailValue->delete();
+            $detailValues = ProductDetailValue::whereIn('id', $request->ids)->get();
+            
+            foreach ($detailValues as $detailValue) {
+                $detailValue->translates()->delete();
+                $detailValue->delete();
+            }
+
+            return response()->json(['success' => true, 'message' => 'Selected detail values deleted successfully']);
+        } catch (\Exception $e) {
+            \Log::error('Bulk delete error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Error occurred while deleting: ' . $e->getMessage()], 500);
         }
-
-        return response()->json(['success' => true]);
     }
 }

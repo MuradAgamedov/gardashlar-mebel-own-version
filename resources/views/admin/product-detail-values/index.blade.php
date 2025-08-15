@@ -68,7 +68,7 @@
                                     Total: {{ $detailValues->count() }} detail values
                                 </div>
                                 <button id="delete-selected-values" class="btn btn-danger btn-sm" disabled>
-                                    <i class="material-icons-outlined">delete</i> 
+                                    <i class="material-icons-outlined">delete</i>
                                 </button>
                             </div>
                             
@@ -234,7 +234,6 @@ function viewDetailValues(detailValueId) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-document.addEventListener('DOMContentLoaded', function() {
     const sortableList = document.getElementById('sortable-values');
     
     if (sortableList) {
@@ -280,46 +279,77 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         sortableList._sortable = sortable;
     }
-});
 
-// Select all functionality
-const selectAll = document.getElementById('select-all-values');
-const checkboxes = document.querySelectorAll('.value-checkbox');
-const deleteBtn = document.getElementById('delete-selected-values');
+    // Select all functionality
+    const selectAll = document.getElementById('select-all-values');
+    const checkboxes = document.querySelectorAll('.value-checkbox');
+    const deleteBtn = document.getElementById('delete-selected-values');
 
-if (selectAll) {
-    selectAll.addEventListener('change', function() {
-        checkboxes.forEach(cb => cb.checked = this.checked);
-        toggleDeleteButton();
+    console.log('Select all element:', selectAll);
+    console.log('Checkboxes found:', checkboxes.length);
+    console.log('Delete button:', deleteBtn);
+
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            console.log('Select all changed:', this.checked);
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            toggleDeleteButton();
+        });
+    }
+
+    checkboxes.forEach((cb, index) => {
+        console.log(`Checkbox ${index}:`, cb);
+        cb.addEventListener('change', function() {
+            console.log(`Checkbox ${index} changed:`, this.checked);
+            toggleDeleteButton();
+        });
     });
-}
 
-checkboxes.forEach(cb => {
-    cb.addEventListener('change', toggleDeleteButton);
-});
+    function toggleDeleteButton() {
+        let anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+        console.log('Any checkbox checked:', anyChecked);
+        deleteBtn.disabled = !anyChecked;
+        console.log('Delete button disabled:', deleteBtn.disabled);
+    }
 
-function toggleDeleteButton() {
-    let anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-    deleteBtn.disabled = !anyChecked;
-}
-
-deleteBtn.addEventListener('click', function() {
-    let ids = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
-    if (ids.length === 0) return;
-    if (!confirm('Are you sure you want to delete the selected detail values?')) return;
-    
-    fetch("{{ route('admin.products.detail-values.bulk-delete', $product) }}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({ ids })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) location.reload();
-        else alert(data.message);
+    deleteBtn.addEventListener('click', function() {
+        console.log('Delete button clicked');
+        let ids = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+        console.log('Selected IDs:', ids);
+        
+        if (ids.length === 0) {
+            alert('Please select at least one item to delete');
+            return;
+        }
+        
+        if (!confirm('Are you sure you want to delete the selected detail values?')) return;
+        
+        console.log('Sending delete request...');
+        
+        fetch("{{ route('admin.products.detail-values.bulk-delete', $product) }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ ids })
+        })
+        .then(res => {
+            console.log('Response status:', res.status);
+            return res.json();
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'Error occurred while deleting');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error occurred while deleting: ' + error.message);
+        });
     });
 });
 </script>
