@@ -39,7 +39,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Edit Product Detail for: <strong>{{ $product->translate()->title ?? 'Product' }}</strong></h5>
                             <a href="{{ route('admin.products.details.index', $product) }}" class="btn btn-outline-secondary">
-                                <i class="material-icons-outlined">arrow_back</i> Back to Product Details
+                                <i class="material-icons-outlined">arrow_back</i>
                             </a>
                         </div>
                     </div>
@@ -133,10 +133,10 @@
                                 <div class="col-md-12">
                                     <div class="d-flex gap-2">
                                         <button type="submit" class="btn btn-primary">
-                                            <i class="material-icons-outlined">save</i> Update Detail
+                                            <i class="material-icons-outlined">save</i>
                                         </button>
                                         <a href="{{ route('admin.products.details.index', $product) }}" class="btn btn-outline-secondary">
-                                            <i class="material-icons-outlined">cancel</i> Cancel
+                                            <i class="material-icons-outlined">cancel</i>
                                         </a>
                                     </div>
                                 </div>

@@ -51,10 +51,10 @@
                             <h5>Detail Values for: <strong>{{ $product->translate()->title ?? 'Product' }}</strong></h5>
                             <div class="d-flex gap-2">
                                 <a href="{{ route('admin.products.detail-values.create', $product) }}" class="btn btn-primary">
-                                    <i class="material-icons-outlined">add</i> Add Detail Value
+                                    <i class="material-icons-outlined">add</i>
                                 </a>
                                 <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
-                                    <i class="material-icons-outlined">arrow_back</i> Back to Products
+                                    <i class="material-icons-outlined">arrow_back</i>
                                 </a>
                             </div>
                         </div>
@@ -156,7 +156,7 @@
                                     <i class="material-icons-outlined" style="font-size: 48px;">list</i>
                                     <p class="mt-2">No detail values found</p>
                                     <a href="{{ route('admin.products.detail-values.create', $product) }}" class="btn btn-primary">
-                                        <i class="material-icons-outlined">add</i> Add First Detail Value
+                                        <i class="material-icons-outlined">add</i>
                                     </a>
                                 </div>
                             </div>
