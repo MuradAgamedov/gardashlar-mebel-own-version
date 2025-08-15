@@ -381,6 +381,11 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         Route::post('products/{product}/detail-values/reorder', [ProductDetailValueController::class, 'reorder'])->name('products.detail-values.reorder');
         Route::post('products/{product}/detail-values/bulk-delete', [ProductDetailValueController::class, 'bulkDelete'])->name('products.detail-values.bulk-delete');
         
+        // Product Details Values Details routes
+        Route::resource('products.detail-values.details', ProductDetailsValuesDetailController::class);
+        Route::post('products/{product}/detail-values/{detailValue}/details/reorder', [ProductDetailsValuesDetailController::class, 'reorder'])->name('products.detail-values.details.reorder');
+        Route::post('products/{product}/detail-values/{detailValue}/details/bulk-delete', [ProductDetailsValuesDetailController::class, 'bulkDelete'])->name('products.detail-values.details.bulk-delete');
+        
         // Our Goals routes
         Route::resource('our-goals', OurGoalController::class);
         Route::post('our-goals/reorder', [OurGoalController::class, 'reorder'])->name('our-goals.reorder');
