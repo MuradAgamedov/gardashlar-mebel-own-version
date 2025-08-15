@@ -81,6 +81,7 @@
                                              </th>
                                              <th width="50">#</th>
                                              <th>Keywords</th>
+                                             <th width="80">Details</th>
                                              <th width="150">Actions</th>
                                          </tr>
                                      </thead>
@@ -109,6 +110,14 @@
                                                              <span class="text-muted">{{ $translate->keyword }}</span>
                                                          </div>
                                                      @endforeach
+                                                 </td>
+                                                 <td>
+                                                     <a href="#" 
+                                                        class="btn btn-sm btn-outline-secondary" 
+                                                        title="View Details"
+                                                        onclick="viewDetails({{ $detailValue->id }})">
+                                                         <i class="material-icons-outlined">visibility</i>
+                                                     </a>
                                                  </td>
                                                                                                  <td>
                                                      <div class="d-flex gap-2">
@@ -192,7 +201,7 @@ function viewDetailValues(detailValueId) {
     
     // Get all translations
     const translations = [];
-    const translationRows = row.querySelectorAll('td:nth-child(3) .mb-2');
+    const translationRows = row.querySelectorAll('td:nth-child(4) .mb-2');
     translationRows.forEach(translationRow => {
         const langCode = translationRow.querySelector('.badge')?.textContent || 'N/A';
         const keywordText = translationRow.querySelector('span:last-child')?.textContent || 'No keyword';
@@ -231,6 +240,12 @@ function viewDetailValues(detailValueId) {
     // Show the modal
     const modal = new bootstrap.Modal(document.getElementById('detailValuesModal'));
     modal.show();
+}
+
+// View Details Function
+function viewDetails(detailValueId) {
+    // Redirect to details page
+    window.location.href = `{{ route('admin.products.detail-values.details.index', $product) }}/${detailValueId}`;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
