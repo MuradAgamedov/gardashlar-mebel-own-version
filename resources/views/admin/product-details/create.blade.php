@@ -422,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Clear all inputs for this language
         clearAllBtn{{ $language->id }}.addEventListener('click', function() {
             if (confirm('Are you sure you want to clear all inputs for this language?')) {
-                const container = document.getElementById(`dynamicInputsContainer-{{ $language->id }}`);
+                const container = document.getElementById(`dynamicInputsContainer-${language->id}`);
                 container.innerHTML = '';
                 inputGroupCounter[{{ $language->id }}] = 0;
                 formFieldCounter[{{ $language->id }}] = 0;
@@ -572,7 +572,7 @@ document.addEventListener('DOMContentLoaded', function() {
         keywordDiv.appendChild(pairsContainer);
         keywordDiv.appendChild(addMorePairsBtn);
 
-        totalInputs[languageId]++;
+        formFieldCounter[languageId]++;
         return keywordDiv;
     }
 
