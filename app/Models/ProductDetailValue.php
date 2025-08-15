@@ -47,6 +47,14 @@ class ProductDetailValue extends Model
     }
 
     /**
+     * Get all details for this product detail value
+     */
+    public function details()
+    {
+        return $this->hasMany(ProductDetailsValuesDetail::class);
+    }
+
+    /**
      * Scope for ordered values
      */
     public function scopeOrdered($query)
