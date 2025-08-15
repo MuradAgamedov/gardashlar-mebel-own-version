@@ -12,6 +12,16 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Check if product_type_id = 2 exists, if not create it
+        $productType = DB::table('product_types')->where('id', 2)->first();
+        if (!$productType) {
+            DB::table('product_types')->insert([
+                'id' => 2,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+        
         // Update all existing products to have product_type_id = 2
         DB::table('products')->update(['product_type_id' => 2]);
     }

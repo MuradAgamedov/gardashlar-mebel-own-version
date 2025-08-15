@@ -41,6 +41,7 @@ class DatabaseSeeder extends Seeder
             ReportSeeder::class,
             VacancySeeder::class,
             ProjectSeeder::class,
+            ProductDetailSeeder::class,
         ]);
     }
 } 

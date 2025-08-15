@@ -241,6 +241,11 @@
                                           
                                             <td>
                                                 <div class="d-flex gap-2">
+                                                    <a href="{{ route('admin.products.details.index', $product) }}" 
+                                                       class="btn btn-sm btn-outline-warning" 
+                                                       title="Product Details">
+                                                        <i class="material-icons-outlined">info</i>
+                                                    </a>
                                                     <a href="{{ route('admin.products.accordions.index', $product) }}" 
                                                        class="btn btn-sm btn-outline-info" 
                                                        title="Accordions">
