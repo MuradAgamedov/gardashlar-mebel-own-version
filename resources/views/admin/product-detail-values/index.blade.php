@@ -81,7 +81,7 @@
                                             </th>
                                             <th width="50">#</th>
                                             <th>Keyword</th>
-                                            <th>Values</th>
+                                            <th>Keywords</th>
                                             <th>Languages</th>
                                             <th width="150">Actions</th>
                                         </tr>
@@ -111,7 +111,7 @@
                                                             <span class="badge badge-light-primary me-2">
                                                                 {{ $translate->language->lang_code ?? 'N/A' }}
                                                             </span>
-                                                            <span class="text-muted">{{ $translate->value }}</span>
+                                                            <span class="text-muted">{{ $translate->keyword }}</span>
                                                         </div>
                                                     @endforeach
                                                 </td>

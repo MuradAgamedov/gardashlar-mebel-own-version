@@ -100,18 +100,18 @@
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="mb-3">
-                                                        <label class="form-label">Value</label>
+                                                        <label class="form-label">Keyword</label>
                                                         @php
                                                             $existingTranslation = $detailValue->translates->where('language_id', $language->id)->first();
-                                                            $value = old('translates.'.$index.'.value', $existingTranslation ? $existingTranslation->value : '');
+                                                            $keyword = old('translates.'.$index.'.keyword', $existingTranslation ? $existingTranslation->keyword : '');
                                                         @endphp
                                                         <input type="text" 
-                                                               class="form-control @error('translates.'.$index.'.value') is-invalid @enderror" 
-                                                               name="translates[{{ $index }}][value]" 
-                                                               placeholder="Enter value for {{ $language->lang_code ?? 'this language' }}"
-                                                               value="{{ $value }}"
+                                                               class="form-control @error('translates.'.$index.'.keyword') is-invalid @enderror" 
+                                                               name="translates[{{ $index }}][keyword]" 
+                                                               placeholder="Enter keyword for {{ $language->lang_code ?? 'this language' }}"
+                                                               value="{{ $keyword }}"
                                                                required>
-                                                        @error('translates.'.$index.'.value')
+                                                        @error('translates.'.$index.'.keyword')
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>

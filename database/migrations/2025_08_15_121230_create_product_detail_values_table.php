@@ -26,7 +26,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_detail_value_id')->constrained('product_detail_values')->onDelete('cascade');
             $table->foreignId('language_id')->constrained('languages')->onDelete('cascade');
-            $table->text('value');
+            $table->text('keyword');
             $table->timestamps();
             
             $table->unique(['product_detail_value_id', 'language_id'], 'product_detail_value_translate_unique');

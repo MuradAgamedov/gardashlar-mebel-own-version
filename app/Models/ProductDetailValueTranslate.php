@@ -12,7 +12,7 @@ class ProductDetailValueTranslate extends Model
     protected $fillable = [
         'product_detail_value_id',
         'language_id',
-        'value',
+        'keyword',
     ];
 
     /**

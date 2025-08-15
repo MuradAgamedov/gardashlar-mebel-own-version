@@ -52,7 +52,7 @@ class ProductDetailValueController extends Controller
             ProductDetailValueTranslate::create([
                 'product_detail_value_id' => $productDetailValue->id,
                 'language_id' => $translate['language_id'],
-                'value' => $translate['value'],
+                'keyword' => $translate['keyword'],
             ]);
         }
 
@@ -95,7 +95,7 @@ class ProductDetailValueController extends Controller
             ProductDetailValueTranslate::create([
                 'product_detail_value_id' => $detailValue->id,
                 'language_id' => $translate['language_id'],
-                'value' => $translate['value'],
+                'keyword' => $translate['keyword'],
             ]);
         }
 
