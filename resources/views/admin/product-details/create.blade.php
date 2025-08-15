@@ -170,6 +170,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 5px;
+    margin-left: 10px;
 }
 
 .remove-row-btn:hover {
@@ -311,6 +312,20 @@
 .add-keyvalue-value-btn:hover {
     background: #138496;
 }
+
+.data-flow-info {
+    background: #e3f2fd;
+    border: 1px solid #2196f3;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 12px;
+    color: #1976d2;
+}
+
+.data-flow-info strong {
+    color: #0d47a1;
+}
 </style>
 @endpush
 
@@ -388,13 +403,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Add inputs based on count
         if (inputCount === 2) {
-            // Key + Value
-            const keyRow = createInputRow('key', 'Key', 'Enter key name');
-            const valueRow = createInputRow('value', 'Value', 'Enter value');
+            // Key + Value - Goes to product_details and product_detail_values
+            const dataFlowInfo = createDataFlowInfo('Key → Details.Keyword, Value → Values.Keyword & Values.Value');
+            inputsContainer.appendChild(dataFlowInfo);
+            
+            const keyRow = createInputRow('key', 'Key', 'Enter key name (e.g., dimensions)');
+            const valueRow = createInputRow('value', 'Value', 'Enter value (e.g., 120x80x45)');
             inputsContainer.appendChild(keyRow);
             inputsContainer.appendChild(valueRow);
         } else if (inputCount === 3) {
             // Keyword with multiple keyvalue-value pairs
+            const dataFlowInfo = createDataFlowInfo('Keyword → Details.Keyword, ValueKeyword → Values.Keyword, Value → Values.Value');
+            inputsContainer.appendChild(dataFlowInfo);
+            
             const keywordContainer = createKeywordContainer();
             inputsContainer.appendChild(keywordContainer);
         }
@@ -404,6 +425,14 @@ document.addEventListener('DOMContentLoaded', function() {
         wrapper.appendChild(inputsContainer);
 
         return wrapper;
+    }
+
+    // Create data flow info
+    function createDataFlowInfo(text) {
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'data-flow-info';
+        infoDiv.innerHTML = `<strong>Data Flow:</strong> ${text}`;
+        return infoDiv;
     }
 
     // Create keyword container
@@ -479,12 +508,12 @@ document.addEventListener('DOMContentLoaded', function() {
         keyvalueDiv.className = 'keyvalue-field';
         const keyvalueLabel = document.createElement('label');
         keyvalueLabel.className = 'form-label';
-        keyvalueLabel.textContent = 'KeyValue';
+        keyvalueLabel.textContent = 'ValueKeyword';
         const keyvalueInput = document.createElement('input');
         keyvalueInput.type = 'text';
         keyvalueInput.className = 'form-control';
-        keyvalueInput.name = `translates[${totalInputs}][keyvalue]`;
-        keyvalueInput.placeholder = 'Enter keyvalue (e.g., size, color)';
+        keyvalueInput.name = `translates[${totalInputs}][valuekeyword]`;
+        keyvalueInput.placeholder = 'Enter value keyword (e.g., size, color)';
         keyvalueInput.required = true;
         keyvalueDiv.appendChild(keyvalueLabel);
         keyvalueDiv.appendChild(keyvalueInput);
