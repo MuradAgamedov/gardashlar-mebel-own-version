@@ -38,7 +38,6 @@ class ProductDetailValueController extends Controller
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.keyword' => 'required|string|max:255',
-            'translates.*.value' => 'required|string',
         ]);
 
         // Create product detail value
@@ -80,7 +79,6 @@ class ProductDetailValueController extends Controller
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.keyword' => 'required|string|max:255',
-            'translates.*.value' => 'required|string',
         ]);
 
         // Delete existing translations
