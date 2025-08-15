@@ -47,25 +47,6 @@
                     <form action="{{ route('admin.products.detail-values.store', $product) }}" method="POST">
                         @csrf
                         <div class="card-body">
-                            <!-- Keyword Field -->
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Keyword</label>
-                                        <input type="text" 
-                                               class="form-control @error('keyword') is-invalid @enderror" 
-                                               name="keyword" 
-                                               placeholder="Enter keyword (e.g., dimensions, material, color)"
-                                               value="{{ old('keyword') }}"
-                                               required>
-                                        @error('keyword')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                        <div class="form-text">This keyword will be used to identify this detail value.</div>
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Language Tabs -->
                             <div class="row mb-4">
                                 <div class="col-12">
