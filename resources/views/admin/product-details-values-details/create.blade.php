@@ -52,23 +52,21 @@
                         </div>
                     </div>
                     
-                    <form action="{{ route('admin.products.detail-values.details.store', [$product, $detailValue]) }}" method="POST">
+                    <form action="{{ route('admin.products.detail-values.details.store', [$product, $detailValue]) }}" method="POST" id="createDetailForm">
                         @csrf
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h6 class="mb-0">Translations</h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div class="d-flex justify-content-between align-items-center">
                                                 <h6 class="mb-0">Translations</h6>
                                                 <button type="button" class="btn btn-sm btn-primary" onclick="addKeywordValuePair()">
                                                     <i class="material-icons-outlined">add</i> Add Keyword & Value
                                                 </button>
                                             </div>
-                                            
+                                        </div>
+                                        <div class="card-body">
                                             <div id="translations-container">
                                                 <!-- Translation tabs will be added here -->
                                             </div>
@@ -83,7 +81,7 @@
                                 <a href="{{ route('admin.products.detail-values.details.index', [$product, $detailValue]) }}" class="btn btn-secondary">
                                     Cancel
                                 </a>
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary" id="submitBtn">
                                     <i class="material-icons-outlined">save</i> Create Detail
                                 </button>
                             </div>
@@ -103,6 +101,10 @@ let translationIndex = 0;
 // Add initial language tabs
 document.addEventListener('DOMContentLoaded', function() {
     createLanguageTabs();
+    // Add initial keyword-value pair to the first language
+    setTimeout(() => {
+        addKeywordValuePair();
+    }, 100);
 });
 
 function createLanguageTabs() {
@@ -175,7 +177,7 @@ function addKeywordValuePair() {
         <div class="row">
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label class="form-label">Keyword</label>
+                    <label class="form-label">Keyword <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" 
                            name="translates[${translationIndex}][keyword]" 
                            placeholder="Enter keyword"
@@ -186,7 +188,7 @@ function addKeywordValuePair() {
             
             <div class="col-md-6">
                 <div class="mb-3">
-                    <label class="form-label">Value</label>
+                    <label class="form-label">Value <span class="text-danger">*</span></label>
                     <textarea class="form-control" 
                               name="translates[${translationIndex}][value]" 
                               placeholder="Enter value"
@@ -229,5 +231,36 @@ function removeKeywordValuePair(index) {
     
     translationIndex = pairs.length;
 }
+
+// Form validation before submit
+document.getElementById('createDetailForm').addEventListener('submit', function(e) {
+    const pairs = document.querySelectorAll('.keyword-value-pair');
+    if (pairs.length === 0) {
+        e.preventDefault();
+        alert('Please add at least one keyword-value pair before submitting.');
+        return false;
+    }
+    
+    // Check if all required fields are filled
+    let isValid = true;
+    pairs.forEach(pair => {
+        const keyword = pair.querySelector('input[name*="[keyword]"]').value.trim();
+        const value = pair.querySelector('textarea[name*="[value]"]').value.trim();
+        
+        if (!keyword || !value) {
+            isValid = false;
+        }
+    });
+    
+    if (!isValid) {
+        e.preventDefault();
+        alert('Please fill in all required fields (keyword and value) before submitting.');
+        return false;
+    }
+    
+    // Disable submit button to prevent double submission
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').innerHTML = '<i class="material-icons-outlined">hourglass_empty</i> Creating...';
+});
 </script>
 @endpush
