@@ -389,6 +389,7 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded - Initializing product details form');
     let inputGroupCounter = {};
     let totalInputs = {};
     let formFieldCounter = {};
@@ -398,6 +399,7 @@ document.addEventListener('DOMContentLoaded', function() {
         inputGroupCounter[{{ $language->id }}] = 0;
         totalInputs[{{ $language->id }}] = 0;
         formFieldCounter[{{ $language->id }}] = 0;
+        console.log('Initialized counters for language:', {{ $language->id }});
     @endforeach
     
     const submitBtn = document.getElementById('submitBtn');
@@ -409,37 +411,51 @@ document.addEventListener('DOMContentLoaded', function() {
         const addThreeBtn{{ $language->id }} = document.querySelector('.add-three-inputs[data-language="{{ $language->id }}"]');
         const clearAllBtn{{ $language->id }} = document.querySelector('.clear-all-inputs[data-language="{{ $language->id }}"]');
         
-        // Add two inputs (Key + Value)
-        addTwoBtn{{ $language->id }}.addEventListener('click', function() {
-            addInputGroup({{ $language->id }}, 2);
-        });
+        if (addTwoBtn{{ $language->id }}) {
+            // Add two inputs (Key + Value)
+            addTwoBtn{{ $language->id }}.addEventListener('click', function() {
+                console.log('Add two inputs button clicked for language:', {{ $language->id }});
+                addInputGroup({{ $language->id }}, 2);
+            });
+        }
 
-        // Add keyword with keyvalue-value pairs
-        addThreeBtn{{ $language->id }}.addEventListener('click', function() {
-            addInputGroup({{ $language->id }}, 3);
-        });
+        if (addThreeBtn{{ $language->id }}) {
+            // Add keyword with keyvalue-value pairs
+            addThreeBtn{{ $language->id }}.addEventListener('click', function() {
+                console.log('Add three inputs button clicked for language:', {{ $language->id }});
+                addInputGroup({{ $language->id }}, 3);
+            });
+        }
 
-        // Clear all inputs for this language
-        clearAllBtn{{ $language->id }}.addEventListener('click', function() {
-            if (confirm('Are you sure you want to clear all inputs for this language?')) {
-                const container = document.getElementById(`dynamicInputsContainer-${language->id}`);
-                container.innerHTML = '';
-                inputGroupCounter[{{ $language->id }}] = 0;
-                formFieldCounter[{{ $language->id }}] = 0;
-                updateSubmitButton();
-                showEmptyState({{ $language->id }});
-            }
-        });
+        if (clearAllBtn{{ $language->id }}) {
+            // Clear all inputs for this language
+            clearAllBtn{{ $language->id }}.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all inputs for this language?')) {
+                    const container = document.getElementById(`dynamicInputsContainer-{{ $language->id }}`);
+                    container.innerHTML = '';
+                    inputGroupCounter[{{ $language->id }}] = 0;
+                    formFieldCounter[{{ $language->id }}] = 0;
+                    updateSubmitButton();
+                    showEmptyState({{ $language->id }});
+                }
+            });
+        }
     @endforeach
 
     // Add input group
     function addInputGroup(languageId, inputCount) {
+        console.log('Adding input group for language:', languageId, 'with count:', inputCount);
         inputGroupCounter[languageId]++;
         const inputGroup = createInputGroup(languageId, inputGroupCounter[languageId], inputCount);
         const container = document.getElementById(`dynamicInputsContainer-${languageId}`);
-        container.appendChild(inputGroup);
-        updateSubmitButton();
-        hideEmptyState(languageId);
+        if (container) {
+            container.appendChild(inputGroup);
+            updateSubmitButton();
+            hideEmptyState(languageId);
+            console.log('Input group added successfully');
+        } else {
+            console.error('Container not found for language:', languageId);
+        }
     }
 
     // Create input group
@@ -638,6 +654,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const newPair = createKeyValuePair(languageId);
         container.appendChild(newPair);
         updateGroupCounter(keywordContainer.closest('.input-group-wrapper'));
+        updateSubmitButton();
     }
 
     // Update group counter
@@ -706,6 +723,7 @@ document.addEventListener('DOMContentLoaded', function() {
         row.appendChild(removeBtn);
 
         formFieldCounter[languageId]++;
+        updateSubmitButton();
         return row;
     }
 
@@ -795,8 +813,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Show initial empty state for all languages
     @foreach($languages as $language)
+        console.log('Setting up empty state for language:', {{ $language->id }});
         showEmptyState({{ $language->id }});
     @endforeach
+    
+    console.log('Product details form initialization complete');
+    console.log('Available languages:', @json($languages->pluck('id')->toArray()));
 });
 </script>
 @endpush
