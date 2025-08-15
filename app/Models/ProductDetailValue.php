@@ -28,12 +28,12 @@ class ProductDetailValue extends Model
         return $this->hasMany(ProductDetailValueTranslate::class);
     }
 
-    public function translate($languageId = null)
+    public function translate($locale = null)
     {
-        if (!$languageId) {
-            $languageId = Language::where('is_default', true)->first()->id ?? 1;
+        if (!$locale) {
+            $locale = config('app.locale', 'en');
         }
-        return $this->translates()->where('language_id', $languageId)->first();
+        return $this->translates()->where('locale', $locale)->first();
     }
 
     public function scopeOrdered($query)
