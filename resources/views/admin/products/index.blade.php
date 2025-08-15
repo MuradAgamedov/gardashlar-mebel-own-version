@@ -246,6 +246,11 @@
                                                        title="Product Details">
                                                         <i class="material-icons-outlined">info</i>
                                                     </a>
+                                                    <a href="{{ route('admin.products.detail-values.index', $product) }}" 
+                                                       class="btn btn-sm btn-outline-secondary" 
+                                                       title="Detail Values">
+                                                        <i class="material-icons-outlined">list</i>
+                                                    </a>
                                                     <a href="{{ route('admin.products.accordions.index', $product) }}" 
                                                        class="btn btn-sm btn-outline-info" 
                                                        title="Accordions">

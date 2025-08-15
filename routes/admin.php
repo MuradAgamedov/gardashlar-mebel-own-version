@@ -65,6 +65,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductAccordionController;
 use App\Http\Controllers\Admin\ProductImageController;
 use App\Http\Controllers\Admin\ProductDetailController;
+use App\Http\Controllers\Admin\ProductDetailValueController;
 use App\Http\Controllers\Admin\OurGoalController;
 use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Admin\SimpleImageController;
@@ -374,6 +375,11 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         Route::resource('products.details', ProductDetailController::class);
         Route::post('products/{product}/details/reorder', [ProductDetailController::class, 'reorder'])->name('products.details.reorder');
         Route::post('products/{product}/details/bulk-delete', [ProductDetailController::class, 'bulkDelete'])->name('products.details.bulk-delete');
+
+        // Product Detail Values routes
+        Route::resource('products.detail-values', ProductDetailValueController::class);
+        Route::post('products/{product}/detail-values/reorder', [ProductDetailValueController::class, 'reorder'])->name('products.detail-values.reorder');
+        Route::post('products/{product}/detail-values/bulk-delete', [ProductDetailValueController::class, 'bulkDelete'])->name('products.detail-values.bulk-delete');
         
         // Our Goals routes
         Route::resource('our-goals', OurGoalController::class);
