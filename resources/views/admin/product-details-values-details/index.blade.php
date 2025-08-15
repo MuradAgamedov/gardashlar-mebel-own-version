@@ -57,7 +57,7 @@
                             <h5>Details for: <strong>{{ $detailValue->translate()->keyword ?? 'Detail Value' }}</strong></h5>
                             <div class="d-flex gap-2">
                                 <a href="{{ route('admin.products.detail-values.details.create', [$product, $detailValue]) }}" class="btn btn-primary">
-                                    <i class="material-icons-outlined">add</i>
+                                    <i class="material-icons-outlined">add</i> Add Detail
                                 </a>
                                 <a href="{{ route('admin.products.detail-values.index', $product) }}" class="btn btn-outline-secondary">
                                     <i class="material-icons-outlined">arrow_back</i>
@@ -69,56 +69,66 @@
                     <div class="card-body">
                         @if($details->count() > 0)
                             <!-- Results Summary -->
-                            <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
                                 <div class="text-muted">
+                                    <i class="material-icons-outlined">list</i>
                                     Total: {{ $details->count() }} details
                                 </div>
-                                <button id="delete-selected-details" class="btn btn-danger btn-sm" disabled>
-                                    <i class="material-icons-outlined">delete</i>
-                                </button>
+                                <div class="d-flex gap-2">
+                                    <button id="delete-selected-details" class="btn btn-danger btn-sm" disabled>
+                                        <i class="material-icons-outlined">delete</i> Delete Selected
+                                    </button>
+                                    <input type="checkbox" id="select-all-details" class="form-check-input">
+                                    <label for="select-all-details" class="form-check-label">Select All</label>
+                                </div>
                             </div>
                             
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th width="30">
-                                                <input type="checkbox" id="select-all-details">
-                                            </th>
-                                            <th width="50">#</th>
-                                            <th>Keywords & Values</th>
-                                            <th width="150">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="sortable-details">
-                                        @foreach($details as $detail)
-                                            <tr data-id="{{ $detail->id }}">
-                                                <td>
-                                                    <input type="checkbox" class="detail-checkbox" value="{{ $detail->id }}">
-                                                </td>
-                                                <td>
-                                                    <div class="drag-handle">
-                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <circle cx="8" cy="8" r="1"></circle>
-                                                            <circle cx="16" cy="8" r="1"></circle>
-                                                            <circle cx="8" cy="16" r="1"></circle>
-                                                            <circle cx="16" cy="16" r="1"></circle>
-                                                        </svg>
-                                                    </div>
-                                                </td>
-                                                <td>
+                            <!-- Details Grid -->
+                            <div class="row" id="sortable-details">
+                                @foreach($details as $index => $detail)
+                                    <div class="col-md-6 col-lg-4 mb-4" data-id="{{ $detail->id }}">
+                                        <div class="card detail-card h-100">
+                                            <div class="card-header d-flex justify-content-between align-items-center py-2">
+                                                <div class="d-flex align-items-center">
+                                                    <input type="checkbox" class="detail-checkbox me-2" value="{{ $detail->id }}">
+                                                    <span class="badge badge-primary">{{ $index + 1 }}</span>
+                                                </div>
+                                                <div class="drag-handle" style="cursor: move;">
+                                                    <i class="material-icons-outlined text-muted">drag_indicator</i>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="card-body">
+                                                <div class="translations-container">
                                                     @foreach($detail->translates as $translate)
-                                                        <div class="mb-2">
-                                                            <span class="badge badge-light-primary me-2">
-                                                                {{ $translate->language->lang_code ?? 'N/A' }}
-                                                            </span>
-                                                            <span class="fw-medium">{{ $translate->keyword }}</span>
-                                                            <span class="text-muted ms-2">: {{ $translate->value }}</span>
+                                                        <div class="translation-item mb-3 p-3 border rounded">
+                                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                                <span class="badge badge-light-primary">
+                                                                    {{ $translate->language->lang_code ?? 'N/A' }}
+                                                                </span>
+                                                                <small class="text-muted">ID: {{ $detail->id }}</small>
+                                                            </div>
+                                                            <div class="keyword-section mb-2">
+                                                                <strong class="text-primary">Keyword:</strong>
+                                                                <span class="ms-2">{{ $translate->keyword }}</span>
+                                                            </div>
+                                                            <div class="value-section">
+                                                                <strong class="text-success">Value:</strong>
+                                                                <div class="mt-1 p-2 bg-light rounded">
+                                                                    {{ $translate->value }}
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     @endforeach
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex gap-2">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="card-footer">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">
+                                                        Order: {{ $detail->order }}
+                                                    </small>
+                                                    <div class="d-flex gap-1">
                                                         <a href="{{ route('admin.products.detail-values.details.edit', [$product, $detailValue, $detail]) }}" 
                                                            class="btn btn-sm btn-outline-primary" 
                                                            title="Edit">
@@ -138,19 +148,20 @@
                                                             </button>
                                                         </form>
                                                     </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         @else
-                            <div class="text-center py-4">
+                            <div class="text-center py-5">
                                 <div class="text-muted">
-                                    <i class="material-icons-outlined" style="font-size: 48px;">list</i>
-                                    <p class="mt-2">No details found</p>
+                                    <i class="material-icons-outlined" style="font-size: 64px; color: #e0e0e0;">list</i>
+                                    <h5 class="mt-3">No details found</h5>
+                                    <p class="text-muted">Start by adding your first detail</p>
                                     <a href="{{ route('admin.products.detail-values.details.create', [$product, $detailValue]) }}" class="btn btn-primary">
-                                        <i class="material-icons-outlined">add</i>
+                                        <i class="material-icons-outlined">add</i> Add First Detail
                                     </a>
                                 </div>
                             </div>
@@ -174,8 +185,8 @@ document.addEventListener('DOMContentLoaded', function() {
             handle: '.drag-handle',
             animation: 150,
             onEnd: function(evt) {
-                const items = Array.from(sortableList.children).map((tr, index) => {
-                    return tr.getAttribute('data-id');
+                const items = Array.from(sortableList.children).map((div, index) => {
+                    return div.getAttribute('data-id');
                 }).filter(id => id !== null);
 
                 // Send reorder request
@@ -194,6 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const alert = document.createElement('div');
                         alert.className = 'alert alert-success alert-dismissible fade show';
                         alert.innerHTML = `
+                            <i class="material-icons-outlined">check_circle</i>
                             Order updated successfully
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         `;
@@ -262,4 +274,42 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+<style>
+.detail-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+.detail-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.translation-item {
+    background-color: #f8f9fa;
+    border-left: 4px solid #007bff !important;
+}
+
+.keyword-section {
+    font-size: 0.9rem;
+}
+
+.value-section {
+    font-size: 0.9rem;
+}
+
+.drag-handle:hover {
+    color: #007bff !important;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.card-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+}
+</style>
 @endpush
