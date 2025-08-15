@@ -35,6 +35,14 @@ class ProductDetail extends Model
     }
 
     /**
+     * Get all values for this product detail
+     */
+    public function values()
+    {
+        return $this->hasMany(ProductDetailValue::class);
+    }
+
+    /**
      * Get translation for specific language
      */
     public function translate($languageId = null)
