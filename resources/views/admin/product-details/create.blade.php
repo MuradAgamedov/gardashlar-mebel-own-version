@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Clear all inputs for this language
         clearAllBtn{{ $language->id }}.addEventListener('click', function() {
             if (confirm('Are you sure you want to clear all inputs for this language?')) {
-                const container = document.getElementById(`dynamicInputsContainer-{{ $language->id }}`);
+                const container = document.getElementById(`dynamicInputsContainer-${language->id}`);
                 container.innerHTML = '';
                 inputGroupCounter[{{ $language->id }}] = 0;
                 totalInputs[{{ $language->id }}] = 0;
@@ -656,6 +656,12 @@ document.addEventListener('DOMContentLoaded', function() {
         label.className = 'form-label';
         label.textContent = labelText;
 
+        // Add hidden language_id field
+        const languageIdInput = document.createElement('input');
+        languageIdInput.type = 'hidden';
+        languageIdInput.name = `translates[${totalInputs[languageId]}][language_id]`;
+        languageIdInput.value = languageId;
+
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'form-control';
@@ -664,6 +670,7 @@ document.addEventListener('DOMContentLoaded', function() {
         input.required = true;
 
         inputDiv.appendChild(label);
+        inputDiv.appendChild(languageIdInput);
         inputDiv.appendChild(input);
 
         const removeBtn = document.createElement('button');

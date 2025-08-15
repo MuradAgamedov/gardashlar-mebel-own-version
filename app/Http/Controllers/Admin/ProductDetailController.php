@@ -9,6 +9,8 @@ use App\Models\ProductDetailTranslate;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\ProductDetailValue;
+use App\Models\ProductDetailValueTranslate;
 
 class ProductDetailController extends Controller
 {
@@ -39,28 +41,57 @@ class ProductDetailController extends Controller
     {
         $request->validate([
             'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.keyword' => 'required|string|max:255',
-            'translates.*.value' => 'required|array',
+            'translates.*.value' => 'required|string|max:1000',
+            'translates.*.valuekeyword' => 'nullable|string|max:255',
         ]);
 
         try {
             DB::beginTransaction();
 
-            // Create product detail
-            $productDetail = ProductDetail::create([
-                'product_id' => $product->id,
-                'order' => ProductDetail::where('product_id', $product->id)->max('order') + 1
-            ]);
+            // Group translations by language
+            $translationsByLanguage = [];
+            foreach ($request->translates as $index => $translate) {
+                $languageId = $request->input("translates.{$index}.language_id", 1); // Default to first language
+                if (!isset($translationsByLanguage[$languageId])) {
+                    $translationsByLanguage[$languageId] = [];
+                }
+                $translationsByLanguage[$languageId][] = $translate;
+            }
 
-            // Create translations
-            foreach ($request->translates as $translate) {
-                ProductDetailTranslate::create([
-                    'product_detail_id' => $productDetail->id,
-                    'language_id' => $translate['language_id'],
-                    'keyword' => $translate['keyword'],
-                    'value' => $translate['value']
-                ]);
+            // Process each language
+            foreach ($translationsByLanguage as $languageId => $translations) {
+                foreach ($translations as $translation) {
+                    // Create product detail
+                    $productDetail = ProductDetail::create([
+                        'product_id' => $product->id,
+                        'order' => ProductDetail::where('product_id', $product->id)->max('order') + 1
+                    ]);
+
+                    // Create product detail translate
+                    ProductDetailTranslate::create([
+                        'product_detail_id' => $productDetail->id,
+                        'language_id' => $languageId,
+                        'keyword' => $translation['keyword'],
+                        'value' => $translation['value']
+                    ]);
+
+                    // If valuekeyword exists, create product detail value
+                    if (isset($translation['valuekeyword']) && !empty($translation['valuekeyword'])) {
+                        $productDetailValue = ProductDetailValue::create([
+                            'product_detail_id' => $productDetail->id,
+                            'order' => ProductDetailValue::where('product_detail_id', $productDetail->id)->max('order') + 1
+                        ]);
+
+                        // Create product detail value translate
+                        ProductDetailValueTranslate::create([
+                            'product_detail_value_id' => $productDetailValue->id,
+                            'language_id' => $languageId,
+                            'keyword' => $translation['valuekeyword'],
+                            'value' => $translation['value']
+                        ]);
+                    }
+                }
             }
 
             DB::commit();
