@@ -13,7 +13,6 @@ class ProductDetailValueTranslate extends Model
         'product_detail_value_id',
         'language_id',
         'keyword',
-        'value',
     ];
 
     /**
