@@ -60,16 +60,64 @@
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-header">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <h6 class="mb-0">Translations</h6>
-                                                <button type="button" class="btn btn-sm btn-primary" onclick="addTranslationPair()">
-                                                    <i class="material-icons-outlined">add</i> Add Language
-                                                </button>
-                                            </div>
+                                            <h6 class="mb-0">Translations</h6>
                                         </div>
                                         <div class="card-body">
-                                            <div id="translations-container">
-                                                <!-- Translation pairs will be added here -->
+                                            <ul class="nav nav-tabs" id="languageTabs" role="tablist">
+                                                @foreach($languages as $index => $language)
+                                                    <li class="nav-item" role="presentation">
+                                                        <button class="nav-link {{ $index === 0 ? 'active' : '' }}" 
+                                                                id="tab-{{ $language->id }}" 
+                                                                data-bs-toggle="tab" 
+                                                                data-bs-target="#content-{{ $language->id }}" 
+                                                                type="button" 
+                                                                role="tab" 
+                                                                aria-controls="content-{{ $language->id }}" 
+                                                                aria-selected="{{ $index === 0 ? 'true' : 'false' }}">
+                                                            {{ $language->lang_code }}
+                                                        </button>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                            
+                                            <div class="tab-content" id="languageTabContent">
+                                                @foreach($languages as $index => $language)
+                                                    @php
+                                                        $translation = $detail->translates->where('language_id', $language->id)->first();
+                                                        $keyword = $translation ? $translation->keyword : '';
+                                                        $value = $translation ? $translation->value : '';
+                                                    @endphp
+                                                    <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" 
+                                                         id="content-{{ $language->id }}" 
+                                                         role="tabpanel" 
+                                                         aria-labelledby="tab-{{ $language->id }}">
+                                                        <div class="p-3">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Keyword</label>
+                                                                        <input type="text" class="form-control" 
+                                                                               name="translates[{{ $language->id }}][keyword]" 
+                                                                               placeholder="Enter keyword for {{ $language->lang_code }}"
+                                                                               value="{{ old('translates.'.$language->id.'.keyword', $keyword) }}"
+                                                                               required>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <div class="col-md-6">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Value</label>
+                                                                        <textarea class="form-control" 
+                                                                                  name="translates[{{ $language->id }}][value]" 
+                                                                                  placeholder="Enter value for {{ $language->lang_code }}"
+                                                                                  rows="3"
+                                                                                  required>{{ old('translates.'.$language->id.'.value', $value) }}</textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
                                             </div>
                                         </div>
                                     </div>
@@ -97,108 +145,27 @@
 
 @push('scripts')
 <script>
-let translationIndex = 0;
-const existingTranslations = @json($detail->translates);
-
-// Add initial translation pairs from existing data
+// Add language_id to form data when submitting
 document.addEventListener('DOMContentLoaded', function() {
-    if (existingTranslations.length > 0) {
-        existingTranslations.forEach(translation => {
-            addTranslationPair(translation);
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        // Add language_id to each translation field
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        tabPanes.forEach(tabPane => {
+            const languageId = tabPane.id.replace('content-', '');
+            const keywordInput = tabPane.querySelector('input[name*="[keyword]"]');
+            const valueTextarea = tabPane.querySelector('textarea[name*="[value]"]');
+            
+            if (keywordInput && valueTextarea) {
+                // Create hidden input for language_id
+                const languageIdInput = document.createElement('input');
+                languageIdInput.type = 'hidden';
+                languageIdInput.name = keywordInput.name.replace('[keyword]', '[language_id]');
+                languageIdInput.value = languageId;
+                form.appendChild(languageIdInput);
+            }
         });
-    } else {
-        addTranslationPair();
-    }
-});
-
-function addTranslationPair(existingTranslation = null) {
-    const container = document.getElementById('translations-container');
-    const pairDiv = document.createElement('div');
-    pairDiv.className = 'translation-pair border rounded p-3 mb-3';
-    pairDiv.id = `translation-pair-${translationIndex}`;
-    
-    const languageId = existingTranslation ? existingTranslation.language_id : '';
-    const keyword = existingTranslation ? existingTranslation.keyword : '';
-    const value = existingTranslation ? existingTranslation.value : '';
-    
-    pairDiv.innerHTML = `
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="mb-0">Language ${translationIndex + 1}</h6>
-            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTranslationPair(${translationIndex})">
-                <i class="material-icons-outlined">delete</i>
-            </button>
-        </div>
-        
-        <div class="row">
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label class="form-label">Language</label>
-                    <select class="form-select" name="translates[${translationIndex}][language_id]" required>
-                        <option value="">Select Language</option>
-                        @foreach($languages as $language)
-                            <option value="{{ $language->id }}" ${languageId == {{ $language->id }} ? 'selected' : ''}>
-                                {{ $language->lang_code }} - {{ $language->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label class="form-label">Keyword</label>
-                    <input type="text" class="form-control" 
-                           name="translates[${translationIndex}][keyword]" 
-                           placeholder="Enter keyword for this language"
-                           value="${keyword}"
-                           required>
-                </div>
-            </div>
-            
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label class="form-label">Value</label>
-                    <textarea class="form-control" 
-                              name="translates[${translationIndex}][value]" 
-                              placeholder="Enter value for this language"
-                              rows="3"
-                              required>${value}</textarea>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    container.appendChild(pairDiv);
-    translationIndex++;
-}
-
-function removeTranslationPair(index) {
-    const pairDiv = document.getElementById(`translation-pair-${index}`);
-    if (pairDiv) {
-        pairDiv.remove();
-    }
-    
-    // Reindex remaining pairs
-    const pairs = document.querySelectorAll('.translation-pair');
-    pairs.forEach((pair, newIndex) => {
-        pair.id = `translation-pair-${newIndex}`;
-        pair.querySelector('h6').textContent = `Language ${newIndex + 1}`;
-        
-        // Update form field names
-        const languageSelect = pair.querySelector('select[name*="[language_id]"]');
-        const keywordInput = pair.querySelector('input[name*="[keyword]"]');
-        const valueTextarea = pair.querySelector('textarea[name*="[value]"]');
-        
-        if (languageSelect) languageSelect.name = `translates[${newIndex}][language_id]`;
-        if (keywordInput) keywordInput.name = `translates[${newIndex}][keyword]`;
-        if (valueTextarea) valueTextarea.name = `translates[${newIndex}][value]`;
-        
-        // Update remove button onclick
-        const removeBtn = pair.querySelector('button[onclick*="removeTranslationPair"]');
-        if (removeBtn) removeBtn.setAttribute('onclick', `removeTranslationPair(${newIndex})`);
     });
-    
-    translationIndex = pairs.length;
-}
+});
 </script>
 @endpush
