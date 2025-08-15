@@ -172,13 +172,6 @@ function addKeywordValuePair() {
     const languageId = activeTab.getAttribute('data-bs-target').replace('#content-', '');
     const pairsContainer = document.getElementById(`pairs-${languageId}`);
     
-    // Check if this language already has a pair
-    const existingPairs = pairsContainer.querySelectorAll('.keyword-value-pair');
-    if (existingPairs.length > 0) {
-        alert('Bu dil üçün artıq keyword-value pair mövcuddur. Hər dil üçün yalnız bir pair əlavə edə bilərsiniz.');
-        return;
-    }
-    
     const pairDiv = document.createElement('div');
     pairDiv.className = 'keyword-value-pair border rounded p-3 mb-3';
     pairDiv.id = `pair-${translationIndex}`;
@@ -260,24 +253,14 @@ document.getElementById('createDetailForm').addEventListener('submit', function(
     
     // Check if all required fields are filled
     let isValid = true;
-    const languageIds = new Set();
     
     pairs.forEach(pair => {
         const keyword = pair.querySelector('input[name*="[keyword]"]').value.trim();
         const value = pair.querySelector('textarea[name*="[value]"]').value.trim();
-        const languageId = pair.querySelector('input[name*="[language_id]"]').value;
         
         if (!keyword || !value) {
             isValid = false;
         }
-        
-        // Check for duplicate language IDs
-        if (languageIds.has(languageId)) {
-            isValid = false;
-            alert('Eyni dil üçün birdən çox pair əlavə edə bilməzsiniz.');
-            return false;
-        }
-        languageIds.add(languageId);
     });
     
     if (!isValid) {
