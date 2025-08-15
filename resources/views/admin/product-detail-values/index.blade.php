@@ -68,7 +68,7 @@
                                     Total: {{ $detailValues->count() }} detail values
                                 </div>
                                 <button id="delete-selected-values" class="btn btn-danger btn-sm" disabled>
-                                    <i class="material-icons-outlined">delete</i> Delete Selected
+                                    <i class="material-icons-outlined">delete</i> 
                                 </button>
                             </div>
                             
