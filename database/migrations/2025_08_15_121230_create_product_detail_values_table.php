@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Create product_detail_values table
+        // Create product_detail_values table (non-translatable fields)
         Schema::create('product_detail_values', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
@@ -21,12 +21,12 @@ return new class extends Migration
             $table->index(['product_id', 'order']);
         });
 
-        // Create product_detail_value_translates table
+        // Create product_detail_value_translates table (translatable fields)
         Schema::create('product_detail_value_translates', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_detail_value_id')->constrained('product_detail_values')->onDelete('cascade');
             $table->foreignId('language_id')->constrained('languages')->onDelete('cascade');
-            $table->text('keyword');
+            $table->string('keyword');
             $table->timestamps();
             
             $table->unique(['product_detail_value_id', 'language_id'], 'product_detail_value_translate_unique');
