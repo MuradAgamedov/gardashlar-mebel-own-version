@@ -51,25 +51,25 @@
                                 <div class="col-md-12">
                                     <div class="alert alert-info">
                                         <i class="material-icons-outlined">info</i>
-                                        <strong>Instructions:</strong> Use the buttons below to add keyword-value pairs. You can add as many as you need.
+                                        <strong>Instructions:</strong> Use the buttons below to add input fields. First button adds 2 inputs, second button adds 3 inputs.
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Dynamic Input Fields Container -->
                             <div id="dynamicInputsContainer">
-                                <!-- Initial input group will be added here -->
+                                <!-- Input fields will be added here -->
                             </div>
 
                             <!-- Action Buttons -->
                             <div class="row mt-4">
                                 <div class="col-md-12">
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn btn-success" id="addSingleInput">
-                                            <i class="material-icons-outlined">add</i> Add Single Input
+                                        <button type="button" class="btn btn-success" id="addTwoInputs">
+                                            <i class="material-icons-outlined">add</i> Add Two Inputs (Key + Value)
                                         </button>
-                                        <button type="button" class="btn btn-primary" id="addMultipleInputs">
-                                            <i class="material-icons-outlined">add_circle</i> Add Multiple Inputs
+                                        <button type="button" class="btn btn-primary" id="addThreeInputs">
+                                            <i class="material-icons-outlined">add_circle</i> Add Three Inputs (Keyword + ValueKeyword + Value)
                                         </button>
                                         <button type="button" class="btn btn-warning" id="clearAllInputs">
                                             <i class="material-icons-outlined">clear_all</i> Clear All
@@ -118,7 +118,7 @@
 
 .input-group-header {
     display: flex;
-    justify-content: space-between;
+    justify-content-between;
     align-items: center;
     margin-bottom: 15px;
     padding-bottom: 10px;
@@ -150,19 +150,15 @@
     transform: scale(1.1);
 }
 
-.keyword-value-row {
+.input-row {
     display: flex;
     gap: 15px;
     margin-bottom: 15px;
     align-items: flex-start;
 }
 
-.keyword-input {
+.input-field {
     flex: 1;
-}
-
-.value-input {
-    flex: 2;
 }
 
 .remove-row-btn {
@@ -178,21 +174,6 @@
 
 .remove-row-btn:hover {
     background: #5a6268;
-}
-
-.add-row-btn {
-    background: #28a745;
-    border: none;
-    color: white;
-    border-radius: 4px;
-    padding: 8px 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 10px;
-}
-
-.add-row-btn:hover {
-    background: #218838;
 }
 
 .input-counter {
@@ -236,23 +217,20 @@ document.addEventListener('DOMContentLoaded', function() {
     let totalInputs = 0;
     
     const container = document.getElementById('dynamicInputsContainer');
-    const addSingleBtn = document.getElementById('addSingleInput');
-    const addMultipleBtn = document.getElementById('addMultipleInputs');
-    const clearAllBtn = document.getElementById('clearAllBtn');
+    const addTwoBtn = document.getElementById('addTwoInputs');
+    const addThreeBtn = document.getElementById('addThreeInputs');
+    const clearAllBtn = document.getElementById('clearAllInputs');
     const submitBtn = document.getElementById('submitBtn');
     const form = document.getElementById('productDetailForm');
 
-    // Add single input group
-    addSingleBtn.addEventListener('click', function() {
-        addInputGroup(1);
+    // Add two inputs (Key + Value)
+    addTwoBtn.addEventListener('click', function() {
+        addInputGroup(2);
     });
 
-    // Add multiple input groups
-    addMultipleBtn.addEventListener('click', function() {
-        const count = prompt('How many input groups would you like to add?', '3');
-        if (count && !isNaN(count) && count > 0) {
-            addInputGroup(parseInt(count));
-        }
+    // Add three inputs (Keyword + ValueKeyword + Value)
+    addThreeBtn.addEventListener('click', function() {
+        addInputGroup(3);
     });
 
     // Clear all inputs
@@ -266,33 +244,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Add input group(s)
-    function addInputGroup(count = 1) {
-        for (let i = 0; i < count; i++) {
-            inputGroupCounter++;
-            const inputGroup = createInputGroup(inputGroupCounter);
-            container.appendChild(inputGroup);
-        }
+    // Add input group
+    function addInputGroup(inputCount) {
+        inputGroupCounter++;
+        const inputGroup = createInputGroup(inputGroupCounter, inputCount);
+        container.appendChild(inputGroup);
         updateSubmitButton();
         hideEmptyState();
     }
 
     // Create input group
-    function createInputGroup(groupId) {
+    function createInputGroup(groupId, inputCount) {
         const wrapper = document.createElement('div');
         wrapper.className = 'input-group-wrapper';
         wrapper.dataset.groupId = groupId;
 
         const counter = document.createElement('div');
         counter.className = 'input-counter';
-        counter.textContent = '1';
+        counter.textContent = inputCount;
 
         const header = document.createElement('div');
         header.className = 'input-group-header';
 
         const title = document.createElement('h6');
         title.className = 'input-group-title';
-        title.textContent = `Input Group ${groupId}`;
+        title.textContent = `Input Group ${groupId} (${inputCount} inputs)`;
 
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';
@@ -306,62 +282,51 @@ document.addEventListener('DOMContentLoaded', function() {
         const inputsContainer = document.createElement('div');
         inputsContainer.className = 'inputs-container';
 
-        // Add initial keyword-value row
-        const initialRow = createKeywordValueRow();
-        inputsContainer.appendChild(initialRow);
-
-        const addRowBtn = document.createElement('button');
-        addRowBtn.type = 'button';
-        addRowBtn.className = 'add-row-btn';
-        addRowBtn.innerHTML = '<i class="material-icons-outlined">add</i> Add Another Row';
-        addRowBtn.onclick = () => addRowToGroup(inputsContainer, wrapper);
+        // Add inputs based on count
+        if (inputCount === 2) {
+            // Key + Value
+            const keyRow = createInputRow('key', 'Key', 'Enter key name');
+            const valueRow = createInputRow('value', 'Value', 'Enter value');
+            inputsContainer.appendChild(keyRow);
+            inputsContainer.appendChild(valueRow);
+        } else if (inputCount === 3) {
+            // Keyword + ValueKeyword + Value
+            const keywordRow = createInputRow('keyword', 'Keyword', 'Enter keyword');
+            const valueKeywordRow = createInputRow('valuekeyword', 'Value Keyword', 'Enter value keyword');
+            const valueRow = createInputRow('value', 'Value', 'Enter value');
+            inputsContainer.appendChild(keywordRow);
+            inputsContainer.appendChild(valueKeywordRow);
+            inputsContainer.appendChild(valueRow);
+        }
 
         wrapper.appendChild(counter);
         wrapper.appendChild(header);
         wrapper.appendChild(inputsContainer);
-        wrapper.appendChild(addRowBtn);
 
         return wrapper;
     }
 
-    // Create keyword-value row
-    function createKeywordValueRow() {
+    // Create input row
+    function createInputRow(fieldName, labelText, placeholder) {
         const row = document.createElement('div');
-        row.className = 'keyword-value-row';
+        row.className = 'input-row';
 
-        const keywordDiv = document.createElement('div');
-        keywordDiv.className = 'keyword-input';
+        const inputDiv = document.createElement('div');
+        inputDiv.className = 'input-field';
 
-        const keywordLabel = document.createElement('label');
-        keywordLabel.className = 'form-label';
-        keywordLabel.textContent = 'Keyword';
+        const label = document.createElement('label');
+        label.className = 'form-label';
+        label.textContent = labelText;
 
-        const keywordInput = document.createElement('input');
-        keywordInput.type = 'text';
-        keywordInput.className = 'form-control';
-        keywordInput.name = `translates[${totalInputs}][keyword]`;
-        keywordInput.placeholder = 'e.g., dimensions, materials, colors';
-        keywordInput.required = true;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'form-control';
+        input.name = `translates[${totalInputs}][${fieldName}]`;
+        input.placeholder = placeholder;
+        input.required = true;
 
-        keywordDiv.appendChild(keywordLabel);
-        keywordDiv.appendChild(keywordInput);
-
-        const valueDiv = document.createElement('div');
-        valueDiv.className = 'value-input';
-
-        const valueLabel = document.createElement('label');
-        valueLabel.className = 'form-label';
-        valueLabel.textContent = 'Value (JSON)';
-
-        const valueInput = document.createElement('textarea');
-        valueInput.className = 'form-control';
-        valueInput.name = `translates[${totalInputs}][value]`;
-        valueInput.rows = '3';
-        valueInput.placeholder = '{"key": "value"} or ["item1", "item2"]';
-        valueInput.required = true;
-
-        valueDiv.appendChild(valueLabel);
-        valueDiv.appendChild(valueInput);
+        inputDiv.appendChild(label);
+        inputDiv.appendChild(input);
 
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';
@@ -369,19 +334,11 @@ document.addEventListener('DOMContentLoaded', function() {
         removeBtn.innerHTML = '<i class="material-icons-outlined">remove</i>';
         removeBtn.onclick = () => removeRow(row);
 
-        row.appendChild(keywordDiv);
-        row.appendChild(valueDiv);
+        row.appendChild(inputDiv);
         row.appendChild(removeBtn);
 
         totalInputs++;
         return row;
-    }
-
-    // Add row to existing group
-    function addRowToGroup(container, groupWrapper) {
-        const newRow = createKeywordValueRow();
-        container.appendChild(newRow);
-        updateGroupCounter(groupWrapper);
     }
 
     // Remove row
@@ -398,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Remove input group
     function removeInputGroup(wrapper) {
         if (container.children.length > 1) {
-            const rows = wrapper.querySelectorAll('.keyword-value-row');
+            const rows = wrapper.querySelectorAll('.input-row');
             totalInputs -= rows.length;
             wrapper.remove();
             updateSubmitButton();
@@ -412,17 +369,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Update group counter
-    function updateGroupCounter(groupWrapper) {
-        const counter = groupWrapper.querySelector('.input-counter');
-        const rows = groupWrapper.querySelectorAll('.keyword-value-row');
-        counter.textContent = rows.length;
-    }
-
     // Update all group counters
     function updateAllGroupCounters() {
         document.querySelectorAll('.input-group-wrapper').forEach(group => {
-            updateGroupCounter(group);
+            const counter = group.querySelector('.input-counter');
+            const rows = group.querySelectorAll('.input-row');
+            counter.textContent = rows.length;
         });
     }
 
@@ -445,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
             emptyState.innerHTML = `
                 <i class="material-icons-outlined">add_circle_outline</i>
                 <p>No input fields added yet.</p>
-                <p class="text-muted">Use the buttons above to add keyword-value pairs.</p>
+                <p class="text-muted">Use the buttons above to add input fields.</p>
             `;
             container.appendChild(emptyState);
         }
@@ -465,19 +417,6 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             alert('Please add at least one input field before submitting.');
             return false;
-        }
-
-        // Validate JSON format for value fields
-        const valueInputs = document.querySelectorAll('textarea[name*="[value]"]');
-        for (let input of valueInputs) {
-            try {
-                JSON.parse(input.value);
-            } catch (error) {
-                e.preventDefault();
-                alert('Invalid JSON format in one or more value fields. Please check your input.');
-                input.focus();
-                return false;
-            }
         }
     });
 
