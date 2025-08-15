@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('order')->default(0);
             $table->timestamps();
             
-            $table->index(['product_detail_value_id', 'order']);
+            $table->index(['product_detail_value_id', 'order'], 'pdvd_product_value_order_idx');
         });
 
         // Create product_details_values_details_translates table (translatable fields)
@@ -30,8 +30,8 @@ return new class extends Migration
             $table->text('value');
             $table->timestamps();
             
-            $table->unique(['product_details_values_detail_id', 'language_id'], 'product_details_values_detail_translate_unique');
-            $table->index(['language_id']);
+            $table->unique(['product_details_values_detail_id', 'language_id'], 'pdvdt_detail_lang_unique');
+            $table->index(['language_id'], 'pdvdt_language_idx');
         });
     }
 
