@@ -56,24 +56,63 @@
                                 </div>
                             </div>
 
-                            <!-- Dynamic Input Fields Container -->
-                            <div id="dynamicInputsContainer">
-                                <!-- Input fields will be added here -->
-                            </div>
+                            <!-- Language Tabs -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <label class="form-label">Product Detail Information</label>
+                                    <ul class="nav nav-tabs" id="languageTabs" role="tablist">
+                                        @foreach($languages as $index => $language)
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link {{ $index === 0 ? 'active' : '' }}" 
+                                                    id="tab-{{ $language->id }}" 
+                                                    data-bs-toggle="tab" 
+                                                    data-bs-target="#content-{{ $language->id }}" 
+                                                    type="button" 
+                                                    role="tab">
+                                                    {{ $language->name ?? $language->lang_name ?? $language->title }} ({{ $language->lang_code }})
+                                            </button>
+                                        </li>
+                                        @endforeach
+                                    </ul>
 
-                            <!-- Action Buttons -->
-                            <div class="row mt-4">
-                                <div class="col-md-12">
-                                    <div class="d-flex gap-2">
-                                        <button type="button" class="btn btn-success" id="addTwoInputs">
-                                            <i class="material-icons-outlined">add</i> Add Two Inputs (Key + Value)
-                                        </button>
-                                        <button type="button" class="btn btn-primary" id="addThreeInputs">
-                                            <i class="material-icons-outlined">add_circle</i> Add Keyword with KeyValue-Value Pairs
-                                        </button>
-                                        <button type="button" class="btn btn-warning" id="clearAllInputs">
-                                            <i class="material-icons-outlined">clear_all</i> Clear All
-                                        </button>
+                                    <!-- Tab Content -->
+                                    <div class="tab-content" id="languageTabContent">
+                                        @foreach($languages as $index => $language)
+                                        <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" 
+                                             id="content-{{ $language->id }}" 
+                                             role="tabpanel" 
+                                             aria-labelledby="tab-{{ $language->id }}">
+                                            
+                                            <div class="card mt-3">
+                                                <div class="card-header">
+                                                    <h6 class="mb-0">{{ $language->name ?? $language->lang_name ?? $language->title }} Content</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <!-- Dynamic Input Fields Container for this language -->
+                                                    <div id="dynamicInputsContainer-{{ $language->id }}" class="dynamic-inputs-container">
+                                                        <!-- Input fields will be added here -->
+                                                    </div>
+
+                                                    <!-- Action Buttons for this language -->
+                                                    <div class="row mt-4">
+                                                        <div class="col-md-12">
+                                                            <div class="d-flex gap-2">
+                                                                <button type="button" class="btn btn-success add-two-inputs" data-language="{{ $language->id }}">
+                                                                    <i class="material-icons-outlined">add</i> Add Two Inputs (Key + Value)
+                                                                </button>
+                                                                <button type="button" class="btn btn-primary add-three-inputs" data-language="{{ $language->id }}">
+                                                                    <i class="material-icons-outlined">add_circle</i> Add Keyword with KeyValue-Value Pairs
+                                                                </button>
+                                                                <button type="button" class="btn btn-warning clear-all-inputs" data-language="{{ $language->id }}">
+                                                                    <i class="material-icons-outlined">clear_all</i> Clear All
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>
@@ -326,57 +365,87 @@
 .data-flow-info strong {
     color: #0d47a1;
 }
+
+.nav-tabs .nav-link {
+    color: #495057;
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+    border-radius: 0.375rem 0.375rem 0 0;
+    margin-right: 2px;
+}
+
+.nav-tabs .nav-link.active {
+    color: #007bff;
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 #fff;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: #e9ecef #e9ecef #dee2e6;
+}
 </style>
 @endpush
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    let inputGroupCounter = 0;
-    let totalInputs = 0;
+    let inputGroupCounter = {};
+    let totalInputs = {};
     
-    const container = document.getElementById('dynamicInputsContainer');
-    const addTwoBtn = document.getElementById('addTwoInputs');
-    const addThreeBtn = document.getElementById('addThreeInputs');
-    const clearAllBtn = document.getElementById('clearAllInputs');
+    // Initialize counters for each language
+    @foreach($languages as $language)
+        inputGroupCounter[{{ $language->id }}] = 0;
+        totalInputs[{{ $language->id }}] = 0;
+    @endforeach
+    
     const submitBtn = document.getElementById('submitBtn');
     const form = document.getElementById('productDetailForm');
 
-    // Add two inputs (Key + Value)
-    addTwoBtn.addEventListener('click', function() {
-        addInputGroup(2);
-    });
+    // Add event listeners for each language tab
+    @foreach($languages as $language)
+        const addTwoBtn{{ $language->id }} = document.querySelector('.add-two-inputs[data-language="{{ $language->id }}"]');
+        const addThreeBtn{{ $language->id }} = document.querySelector('.add-three-inputs[data-language="{{ $language->id }}"]');
+        const clearAllBtn{{ $language->id }} = document.querySelector('.clear-all-inputs[data-language="{{ $language->id }}"]');
+        
+        // Add two inputs (Key + Value)
+        addTwoBtn{{ $language->id }}.addEventListener('click', function() {
+            addInputGroup({{ $language->id }}, 2);
+        });
 
-    // Add keyword with keyvalue-value pairs
-    addThreeBtn.addEventListener('click', function() {
-        addInputGroup(3);
-    });
+        // Add keyword with keyvalue-value pairs
+        addThreeBtn{{ $language->id }}.addEventListener('click', function() {
+            addInputGroup({{ $language->id }}, 3);
+        });
 
-    // Clear all inputs
-    clearAllBtn.addEventListener('click', function() {
-        if (confirm('Are you sure you want to clear all inputs?')) {
-            container.innerHTML = '';
-            inputGroupCounter = 0;
-            totalInputs = 0;
-            updateSubmitButton();
-            showEmptyState();
-        }
-    });
+        // Clear all inputs for this language
+        clearAllBtn{{ $language->id }}.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all inputs for this language?')) {
+                const container = document.getElementById(`dynamicInputsContainer-{{ $language->id }}`);
+                container.innerHTML = '';
+                inputGroupCounter[{{ $language->id }}] = 0;
+                totalInputs[{{ $language->id }}] = 0;
+                updateSubmitButton();
+                showEmptyState({{ $language->id }});
+            }
+        });
+    @endforeach
 
     // Add input group
-    function addInputGroup(inputCount) {
-        inputGroupCounter++;
-        const inputGroup = createInputGroup(inputGroupCounter, inputCount);
+    function addInputGroup(languageId, inputCount) {
+        inputGroupCounter[languageId]++;
+        const inputGroup = createInputGroup(languageId, inputGroupCounter[languageId], inputCount);
+        const container = document.getElementById(`dynamicInputsContainer-${languageId}`);
         container.appendChild(inputGroup);
         updateSubmitButton();
-        hideEmptyState();
+        hideEmptyState(languageId);
     }
 
     // Create input group
-    function createInputGroup(groupId, inputCount) {
+    function createInputGroup(languageId, groupId, inputCount) {
         const wrapper = document.createElement('div');
         wrapper.className = 'input-group-wrapper';
         wrapper.dataset.groupId = groupId;
+        wrapper.dataset.languageId = languageId;
 
         const counter = document.createElement('div');
         counter.className = 'input-counter';
@@ -407,8 +476,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const dataFlowInfo = createDataFlowInfo('Key → Details.Keyword, Value → Values.Keyword & Values.Value');
             inputsContainer.appendChild(dataFlowInfo);
             
-            const keyRow = createInputRow('key', 'Key', 'Enter key name (e.g., dimensions)');
-            const valueRow = createInputRow('value', 'Value', 'Enter value (e.g., 120x80x45)');
+            const keyRow = createInputRow(languageId, 'key', 'Key', 'Enter key name (e.g., dimensions)');
+            const valueRow = createInputRow(languageId, 'value', 'Value', 'Enter value (e.g., 120x80x45)');
             inputsContainer.appendChild(keyRow);
             inputsContainer.appendChild(valueRow);
         } else if (inputCount === 3) {
@@ -416,7 +485,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const dataFlowInfo = createDataFlowInfo('Keyword → Details.Keyword, ValueKeyword → Values.Keyword, Value → Values.Value');
             inputsContainer.appendChild(dataFlowInfo);
             
-            const keywordContainer = createKeywordContainer();
+            const keywordContainer = createKeywordContainer(languageId);
             inputsContainer.appendChild(keywordContainer);
         }
 
@@ -436,7 +505,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Create keyword container
-    function createKeywordContainer() {
+    function createKeywordContainer(languageId) {
         const keywordDiv = document.createElement('div');
         keywordDiv.className = 'keyword-container';
 
@@ -467,7 +536,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const keywordInput = document.createElement('input');
         keywordInput.type = 'text';
         keywordInput.className = 'form-control';
-        keywordInput.name = `translates[${totalInputs}][keyword]`;
+        keywordInput.name = `translates[${totalInputs[languageId]}][keyword]`;
         keywordInput.placeholder = 'Enter keyword (e.g., specifications)';
         keywordInput.required = true;
         keywordField.appendChild(keywordLabel);
@@ -479,7 +548,7 @@ document.addEventListener('DOMContentLoaded', function() {
         pairsContainer.className = 'pairs-container';
 
         // Add initial keyvalue-value pair
-        const initialPair = createKeyValuePair();
+        const initialPair = createKeyValuePair(languageId);
         pairsContainer.appendChild(initialPair);
 
         // Add more pairs button
@@ -487,19 +556,19 @@ document.addEventListener('DOMContentLoaded', function() {
         addMorePairsBtn.type = 'button';
         addMorePairsBtn.className = 'add-keyvalue-value-btn';
         addMorePairsBtn.innerHTML = '<i class="material-icons-outlined">add</i> Add More KeyValue-Value Pairs';
-        addMorePairsBtn.onclick = () => addKeyValuePair(pairsContainer, keywordDiv);
+        addMorePairsBtn.onclick = () => addKeyValuePair(pairsContainer, keywordDiv, languageId);
 
         keywordDiv.appendChild(header);
         keywordDiv.appendChild(keywordRow);
         keywordDiv.appendChild(pairsContainer);
         keywordDiv.appendChild(addMorePairsBtn);
 
-        totalInputs++;
+        totalInputs[languageId]++;
         return keywordDiv;
     }
 
     // Create keyvalue-value pair
-    function createKeyValuePair() {
+    function createKeyValuePair(languageId) {
         const pairDiv = document.createElement('div');
         pairDiv.className = 'keyvalue-value-row';
 
@@ -512,7 +581,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const keyvalueInput = document.createElement('input');
         keyvalueInput.type = 'text';
         keyvalueInput.className = 'form-control';
-        keyvalueInput.name = `translates[${totalInputs}][valuekeyword]`;
+        keyvalueInput.name = `translates[${totalInputs[languageId]}][valuekeyword]`;
         keyvalueInput.placeholder = 'Enter value keyword (e.g., size, color)';
         keyvalueInput.required = true;
         keyvalueDiv.appendChild(keyvalueLabel);
@@ -527,7 +596,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const valueInput = document.createElement('input');
         valueInput.type = 'text';
         valueInput.className = 'form-control';
-        valueInput.name = `translates[${totalInputs}][value]`;
+        valueInput.name = `translates[${totalInputs[languageId]}][value]`;
         valueInput.placeholder = 'Enter value (e.g., large, white)';
         valueInput.required = true;
         valueDiv.appendChild(valueLabel);
@@ -538,28 +607,28 @@ document.addEventListener('DOMContentLoaded', function() {
         removeBtn.type = 'button';
         removeBtn.className = 'remove-keyvalue-value';
         removeBtn.textContent = 'Remove';
-        removeBtn.onclick = () => removeKeyValuePair(pairDiv);
+        removeBtn.onclick = () => removeKeyValuePair(pairDiv, languageId);
 
         pairDiv.appendChild(keyvalueDiv);
         pairDiv.appendChild(valueDiv);
         pairDiv.appendChild(removeBtn);
 
-        totalInputs++;
+        totalInputs[languageId]++;
         return pairDiv;
     }
 
     // Add more keyvalue-value pairs
-    function addKeyValuePair(container, keywordContainer) {
-        const newPair = createKeyValuePair();
+    function addKeyValuePair(container, keywordContainer, languageId) {
+        const newPair = createKeyValuePair(languageId);
         container.appendChild(newPair);
         updateGroupCounter(keywordContainer.closest('.input-group-wrapper'));
     }
 
     // Remove keyvalue-value pair
-    function removeKeyValuePair(pairDiv) {
+    function removeKeyValuePair(pairDiv, languageId) {
         if (pairDiv.parentElement.children.length > 1) {
             pairDiv.remove();
-            totalInputs--;
+            totalInputs[languageId]--;
             updateAllGroupCounters();
         } else {
             alert('At least one KeyValue-Value pair must remain.');
@@ -568,14 +637,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Remove keyword container
     function removeKeywordContainer(keywordDiv) {
+        const languageId = parseInt(keywordDiv.closest('.input-group-wrapper').dataset.languageId);
         const pairs = keywordDiv.querySelectorAll('.keyvalue-value-row');
-        totalInputs -= (pairs.length + 1); // +1 for keyword input
+        totalInputs[languageId] -= (pairs.length + 1); // +1 for keyword input
         keywordDiv.remove();
         updateAllGroupCounters();
     }
 
     // Create input row
-    function createInputRow(fieldName, labelText, placeholder) {
+    function createInputRow(languageId, fieldName, labelText, placeholder) {
         const row = document.createElement('div');
         row.className = 'input-row';
 
@@ -589,7 +659,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'form-control';
-        input.name = `translates[${totalInputs}][${fieldName}]`;
+        input.name = `translates[${totalInputs[languageId]}][${fieldName}]`;
         input.placeholder = placeholder;
         input.required = true;
 
@@ -600,20 +670,20 @@ document.addEventListener('DOMContentLoaded', function() {
         removeBtn.type = 'button';
         removeBtn.className = 'remove-row-btn';
         removeBtn.innerHTML = '<i class="material-icons-outlined">remove</i>';
-        removeBtn.onclick = () => removeRow(row);
+        removeBtn.onclick = () => removeRow(row, languageId);
 
         row.appendChild(inputDiv);
         row.appendChild(removeBtn);
 
-        totalInputs++;
+        totalInputs[languageId]++;
         return row;
     }
 
     // Remove row
-    function removeRow(row) {
+    function removeRow(row, languageId) {
         if (row.parentElement.children.length > 1) {
             row.remove();
-            totalInputs--;
+            totalInputs[languageId]--;
             updateAllGroupCounters();
         } else {
             alert('At least one row must remain in each group.');
@@ -622,15 +692,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Remove input group
     function removeInputGroup(wrapper) {
-        if (container.children.length > 1) {
+        const languageId = parseInt(wrapper.dataset.languageId);
+        if (wrapper.parentElement.children.length > 1) {
             const rows = wrapper.querySelectorAll('.input-row, .keyword-container');
-            totalInputs -= rows.length;
+            totalInputs[languageId] -= rows.length;
             wrapper.remove();
             updateSubmitButton();
             updateAllGroupCounters();
             
-            if (container.children.length === 0) {
-                showEmptyState();
+            if (wrapper.parentElement.children.length === 0) {
+                showEmptyState(languageId);
             }
         } else {
             alert('At least one input group must remain.');
@@ -648,7 +719,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Update submit button state
     function updateSubmitButton() {
-        if (totalInputs > 0) {
+        const totalInputsSum = Object.values(totalInputs).reduce((sum, count) => sum + count, 0);
+        if (totalInputsSum > 0) {
             submitBtn.disabled = false;
             submitBtn.classList.remove('submit-btn-disabled');
         } else {
@@ -658,13 +730,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Show empty state
-    function showEmptyState() {
+    function showEmptyState(languageId) {
+        const container = document.getElementById(`dynamicInputsContainer-${languageId}`);
         if (container.children.length === 0) {
             const emptyState = document.createElement('div');
             emptyState.className = 'empty-state';
             emptyState.innerHTML = `
                 <i class="material-icons-outlined">add_circle_outline</i>
-                <p>No input fields added yet.</p>
+                <p>No input fields added yet for this language.</p>
                 <p class="text-muted">Use the buttons above to add input fields.</p>
             `;
             container.appendChild(emptyState);
@@ -672,7 +745,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Hide empty state
-    function hideEmptyState() {
+    function hideEmptyState(languageId) {
+        const container = document.getElementById(`dynamicInputsContainer-${languageId}`);
         const emptyState = container.querySelector('.empty-state');
         if (emptyState) {
             emptyState.remove();
@@ -681,15 +755,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Form validation
     form.addEventListener('submit', function(e) {
-        if (totalInputs === 0) {
+        const totalInputsSum = Object.values(totalInputs).reduce((sum, count) => sum + count, 0);
+        if (totalInputsSum === 0) {
             e.preventDefault();
             alert('Please add at least one input field before submitting.');
             return false;
         }
     });
 
-    // Show initial empty state
-    showEmptyState();
+    // Show initial empty state for all languages
+    @foreach($languages as $language)
+        showEmptyState({{ $language->id }});
+    @endforeach
 });
 </script>
 @endpush
