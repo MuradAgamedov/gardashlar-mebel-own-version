@@ -543,6 +543,13 @@ document.addEventListener('DOMContentLoaded', function() {
         keywordField.appendChild(keywordInput);
         keywordRow.appendChild(keywordField);
 
+        // Add hidden language_id field
+        const languageIdInput = document.createElement('input');
+        languageIdInput.type = 'hidden';
+        languageIdInput.name = `translates[${totalInputs[languageId]}][language_id]`;
+        languageIdInput.value = languageId;
+        keywordRow.appendChild(languageIdInput);
+
         // KeyValue-Value pairs container
         const pairsContainer = document.createElement('div');
         pairsContainer.className = 'pairs-container';
@@ -602,6 +609,12 @@ document.addEventListener('DOMContentLoaded', function() {
         valueDiv.appendChild(valueLabel);
         valueDiv.appendChild(valueInput);
 
+        // Add hidden language_id field
+        const languageIdInput = document.createElement('input');
+        languageIdInput.type = 'hidden';
+        languageIdInput.name = `translates[${totalInputs[languageId]}][language_id]`;
+        languageIdInput.value = languageId;
+
         // Remove button
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';
@@ -611,6 +624,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         pairDiv.appendChild(keyvalueDiv);
         pairDiv.appendChild(valueDiv);
+        pairDiv.appendChild(languageIdInput);
         pairDiv.appendChild(removeBtn);
 
         totalInputs[languageId]++;
