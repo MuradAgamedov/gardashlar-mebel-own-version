@@ -63,9 +63,9 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                                <h6 class="mb-0">Translation Pairs</h6>
-                                                <button type="button" class="btn btn-sm btn-primary" onclick="addTranslationTab()">
-                                                    <i class="material-icons-outlined">add</i> Add Language Tab
+                                                <h6 class="mb-0">Translations</h6>
+                                                <button type="button" class="btn btn-sm btn-primary" onclick="addKeywordValuePair()">
+                                                    <i class="material-icons-outlined">add</i> Add Keyword & Value
                                                 </button>
                                             </div>
                                             
@@ -100,137 +100,134 @@
 <script>
 let translationIndex = 0;
 
-// Add initial translation tab
+// Add initial language tabs
 document.addEventListener('DOMContentLoaded', function() {
-    addTranslationTab();
+    createLanguageTabs();
 });
 
-function addTranslationTab() {
+function createLanguageTabs() {
     const container = document.getElementById('translations-container');
     
     // Create tab navigation
     const tabNav = document.createElement('ul');
     tabNav.className = 'nav nav-tabs mb-3';
-    tabNav.id = `tab-nav-${translationIndex}`;
+    tabNav.id = 'language-tabs';
     
     // Create tab content container
     const tabContent = document.createElement('div');
     tabContent.className = 'tab-content';
-    tabContent.id = `tab-content-${translationIndex}`;
+    tabContent.id = 'language-tab-content';
     
-    // Create tab button
-    const tabButton = document.createElement('li');
-    tabButton.className = 'nav-item';
-    tabButton.innerHTML = `
-        <button class="nav-link active" 
-                id="tab-${translationIndex}" 
-                data-bs-toggle="tab" 
-                data-bs-target="#content-${translationIndex}" 
-                type="button" 
-                role="tab">
-            Language ${translationIndex + 1}
-            <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="removeTranslationTab(${translationIndex})">
+    // Create tabs for each language
+    @foreach($languages as $index => $language)
+        const tabButton{{ $index }} = document.createElement('li');
+        tabButton{{ $index }}.className = 'nav-item';
+        tabButton{{ $index }}.innerHTML = `
+            <button class="nav-link {{ $index === 0 ? 'active' : '' }}" 
+                    id="tab-{{ $language->id }}" 
+                    data-bs-toggle="tab" 
+                    data-bs-target="#content-{{ $language->id }}" 
+                    type="button" 
+                    role="tab">
+                {{ $language->lang_code }}
+            </button>
+        `;
+        
+        const tabPane{{ $index }} = document.createElement('div');
+        tabPane{{ $index }}.className = 'tab-pane fade {{ $index === 0 ? 'show active' : '' }}';
+        tabPane{{ $index }}.id = 'content-{{ $language->id }}';
+        tabPane{{ $index }}.innerHTML = `
+            <div class="p-3">
+                <div id="pairs-{{ $language->id }}">
+                    <!-- Keyword & Value pairs will be added here -->
+                </div>
+            </div>
+        `;
+        
+        tabNav.appendChild(tabButton{{ $index }});
+        tabContent.appendChild(tabPane{{ $index }});
+    @endforeach
+    
+    container.appendChild(tabNav);
+    container.appendChild(tabContent);
+}
+
+function addKeywordValuePair() {
+    // Get active tab
+    const activeTab = document.querySelector('.nav-link.active');
+    if (!activeTab) return;
+    
+    const languageId = activeTab.getAttribute('data-bs-target').replace('#content-', '');
+    const pairsContainer = document.getElementById(`pairs-${languageId}`);
+    
+    const pairDiv = document.createElement('div');
+    pairDiv.className = 'keyword-value-pair border rounded p-3 mb-3';
+    pairDiv.id = `pair-${translationIndex}`;
+    
+    pairDiv.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0">Pair ${translationIndex + 1}</h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeKeywordValuePair(${translationIndex})">
                 <i class="material-icons-outlined">delete</i>
             </button>
-        </button>
-    `;
-    
-    // Create tab content
-    const tabPane = document.createElement('div');
-    tabPane.className = 'tab-pane fade show active';
-    tabPane.id = `content-${translationIndex}`;
-    tabPane.innerHTML = `
-        <div class="p-3">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label class="form-label">Language</label>
-                        <select class="form-select" name="translates[${translationIndex}][language_id]" required>
-                            <option value="">Select Language</option>
-                            @foreach($languages as $language)
-                                <option value="{{ $language->id }}">
-                                    {{ $language->lang_code }} - {{ $language->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Keyword</label>
+                    <input type="text" class="form-control" 
+                           name="translates[${translationIndex}][keyword]" 
+                           placeholder="Enter keyword"
+                           required>
+                    <input type="hidden" name="translates[${translationIndex}][language_id]" value="${languageId}">
                 </div>
-                
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label class="form-label">Keyword</label>
-                        <input type="text" class="form-control" 
-                               name="translates[${translationIndex}][keyword]" 
-                               placeholder="Enter keyword for this language"
-                               required>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label class="form-label">Value</label>
-                        <textarea class="form-control" 
-                                  name="translates[${translationIndex}][value]" 
-                                  placeholder="Enter value for this language"
-                                  rows="3"
-                                  required></textarea>
-                    </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Value</label>
+                    <textarea class="form-control" 
+                              name="translates[${translationIndex}][value]" 
+                              placeholder="Enter value"
+                              rows="3"
+                              required></textarea>
                 </div>
             </div>
         </div>
     `;
     
-    // Append elements
-    tabNav.appendChild(tabButton);
-    tabContent.appendChild(tabPane);
-    container.appendChild(tabNav);
-    container.appendChild(tabContent);
-    
+    pairsContainer.appendChild(pairDiv);
     translationIndex++;
 }
 
-function removeTranslationTab(index) {
-    // Remove tab navigation
-    const tabNav = document.getElementById(`tab-nav-${index}`);
-    if (tabNav) tabNav.remove();
+function removeKeywordValuePair(index) {
+    const pairDiv = document.getElementById(`pair-${index}`);
+    if (pairDiv) {
+        pairDiv.remove();
+    }
     
-    // Remove tab content
-    const tabContent = document.getElementById(`tab-content-${index}`);
-    if (tabContent) tabContent.remove();
-    
-    // Reindex remaining tabs
-    const remainingTabs = document.querySelectorAll('[id^="tab-nav-"]');
-    remainingTabs.forEach((tabNav, newIndex) => {
-        const oldIndex = tabNav.id.replace('tab-nav-', '');
-        const tabContent = document.getElementById(`tab-content-${oldIndex}`);
+    // Reindex remaining pairs
+    const pairs = document.querySelectorAll('.keyword-value-pair');
+    pairs.forEach((pair, newIndex) => {
+        pair.id = `pair-${newIndex}`;
+        pair.querySelector('h6').textContent = `Pair ${newIndex + 1}`;
         
-        if (tabContent) {
-            // Update IDs
-            tabNav.id = `tab-nav-${newIndex}`;
-            tabContent.id = `tab-content-${newIndex}`;
-            
-            // Update tab button
-            const tabButton = tabNav.querySelector('button');
-            tabButton.id = `tab-${newIndex}`;
-            tabButton.setAttribute('data-bs-target', `#content-${newIndex}`);
-            tabButton.innerHTML = tabButton.innerHTML.replace(`Language ${parseInt(oldIndex) + 1}`, `Language ${newIndex + 1}`);
-            
-            // Update remove button onclick
-            const removeBtn = tabButton.querySelector('button[onclick*="removeTranslationTab"]');
-            if (removeBtn) removeBtn.setAttribute('onclick', `removeTranslationTab(${newIndex})`);
-            
-            // Update form field names
-            const languageSelect = tabContent.querySelector('select[name*="[language_id]"]');
-            const keywordInput = tabContent.querySelector('input[name*="[keyword]"]');
-            const valueTextarea = tabContent.querySelector('textarea[name*="[value]"]');
-            
-            if (languageSelect) languageSelect.name = `translates[${newIndex}][language_id]`;
-            if (keywordInput) keywordInput.name = `translates[${newIndex}][keyword]`;
-            if (valueTextarea) valueTextarea.name = `translates[${newIndex}][value]`;
-        }
+        // Update form field names
+        const keywordInput = pair.querySelector('input[name*="[keyword]"]');
+        const valueTextarea = pair.querySelector('textarea[name*="[value]"]');
+        const languageInput = pair.querySelector('input[name*="[language_id]"]');
+        
+        if (keywordInput) keywordInput.name = `translates[${newIndex}][keyword]`;
+        if (valueTextarea) valueTextarea.name = `translates[${newIndex}][value]`;
+        if (languageInput) languageInput.name = `translates[${newIndex}][language_id]`;
+        
+        // Update remove button onclick
+        const removeBtn = pair.querySelector('button[onclick*="removeKeywordValuePair"]');
+        if (removeBtn) removeBtn.setAttribute('onclick', `removeKeywordValuePair(${newIndex})`);
     });
     
-    translationIndex = remainingTabs.length;
+    translationIndex = pairs.length;
 }
 </script>
 @endpush
