@@ -46,14 +46,15 @@ class ProductDetailsValuesDetailController extends Controller
             'translates.*.value' => 'required|string',
         ]);
 
-        // Create detail
-        $detail = ProductDetailsValuesDetail::create([
-            'product_detail_value_id' => $detailValue->id,
-            'order' => ProductDetailsValuesDetail::where('product_detail_value_id', $detailValue->id)->max('order') + 1
-        ]);
-
-        // Create translations
+        // Create a separate detail for each keyword-value pair
         foreach ($request->translates as $translate) {
+            // Create detail
+            $detail = ProductDetailsValuesDetail::create([
+                'product_detail_value_id' => $detailValue->id,
+                'order' => ProductDetailsValuesDetail::where('product_detail_value_id', $detailValue->id)->max('order') + 1
+            ]);
+
+            // Create translation for this detail
             ProductDetailsValuesDetailTranslate::create([
                 'product_details_values_detail_id' => $detail->id,
                 'language_id' => $translate['language_id'],
@@ -63,7 +64,7 @@ class ProductDetailsValuesDetailController extends Controller
         }
 
         return redirect()->route('admin.products.detail-values.details.index', [$product, $detailValue])
-            ->with('success', 'Detail created successfully.');
+            ->with('success', 'Details created successfully.');
     }
 
     /**
@@ -97,18 +98,19 @@ class ProductDetailsValuesDetailController extends Controller
             'translates.*.value' => 'required|string',
         ]);
 
+        // Since each detail now has only one translation, we'll update the first one
+        $translate = $request->translates[0];
+        
         // Delete existing translations
         $detail->translates()->delete();
 
-        // Create new translations
-        foreach ($request->translates as $translate) {
-            ProductDetailsValuesDetailTranslate::create([
-                'product_details_values_detail_id' => $detail->id,
-                'language_id' => $translate['language_id'],
-                'keyword' => $translate['keyword'],
-                'value' => $translate['value'],
-            ]);
-        }
+        // Create new translation
+        ProductDetailsValuesDetailTranslate::create([
+            'product_details_values_detail_id' => $detail->id,
+            'language_id' => $translate['language_id'],
+            'keyword' => $translate['keyword'],
+            'value' => $translate['value'],
+        ]);
 
         return redirect()->route('admin.products.detail-values.details.index', [$product, $detailValue])
             ->with('success', 'Detail updated successfully.');
