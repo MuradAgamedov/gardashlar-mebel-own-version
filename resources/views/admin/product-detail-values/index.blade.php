@@ -180,8 +180,54 @@
 @push('scripts')
 <script>
 function viewDetailValues(detailValueId) {
-    // This function will be implemented later to show detailed values
-    alert('View detail values functionality will be implemented here for ID: ' + detailValueId);
+    // Find the detail value data from the table
+    const row = document.querySelector(`tr[data-id="${detailValueId}"]`);
+    if (!row) return;
+    
+    // Get the keyword and value from the first translation
+    const keyword = row.querySelector('td:nth-child(3) strong')?.textContent || 'No keyword';
+    const value = row.querySelector('td:nth-child(4)')?.textContent?.trim() || 'No value';
+    
+    // Get all language badges
+    const languageBadges = Array.from(row.querySelectorAll('td:nth-child(5) .badge')).map(badge => badge.textContent);
+    
+    // Create modal content
+    const modalBody = document.getElementById('detailValuesModalBody');
+    modalBody.innerHTML = `
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Detail Value Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Keyword:</label>
+                                <p class="mb-0">${keyword}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Value:</label>
+                                <p class="mb-0">${value}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Available Languages:</label>
+                                <div class="d-flex gap-2 mt-2">
+                                    ${languageBadges.map(lang => `<span class="badge bg-primary">${lang}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('detailValuesModal'));
+    modal.show();
 }
 
 // Enable drag and drop reordering
