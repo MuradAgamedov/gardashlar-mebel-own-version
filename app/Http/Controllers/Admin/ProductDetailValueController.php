@@ -35,16 +35,15 @@ class ProductDetailValueController extends Controller
     public function store(Request $request, Product $product)
     {
         $request->validate([
-            'keyword' => 'required|string|max:255',
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.value' => 'required|string',
+            'translates.*.keyword' => 'required|string|max:255',
         ]);
 
         // Create product detail value
         $productDetailValue = ProductDetailValue::create([
-            'keyword' => $request->keyword,
-            'order' => ProductDetailValue::max('order') + 1
+            'product_id' => $product->id,
+            'order' => ProductDetailValue::where('product_id', $product->id)->max('order') + 1
         ]);
 
         // Create translations
@@ -76,16 +75,12 @@ class ProductDetailValueController extends Controller
     public function update(Request $request, Product $product, ProductDetailValue $detailValue)
     {
         $request->validate([
-            'keyword' => 'required|string|max:255',
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.value' => 'required|string',
+            'translates.*.keyword' => 'required|string|max:255',
         ]);
 
-        // Update keyword
-        $detailValue->update([
-            'keyword' => $request->keyword
-        ]);
+        // No need to update main keyword field since it's not used
 
         // Delete existing translations
         $detailValue->translates()->delete();

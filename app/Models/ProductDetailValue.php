@@ -10,9 +10,17 @@ class ProductDetailValue extends Model
     use HasFactory;
 
     protected $fillable = [
+        'product_id',
         'order',
-        'keyword',
     ];
+
+    /**
+     * Get the product that owns this detail value
+     */
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 
     protected $casts = [
         'order' => 'integer',

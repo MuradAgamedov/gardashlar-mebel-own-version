@@ -14,11 +14,11 @@ return new class extends Migration
         // Create product_detail_values table
         Schema::create('product_detail_values', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->integer('order')->default(0);
-            $table->string('keyword');
             $table->timestamps();
             
-            $table->index(['order']);
+            $table->index(['product_id', 'order']);
         });
 
         // Create product_detail_value_translates table
