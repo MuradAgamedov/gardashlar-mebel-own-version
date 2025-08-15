@@ -57,7 +57,7 @@
                             <h5>Details for: <strong>{{ $detailValue->translate()->keyword ?? 'Detail Value' }}</strong></h5>
                             <div class="d-flex gap-2">
                                 <a href="{{ route('admin.products.detail-values.details.create', [$product, $detailValue]) }}" class="btn btn-primary">
-                                    <i class="material-icons-outlined">add</i> Add Detail
+                                    <i class="material-icons-outlined">add</i>
                                 </a>
                                 <a href="{{ route('admin.products.detail-values.index', $product) }}" class="btn btn-outline-secondary">
                                     <i class="material-icons-outlined">arrow_back</i>
@@ -76,7 +76,7 @@
                                 </div>
                                 <div class="d-flex gap-2">
                                     <button id="delete-selected-details" class="btn btn-danger btn-sm" disabled>
-                                        <i class="material-icons-outlined">delete</i> Delete Selected
+                                        <i class="material-icons-outlined">delete</i>
                                     </button>
                                     <input type="checkbox" id="select-all-details" class="form-check-input">
                                     <label for="select-all-details" class="form-check-label">Select All</label>
@@ -162,7 +162,7 @@
                                     <h5 class="mt-3">No details found</h5>
                                     <p class="text-muted">Start by adding your first detail</p>
                                     <a href="{{ route('admin.products.detail-values.details.create', [$product, $detailValue]) }}" class="btn btn-primary">
-                                        <i class="material-icons-outlined">add</i> Add First Detail
+                                        <i class="material-icons-outlined">add</i>
                                     </a>
                                 </div>
                             </div>
