@@ -245,7 +245,7 @@ function viewDetailValues(detailValueId) {
 // View Details Function
 function viewDetails(detailValueId) {
     // Redirect to details page
-    window.location.href = `{{ route('admin.products.detail-values.details.index', $product) }}/${detailValueId}`;
+    window.location.href = `{{ route('admin.products.detail-values.details.index', [$product, 'detail_value' => 'PLACEHOLDER']) }}`.replace('PLACEHOLDER', detailValueId);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
