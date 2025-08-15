@@ -391,11 +391,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     let inputGroupCounter = {};
     let totalInputs = {};
+    let formFieldCounter = {};
     
     // Initialize counters for each language
     @foreach($languages as $language)
         inputGroupCounter[{{ $language->id }}] = 0;
         totalInputs[{{ $language->id }}] = 0;
+        formFieldCounter[{{ $language->id }}] = 0;
     @endforeach
     
     const submitBtn = document.getElementById('submitBtn');
@@ -420,10 +422,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Clear all inputs for this language
         clearAllBtn{{ $language->id }}.addEventListener('click', function() {
             if (confirm('Are you sure you want to clear all inputs for this language?')) {
-                const container = document.getElementById(`dynamicInputsContainer-${language->id}`);
+                const container = document.getElementById(`dynamicInputsContainer-{{ $language->id }}`);
                 container.innerHTML = '';
                 inputGroupCounter[{{ $language->id }}] = 0;
-                totalInputs[{{ $language->id }}] = 0;
+                formFieldCounter[{{ $language->id }}] = 0;
                 updateSubmitButton();
                 showEmptyState({{ $language->id }});
             }
@@ -476,7 +478,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const dataFlowInfo = createDataFlowInfo('Key → Details.Keyword, Value → Values.Keyword & Values.Value');
             inputsContainer.appendChild(dataFlowInfo);
             
-            const keyRow = createInputRow(languageId, 'key', 'Key', 'Enter key name (e.g., dimensions)');
+            const keyRow = createInputRow(languageId, 'keyword', 'Key', 'Enter key name (e.g., dimensions)');
             const valueRow = createInputRow(languageId, 'value', 'Value', 'Enter value (e.g., 120x80x45)');
             inputsContainer.appendChild(keyRow);
             inputsContainer.appendChild(valueRow);
@@ -536,7 +538,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const keywordInput = document.createElement('input');
         keywordInput.type = 'text';
         keywordInput.className = 'form-control';
-        keywordInput.name = `translates[${totalInputs[languageId]}][keyword]`;
+        keywordInput.name = `translates[${formFieldCounter[languageId]}][keyword]`;
         keywordInput.placeholder = 'Enter keyword (e.g., specifications)';
         keywordInput.required = true;
         keywordField.appendChild(keywordLabel);
@@ -546,7 +548,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add hidden language_id field
         const languageIdInput = document.createElement('input');
         languageIdInput.type = 'hidden';
-        languageIdInput.name = `translates[${totalInputs[languageId]}][language_id]`;
+        languageIdInput.name = `translates[${formFieldCounter[languageId]}][language_id]`;
         languageIdInput.value = languageId;
         keywordRow.appendChild(languageIdInput);
 
@@ -588,7 +590,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const keyvalueInput = document.createElement('input');
         keyvalueInput.type = 'text';
         keyvalueInput.className = 'form-control';
-        keyvalueInput.name = `translates[${totalInputs[languageId]}][valuekeyword]`;
+        keyvalueInput.name = `translates[${formFieldCounter[languageId]}][valuekeyword]`;
         keyvalueInput.placeholder = 'Enter value keyword (e.g., size, color)';
         keyvalueInput.required = true;
         keyvalueDiv.appendChild(keyvalueLabel);
@@ -603,7 +605,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const valueInput = document.createElement('input');
         valueInput.type = 'text';
         valueInput.className = 'form-control';
-        valueInput.name = `translates[${totalInputs[languageId]}][value]`;
+        valueInput.name = `translates[${formFieldCounter[languageId]}][value]`;
         valueInput.placeholder = 'Enter value (e.g., large, white)';
         valueInput.required = true;
         valueDiv.appendChild(valueLabel);
@@ -612,7 +614,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add hidden language_id field
         const languageIdInput = document.createElement('input');
         languageIdInput.type = 'hidden';
-        languageIdInput.name = `translates[${totalInputs[languageId]}][language_id]`;
+        languageIdInput.name = `translates[${formFieldCounter[languageId]}][language_id]`;
         languageIdInput.value = languageId;
 
         // Remove button
@@ -627,7 +629,7 @@ document.addEventListener('DOMContentLoaded', function() {
         pairDiv.appendChild(languageIdInput);
         pairDiv.appendChild(removeBtn);
 
-        totalInputs[languageId]++;
+        formFieldCounter[languageId]++;
         return pairDiv;
     }
 
@@ -638,11 +640,18 @@ document.addEventListener('DOMContentLoaded', function() {
         updateGroupCounter(keywordContainer.closest('.input-group-wrapper'));
     }
 
+    // Update group counter
+    function updateGroupCounter(groupWrapper) {
+        const counter = groupWrapper.querySelector('.input-counter');
+        const rows = groupWrapper.querySelectorAll('.input-row, .keyword-container');
+        counter.textContent = rows.length;
+    }
+
     // Remove keyvalue-value pair
     function removeKeyValuePair(pairDiv, languageId) {
         if (pairDiv.parentElement.children.length > 1) {
             pairDiv.remove();
-            totalInputs[languageId]--;
+            formFieldCounter[languageId]--;
             updateAllGroupCounters();
         } else {
             alert('At least one KeyValue-Value pair must remain.');
@@ -653,7 +662,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function removeKeywordContainer(keywordDiv) {
         const languageId = parseInt(keywordDiv.closest('.input-group-wrapper').dataset.languageId);
         const pairs = keywordDiv.querySelectorAll('.keyvalue-value-row');
-        totalInputs[languageId] -= (pairs.length + 1); // +1 for keyword input
+        formFieldCounter[languageId] -= (pairs.length + 1); // +1 for keyword input
         keywordDiv.remove();
         updateAllGroupCounters();
     }
@@ -673,13 +682,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add hidden language_id field
         const languageIdInput = document.createElement('input');
         languageIdInput.type = 'hidden';
-        languageIdInput.name = `translates[${totalInputs[languageId]}][language_id]`;
+        languageIdInput.name = `translates[${formFieldCounter[languageId]}][language_id]`;
         languageIdInput.value = languageId;
 
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'form-control';
-        input.name = `translates[${totalInputs[languageId]}][${fieldName}]`;
+        input.name = `translates[${formFieldCounter[languageId]}][${fieldName}]`;
         input.placeholder = placeholder;
         input.required = true;
 
@@ -696,7 +705,7 @@ document.addEventListener('DOMContentLoaded', function() {
         row.appendChild(inputDiv);
         row.appendChild(removeBtn);
 
-        totalInputs[languageId]++;
+        formFieldCounter[languageId]++;
         return row;
     }
 
@@ -704,7 +713,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function removeRow(row, languageId) {
         if (row.parentElement.children.length > 1) {
             row.remove();
-            totalInputs[languageId]--;
+            formFieldCounter[languageId]--;
             updateAllGroupCounters();
         } else {
             alert('At least one row must remain in each group.');
@@ -716,7 +725,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const languageId = parseInt(wrapper.dataset.languageId);
         if (wrapper.parentElement.children.length > 1) {
             const rows = wrapper.querySelectorAll('.input-row, .keyword-container');
-            totalInputs[languageId] -= rows.length;
+            formFieldCounter[languageId] -= rows.length;
             wrapper.remove();
             updateSubmitButton();
             updateAllGroupCounters();
@@ -740,7 +749,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Update submit button state
     function updateSubmitButton() {
-        const totalInputsSum = Object.values(totalInputs).reduce((sum, count) => sum + count, 0);
+        const totalInputsSum = Object.values(formFieldCounter).reduce((sum, count) => sum + count, 0);
         if (totalInputsSum > 0) {
             submitBtn.disabled = false;
             submitBtn.classList.remove('submit-btn-disabled');
@@ -776,7 +785,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Form validation
     form.addEventListener('submit', function(e) {
-        const totalInputsSum = Object.values(totalInputs).reduce((sum, count) => sum + count, 0);
+        const totalInputsSum = Object.values(formFieldCounter).reduce((sum, count) => sum + count, 0);
         if (totalInputsSum === 0) {
             e.preventDefault();
             alert('Please add at least one input field before submitting.');
