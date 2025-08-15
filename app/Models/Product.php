@@ -64,10 +64,7 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 
-    public function details()
-    {
-        return $this->hasMany(ProductDetail::class);
-    }
+
 
     // Scopes
     public function scopeActive($query)
