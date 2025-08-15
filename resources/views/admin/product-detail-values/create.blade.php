@@ -92,18 +92,6 @@
                                                         @enderror
                                                     </div>
                                                     
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Value</label>
-                                                        <textarea class="form-control @error('translates.'.$index.'.value') is-invalid @enderror" 
-                                                                  name="translates[{{ $index }}][value]" 
-                                                                  placeholder="Enter value for {{ $language->lang_code ?? 'this language' }}"
-                                                                  rows="3"
-                                                                  required>{{ old('translates.'.$index.'.value') }}</textarea>
-                                                        @error('translates.'.$index.'.value')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                    
                                                     <!-- Hidden language_id field -->
                                                     <input type="hidden" name="translates[{{ $index }}][language_id]" value="{{ $language->id }}">
                                                 </div>
