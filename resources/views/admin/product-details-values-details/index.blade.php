@@ -69,7 +69,7 @@
                     <div class="card-body">
                         @if($details->count() > 0)
                             <!-- Results Summary -->
-                            <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div class="text-muted">
                                     <i class="material-icons-outlined">list</i>
                                     Total: {{ $details->count() }} details
@@ -83,76 +83,77 @@
                                 </div>
                             </div>
                             
-                            <!-- Details Grid -->
-                            <div class="row" id="sortable-details">
-                                @foreach($details as $index => $detail)
-                                    <div class="col-md-6 col-lg-4 mb-4" data-id="{{ $detail->id }}">
-                                        <div class="card detail-card h-100">
-                                            <div class="card-header d-flex justify-content-between align-items-center py-2">
-                                                <div class="d-flex align-items-center">
-                                                    <input type="checkbox" class="detail-checkbox me-2" value="{{ $detail->id }}">
-                                                    <span class="badge badge-primary">{{ $index + 1 }}</span>
-                                                </div>
-                                                <div class="drag-handle" style="cursor: move;">
-                                                    <i class="material-icons-outlined text-muted">drag_indicator</i>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="card-body">
-                                                <div class="translations-container">
-                                                    @foreach($detail->translates as $translate)
-                                                        <div class="translation-item mb-3 p-3 border rounded">
-                                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                                <span class="badge badge-light-primary">
-                                                                    {{ $translate->language->lang_code ?? 'N/A' }}
-                                                                </span>
-                                                                <small class="text-muted">ID: {{ $detail->id }}</small>
-                                                            </div>
-                                                            <div class="keyword-section mb-2">
-                                                                <strong class="text-primary">Keyword:</strong>
-                                                                <span class="ms-2">{{ $translate->keyword }}</span>
-                                                            </div>
-                                                            <div class="value-section">
-                                                                <strong class="text-success">Value:</strong>
-                                                                <div class="mt-1 p-2 bg-light rounded">
-                                                                    {{ $translate->value }}
-                                                                </div>
-                                                            </div>
+                            <!-- Details Table -->
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th width="30">
+                                                <input type="checkbox" id="select-all-details">
+                                            </th>
+                                            <th width="50">#</th>
+                                            <th width="80">Order</th>
+                                            <th width="100">Language</th>
+                                            <th>Keyword</th>
+                                            <th>Value</th>
+                                            <th width="150">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sortable-details">
+                                        @foreach($details as $index => $detail)
+                                            @foreach($detail->translates as $translate)
+                                                <tr data-id="{{ $detail->id }}" data-detail-id="{{ $detail->id }}">
+                                                    <td>
+                                                        <input type="checkbox" class="detail-checkbox" value="{{ $detail->id }}">
+                                                    </td>
+                                                    <td>
+                                                        <div class="drag-handle" style="cursor: move;">
+                                                            <i class="material-icons-outlined text-muted">drag_indicator</i>
                                                         </div>
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="card-footer">
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <small class="text-muted">
-                                                        Order: {{ $detail->order }}
-                                                    </small>
-                                                    <div class="d-flex gap-1">
-                                                        <a href="{{ route('admin.products.detail-values.details.edit', [$product, $detailValue, $detail]) }}" 
-                                                           class="btn btn-sm btn-outline-primary" 
-                                                           title="Edit">
-                                                            <i class="material-icons-outlined">edit</i>
-                                                        </a>
-                                                        
-                                                        <form action="{{ route('admin.products.detail-values.details.destroy', [$product, $detailValue, $detail]) }}" 
-                                                              method="POST" 
-                                                              class="d-inline"
-                                                              onsubmit="return confirm('Are you sure you want to delete this detail?')">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" 
-                                                                    class="btn btn-sm btn-outline-danger" 
-                                                                    title="Delete">
-                                                                <i class="material-icons-outlined">delete</i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-primary">{{ $detail->order }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-light-primary">
+                                                            {{ $translate->language->lang_code ?? 'N/A' }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <strong class="text-primary">{{ $translate->keyword }}</strong>
+                                                    </td>
+                                                    <td>
+                                                        <div class="text-truncate" style="max-width: 300px;" title="{{ $translate->value }}">
+                                                            {{ $translate->value }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="d-flex gap-2">
+                                                            <a href="{{ route('admin.products.detail-values.details.edit', [$product, $detailValue, $detail]) }}" 
+                                                               class="btn btn-sm btn-outline-primary" 
+                                                               title="Edit">
+                                                                <i class="material-icons-outlined">edit</i>
+                                                            </a>
+                                                            
+                                                            <form action="{{ route('admin.products.detail-values.details.destroy', [$product, $detailValue, $detail]) }}" 
+                                                                  method="POST" 
+                                                                  class="d-inline"
+                                                                  onsubmit="return confirm('Are you sure you want to delete this detail?')">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" 
+                                                                        class="btn btn-sm btn-outline-danger" 
+                                                                        title="Delete">
+                                                                    <i class="material-icons-outlined">delete</i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         @else
                             <div class="text-center py-5">
@@ -185,9 +186,12 @@ document.addEventListener('DOMContentLoaded', function() {
             handle: '.drag-handle',
             animation: 150,
             onEnd: function(evt) {
-                const items = Array.from(sortableList.children).map((div, index) => {
-                    return div.getAttribute('data-id');
+                const items = Array.from(sortableList.children).map((tr, index) => {
+                    return tr.getAttribute('data-detail-id');
                 }).filter(id => id !== null);
+
+                // Remove duplicates (same detail might have multiple rows for different languages)
+                const uniqueItems = [...new Set(items)];
 
                 // Send reorder request
                 fetch('{{ route("admin.products.detail-values.details.reorder", [$product, $detailValue]) }}', {
@@ -196,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
-                    body: JSON.stringify({ items: items })
+                    body: JSON.stringify({ items: uniqueItems })
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -242,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function toggleDeleteButton() {
-        let anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+        let anyChecked = Array.from(checkboxes).filter(cb => cb.checked).length > 0;
         deleteBtn.disabled = !anyChecked;
     }
 
@@ -276,29 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-.detail-card {
-    transition: all 0.3s ease;
-    border: 1px solid #e0e0e0;
-}
-
-.detail-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
-}
-
-.translation-item {
-    background-color: #f8f9fa;
-    border-left: 4px solid #007bff !important;
-}
-
-.keyword-section {
-    font-size: 0.9rem;
-}
-
-.value-section {
-    font-size: 0.9rem;
-}
-
 .drag-handle:hover {
     color: #007bff !important;
 }
@@ -307,9 +288,14 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 0.75rem;
 }
 
-.card-footer {
-    background-color: #f8f9fa;
-    border-top: 1px solid #e0e0e0;
+.table td {
+    vertical-align: middle;
+}
+
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>
 @endpush
