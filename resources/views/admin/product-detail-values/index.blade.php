@@ -81,7 +81,6 @@
                                              </th>
                                              <th width="50">#</th>
                                              <th>Keywords</th>
-                                             <th>Languages</th>
                                              <th width="150">Actions</th>
                                          </tr>
                                      </thead>
@@ -110,15 +109,6 @@
                                                              <span class="text-muted">{{ $translate->keyword }}</span>
                                                          </div>
                                                      @endforeach
-                                                 </td>
-                                                 <td>
-                                                     <div class="d-flex flex-wrap gap-1">
-                                                         @foreach($detailValue->translates as $translate)
-                                                             <span class="badge badge-light-info">
-                                                                 {{ $translate->language->lang_name ?? 'N/A' }}
-                                                             </span>
-                                                         @endforeach
-                                                     </div>
                                                  </td>
                                                                                                  <td>
                                                      <div class="d-flex gap-2">
