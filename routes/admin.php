@@ -371,7 +371,9 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
         Route::post('products/{product}/images/reorder', [ProductImageController::class, 'reorder'])->name('products.images.reorder');
         
         // Product Details routes
-        Route::get('products/{product}/details', [ProductDetailController::class, 'index'])->name('products.details.index');
+        Route::resource('products.details', ProductDetailController::class);
+        Route::post('products/{product}/details/reorder', [ProductDetailController::class, 'reorder'])->name('products.details.reorder');
+        Route::post('products/{product}/details/bulk-delete', [ProductDetailController::class, 'bulkDelete'])->name('products.details.bulk-delete');
         
         // Our Goals routes
         Route::resource('our-goals', OurGoalController::class);
