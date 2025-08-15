@@ -74,56 +74,52 @@
                             
                             <div class="table-responsive">
                                 <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th width="30">
-                                                <input type="checkbox" id="select-all-values">
-                                            </th>
-                                            <th width="50">#</th>
-                                            <th>Keyword</th>
-                                            <th>Keywords</th>
-                                            <th>Languages</th>
-                                            <th width="150">Actions</th>
-                                        </tr>
-                                    </thead>
+                                                                         <thead>
+                                         <tr>
+                                             <th width="30">
+                                                 <input type="checkbox" id="select-all-values">
+                                             </th>
+                                             <th width="50">#</th>
+                                             <th>Keywords</th>
+                                             <th>Languages</th>
+                                             <th width="150">Actions</th>
+                                         </tr>
+                                     </thead>
                                     <tbody id="sortable-values">
                                         @foreach($detailValues as $detailValue)
-                                            <tr data-id="{{ $detailValue->id }}">
-                                                <td>
-                                                    <input type="checkbox" class="value-checkbox" value="{{ $detailValue->id }}">
-                                                </td>
-                                                <td>
-                                                    <div class="drag-handle">
-                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <circle cx="8" cy="8" r="1"></circle>
-                                                            <circle cx="16" cy="8" r="1"></circle>
-                                                            <circle cx="8" cy="16" r="1"></circle>
-                                                            <circle cx="16" cy="16" r="1"></circle>
-                                                        </svg>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <strong>{{ $detailValue->keyword }}</strong>
-                                                </td>
-                                                <td>
-                                                    @foreach($detailValue->translates as $translate)
-                                                        <div class="mb-2">
-                                                            <span class="badge badge-light-primary me-2">
-                                                                {{ $translate->language->lang_code ?? 'N/A' }}
-                                                            </span>
-                                                            <span class="text-muted">{{ $translate->keyword }}</span>
-                                                        </div>
-                                                    @endforeach
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex flex-wrap gap-1">
-                                                        @foreach($detailValue->translates as $translate)
-                                                            <span class="badge badge-light-info">
-                                                                {{ $translate->language->lang_name ?? 'N/A' }}
-                                                            </span>
-                                                        @endforeach
-                                                    </div>
-                                                </td>
+                                                                                         <tr data-id="{{ $detailValue->id }}">
+                                                 <td>
+                                                     <input type="checkbox" class="value-checkbox" value="{{ $detailValue->id }}">
+                                                 </td>
+                                                 <td>
+                                                     <div class="drag-handle">
+                                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                             <circle cx="8" cy="8" r="1"></circle>
+                                                             <circle cx="16" cy="8" r="1"></circle>
+                                                             <circle cx="8" cy="16" r="1"></circle>
+                                                             <circle cx="16" cy="16" r="1"></circle>
+                                                         </svg>
+                                                     </div>
+                                                 </td>
+                                                 <td>
+                                                     @foreach($detailValue->translates as $translate)
+                                                         <div class="mb-2">
+                                                             <span class="badge badge-light-primary me-2">
+                                                                 {{ $translate->language->lang_code ?? 'N/A' }}
+                                                             </span>
+                                                             <span class="text-muted">{{ $translate->keyword }}</span>
+                                                         </div>
+                                                     @endforeach
+                                                 </td>
+                                                 <td>
+                                                     <div class="d-flex flex-wrap gap-1">
+                                                         @foreach($detailValue->translates as $translate)
+                                                             <span class="badge badge-light-info">
+                                                                 {{ $translate->language->lang_name ?? 'N/A' }}
+                                                             </span>
+                                                         @endforeach
+                                                     </div>
+                                                 </td>
                                                                                                  <td>
                                                      <div class="d-flex gap-2">
                                                          <a href="{{ route('admin.products.detail-values.edit', [$product, $detailValue]) }}" 
@@ -204,12 +200,9 @@ function viewDetailValues(detailValueId) {
     const row = document.querySelector(`tr[data-id="${detailValueId}"]`);
     if (!row) return;
     
-    // Get the keyword from the main table
-    const keyword = row.querySelector('td:nth-child(3) strong')?.textContent || 'No keyword';
-    
     // Get all translations
     const translations = [];
-    const translationRows = row.querySelectorAll('td:nth-child(4) .mb-2');
+    const translationRows = row.querySelectorAll('td:nth-child(3) .mb-2');
     translationRows.forEach(translationRow => {
         const langCode = translationRow.querySelector('.badge')?.textContent || 'N/A';
         const keywordText = translationRow.querySelector('span:last-child')?.textContent || 'No keyword';
@@ -225,27 +218,21 @@ function viewDetailValues(detailValueId) {
                     <div class="card-header">
                         <h6 class="mb-0">Detail Value Information</h6>
                     </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Main Keyword:</label>
-                                <p class="mb-0">${keyword}</p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Translations:</label>
-                                <div class="mt-2">
-                                    ${translations.map(trans => `
-                                        <div class="d-flex align-items-center mb-2 p-2 border rounded">
-                                            <span class="badge bg-primary me-3">${trans.langCode}</span>
-                                            <span class="fw-medium">${trans.keyword}</span>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                         <div class="card-body">
+                         <div class="row">
+                             <div class="col-12">
+                                 <label class="form-label fw-bold">Translations:</label>
+                                 <div class="mt-2">
+                                     ${translations.map(trans => `
+                                         <div class="d-flex align-items-center mb-2 p-2 border rounded">
+                                             <span class="badge bg-primary me-3">${trans.langCode}</span>
+                                             <span class="fw-medium">${trans.keyword}</span>
+                                         </div>
+                                     `).join('')}
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
                 </div>
             </div>
         </div>
