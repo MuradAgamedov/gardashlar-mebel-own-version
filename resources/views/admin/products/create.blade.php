@@ -289,41 +289,7 @@
                                                     <div class="col-12 mt-3">
                                                         <h6 class="mb-3">Product Details</h6>
                                                     </div>
-                                                    <div class="col-md-4">
-                                                        <label class="form-label">Weight (kg)</label>
-                                                        <input type="text" 
-                                                               class="form-control @error("translations.{$language->id}.weight") is-invalid @enderror" 
-                                                               name="translations[{{ $language->id }}][weight]" 
-                                                               value="{{ old("translations.{$language->id}.weight") }}"
-                                                               min="0" 
-                                                               step="0.001"
-                                                               placeholder="0.000">
-                                                        @error("translations.{$language->id}.weight")
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                    
-                                                    <div class="col-md-4">
-                                                        <label class="form-label">Material</label>
-                                                        <textarea class="form-control @error("translations.{$language->id}.material") is-invalid @enderror" 
-                                                                  name="translations[{{ $language->id }}][material]" 
-                                                                  rows="3"
-                                                                  placeholder="e.g., Cotton, Wood, Metal">{{ old("translations.{$language->id}.material") }}</textarea>
-                                                        @error("translations.{$language->id}.material")
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                    
-                                                    <div class="col-md-4">
-                                                        <label class="form-label">Size</label>
-                                                        <textarea class="form-control @error("translations.{$language->id}.size") is-invalid @enderror" 
-                                                                  name="translations[{{ $language->id }}][size]" 
-                                                                  rows="3"
-                                                                  placeholder="e.g., S, M, L, XL">{{ old("translations.{$language->id}.size") }}</textarea>
-                                                        @error("translations.{$language->id}.size")
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
+
                                                 </div>
                                                 
                                                 <input type="hidden" 
