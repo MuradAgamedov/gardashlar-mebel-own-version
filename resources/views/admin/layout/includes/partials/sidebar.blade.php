@@ -3,6 +3,14 @@
   <div class="main-sidebar" id="main-sidebar">
     <ul class="sidebar-menu" id="simple-bar">
 
+      <!-- CACHE CLEAR BUTTON -->
+      <li class="sidebar-list">
+        <button class="sidebar-link cache-clear-btn" id="cache-clear-btn" type="button">
+          <i class="fas fa-broom"></i>
+          <h6>Clear Cache</h6>
+        </button>
+      </li>
+
       <!-- GENERAL -->
       <li class="sidebar-main-title"><div><h5 class="sidebar-title">General</h5></div></li>
       <li class="sidebar-list">
@@ -308,6 +316,49 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }
+
+  // Cache clear button functionality
+  const cacheClearBtn = document.getElementById('cache-clear-btn');
+  if (cacheClearBtn) {
+    cacheClearBtn.addEventListener('click', async function() {
+      // Disable button and show loading state
+      const originalText = this.innerHTML;
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i><h6>Clearing...</h6>';
+      this.disabled = true;
+      
+      try {
+        const response = await fetch('{{ route("admin.clear-cache") }}', {
+          method: 'POST',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // Show success message
+          this.innerHTML = '<i class="fas fa-check text-success"></i><h6>Cache Cleared!</h6>';
+          setTimeout(() => {
+            this.innerHTML = originalText;
+            this.disabled = false;
+          }, 2000);
+        } else {
+          throw new Error(result.message);
+        }
+      } catch (error) {
+        console.error('Error clearing cache:', error);
+        // Show error message
+        this.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i><h6>Error!</h6>';
+        setTimeout(() => {
+          this.innerHTML = originalText;
+          this.disabled = false;
+        }, 2000);
+      }
+    });
+  }
 });
 </script>
 
@@ -336,5 +387,43 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 .sidebar-submenu a:hover {
   color: #007bff;
+}
+
+/* Cache Clear Button Styles */
+.cache-clear-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  margin: 10px 15px;
+  padding: 12px 15px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.cache-clear-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.cache-clear-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cache-clear-btn .text-success {
+  color: #28a745 !important;
+}
+
+.cache-clear-btn .text-danger {
+  color: #dc3545 !important;
+}
+
+.cache-clear-btn h6 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
 }
 </style>

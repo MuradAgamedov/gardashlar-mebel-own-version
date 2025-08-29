@@ -94,6 +94,7 @@ Route::prefix('')->name('admin.')->group(function () {
         // Dashboard routes
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::post('clear-cache', [DashboardController::class, 'clearCache'])->name('clear-cache');
         
         // Language routes
         Route::resource('languages', LanguageController::class);
