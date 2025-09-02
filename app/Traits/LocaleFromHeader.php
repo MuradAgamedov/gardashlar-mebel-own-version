@@ -8,15 +8,15 @@ use App\Models\Language;
 trait LocaleFromHeader
 {
     /**
-     * Get language ID directly from header (expects numeric language_id)
+     * Get language ID from header locale string (expects lang_code like "en", "az", "tr")
      */
     protected function getLanguageIdFromHeader(Request $request): ?int
     {
-        $languageId = (int) $request->header('locale');
+        $locale = $request->header('locale');
 
-        // Əgər rəqəmsə və status aktivdirsə
-        if ($languageId > 0) {
-            $language = Language::where('id', $languageId)
+        // Əgər locale string varsa və status aktivdirsə
+        if (!empty($locale)) {
+            $language = Language::where('lang_code', $locale)
                 ->where('status', true)
                 ->first();
 
@@ -25,7 +25,7 @@ trait LocaleFromHeader
             }
         }
 
-        // Əgər düzgün ID deyilsə, default dilin ID-sini qaytar
+        // Əgər düzgün locale deyilsə, default dilin ID-sini qaytar
         $default = Language::where('is_default', true)
             ->where('status', true)
             ->first();
