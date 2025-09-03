@@ -186,7 +186,7 @@ Route::get('/suggest-a-place', [SuggestAPlaceController::class, 'index'])->name(
 
 // KIVs API Routes
 Route::get('/kivs', [KivController::class, 'index'])->name('api.kivs.index');
-Route::get('/kivs/download', [KivController::class, 'download'])->name('api.kivs.download');
+Route::get('/image/download', [KivController::class, 'download'])->name('api.kivs.download');
 
 // Become A Partner Form API Routes
 Route::post('/become-a-partner-form', [BecomeAPartnerFormController::class, 'store'])->name('api.become-a-partner-form.store');
