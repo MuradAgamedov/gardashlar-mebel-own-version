@@ -188,7 +188,7 @@ class KivController extends Controller
      *     )
      * )
      */
-    public function download(Request $request): Response|JsonResponse
+    public function download(Request $request): Response|JsonResponse|BinaryFileResponse
     {
         try {
             $path = $request->query('path');
@@ -213,9 +213,19 @@ class KivController extends Controller
 
             // Faylın mövcudluğunu yoxlayırıq
             if (!Storage::disk('public')->exists($path)) {
+                // Debug məlumatları əlavə edirik
+                $storagePath = Storage::disk('public')->path($path);
+                $allFiles = Storage::disk('public')->allFiles('kivs');
+                
                 return response()->json([
                     'success' => false,
-                    'message' => 'Image not found'
+                    'message' => 'Image not found',
+                    'debug' => [
+                        'requested_path' => $path,
+                        'storage_path' => $storagePath,
+                        'available_files' => $allFiles,
+                        'storage_exists' => file_exists($storagePath)
+                    ]
                 ], 404);
             }
 
