@@ -12,7 +12,7 @@ trait LocaleFromHeader
      */
     protected function getLanguageIdFromHeader(Request $request): ?int
     {
-        $locale = $request->header('locale');
+        $locale = $request->header('locale', 'az');
 
         // Əgər locale string varsa və status aktivdirsə
         if (!empty($locale)) {
