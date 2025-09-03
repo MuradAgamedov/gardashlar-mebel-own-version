@@ -41,8 +41,9 @@ class SuggestionController extends Controller
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="title", type="string", example="Məhsul Tövsiyyəsi 1"),
      *                     @OA\Property(property="image_alt_text", type="string", example="Məhsul tövsiyyəsi şəkli"),
-     *                     @OA\Property(property="image", type="string", example="suggestions/sample-suggestion-1.jpg"),
-     *                     @OA\Property(property="pdf", type="string", nullable=true, example="suggestions/pdfs/sample-pdf-1.pdf"),
+     *                     @OA\Property(property="image", type="string", example="https://admin.gardaslar.coder.az/storage/suggestions/sample-suggestion-1.jpg"),
+     *                     @OA\Property(property="pdf", type="string", nullable=true, example="https://admin.gardaslar.coder.az/storage/suggestions/pdfs/sample-pdf-1.pdf"),
+     *                     @OA\Property(property="has_pdf", type="boolean", example=true),
      *                     @OA\Property(property="order", type="integer", example=1)
      *                 )
      *             )
@@ -94,8 +95,9 @@ class SuggestionController extends Controller
                     'id' => $suggestion->id,
                     'title' => $translation ? $translation->title : '',
                     'image_alt_text' => $translation ? $translation->image_alt_text : '',
-                    'image' => $suggestion->image,
-                    'pdf' => $suggestion->pdf,
+                    'image' => $suggestion->image ? asset('storage/' . $suggestion->image) : null,
+                    'pdf' => $suggestion->pdf ? asset('storage/' . $suggestion->pdf) : null,
+                    'has_pdf' => !empty($suggestion->pdf),
                     'order' => $suggestion->order
                 ];
             });
@@ -202,8 +204,9 @@ class SuggestionController extends Controller
                 'id' => $suggestion->id,
                 'title' => $translation ? $translation->title : '',
                 'image_alt_text' => $translation ? $translation->image_alt_text : '',
-                'image' => $suggestion->image,
-                'pdf' => $suggestion->pdf,
+                'image' => $suggestion->image ? asset('storage/' . $suggestion->image) : null,
+                'pdf' => $suggestion->pdf ? asset('storage/' . $suggestion->pdf) : null,
+                'has_pdf' => !empty($suggestion->pdf),
                 'order' => $suggestion->order
             ];
 
