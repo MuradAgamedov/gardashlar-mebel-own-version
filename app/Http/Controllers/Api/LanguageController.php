@@ -37,6 +37,7 @@ class LanguageController extends Controller
      *                     @OA\Property(property="lang_code", type="string", example="az"),
      *                     @OA\Property(property="lang_name", type="string", example="Azerbaijani"),
      *                     @OA\Property(property="is_default", type="boolean", example=true),
+     *                     @OA\Property(property="is_main_language", type="boolean", example=true),
      *                     @OA\Property(property="order", type="integer", example=1)
      *                 )
      *             )
@@ -61,7 +62,7 @@ class LanguageController extends Controller
             $languages = Cache::rememberForever('api_languages', function () {
                 return Language::where('status', true)
                     ->orderBy('order')
-                    ->select(['id', 'title', 'lang_code', 'lang_name', 'is_default', 'order'])
+                    ->select(['id', 'title', 'lang_code', 'lang_name', 'is_default', 'is_main_language', 'order'])
                     ->get();
             });
 
