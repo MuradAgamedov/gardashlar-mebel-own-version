@@ -12,8 +12,8 @@ trait LocaleFromHeader
      */
     protected function getLanguageIdFromHeader(Request $request): ?int
     {
-        $locale = $request->header('locale', 'az');
-
+        $locale = $request->header('locale') ;
+       
         // Əgər locale string varsa və status aktivdirsə
         if (!empty($locale)) {
             $language = Language::where('lang_code', $locale)
@@ -26,10 +26,10 @@ trait LocaleFromHeader
         }
 
         // Əgər düzgün locale deyilsə, default dilin ID-sini qaytar
-        $default = Language::where('is_default', true)
+        $default = Language::where('is_main_language', true)
             ->where('status', true)
             ->first();
-
+      
         return $default?->id;
     }
 }
