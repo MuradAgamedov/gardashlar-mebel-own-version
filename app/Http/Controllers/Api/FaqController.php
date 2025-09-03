@@ -62,7 +62,6 @@ class FaqController extends Controller
     public function index(Request $request)
     {
         $languageId = $this->getLanguageIdFromHeader($request);
-        dd($languageId);
         // Debug məlumatları əlavə edirik
         $debug = [
             'requested_locale' => $request->header('locale'),
