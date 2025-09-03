@@ -39,6 +39,7 @@ use App\Http\Controllers\Api\BecomeAPartnerController;
 use App\Http\Controllers\Api\BecomeAInvestorController;
 use App\Http\Controllers\Api\SuggestAPlaceController;
 use App\Http\Controllers\Api\KivController;
+use App\Http\Controllers\Api\FileActionController;
 use App\Http\Controllers\Api\BecomeAPartnerFormController;
 use App\Http\Controllers\Api\BecomeAInvestorFormController;
 use App\Http\Controllers\Api\ServiceFormController;
@@ -186,7 +187,7 @@ Route::get('/suggest-a-place', [SuggestAPlaceController::class, 'index'])->name(
 
 // KIVs API Routes
 Route::get('/kivs', [KivController::class, 'index'])->name('api.kivs.index');
-Route::get('/image/download', [KivController::class, 'download'])->name('api.kivs.download');
+Route::get('/file/download', [FileActionController::class, 'download'])->name('api.file.download');
 
 // Become A Partner Form API Routes
 Route::post('/become-a-partner-form', [BecomeAPartnerFormController::class, 'store'])->name('api.become-a-partner-form.store');

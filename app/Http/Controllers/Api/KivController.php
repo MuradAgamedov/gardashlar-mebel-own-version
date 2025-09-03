@@ -7,10 +7,7 @@ use App\Models\Kiv;
 use App\Models\KivCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use OpenApi\Annotations as OA;
 
 /**
@@ -148,110 +145,5 @@ class KivController extends Controller
         return null;
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/kivs/download",
-     *     operationId="downloadKivImage",
-     *     tags={"KIVs"},
-     *     summary="Download KIV image",
-     *     description="Downloads a KIV image by providing the image path",
-     *     @OA\Parameter(
-     *         name="path",
-     *         in="query",
-     *         description="Image path (e.g., kivs/filename.png)",
-     *         required=true,
-     *         @OA\Schema(type="string", example="kivs/3eb74a1ab26761dc54a05d7e3de374790d39fe52_1754390181_p0aDbClx.png")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Image downloaded successfully",
-     *         @OA\MediaType(
-     *             mediaType="image/*",
-     *             @OA\Schema(type="string", format="binary")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Image not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Image not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Invalid path provided",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Invalid path provided")
-     *         )
-     *     )
-     * )
-     */
-    public function download(Request $request): Response|JsonResponse|BinaryFileResponse
-    {
-        try {
-            $path = $request->query('path');
-            
-            if (!$path) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Path parameter is required'
-                ], 400);
-            }
 
-            // Təhlükəsizlik üçün path-i təmizləyirik
-            $path = ltrim($path, '/');
-            
-            // Yalnız kivs qovluğundan faylları yükləməyə icazə veririk
-            if (!str_starts_with($path, 'kivs/')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Access denied. Only KIV images can be downloaded.'
-                ], 403);
-            }
-
-            // Faylın mövcudluğunu yoxlayırıq
-            if (!Storage::disk('public')->exists($path)) {
-                // Debug məlumatları əlavə edirik
-                $storagePath = Storage::disk('public')->path($path);
-                $allFiles = Storage::disk('public')->allFiles('kivs');
-                
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Image not found',
-                    'debug' => [
-                        'requested_path' => $path,
-                        'storage_path' => $storagePath,
-                        'available_files' => $allFiles,
-                        'storage_exists' => file_exists($storagePath)
-                    ]
-                ], 404);
-            }
-
-            // Faylın tam yolunu alırıq
-            $fullPath = Storage::disk('public')->path($path);
-            
-            // MIME type-ı təyin edirik
-            $mimeType = mime_content_type($fullPath);
-            
-            // Fayl adını alırıq
-            $filename = basename($path);
-            
-            // Faylı yükləyirik
-            return response()->file($fullPath, [
-                'Content-Type' => $mimeType,
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-                'Access-Control-Allow-Origin' => '*',
-                'Access-Control-Allow-Methods' => 'GET',
-                'Access-Control-Allow-Headers' => 'Content-Type',
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error downloading image: ' . $e->getMessage()
-            ], 500);
-        }
-    }
 }
