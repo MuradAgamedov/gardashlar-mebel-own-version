@@ -63,9 +63,16 @@ class FaqController extends Controller
     {
         $languageId = $this->getLanguageIdFromHeader($request);
         
+        // Debug məlumatları əlavə edirik
+        $debug = [
+            'requested_locale' => $request->header('locale'),
+            'detected_language_id' => $languageId,
+            'all_languages' => \App\Models\Language::where('status', true)->get(['id', 'lang_code', 'is_default'])
+        ];
+        
         $cacheKey = "faqs_{$languageId}";
         
-        return Cache::remember($cacheKey, 3600, function () use ($languageId) {
+        return Cache::remember($cacheKey, 3600, function () use ($languageId, $debug) {
             $faqs = Faq::active()
                 ->ordered()
                 ->with(['translates' => function($query) use ($languageId) {
@@ -76,7 +83,8 @@ class FaqController extends Controller
             if ($faqs->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No FAQs found'
+                    'message' => 'No FAQs found',
+                    'debug' => $debug
                 ], 404);
             }
             
@@ -87,13 +95,16 @@ class FaqController extends Controller
                     'id' => $faq->id,
                     'question' => $translation ? $translation->question : null,
                     'answer' => $translation ? $translation->answer : null,
+                    'has_translation' => $translation ? true : false,
+                    'all_translations' => $faq->translates->count()
                 ];
             });
             
             return response()->json([
                 'success' => true,
                 'message' => 'FAQs retrieved successfully',
-                'data' => $data
+                'data' => $data,
+                'debug' => $debug
             ]);
         });
     }
