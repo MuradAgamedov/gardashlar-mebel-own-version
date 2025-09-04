@@ -808,18 +808,24 @@ class ProductsController extends Controller
             });
 
             // Get product detail values (already ordered by order field from database)
-            $productDetailValues = $product->detailValues->map(function ($detailValue) {
+            $productDetailValues = $product->detailValues->map(function ($detailValue) use ($languageId) {
                 $translation = $detailValue->translates->first();
                 
-                // Get details for this specific detail value only
-                $details = $detailValue->details->map(function ($detail) {
-                    $detailTranslation = $detail->translates->first();
-                    return [
-                        'id' => $detail->id,
-                        'keyword' => $detailTranslation ? $detailTranslation->keyword : '',
-                        'value' => $detailTranslation ? $detailTranslation->value : ''
-                    ];
-                });
+                // Load details for this specific detail value with translations
+                $details = $detailValue->details()
+                    ->with(['translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    }])
+                    ->orderBy('order')
+                    ->get()
+                    ->map(function ($detail) {
+                        $detailTranslation = $detail->translates->first();
+                        return [
+                            'id' => $detail->id,
+                            'keyword' => $detailTranslation ? $detailTranslation->keyword : '',
+                            'value' => $detailTranslation ? $detailTranslation->value : ''
+                        ];
+                    });
                 
                 return [
                     'id' => $detailValue->id,
