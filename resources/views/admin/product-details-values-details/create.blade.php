@@ -206,6 +206,11 @@ function createLanguageTabs() {
                 <div id="pairs-{{ $language->id }}">
                     <!-- Keyword & Value pairs will be added here -->
                 </div>
+                <div class="mt-3">
+                    <button type="button" class="btn btn-sm btn-primary" onclick="addKeywordValuePairForLanguage({{ $language->id }})">
+                        <i class="material-icons-outlined">add</i> Add Keyword & Value for {{ $language->lang_code }}
+                    </button>
+                </div>
             </div>
         `;
         
@@ -245,15 +250,8 @@ function createLanguageTabs() {
     console.log('Language tabs created successfully');
 }
 
-function addKeywordValuePair() {
-    // Get active tab
-    const activeTab = document.querySelector('.nav-link.active');
-    if (!activeTab) {
-        console.error('No active tab found');
-        return;
-    }
-    
-    const languageId = activeTab.getAttribute('data-bs-target').replace('#content-', '');
+// Add keyword-value pair for specific language
+function addKeywordValuePairForLanguage(languageId) {
     const pairsContainer = document.getElementById(`pairs-${languageId}`);
     
     if (!pairsContainer) {
@@ -263,6 +261,24 @@ function addKeywordValuePair() {
     }
     
     console.log('Adding keyword-value pair to language:', languageId);
+    createKeywordValuePair(pairsContainer, languageId);
+}
+
+// Legacy function for backward compatibility
+function addKeywordValuePair() {
+    // Get active tab
+    const activeTab = document.querySelector('.nav-link.active');
+    if (!activeTab) {
+        console.error('No active tab found');
+        return;
+    }
+    
+    const languageId = activeTab.getAttribute('data-bs-target').replace('#content-', '');
+    addKeywordValuePairForLanguage(languageId);
+}
+
+// Create keyword-value pair in specific container
+function createKeywordValuePair(pairsContainer, languageId) {
     
     const pairDiv = document.createElement('div');
     pairDiv.className = 'keyword-value-pair border rounded p-3 mb-3';
