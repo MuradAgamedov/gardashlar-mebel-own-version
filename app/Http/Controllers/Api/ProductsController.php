@@ -7,6 +7,7 @@ use App\Models\ProductCategory;
 use App\Models\ProductPriceFilter;
 use App\Models\ProductColor;
 use App\Models\ProductType;
+use App\Models\ProductPageCategory;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -89,7 +90,19 @@ class ProductsController extends Controller
      *                     type="array",
      *                     @OA\Items(
      *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="title", type="string", example="Masa"),
+     *                         @OA\Property(property="title", type="string", example="Masa")
+     *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="product_page_categories",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="product_category_id", type="integer", example=5),
+     *                         @OA\Property(property="title", type="string", example="Ofis"),
+     *                         @OA\Property(property="slug", type="string", example="ofis"),
+     *                         @OA\Property(property="image", type="string", example="https://admin.gardaslar.coder.az/storage/product-categories/..."),
+     *                         @OA\Property(property="image_alt_text", type="string", example="Ofis şəkli"),
      *                         @OA\Property(property="order", type="integer", example=1)
      *                     )
      *                 )
@@ -189,6 +202,30 @@ class ProductsController extends Controller
                 ];
             });
 
+            // Get product page categories
+            $productPageCategories = Cache::rememberForever("product_page_categories_{$languageId}", function () use ($languageId) {
+                return ProductPageCategory::with(['productCategory.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }])
+                ->active()
+                ->ordered()
+                ->get();
+            });
+
+            $productPageCategoriesData = $productPageCategories->map(function ($pageCategory) {
+                $category = $pageCategory->productCategory;
+                $translation = $category ? $category->translates->first() : null;
+                return [
+                    'id' => $pageCategory->id,
+                    'product_category_id' => $pageCategory->product_category_id,
+                    'title' => $translation ? $translation->title : '',
+                    'slug' => $translation ? $translation->slug : '',
+                    'image' => $category && $category->image ? asset('storage/' . $category->image) : null,
+                    'image_alt_text' => $translation ? $translation->image_alt_text : '',
+                    'order' => $pageCategory->order
+                ];
+            });
+
             return response()->json([
                 'success' => true,
                 'message' => 'Product categories retrieved successfully',
@@ -196,7 +233,8 @@ class ProductsController extends Controller
                     'categories' => $categoriesData,
                     'product_price_filters' => $priceFiltersData,
                     'product_colors' => $productColorsData,
-                    'product_types' => $productTypesData
+                    'product_types' => $productTypesData,
+                    'product_page_categories' => $productPageCategoriesData
                 ]
             ]);
 
