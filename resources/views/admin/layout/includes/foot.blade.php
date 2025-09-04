@@ -4,8 +4,8 @@
 <script src="{{ asset('admin/assets/js/vendors/jquery/jquery.min.js') }}"></script>
 
 <!-- bootstrap js -->
-<script src="{{ asset('admin/assets/js/vendors/bootstrap/dist/js/bootstrap.bundle.min.js') }}" defer></script>
-<script src="{{ asset('admin/assets/js/vendors/bootstrap/dist/js/popper.min.js') }}" defer></script>
+<script src="{{ asset('admin/assets/js/vendors/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('admin/assets/js/vendors/bootstrap/dist/js/popper.min.js') }}"></script>
 
 <!-- fontawesome -->
 <script src="{{ asset('admin/assets/js/vendors/font-awesome/fontawesome-min.js') }}"></script>

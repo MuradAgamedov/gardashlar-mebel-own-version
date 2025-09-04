@@ -108,13 +108,26 @@
 <script>
 let translationIndex = 0;
 
+// Wait for Bootstrap to be fully loaded
+function waitForBootstrap() {
+    return new Promise((resolve) => {
+        if (typeof bootstrap !== 'undefined') {
+            resolve();
+        } else {
+            setTimeout(() => waitForBootstrap().then(resolve), 100);
+        }
+    });
+}
+
 // Add initial language tabs
 document.addEventListener('DOMContentLoaded', function() {
-    createLanguageTabs();
-    // Add initial keyword-value pair to the first language
-    setTimeout(() => {
-        addKeywordValuePair();
-    }, 100);
+    waitForBootstrap().then(() => {
+        createLanguageTabs();
+        // Add initial keyword-value pair to the first language
+        setTimeout(() => {
+            addKeywordValuePair();
+        }, 100);
+    });
 });
 
 function createLanguageTabs() {
@@ -162,15 +175,29 @@ function createLanguageTabs() {
     
     container.appendChild(tabNav);
     container.appendChild(tabContent);
+    
+    // Initialize Bootstrap tabs
+    const tabElements = container.querySelectorAll('[data-bs-toggle="tab"]');
+    tabElements.forEach(tabElement => {
+        new bootstrap.Tab(tabElement);
+    });
 }
 
 function addKeywordValuePair() {
     // Get active tab
     const activeTab = document.querySelector('.nav-link.active');
-    if (!activeTab) return;
+    if (!activeTab) {
+        console.error('No active tab found');
+        return;
+    }
     
     const languageId = activeTab.getAttribute('data-bs-target').replace('#content-', '');
     const pairsContainer = document.getElementById(`pairs-${languageId}`);
+    
+    if (!pairsContainer) {
+        console.error('Pairs container not found for language:', languageId);
+        return;
+    }
     
     const pairDiv = document.createElement('div');
     pairDiv.className = 'keyword-value-pair border rounded p-3 mb-3';
