@@ -726,7 +726,7 @@ class ProductsController extends Controller
                 return [
                     'id' => $accordion->id,
                     'title' => $translation ? $translation->title : '',
-                    'content' => $translation ? $translation->content : '',
+                    'content' => $translation ? $translation->description : '',
                     'order' => $accordion->order
                 ];
             });
