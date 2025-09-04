@@ -101,8 +101,7 @@ class ProductsController extends Controller
      *                         @OA\Property(property="title", type="string", example="Ofis"),
      *                         @OA\Property(property="slug", type="string", example="ofis"),
      *                         @OA\Property(property="image", type="string", example="https://admin.gardaslar.coder.az/storage/product-categories/..."),
-     *                         @OA\Property(property="image_alt_text", type="string", example="Ofis şəkli"),
-     *                         @OA\Property(property="order", type="integer", example=1)
+     *                         @OA\Property(property="image_alt_text", type="string", example="Ofis şəkli")
      *                     )
      *                 )
      *             )
@@ -217,10 +216,7 @@ class ProductsController extends Controller
                 return [
                     'id' => $pageCategory->id,
                     'title' => $translation ? $translation->title : '',
-                    'slug' => $translation ? $translation->slug : '',
-                    'image' => $category && $category->image ? asset('storage/' . $category->image) : null,
-                    'image_alt_text' => $translation ? $translation->image_alt_text : '',
-                    'order' => $pageCategory->order
+                    'slug' => $translation ? $translation->slug : ''
                 ];
             });
 
