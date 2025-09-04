@@ -13,8 +13,7 @@ class Service extends Model
     protected $fillable = [
         'status',
         'order',
-        'slug',
-        'advantages_title'
+        'slug'
     ];
 
     protected $casts = [

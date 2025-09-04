@@ -50,7 +50,6 @@ class ServiceController extends Controller
         // Validate the request
         $request->validate([
             'status' => 'nullable',
-            'advantages_title' => 'nullable|string|max:255',
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.title' => 'required|string|max:255',
@@ -58,6 +57,7 @@ class ServiceController extends Controller
             'translates.*.card_description' => 'required|string',
             'translates.*.main_description' => 'required|string',
             'translates.*.form_top_text' => 'nullable|string',
+            'translates.*.advantages_title' => 'nullable|string|max:255',
             'translates.*.seo_title' => 'nullable|string|max:255',
             'translates.*.seo_keywords' => 'nullable|string',
             'translates.*.seo_description' => 'nullable|string',
@@ -71,8 +71,7 @@ class ServiceController extends Controller
         try {
             // Create the service
             $service = Service::create([
-                'status' => $request->has('status') ? true : false,
-                'advantages_title' => $request->input('advantages_title')
+                'status' => $request->has('status') ? true : false
             ]);
 
             // Create translations for each language
@@ -84,6 +83,7 @@ class ServiceController extends Controller
                     'card_description' => trim($translate['card_description']),
                     'main_description' => trim($translate['main_description']),
                     'form_top_text' => trim($translate['form_top_text'] ?? ''),
+                    'advantages_title' => trim($translate['advantages_title'] ?? ''),
                     'seo_title' => trim($translate['seo_title'] ?? ''),
                     'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
                     'seo_description' => trim($translate['seo_description'] ?? ''),
@@ -129,7 +129,6 @@ class ServiceController extends Controller
         // Validate the request
         $request->validate([
             'status' => 'nullable',
-            'advantages_title' => 'nullable|string|max:255',
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.title' => 'required|string|max:255',
@@ -137,6 +136,7 @@ class ServiceController extends Controller
             'translates.*.card_description' => 'required|string',
             'translates.*.main_description' => 'required|string',
             'translates.*.form_top_text' => 'nullable|string',
+            'translates.*.advantages_title' => 'nullable|string|max:255',
             'translates.*.seo_title' => 'nullable|string|max:255',
             'translates.*.seo_keywords' => 'nullable|string',
             'translates.*.seo_description' => 'nullable|string',
@@ -150,8 +150,7 @@ class ServiceController extends Controller
         try {
             // Update the service
             $service->update([
-                'status' => $request->has('status') ? true : false,
-                'advantages_title' => $request->input('advantages_title')
+                'status' => $request->has('status') ? true : false
             ]);
 
             // Update or create translations
@@ -164,6 +163,7 @@ class ServiceController extends Controller
                         'card_description' => trim($translate['card_description']),
                         'main_description' => trim($translate['main_description']),
                         'form_top_text' => trim($translate['form_top_text'] ?? ''),
+                        'advantages_title' => trim($translate['advantages_title'] ?? ''),
                         'seo_title' => trim($translate['seo_title'] ?? ''),
                         'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
                         'seo_description' => trim($translate['seo_description'] ?? ''),

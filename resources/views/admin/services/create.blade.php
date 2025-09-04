@@ -50,20 +50,6 @@
 
                             
                             <div class="row">
-                                <div class="col-md-12 mb-3">
-                                    <label class="form-label">Advantages Title</label>
-                                    <input type="text" 
-                                           class="form-control @error('advantages_title') is-invalid @enderror" 
-                                           name="advantages_title" 
-                                           value="{{ old('advantages_title') }}"
-                                           placeholder="Enter advantages title">
-                                    @error('advantages_title')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="row">
                                 <div class="col-md-12">
                                     <div class="card">
                                         <div class="card-header">
@@ -144,6 +130,18 @@
                                                                           rows="5" 
                                                                           placeholder="Enter form top text">{{ old('translates.'.$index.'.form_top_text') }}</textarea>
                                                                 @error('translates.'.$index.'.form_top_text')
+                                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                                @enderror
+                                                            </div>
+                                                            
+                                                            <div class="col-md-12 mb-3">
+                                                                <label class="form-label">Advantages Title</label>
+                                                                <input type="text" 
+                                                                       class="form-control @error('translates.'.$index.'.advantages_title') is-invalid @enderror" 
+                                                                       name="translates[{{ $index }}][advantages_title]" 
+                                                                       value="{{ old('translates.'.$index.'.advantages_title') }}"
+                                                                       placeholder="Enter advantages title">
+                                                                @error('translates.'.$index.'.advantages_title')
                                                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                                                 @enderror
                                                             </div>
