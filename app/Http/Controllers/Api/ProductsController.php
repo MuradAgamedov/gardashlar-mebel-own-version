@@ -667,6 +667,14 @@ class ProductsController extends Controller
                  *                     )
                  *                 ),
                  *                 @OA\Property(
+                 *                     property="product_detail_values",
+                 *                     type="array",
+                 *                     @OA\Items(
+                 *                         @OA\Property(property="id", type="integer", example=1),
+                 *                         @OA\Property(property="keyword", type="string", example="Size")
+                 *                     )
+                 *                 ),
+                 *                 @OA\Property(
      *                     property="images",
      *                     type="array",
      *                     @OA\Items(
@@ -721,6 +729,12 @@ class ProductsController extends Controller
                     $query->orderBy('order');
                 },
                 'details.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                },
+                'detailValues' => function($query) {
+                    $query->orderBy('order');
+                },
+                'detailValues.translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
                 },
                 'images' => function($query) {
@@ -778,6 +792,15 @@ class ProductsController extends Controller
                 ];
             });
 
+            // Get product detail values (already ordered by order field from database)
+            $productDetailValues = $product->detailValues->map(function ($detailValue) {
+                $translation = $detailValue->translates->first();
+                return [
+                    'id' => $detailValue->id,
+                    'keyword' => $translation ? $translation->keyword : ''
+                ];
+            });
+
             // Get product images with color filtering
             $images = $product->images;
             
@@ -828,6 +851,7 @@ class ProductsController extends Controller
                 'product_tags' => $productTags,
                 'product_accordions' => $productAccordions,
                 'product_details' => $productDetails,
+                'product_detail_values' => $productDetailValues,
                 'images' => $productImages
             ];
 
