@@ -647,6 +647,17 @@ class ProductsController extends Controller
      *                         @OA\Property(property="title", type="string", example="Product Features"),
      *                         @OA\Property(property="content", type="string", example="Detailed product features and specifications")
      *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="images",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="image_url", type="string", example="https://admin.gardaslar.coder.az/storage/products/image.jpg"),
+     *                         @OA\Property(property="is_main", type="boolean", example=true),
+     *                         @OA\Property(property="order", type="integer", example=1),
+     *                         @OA\Property(property="color_id", type="integer", example=1)
+     *                     )
      *                 )
      *             )
      *         )
@@ -686,6 +697,9 @@ class ProductsController extends Controller
                 },
                 'accordions.translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
+                },
+                'images' => function($query) {
+                    $query->where('status', true)->orderBy('order');
                 }
             ])->whereHas('translates', function($query) use ($slug) {
                 $query->where('slug', $slug);
@@ -729,6 +743,17 @@ class ProductsController extends Controller
                 ];
             });
 
+            // Get product images
+            $productImages = $product->images->map(function ($image) {
+                return [
+                    'id' => $image->id,
+                    'image_url' => $image->image ? asset('storage/' . $image->image) : null,
+                    'is_main' => $image->is_main,
+                    'order' => $image->order,
+                    'color_id' => $image->color_id
+                ];
+            });
+
             $productData = [
                 'id' => $product->id,
                 'title' => $translation ? $translation->title : '',
@@ -737,7 +762,8 @@ class ProductsController extends Controller
                 'view_count' => $product->view_count,
                 'product_types' => $productTypes,
                 'product_tags' => $productTags,
-                'product_accordions' => $productAccordions
+                'product_accordions' => $productAccordions,
+                'images' => $productImages
             ];
 
             return response()->json([
