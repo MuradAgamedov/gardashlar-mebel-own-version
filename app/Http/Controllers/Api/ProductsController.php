@@ -811,7 +811,7 @@ class ProductsController extends Controller
             $productDetailValues = $product->detailValues->map(function ($detailValue) {
                 $translation = $detailValue->translates->first();
                 
-                // Get details for this detail value
+                // Get details for this specific detail value only
                 $details = $detailValue->details->map(function ($detail) {
                     $detailTranslation = $detail->translates->first();
                     return [
