@@ -57,6 +57,34 @@ class ProductsController extends Controller
      *         required=false,
      *         @OA\Schema(type="string", example="masalar")
      *     ),
+     *     @OA\Parameter(
+     *         name="sort",
+     *         in="query",
+     *         description="Sort products by: price_asc, price_desc, newest, oldest, view_count",
+     *         required=false,
+     *         @OA\Schema(type="string", example="price_asc")
+     *     ),
+     *     @OA\Parameter(
+     *         name="type_id",
+     *         in="query",
+     *         description="Filter products by type IDs (array)",
+     *         required=false,
+     *         @OA\Schema(type="array", @OA\Items(type="integer"), example={1, 2, 3})
+     *     ),
+     *     @OA\Parameter(
+     *         name="filters",
+     *         in="query",
+     *         description="Price filter IDs (array)",
+     *         required=false,
+     *         @OA\Schema(type="array", @OA\Items(type="integer"), example={1, 2, 3})
+     *     ),
+     *     @OA\Parameter(
+     *         name="color",
+     *         in="query",
+     *         description="Filter products by color IDs (array) - products with images of these colors",
+     *         required=false,
+     *         @OA\Schema(type="array", @OA\Items(type="integer"), example={1, 2, 3})
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
@@ -73,6 +101,9 @@ class ProductsController extends Controller
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="title", type="string", example="Ana Kategori"),
      *                     @OA\Property(property="slug", type="string", example="ana-kategori"),
+     *                     @OA\Property(property="seo_title", type="string", example="Ana Kategori - Gardashlar"),
+     *                     @OA\Property(property="seo_keywords", type="string", example="ana kategori, gardashlar, mebel"),
+     *                     @OA\Property(property="seo_description", type="string", example="Ana kategori haqqında təsvir"),
      *                     @OA\Property(
      *                         property="children",
      *                         type="array",
@@ -80,6 +111,9 @@ class ProductsController extends Controller
      *                             @OA\Property(property="id", type="integer", example=2),
      *                             @OA\Property(property="title", type="string", example="Alt Kategori 1"),
      *                             @OA\Property(property="slug", type="string", example="alt-kategori-1"),
+     *                             @OA\Property(property="seo_title", type="string", example="Alt Kategori 1 - Gardashlar"),
+     *                             @OA\Property(property="seo_keywords", type="string", example="alt kategori, gardashlar"),
+     *                             @OA\Property(property="seo_description", type="string", example="Alt kategori haqqında təsvir"),
      *                             @OA\Property(property="children", type="array", @OA\Items())
      *                         )
      *                     )
@@ -166,6 +200,12 @@ class ProductsController extends Controller
      *                     @OA\Property(property="from", type="integer", example=1),
      *                     @OA\Property(property="to", type="integer", example=12),
      *                     @OA\Property(property="has_more_pages", type="boolean", example=true)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="applied_filters",
+     *                     type="object",
+     *                     @OA\Property(property="min_price", type="number", format="float", example=100.00),
+     *                     @OA\Property(property="max_price", type="number", format="float", example=500.00)
      *                 )
      *             )
      *         )
@@ -313,14 +353,21 @@ class ProductsController extends Controller
             $perPage = $request->get('per_page', 12);
             $page = $request->get('page', 1);
             $categorySlug = $request->get('category_slug');
+            $typeIds = $request->get('type_id', []);
+            $filterIds = $request->get('filters', []);
+            $colorIds = $request->get('color', []);
+            $sort = $request->get('sort', 'view_count');
 
             // Build products query
             $productsQuery = Product::with([
                 'translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
                 },
-                'images' => function($query) {
+                'images' => function($query) use ($colorIds) {
                     $query->where('status', true)->orderBy('order');
+                    if (!empty($colorIds) && is_array($colorIds)) {
+                        $query->whereIn('color_id', $colorIds);
+                    }
                 },
                 'types.translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
@@ -330,9 +377,9 @@ class ProductsController extends Controller
 
             // Filter by category if category_slug is provided
             if ($categorySlug) {
-                // Get the category by slug
-                $category = ProductCategory::whereHas('translates', function($query) use ($categorySlug, $languageId) {
-                    $query->where('slug', $categorySlug)->where('language_id', $languageId);
+                // Get the category by slug (any language)
+                $category = ProductCategory::whereHas('translates', function($query) use ($categorySlug) {
+                    $query->where('slug', $categorySlug);
                 })->first();
                 
                 if ($category) {
@@ -354,9 +401,68 @@ class ProductsController extends Controller
                 }
             }
 
+            // Filter by types if type_ids array is provided
+            if (!empty($typeIds) && is_array($typeIds)) {
+                // Filter products that belong to any of these types
+                $productsQuery->whereHas('types', function($query) use ($typeIds) {
+                    $query->whereIn('product_types.id', $typeIds);
+                });
+            }
+
+            // Filter by colors if color_ids array is provided
+            if (!empty($colorIds) && is_array($colorIds)) {
+                // Filter products that have images with any of these colors
+                $productsQuery->whereHas('images', function($query) use ($colorIds) {
+                    $query->whereIn('color_id', $colorIds)->where('status', true);
+                });
+            }
+
+            // Filter by price range using filter IDs
+            $appliedMinPrice = null;
+            $appliedMaxPrice = null;
+            
+            if (!empty($filterIds) && is_array($filterIds)) {
+                // Get price filters by IDs
+                $priceFilters = ProductPriceFilter::whereIn('id', $filterIds)->get();
+                
+                if ($priceFilters->isNotEmpty()) {
+                    // Get min and max prices from all selected filters
+                    $appliedMinPrice = $priceFilters->min('min_price');
+                    $appliedMaxPrice = $priceFilters->max('max_price');
+                    
+                    // Apply price range filter
+                    if ($appliedMinPrice !== null) {
+                        $productsQuery->where('price', '>=', $appliedMinPrice);
+                    }
+                    
+                    if ($appliedMaxPrice !== null) {
+                        $productsQuery->where('price', '<=', $appliedMaxPrice);
+                    }
+                }
+            }
+
+            // Apply sorting
+            switch ($sort) {
+                case 'price_asc':
+                    $productsQuery->orderBy('price', 'asc');
+                    break;
+                case 'price_desc':
+                    $productsQuery->orderBy('price', 'desc');
+                    break;
+                case 'newest':
+                    $productsQuery->orderBy('created_at', 'desc');
+                    break;
+                case 'oldest':
+                    $productsQuery->orderBy('created_at', 'asc');
+                    break;
+                case 'view_count':
+                default:
+                    $productsQuery->orderBy('view_count', 'desc');
+                    break;
+            }
+
             // Get products with pagination
-            $products = $productsQuery->orderBy('view_count', 'desc')
-                ->paginate($perPage, ['*'], 'page', $page);
+            $products = $productsQuery->paginate($perPage, ['*'], 'page', $page);
 
             $productsData = $products->map(function ($product) {
                 $translation = $product->translates->first();
@@ -408,7 +514,11 @@ class ProductsController extends Controller
                     'sort_options' => $sortOptions,
                     'sort_translations' => $sortTranslations,
                     'products' => $productsData,
-                    'pagination' => $paginationData
+                    'pagination' => $paginationData,
+                    'applied_filters' => [
+                        'min_price' => $appliedMinPrice,
+                        'max_price' => $appliedMaxPrice
+                    ]
                 ]
             ]);
 
@@ -435,6 +545,9 @@ class ProductsController extends Controller
                 'id' => $category->id,
                 'title' => $translation ? $translation->title : '',
                 'slug' => $translation ? $translation->slug : '',
+                'seo_title' => $translation ? $translation->seo_title : '',
+                'seo_keywords' => $translation ? $translation->seo_keywords : '',
+                'seo_description' => $translation ? $translation->seo_description : '',
                 'children' => []
             ];
 
