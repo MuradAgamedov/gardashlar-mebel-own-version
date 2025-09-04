@@ -94,14 +94,21 @@ class ProductsController extends Controller
                 ], 400);
             }
 
-            $categories = Cache::rememberForever("product_categories_{$languageId}", function () use ($languageId) {
-                return ProductCategory::with(['translates' => function($query) use ($languageId) {
+            // Debug: Cache-i təmizləyək
+            Cache::forget("product_categories_{$languageId}");
+            
+            $categories = ProductCategory::with(['translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
                 }])
                 ->active()
                 ->ordered()
                 ->get();
-            });
+                
+            // Debug: Kateqoriyaları yoxlayaq
+            \Log::info('Categories count: ' . $categories->count());
+            foreach ($categories as $cat) {
+                \Log::info("Category ID: {$cat->id}, Parent ID: " . ($cat->parent_id ?? 'null') . ", Title: " . ($cat->translates->first()->title ?? 'no title'));
+            }
 
             // Build hierarchical structure
             $categoriesData = $this->buildHierarchy($categories);
@@ -148,10 +155,18 @@ class ProductsController extends Controller
         // Second pass: build parent-child relationships
         foreach ($categories as $category) {
             if (!is_null($category->parent_id) && isset($categoryMap[$category->parent_id])) {
+                \Log::info("Adding child {$category->id} to parent {$category->parent_id}");
                 $categoryMap[$category->parent_id]['children'][] = $categoryMap[$category->id];
             } else if (is_null($category->parent_id)) {
+                \Log::info("Adding root category {$category->id}");
                 $rootCategories[] = $categoryMap[$category->id];
             }
+        }
+        
+        // Debug: Final result
+        \Log::info('Root categories count: ' . count($rootCategories));
+        foreach ($rootCategories as $root) {
+            \Log::info("Root category {$root['id']} has " . count($root['children']) . " children");
         }
 
         // Sort children by order
