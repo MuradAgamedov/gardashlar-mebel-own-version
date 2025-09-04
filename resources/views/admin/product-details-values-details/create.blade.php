@@ -108,26 +108,33 @@
 <script>
 let translationIndex = 0;
 
-// Wait for Bootstrap to be fully loaded
-function waitForBootstrap() {
-    return new Promise((resolve) => {
-        if (typeof bootstrap !== 'undefined') {
-            resolve();
-        } else {
-            setTimeout(() => waitForBootstrap().then(resolve), 100);
-        }
+// Simple tab switching without Bootstrap dependency
+function switchTab(tabElement) {
+    const targetId = tabElement.getAttribute('data-bs-target');
+    const targetPane = document.querySelector(targetId);
+    
+    if (!targetPane) return;
+    
+    // Remove active class from all tabs and panes
+    document.querySelectorAll('.nav-link').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.remove('show', 'active');
     });
+    
+    // Add active class to clicked tab and corresponding pane
+    tabElement.classList.add('active');
+    targetPane.classList.add('show', 'active');
 }
 
 // Add initial language tabs
 document.addEventListener('DOMContentLoaded', function() {
-    waitForBootstrap().then(() => {
-        createLanguageTabs();
-        // Add initial keyword-value pair to the first language
-        setTimeout(() => {
-            addKeywordValuePair();
-        }, 100);
-    });
+    console.log('DOM loaded, creating language tabs...');
+    createLanguageTabs();
+    
+    // Add initial keyword-value pair to the first language
+    setTimeout(() => {
+        addKeywordValuePair();
+    }, 200);
 });
 
 function createLanguageTabs() {
@@ -150,10 +157,10 @@ function createLanguageTabs() {
         tabButton{{ $index }}.innerHTML = `
             <button class="nav-link {{ $index === 0 ? 'active' : '' }}" 
                     id="tab-{{ $language->id }}" 
-                    data-bs-toggle="tab" 
                     data-bs-target="#content-{{ $language->id }}" 
                     type="button" 
-                    role="tab">
+                    role="tab"
+                    onclick="switchTab(this)">
                 {{ $language->lang_code }}
             </button>
         `;
@@ -176,11 +183,8 @@ function createLanguageTabs() {
     container.appendChild(tabNav);
     container.appendChild(tabContent);
     
-    // Initialize Bootstrap tabs
-    const tabElements = container.querySelectorAll('[data-bs-toggle="tab"]');
-    tabElements.forEach(tabElement => {
-        new bootstrap.Tab(tabElement);
-    });
+    // Debug: Log that tabs were created
+    console.log('Language tabs created successfully');
 }
 
 function addKeywordValuePair() {
