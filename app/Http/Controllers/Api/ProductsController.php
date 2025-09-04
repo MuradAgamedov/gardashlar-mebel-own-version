@@ -645,8 +645,7 @@ class ProductsController extends Controller
      *                     @OA\Items(
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="title", type="string", example="Product Features"),
-     *                         @OA\Property(property="content", type="string", example="Detailed product features and specifications"),
-     *                         @OA\Property(property="order", type="integer", example=1)
+     *                         @OA\Property(property="content", type="string", example="Detailed product features and specifications")
      *                     )
      *                 )
      *             )
@@ -726,8 +725,7 @@ class ProductsController extends Controller
                 return [
                     'id' => $accordion->id,
                     'title' => $translation ? $translation->title : '',
-                    'content' => $translation ? $translation->description : '',
-                    'order' => $accordion->order
+                    'content' => $translation ? $translation->description : ''
                 ];
             });
 
