@@ -324,6 +324,15 @@ class ProductsController extends Controller
             $productsData = $products->map(function ($product) {
                 $translation = $product->translates->first();
                 $mainImage = $product->images->first();
+                
+                // Debug: Log image info
+                \Log::info("Product ID: {$product->id}, Images count: " . $product->images->count());
+                if ($mainImage) {
+                    \Log::info("Main image found: {$mainImage->image}, is_main: {$mainImage->is_main}, status: {$mainImage->status}");
+                } else {
+                    \Log::info("No main image found for product {$product->id}");
+                }
+                
                 $productTypes = $product->types->map(function ($type) {
                     $translation = $type->translates->first();
                     return [
@@ -331,7 +340,7 @@ class ProductsController extends Controller
                         'title' => $translation ? $translation->title : ''
                     ];
                 });
-
+                dd($mainImage);
                 return [
                     'id' => $product->id,
                     'title' => $translation ? $translation->title : '',
