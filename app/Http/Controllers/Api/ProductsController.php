@@ -8,6 +8,7 @@ use App\Models\ProductPriceFilter;
 use App\Models\ProductColor;
 use App\Models\ProductType;
 use App\Models\ProductPageCategory;
+use App\Models\Product;
 use App\Models\Dictionary;
 use App\Models\Language;
 use Illuminate\Http\Request;
@@ -97,11 +98,40 @@ class ProductsController extends Controller
      *                 ),
      *                 @OA\Property(
      *                     property="sort_options",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="value", type="string", example="price_asc"),
+     *                         @OA\Property(property="label", type="string", example="price_asc")
+     *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="sort_translations",
      *                     type="object",
      *                     @OA\Property(property="price_asc", type="string", example="Qiymət artımına görə (ucuzdan bahaya)"),
      *                     @OA\Property(property="price_desc", type="string", example="Qiymət azalmaya görə (bahadan ucuza)"),
      *                     @OA\Property(property="newest", type="string", example="Ən yenilər (ən son əlavə olunan məhsullar əvvəl göstərilir)"),
-     *                     @OA\Property(property="oldest", type="string", example="Ən köhnələr (əvvəl əlavə olunan məhsullar əvvəl göstərilir)")
+     *                     @OA\Property(property="oldest", type="string", example="Ən köhnələr (əvvəl əlavə olunan məhsullar əvvəl göstərilir)"),
+     *                     @OA\Property(property="view_count", type="string", example="Ən çox baxılanlar")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="products",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="title", type="string", example="Masa"),
+     *                         @OA\Property(property="card_image", type="string", example="https://admin.gardaslar.coder.az/storage/products/..."),
+     *                         @OA\Property(property="price", type="number", format="float", example=299.99),
+     *                         @OA\Property(property="discount_percent", type="number", format="float", example=10.00),
+     *                         @OA\Property(property="view_count", type="integer", example=150),
+     *                         @OA\Property(
+     *                             property="product_types",
+     *                             type="array",
+     *                             @OA\Items(
+     *                                 @OA\Property(property="id", type="integer", example=1),
+     *                                 @OA\Property(property="title", type="string", example="Masa")
+     *                             )
+     *                         )
+     *                     )
      *                 )
      *             )
      *         )
@@ -219,13 +249,23 @@ class ProductsController extends Controller
                 ];
             });
 
-            // Get sort options from dictionary
-            $sortOptions = Cache::rememberForever("sort_options_{$languageId}", function () use ($languageId) {
+            // Get sort options for frontend select
+            $sortOptions = [
+                ['value' => 'price_asc', 'label' => 'price_asc'],
+                ['value' => 'price_desc', 'label' => 'price_desc'],
+                ['value' => 'newest', 'label' => 'newest'],
+                ['value' => 'oldest', 'label' => 'oldest'],
+                ['value' => 'view_count', 'label' => 'view_count']
+            ];
+
+            // Get sort translations from dictionary
+            $sortTranslations = Cache::rememberForever("sort_translations_{$languageId}", function () use ($languageId) {
                 $sortKeywords = [
                     'price_asc' => 'price_asc',
                     'price_desc' => 'price_desc', 
                     'newest' => 'newest',
-                    'oldest' => 'oldest'
+                    'oldest' => 'oldest',
+                    'view_count' => 'view_count'
                 ];
 
                 $sortData = [];
@@ -234,6 +274,46 @@ class ProductsController extends Controller
                 }
 
                 return $sortData;
+            });
+
+            // Get products with main image and product types
+            $products = Cache::rememberForever("products_{$languageId}", function () use ($languageId) {
+                return Product::with([
+                    'translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'images' => function($query) {
+                        $query->where('is_main', true)->where('status', true);
+                    },
+                    'types.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    }
+                ])
+                ->active()
+                ->orderBy('view_count', 'desc')
+                ->get();
+            });
+
+            $productsData = $products->map(function ($product) {
+                $translation = $product->translates->first();
+                $mainImage = $product->images->first();
+                $productTypes = $product->types->map(function ($type) {
+                    $translation = $type->translates->first();
+                    return [
+                        'id' => $type->id,
+                        'title' => $translation ? $translation->title : ''
+                    ];
+                });
+
+                return [
+                    'id' => $product->id,
+                    'title' => $translation ? $translation->title : '',
+                    'card_image' => $mainImage ? $mainImage->image_url : null,
+                    'price' => $product->price,
+                    'discount_percent' => $product->discount_percent,
+                    'view_count' => $product->view_count,
+                    'product_types' => $productTypes
+                ];
             });
 
             return response()->json([
@@ -245,7 +325,9 @@ class ProductsController extends Controller
                     'product_colors' => $productColorsData,
                     'product_types' => $productTypesData,
                     'product_page_categories' => $productPageCategoriesData,
-                    'sort_options' => $sortOptions
+                    'sort_options' => $sortOptions,
+                    'sort_translations' => $sortTranslations,
+                    'products' => $productsData
                 ]
             ]);
 
