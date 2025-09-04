@@ -71,9 +71,7 @@
                                         <div class="card-header">
                                             <div class="d-flex justify-content-between align-items-center">
                                                 <h6 class="mb-0">Details by Language</h6>
-                                                <button type="button" class="btn btn-sm btn-primary" onclick="addKeywordValuePair()">
-                                                    <i class="material-icons-outlined">add</i> Add Keyword & Value
-                                                </button>
+                                                <small class="text-muted">Each language has its own form fields</small>
                                             </div>
                                         </div>
                                         <div class="card-body">
@@ -158,9 +156,11 @@ document.addEventListener('DOMContentLoaded', function() {
     waitForBootstrap().then(() => {
         createLanguageTabs();
         
-        // Add initial keyword-value pair to the first language
+        // Add initial keyword-value pair to all languages
         setTimeout(() => {
-            addKeywordValuePair();
+            @foreach($languages as $language)
+                addKeywordValuePairForLanguage({{ $language->id }});
+            @endforeach
         }, 200);
     });
 });
