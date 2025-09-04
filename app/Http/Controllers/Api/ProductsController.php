@@ -335,7 +335,7 @@ class ProductsController extends Controller
                 return [
                     'id' => $product->id,
                     'title' => $translation ? $translation->title : '',
-                    'card_image' => $mainImage ? $mainImage->image_url : null,
+                    'card_image' => $mainImage && $mainImage->image ? asset('storage/' . $mainImage->image) : null,
                     'price' => $product->price,
                     'discount_percent' => $product->discount_percent,
                     'view_count' => $product->view_count,
