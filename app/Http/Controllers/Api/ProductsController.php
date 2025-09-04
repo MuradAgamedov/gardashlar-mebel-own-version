@@ -48,10 +48,6 @@ class ProductsController extends Controller
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="title", type="string", example="Ana Kategori"),
      *                     @OA\Property(property="slug", type="string", example="ana-kategori"),
-     *                     @OA\Property(property="image", type="string", example="https://admin.gardaslar.coder.az/storage/categories/category-1.jpg"),
-     *                     @OA\Property(property="image_alt_text", type="string", example="Ana kategori şəkli"),
-     *                     @OA\Property(property="order", type="integer", example=1),
-     *                     @OA\Property(property="parent_id", type="integer", nullable=true, example=null),
      *                     @OA\Property(
      *                         property="children",
      *                         type="array",
@@ -59,10 +55,6 @@ class ProductsController extends Controller
      *                             @OA\Property(property="id", type="integer", example=2),
      *                             @OA\Property(property="title", type="string", example="Alt Kategori 1"),
      *                             @OA\Property(property="slug", type="string", example="alt-kategori-1"),
-     *                             @OA\Property(property="image", type="string", example="https://admin.gardaslar.coder.az/storage/categories/subcategory-1.jpg"),
-     *                             @OA\Property(property="image_alt_text", type="string", example="Alt kategori 1 şəkli"),
-     *                             @OA\Property(property="order", type="integer", example=1),
-     *                             @OA\Property(property="parent_id", type="integer", example=1),
      *                             @OA\Property(property="children", type="array", @OA\Items())
      *                         )
      *                     )
