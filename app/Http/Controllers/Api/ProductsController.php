@@ -253,10 +253,6 @@ class ProductsController extends Controller
                 'id' => $category->id,
                 'title' => $translation ? $translation->title : '',
                 'slug' => $translation ? $translation->slug : '',
-                'image' => $category->image ? asset('storage/' . $category->image) : null,
-                'image_alt_text' => $translation ? $translation->image_alt_text : '',
-                'order' => $category->order,
-                'parent_id' => $category->parent_id,
                 'children' => []
             ];
 
