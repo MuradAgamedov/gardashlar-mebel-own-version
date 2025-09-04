@@ -36,8 +36,11 @@ class ProductsController extends Controller
      *             @OA\Property(property="message", type="string", example="Product categories retrieved successfully"),
      *             @OA\Property(
      *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="categories",
+     *                     type="array",
+     *                     @OA\Items(
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="title", type="string", example="Ana Kategori"),
      *                     @OA\Property(property="slug", type="string", example="ana-kategori"),
@@ -116,7 +119,9 @@ class ProductsController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Product categories retrieved successfully',
-                'data' => $categoriesData
+                'data' => [
+                    'categories' => $categoriesData
+                ]
             ]);
 
         } catch (\Exception $e) {
