@@ -648,16 +648,26 @@ class ProductsController extends Controller
      *                         @OA\Property(property="title", type="string", example="Premium")
      *                     )
      *                 ),
-     *                 @OA\Property(
-     *                     property="product_accordions",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="title", type="string", example="Product Features"),
-     *                         @OA\Property(property="content", type="string", example="Detailed product features and specifications")
-     *                     )
-     *                 ),
-     *                 @OA\Property(
+                      *                 @OA\Property(
+                 *                     property="product_accordions",
+                 *                     type="array",
+                 *                     @OA\Items(
+                 *                         @OA\Property(property="id", type="integer", example=1),
+                 *                         @OA\Property(property="title", type="string", example="Product Features"),
+                 *                         @OA\Property(property="content", type="string", example="Detailed product features and specifications")
+                 *                     )
+                 *                 ),
+                 *                 @OA\Property(
+                 *                     property="product_details",
+                 *                     type="array",
+                 *                     @OA\Items(
+                 *                         @OA\Property(property="id", type="integer", example=1),
+                 *                         @OA\Property(property="order", type="integer", example=1),
+                 *                         @OA\Property(property="keyword", type="string", example="Material"),
+                 *                         @OA\Property(property="value", type="string", example="Wood")
+                 *                     )
+                 *                 ),
+                 *                 @OA\Property(
      *                     property="images",
      *                     type="array",
      *                     @OA\Items(
@@ -708,6 +718,9 @@ class ProductsController extends Controller
                 'accordions.translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
                 },
+                'details' => function($query) {
+                    $query->orderBy('order');
+                },
                 'details.translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
                 },
@@ -756,7 +769,7 @@ class ProductsController extends Controller
                 ];
             });
 
-            // Get product details
+            // Get product details (already ordered by order field from database)
             $productDetails = $product->details->map(function ($detail) {
                 $translation = $detail->translates->first();
                 return [
