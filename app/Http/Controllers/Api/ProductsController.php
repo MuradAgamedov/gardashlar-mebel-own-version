@@ -629,6 +629,8 @@ class ProductsController extends Controller
      *                 @OA\Property(property="title", type="string", example="Masa"),
      *                 @OA\Property(property="slug", type="string", example="masa-1"),
      *                 @OA\Property(property="price", type="number", format="float", example=299.99),
+     *                 @OA\Property(property="discount_price", type="number", format="float", example=269.99, description="Calculated discount price if discount_percent > 0"),
+     *                 @OA\Property(property="discount_percent", type="number", format="float", example=10.00),
      *                 @OA\Property(property="view_count", type="integer", example=150),
      *                 @OA\Property(
      *                     property="product_types",
@@ -783,11 +785,19 @@ class ProductsController extends Controller
                 return $imageData;
             });
 
+            // Calculate discount price
+            $discountPrice = null;
+            if ($product->discount_percent && $product->discount_percent > 0) {
+                $discountPrice = $product->price - ($product->price * $product->discount_percent / 100);
+            }
+
             $productData = [
                 'id' => $product->id,
                 'title' => $translation ? $translation->title : '',
                 'slug' => $translation ? $translation->slug : '',
                 'price' => $product->price,
+                'discount_price' => $discountPrice,
+                'discount_percent' => $product->discount_percent,
                 'view_count' => $product->view_count,
                 'product_types' => $productTypes,
                 'product_tags' => $productTags,
@@ -805,6 +815,247 @@ class ProductsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error retrieving product: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/products/{id}/details",
+     *     summary="Get product details",
+     *     tags={"Products"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Product ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=45)
+     *     ),
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language code (az, en, ru)",
+     *         required=false,
+     *         @OA\Schema(type="string", default="az")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Product details retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="keyword", type="string", example="Material"),
+     *                     @OA\Property(property="value", type="string", example="Wood")
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function details(Request $request, $id)
+    {
+        try {
+            $languageId = $this->getLanguageIdFromHeader($request);
+            
+            if (!$languageId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid language'
+                ], 400);
+            }
+
+            $product = Product::findOrFail($id);
+            $details = $product->details()->with(['translates' => function($query) use ($languageId) {
+                $query->where('language_id', $languageId);
+            }])->get();
+
+            $detailsData = $details->map(function ($detail) {
+                $translation = $detail->translates->first();
+                return [
+                    'id' => $detail->id,
+                    'keyword' => $translation ? $translation->keyword : '',
+                    'value' => $translation ? $translation->value : ''
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product details retrieved successfully',
+                'data' => $detailsData
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving product details: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/products/{id}/detail-values",
+     *     summary="Get product detail values",
+     *     tags={"Products"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Product ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=45)
+     *     ),
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language code (az, en, ru)",
+     *         required=false,
+     *         @OA\Schema(type="string", default="az")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Product detail values retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="keyword", type="string", example="Color Options")
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function detailValues(Request $request, $id)
+    {
+        try {
+            $languageId = $this->getLanguageIdFromHeader($request);
+            
+            if (!$languageId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid language'
+                ], 400);
+            }
+
+            $product = Product::findOrFail($id);
+            $detailValues = $product->detailValues()->with(['translates' => function($query) use ($languageId) {
+                $query->where('language_id', $languageId);
+            }])->get();
+
+            $detailValuesData = $detailValues->map(function ($detailValue) {
+                $translation = $detailValue->translates->first();
+                return [
+                    'id' => $detailValue->id,
+                    'keyword' => $translation ? $translation->keyword : ''
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product detail values retrieved successfully',
+                'data' => $detailValuesData
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving product detail values: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/products/{id}/detail-values/{detailValueId}/details",
+     *     summary="Get product detail value details",
+     *     tags={"Products"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Product ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=45)
+     *     ),
+     *     @OA\Parameter(
+     *         name="detailValueId",
+     *         in="path",
+     *         description="Detail Value ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language code (az, en, ru)",
+     *         required=false,
+     *         @OA\Schema(type="string", default="az")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Product detail value details retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="keyword", type="string", example="Red"),
+     *                     @OA\Property(property="value", type="string", example="Bright red color option")
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function detailValueDetails(Request $request, $id, $detailValueId)
+    {
+        try {
+            $languageId = $this->getLanguageIdFromHeader($request);
+            
+            if (!$languageId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid language'
+                ], 400);
+            }
+
+            $product = Product::findOrFail($id);
+            $detailValue = $product->detailValues()->findOrFail($detailValueId);
+            
+            $details = $detailValue->details()->with(['translates' => function($query) use ($languageId) {
+                $query->where('language_id', $languageId);
+            }])->get();
+
+            $detailsData = $details->map(function ($detail) {
+                $translation = $detail->translates->first();
+                return [
+                    'id' => $detail->id,
+                    'keyword' => $translation ? $translation->keyword : '',
+                    'value' => $translation ? $translation->value : ''
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product detail value details retrieved successfully',
+                'data' => $detailsData
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving product detail value details: ' . $e->getMessage()
             ], 500);
         }
     }
