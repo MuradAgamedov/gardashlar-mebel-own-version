@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
 use App\Models\ProductPriceFilter;
+use App\Models\ProductColor;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -73,6 +74,14 @@ class ProductsController extends Controller
      *                         @OA\Property(property="min_price", type="number", format="float", example=0.00),
      *                         @OA\Property(property="max_price", type="number", format="float", example=100.00)
      *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="product_colors",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="color_code", type="string", example="#FF0000")
+     *                     )
      *                 )
      *             )
      *         )
@@ -140,12 +149,25 @@ class ProductsController extends Controller
                 ];
             });
 
+            // Get product colors
+            $productColors = Cache::rememberForever("product_colors", function () {
+                return ProductColor::all();
+            });
+
+            $productColorsData = $productColors->map(function ($color) {
+                return [
+                    'id' => $color->id,
+                    'color_code' => $color->color_code
+                ];
+            });
+
             return response()->json([
                 'success' => true,
                 'message' => 'Product categories retrieved successfully',
                 'data' => [
                     'categories' => $categoriesData,
-                    'product_price_filters' => $priceFiltersData
+                    'product_price_filters' => $priceFiltersData,
+                    'product_colors' => $productColorsData
                 ]
             ]);
 
