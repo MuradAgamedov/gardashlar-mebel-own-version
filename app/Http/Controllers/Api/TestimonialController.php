@@ -37,8 +37,8 @@ class TestimonialController extends Controller
 
                 return [
                     'id' => $testimonial->id,
-                    'customer_image_url' => $testimonial->customer_image ? asset('storage/' . $testimonial->customer_image) : null,
-                    'company_logo_url' => $testimonial->company_logo ? asset('storage/' . $testimonial->company_logo) : null,
+                    'customer_image_url' => $testimonial->customer_image ? asset('storage/' . $testimonial->customer_image) : asset('images/default_image.webp'),
+                    'company_logo_url' => $testimonial->company_logo ? asset('storage/' . $testimonial->company_logo) : asset('images/default_image.webp'),
                     'full_name' => $translation ? $translation->full_name : null,
                     'position' => $translation ? $translation->position : null,
                     'comment' => $translation ? $translation->comment : null,
@@ -130,8 +130,8 @@ class TestimonialController extends Controller
 
                 return [
                     'id' => $testimonial->id,
-                    'customer_image_url' => $testimonial->customer_image ? asset('storage/' . $testimonial->customer_image) : null,
-                    'company_logo_url' => $testimonial->company_logo ? asset('storage/' . $testimonial->company_logo) : null,
+                    'customer_image_url' => $testimonial->customer_image ? asset('storage/' . $testimonial->customer_image) : asset('images/default_image.webp'),
+                    'company_logo_url' => $testimonial->company_logo ? asset('storage/' . $testimonial->company_logo) : asset('images/default_image.webp'),
                     'translations' => $translations,
                 ];
             });

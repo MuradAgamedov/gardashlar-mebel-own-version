@@ -43,7 +43,7 @@ class CertificateController extends Controller
                     $translation = $certificate->translates->first();
                     return [
                         'id' => $certificate->id,
-                        'image_url' => $certificate->image ? asset('storage/' . $certificate->image) : null,
+                        'image_url' => $certificate->image ? asset('storage/' . $certificate->image) : asset('images/default_image.webp'),
                         'title' => $translation ? $translation->title : '',
                         'date' => $certificate->date
                     ];

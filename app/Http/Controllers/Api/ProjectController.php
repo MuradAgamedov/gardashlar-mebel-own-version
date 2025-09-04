@@ -154,7 +154,7 @@ class ProjectController extends Controller
                         'title' => $translation ? $translation->title : null,
                         'slug' => $translation ? $translation->slug : null,
                         'company_name' => $translation ? $translation->company_name : null,
-                        'main_image' => $mainImage ? $mainImage->image_url : null
+                        'main_image' => $mainImage ? $mainImage->image_url : asset('images/default_image.webp')
                     ];
                 })->filter(function ($item) {
                     // Filter out items without title or slug

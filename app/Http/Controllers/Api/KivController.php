@@ -83,7 +83,7 @@ class KivController extends Controller
                         
                         return [
                             'id' => $kiv->id,
-                            'image' => $kiv->image ? asset('storage/' . $kiv->image) : null,
+                            'image' => $kiv->image ? asset('storage/' . $kiv->image) : asset('images/default_image.webp'),
                             'video_id' => $videoId,
                             'video_link' => $kiv->video_link,
                         ];

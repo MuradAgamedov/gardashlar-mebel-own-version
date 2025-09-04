@@ -95,7 +95,7 @@ class SuggestionController extends Controller
                     'id' => $suggestion->id,
                     'title' => $translation ? $translation->title : '',
                     'image_alt_text' => $translation ? $translation->image_alt_text : '',
-                    'image' => $suggestion->image ? asset('storage/' . $suggestion->image) : null,
+                    'image' => $suggestion->image ? asset('storage/' . $suggestion->image) : asset('images/default_image.webp'),
                     'pdf' => $suggestion->pdf ? asset('storage/' . $suggestion->pdf) : null,
                     'has_pdf' => !empty($suggestion->pdf),
                     'order' => $suggestion->order
@@ -204,7 +204,7 @@ class SuggestionController extends Controller
                 'id' => $suggestion->id,
                 'title' => $translation ? $translation->title : '',
                 'image_alt_text' => $translation ? $translation->image_alt_text : '',
-                'image' => $suggestion->image ? asset('storage/' . $suggestion->image) : null,
+                'image' => $suggestion->image ? asset('storage/' . $suggestion->image) : asset('images/default_image.webp'),
                 'pdf' => $suggestion->pdf ? asset('storage/' . $suggestion->pdf) : null,
                 'has_pdf' => !empty($suggestion->pdf),
                 'order' => $suggestion->order

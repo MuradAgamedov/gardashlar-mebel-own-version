@@ -80,7 +80,7 @@ class AboutController extends Controller
                     
                     return [
                         'id' => $about->id,
-                        'image_url' => $about->image ? asset('storage/' . $about->image) : null,
+                        'image_url' => $about->image ? asset('storage/' . $about->image) : asset('images/default_image.webp'),
                         'date' => $about->date,
                         'title' => $translation ? $translation->title : '',
                         'description' => $translation ? $translation->description : '',

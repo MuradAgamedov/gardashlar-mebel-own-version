@@ -275,8 +275,8 @@ class BlogPostController extends Controller
                 'title' => $translate->title ?? null,
                 'slug' => $translate->slug ?? null,
                 'description' => $translate->description ?? null,
-                'card_image_url' => $blogPost->card_image ? asset('storage/' . $blogPost->card_image) : null,
-                'inner_banner_image_url' => $blogPost->inner_banner_image ? asset('storage/' . $blogPost->inner_banner_image) : null,
+                'card_image_url' => $blogPost->card_image ? asset('storage/' . $blogPost->card_image) : asset('images/default_image.webp'),
+                'inner_banner_image_url' => $blogPost->inner_banner_image ? asset('storage/' . $blogPost->inner_banner_image) : asset('images/default_image.webp'),
                 'published_at' => $blogPost->published_at,
                 'category' => [
                     'id' => $blogPost->category->id,
@@ -285,7 +285,7 @@ class BlogPostController extends Controller
                 'images' => $blogPost->images->map(function ($image) {
                     return [
                         'id' => $image->id,
-                        'image_url' => $image->image_url ? asset('storage/' . $image->image_url) : null
+                        'image_url' => $image->image_url ? asset('storage/' . $image->image_url) : asset('images/default_image.webp')
                     ];
                 })
             ];

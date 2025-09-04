@@ -48,6 +48,13 @@ class ProductsController extends Controller
      *         required=false,
      *         @OA\Schema(type="integer", default=12)
      *     ),
+     *     @OA\Parameter(
+     *         name="category_id",
+     *         in="query",
+     *         description="Filter products by category ID. If parent category, returns products from all children + parent. If child category, returns only products from that category.",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=5)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
@@ -304,9 +311,10 @@ class ProductsController extends Controller
             // Get pagination parameters
             $perPage = $request->get('per_page', 12);
             $page = $request->get('page', 1);
+            $categoryId = $request->get('category_id');
 
-            // Get products with pagination
-            $products = Product::with([
+            // Build products query
+            $productsQuery = Product::with([
                 'translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
                 },
@@ -317,9 +325,32 @@ class ProductsController extends Controller
                     $query->where('language_id', $languageId);
                 }
             ])
-            ->active()
-            ->orderBy('view_count', 'desc')
-            ->paginate($perPage, ['*'], 'page', $page);
+            ->active();
+
+            // Filter by category if category_id is provided
+            if ($categoryId) {
+                // Get the category
+                $category = ProductCategory::find($categoryId);
+                
+                if ($category) {
+                    // Check if it's a parent category (has children)
+                    $children = ProductCategory::where('parent_id', $categoryId)->pluck('id');
+                    
+                    if ($children->isNotEmpty()) {
+                        // If parent category, get products from all children + parent itself
+                        $categoryIds = $children->push($categoryId)->toArray();
+                    } else {
+                        // If child category, get products only from this category
+                        $categoryIds = [$categoryId];
+                    }
+                    
+                    $productsQuery->whereIn('category_id', $categoryIds);
+                }
+            }
+
+            // Get products with pagination
+            $products = $productsQuery->orderBy('view_count', 'desc')
+                ->paginate($perPage, ['*'], 'page', $page);
 
             $productsData = $products->map(function ($product) {
                 $translation = $product->translates->first();
@@ -329,13 +360,6 @@ class ProductsController extends Controller
                     $mainImage = $product->images->first();
                 }
                 
-                // Debug: Log image info
-                \Log::info("Product ID: {$product->id}, Images count: " . $product->images->count());
-                if ($mainImage) {
-                    \Log::info("Main image found: {$mainImage->image}, is_main: {$mainImage->is_main}, status: {$mainImage->status}");
-                } else {
-                    \Log::info("No main image found for product {$product->id}");
-                }
                 
                 $productTypes = $product->types->map(function ($type) {
                     $translation = $type->translates->first();

@@ -79,7 +79,7 @@ class AdministrationController extends Controller
                     
                     return [
                         'id' => $administration->id,
-                        'image_url' => $administration->image ? asset('storage/' . $administration->image) : null,
+                        'image_url' => $administration->image ? asset('storage/' . $administration->image) : asset('images/default_image.webp'),
                         'title' => $translation ? $translation->title : '',
                         'position' => $translation ? $translation->position : ''
                     ];
