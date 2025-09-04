@@ -638,6 +638,16 @@ class ProductsController extends Controller
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="title", type="string", example="Premium")
      *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="product_accordions",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="title", type="string", example="Product Features"),
+     *                         @OA\Property(property="content", type="string", example="Detailed product features and specifications"),
+     *                         @OA\Property(property="order", type="integer", example=1)
+     *                     )
      *                 )
      *             )
      *         )
@@ -710,6 +720,17 @@ class ProductsController extends Controller
                 ];
             });
 
+            // Get product accordions
+            $productAccordions = $product->accordions->map(function ($accordion) {
+                $translation = $accordion->translates->first();
+                return [
+                    'id' => $accordion->id,
+                    'title' => $translation ? $translation->title : '',
+                    'content' => $translation ? $translation->content : '',
+                    'order' => $accordion->order
+                ];
+            });
+
             $productData = [
                 'id' => $product->id,
                 'title' => $translation ? $translation->title : '',
@@ -717,7 +738,8 @@ class ProductsController extends Controller
                 'price' => $product->price,
                 'view_count' => $product->view_count,
                 'product_types' => $productTypes,
-                'product_tags' => $productTags
+                'product_tags' => $productTags,
+                'product_accordions' => $productAccordions
             ];
 
             return response()->json([
