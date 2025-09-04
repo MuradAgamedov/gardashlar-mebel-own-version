@@ -71,8 +71,7 @@ class ProductsController extends Controller
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="title", type="string", example="0-100 AZN"),
      *                         @OA\Property(property="min_price", type="number", format="float", example=0.00),
-     *                         @OA\Property(property="max_price", type="number", format="float", example=100.00),
-     *                         @OA\Property(property="order", type="integer", example=1)
+     *                         @OA\Property(property="max_price", type="number", format="float", example=100.00)
      *                     )
      *                 )
      *             )
@@ -137,8 +136,7 @@ class ProductsController extends Controller
                     'id' => $filter->id,
                     'title' => $translation ? $translation->title : '',
                     'min_price' => $filter->min_price,
-                    'max_price' => $filter->max_price,
-                    'order' => $filter->order
+                    'max_price' => $filter->max_price
                 ];
             });
 
