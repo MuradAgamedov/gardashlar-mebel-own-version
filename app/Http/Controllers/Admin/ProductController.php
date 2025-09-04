@@ -217,9 +217,6 @@ class ProductController extends Controller
                         'seo_title' => $translation['seo_title'] ?? null,
                         'seo_keywords' => $translation['seo_keywords'] ?? null,
                         'seo_description' => $translation['seo_description'] ?? null,
-                        'weight' => $translation['weight'] ?? null,
-                        'material' => $translation['material'] ?? null,
-                        'size' => $translation['size'] ?? null
                     ]
                 );
             }

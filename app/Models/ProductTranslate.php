@@ -17,10 +17,7 @@ class ProductTranslate extends Model
         'slug',
         'seo_title',
         'seo_keywords',
-        'seo_description',
-        'weight',
-        'material',
-        'size'
+        'seo_description'
     ];
 
  
