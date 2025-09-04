@@ -674,6 +674,9 @@ class ProductsController extends Controller
                 },
                 'tags.translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
+                },
+                'accordions.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
                 }
             ])->whereHas('translates', function($query) use ($slug) {
                 $query->where('slug', $slug);
