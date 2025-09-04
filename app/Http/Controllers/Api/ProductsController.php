@@ -187,7 +187,6 @@ class ProductsController extends Controller
         // Second pass: build parent-child relationships
         foreach ($categories as $category) {
             if (!is_null($category->parent_id) && isset($categoryMap[$category->parent_id])) {
-                \Log::info("Adding child {$category->id} to parent {$category->parent_id}");
                 $categoryMap[$category->parent_id]['children'][] = $categoryMap[$category->id];
             }
         }
@@ -195,15 +194,8 @@ class ProductsController extends Controller
         // Third pass: collect root categories
         foreach ($categories as $category) {
             if (is_null($category->parent_id)) {
-                \Log::info("Adding root category {$category->id}");
                 $rootCategories[] = $categoryMap[$category->id];
             }
-        }
-        
-        // Debug: Final result
-        \Log::info('Root categories count: ' . count($rootCategories));
-        foreach ($rootCategories as $root) {
-            \Log::info("Root category {$root['id']} has " . count($root['children']) . " children");
         }
 
         // Sort children by order
