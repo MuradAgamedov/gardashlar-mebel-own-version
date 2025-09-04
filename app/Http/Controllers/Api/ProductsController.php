@@ -11,6 +11,7 @@ use App\Models\ProductPageCategory;
 use App\Models\Product;
 use App\Models\Dictionary;
 use App\Models\Language;
+use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -22,6 +23,7 @@ use Illuminate\Support\Facades\Cache;
  */
 class ProductsController extends Controller
 {
+    use LocaleFromHeader;
     /**
      * @OA\Get(
      *     path="/api/products",
@@ -49,11 +51,11 @@ class ProductsController extends Controller
      *         @OA\Schema(type="integer", default=12)
      *     ),
      *     @OA\Parameter(
-     *         name="category_id",
+     *         name="category_slug",
      *         in="query",
-     *         description="Filter products by category ID. If parent category, returns products from all children + parent. If child category, returns only products from that category.",
+     *         description="Filter products by category slug. If parent category, returns products from all children + parent. If child category, returns only products from that category.",
      *         required=false,
-     *         @OA\Schema(type="integer", example=5)
+     *         @OA\Schema(type="string", example="masalar")
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -189,13 +191,12 @@ class ProductsController extends Controller
     public function categories(Request $request)
     {
         try {
-            $languageId = $request->header('locale', 1);
-            $language = Language::find($languageId);
+            $languageId = $this->getLanguageIdFromHeader($request);
             
-            if (!$language) {
+            if (!$languageId) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid language ID'
+                    'message' => 'Invalid language'
                 ], 400);
             }
 
@@ -311,7 +312,7 @@ class ProductsController extends Controller
             // Get pagination parameters
             $perPage = $request->get('per_page', 12);
             $page = $request->get('page', 1);
-            $categoryId = $request->get('category_id');
+            $categorySlug = $request->get('category_slug');
 
             // Build products query
             $productsQuery = Product::with([
@@ -327,21 +328,23 @@ class ProductsController extends Controller
             ])
             ->active();
 
-            // Filter by category if category_id is provided
-            if ($categoryId) {
-                // Get the category
-                $category = ProductCategory::find($categoryId);
+            // Filter by category if category_slug is provided
+            if ($categorySlug) {
+                // Get the category by slug
+                $category = ProductCategory::whereHas('translates', function($query) use ($categorySlug, $languageId) {
+                    $query->where('slug', $categorySlug)->where('language_id', $languageId);
+                })->first();
                 
                 if ($category) {
                     // Check if it's a parent category (has children)
-                    $children = ProductCategory::where('parent_id', $categoryId)->pluck('id');
+                    $children = ProductCategory::where('parent_id', $category->id)->pluck('id');
                     
                     if ($children->isNotEmpty()) {
                         // If parent category, get products from all children + parent itself
-                        $categoryIds = $children->push($categoryId)->toArray();
+                        $categoryIds = $children->push($category->id)->toArray();
                     } else {
                         // If child category, get products only from this category
-                        $categoryIds = [$categoryId];
+                        $categoryIds = [$category->id];
                     }
                     
                     // Filter products that belong to any of these categories
