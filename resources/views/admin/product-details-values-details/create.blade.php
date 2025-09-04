@@ -128,7 +128,13 @@ function manualTabSwitch(tabElement) {
     tabElement.classList.add('active');
     targetPane.classList.add('show', 'active');
     
+    // Force display the target pane
+    targetPane.style.display = 'block';
+    targetPane.style.opacity = '1';
+    
     console.log('Tab switched to:', targetId);
+    console.log('Target pane found:', targetPane);
+    console.log('Target pane classes:', targetPane.className);
 }
 
 // Wait for Bootstrap to be fully loaded
@@ -193,6 +199,10 @@ function createLanguageTabs() {
         tabPane{{ $index }}.id = 'content-{{ $language->id }}';
         tabPane{{ $index }}.innerHTML = `
             <div class="p-3">
+                <div class="mb-3">
+                    <h6>Language: {{ $language->lang_code }}</h6>
+                    <p class="text-muted">Add keyword-value pairs for {{ $language->lang_code }} language</p>
+                </div>
                 <div id="pairs-{{ $language->id }}">
                     <!-- Keyword & Value pairs will be added here -->
                 </div>
@@ -365,6 +375,25 @@ document.getElementById('createDetailForm').addEventListener('submit', function(
 
 .keyword-value-pair:hover {
     background-color: #e9ecef;
+}
+
+/* Force tab content to be visible */
+.tab-pane {
+    display: none !important;
+}
+
+.tab-pane.show.active {
+    display: block !important;
+    opacity: 1 !important;
+}
+
+/* Ensure tab content is visible */
+.tab-content {
+    min-height: 200px;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 0.375rem 0.375rem;
+    background-color: #fff;
 }
 </style>
 @endpush
