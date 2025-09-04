@@ -276,23 +276,25 @@ class ProductsController extends Controller
                 return $sortData;
             });
 
-            // Get products with main image and product types
-            $products = Cache::rememberForever("products_{$languageId}", function () use ($languageId) {
-                return Product::with([
-                    'translates' => function($query) use ($languageId) {
-                        $query->where('language_id', $languageId);
-                    },
-                    'images' => function($query) {
-                        $query->where('is_main', true)->where('status', true);
-                    },
-                    'types.translates' => function($query) use ($languageId) {
-                        $query->where('language_id', $languageId);
-                    }
-                ])
-                ->active()
-                ->orderBy('view_count', 'desc')
-                ->get();
-            });
+            // Get pagination parameters
+            $perPage = $request->get('per_page', 12);
+            $page = $request->get('page', 1);
+
+            // Get products with pagination
+            $products = Product::with([
+                'translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                },
+                'images' => function($query) {
+                    $query->where('is_main', true)->where('status', true);
+                },
+                'types.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }
+            ])
+            ->active()
+            ->orderBy('view_count', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
 
             $productsData = $products->map(function ($product) {
                 $translation = $product->translates->first();
@@ -316,6 +318,17 @@ class ProductsController extends Controller
                 ];
             });
 
+            // Pagination data
+            $paginationData = [
+                'current_page' => $products->currentPage(),
+                'per_page' => $products->perPage(),
+                'total' => $products->total(),
+                'last_page' => $products->lastPage(),
+                'from' => $products->firstItem(),
+                'to' => $products->lastItem(),
+                'has_more_pages' => $products->hasMorePages()
+            ];
+
             return response()->json([
                 'success' => true,
                 'message' => 'Product categories retrieved successfully',
@@ -327,7 +340,8 @@ class ProductsController extends Controller
                     'product_page_categories' => $productPageCategoriesData,
                     'sort_options' => $sortOptions,
                     'sort_translations' => $sortTranslations,
-                    'products' => $productsData
+                    'products' => $productsData,
+                    'pagination' => $paginationData
                 ]
             ]);
 
