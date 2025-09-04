@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SuggestionsComplaintsController;
 use App\Http\Controllers\Admin\VacancyController;
 use App\Http\Controllers\Admin\VacancyRequirementController;
+use App\Http\Controllers\Admin\VacancyFormController;
 use App\Http\Controllers\Admin\CustomerRightsController;
 use App\Http\Controllers\Admin\DeliveryPaymentController;
 use App\Http\Controllers\Admin\WarrantyPolicyController;
@@ -173,6 +174,12 @@ Route::post('become-a-investor-advantages/delete-selected', [BecomeAInvestorAdva
         Route::resource('vacancy-requirements', VacancyRequirementController::class);
         Route::get('vacancy-requirements/create/{vacancy_id}', [VacancyRequirementController::class, 'createForVacancy'])->name('vacancy-requirements.create-for-vacancy');
         Route::post('vacancy-requirements/reorder', [VacancyRequirementController::class, 'reorder'])->name('vacancy-requirements.reorder');
+        
+        // Vacancy Form routes
+        Route::resource('vacancy-forms', VacancyFormController::class)->only(['index', 'show', 'destroy']);
+        Route::patch('vacancy-forms/{id}/mark-read', [VacancyFormController::class, 'markAsRead'])->name('vacancy-forms.mark-read');
+        Route::patch('vacancy-forms/{id}/mark-unread', [VacancyFormController::class, 'markAsUnread'])->name('vacancy-forms.mark-unread');
+        Route::get('vacancy-forms/{id}/download-file', [VacancyFormController::class, 'downloadFile'])->name('vacancy-forms.download-file');
         
         // Customer Rights routes
         Route::get('customer-rights/edit', [CustomerRightsController::class, 'edit'])->name('customer-rights.edit');

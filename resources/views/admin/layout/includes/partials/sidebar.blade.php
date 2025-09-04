@@ -262,6 +262,14 @@
           <li><a href="{{ route('admin.reports.index') }}">Reports</a></li>
           <li><a href="{{ route('admin.faqs.index') }}">FAQs</a></li>
           <li><a href="{{ route('admin.vacancies.index') }}">Vacancies</a></li>
+          <li><a href="{{ route('admin.vacancy-forms.index') }}">Vacancy Forms
+            @php
+              $unreadVacancyForms = \App\Models\VacancyForm::where('is_read', false)->count();
+            @endphp
+            @if($unreadVacancyForms > 0)
+              <span class="badge bg-danger ms-2">{{ $unreadVacancyForms }}</span>
+            @endif
+          </a></li>
         </ul>
       </li>
 
