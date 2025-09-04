@@ -142,17 +142,17 @@ class ProductsController extends Controller
                 'children' => []
             ];
 
-            $categoryMap[$category->id] = $categoryData;
+            $categoryMap[$category->id] = &$categoryData;
 
             if (is_null($category->parent_id)) {
-                $rootCategories[] = $categoryData;
+                $rootCategories[] = &$categoryData;
             }
         }
 
         // Second pass: build parent-child relationships
         foreach ($categories as $category) {
             if (!is_null($category->parent_id) && isset($categoryMap[$category->parent_id])) {
-                $categoryMap[$category->parent_id]['children'][] = $categoryMap[$category->id];
+                $categoryMap[$category->parent_id]['children'][] = &$categoryMap[$category->id];
             }
         }
 
