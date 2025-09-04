@@ -8,6 +8,7 @@ use App\Models\ProductPriceFilter;
 use App\Models\ProductColor;
 use App\Models\ProductType;
 use App\Models\ProductPageCategory;
+use App\Models\Dictionary;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -93,6 +94,14 @@ class ProductsController extends Controller
      *                         @OA\Property(property="title", type="string", example="Ofis"),
      *                         @OA\Property(property="slug", type="string", example="ofis")
      *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="sort_options",
+     *                     type="object",
+     *                     @OA\Property(property="price_asc", type="string", example="Qiymət artımına görə (ucuzdan bahaya)"),
+     *                     @OA\Property(property="price_desc", type="string", example="Qiymət azalmaya görə (bahadan ucuza)"),
+     *                     @OA\Property(property="newest", type="string", example="Ən yenilər (ən son əlavə olunan məhsullar əvvəl göstərilir)"),
+     *                     @OA\Property(property="oldest", type="string", example="Ən köhnələr (əvvəl əlavə olunan məhsullar əvvəl göstərilir)")
      *                 )
      *             )
      *         )
@@ -210,6 +219,23 @@ class ProductsController extends Controller
                 ];
             });
 
+            // Get sort options from dictionary
+            $sortOptions = Cache::rememberForever("sort_options_{$languageId}", function () use ($languageId) {
+                $sortKeywords = [
+                    'price_asc' => 'price_asc',
+                    'price_desc' => 'price_desc', 
+                    'newest' => 'newest',
+                    'oldest' => 'oldest'
+                ];
+
+                $sortData = [];
+                foreach ($sortKeywords as $key => $keyword) {
+                    $sortData[$key] = Dictionary::getValue($keyword, $languageId);
+                }
+
+                return $sortData;
+            });
+
             return response()->json([
                 'success' => true,
                 'message' => 'Product categories retrieved successfully',
@@ -218,7 +244,8 @@ class ProductsController extends Controller
                     'product_price_filters' => $priceFiltersData,
                     'product_colors' => $productColorsData,
                     'product_types' => $productTypesData,
-                    'product_page_categories' => $productPageCategoriesData
+                    'product_page_categories' => $productPageCategoriesData,
+                    'sort_options' => $sortOptions
                 ]
             ]);
 
