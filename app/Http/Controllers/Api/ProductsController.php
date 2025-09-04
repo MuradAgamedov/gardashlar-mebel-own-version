@@ -99,9 +99,7 @@ class ProductsController extends Controller
      *                     @OA\Items(
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="title", type="string", example="Ofis"),
-     *                         @OA\Property(property="slug", type="string", example="ofis"),
-     *                         @OA\Property(property="image", type="string", example="https://admin.gardaslar.coder.az/storage/product-categories/..."),
-     *                         @OA\Property(property="image_alt_text", type="string", example="Ofis şəkli")
+     *                         @OA\Property(property="slug", type="string", example="ofis")
      *                     )
      *                 )
      *             )
