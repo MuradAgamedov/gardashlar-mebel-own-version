@@ -128,7 +128,7 @@ class ProductsController extends Controller
         $categoryMap = [];
         $rootCategories = [];
 
-        // First pass: create category map and identify root categories
+        // First pass: create category map
         foreach ($categories as $category) {
             $translation = $category->translates->first();
             $categoryData = [
@@ -142,23 +142,21 @@ class ProductsController extends Controller
                 'children' => []
             ];
 
-            $categoryMap[$category->id] = &$categoryData;
-
-            if (is_null($category->parent_id)) {
-                $rootCategories[] = &$categoryData;
-            }
+            $categoryMap[$category->id] = $categoryData;
         }
 
         // Second pass: build parent-child relationships
         foreach ($categories as $category) {
             if (!is_null($category->parent_id) && isset($categoryMap[$category->parent_id])) {
-                $categoryMap[$category->parent_id]['children'][] = &$categoryMap[$category->id];
+                $categoryMap[$category->parent_id]['children'][] = $categoryMap[$category->id];
+            } else if (is_null($category->parent_id)) {
+                $rootCategories[] = $categoryMap[$category->id];
             }
         }
 
         // Sort children by order
-        foreach ($categoryMap as &$category) {
-            usort($category['children'], function($a, $b) {
+        foreach ($categoryMap as $id => $category) {
+            usort($categoryMap[$id]['children'], function($a, $b) {
                 return $a['order'] <=> $b['order'];
             });
         }
