@@ -185,8 +185,7 @@ class ProductsController extends Controller
                 $translation = $type->translates->first();
                 return [
                     'id' => $type->id,
-                    'title' => $translation ? $translation->title : '',
-                    'order' => $type->order
+                    'title' => $translation ? $translation->title : ''
                 ];
             });
 
