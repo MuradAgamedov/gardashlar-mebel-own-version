@@ -90,11 +90,28 @@ class VacancyFormController extends Controller
     {
         $form = VacancyForm::findOrFail($id);
         
-        if (!$form->file || !Storage::exists($form->file)) {
-            return redirect()->back()->with('error', 'File not found');
+        if (!$form->file) {
+            return redirect()->back()->with('error', 'No file attached');
         }
 
-        return Storage::download($form->file, $form->file_name);
+        // Check if file exists in storage
+        if (!Storage::exists($form->file)) {
+            return redirect()->back()->with('error', 'File not found in storage');
+        }
+
+        // Get file path
+        $filePath = Storage::path($form->file);
+        
+        // Check if file exists on disk
+        if (!file_exists($filePath)) {
+            return redirect()->back()->with('error', 'File does not exist on disk');
+        }
+
+        // Get original filename
+        $originalName = $form->file_name ?: basename($form->file);
+        
+        // Return file download response
+        return response()->download($filePath, $originalName);
     }
 
     /**
