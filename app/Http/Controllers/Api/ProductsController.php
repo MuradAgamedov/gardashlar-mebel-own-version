@@ -671,7 +671,16 @@ class ProductsController extends Controller
                  *                     type="array",
                  *                     @OA\Items(
                  *                         @OA\Property(property="id", type="integer", example=1),
-                 *                         @OA\Property(property="keyword", type="string", example="Size")
+                 *                         @OA\Property(property="keyword", type="string", example="Size"),
+                 *                         @OA\Property(
+                 *                             property="details",
+                 *                             type="array",
+                 *                             @OA\Items(
+                 *                                 @OA\Property(property="id", type="integer", example=1),
+                 *                                 @OA\Property(property="keyword", type="string", example="Small"),
+                 *                                 @OA\Property(property="value", type="string", example="30x40cm")
+                 *                             )
+                 *                         )
                  *                     )
                  *                 ),
                  *                 @OA\Property(
@@ -737,6 +746,12 @@ class ProductsController extends Controller
                 'detailValues.translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
                 },
+                'detailValues.details' => function($query) {
+                    $query->orderBy('order');
+                },
+                'detailValues.details.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                },
                 'images' => function($query) {
                     $query->where('status', true)->orderBy('order');
                 }
@@ -795,9 +810,21 @@ class ProductsController extends Controller
             // Get product detail values (already ordered by order field from database)
             $productDetailValues = $product->detailValues->map(function ($detailValue) {
                 $translation = $detailValue->translates->first();
+                
+                // Get details for this detail value
+                $details = $detailValue->details->map(function ($detail) {
+                    $detailTranslation = $detail->translates->first();
+                    return [
+                        'id' => $detail->id,
+                        'keyword' => $detailTranslation ? $detailTranslation->keyword : '',
+                        'value' => $detailTranslation ? $detailTranslation->value : ''
+                    ];
+                });
+                
                 return [
                     'id' => $detailValue->id,
-                    'keyword' => $translation ? $translation->keyword : ''
+                    'keyword' => $translation ? $translation->keyword : '',
+                    'details' => $details
                 ];
             });
 
