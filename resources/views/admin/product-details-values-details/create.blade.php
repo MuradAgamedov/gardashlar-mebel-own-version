@@ -108,7 +108,28 @@
 <script>
 let translationIndex = 0;
 
-// Bootstrap tabs will handle switching automatically
+// Manual tab switching function (fallback for Bootstrap issues)
+function manualTabSwitch(tabElement) {
+    const targetId = tabElement.getAttribute('data-bs-target');
+    const targetPane = document.querySelector(targetId);
+    
+    if (!targetPane) {
+        console.error('Target pane not found:', targetId);
+        return;
+    }
+    
+    // Remove active class from all tabs and panes
+    document.querySelectorAll('.nav-link').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.remove('show', 'active');
+    });
+    
+    // Add active class to clicked tab and corresponding pane
+    tabElement.classList.add('active');
+    targetPane.classList.add('show', 'active');
+    
+    console.log('Tab switched to:', targetId);
+}
 
 // Wait for Bootstrap to be fully loaded
 function waitForBootstrap() {
@@ -161,7 +182,8 @@ function createLanguageTabs() {
                     data-bs-toggle="tab"
                     data-bs-target="#content-{{ $language->id }}" 
                     type="button" 
-                    role="tab">
+                    role="tab"
+                    onclick="manualTabSwitch(this)">
                 {{ $language->lang_code }}
             </button>
         `;
@@ -188,17 +210,29 @@ function createLanguageTabs() {
     const tabElements = container.querySelectorAll('[data-bs-toggle="tab"]');
     console.log('Found tab elements:', tabElements.length);
     
+    let bootstrapInitialized = false;
+    
     tabElements.forEach((tabElement, index) => {
         try {
             new bootstrap.Tab(tabElement);
-            console.log(`Tab ${index + 1} initialized successfully`);
+            console.log(`Tab ${index + 1} initialized successfully with Bootstrap`);
+            bootstrapInitialized = true;
         } catch (error) {
-            console.error(`Error initializing tab ${index + 1}:`, error);
+            console.error(`Error initializing tab ${index + 1} with Bootstrap:`, error);
         }
     });
     
+    // If Bootstrap failed, ensure manual switching works
+    if (!bootstrapInitialized) {
+        console.log('Bootstrap initialization failed, using manual tab switching');
+        // Remove data-bs-toggle to prevent Bootstrap interference
+        tabElements.forEach(tabElement => {
+            tabElement.removeAttribute('data-bs-toggle');
+        });
+    }
+    
     // Debug: Log that tabs were created
-    console.log('Language tabs created successfully with Bootstrap initialization');
+    console.log('Language tabs created successfully');
 }
 
 function addKeywordValuePair() {
@@ -214,8 +248,11 @@ function addKeywordValuePair() {
     
     if (!pairsContainer) {
         console.error('Pairs container not found for language:', languageId);
+        console.log('Available containers:', document.querySelectorAll('[id^="pairs-"]'));
         return;
     }
+    
+    console.log('Adding keyword-value pair to language:', languageId);
     
     const pairDiv = document.createElement('div');
     pairDiv.className = 'keyword-value-pair border rounded p-3 mb-3';
