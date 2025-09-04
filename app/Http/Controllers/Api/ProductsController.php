@@ -323,7 +323,11 @@ class ProductsController extends Controller
 
             $productsData = $products->map(function ($product) {
                 $translation = $product->translates->first();
-                $mainImage = $product->images->first();
+                // Find main image - first try to find is_main=true, then fallback to first image
+                $mainImage = $product->images->where('is_main', true)->first();
+                if (!$mainImage) {
+                    $mainImage = $product->images->first();
+                }
                 
                 // Debug: Log image info
                 \Log::info("Product ID: {$product->id}, Images count: " . $product->images->count());
