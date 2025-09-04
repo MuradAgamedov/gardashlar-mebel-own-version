@@ -662,6 +662,9 @@ class ProductsController extends Controller
                 },
                 'types.translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
+                },
+                'tags.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
                 }
             ])->whereHas('translates', function($query) use ($slug) {
                 $query->where('slug', $slug);
@@ -686,13 +689,23 @@ class ProductsController extends Controller
                 ];
             });
 
+            // Get product tags
+            $productTags = $product->tags->map(function ($tag) {
+                $translation = $tag->translates->first();
+                return [
+                    'id' => $tag->id,
+                    'title' => $translation ? $translation->title : ''
+                ];
+            });
+
             $productData = [
                 'id' => $product->id,
                 'title' => $translation ? $translation->title : '',
                 'slug' => $translation ? $translation->slug : '',
                 'price' => $product->price,
                 'view_count' => $product->view_count,
-                'product_types' => $productTypes
+                'product_types' => $productTypes,
+                'product_tags' => $productTags
             ];
 
             return response()->json([
