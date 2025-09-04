@@ -481,6 +481,7 @@ class ProductsController extends Controller
                         'title' => $translation ? $translation->title : ''
                     ];
                 });
+                
                 return [
                     'id' => $product->id,
                     'title' => $translation ? $translation->title : '',
@@ -628,6 +629,14 @@ class ProductsController extends Controller
      *                     @OA\Items(
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="title", type="string", example="Masa")
+     *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="product_tags",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="title", type="string", example="Premium")
      *                     )
      *                 )
      *             )
