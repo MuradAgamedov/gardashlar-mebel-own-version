@@ -609,6 +609,13 @@ class ProductsController extends Controller
      *         required=false,
      *         @OA\Schema(type="string", default="az")
      *     ),
+     *     @OA\Parameter(
+     *         name="color_id",
+     *         in="query",
+     *         description="Filter images by color ID. If not provided, shows images from the first available color.",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
@@ -656,7 +663,7 @@ class ProductsController extends Controller
      *                         @OA\Property(property="image_url", type="string", example="https://admin.gardaslar.coder.az/storage/products/image.jpg"),
      *                         @OA\Property(property="is_main", type="boolean", example=true),
      *                         @OA\Property(property="order", type="integer", example=1),
-     *                         @OA\Property(property="color_id", type="integer", example=1)
+     *                         @OA\Property(property="color_id", type="integer", example=1, description="Only included if not null")
      *                     )
      *                 )
      *             )
@@ -676,6 +683,7 @@ class ProductsController extends Controller
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
+            $colorId = $request->get('color_id');
             
             if (!$languageId) {
                 return response()->json([
@@ -743,15 +751,36 @@ class ProductsController extends Controller
                 ];
             });
 
-            // Get product images
-            $productImages = $product->images->map(function ($image) {
-                return [
+            // Get product images with color filtering
+            $images = $product->images;
+            
+            // If no color_id provided, get the first available color
+            if (!$colorId) {
+                $firstColorId = $images->where('color_id', '!=', null)->min('color_id');
+                if ($firstColorId) {
+                    $colorId = $firstColorId;
+                }
+            }
+            
+            // Filter images by color_id if specified
+            if ($colorId) {
+                $images = $images->where('color_id', $colorId);
+            }
+            
+            $productImages = $images->map(function ($image) {
+                $imageData = [
                     'id' => $image->id,
                     'image_url' => $image->image ? asset('storage/' . $image->image) : null,
                     'is_main' => $image->is_main,
-                    'order' => $image->order,
-                    'color_id' => $image->color_id
+                    'order' => $image->order
                 ];
+                
+                // Only include color_id if it's not null
+                if ($image->color_id !== null) {
+                    $imageData['color_id'] = $image->color_id;
+                }
+                
+                return $imageData;
             });
 
             $productData = [
