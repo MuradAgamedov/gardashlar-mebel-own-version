@@ -265,16 +265,20 @@ class ProductsController extends Controller
             }
         }
 
-        // Sort children by order
+        // Sort children by order (using original category order)
         foreach ($categoryMap as $id => $category) {
-            usort($categoryMap[$id]['children'], function($a, $b) {
-                return $a['order'] <=> $b['order'];
+            usort($categoryMap[$id]['children'], function($a, $b) use ($categories) {
+                $catA = $categories->where('id', $a['id'])->first();
+                $catB = $categories->where('id', $b['id'])->first();
+                return ($catA ? $catA->order : 0) <=> ($catB ? $catB->order : 0);
             });
         }
 
-        // Sort root categories by order
-        usort($rootCategories, function($a, $b) {
-            return $a['order'] <=> $b['order'];
+        // Sort root categories by order (using original category order)
+        usort($rootCategories, function($a, $b) use ($categories) {
+            $catA = $categories->where('id', $a['id'])->first();
+            $catB = $categories->where('id', $b['id'])->first();
+            return ($catA ? $catA->order : 0) <=> ($catB ? $catB->order : 0);
         });
 
         return $rootCategories;
