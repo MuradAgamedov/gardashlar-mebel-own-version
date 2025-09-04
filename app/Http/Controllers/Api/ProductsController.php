@@ -34,6 +34,20 @@ class ProductsController extends Controller
      *         required=false,
      *         @OA\Schema(type="integer", default=1)
      *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number",
+     *         required=false,
+     *         @OA\Schema(type="integer", default=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Number of products per page",
+     *         required=false,
+     *         @OA\Schema(type="integer", default=12)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
