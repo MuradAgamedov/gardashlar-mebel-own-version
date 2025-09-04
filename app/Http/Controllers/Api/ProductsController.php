@@ -1,0 +1,173 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\ProductCategory;
+use App\Models\Language;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+
+/**
+ * @OA\Tag(
+ *     name="Products",
+ *     description="API Endpoints for products and product categories"
+ * )
+ */
+class ProductsController extends Controller
+{
+    /**
+     * @OA\Get(
+     *     path="/api/products",
+     *     summary="Get all product categories with hierarchical structure",
+     *     tags={"Products"},
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language ID (1=az, 2=en, 3=ru)",
+     *         required=false,
+     *         @OA\Schema(type="integer", default=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Product categories retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="title", type="string", example="Ana Kategori"),
+     *                     @OA\Property(property="slug", type="string", example="ana-kategori"),
+     *                     @OA\Property(property="image", type="string", example="https://admin.gardaslar.coder.az/storage/categories/category-1.jpg"),
+     *                     @OA\Property(property="image_alt_text", type="string", example="Ana kategori şəkli"),
+     *                     @OA\Property(property="order", type="integer", example=1),
+     *                     @OA\Property(property="parent_id", type="integer", nullable=true, example=null),
+     *                     @OA\Property(
+     *                         property="children",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             @OA\Property(property="id", type="integer", example=2),
+     *                             @OA\Property(property="title", type="string", example="Alt Kategori 1"),
+     *                             @OA\Property(property="slug", type="string", example="alt-kategori-1"),
+     *                             @OA\Property(property="image", type="string", example="https://admin.gardaslar.coder.az/storage/categories/subcategory-1.jpg"),
+     *                             @OA\Property(property="image_alt_text", type="string", example="Alt kategori 1 şəkli"),
+     *                             @OA\Property(property="order", type="integer", example=1),
+     *                             @OA\Property(property="parent_id", type="integer", example=1),
+     *                             @OA\Property(property="children", type="array", @OA\Items())
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid language ID",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Invalid language ID")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error retrieving product categories")
+     *         )
+     *     )
+     * )
+     */
+    public function categories(Request $request)
+    {
+        try {
+            $languageId = $request->header('locale', 1);
+            $language = Language::find($languageId);
+            
+            if (!$language) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid language ID'
+                ], 400);
+            }
+
+            $categories = Cache::rememberForever("product_categories_{$languageId}", function () use ($languageId) {
+                return ProductCategory::with(['translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }])
+                ->active()
+                ->ordered()
+                ->get();
+            });
+
+            // Build hierarchical structure
+            $categoriesData = $this->buildHierarchy($categories);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product categories retrieved successfully',
+                'data' => $categoriesData
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving product categories: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Build hierarchical structure for categories
+     */
+    private function buildHierarchy($categories)
+    {
+        $categoryMap = [];
+        $rootCategories = [];
+
+        // First pass: create category map and identify root categories
+        foreach ($categories as $category) {
+            $translation = $category->translates->first();
+            $categoryData = [
+                'id' => $category->id,
+                'title' => $translation ? $translation->title : '',
+                'slug' => $translation ? $translation->slug : '',
+                'image' => $category->image ? asset('storage/' . $category->image) : null,
+                'image_alt_text' => $translation ? $translation->image_alt_text : '',
+                'order' => $category->order,
+                'parent_id' => $category->parent_id,
+                'children' => []
+            ];
+
+            $categoryMap[$category->id] = $categoryData;
+
+            if (is_null($category->parent_id)) {
+                $rootCategories[] = $categoryData;
+            }
+        }
+
+        // Second pass: build parent-child relationships
+        foreach ($categories as $category) {
+            if (!is_null($category->parent_id) && isset($categoryMap[$category->parent_id])) {
+                $categoryMap[$category->parent_id]['children'][] = $categoryMap[$category->id];
+            }
+        }
+
+        // Sort children by order
+        foreach ($categoryMap as &$category) {
+            usort($category['children'], function($a, $b) {
+                return $a['order'] <=> $b['order'];
+            });
+        }
+
+        // Sort root categories by order
+        usort($rootCategories, function($a, $b) {
+            return $a['order'] <=> $b['order'];
+        });
+
+        return $rootCategories;
+    }
+}

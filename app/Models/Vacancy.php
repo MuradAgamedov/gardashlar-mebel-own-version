@@ -67,6 +67,14 @@ class Vacancy extends Model
         return $this->hasMany(VacancyRequirement::class);
     }
 
+/**
+     * Get all forms for this vacancy
+     */
+    public function forms()
+    {
+        return $this->hasMany(VacancyForm::class);
+    }
+
     /**
      * Scope for active vacancies
      */

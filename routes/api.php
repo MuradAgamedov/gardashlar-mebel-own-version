@@ -56,6 +56,8 @@ use App\Http\Controllers\Api\RefundPolicyController;
 use App\Http\Controllers\Api\CompanyManagementController;
 use App\Http\Controllers\Api\SiteUsageRulesController;
 use App\Http\Controllers\Api\SuggestionController;
+use App\Http\Controllers\Api\ProductsController;
+use App\Http\Controllers\Api\VacancyFormController;
 use App\Http\Controllers\Api\AuthController;
 
 
@@ -214,6 +216,12 @@ Route::post('/suggestions-complaints-form', [SuggestionsComplaintsFormController
 Route::get('/vacancies', [VacancyController::class, 'index'])->name('api.vacancies.index');
 Route::get('/vacancies/{slug}', [VacancyController::class, 'show'])->name('api.vacancies.show');
 
+// Vacancy Forms API Routes
+Route::post('/vacancy-forms', [VacancyFormController::class, 'store'])->name('api.vacancy-forms.store');
+Route::get('/vacancy-forms', [VacancyFormController::class, 'index'])->name('api.vacancy-forms.index');
+Route::get('/vacancy-forms/{id}', [VacancyFormController::class, 'show'])->name('api.vacancy-forms.show');
+Route::patch('/vacancy-forms/{id}/mark-read', [VacancyFormController::class, 'markAsRead'])->name('api.vacancy-forms.mark-read');
+
 // Privacy Policy API Routes
 Route::get('/privacy-policy', [PrivacyPolicyController::class, 'index'])->name('api.privacy-policy.index');
 
@@ -238,6 +246,9 @@ Route::get('/site-usage-rules', [SiteUsageRulesController::class, 'index'])->nam
 // Suggestions API Routes
 Route::get('/suggestions', [SuggestionController::class, 'index'])->name('api.suggestions.index');
 Route::get('/suggestions/{id}', [SuggestionController::class, 'show'])->name('api.suggestions.show');
+
+// Products API Routes
+Route::get('/products', [ProductsController::class, 'categories'])->name('api.products.index');
 
 // Auth API Routes
 Route::post('/register', [AuthController::class, 'register'])->name('api.auth.register');
