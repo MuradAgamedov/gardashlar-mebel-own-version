@@ -87,8 +87,6 @@ class ProductController extends Controller
             'translations.*.seo_title' => 'nullable|string|max:255',
             'translations.*.seo_keywords' => 'nullable|string',
             'translations.*.seo_description' => 'nullable|string',
-            'translations.*.material' => 'nullable|string',
-            'translations.*.size' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
             'discount_percent' => 'nullable|numeric|min:0|max:100',
             'product_tags' => 'nullable|string',
@@ -113,9 +111,6 @@ class ProductController extends Controller
                     'seo_title' => $translation['seo_title'] ?? null,
                     'seo_keywords' => $translation['seo_keywords'] ?? null,
                     'seo_description' => $translation['seo_description'] ?? null,
-                    'weight' => $translation['weight'] ?? null,
-                    'material' => $translation['material'] ?? null,
-                    'size' => $translation['size'] ?? null
                 ]);
             }
 
@@ -195,8 +190,6 @@ class ProductController extends Controller
             'translations.*.seo_title' => 'nullable|string|max:255',
             'translations.*.seo_keywords' => 'nullable|string',
             'translations.*.seo_description' => 'nullable|string',
-            'translations.*.material' => 'nullable|string',
-            'translations.*.size' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
             'discount_percent' => 'nullable|numeric|min:0|max:100',
             'product_tags' => 'nullable|string',
