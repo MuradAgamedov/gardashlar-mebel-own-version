@@ -46,7 +46,8 @@ class ServiceController extends Controller
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="slug", type="string", example="mebel-istehsali"),
      *                     @OA\Property(property="title", type="string", example="Mebel İstehsalı"),
-     *                     @OA\Property(property="card_description", type="string", example="Yüksək keyfiyyətli mebel istehsalı")
+     *                     @OA\Property(property="card_description", type="string", example="Yüksək keyfiyyətli mebel istehsalı"),
+     *                     @OA\Property(property="advantages_title", type="string", example="Xidmətlərimizin Üstünlükləri")
      *                 )
      *             )
      *         )
@@ -90,7 +91,8 @@ class ServiceController extends Controller
                             'id' => $service->id,
                             'slug' => $translation ? $translation->slug : null,
                             'title' => $translation ? $translation->title : 'No title',
-                            'card_description' => $translation ? $translation->card_description : 'No description'
+                            'card_description' => $translation ? $translation->card_description : 'No description',
+                            'advantages_title' => $translation ? $translation->advantages_title : null
                         ];
                     });
             });
@@ -145,6 +147,7 @@ class ServiceController extends Controller
      *                 @OA\Property(property="card_description", type="string", example="Keyfiyyətli tikinti və inşaat işləri"),
      *                 @OA\Property(property="main_description", type="string", example="Biz müasir texnologiyalardan istifadə edərək..."),
      *                 @OA\Property(property="form_top_text", type="string", example="<p>Form üçün üst mətn</p>"),
+     *                 @OA\Property(property="advantages_title", type="string", example="Xidmətlərimizin Üstünlükləri"),
      *                 @OA\Property(property="seo_title", type="string", example="Tikinti Xidmətləri"),
      *                 @OA\Property(property="seo_keywords", type="string", example="tikinti, inşaat, bina"),
      *                 @OA\Property(property="seo_description", type="string", example="Professional tikinti xidmətləri"),
@@ -234,6 +237,7 @@ class ServiceController extends Controller
                     'card_description' => $translation ? $translation->card_description : '',
                     'main_description' => $translation ? $translation->main_description : '',
                     'form_top_text' => $translation ? $translation->form_top_text : '',
+                    'advantages_title' => $translation ? $translation->advantages_title : '',
                     'seo_title' => $translation ? $translation->seo_title : '',
                     'seo_keywords' => $translation ? $translation->seo_keywords : '',
                     'seo_description' => $translation ? $translation->seo_description : '',
