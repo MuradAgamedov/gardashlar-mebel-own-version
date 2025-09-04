@@ -708,6 +708,9 @@ class ProductsController extends Controller
                 'accordions.translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
                 },
+                'details.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                },
                 'images' => function($query) {
                     $query->where('status', true)->orderBy('order');
                 }
@@ -750,6 +753,17 @@ class ProductsController extends Controller
                     'id' => $accordion->id,
                     'title' => $translation ? $translation->title : '',
                     'content' => $translation ? $translation->description : ''
+                ];
+            });
+
+            // Get product details
+            $productDetails = $product->details->map(function ($detail) {
+                $translation = $detail->translates->first();
+                return [
+                    'id' => $detail->id,
+                    'order' => $detail->order,
+                    'keyword' => $translation ? $translation->keyword : '',
+                    'value' => $translation ? $translation->value : ''
                 ];
             });
 
@@ -802,6 +816,7 @@ class ProductsController extends Controller
                 'product_types' => $productTypes,
                 'product_tags' => $productTags,
                 'product_accordions' => $productAccordions,
+                'product_details' => $productDetails,
                 'images' => $productImages
             ];
 
