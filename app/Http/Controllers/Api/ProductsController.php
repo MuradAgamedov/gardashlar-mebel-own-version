@@ -177,10 +177,10 @@ class ProductsController extends Controller
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="title", type="string", example="Masa"),
      *                         @OA\Property(property="slug", type="string", example="masa-1"),
-     *                         @OA\Property(property="card_image", type="string", example="https://admin.gardaslar.coder.az/storage/products/... or https://admin.gardaslar.coder.az/images/default_image.webp"),
      *                         @OA\Property(property="price", type="number", format="float", example=299.99),
-     *                         @OA\Property(property="discount_percent", type="number", format="float", example=10.00),
      *                         @OA\Property(property="view_count", type="integer", example=150),
+     *                         @OA\Property(property="card_image", type="string", example="https://admin.gardaslar.coder.az/storage/products/... or https://admin.gardaslar.coder.az/images/default_image.webp"),
+     *                         @OA\Property(property="discount_percent", type="number", format="float", example=10.00),
      *                         @OA\Property(
      *                             property="product_types",
      *                             type="array",
@@ -485,10 +485,10 @@ class ProductsController extends Controller
                     'id' => $product->id,
                     'title' => $translation ? $translation->title : '',
                     'slug' => $translation ? $translation->slug : '',
-                    'card_image' => $mainImage && $mainImage->image ? asset('storage/' . $mainImage->image) : asset('images/default_image.webp'),
                     'price' => $product->price,
-                    'discount_percent' => $product->discount_percent,
                     'view_count' => $product->view_count,
+                    'card_image' => $mainImage && $mainImage->image ? asset('storage/' . $mainImage->image) : asset('images/default_image.webp'),
+                    'discount_percent' => $product->discount_percent,
                     'product_types' => $productTypes
                 ];
             });
