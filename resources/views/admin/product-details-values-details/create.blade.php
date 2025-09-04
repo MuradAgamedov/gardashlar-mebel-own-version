@@ -114,8 +114,10 @@ let translationIndex = 0;
 function waitForBootstrap() {
     return new Promise((resolve) => {
         if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+            console.log('Bootstrap is ready!');
             resolve();
         } else {
+            console.log('Waiting for Bootstrap...');
             setTimeout(() => waitForBootstrap().then(resolve), 100);
         }
     });
@@ -184,8 +186,15 @@ function createLanguageTabs() {
     
     // Initialize Bootstrap tabs
     const tabElements = container.querySelectorAll('[data-bs-toggle="tab"]');
-    tabElements.forEach(tabElement => {
-        new bootstrap.Tab(tabElement);
+    console.log('Found tab elements:', tabElements.length);
+    
+    tabElements.forEach((tabElement, index) => {
+        try {
+            new bootstrap.Tab(tabElement);
+            console.log(`Tab ${index + 1} initialized successfully`);
+        } catch (error) {
+            console.error(`Error initializing tab ${index + 1}:`, error);
+        }
     });
     
     // Debug: Log that tabs were created
