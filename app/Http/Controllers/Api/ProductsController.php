@@ -805,7 +805,10 @@ class ProductsController extends Controller
                     'keyword' => $translation ? $translation->keyword : '',
                     'value' => $translation ? $translation->value : ''
                 ];
-            });
+            })->filter(function ($detail) {
+                // Only include details that have both keyword and value
+                return !empty($detail['keyword']) && !empty($detail['value']);
+            })->values();
 
             // Get product detail values (already ordered by order field from database)
             $productDetailValues = $product->detailValues->map(function ($detailValue) use ($languageId) {
@@ -825,7 +828,12 @@ class ProductsController extends Controller
                             'keyword' => $detailTranslation ? $detailTranslation->keyword : '',
                             'value' => $detailTranslation ? $detailTranslation->value : ''
                         ];
-                    });
+                    })
+                    ->filter(function ($detail) {
+                        // Only include details that have both keyword and value
+                        return !empty($detail['keyword']) && !empty($detail['value']);
+                    })
+                    ->values();
                 
                 return [
                     'id' => $detailValue->id,
