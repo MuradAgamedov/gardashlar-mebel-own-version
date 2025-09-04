@@ -249,6 +249,7 @@ Route::get('/suggestions/{id}', [SuggestionController::class, 'show'])->name('ap
 
 // Products API Routes
 Route::get('/products', [ProductsController::class, 'categories'])->name('api.products.index');
+Route::get('/products/{slug}', [ProductsController::class, 'show'])->name('api.products.show');
 
 // Auth API Routes
 Route::post('/register', [AuthController::class, 'register'])->name('api.auth.register');

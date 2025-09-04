@@ -586,4 +586,93 @@ class ProductsController extends Controller
 
         return $rootCategories;
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/products/{slug}",
+     *     summary="Get single product by slug",
+     *     tags={"Products"},
+     *     @OA\Parameter(
+     *         name="slug",
+     *         in="path",
+     *         description="Product slug",
+     *         required=true,
+     *         @OA\Schema(type="string", example="masa-1")
+     *     ),
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language code (az, en, ru)",
+     *         required=false,
+     *         @OA\Schema(type="string", default="az")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Product retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="title", type="string", example="Masa")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Product not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Product not found")
+     *         )
+     *     )
+     * )
+     */
+    public function show(Request $request, $slug)
+    {
+        try {
+            $languageId = $this->getLanguageIdFromHeader($request);
+            
+            if (!$languageId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid language'
+                ], 400);
+            }
+
+            // Find product by slug (any language)
+            $product = Product::whereHas('translates', function($query) use ($slug) {
+                $query->where('slug', $slug);
+            })->first();
+
+            if (!$product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product not found'
+                ], 404);
+            }
+
+            // Get translation for the requested language
+            $translation = $product->translates()->where('language_id', $languageId)->first();
+
+            $productData = [
+                'id' => $product->id,
+                'title' => $translation ? $translation->title : ''
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product retrieved successfully',
+                'data' => $productData
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving product: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
