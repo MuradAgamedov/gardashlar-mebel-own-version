@@ -311,7 +311,7 @@ class ProductsController extends Controller
                     $query->where('language_id', $languageId);
                 },
                 'images' => function($query) {
-                    $query->where('is_main', true)->where('status', true)->orderBy('order');
+                    $query->where('status', true)->orderBy('order');
                 },
                 'types.translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
@@ -340,7 +340,6 @@ class ProductsController extends Controller
                         'title' => $translation ? $translation->title : ''
                     ];
                 });
-                dd($mainImage);
                 return [
                     'id' => $product->id,
                     'title' => $translation ? $translation->title : '',
