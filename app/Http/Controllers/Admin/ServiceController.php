@@ -50,6 +50,7 @@ class ServiceController extends Controller
         // Validate the request
         $request->validate([
             'status' => 'nullable',
+            'advantages_title' => 'nullable|string|max:255',
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.title' => 'required|string|max:255',
@@ -70,7 +71,8 @@ class ServiceController extends Controller
         try {
             // Create the service
             $service = Service::create([
-                'status' => $request->has('status') ? true : false
+                'status' => $request->has('status') ? true : false,
+                'advantages_title' => $request->input('advantages_title')
             ]);
 
             // Create translations for each language
