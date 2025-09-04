@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
 use App\Models\ProductPriceFilter;
 use App\Models\ProductColor;
+use App\Models\ProductType;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -81,6 +82,15 @@ class ProductsController extends Controller
      *                     @OA\Items(
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="color_code", type="string", example="#FF0000")
+     *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="product_types",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="title", type="string", example="Masa"),
+     *                         @OA\Property(property="order", type="integer", example=1)
      *                     )
      *                 )
      *             )
@@ -161,13 +171,33 @@ class ProductsController extends Controller
                 ];
             });
 
+            // Get product types
+            $productTypes = Cache::rememberForever("product_types_{$languageId}", function () use ($languageId) {
+                return ProductType::with(['translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }])
+                ->active()
+                ->ordered()
+                ->get();
+            });
+
+            $productTypesData = $productTypes->map(function ($type) {
+                $translation = $type->translates->first();
+                return [
+                    'id' => $type->id,
+                    'title' => $translation ? $translation->title : '',
+                    'order' => $type->order
+                ];
+            });
+
             return response()->json([
                 'success' => true,
                 'message' => 'Product categories retrieved successfully',
                 'data' => [
                     'categories' => $categoriesData,
                     'product_price_filters' => $priceFiltersData,
-                    'product_colors' => $productColorsData
+                    'product_colors' => $productColorsData,
+                    'product_types' => $productTypesData
                 ]
             ]);
 
