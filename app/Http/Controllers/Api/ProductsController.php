@@ -621,7 +621,15 @@ class ProductsController extends Controller
      *                 @OA\Property(property="title", type="string", example="Masa"),
      *                 @OA\Property(property="slug", type="string", example="masa-1"),
      *                 @OA\Property(property="price", type="number", format="float", example=299.99),
-     *                 @OA\Property(property="view_count", type="integer", example=150)
+     *                 @OA\Property(property="view_count", type="integer", example=150),
+     *                 @OA\Property(
+     *                     property="product_types",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="title", type="string", example="Masa")
+     *                     )
+     *                 )
      *             )
      *         )
      *     ),
@@ -648,7 +656,14 @@ class ProductsController extends Controller
             }
 
             // Find product by slug (any language)
-            $product = Product::whereHas('translates', function($query) use ($slug) {
+            $product = Product::with([
+                'translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                },
+                'types.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }
+            ])->whereHas('translates', function($query) use ($slug) {
                 $query->where('slug', $slug);
             })->first();
 
@@ -660,14 +675,24 @@ class ProductsController extends Controller
             }
 
             // Get translation for the requested language
-            $translation = $product->translates()->where('language_id', $languageId)->first();
+            $translation = $product->translates->first();
+
+            // Get product types
+            $productTypes = $product->types->map(function ($type) {
+                $translation = $type->translates->first();
+                return [
+                    'id' => $type->id,
+                    'title' => $translation ? $translation->title : ''
+                ];
+            });
 
             $productData = [
                 'id' => $product->id,
                 'title' => $translation ? $translation->title : '',
                 'slug' => $translation ? $translation->slug : '',
                 'price' => $product->price,
-                'view_count' => $product->view_count
+                'view_count' => $product->view_count,
+                'product_types' => $productTypes
             ];
 
             return response()->json([
