@@ -344,7 +344,10 @@ class ProductsController extends Controller
                         $categoryIds = [$categoryId];
                     }
                     
-                    $productsQuery->whereIn('category_id', $categoryIds);
+                    // Filter products that belong to any of these categories
+                    $productsQuery->whereHas('categories', function($query) use ($categoryIds) {
+                        $query->whereIn('product_categories.id', $categoryIds);
+                    });
                 }
             }
 
