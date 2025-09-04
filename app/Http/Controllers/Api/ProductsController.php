@@ -618,7 +618,8 @@ class ProductsController extends Controller
      *                 property="data",
      *                 type="object",
      *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="title", type="string", example="Masa")
+     *                 @OA\Property(property="title", type="string", example="Masa"),
+     *                 @OA\Property(property="slug", type="string", example="masa-1")
      *             )
      *         )
      *     ),
@@ -661,7 +662,8 @@ class ProductsController extends Controller
 
             $productData = [
                 'id' => $product->id,
-                'title' => $translation ? $translation->title : ''
+                'title' => $translation ? $translation->title : '',
+                'slug' => $translation ? $translation->slug : ''
             ];
 
             return response()->json([
