@@ -157,7 +157,12 @@ class ProductsController extends Controller
             if (!is_null($category->parent_id) && isset($categoryMap[$category->parent_id])) {
                 \Log::info("Adding child {$category->id} to parent {$category->parent_id}");
                 $categoryMap[$category->parent_id]['children'][] = $categoryMap[$category->id];
-            } else if (is_null($category->parent_id)) {
+            }
+        }
+
+        // Third pass: collect root categories
+        foreach ($categories as $category) {
+            if (is_null($category->parent_id)) {
                 \Log::info("Adding root category {$category->id}");
                 $rootCategories[] = $categoryMap[$category->id];
             }
