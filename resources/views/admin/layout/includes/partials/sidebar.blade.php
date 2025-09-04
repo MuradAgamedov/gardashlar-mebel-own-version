@@ -96,6 +96,19 @@
           </a>
         </li>
 
+        <li class="sidebar-list">
+          <a class="sidebar-link" href="{{ route('admin.vacancy-forms.index') }}">
+            <i class="fas fa-briefcase"></i>
+            <h6>Vacancy Forms</h6>
+            @php
+              $unreadVacancyForms = \App\Models\VacancyForm::where('is_read', false)->count();
+            @endphp
+            @if($unreadVacancyForms > 0)
+              <span class="badge bg-danger ms-2">{{ $unreadVacancyForms }}</span>
+            @endif
+          </a>
+        </li>
+
       <!-- CONTENT MANAGEMENT -->
       <li class="sidebar-main-title"><div><h5 class="sidebar-title">Content Management</h5></div></li>
       <li class="sidebar-list">
