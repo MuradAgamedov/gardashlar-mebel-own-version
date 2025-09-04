@@ -133,7 +133,7 @@ class ProductsController extends Controller
      *                     @OA\Items(
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="title", type="string", example="Masa"),
-     *                         @OA\Property(property="card_image", type="string", example="https://admin.gardaslar.coder.az/storage/products/..."),
+     *                         @OA\Property(property="card_image", type="string", example="https://admin.gardaslar.coder.az/storage/products/... or https://admin.gardaslar.coder.az/images/default_image.webp"),
      *                         @OA\Property(property="price", type="number", format="float", example=299.99),
      *                         @OA\Property(property="discount_percent", type="number", format="float", example=10.00),
      *                         @OA\Property(property="view_count", type="integer", example=150),
