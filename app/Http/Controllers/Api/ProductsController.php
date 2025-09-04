@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
+use App\Models\ProductPriceFilter;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -62,6 +63,17 @@ class ProductsController extends Controller
      *                             @OA\Property(property="children", type="array", @OA\Items())
      *                         )
      *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="product_price_filters",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="title", type="string", example="0-100 AZN"),
+     *                         @OA\Property(property="min_price", type="number", format="float", example=0.00),
+     *                         @OA\Property(property="max_price", type="number", format="float", example=100.00),
+     *                         @OA\Property(property="order", type="integer", example=1)
+     *                     )
      *                 )
      *             )
      *         )
@@ -97,30 +109,45 @@ class ProductsController extends Controller
                 ], 400);
             }
 
-            // Debug: Cache-i təmizləyək
-            Cache::forget("product_categories_{$languageId}");
-            
-            $categories = ProductCategory::with(['translates' => function($query) use ($languageId) {
+            $categories = Cache::rememberForever("product_categories_{$languageId}", function () use ($languageId) {
+                return ProductCategory::with(['translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
                 }])
                 ->active()
                 ->ordered()
                 ->get();
-                
-            // Debug: Kateqoriyaları yoxlayaq
-            \Log::info('Categories count: ' . $categories->count());
-            foreach ($categories as $cat) {
-                \Log::info("Category ID: {$cat->id}, Parent ID: " . ($cat->parent_id ?? 'null') . ", Title: " . ($cat->translates->first()->title ?? 'no title'));
-            }
+            });
 
             // Build hierarchical structure
             $categoriesData = $this->buildHierarchy($categories);
+
+            // Get product price filters
+            $priceFilters = Cache::rememberForever("product_price_filters_{$languageId}", function () use ($languageId) {
+                return ProductPriceFilter::with(['translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }])
+                ->active()
+                ->ordered()
+                ->get();
+            });
+
+            $priceFiltersData = $priceFilters->map(function ($filter) {
+                $translation = $filter->translates->first();
+                return [
+                    'id' => $filter->id,
+                    'title' => $translation ? $translation->title : '',
+                    'min_price' => $filter->min_price,
+                    'max_price' => $filter->max_price,
+                    'order' => $filter->order
+                ];
+            });
 
             return response()->json([
                 'success' => true,
                 'message' => 'Product categories retrieved successfully',
                 'data' => [
-                    'categories' => $categoriesData
+                    'categories' => $categoriesData,
+                    'product_price_filters' => $priceFiltersData
                 ]
             ]);
 
