@@ -662,7 +662,6 @@ class ProductsController extends Controller
                  *                     type="array",
                  *                     @OA\Items(
                  *                         @OA\Property(property="id", type="integer", example=1),
-                 *                         @OA\Property(property="order", type="integer", example=1),
                  *                         @OA\Property(property="keyword", type="string", example="Material"),
                  *                         @OA\Property(property="value", type="string", example="Wood")
                  *                     )
@@ -774,7 +773,6 @@ class ProductsController extends Controller
                 $translation = $detail->translates->first();
                 return [
                     'id' => $detail->id,
-                    'order' => $detail->order,
                     'keyword' => $translation ? $translation->keyword : '',
                     'value' => $translation ? $translation->value : ''
                 ];
