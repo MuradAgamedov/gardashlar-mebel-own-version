@@ -99,23 +99,24 @@ class ProductsController extends Controller
      *                     property="categories",
      *                     type="array",
      *                     @OA\Items(
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="title", type="string", example="Ana Kategori"),
-     *                     @OA\Property(property="slug", type="string", example="ana-kategori"),
-     *                     @OA\Property(property="seo_title", type="string", example="Ana Kategori - Gardashlar"),
-     *                     @OA\Property(property="seo_keywords", type="string", example="ana kategori, gardashlar, mebel"),
-     *                     @OA\Property(property="seo_description", type="string", example="Ana kategori haqqında təsvir"),
-     *                     @OA\Property(
-     *                         property="children",
-     *                         type="array",
-     *                         @OA\Items(
-     *                             @OA\Property(property="id", type="integer", example=2),
-     *                             @OA\Property(property="title", type="string", example="Alt Kategori 1"),
-     *                             @OA\Property(property="slug", type="string", example="alt-kategori-1"),
-     *                             @OA\Property(property="seo_title", type="string", example="Alt Kategori 1 - Gardashlar"),
-     *                             @OA\Property(property="seo_keywords", type="string", example="alt kategori, gardashlar"),
-     *                             @OA\Property(property="seo_description", type="string", example="Alt kategori haqqında təsvir"),
-     *                             @OA\Property(property="children", type="array", @OA\Items())
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="title", type="string", example="Ana Kategori"),
+     *                         @OA\Property(property="slug", type="string", example="ana-kategori"),
+     *                         @OA\Property(property="seo_title", type="string", example="Ana Kategori - Gardashlar"),
+     *                         @OA\Property(property="seo_keywords", type="string", example="ana kategori, gardashlar, mebel"),
+     *                         @OA\Property(property="seo_description", type="string", example="Ana kategori haqqında təsvir"),
+     *                         @OA\Property(
+     *                             property="children",
+     *                             type="array",
+     *                             @OA\Items(
+     *                                 @OA\Property(property="id", type="integer", example=2),
+     *                                 @OA\Property(property="title", type="string", example="Alt Kategori 1"),
+     *                                 @OA\Property(property="slug", type="string", example="alt-kategori-1"),
+     *                                 @OA\Property(property="seo_title", type="string", example="Alt Kategori 1 - Gardashlar"),
+     *                                 @OA\Property(property="seo_keywords", type="string", example="alt kategori, gardashlar"),
+     *                                 @OA\Property(property="seo_description", type="string", example="Alt kategori haqqında təsvir"),
+     *                                 @OA\Property(property="children", type="array", @OA\Items())
+     *                             )
      *                         )
      *                     )
      *                 ),
