@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\BecomeAInvestor;
 use App\Models\BecomeAInvestorAdvantage;
+use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -15,6 +16,7 @@ use OpenApi\Annotations as OA;
  */
 class BecomeAInvestorController extends Controller
 {
+    use LocaleFromHeader;
     /**
      * @OA\Get(
      *     path="/api/become-a-investor",
@@ -75,7 +77,7 @@ class BecomeAInvestorController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $languageId = $request->header('locale', 3);
+            $languageId = $this->getLanguageIdFromHeader($request);
             $cacheKey = "api_become_a_investor_{$languageId}";
             
             $data = Cache::rememberForever($cacheKey, function () use ($languageId) {

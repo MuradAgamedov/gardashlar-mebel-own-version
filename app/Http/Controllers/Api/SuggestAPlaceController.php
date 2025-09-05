@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\SuggestAPlace;
+use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -14,6 +15,7 @@ use OpenApi\Annotations as OA;
  */
 class SuggestAPlaceController extends Controller
 {
+    use LocaleFromHeader;
     /**
      * @OA\Get(
      *     path="/api/suggest-a-place",
@@ -30,7 +32,7 @@ class SuggestAPlaceController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $languageId = $request->header('locale', 3);
+            $languageId = $this->getLanguageIdFromHeader($request);
             $cacheKey = "api_suggest_a_place_{$languageId}";
             
             $data = Cache::rememberForever($cacheKey, function () use ($languageId) {

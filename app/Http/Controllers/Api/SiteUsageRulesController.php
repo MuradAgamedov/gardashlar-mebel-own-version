@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Traits\LocaleFromHeader;
 use App\Models\SiteUsageRules;
 use App\Models\Language;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 
 class SiteUsageRulesController extends Controller
 {
+    use LocaleFromHeader;
     /**
      * @OA\Get(
      *     path="/api/site-usage-rules",
@@ -59,7 +61,7 @@ class SiteUsageRulesController extends Controller
     {
         try {
             // Get language ID from header
-            $languageId = $request->header('locale', 1); // Default to Azerbaijani (1)
+            $languageId = $this->getLanguageIdFromHeader($request); // Default to Azerbaijani (1)
             
             // Validate language ID
             $language = Language::find($languageId);

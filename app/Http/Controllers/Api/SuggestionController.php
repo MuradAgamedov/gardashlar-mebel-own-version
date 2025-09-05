@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Suggestion;
 use App\Models\Language;
+use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Cache;
  */
 class SuggestionController extends Controller
 {
+    use LocaleFromHeader;
     /**
      * @OA\Get(
      *     path="/api/suggestions",
@@ -70,7 +72,7 @@ class SuggestionController extends Controller
     public function index(Request $request)
     {
         try {
-            $languageId = $request->header('locale', 1);
+            $languageId = $this->getLanguageIdFromHeader($request);
             $language = Language::find($languageId);
             
             if (!$language) {
@@ -174,7 +176,7 @@ class SuggestionController extends Controller
     public function show(Request $request, $id)
     {
         try {
-            $languageId = $request->header('locale', 1);
+            $languageId = $this->getLanguageIdFromHeader($request);
             $language = Language::find($languageId);
             
             if (!$language) {

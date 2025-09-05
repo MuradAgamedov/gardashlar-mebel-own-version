@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Kiv;
 use App\Models\KivCategory;
+use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -15,6 +16,7 @@ use OpenApi\Annotations as OA;
  */
 class KivController extends Controller
 {
+    use LocaleFromHeader;
     /**
      * @OA\Get(
      *     path="/api/kivs",
@@ -61,7 +63,7 @@ class KivController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $languageId = $request->header('locale', 3);
+            $languageId = $this->getLanguageIdFromHeader($request);
             $cacheKey = "api_kivs_{$languageId}";
             
             $data = Cache::rememberForever($cacheKey, function () use ($languageId) {
