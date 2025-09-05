@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use OpenApi\Annotations as OA;
-
+use App\Traits\LocaleFromHeader;
 /**
  * @OA\Tag(
  *     name="Become A Partner",
@@ -18,6 +18,7 @@ use OpenApi\Annotations as OA;
  */
 class BecomeAPartnerController extends Controller
 {
+    use LocaleFromHeader;
     /**
      * @OA\Get(
      *     path="/api/become-a-partner",
@@ -83,7 +84,7 @@ class BecomeAPartnerController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $languageId = $request->header('locale', 3); // Default to Azerbaijani
+            $languageId = $this->getLanguageIdFromHeader($request);
             $cacheKey = "api_become_a_partner_{$languageId}";
             
             $data = Cache::rememberForever($cacheKey, function () use ($languageId) {
