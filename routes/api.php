@@ -99,6 +99,7 @@ Route::get('/home-page-project-categories', [HomePageProjectCategoryController::
 Route::get('/project-categories', [ProjectCategoryController::class, 'index'])->name('api.project-categories.index');
 
 // Projects API Routes
+Route::get('/projects', [ProjectController::class, 'getAllProjects'])->name('api.projects.all');
 Route::get('/projects/{slug}', [ProjectController::class, 'getByCategorySlug'])->name('api.projects.by-category');
 Route::get('/project/{slug}', [ProjectController::class, 'getBySlug'])->name('api.project.details');
 

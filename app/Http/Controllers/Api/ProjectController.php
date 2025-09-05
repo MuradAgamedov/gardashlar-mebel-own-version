@@ -20,6 +20,149 @@ class ProjectController extends Controller
 
     /**
      * @OA\Get(
+     *     path="/projects",
+     *     operationId="getAllProjects",
+     *     tags={"Projects"},
+     *     summary="Get all projects",
+     *     description="Returns paginated active projects with title, slug, company name and main image",
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number for pagination",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1, default=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Number of items per page",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=9, default=9)
+     *     ),
+     *     @OA\Parameter(
+     *         name="Accept-Language",
+     *         in="header",
+     *         description="Language code (az, en, ru)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="az")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object", 
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="title", type="string", example="Modern Sofa Design"),
+     *                 @OA\Property(property="slug", type="string", example="modern-sofa-design"),
+     *                 @OA\Property(property="company_name", type="string", example="Gardashlar Furniture"),
+     *                 @OA\Property(property="main_image", type="string", example="https://example.com/storage/projects/image.jpg")
+     *             )),
+     *             @OA\Property(property="pagination", type="object",
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="per_page", type="integer", example=9),
+     *                 @OA\Property(property="total", type="integer", example=18),
+     *                 @OA\Property(property="last_page", type="integer", example=2),
+     *                 @OA\Property(property="from", type="integer", example=1),
+     *                 @OA\Property(property="to", type="integer", example=9)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error occurred while getting projects"),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
+     */
+    public function getAllProjects(Request $request): JsonResponse
+    {
+        try {
+            $languageId = $this->getLanguageIdFromHeader($request);
+            $page = $request->get('page', 1);
+            $perPage = $request->get('per_page', 9);
+            $cacheKey = "api:projects:all:lang:{$languageId}:page:{$page}:per_page:{$perPage}";
+            
+            $data = Cache::rememberForever($cacheKey, function () use ($languageId, $page, $perPage) {
+                // Get all projects with pagination
+                $projectsQuery = Project::with([
+                    'translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'images' => function($query) {
+                        $query->where('is_main_image', true)->where('status', true);
+                    }
+                ])
+                ->active()
+                ->ordered();
+
+                // Apply pagination
+                $projects = $projectsQuery->paginate($perPage, ['*'], 'page', $page);
+
+                // Transform the data
+                $transformedData = $projects->getCollection()->map(function ($project) use ($languageId) {
+                    // Get translation for the specified language
+                    $translation = $project->translates()
+                        ->where('language_id', $languageId)
+                        ->first();
+                    
+                    // If no translation found, get the first available translation
+                    if (!$translation) {
+                        $translation = $project->translates()->first();
+                    }
+
+                    // Get main image
+                    $mainImage = $project->images()->where('is_main_image', true)->where('status', true)->first();
+
+                    return [
+                        'id' => $project->id,
+                        'title' => $translation ? $translation->title : null,
+                        'slug' => $translation ? $translation->slug : null,
+                        'company_name' => $translation ? $translation->company_name : null,
+                        'main_image' => $mainImage ? $mainImage->image_url : asset('images/default_image.webp')
+                    ];
+                })->filter(function ($item) {
+                    // Filter out items without title or slug
+                    return !empty($item['title']) && !empty($item['slug']);
+                })->values();
+
+                // Create pagination info
+                $pagination = [
+                    'current_page' => $projects->currentPage(),
+                    'per_page' => $projects->perPage(),
+                    'total' => $projects->total(),
+                    'last_page' => $projects->lastPage(),
+                    'from' => $projects->firstItem(),
+                    'to' => $projects->lastItem()
+                ];
+
+                return [
+                    'data' => $transformedData,
+                    'pagination' => $pagination
+                ];
+            });
+
+            return response()->json([
+                'success' => true, 
+                'data' => $data['data'], 
+                'pagination' => $data['pagination']
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Layihələr əldə edilərkən xəta baş verdi: ' . $e->getMessage(), 
+                'data' => [],
+                'pagination' => null
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Get(
      *     path="/projects/{slug}",
      *     operationId="getProjectsByCategorySlug",
      *     tags={"Projects"},
