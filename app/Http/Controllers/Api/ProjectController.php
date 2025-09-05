@@ -233,10 +233,7 @@ class ProjectController extends Controller
      *                 @OA\Property(property="slug", type="string", example="modern-soft-furniture-design"),
      *                 @OA\Property(property="company_name", type="string", example="Gardashlar Furniture"),
      *                 @OA\Property(property="description", type="string", example="Modern soft furniture design description"),
-     *                 @OA\Property(property="category", type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="title", type="string", example="Yumşaq Mebellər")
-     *                 ),
+     *                 @OA\Property(property="category_slug", type="string", example="yumshaq-mebeller"),
      *                 @OA\Property(property="images", type="array", @OA\Items(type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="image_url", type="string", example="https://example.com/storage/projects/image.jpg"),
@@ -328,11 +325,7 @@ class ProjectController extends Controller
                     'slug' => $translation ? $translation->slug : null,
                     'company_name' => $translation ? $translation->company_name : null,
                     'description' => $translation ? $translation->description : null,
-                    'category' => [
-                        'id' => $project->category->id,
-                        'title' => $categoryTranslation ? $categoryTranslation->title : null,
-                        'slug' => $categoryTranslation ? $categoryTranslation->slug : null
-                    ],
+                    'category_slug' => $categoryTranslation ? $categoryTranslation->slug : null,
                     'images' => $project->images->map(function ($image) {
                         return [
                             'id' => $image->id,
