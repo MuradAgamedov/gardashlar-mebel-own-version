@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Cache;
 class ProductsController extends Controller
 {
     use LocaleFromHeader;
+
     /**
      * @OA\Get(
      *     path="/api/products",
