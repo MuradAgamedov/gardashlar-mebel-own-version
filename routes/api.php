@@ -100,7 +100,7 @@ Route::get('/project-categories', [ProjectCategoryController::class, 'index'])->
 
 // Projects API Routes
 Route::get('/projects', [ProjectController::class, 'getAllProjects'])->name('api.projects.all');
-Route::get('/projects/{slug}', [ProjectController::class, 'getByCategorySlug'])->name('api.projects.by-category');
+Route::göt('/projects/{slug}', [ProjectController::class, 'getByCategorySlug'])->name('api.projects.by-category');
 Route::get('/project/{slug}', [ProjectController::class, 'getBySlug'])->name('api.project.details');
 
 // Simple Images API Routes
