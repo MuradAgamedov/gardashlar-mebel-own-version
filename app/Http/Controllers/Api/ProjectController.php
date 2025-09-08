@@ -408,6 +408,14 @@ class ProjectController extends Controller
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="video_link", type="string", example="https://youtube.com/watch?v=example"),
      *                     @OA\Property(property="order", type="integer", example=1)
+     *                 )),
+     *                 @OA\Property(property="similar_projects", type="array", @OA\Items(type="object",
+     *                     @OA\Property(property="id", type="integer", example=2),
+     *                     @OA\Property(property="title", type="string", example="Similar Project"),
+     *                     @OA\Property(property="slug", type="string", example="similar-project"),
+     *                     @OA\Property(property="company_name", type="string", example="Similar Company"),
+     *                     @OA\Property(property="category_slug", type="string", example="category-slug"),
+     *                     @OA\Property(property="main_image", type="string", example="https://example.com/similar-image.jpg")
      *                 ))
      *             )
      *         )
@@ -482,6 +490,34 @@ class ProjectController extends Controller
                 if (!$categoryTranslation) {
                     $categoryTranslation = $project->category->translates()->first();
                 }
+
+                // Get similar projects (same category, excluding current project)
+                $similarProjects = Project::with([
+                    'translates' => fn($q) => $q->where('language_id', $languageId),
+                    'category.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'images' => fn($q) => $q->where('is_main_image', true)->where('status', true)
+                ])
+                ->where('project_category_id', $project->project_category_id)
+                ->where('id', '!=', $project->id)
+                ->active()
+                ->ordered()
+                ->limit(4)
+                ->get()
+                ->map(function ($similarProject) use ($languageId) {
+                    $similarTranslation = $similarProject->translates->first();
+                    $similarCategoryTranslation = $similarProject->category->translates->first();
+                    $similarMainImage = $similarProject->images->first();
+                    
+                    return [
+                        'id' => $similarProject->id,
+                        'title' => $similarTranslation ? $similarTranslation->title : null,
+                        'slug' => $similarTranslation ? $similarTranslation->slug : null,
+                        'company_name' => $similarTranslation ? $similarTranslation->company_name : null,
+                        'category_slug' => $similarCategoryTranslation ? $similarCategoryTranslation->slug : null,
+                        'main_image' => $similarMainImage ? $similarMainImage->image_url : asset('images/default_image.webp')
+                    ];
+                });
+
                 return [
                     'id' => $project->id,
                     'title' => $translation ? $translation->title : null,
@@ -496,15 +532,14 @@ class ProjectController extends Controller
                             'is_main_image' => $image->is_main_image,
                         ];
                     }),
-                 
-
                     'videos' => $project->videos->map(function ($video) {
                         return [
                             'id' => $video->id,
                             'video_link' => $video->video_link,
                             'video_id' => explode("?",$video->video_link)[1]
                         ];
-                    })
+                    }),
+                    'similar_projects' => $similarProjects
                 ];
             });
 
