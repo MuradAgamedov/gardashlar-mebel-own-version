@@ -1197,7 +1197,7 @@ class ProductsController extends Controller
  *         @OA\JsonContent(
  *             @OA\Property(property="success", type="boolean", example=false),
  *             @OA\Property(property="message", type="string", example="Məhsul tapılmadı"),
- *             @OA\Property(property="data", type="null")
+ *             @OA\Property(property="data", type="object", nullable=true, example=null)
  *         )
  *     )
  * )
