@@ -482,7 +482,7 @@ class ProjectController extends Controller
                 if (!$categoryTranslation) {
                     $categoryTranslation = $project->category->translates()->first();
                 }
-
+                $videoId = explode('?',$video->video_link)[1];
                 return [
                     'id' => $project->id,
                     'title' => $translation ? $translation->title : null,
@@ -495,14 +495,15 @@ class ProjectController extends Controller
                             'id' => $image->id,
                             'image_url' => $image->image_url,
                             'is_main_image' => $image->is_main_image,
-                            'order' => $image->order
                         ];
                     }),
+                 
+
                     'videos' => $project->videos->map(function ($video) {
                         return [
                             'id' => $video->id,
                             'video_link' => $video->video_link,
-                            'order' => $video->order
+                            'video_id' = $videoId
                         ];
                     })
                 ];

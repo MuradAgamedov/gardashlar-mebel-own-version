@@ -74,6 +74,14 @@ class Product extends Model
         return $this->hasMany(ProductDetailValue::class);
     }
 
+    /**
+     * Get the favorites for this product
+     */
+    public function favorites()
+    {
+        return $this->hasMany(ProductFavorite::class);
+    }
+
     // Scopes
     public function scopeActive($query)
     {
