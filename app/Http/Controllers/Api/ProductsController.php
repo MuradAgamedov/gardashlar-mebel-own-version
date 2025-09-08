@@ -1176,7 +1176,7 @@ class ProductsController extends Controller
      *         required=true,
      *         @OA\Schema(type="integer", example=1)
      *     ),
-     *     @OA\SecurityRequirement(name="bearerAuth")
+     *     @OA\SecurityRequirement(name="bearerAuth"),
      *     @OA\Response(
      *         response=200,
      *         description="Product added to favorites successfully",
@@ -1248,7 +1248,7 @@ class ProductsController extends Controller
      *         required=true,
      *         @OA\Schema(type="integer", example=1)
      *     ),
-     *     @OA\SecurityRequirement(name="bearerAuth")
+     *     @OA\SecurityRequirement(name="bearerAuth"),
      *     @OA\Response(
      *         response=200,
      *         description="Product removed from favorites successfully",
@@ -1313,7 +1313,7 @@ class ProductsController extends Controller
      *     tags={"Products"},
      *     summary="Get user's favorite products",
      *     description="Returns paginated list of user's favorite products",
-     *     @OA\SecurityRequirement(name="bearerAuth")
+     *     @OA\SecurityRequirement(name="bearerAuth"),
      *     @OA\Parameter(
      *         name="page",
      *         in="query",
@@ -1464,7 +1464,7 @@ class ProductsController extends Controller
      *         required=true,
      *         @OA\Schema(type="integer", example=1)
      *     ),
-     *     @OA\SecurityRequirement(name="bearerAuth")
+     *     @OA\SecurityRequirement(name="bearerAuth"),
      *     @OA\Response(
      *         response=200,
      *         description="Product added to compare list successfully",
@@ -1566,7 +1566,7 @@ class ProductsController extends Controller
      *         required=true,
      *         @OA\Schema(type="integer", example=1)
      *     ),
-     *     @OA\SecurityRequirement(name="bearerAuth")
+     *     @OA\SecurityRequirement(name="bearerAuth"),
      *     @OA\Response(
      *         response=200,
      *         description="Product removed from compare list successfully",
@@ -1635,7 +1635,7 @@ class ProductsController extends Controller
      *     tags={"Products"},
      *     summary="Get user's compare list",
      *     description="Returns list of user's products in compare list",
-     *     @OA\SecurityRequirement(name="bearerAuth")
+     *     @OA\SecurityRequirement(name="bearerAuth"),
      *     @OA\Parameter(
      *         name="locale",
      *         in="header",
@@ -1795,7 +1795,7 @@ class ProductsController extends Controller
      *     tags={"Products"},
      *     summary="Clear user's compare list",
      *     description="Remove all products from user's compare list",
-     *     @OA\SecurityRequirement(name="bearerAuth")
+     *     @OA\SecurityRequirement(name="bearerAuth"),
      *     @OA\Response(
      *         response=200,
      *         description="Compare list cleared successfully",
