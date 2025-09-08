@@ -482,7 +482,6 @@ class ProjectController extends Controller
                 if (!$categoryTranslation) {
                     $categoryTranslation = $project->category->translates()->first();
                 }
-                $videoId = explode("?",$video->video_link)[1];
                 return [
                     'id' => $project->id,
                     'title' => $translation ? $translation->title : null,
@@ -503,7 +502,7 @@ class ProjectController extends Controller
                         return [
                             'id' => $video->id,
                             'video_link' => $video->video_link,
-                            'video_id' = $videoId
+                            'video_id' => explode("?",$video->video_link)[1]
                         ];
                     })
                 ];
