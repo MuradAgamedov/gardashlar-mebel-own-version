@@ -61,6 +61,16 @@ class BlogPostController extends Controller
      *             example="technology"
      *         )
      *     ),
+     *     @OA\Parameter(
+     *         name="sort",
+     *         in="query",
+     *         description="Sort blog posts by: newest, oldest",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string",
+     *             example="newest"
+     *         )
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful response",
@@ -108,19 +118,30 @@ class BlogPostController extends Controller
             $page = $request->get('page', 1);
             $perPage = min($request->get('per_page', 10), 50); // Max 50 per page
             $categorySlug = $request->get('category_slug');
+            $sort = $request->get('sort', 'newest');
             
-            $cacheKey = "api:blog-posts:lang:{$languageId}:page:{$page}:per_page:{$perPage}";
+            $cacheKey = "api:blog-posts:lang:{$languageId}:page:{$page}:per_page:{$perPage}:sort:{$sort}";
             if ($categorySlug) {
                 $cacheKey .= ":category:{$categorySlug}";
             }
 
-            $blogPosts = Cache::remember($cacheKey, 3600, function () use ($languageId, $page, $perPage, $categorySlug) {
+            $blogPosts = Cache::remember($cacheKey, 3600, function () use ($languageId, $page, $perPage, $categorySlug, $sort) {
                 $query = BlogPost::published()
                     ->with([
                         'translates' => fn($q) => $q->where('language_id', $languageId),
                         'category.translates' => fn($q) => $q->where('language_id', $languageId)
-                    ])
-                    ->orderBy('published_at', 'desc');
+                    ]);
+
+                // Apply sorting
+                switch ($sort) {
+                    case 'oldest':
+                        $query->orderBy('published_at', 'asc');
+                        break;
+                    case 'newest':
+                    default:
+                        $query->orderBy('published_at', 'desc');
+                        break;
+                }
 
                 // Filter by category slug if provided
                 if ($categorySlug) {
