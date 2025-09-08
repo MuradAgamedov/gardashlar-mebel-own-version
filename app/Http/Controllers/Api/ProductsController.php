@@ -1163,46 +1163,46 @@ class ProductsController extends Controller
     }
 
    /**
- * @OA\Post(
- *     path="/api/products/{id}/favorite",
- *     operationId="addProductToFavorites",
- *     tags={"Products"},
- *     summary="Add product to favorites",
- *     description="Add a product to user's favorites list",
- *     @OA\Parameter(
- *         name="id",
- *         in="path",
- *         description="Product ID",
- *         required=true,
- *         @OA\Schema(
- *             type="integer",
- *             example=1
- *         )
- *     ),
- *     @OA\SecurityRequirement(name="bearerAuth"),
- *     @OA\Response(
- *         response=200,
- *         description="Product added to favorites successfully",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean", example=true),
- *             @OA\Property(property="message", type="string", example="Məhsul seçilmişlərə əlavə edildi"),
- *             @OA\Property(property="data", type="object",
- *                 properties={
- *                     @OA\Property(property="is_favorited", type="boolean", example=true)
- *                 }
- *             )
- *         )
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="Product not found",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean", example=false),
- *             @OA\Property(property="message", type="string", example="Məhsul tapılmadı"),
- *             @OA\Property(property="data", type="object", nullable=true, example=null)
- *         )
- *     )
- * )
+    * @OA\Post(
+    *     path="/api/products/{id}/favorite",
+    *     operationId="addProductToFavorites",
+    *     tags={"Products"},
+    *     summary="Add product to favorites",
+    *     description="Add a product to user's favorites list",
+    *     @OA\Parameter(
+    *         name="id",
+    *         in="path",
+    *         description="Product ID",
+    *         required=true,
+    *         @OA\Schema(
+    *             type="integer",
+    *             example=1
+    *         )
+    *     ),
+    *     @OA\SecurityRequirement(name="bearerAuth"),
+    *     @OA\Response(
+    *         response=200,
+    *         description="Product added to favorites successfully",
+    *         @OA\JsonContent(
+    *             @OA\Property(property="success", type="boolean", example=true),
+    *             @OA\Property(property="message", type="string", example="Məhsul seçilmişlərə əlavə edildi"),
+    *             @OA\Property(property="data", type="object",
+    *                 properties={
+    *                     @OA\Property(property="is_favorited", type="boolean", example=true)
+    *                 }
+    *             )
+    *         )
+    *     ),
+    *     @OA\Response(
+    *         response=404,
+    *         description="Product not found",
+    *         @OA\JsonContent(
+    *             @OA\Property(property="success", type="boolean", example=false),
+    *             @OA\Property(property="message", type="string", example="Məhsul tapılmadı"),
+    *             @OA\Property(property="data", type="object", nullable=true, example=null)
+    *         )
+    *     )
+    * )
  */
 
     public function addToFavorites(Request $request, int $id)
