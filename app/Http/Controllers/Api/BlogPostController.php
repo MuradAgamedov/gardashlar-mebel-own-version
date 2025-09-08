@@ -260,6 +260,19 @@ class BlogPostController extends Controller
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="image_url", type="string", example="https://example.com/storage/uploads/blogs/images/image1.jpg")
      *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="similar_blogs",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=2),
+     *                         @OA\Property(property="title", type="string", example="Similar Blog Post"),
+     *                         @OA\Property(property="slug", type="string", example="similar-blog-post"),
+     *                         @OA\Property(property="card_image_url", type="string", example="https://example.com/similar-image.jpg"),
+     *                         @OA\Property(property="card_description", type="string", example="Similar blog description"),
+     *                         @OA\Property(property="published_at", type="string", example="2024-01-02T00:00:00.000000Z")
+     *                     )
      *                 )
      *             )
      *         )
@@ -314,6 +327,28 @@ class BlogPostController extends Controller
             $translate = $blogPost->translates->first();
             $categoryTranslate = $blogPost->category->translates->first();
 
+            // Get similar blogs (same category, excluding current blog)
+            $similarBlogs = BlogPost::published()
+                ->with([
+                    'translates' => fn($q) => $q->where('language_id', $languageId)
+                ])
+                ->where('blog_category_id', $blogPost->blog_category_id)
+                ->where('id', '!=', $blogPost->id)
+                ->orderBy('published_at', 'desc')
+                ->limit(4)
+                ->get()
+                ->map(function ($similarBlog) {
+                    $similarTranslate = $similarBlog->translates->first();
+                    return [
+                        'id' => $similarBlog->id,
+                        'title' => $similarTranslate->title ?? null,
+                        'slug' => $similarTranslate->slug ?? null,
+                        'card_image_url' => $similarBlog->card_image ? asset('storage/' . $similarBlog->card_image) : asset('images/default_image.webp'),
+                        'card_description' => $similarTranslate->card_description ?? null,
+                        'published_at' => $similarBlog->published_at
+                    ];
+                });
+
             $data = [
                 'id' => $blogPost->id,
                 'title' => $translate->title ?? null,
@@ -333,7 +368,8 @@ class BlogPostController extends Controller
                         'id' => $image->id,
                         'image_url' => $image->image_url ? asset('storage/' . $image->image_url) : asset('images/default_image.webp')
                     ];
-                })
+                }),
+                'similar_blogs' => $similarBlogs
             ];
 
             return response()->json([
