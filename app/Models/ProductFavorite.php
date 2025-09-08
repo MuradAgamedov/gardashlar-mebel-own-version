@@ -5,18 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProjectFavorite extends Model
+class ProductFavorite extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'user_id',
-        'project_id',
+        'product_id',
     ];
 
     protected $casts = [
         'user_id' => 'integer',
-        'project_id' => 'integer',
+        'product_id' => 'integer',
     ];
 
     /**
@@ -28,41 +28,41 @@ class ProjectFavorite extends Model
     }
 
     /**
-     * Get the project that is favorited
+     * Get the product that is favorited
      */
-    public function project()
+    public function product()
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(Product::class);
     }
 
     /**
-     * Check if a user has favorited a specific project
+     * Check if a user has favorited a specific product
      */
-    public static function isFavorited($userId, $projectId)
+    public static function isFavorited($userId, $productId)
     {
         return static::where('user_id', $userId)
-                    ->where('project_id', $projectId)
+                    ->where('product_id', $productId)
                     ->exists();
     }
 
     /**
-     * Add a project to favorites
+     * Add a product to favorites
      */
-    public static function addToFavorites($userId, $projectId)
+    public static function addToFavorites($userId, $productId)
     {
         return static::firstOrCreate([
             'user_id' => $userId,
-            'project_id' => $projectId,
+            'product_id' => $productId,
         ]);
     }
 
     /**
-     * Remove a project from favorites
+     * Remove a product from favorites
      */
-    public static function removeFromFavorites($userId, $projectId)
+    public static function removeFromFavorites($userId, $productId)
     {
         return static::where('user_id', $userId)
-                    ->where('project_id', $projectId)
+                    ->where('product_id', $productId)
                     ->delete();
     }
 }

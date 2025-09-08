@@ -9,6 +9,7 @@ use App\Models\ProductColor;
 use App\Models\ProductType;
 use App\Models\ProductPageCategory;
 use App\Models\Product;
+use App\Models\ProductFavorite;
 use App\Models\Dictionary;
 use App\Models\Language;
 use App\Traits\LocaleFromHeader;
@@ -1149,6 +1150,337 @@ class ProductsController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error retrieving product detail value details: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/products/{id}/favorite",
+     *     operationId="addProductToFavorites",
+     *     tags={"Products"},
+     *     summary="Add product to favorites",
+     *     description="Add a product to user's favorites list",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Product ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="user_id",
+     *         in="query",
+     *         description="User ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Product added to favorites successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Məhsul seçilmişlərə əlavə edildi"),
+     *             @OA\Property(property="data", type="object", 
+     *                 @OA\Property(property="is_favorited", type="boolean", example=true)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Product not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Məhsul tapılmadı"),
+     *             @OA\Property(property="data", type="null")
+     *         )
+     *     )
+     * )
+     */
+    public function addToFavorites(Request $request, int $id)
+    {
+        try {
+            $userId = $request->get('user_id');
+            
+            if (!$userId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'İstifadəçi ID tələb olunur',
+                    'data' => null
+                ], 400);
+            }
+
+            // Check if product exists
+            $product = Product::active()->find($id);
+            if (!$product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Məhsul tapılmadı',
+                    'data' => null
+                ], 404);
+            }
+
+            // Add to favorites
+            ProductFavorite::addToFavorites($userId, $id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Məhsul seçilmişlərə əlavə edildi',
+                'data' => [
+                    'is_favorited' => true
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Məhsul seçilmişlərə əlavə edilərkən xəta baş verdi: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/products/{id}/favorite",
+     *     operationId="removeProductFromFavorites",
+     *     tags={"Products"},
+     *     summary="Remove product from favorites",
+     *     description="Remove a product from user's favorites list",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Product ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="user_id",
+     *         in="query",
+     *         description="User ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Product removed from favorites successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Məhsul seçilmişlərdən silindi"),
+     *             @OA\Property(property="data", type="object", 
+     *                 @OA\Property(property="is_favorited", type="boolean", example=false)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Product not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Məhsul tapılmadı"),
+     *             @OA\Property(property="data", type="null")
+     *         )
+     *     )
+     * )
+     */
+    public function removeFromFavorites(Request $request, int $id)
+    {
+        try {
+            $userId = $request->get('user_id');
+            
+            if (!$userId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'İstifadəçi ID tələb olunur',
+                    'data' => null
+                ], 400);
+            }
+
+            // Check if product exists
+            $product = Product::active()->find($id);
+            if (!$product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Məhsul tapılmadı',
+                    'data' => null
+                ], 404);
+            }
+
+            // Remove from favorites
+            ProductFavorite::removeFromFavorites($userId, $id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Məhsul seçilmişlərdən silindi',
+                'data' => [
+                    'is_favorited' => false
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Məhsul seçilmişlərdən silinərkən xəta baş verdi: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/products/favorites",
+     *     operationId="getUserFavorites",
+     *     tags={"Products"},
+     *     summary="Get user's favorite products",
+     *     description="Returns paginated list of user's favorite products",
+     *     @OA\Parameter(
+     *         name="user_id",
+     *         in="query",
+     *         description="User ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number for pagination",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=1, default=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         description="Number of items per page",
+     *         required=false,
+     *         @OA\Schema(type="integer", example=12, default=12)
+     *     ),
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language code (az, en, ru)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="az")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object", 
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="title", type="string", example="Modern Masa"),
+     *                 @OA\Property(property="slug", type="string", example="modern-masa"),
+     *                 @OA\Property(property="price", type="number", example=299.99),
+     *                 @OA\Property(property="discount_percent", type="number", example=10),
+     *                 @OA\Property(property="main_image", type="string", example="https://example.com/storage/products/image.jpg")
+     *             )),
+     *             @OA\Property(property="pagination", type="object",
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="per_page", type="integer", example=12),
+     *                 @OA\Property(property="total", type="integer", example=25),
+     *                 @OA\Property(property="last_page", type="integer", example=3),
+     *                 @OA\Property(property="from", type="integer", example=1),
+     *                 @OA\Property(property="to", type="integer", example=12)
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function getFavorites(Request $request)
+    {
+        try {
+            $userId = $request->get('user_id');
+            
+            if (!$userId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'İstifadəçi ID tələb olunur',
+                    'data' => [],
+                    'pagination' => null
+                ], 400);
+            }
+
+            $languageId = $this->getLanguageIdFromHeader($request);
+            $page = $request->get('page', 1);
+            $perPage = $request->get('per_page', 12);
+            $cacheKey = "api:products:favorites:user:{$userId}:lang:{$languageId}:page:{$page}:per_page:{$perPage}";
+            
+            $data = Cache::rememberForever($cacheKey, function () use ($userId, $languageId, $page, $perPage) {
+                // Get user's favorite products with pagination
+                $favoritesQuery = ProductFavorite::with([
+                    'product.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'product.images' => function($query) {
+                        $query->where('status', true)->orderBy('order');
+                    }
+                ])
+                ->where('user_id', $userId)
+                ->whereHas('product', function($query) {
+                    $query->active();
+                });
+
+                // Apply pagination
+                $favorites = $favoritesQuery->paginate($perPage, ['*'], 'page', $page);
+
+                // Transform the data
+                $transformedData = $favorites->getCollection()->map(function ($favorite) use ($languageId) {
+                    $product = $favorite->product;
+                    
+                    // Get translation for the specified language
+                    $translation = $product->translates()
+                        ->where('language_id', $languageId)
+                        ->first();
+                    
+                    // If no translation found, get the first available translation
+                    if (!$translation) {
+                        $translation = $product->translates()->first();
+                    }
+
+                    // Get main image
+                    $mainImage = $product->images()->where('status', true)->first();
+
+                    return [
+                        'id' => $product->id,
+                        'title' => $translation ? $translation->title : null,
+                        'slug' => $translation ? $translation->slug : null,
+                        'price' => $product->price,
+                        'discount_percent' => $product->discount_percent,
+                        'main_image' => $mainImage ? $mainImage->image_url : asset('images/default_image.webp')
+                    ];
+                })->filter(function ($item) {
+                    // Filter out items without title or slug
+                    return !empty($item['title']) && !empty($item['slug']);
+                })->values();
+
+                // Create pagination info
+                $pagination = [
+                    'current_page' => $favorites->currentPage(),
+                    'per_page' => $favorites->perPage(),
+                    'total' => $favorites->total(),
+                    'last_page' => $favorites->lastPage(),
+                    'from' => $favorites->firstItem(),
+                    'to' => $favorites->lastItem()
+                ];
+
+                return [
+                    'data' => $transformedData,
+                    'pagination' => $pagination
+                ];
+            });
+
+            return response()->json([
+                'success' => true, 
+                'data' => $data['data'], 
+                'pagination' => $data['pagination']
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Seçilmiş məhsullar əldə edilərkən xəta baş verdi: ' . $e->getMessage(),
+                'data' => [],
+                'pagination' => null
             ], 500);
         }
     }

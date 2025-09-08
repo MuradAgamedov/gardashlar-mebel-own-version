@@ -61,6 +61,14 @@ class Project extends Model
     }
 
     /**
+     * Get the favorites for this project
+     */
+    public function favorites()
+    {
+        return $this->hasMany(ProjectFavorite::class);
+    }
+
+    /**
      * Scope for active projects
      */
     public function scopeActive($query)
