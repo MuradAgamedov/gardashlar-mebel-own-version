@@ -82,10 +82,23 @@
                                                         <input type="text" 
                                                                class="form-control @error('translations.' . $language->id . '.title') is-invalid @enderror" 
                                                                name="translations[{{ $language->id }}][title]" 
+                                                               id="title_{{ $language->id }}"
                                                                value="{{ old('translations.' . $language->id . '.title') }}" 
                                                                placeholder="Enter title for {{ $language->title }}"
                                                                required>
                                                         @error('translations.' . $language->id . '.title')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Slug</label>
+                                                        <input type="text" 
+                                                               class="form-control @error('translations.' . $language->id . '.slug') is-invalid @enderror" 
+                                                               name="translations[{{ $language->id }}][slug]" 
+                                                               id="slug_{{ $language->id }}"
+                                                               value="{{ old('translations.' . $language->id . '.slug') }}" 
+                                                               placeholder="Auto-generated from title">
+                                                        @error('translations.' . $language->id . '.slug')
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>
