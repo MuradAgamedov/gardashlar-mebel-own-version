@@ -1585,8 +1585,10 @@ class ProductsController extends Controller
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Məhsul müqayisə siyahısından silindi"),
      *             @OA\Property(property="data", type="object", 
-     *                 @OA\Property(property="is_compared", type="boolean", example=false),
-     *                 @OA\Property(property="compare_count", type="integer", example=1)
+     *                 properties={
+     *                     @OA\Property(property="is_compared", type="boolean", example=false),
+     *                     @OA\Property(property="compare_count", type="integer", example=1)
+     *                 }
      *             )
      *         )
      *     ),
@@ -1814,7 +1816,9 @@ class ProductsController extends Controller
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Müqayisə siyahısı təmizləndi"),
      *             @OA\Property(property="data", type="object", 
-     *                 @OA\Property(property="compare_count", type="integer", example=0)
+     *                 properties={
+     *                     @OA\Property(property="compare_count", type="integer", example=0)
+     *                 }
      *             )
      *         )
      *     )
