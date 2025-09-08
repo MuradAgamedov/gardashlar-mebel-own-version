@@ -76,7 +76,8 @@ class BlogPostController extends Controller
      *                     @OA\Property(property="title", type="string", example="Blog Post Title"),
      *                     @OA\Property(property="slug", type="string", example="blog-post-slug"),
      *                     @OA\Property(property="card_image_url", type="string", example="https://example.com/image.jpg"),
-     *                     @OA\Property(property="card_description", type="string", example="Short description for card")
+     *                     @OA\Property(property="card_description", type="string", example="Short description for card"),
+     *                     @OA\Property(property="category_slug", type="string", example="category-slug")
      *                 )
      *             ),
      *             @OA\Property(
@@ -115,7 +116,10 @@ class BlogPostController extends Controller
 
             $blogPosts = Cache::remember($cacheKey, 3600, function () use ($languageId, $page, $perPage, $categoryId) {
                 $query = BlogPost::published()
-                    ->with(['translates' => fn($q) => $q->where('language_id', $languageId)])
+                    ->with([
+                        'translates' => fn($q) => $q->where('language_id', $languageId),
+                        'category.translates' => fn($q) => $q->where('language_id', $languageId)
+                    ])
                     ->orderBy('published_at', 'desc');
 
                 // Filter by category if provided
@@ -128,6 +132,7 @@ class BlogPostController extends Controller
 
             $data = $blogPosts->getCollection()->map(function ($blogPost) {
                 $translate = $blogPost->translates->first();
+                $categoryTranslate = $blogPost->category->translates->first();
                 
                 return [
                     'id' => $blogPost->id,
@@ -136,6 +141,7 @@ class BlogPostController extends Controller
                     'card_image' => $blogPost->card_image,
                     'card_image_url' => $blogPost->card_image_url,
                     'card_description' => $translate->card_description ?? null,
+                    'category_slug' => $categoryTranslate->slug ?? null,
                 ];
             });
 
@@ -206,8 +212,10 @@ class BlogPostController extends Controller
      *                     property="category",
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="title", type="string", example="Category Title")
+     *                     @OA\Property(property="title", type="string", example="Category Title"),
+     *                     @OA\Property(property="slug", type="string", example="category-slug")
      *                 ),
+     *                 @OA\Property(property="category_slug", type="string", example="category-slug"),
      *                 @OA\Property(
      *                     property="images",
      *                     type="array",
@@ -281,7 +289,9 @@ class BlogPostController extends Controller
                 'category' => [
                     'id' => $blogPost->category->id,
                     'title' => $categoryTranslate->title ?? null,
+                    'slug' => $categoryTranslate->slug ?? null,
                 ],
+                'category_slug' => $categoryTranslate->slug ?? null,
                 'images' => $blogPost->images->map(function ($image) {
                     return [
                         'id' => $image->id,

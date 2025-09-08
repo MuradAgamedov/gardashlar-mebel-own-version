@@ -13,6 +13,7 @@ class BlogCategoryTranslate extends Model
         'blog_category_id',
         'language_id',
         'title',
+        'slug',
         'seo_title',
         'seo_keywords',
         'seo_description',
