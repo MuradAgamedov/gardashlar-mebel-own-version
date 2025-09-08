@@ -97,6 +97,15 @@ class BlogPostController extends Controller
      *                 @OA\Property(property="last_page", type="integer", example=5),
      *                 @OA\Property(property="per_page", type="integer", example=10),
      *                 @OA\Property(property="total", type="integer", example=50)
+     *             ),
+     *             @OA\Property(
+     *                 property="sort_options",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="value", type="string", example="newest"),
+     *                     @OA\Property(property="label", type="string", example="newest")
+     *                 )
      *             )
      *         )
      *     ),
@@ -176,6 +185,10 @@ class BlogPostController extends Controller
                     'last_page' => $blogPosts->lastPage(),
                     'per_page' => $blogPosts->perPage(),
                     'total' => $blogPosts->total(),
+                ],
+                'sort_options' => [
+                    ['value' => 'newest', 'label' => 'newest'],
+                    ['value' => 'oldest', 'label' => 'oldest']
                 ]
             ], 200);
 
