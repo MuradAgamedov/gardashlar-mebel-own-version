@@ -1174,10 +1174,7 @@ class ProductsController extends Controller
     *         in="path",
     *         description="Product ID",
     *         required=true,
-    *         @OA\Schema(
-    *             type="integer",
-    *             example=1
-    *         )
+    *         @OA\Schema(type="integer", example=1)
     *     ),
     *     @OA\SecurityRequirement(name="bearerAuth"),
     *     @OA\Response(
