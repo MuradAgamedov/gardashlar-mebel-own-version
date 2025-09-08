@@ -1187,7 +1187,9 @@ class ProductsController extends Controller
  *             @OA\Property(property="success", type="boolean", example=true),
  *             @OA\Property(property="message", type="string", example="Məhsul seçilmişlərə əlavə edildi"),
  *             @OA\Property(property="data", type="object",
- *                 @OA\Property(property="is_favorited", type="boolean", example=true)
+ *                 properties={
+ *                     @OA\Property(property="is_favorited", type="boolean", example=true)
+ *                 }
  *             )
  *         )
  *     ),
@@ -1261,7 +1263,9 @@ class ProductsController extends Controller
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Məhsul seçilmişlərdən silindi"),
      *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="is_favorited", type="boolean", example=false)
+     *                 properties={
+     *                     @OA\Property(property="is_favorited", type="boolean", example=false)
+     *                 }
      *             )
      *         )
      *     ),
@@ -1477,8 +1481,10 @@ class ProductsController extends Controller
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Məhsul müqayisə siyahısına əlavə edildi"),
      *             @OA\Property(property="data", type="object", 
-     *                 @OA\Property(property="is_compared", type="boolean", example=true),
-     *                 @OA\Property(property="compare_count", type="integer", example=2)
+     *                 properties={
+     *                     @OA\Property(property="is_compared", type="boolean", example=true),
+     *                     @OA\Property(property="compare_count", type="integer", example=2)
+     *                 }
      *             )
      *         )
      *     ),
