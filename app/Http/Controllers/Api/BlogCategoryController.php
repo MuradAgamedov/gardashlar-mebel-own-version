@@ -64,6 +64,7 @@ class BlogCategoryController extends Controller
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="title", type="string", example="Category Title"),
+     *                     @OA\Property(property="slug", type="string", example="category-slug"),
      *                     @OA\Property(property="posts_count", type="integer", example=5)
      *                 )
      *             ),
@@ -113,6 +114,7 @@ class BlogCategoryController extends Controller
                 return [
                     'id' => $blogCategory->id,
                     'title' => $translate->title ?? null,
+                    'slug' => $translate->slug ?? null,
                     'posts_count' => $blogCategory->blog_posts_count,
                 ];
             });
