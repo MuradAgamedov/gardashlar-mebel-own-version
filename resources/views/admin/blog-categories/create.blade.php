@@ -163,4 +163,34 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Slug generation function
+    function generateSlug(text) {
+        return text
+            .toLowerCase()
+            .trim()
+            .replace(/[^\w\s-]/g, '') // Remove special characters
+            .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
+            .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+    }
+
+    // Get all title inputs
+    const titleInputs = document.querySelectorAll('input[id^="title_"]');
+    
+    titleInputs.forEach(function(titleInput) {
+        titleInput.addEventListener('input', function() {
+            const languageId = this.id.split('_')[1];
+            const slugInput = document.getElementById('slug_' + languageId);
+            
+            if (slugInput && this.value.trim()) {
+                slugInput.value = generateSlug(this.value);
+            }
+        });
+    });
+});
+</script>
 @endsection 

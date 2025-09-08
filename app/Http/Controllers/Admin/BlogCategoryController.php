@@ -48,12 +48,14 @@ class BlogCategoryController extends Controller
         foreach ($languages as $language) {
             $request->validate([
                 "translations.{$language->id}.title" => 'required|string|max:255',
+                "translations.{$language->id}.slug" => 'nullable|string|max:255',
                 "translations.{$language->id}.seo_title" => 'nullable|string|max:255',
                 "translations.{$language->id}.seo_keywords" => 'nullable|string',
                 "translations.{$language->id}.seo_description" => 'nullable|string',
             ], [
                 "translations.{$language->id}.title.required" => "Title is required for {$language->title}.",
                 "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->title}.",
+                "translations.{$language->id}.slug.max" => "Slug may not be greater than 255 characters for {$language->title}.",
                 "translations.{$language->id}.seo_title.max" => "SEO title may not be greater than 255 characters for {$language->title}.",
             ]);
         }
@@ -72,6 +74,7 @@ class BlogCategoryController extends Controller
                     'blog_category_id' => $blogCategory->id,
                     'language_id' => $language->id,
                     'title' => trim($translationData['title'] ?? ''),
+                    'slug' => trim($translationData['slug'] ?? ''),
                     'seo_title' => trim($translationData['seo_title'] ?? ''),
                     'seo_keywords' => trim($translationData['seo_keywords'] ?? ''),
                     'seo_description' => trim($translationData['seo_description'] ?? ''),
@@ -118,12 +121,14 @@ class BlogCategoryController extends Controller
         foreach ($languages as $language) {
             $request->validate([
                 "translations.{$language->id}.title" => 'required|string|max:255',
+                "translations.{$language->id}.slug" => 'nullable|string|max:255',
                 "translations.{$language->id}.seo_title" => 'nullable|string|max:255',
                 "translations.{$language->id}.seo_keywords" => 'nullable|string',
                 "translations.{$language->id}.seo_description" => 'nullable|string',
             ], [
                 "translations.{$language->id}.title.required" => "Title is required for {$language->title}.",
                 "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->title}.",
+                "translations.{$language->id}.slug.max" => "Slug may not be greater than 255 characters for {$language->title}.",
                 "translations.{$language->id}.seo_title.max" => "SEO title may not be greater than 255 characters for {$language->title}.",
             ]);
         }
@@ -145,6 +150,7 @@ class BlogCategoryController extends Controller
                     ],
                     [
                         'title' => trim($translationData['title'] ?? ''),
+                        'slug' => trim($translationData['slug'] ?? ''),
                         'seo_title' => trim($translationData['seo_title'] ?? ''),
                         'seo_keywords' => trim($translationData['seo_keywords'] ?? ''),
                         'seo_description' => trim($translationData['seo_description'] ?? ''),
