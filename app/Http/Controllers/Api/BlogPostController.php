@@ -52,13 +52,13 @@ class BlogPostController extends Controller
      *         )
      *     ),
      *     @OA\Parameter(
-     *         name="category_id",
+     *         name="category_slug",
      *         in="query",
-     *         description="Filter by blog category ID",
+     *         description="Filter by blog category slug",
      *         required=false,
      *         @OA\Schema(
-     *             type="integer",
-     *             example=1
+     *             type="string",
+     *             example="technology"
      *         )
      *     ),
      *     @OA\Response(
@@ -107,14 +107,14 @@ class BlogPostController extends Controller
             $languageId = $this->getLanguageIdFromHeader($request);
             $page = $request->get('page', 1);
             $perPage = min($request->get('per_page', 10), 50); // Max 50 per page
-            $categoryId = $request->get('category_id');
+            $categorySlug = $request->get('category_slug');
             
             $cacheKey = "api:blog-posts:lang:{$languageId}:page:{$page}:per_page:{$perPage}";
-            if ($categoryId) {
-                $cacheKey .= ":category:{$categoryId}";
+            if ($categorySlug) {
+                $cacheKey .= ":category:{$categorySlug}";
             }
 
-            $blogPosts = Cache::remember($cacheKey, 3600, function () use ($languageId, $page, $perPage, $categoryId) {
+            $blogPosts = Cache::remember($cacheKey, 3600, function () use ($languageId, $page, $perPage, $categorySlug) {
                 $query = BlogPost::published()
                     ->with([
                         'translates' => fn($q) => $q->where('language_id', $languageId),
@@ -122,9 +122,11 @@ class BlogPostController extends Controller
                     ])
                     ->orderBy('published_at', 'desc');
 
-                // Filter by category if provided
-                if ($categoryId) {
-                    $query->where('blog_category_id', $categoryId);
+                // Filter by category slug if provided
+                if ($categorySlug) {
+                    $query->whereHas('category.translates', function($q) use ($categorySlug) {
+                        $q->where('slug', $categorySlug);
+                    });
                 }
 
                 return $query->paginate($perPage);

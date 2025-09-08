@@ -1186,10 +1186,10 @@ class ProductsController extends Controller
     *         @OA\JsonContent(
     *             @OA\Property(property="success", type="boolean", example=true),
     *             @OA\Property(property="message", type="string", example="Məhsul seçilmişlərə əlavə edildi"),
-    *             @OA\Property(property="data", type="object",
-    *                 properties={
-    *                     @OA\Property(property="is_favorited", type="boolean", example=true)
-    *                 }
+    *             @OA\Property(
+    *                 property="data",
+    *                 type="object",
+    *                 @OA\Property(property="is_favorited", type="boolean", example=true)
     *             )
     *         )
     *     ),
