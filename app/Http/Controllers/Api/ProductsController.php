@@ -10,6 +10,7 @@ use App\Models\ProductType;
 use App\Models\ProductPageCategory;
 use App\Models\Product;
 use App\Models\ProductFavorite;
+use App\Models\ProductCompare;
 use App\Models\Dictionary;
 use App\Models\Language;
 use App\Traits\LocaleFromHeader;
@@ -20,6 +21,13 @@ use Illuminate\Support\Facades\Cache;
  * @OA\Tag(
  *     name="Products",
  *     description="API Endpoints for products and product categories"
+ * )
+ * 
+ * @OA\SecurityScheme(
+ *     securityScheme="bearerAuth",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT"
  * )
  */
 class ProductsController extends Controller
@@ -1168,13 +1176,7 @@ class ProductsController extends Controller
      *         required=true,
      *         @OA\Schema(type="integer", example=1)
      *     ),
-     *     @OA\Parameter(
-     *         name="user_id",
-     *         in="query",
-     *         description="User ID",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
+     *     @OA\SecurityRequirement(name="bearerAuth"),
      *     @OA\Response(
      *         response=200,
      *         description="Product added to favorites successfully",
@@ -1200,15 +1202,7 @@ class ProductsController extends Controller
     public function addToFavorites(Request $request, int $id)
     {
         try {
-            $userId = $request->get('user_id');
-            
-            if (!$userId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'İstifadəçi ID tələb olunur',
-                    'data' => null
-                ], 400);
-            }
+            $userId = $request->user()->id;
 
             // Check if product exists
             $product = Product::active()->find($id);
@@ -1254,13 +1248,7 @@ class ProductsController extends Controller
      *         required=true,
      *         @OA\Schema(type="integer", example=1)
      *     ),
-     *     @OA\Parameter(
-     *         name="user_id",
-     *         in="query",
-     *         description="User ID",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
+     *     @OA\SecurityRequirement(name="bearerAuth"),
      *     @OA\Response(
      *         response=200,
      *         description="Product removed from favorites successfully",
@@ -1286,15 +1274,7 @@ class ProductsController extends Controller
     public function removeFromFavorites(Request $request, int $id)
     {
         try {
-            $userId = $request->get('user_id');
-            
-            if (!$userId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'İstifadəçi ID tələb olunur',
-                    'data' => null
-                ], 400);
-            }
+            $userId = $request->user()->id;
 
             // Check if product exists
             $product = Product::active()->find($id);
@@ -1333,13 +1313,7 @@ class ProductsController extends Controller
      *     tags={"Products"},
      *     summary="Get user's favorite products",
      *     description="Returns paginated list of user's favorite products",
-     *     @OA\Parameter(
-     *         name="user_id",
-     *         in="query",
-     *         description="User ID",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
+     *     @OA\SecurityRequirement(name="bearerAuth"),
      *     @OA\Parameter(
      *         name="page",
      *         in="query",
@@ -1389,16 +1363,7 @@ class ProductsController extends Controller
     public function getFavorites(Request $request)
     {
         try {
-            $userId = $request->get('user_id');
-            
-            if (!$userId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'İstifadəçi ID tələb olunur',
-                    'data' => [],
-                    'pagination' => null
-                ], 400);
-            }
+            $userId = $request->user()->id;
 
             $languageId = $this->getLanguageIdFromHeader($request);
             $page = $request->get('page', 1);
@@ -1481,6 +1446,390 @@ class ProductsController extends Controller
                 'message' => 'Seçilmiş məhsullar əldə edilərkən xəta baş verdi: ' . $e->getMessage(),
                 'data' => [],
                 'pagination' => null
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/products/{id}/compare",
+     *     operationId="addProductToCompare",
+     *     tags={"Products"},
+     *     summary="Add product to compare list",
+     *     description="Add a product to user's compare list (max 4 products)",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Product ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\SecurityRequirement(name="bearerAuth"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Product added to compare list successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Məhsul müqayisə siyahısına əlavə edildi"),
+     *             @OA\Property(property="data", type="object", 
+     *                 @OA\Property(property="is_compared", type="boolean", example=true),
+     *                 @OA\Property(property="compare_count", type="integer", example=2)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Maximum compare limit reached",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Müqayisə siyahısında maksimum 4 məhsul ola bilər"),
+     *             @OA\Property(property="data", type="null")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Product not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Məhsul tapılmadı"),
+     *             @OA\Property(property="data", type="null")
+     *         )
+     *     )
+     * )
+     */
+    public function addToCompare(Request $request, int $id)
+    {
+        try {
+            $userId = $request->user()->id;
+
+            // Check if product exists
+            $product = Product::active()->find($id);
+            if (!$product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Məhsul tapılmadı',
+                    'data' => null
+                ], 404);
+            }
+
+            // Check if already in compare list
+            if (ProductCompare::isCompared($userId, $id)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Məhsul artıq müqayisə siyahısındadır',
+                    'data' => null
+                ], 400);
+            }
+
+            // Check compare list limit (max 4 products)
+            $compareCount = ProductCompare::getCompareCount($userId);
+            if ($compareCount >= 4) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Müqayisə siyahısında maksimum 4 məhsul ola bilər',
+                    'data' => null
+                ], 400);
+            }
+
+            // Add to compare
+            ProductCompare::addToCompare($userId, $id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Məhsul müqayisə siyahısına əlavə edildi',
+                'data' => [
+                    'is_compared' => true,
+                    'compare_count' => $compareCount + 1
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Məhsul müqayisə siyahısına əlavə edilərkən xəta baş verdi: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/products/{id}/compare",
+     *     operationId="removeProductFromCompare",
+     *     tags={"Products"},
+     *     summary="Remove product from compare list",
+     *     description="Remove a product from user's compare list",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Product ID",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\SecurityRequirement(name="bearerAuth"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Product removed from compare list successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Məhsul müqayisə siyahısından silindi"),
+     *             @OA\Property(property="data", type="object", 
+     *                 @OA\Property(property="is_compared", type="boolean", example=false),
+     *                 @OA\Property(property="compare_count", type="integer", example=1)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Product not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Məhsul tapılmadı"),
+     *             @OA\Property(property="data", type="null")
+     *         )
+     *     )
+     * )
+     */
+    public function removeFromCompare(Request $request, int $id)
+    {
+        try {
+            $userId = $request->user()->id;
+
+            // Check if product exists
+            $product = Product::active()->find($id);
+            if (!$product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Məhsul tapılmadı',
+                    'data' => null
+                ], 404);
+            }
+
+            // Remove from compare
+            ProductCompare::removeFromCompare($userId, $id);
+
+            $compareCount = ProductCompare::getCompareCount($userId);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Məhsul müqayisə siyahısından silindi',
+                'data' => [
+                    'is_compared' => false,
+                    'compare_count' => $compareCount
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Məhsul müqayisə siyahısından silinərkən xəta baş verdi: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/products/compare",
+     *     operationId="getUserCompareList",
+     *     tags={"Products"},
+     *     summary="Get user's compare list",
+     *     description="Returns list of user's products in compare list",
+     *     @OA\SecurityRequirement(name="bearerAuth"),
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language code (az, en, ru)",
+     *         required=false,
+     *         @OA\Schema(type="string", example="az")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object", 
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="title", type="string", example="Modern Masa"),
+     *                 @OA\Property(property="slug", type="string", example="modern-masa"),
+     *                 @OA\Property(property="price", type="number", example=299.99),
+     *                 @OA\Property(property="discount_percent", type="number", example=10),
+     *                 @OA\Property(property="main_image", type="string", example="https://example.com/storage/products/image.jpg"),
+     *                 @OA\Property(property="description", type="string", example="Yüksək keyfiyyətli masa"),
+     *                 @OA\Property(property="categories", type="array", @OA\Items(type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="title", type="string", example="Masalar")
+     *                 )),
+     *                 @OA\Property(property="types", type="array", @OA\Items(type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="title", type="string", example="Yemək masası")
+     *                 ))
+     *             )),
+     *             @OA\Property(property="compare_count", type="integer", example=3)
+     *         )
+     *     )
+     * )
+     */
+    public function getCompareList(Request $request)
+    {
+        try {
+            $userId = $request->user()->id;
+
+            $languageId = $this->getLanguageIdFromHeader($request);
+            $cacheKey = "api:products:compare:user:{$userId}:lang:{$languageId}";
+            
+            $data = Cache::rememberForever($cacheKey, function () use ($userId, $languageId) {
+                // Get user's compare list
+                $compares = ProductCompare::with([
+                    'product.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'product.categories.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'product.types.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'product.images' => function($query) {
+                        $query->where('status', true)->orderBy('order');
+                    }
+                ])
+                ->where('user_id', $userId)
+                ->whereHas('product', function($query) {
+                    $query->active();
+                })
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+                // Transform the data
+                $transformedData = $compares->map(function ($compare) use ($languageId) {
+                    $product = $compare->product;
+                    
+                    // Get translation for the specified language
+                    $translation = $product->translates()
+                        ->where('language_id', $languageId)
+                        ->first();
+                    
+                    // If no translation found, get the first available translation
+                    if (!$translation) {
+                        $translation = $product->translates()->first();
+                    }
+
+                    // Get main image
+                    $mainImage = $product->images()->where('status', true)->first();
+
+                    // Get categories
+                    $categories = $product->categories->map(function ($category) use ($languageId) {
+                        $categoryTranslation = $category->translates()
+                            ->where('language_id', $languageId)
+                            ->first();
+                        
+                        if (!$categoryTranslation) {
+                            $categoryTranslation = $category->translates()->first();
+                        }
+
+                        return [
+                            'id' => $category->id,
+                            'title' => $categoryTranslation ? $categoryTranslation->title : null
+                        ];
+                    });
+
+                    // Get types
+                    $types = $product->types->map(function ($type) use ($languageId) {
+                        $typeTranslation = $type->translates()
+                            ->where('language_id', $languageId)
+                            ->first();
+                        
+                        if (!$typeTranslation) {
+                            $typeTranslation = $type->translates()->first();
+                        }
+
+                        return [
+                            'id' => $type->id,
+                            'title' => $typeTranslation ? $typeTranslation->title : null
+                        ];
+                    });
+
+                    return [
+                        'id' => $product->id,
+                        'title' => $translation ? $translation->title : null,
+                        'slug' => $translation ? $translation->slug : null,
+                        'price' => $product->price,
+                        'discount_percent' => $product->discount_percent,
+                        'main_image' => $mainImage ? $mainImage->image_url : asset('images/default_image.webp'),
+                        'description' => $translation ? $translation->description : null,
+                        'categories' => $categories,
+                        'types' => $types
+                    ];
+                })->filter(function ($item) {
+                    // Filter out items without title or slug
+                    return !empty($item['title']) && !empty($item['slug']);
+                })->values();
+
+                return [
+                    'data' => $transformedData,
+                    'compare_count' => $compares->count()
+                ];
+            });
+
+            return response()->json([
+                'success' => true, 
+                'data' => $data['data'], 
+                'compare_count' => $data['compare_count']
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Müqayisə siyahısı əldə edilərkən xəta baş verdi: ' . $e->getMessage(),
+                'data' => [],
+                'compare_count' => 0
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/products/compare/clear",
+     *     operationId="clearUserCompareList",
+     *     tags={"Products"},
+     *     summary="Clear user's compare list",
+     *     description="Remove all products from user's compare list",
+     *     @OA\SecurityRequirement(name="bearerAuth"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Compare list cleared successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Müqayisə siyahısı təmizləndi"),
+     *             @OA\Property(property="data", type="object", 
+     *                 @OA\Property(property="compare_count", type="integer", example=0)
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function clearCompareList(Request $request)
+    {
+        try {
+            $userId = $request->user()->id;
+
+            // Clear compare list
+            ProductCompare::clearUserCompareList($userId);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Müqayisə siyahısı təmizləndi',
+                'data' => [
+                    'compare_count' => 0
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Müqayisə siyahısı təmizlənərkən xəta baş verdi: ' . $e->getMessage(),
+                'data' => null
             ], 500);
         }
     }

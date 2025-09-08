@@ -82,6 +82,14 @@ class Product extends Model
         return $this->hasMany(ProductFavorite::class);
     }
 
+    /**
+     * Get the compares for this product
+     */
+    public function compares()
+    {
+        return $this->hasMany(ProductCompare::class);
+    }
+
     // Scopes
     public function scopeActive($query)
     {

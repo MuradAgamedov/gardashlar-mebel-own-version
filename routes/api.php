@@ -255,10 +255,18 @@ Route::get('/products/{id}/details', [ProductsController::class, 'details'])->na
 Route::get('/products/{id}/detail-values', [ProductsController::class, 'detailValues'])->name('api.products.detail-values');
 Route::get('/products/{id}/detail-values/{detailValueId}/details', [ProductsController::class, 'detailValueDetails'])->name('api.products.detail-value-details');
 
-// Product Favorites API Routes
-Route::post('/products/{id}/favorite', [ProductsController::class, 'addToFavorites'])->name('api.products.add-favorite');
-Route::delete('/products/{id}/favorite', [ProductsController::class, 'removeFromFavorites'])->name('api.products.remove-favorite');
-Route::get('/products/favorites', [ProductsController::class, 'getFavorites'])->name('api.products.favorites');
+// Product Favorites API Routes (Requires Authentication)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/products/{id}/favorite', [ProductsController::class, 'addToFavorites'])->name('api.products.add-favorite');
+    Route::delete('/products/{id}/favorite', [ProductsController::class, 'removeFromFavorites'])->name('api.products.remove-favorite');
+    Route::get('/products/favorites', [ProductsController::class, 'getFavorites'])->name('api.products.favorites');
+    
+    // Product Compare API Routes (Requires Authentication)
+    Route::post('/products/{id}/compare', [ProductsController::class, 'addToCompare'])->name('api.products.add-compare');
+    Route::delete('/products/{id}/compare', [ProductsController::class, 'removeFromCompare'])->name('api.products.remove-compare');
+    Route::get('/products/compare', [ProductsController::class, 'getCompareList'])->name('api.products.compare-list');
+    Route::delete('/products/compare/clear', [ProductsController::class, 'clearCompareList'])->name('api.products.clear-compare');
+});
 
 // Auth API Routes
 Route::post('/register', [AuthController::class, 'register'])->name('api.auth.register');
