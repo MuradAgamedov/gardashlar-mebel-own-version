@@ -3300,6 +3300,81 @@
                 }
             }
         },
+        "/api/file/download": {
+            "get": {
+                "tags": [
+                    "File Actions"
+                ],
+                "summary": "Download file by URL",
+                "description": "Downloads a file by providing the full URL path",
+                "operationId": "downloadFile",
+                "parameters": [
+                    {
+                        "name": "url",
+                        "in": "query",
+                        "description": "Full file URL (e.g., https://admin.gardaslar.coder.az/storage/kivs/filename.png)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "https://admin.gardaslar.coder.az/storage/kivs/3eb74a1ab26761dc54a05d7e3de374790d39fe52_1754390181_p0aDbClx.png"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "File downloaded successfully",
+                        "content": {
+                            "application/octet-stream": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "File not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "File not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid URL provided",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid URL provided"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/hero-categories": {
             "get": {
                 "tags": [
@@ -3890,6 +3965,10 @@
                                                         "example": "Azerbaijani"
                                                     },
                                                     "is_default": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "is_main_language": {
                                                         "type": "boolean",
                                                         "example": true
                                                     },
@@ -4737,6 +4816,956 @@
                 }
             }
         },
+        "/api/products": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get all product categories with hierarchical structure",
+                "operationId": "bc73c164c8a5713aad0592ef6f6ab801",
+                "parameters": [
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language ID (1=az, 2=en, 3=ru)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of products per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 12
+                        }
+                    },
+                    {
+                        "name": "category_slug",
+                        "in": "query",
+                        "description": "Filter products by category slug. If parent category, returns products from all children + parent. If child category, returns only products from that category.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "masalar"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort products by: price_asc, price_desc, newest, oldest, view_count",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "price_asc"
+                        }
+                    },
+                    {
+                        "name": "type_id",
+                        "in": "query",
+                        "description": "Filter products by type IDs (array)",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            },
+                            "example": [
+                                1,
+                                2,
+                                3
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filters",
+                        "in": "query",
+                        "description": "Price filter IDs (array)",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            },
+                            "example": [
+                                1,
+                                2,
+                                3
+                            ]
+                        }
+                    },
+                    {
+                        "name": "color",
+                        "in": "query",
+                        "description": "Filter products by color IDs (array) - products with images of these colors",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            },
+                            "example": [
+                                1,
+                                2,
+                                3
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product categories retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "categories": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Ana Kategori"
+                                                            },
+                                                            "slug": {
+                                                                "type": "string",
+                                                                "example": "ana-kategori"
+                                                            },
+                                                            "seo_title": {
+                                                                "type": "string",
+                                                                "example": "Ana Kategori - Gardashlar"
+                                                            },
+                                                            "seo_keywords": {
+                                                                "type": "string",
+                                                                "example": "ana kategori, gardashlar, mebel"
+                                                            },
+                                                            "seo_description": {
+                                                                "type": "string",
+                                                                "example": "Ana kategori haqqında təsvir"
+                                                            },
+                                                            "children": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 2
+                                                                        },
+                                                                        "title": {
+                                                                            "type": "string",
+                                                                            "example": "Alt Kategori 1"
+                                                                        },
+                                                                        "slug": {
+                                                                            "type": "string",
+                                                                            "example": "alt-kategori-1"
+                                                                        },
+                                                                        "seo_title": {
+                                                                            "type": "string",
+                                                                            "example": "Alt Kategori 1 - Gardashlar"
+                                                                        },
+                                                                        "seo_keywords": {
+                                                                            "type": "string",
+                                                                            "example": "alt kategori, gardashlar"
+                                                                        },
+                                                                        "seo_description": {
+                                                                            "type": "string",
+                                                                            "example": "Alt kategori haqqında təsvir"
+                                                                        },
+                                                                        "children": {
+                                                                            "type": "array",
+                                                                            "items": {}
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "product_price_filters": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "0-100 AZN"
+                                                            },
+                                                            "min_price": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 0
+                                                            },
+                                                            "max_price": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 100
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "product_colors": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "color_code": {
+                                                                "type": "string",
+                                                                "example": "#FF0000"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "product_types": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Masa"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "product_page_categories": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Ofis"
+                                                            },
+                                                            "slug": {
+                                                                "type": "string",
+                                                                "example": "ofis"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "sort_options": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "value": {
+                                                                "type": "string",
+                                                                "example": "price_asc"
+                                                            },
+                                                            "label": {
+                                                                "type": "string",
+                                                                "example": "price_asc"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "sort_translations": {
+                                                    "properties": {
+                                                        "price_asc": {
+                                                            "type": "string",
+                                                            "example": "Qiymət artımına görə (ucuzdan bahaya)"
+                                                        },
+                                                        "price_desc": {
+                                                            "type": "string",
+                                                            "example": "Qiymət azalmaya görə (bahadan ucuza)"
+                                                        },
+                                                        "newest": {
+                                                            "type": "string",
+                                                            "example": "Ən yenilər (ən son əlavə olunan məhsullar əvvəl göstərilir)"
+                                                        },
+                                                        "oldest": {
+                                                            "type": "string",
+                                                            "example": "Ən köhnələr (əvvəl əlavə olunan məhsullar əvvəl göstərilir)"
+                                                        },
+                                                        "view_count": {
+                                                            "type": "string",
+                                                            "example": "Ən çox baxılanlar"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "products": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Masa"
+                                                            },
+                                                            "slug": {
+                                                                "type": "string",
+                                                                "example": "masa-1"
+                                                            },
+                                                            "price": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 299.99
+                                                            },
+                                                            "view_count": {
+                                                                "type": "integer",
+                                                                "example": 150
+                                                            },
+                                                            "card_image": {
+                                                                "type": "string",
+                                                                "example": "https://admin.gardaslar.coder.az/storage/products/... or https://admin.gardaslar.coder.az/images/default_image.webp"
+                                                            },
+                                                            "discount_percent": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 10
+                                                            },
+                                                            "product_types": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 1
+                                                                        },
+                                                                        "title": {
+                                                                            "type": "string",
+                                                                            "example": "Masa"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "pagination": {
+                                                    "properties": {
+                                                        "current_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "per_page": {
+                                                            "type": "integer",
+                                                            "example": 12
+                                                        },
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 100
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer",
+                                                            "example": 9
+                                                        },
+                                                        "from": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "to": {
+                                                            "type": "integer",
+                                                            "example": 12
+                                                        },
+                                                        "has_more_pages": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "applied_filters": {
+                                                    "properties": {
+                                                        "min_price": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 100
+                                                        },
+                                                        "max_price": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 500
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid language ID",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid language ID"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error retrieving product categories"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/products/{slug}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get single product by slug",
+                "operationId": "4af5eca07543280f207ae4274b7469e2",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Product slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "masa-1"
+                        }
+                    },
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language code (az, en, ru)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "az"
+                        }
+                    },
+                    {
+                        "name": "color_id",
+                        "in": "query",
+                        "description": "Filter images by color ID. If not provided, shows images from the first available color.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Masa"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "masa-1"
+                                                },
+                                                "price": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 299.99
+                                                },
+                                                "discount_price": {
+                                                    "description": "Calculated discount price if discount_percent > 0",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 269.99
+                                                },
+                                                "discount_percent": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 10
+                                                },
+                                                "view_count": {
+                                                    "type": "integer",
+                                                    "example": 150
+                                                },
+                                                "product_types": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Masa"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "product_tags": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Premium"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "product_accordions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Product Features"
+                                                            },
+                                                            "content": {
+                                                                "type": "string",
+                                                                "example": "Detailed product features and specifications"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "product_details": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "keyword": {
+                                                                "type": "string",
+                                                                "example": "Material"
+                                                            },
+                                                            "value": {
+                                                                "type": "string",
+                                                                "example": "Wood"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "product_detail_values": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "keyword": {
+                                                                "type": "string",
+                                                                "example": "Size"
+                                                            },
+                                                            "details": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 1
+                                                                        },
+                                                                        "keyword": {
+                                                                            "type": "string",
+                                                                            "example": "Small"
+                                                                        },
+                                                                        "value": {
+                                                                            "type": "string",
+                                                                            "example": "30x40cm"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
+                                                                }
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "image_url": {
+                                                                "type": "string",
+                                                                "example": "https://admin.gardaslar.coder.az/storage/products/image.jpg"
+                                                            },
+                                                            "is_main": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            },
+                                                            "order": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "color_id": {
+                                                                "description": "Only included if not null",
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/products/{id}/details": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get product details",
+                "operationId": "0ec02136534dd1d2828d69d9ea9ce572",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 45
+                        }
+                    },
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language code (az, en, ru)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "az"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product details retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "keyword": {
+                                                        "type": "string",
+                                                        "example": "Material"
+                                                    },
+                                                    "value": {
+                                                        "type": "string",
+                                                        "example": "Wood"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/products/{id}/detail-values": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get product detail values",
+                "operationId": "b7b3cda0ea7f520d28e6acc08e6b4039",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 45
+                        }
+                    },
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language code (az, en, ru)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "az"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product detail values retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "keyword": {
+                                                        "type": "string",
+                                                        "example": "Color Options"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/products/{id}/detail-values/{detailValueId}/details": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get product detail value details",
+                "operationId": "713fba8066eb7977f056fbd417137090",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 45
+                        }
+                    },
+                    {
+                        "name": "detailValueId",
+                        "in": "path",
+                        "description": "Detail Value ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "locale",
+                        "in": "header",
+                        "description": "Language code (az, en, ru)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "az"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product detail value details retrieved successfully"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "keyword": {
+                                                        "type": "string",
+                                                        "example": "Red"
+                                                    },
+                                                    "value": {
+                                                        "type": "string",
+                                                        "example": "Bright red color option"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/project-categories": {
             "get": {
                 "tags": [
@@ -4813,6 +5842,501 @@
                                             "items": {
                                                 "type": "object"
                                             }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/projects": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get all projects",
+                "description": "Returns paginated active projects with title, slug, company name and main image",
+                "operationId": "getAllProjects",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 9,
+                            "example": 9
+                        }
+                    },
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Language code (az, en, ru)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "az"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Modern Sofa Design"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string",
+                                                        "example": "modern-sofa-design"
+                                                    },
+                                                    "company_name": {
+                                                        "type": "string",
+                                                        "example": "Gardashlar Furniture"
+                                                    },
+                                                    "main_image": {
+                                                        "type": "string",
+                                                        "example": "https://example.com/storage/projects/image.jpg"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 9
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 18
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "example": 9
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error occurred while getting projects"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/{slug}": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get projects by category slug",
+                "description": "Returns paginated active projects for a specific category with title, slug, company name and main image",
+                "operationId": "getProjectsByCategorySlug",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Project category slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "yumaq-mebellr"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 9,
+                            "example": 9
+                        }
+                    },
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Language code (az, en, ru)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "az"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Modern Sofa Design"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string",
+                                                        "example": "modern-sofa-design"
+                                                    },
+                                                    "company_name": {
+                                                        "type": "string",
+                                                        "example": "Gardashlar Furniture"
+                                                    },
+                                                    "main_image": {
+                                                        "type": "string",
+                                                        "example": "https://example.com/storage/projects/image.jpg"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 9
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 18
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "example": 9
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Category not found"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error occurred while getting projects"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/project/{slug}": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get project details by slug",
+                "description": "Returns detailed information about a specific project including images, videos, and translations",
+                "operationId": "getProjectBySlug",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Project slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "modern-soft-furniture-design"
+                        }
+                    },
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Language code (az, en, ru)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "az"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Modern Soft Furniture Design"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "modern-soft-furniture-design"
+                                                },
+                                                "company_name": {
+                                                    "type": "string",
+                                                    "example": "Gardashlar Furniture"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Modern soft furniture design description"
+                                                },
+                                                "category_slug": {
+                                                    "type": "string",
+                                                    "example": "yumshaq-mebeller"
+                                                },
+                                                "images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "image_url": {
+                                                                "type": "string",
+                                                                "example": "https://example.com/storage/projects/image.jpg"
+                                                            },
+                                                            "is_main_image": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            },
+                                                            "order": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "videos": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "video_link": {
+                                                                "type": "string",
+                                                                "example": "https://youtube.com/watch?v=example"
+                                                            },
+                                                            "order": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Project not found"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error occurred while getting project"
+                                        },
+                                        "data": {
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -5069,6 +6593,10 @@
                                                     "card_description": {
                                                         "type": "string",
                                                         "example": "Yüksək keyfiyyətli mebel istehsalı"
+                                                    },
+                                                    "advantages_title": {
+                                                        "type": "string",
+                                                        "example": "Xidmətlərimizin Üstünlükləri"
                                                     }
                                                 },
                                                 "type": "object"
@@ -5173,6 +6701,10 @@
                                                 "form_top_text": {
                                                     "type": "string",
                                                     "example": "<p>Form üçün üst mətn</p>"
+                                                },
+                                                "advantages_title": {
+                                                    "type": "string",
+                                                    "example": "Xidmətlərimizin Üstünlükləri"
                                                 },
                                                 "seo_title": {
                                                     "type": "string",
@@ -6497,12 +8029,16 @@
                                                     },
                                                     "image": {
                                                         "type": "string",
-                                                        "example": "suggestions/sample-suggestion-1.jpg"
+                                                        "example": "https://admin.gardaslar.coder.az/storage/suggestions/sample-suggestion-1.jpg"
                                                     },
                                                     "pdf": {
                                                         "type": "string",
-                                                        "example": "suggestions/pdfs/sample-pdf-1.pdf",
+                                                        "example": "https://admin.gardaslar.coder.az/storage/suggestions/pdfs/sample-pdf-1.pdf",
                                                         "nullable": true
+                                                    },
+                                                    "has_pdf": {
+                                                        "type": "boolean",
+                                                        "example": true
                                                     },
                                                     "order": {
                                                         "type": "integer",
@@ -7188,6 +8724,188 @@
                 }
             }
         },
+        "/api/vacancy-forms": {
+            "post": {
+                "tags": [
+                    "Vacancy Forms"
+                ],
+                "summary": "Submit vacancy application form",
+                "description": "Submit a new vacancy application form with file upload",
+                "operationId": "ab58b1502d30fa8937acdfe6505da638",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "vacancy_id",
+                                    "name",
+                                    "mobile",
+                                    "email",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "vacancy_id": {
+                                        "description": "Vacancy ID",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "name": {
+                                        "description": "Full name",
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "mobile": {
+                                        "description": "Mobile number",
+                                        "type": "string",
+                                        "example": "+994501234567"
+                                    },
+                                    "email": {
+                                        "description": "Email address",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "message": {
+                                        "description": "Application message",
+                                        "type": "string",
+                                        "example": "I want to apply for this position"
+                                    },
+                                    "file": {
+                                        "description": "Optional file upload (PDF, DOC, DOCX, max 10MB)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Form submitted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Form submitted successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "vacancy_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "mobile": {
+                                                    "type": "string",
+                                                    "example": "+994501234567"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "john@example.com"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "I want to apply for this position"
+                                                },
+                                                "file": {
+                                                    "type": "string",
+                                                    "example": "vacancy-forms/file.pdf"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Vacancy not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Vacancy not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error submitting form"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/warranty-policy": {
             "get": {
                 "tags": [
@@ -7483,6 +9201,10 @@
             "description": "API Endpoints for FAQs"
         },
         {
+            "name": "File Actions",
+            "description": "API Endpoints for File Operations"
+        },
+        {
             "name": "Individual Project Orders",
             "description": "API Endpoints for Individual Project Orders"
         },
@@ -7495,8 +9217,16 @@
             "description": "API Endpoints for Maps"
         },
         {
+            "name": "Products",
+            "description": "API Endpoints for products and product categories"
+        },
+        {
             "name": "ProjectCategories",
             "description": "Project categories API endpoints"
+        },
+        {
+            "name": "Projects",
+            "description": "Projects API endpoints"
         },
         {
             "name": "Reports",
@@ -7537,6 +9267,10 @@
         {
             "name": "Vacancies",
             "description": "API Endpoints for Vacancies"
+        },
+        {
+            "name": "Vacancy Forms",
+            "description": "API Endpoints for Vacancy Forms"
         },
         {
             "name": "Abouts",
