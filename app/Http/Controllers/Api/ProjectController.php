@@ -482,7 +482,7 @@ class ProjectController extends Controller
                 if (!$categoryTranslation) {
                     $categoryTranslation = $project->category->translates()->first();
                 }
-                $videoId = explode('?',$video->video_link)[1];
+                $videoId = explode("?",$video->video_link)[1];
                 return [
                     'id' => $project->id,
                     'title' => $translation ? $translation->title : null,
