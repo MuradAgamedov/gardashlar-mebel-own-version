@@ -103,6 +103,11 @@ Route::get('/projects', [ProjectController::class, 'getAllProjects'])->name('api
 Route::get('/projects/{slug}', [ProjectController::class, 'getByCategorySlug'])->name('api.projects.by-category');
 Route::get('/project/{slug}', [ProjectController::class, 'getBySlug'])->name('api.project.details');
 
+// Project Favorites API Routes
+Route::post('/projects/{id}/favorite', [ProjectController::class, 'addToFavorites'])->name('api.projects.add-favorite');
+Route::delete('/projects/{id}/favorite', [ProjectController::class, 'removeFromFavorites'])->name('api.projects.remove-favorite');
+Route::get('/projects/favorites', [ProjectController::class, 'getFavorites'])->name('api.projects.favorites');
+
 // Simple Images API Routes
 Route::get('/simple-images', [SimpleImageController::class, 'index'])->name('api.simple-images.index');
 Route::get('/simple-images/{keyword}', [SimpleImageController::class, 'show'])->name('api.simple-images.show');
