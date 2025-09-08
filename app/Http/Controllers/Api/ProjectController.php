@@ -120,12 +120,21 @@ class ProjectController extends Controller
 
                     // Get main image
                     $mainImage = $project->images()->where('is_main_image', true)->where('status', true)->first();
+                            // Get category translation
+                $categoryTranslation = $project->category->translates()
+                ->where('language_id', $languageId)
+                ->first();
+            
+            if (!$categoryTranslation) {
+                $categoryTranslation = $project->category->translates()->first();
+            }
 
                     return [
                         'id' => $project->id,
                         'title' => $translation ? $translation->title : null,
                         'slug' => $translation ? $translation->slug : null,
                         'company_name' => $translation ? $translation->company_name : null,
+                        'category_slug' => $categoryTranslation ? $categoryTranslation->slug : null,
                         'main_image' => $mainImage ? $mainImage->image_url : asset('images/default_image.webp')
                     ];
                 })->filter(function ($item) {
