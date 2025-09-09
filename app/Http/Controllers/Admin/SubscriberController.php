@@ -1,0 +1,70 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Subscriber;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class SubscriberController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $query = Subscriber::query();
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('email', 'like', "%{$search}%");
+        }
+
+        // Order by created_at desc
+        $query->orderBy('created_at', 'desc');
+
+        $subscribers = $query->paginate(15);
+
+        return view('admin.subscribers.index', compact('subscribers'));
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        try {
+            $subscriber = Subscriber::findOrFail($id);
+            $subscriber->delete();
+
+            return redirect()->route('admin.subscribers.index')
+                ->with('success', 'Subscriber deleted successfully!');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.subscribers.index')
+                ->with('error', 'Error deleting subscriber: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Bulk delete subscribers
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'subscriber_ids' => 'required|array',
+            'subscriber_ids.*' => 'exists:subscribers,id'
+        ]);
+
+        try {
+            $deletedCount = Subscriber::whereIn('id', $request->subscriber_ids)->delete();
+
+            return redirect()->route('admin.subscribers.index')
+                ->with('success', "Successfully deleted {$deletedCount} subscriber(s)!");
+        } catch (\Exception $e) {
+            return redirect()->route('admin.subscribers.index')
+                ->with('error', 'Error deleting subscribers: ' . $e->getMessage());
+        }
+    }
+}

@@ -83,6 +83,7 @@ use App\Http\Controllers\Admin\BecomeAInvestorFormController;
 use App\Http\Controllers\Admin\ServiceFormController;
 use App\Http\Controllers\Admin\SuggestAPlaceFormController;
 use App\Http\Controllers\Admin\SuggestionsComplaintsFormController;
+use App\Http\Controllers\Admin\SubscriberController;
 
 Route::prefix('')->name('admin.')->group(function () {
     // Auth routes (no middleware)
@@ -410,6 +411,10 @@ Route::get('product-types/{productType}/products/search', [ProductTypeProductCon
 Route::resource('contact-messages', ContactMessageController::class)->only(['index', 'show', 'destroy']);
 Route::post('contact-messages/delete-selected', [ContactMessageController::class, 'deleteSelected'])->name('contact-messages.delete-selected');
 Route::post('contact-messages/{id}/mark-as-read', [ContactMessageController::class, 'markAsRead'])->name('contact-messages.mark-as-read');
+
+        // Subscribers routes
+        Route::resource('subscribers', SubscriberController::class)->only(['index', 'destroy']);
+        Route::post('subscribers/bulk-delete', [SubscriberController::class, 'bulkDelete'])->name('subscribers.bulk-delete');
 
 // Become A Partner Forms routes
         Route::resource('become-a-partner-forms', BecomeAPartnerFormController::class)->only(['index', 'show', 'destroy']);

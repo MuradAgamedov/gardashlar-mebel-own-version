@@ -271,8 +271,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Subscriber API Routes
 Route::post('/subscribers', [SubscriberController::class, 'store'])->name('api.subscribers.store');
-Route::get('/subscribers', [SubscriberController::class, 'index'])->name('api.subscribers.index');
-Route::delete('/subscribers/{id}', [SubscriberController::class, 'destroy'])->name('api.subscribers.destroy');
+
 
 // Auth API Routes
 Route::post('/register', [AuthController::class, 'register'])->name('api.auth.register');

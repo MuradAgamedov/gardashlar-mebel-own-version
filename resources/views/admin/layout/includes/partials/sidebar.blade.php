@@ -109,6 +109,19 @@
           </a>
         </li>
 
+        <li class="sidebar-list">
+          <a class="sidebar-link" href="{{ route('admin.subscribers.index') }}">
+            <i class="fas fa-envelope-open-text"></i>
+            <h6>Subscribers</h6>
+            @php
+              $subscriberCount = \App\Models\Subscriber::count();
+            @endphp
+            @if($subscriberCount > 0)
+              <span class="badge bg-info ms-2">{{ $subscriberCount }}</span>
+            @endif
+          </a>
+        </li>
+
       <!-- CONTENT MANAGEMENT -->
       <li class="sidebar-main-title"><div><h5 class="sidebar-title">Content Management</h5></div></li>
       <li class="sidebar-list">
