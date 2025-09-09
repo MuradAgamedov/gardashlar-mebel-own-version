@@ -196,7 +196,9 @@ class HeroCategoryController extends Controller
                             'discount_percent' => $product->discount_percent ?? 0,
                             'main_image_url' => $mainImage ? $mainImage->image_url : null,
                         ];
-                    });
+                    })
+                    ->values() // Reset array keys and convert to array
+                    ->toArray(); // Convert Collection to array
             });
 
             return response()->json([
