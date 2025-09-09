@@ -46,6 +46,7 @@ class HomePageProjectCategoryController extends Controller
                     return [
                         'id' => $item->projectCategory->id,
                         'title' => $translation ? $translation->title : null,
+                        'slug' => $translation ? $translation->slug : null,
                         'image_url' => $item->projectCategory->image_url
                     ];
                 });
