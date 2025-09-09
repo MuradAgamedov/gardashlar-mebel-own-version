@@ -79,6 +79,7 @@ class HomePageCategoryController extends Controller
                             'image_url' => $productCategory->image_url,
                             'title' => $translate->title ?? null,
                             'slug' => $translate->slug ?? null,
+                            'parentSlug' =>  $productCategory->parent_id == null ? null : $productCategory->translate->slug
                         ];
                     });
             });
