@@ -8,6 +8,7 @@ use App\Models\ProjectCategoryTranslate;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use App\Services\ImageService;
 
@@ -18,6 +19,17 @@ class ProjectCategoryController extends Controller
     public function __construct(ImageService $imageService)
     {
         $this->imageService = $imageService;
+    }
+
+    /**
+     * Clear project categories cache for all languages
+     */
+    private function clearProjectCategoriesCache()
+    {
+        $languages = Language::all();
+        foreach ($languages as $language) {
+            Cache::forget("api:project-categories:all:lang:{$language->id}");
+        }
     }
 
     /**
@@ -81,6 +93,9 @@ class ProjectCategoryController extends Controller
                     ]);
                 }
             }
+
+            // Clear cache after creating
+            $this->clearProjectCategoriesCache();
 
             return redirect()->route('admin.project-categories.index')
                 ->with('success', 'Project category created successfully.');
@@ -153,6 +168,9 @@ class ProjectCategoryController extends Controller
                 }
             }
 
+            // Clear cache after updating
+            $this->clearProjectCategoriesCache();
+
             return redirect()->route('admin.project-categories.index')
                 ->with('success', 'Project category updated successfully.');
 
@@ -171,6 +189,10 @@ class ProjectCategoryController extends Controller
     {
         try {
             $projectCategory->delete();
+            
+            // Clear cache after deleting
+            $this->clearProjectCategoriesCache();
+            
             return redirect()->route('admin.project-categories.index')
                 ->with('success', 'Project category deleted successfully.');
         } catch (\Exception $e) {
@@ -194,6 +216,9 @@ class ProjectCategoryController extends Controller
                 ProjectCategory::where('id', $id)->update(['order' => $index + 1]);
             }
 
+            // Clear cache after reordering
+            $this->clearProjectCategoriesCache();
+
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             Log::error('Error reordering project categories: ' . $e->getMessage());
@@ -213,6 +238,9 @@ class ProjectCategoryController extends Controller
 
         try {
             $deletedCount = ProjectCategory::whereIn('id', $request->ids)->delete();
+            
+            // Clear cache after bulk deleting
+            $this->clearProjectCategoriesCache();
             
             return redirect()->route('admin.project-categories.index')
                 ->with('success', "{$deletedCount} project category(ies) deleted successfully!");
