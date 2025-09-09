@@ -118,12 +118,12 @@ class ProjectController extends Controller
     {
         // Custom validation for slug uniqueness excluding current translations
         $customRules = [
-            'company_name' => 'required|string|max:255',
             'project_category_id' => 'required|exists:project_categories,id',
             'status' => 'boolean',
             'translations' => 'required|array',
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.title' => 'required|string|max:255',
+            'translations.*.company_name' => 'required|string|max:255',
             'translations.*.description' => 'required|string',
             'translations.*.seo_title' => 'nullable|string|max:255',
             'translations.*.seo_keywords' => 'nullable|string',
