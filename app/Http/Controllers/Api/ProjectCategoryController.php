@@ -36,7 +36,15 @@ class ProjectCategoryController extends Controller
      *         description="Successful response",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="array", @OA\Items(type="object", @OA\Property(property="id", type="integer", example=1), @OA\Property(property="title", type="string", example="Soft Furniture Designs"), @OA\Property(property="slug", type="string", example="soft-furniture-designs")))
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object", 
+     *                 @OA\Property(property="id", type="integer", example=1), 
+     *                 @OA\Property(property="title", type="string", example="Soft Furniture Designs"), 
+     *                 @OA\Property(property="slug", type="string", example="soft-furniture-designs"),
+     *                 @OA\Property(property="seo_title", type="string", example="Soft Furniture Designs - Gardashlar"),
+     *                 @OA\Property(property="seo_keywords", type="string", example="soft furniture, design, gardashlar"),
+     *                 @OA\Property(property="seo_description", type="string", example="High quality soft furniture designs by Gardashlar"),
+     *                 @OA\Property(property="image_alt_text", type="string", example="Soft furniture design category image")
+     *             ))
      *         )
      *     ),
      *     @OA\Response(
@@ -78,7 +86,11 @@ class ProjectCategoryController extends Controller
                     return [
                         'id' => $category->id,
                         'title' => $translation ? $translation->title : null,
-                        'slug' => $translation ? $translation->slug : null
+                        'slug' => $translation ? $translation->slug : null,
+                        'seo_title' => $translation ? $translation->seo_title : null,
+                        'seo_keywords' => $translation ? $translation->seo_keywords : null,
+                        'seo_description' => $translation ? $translation->seo_description : null,
+                        'image_alt_text' => $translation ? $translation->image_alt_text : null
                     ];
                 })->filter(function ($item) {
                     // Filter out items without title or slug
