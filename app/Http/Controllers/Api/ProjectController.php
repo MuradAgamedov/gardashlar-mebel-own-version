@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectCategory;
+use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -17,6 +18,24 @@ use OpenApi\Annotations as OA;
 class ProjectController extends Controller
 {
     use LocaleFromHeader;
+
+    /**
+     * Clear project cache for all languages
+     */
+    private function clearProjectCache($projectSlug = null)
+    {
+        $languages = Language::all();
+        foreach ($languages as $language) {
+            // Clear general project caches
+            Cache::forget("api:projects:lang:{$language->id}");
+            Cache::forget("api:projects:page:1:per_page:9:lang:{$language->id}");
+            
+            // Clear specific project cache if slug provided
+            if ($projectSlug) {
+                Cache::forget("api:project:details:{$projectSlug}:lang:{$language->id}");
+            }
+        }
+    }
 
     /**
      * @OA\Get(
@@ -434,6 +453,9 @@ class ProjectController extends Controller
      *                 @OA\Property(property="slug", type="string", example="modern-soft-furniture-design"),
      *                 @OA\Property(property="company_name", type="string", example="Gardashlar Furniture"),
      *                 @OA\Property(property="description", type="string", example="Modern soft furniture design description"),
+     *                 @OA\Property(property="seo_title", type="string", example="Modern Soft Furniture Design - Gardashlar"),
+     *                 @OA\Property(property="seo_keywords", type="string", example="soft furniture, modern design, gardashlar"),
+     *                 @OA\Property(property="seo_description", type="string", example="High quality modern soft furniture design by Gardashlar"),
      *                 @OA\Property(property="category_slug", type="string", example="yumshaq-mebeller"),
      *                 @OA\Property(property="images", type="array", @OA\Items(type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
@@ -561,6 +583,9 @@ class ProjectController extends Controller
                     'slug' => $translation ? $translation->slug : null,
                     'company_name' => $translation ? $translation->company_name : null,
                     'description' => $translation ? $translation->description : null,
+                    'seo_title' => $translation ? $translation->seo_title : null,
+                    'seo_keywords' => $translation ? $translation->seo_keywords : null,
+                    'seo_description' => $translation ? $translation->seo_description : null,
                     'category_slug' => $categoryTranslation ? $categoryTranslation->slug : null,
                     'images' => $project->images->map(function ($image) {
                         return [
