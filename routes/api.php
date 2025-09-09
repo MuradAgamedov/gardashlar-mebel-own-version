@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\DictionaryController;
 use App\Http\Controllers\Api\SocialNetworkController;
 use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\PartnerSliderController;
+use App\Http\Controllers\Api\SubscriberController;
 use App\Http\Controllers\Api\TestimonialController;
 use App\Http\Controllers\Api\BlogPostController;
 use App\Http\Controllers\Api\BlogCategoryController;
@@ -267,6 +268,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/products/compare', [ProductsController::class, 'getCompareList'])->name('api.products.compare-list');
     Route::delete('/products/compare/clear', [ProductsController::class, 'clearCompareList'])->name('api.products.clear-compare');
 });
+
+// Subscriber API Routes
+Route::post('/subscribers', [SubscriberController::class, 'store'])->name('api.subscribers.store');
+Route::get('/subscribers', [SubscriberController::class, 'index'])->name('api.subscribers.index');
+Route::delete('/subscribers/{id}', [SubscriberController::class, 'destroy'])->name('api.subscribers.destroy');
 
 // Auth API Routes
 Route::post('/register', [AuthController::class, 'register'])->name('api.auth.register');
