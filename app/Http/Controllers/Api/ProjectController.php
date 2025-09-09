@@ -218,6 +218,7 @@ class ProjectController extends Controller
      *                 @OA\Property(property="title", type="string", example="Modern Sofa Design"),
      *                 @OA\Property(property="slug", type="string", example="modern-sofa-design"),
      *                 @OA\Property(property="company_name", type="string", example="Gardashlar Furniture"),
+     *                 @OA\Property(property="category_slug", type="string", example="yumshaq-mebeller"),
      *                 @OA\Property(property="main_image", type="string", example="https://example.com/storage/projects/image.jpg")
      *             )),
      *             @OA\Property(property="pagination", type="object",
@@ -227,7 +228,15 @@ class ProjectController extends Controller
      *                 @OA\Property(property="last_page", type="integer", example=2),
      *                 @OA\Property(property="from", type="integer", example=1),
      *                 @OA\Property(property="to", type="integer", example=9)
-     *             )
+     *             ),
+     *             @OA\Property(property="similar_projects", type="array", @OA\Items(type="object",
+     *                 @OA\Property(property="id", type="integer", example=2),
+     *                 @OA\Property(property="title", type="string", example="Similar Project"),
+     *                 @OA\Property(property="slug", type="string", example="similar-project"),
+     *                 @OA\Property(property="company_name", type="string", example="Similar Company"),
+     *                 @OA\Property(property="category_slug", type="string", example="category-slug"),
+     *                 @OA\Property(property="main_image", type="string", example="https://example.com/similar-image.jpg")
+     *             ))
      *         )
      *     ),
      *     @OA\Response(
@@ -325,6 +334,32 @@ class ProjectController extends Controller
                     return !empty($item['title']) && !empty($item['slug']);
                 })->values();
 
+                // Get similar projects (from the same category)
+                $similarProjects = Project::with([
+                    'translates' => fn($q) => $q->where('language_id', $languageId),
+                    'category.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'images' => fn($q) => $q->where('is_main_image', true)->where('status', true)
+                ])
+                ->where('project_category_id', $category->id)
+                ->active()
+                ->ordered()
+                ->limit(4)
+                ->get()
+                ->map(function ($similarProject) use ($languageId) {
+                    $similarTranslation = $similarProject->translates->first();
+                    $similarCategoryTranslation = $similarProject->category->translates->first();
+                    $similarMainImage = $similarProject->images->first();
+                    
+                    return [
+                        'id' => $similarProject->id,
+                        'title' => $similarTranslation ? $similarTranslation->title : null,
+                        'slug' => $similarTranslation ? $similarTranslation->slug : null,
+                        'company_name' => $similarTranslation ? $similarTranslation->company_name : null,
+                        'category_slug' => $similarCategoryTranslation ? $similarCategoryTranslation->slug : null,
+                        'main_image' => $similarMainImage ? $similarMainImage->image_url : asset('images/default_image.webp')
+                    ];
+                });
+
                 // Create pagination info
                 $pagination = [
                     'current_page' => $projects->currentPage(),
@@ -337,7 +372,8 @@ class ProjectController extends Controller
 
                 return [
                     'data' => $transformedData,
-                    'pagination' => $pagination
+                    'pagination' => $pagination,
+                    'similar_projects' => $similarProjects
                 ];
             });
 
@@ -353,7 +389,8 @@ class ProjectController extends Controller
             return response()->json([
                 'success' => true, 
                 'data' => $data['data'], 
-                'pagination' => $data['pagination']
+                'pagination' => $data['pagination'],
+                'similar_projects' => $data['similar_projects']
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
