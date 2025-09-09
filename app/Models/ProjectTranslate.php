@@ -16,6 +16,9 @@ class ProjectTranslate extends Model
         'company_name',
         'slug',
         'description',
+        'seo_title',
+        'seo_keywords',
+        'seo_description',
     ];
 
     /**

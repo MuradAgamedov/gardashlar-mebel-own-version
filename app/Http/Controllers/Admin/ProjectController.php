@@ -60,6 +60,9 @@ class ProjectController extends Controller
             'translations.*.company_name' => 'required|string|max:255',
             'translations.*.slug' => 'required|string|max:255|unique:project_translates,slug',
             'translations.*.description' => 'required|string',
+            'translations.*.seo_title' => 'nullable|string|max:255',
+            'translations.*.seo_keywords' => 'nullable|string',
+            'translations.*.seo_description' => 'nullable|string',
         ]);
 
         try {
@@ -78,6 +81,9 @@ class ProjectController extends Controller
                         'company_name' => $translation['company_name'],
                         'slug' => $translation['slug'],
                         'description' => $translation['description'],
+                        'seo_title' => $translation['seo_title'] ?? null,
+                        'seo_keywords' => $translation['seo_keywords'] ?? null,
+                        'seo_description' => $translation['seo_description'] ?? null,
                     ]);
                 }
             }
@@ -119,6 +125,9 @@ class ProjectController extends Controller
             'translations.*.language_id' => 'required|exists:languages,id',
             'translations.*.title' => 'required|string|max:255',
             'translations.*.description' => 'required|string',
+            'translations.*.seo_title' => 'nullable|string|max:255',
+            'translations.*.seo_keywords' => 'nullable|string',
+            'translations.*.seo_description' => 'nullable|string',
         ];
 
         // Add slug validation for each translation
@@ -155,6 +164,9 @@ class ProjectController extends Controller
                             'company_name' => $translation['company_name'],
                             'slug' => $translation['slug'],
                             'description' => $translation['description'],
+                            'seo_title' => $translation['seo_title'] ?? null,
+                            'seo_keywords' => $translation['seo_keywords'] ?? null,
+                            'seo_description' => $translation['seo_description'] ?? null,
                         ]);
                     } else {
                         // Create new translation
@@ -165,6 +177,9 @@ class ProjectController extends Controller
                             'company_name' => $translation['company_name'],
                             'slug' => $translation['slug'],
                             'description' => $translation['description'],
+                            'seo_title' => $translation['seo_title'] ?? null,
+                            'seo_keywords' => $translation['seo_keywords'] ?? null,
+                            'seo_description' => $translation['seo_description'] ?? null,
                         ]);
                     }
                 }
