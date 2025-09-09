@@ -175,7 +175,7 @@ class HeroCategoryController extends Controller
                     ->ordered()
                     ->with([
                         'product.translates' => fn($q) => $q->where('language_id', $languageId),
-                        'product.images' => fn($q) => $q->where('is_main', true)->active(),
+                        'product.images' => fn($q) => $q->active()->ordered(),
                         'product.categories' => fn($q) => $q->where('product_categories.id', $categoryId)
                     ])
                     ->get()
@@ -186,7 +186,12 @@ class HeroCategoryController extends Controller
                     ->map(function ($heroProduct) {
                         $product = $heroProduct->product;
                         $translate = $product->translates->first();
-                        $mainImage = $product->images->first();
+                        
+                        // Try to get main image first, then any active image
+                        $mainImage = $product->images->where('is_main', true)->first();
+                        if (!$mainImage) {
+                            $mainImage = $product->images->first();
+                        }
                         
                         return [
                             'id' => $product->id,
