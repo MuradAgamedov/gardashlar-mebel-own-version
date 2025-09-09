@@ -65,6 +65,9 @@ class BlogCategoryController extends Controller
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="title", type="string", example="Category Title"),
      *                     @OA\Property(property="slug", type="string", example="category-slug"),
+     *                     @OA\Property(property="seo_title", type="string", example="Category Title - SEO Optimized"),
+     *                     @OA\Property(property="seo_keywords", type="string", example="category, blog, seo"),
+     *                     @OA\Property(property="seo_description", type="string", example="SEO description for category"),
      *                     @OA\Property(property="posts_count", type="integer", example=5)
      *                 )
      *             ),
@@ -115,6 +118,9 @@ class BlogCategoryController extends Controller
                     'id' => $blogCategory->id,
                     'title' => $translate->title ?? null,
                     'slug' => $translate->slug ?? null,
+                    'seo_title' => $translate->seo_title ?? null,
+                    'seo_keywords' => $translate->seo_keywords ?? null,
+                    'seo_description' => $translate->seo_description ?? null,
                     'posts_count' => $blogCategory->blog_posts_count,
                 ];
             });
