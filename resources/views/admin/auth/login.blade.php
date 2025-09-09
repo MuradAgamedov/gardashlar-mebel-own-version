@@ -55,7 +55,7 @@
                             </a>
                         </div>
                         <div class="login-main"> 
-                            <form class="theme-form" method="POST" action="{{ route('admin.login') }}">
+                            <form class="theme-form" method="POST" action="{{ route('admin.login.post') }}">
                                 @csrf
                                 <h2 class="text-center">Sign in to account</h2>
                                 <p class="text-center">Enter your email & password to login</p>

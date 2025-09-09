@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
 
         // Seed languages
         $this->call([
+            AdminUserSeeder::class,
             LanguageSeeder::class,
             PolicyPagesSeeder::class,
             SuggestionSeeder::class,
