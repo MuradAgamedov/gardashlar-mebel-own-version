@@ -123,6 +123,7 @@
           <li><a href="{{ route('admin.testimonials.index') }}">Testimonials</a></li>
           <li><a href="{{ route('admin.home-page-projects.index') }}">Home Page Projects</a></li>
           <li><a href="{{ route('admin.home-page-categories.index') }}">Home Page Categories</a></li>
+          <li><a href="{{route('admin.home-page-discount.edit')}}">Home Page Discount</a></li>
         </ul>
       </li>
 
