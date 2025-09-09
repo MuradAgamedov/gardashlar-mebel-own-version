@@ -90,7 +90,6 @@ class ProjectCategoryController extends Controller
                         'seo_title' => $translation ? $translation->seo_title : null,
                         'seo_keywords' => $translation ? $translation->seo_keywords : null,
                         'seo_description' => $translation ? $translation->seo_description : null,
-                        'image_alt_text' => $translation ? $translation->image_alt_text : null
                     ];
                 })->filter(function ($item) {
                     // Filter out items without title or slug
