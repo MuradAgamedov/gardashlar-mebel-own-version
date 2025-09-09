@@ -362,7 +362,6 @@ class BlogPostController extends Controller
                 'seo_title' => $blogPost->seo_title ?? null,
                 'seo_keywords' => $blogPost->seo_keywords ?? null,
                 'seo_description' => $blogPost->seo_description ?? null,
-                'posts_count' => $blogCategory->blog_posts_count,
                 'category' => [
                     'id' => $blogPost->category->id,
                     'title' => $categoryTranslate->title ?? null,
