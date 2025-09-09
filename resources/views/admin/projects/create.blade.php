@@ -179,7 +179,7 @@
                                                     </div>
                                                     
                                                     <!-- Description -->
-                                                    <div class="col-md-12">
+                                                    <div class="col-md-12 mb-3">
                                                         <label class="form-label">
                                                             Description <span class="text-danger">*</span>
                                                         </label>
@@ -188,6 +188,63 @@
                                                                   placeholder="Enter project description in {{ $language->lang_name }}"
                                                                   required>{{ old("translations.{$language->id}.description") }}</textarea>
                                                         @error("translations.{$language->id}.description")
+                                                            <div class="invalid-feedback">
+                                                                {{ $message }}
+                                                            </div>
+                                                        @enderror
+                                                    </div>
+                                                    
+                                                    <!-- SEO Fields -->
+                                                    <div class="col-12 mb-3">
+                                                        <h6 class="mb-3 text-primary">
+                                                            <i class="material-icons-outlined">search</i>
+                                                            SEO Information
+                                                        </h6>
+                                                    </div>
+                                                    
+                                                    <!-- SEO Title -->
+                                                    <div class="col-md-12 mb-3">
+                                                        <label class="form-label">
+                                                            SEO Title
+                                                        </label>
+                                                        <input type="text" 
+                                                               class="form-control @error("translations.{$language->id}.seo_title") is-invalid @enderror" 
+                                                               name="translations[{{ $language->id }}][seo_title]" 
+                                                               value="{{ old("translations.{$language->id}.seo_title") }}" 
+                                                               placeholder="Enter SEO optimized title for {{ $language->lang_name }}">
+                                                        @error("translations.{$language->id}.seo_title")
+                                                            <div class="invalid-feedback">
+                                                                {{ $message }}
+                                                            </div>
+                                                        @enderror
+                                                    </div>
+                                                    
+                                                    <!-- SEO Keywords -->
+                                                    <div class="col-md-12 mb-3">
+                                                        <label class="form-label">
+                                                            SEO Keywords
+                                                        </label>
+                                                        <textarea class="form-control @error("translations.{$language->id}.seo_keywords") is-invalid @enderror" 
+                                                                  name="translations[{{ $language->id }}][seo_keywords]" 
+                                                                  rows="2"
+                                                                  placeholder="Enter SEO keywords separated by commas for {{ $language->lang_name }}">{{ old("translations.{$language->id}.seo_keywords") }}</textarea>
+                                                        @error("translations.{$language->id}.seo_keywords")
+                                                            <div class="invalid-feedback">
+                                                                {{ $message }}
+                                                            </div>
+                                                        @enderror
+                                                    </div>
+                                                    
+                                                    <!-- SEO Description -->
+                                                    <div class="col-md-12 mb-3">
+                                                        <label class="form-label">
+                                                            SEO Description
+                                                        </label>
+                                                        <textarea class="form-control @error("translations.{$language->id}.seo_description") is-invalid @enderror" 
+                                                                  name="translations[{{ $language->id }}][seo_description]" 
+                                                                  rows="3"
+                                                                  placeholder="Enter SEO meta description for {{ $language->lang_name }}">{{ old("translations.{$language->id}.seo_description") }}</textarea>
+                                                        @error("translations.{$language->id}.seo_description")
                                                             <div class="invalid-feedback">
                                                                 {{ $message }}
                                                             </div>
