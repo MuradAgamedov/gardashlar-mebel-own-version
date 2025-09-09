@@ -70,7 +70,7 @@ class HomePageCategoryController extends Controller
                     ->ordered()
                     ->with(['productCategory.translates' => fn($q) => $q->where('language_id', $languageId)])
                     ->get()
-                    ->map(function ($homePageCategory) {
+                    ->map(function ($homePageCategory) use ($languageId) {
                         $productCategory = $homePageCategory->productCategory;
                         $translate = $productCategory->translates->first();
                         
