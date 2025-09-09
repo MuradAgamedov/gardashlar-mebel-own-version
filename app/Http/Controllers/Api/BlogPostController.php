@@ -359,6 +359,10 @@ class BlogPostController extends Controller
                 'card_image_url' => $blogPost->card_image ? asset('storage/' . $blogPost->card_image) : asset('images/default_image.webp'),
                 'inner_banner_image_url' => $blogPost->inner_banner_image ? asset('storage/' . $blogPost->inner_banner_image) : asset('images/default_image.webp'),
                 'published_at' => $blogPost->published_at,
+                'seo_title' => $blogPost->seo_title ?? null,
+                'seo_keywords' => $blogPost->seo_keywords ?? null,
+                'seo_description' => $blogPost->seo_description ?? null,
+                'posts_count' => $blogCategory->blog_posts_count,
                 'category' => [
                     'id' => $blogPost->category->id,
                     'title' => $categoryTranslate->title ?? null,
