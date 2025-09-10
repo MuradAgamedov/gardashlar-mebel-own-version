@@ -114,6 +114,7 @@ class ProductsController extends Controller
      *                         @OA\Property(property="seo_title", type="string", example="Ana Kategori - Gardashlar"),
      *                         @OA\Property(property="seo_keywords", type="string", example="ana kategori, gardashlar, mebel"),
      *                         @OA\Property(property="seo_description", type="string", example="Ana kategori haqqında təsvir"),
+     *                         @OA\Property(property="parentSlug", type="string", example=null, description="Parent category slug if parent_id exists, null otherwise"),
      *                         @OA\Property(
      *                             property="children",
      *                             type="array",
@@ -124,6 +125,7 @@ class ProductsController extends Controller
      *                                 @OA\Property(property="seo_title", type="string", example="Alt Kategori 1 - Gardashlar"),
      *                                 @OA\Property(property="seo_keywords", type="string", example="alt kategori, gardashlar"),
      *                                 @OA\Property(property="seo_description", type="string", example="Alt kategori haqqında təsvir"),
+     *                                 @OA\Property(property="parentSlug", type="string", example="ana-kategori", description="Parent category slug if parent_id exists, null otherwise"),
      *                                 @OA\Property(property="children", type="array", @OA\Items())
      *                             )
      *                         )
@@ -161,7 +163,8 @@ class ProductsController extends Controller
      *                     @OA\Items(
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="title", type="string", example="Ofis"),
-     *                         @OA\Property(property="slug", type="string", example="ofis")
+     *                         @OA\Property(property="slug", type="string", example="ofis"),
+     *                         @OA\Property(property="parentSlug", type="string", example=null, description="Parent category slug if parent_id exists, null otherwise")
      *                     )
      *                 ),
      *                 @OA\Property(
@@ -324,13 +327,25 @@ class ProductsController extends Controller
                 ->get();
             });
 
-            $productPageCategoriesData = $productPageCategories->map(function ($pageCategory) {
+            $productPageCategoriesData = $productPageCategories->map(function ($pageCategory) use ($languageId) {
                 $category = $pageCategory->productCategory;
                 $translation = $category ? $category->translates->first() : null;
+                
+                // Get parent slug if parent_id exists
+                $parentSlug = null;
+                if ($category && $category->parent_id) {
+                    $parentCategory = ProductCategory::find($category->parent_id);
+                    if ($parentCategory) {
+                        $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
+                        $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
+                    }
+                }
+                
                 return [
                     'id' => $pageCategory->id,
                     'title' => $translation ? $translation->title : '',
-                    'slug' => $translation ? $translation->slug : ''
+                    'slug' => $translation ? $translation->slug : '',
+                    'parentSlug' => $parentSlug
                 ];
             });
 
@@ -555,6 +570,17 @@ class ProductsController extends Controller
         // First pass: create category map
         foreach ($categories as $category) {
             $translation = $category->translates->first();
+            
+            // Get parent slug if parent_id exists
+            $parentSlug = null;
+            if ($category->parent_id) {
+                $parentCategory = $categories->where('id', $category->parent_id)->first();
+                if ($parentCategory) {
+                    $parentTranslation = $parentCategory->translates->first();
+                    $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
+                }
+            }
+            
             $categoryData = [
                 'id' => $category->id,
                 'title' => $translation ? $translation->title : '',
@@ -562,6 +588,7 @@ class ProductsController extends Controller
                 'seo_title' => $translation ? $translation->seo_title : '',
                 'seo_keywords' => $translation ? $translation->seo_keywords : '',
                 'seo_description' => $translation ? $translation->seo_description : '',
+                'parentSlug' => $parentSlug,
                 'children' => []
             ];
 
