@@ -195,6 +195,8 @@ class ProductsController extends Controller
      *                         @OA\Property(property="view_count", type="integer", example=150),
      *                         @OA\Property(property="card_image", type="string", example="https://admin.gardaslar.coder.az/storage/products/... or https://admin.gardaslar.coder.az/images/default_image.webp"),
      *                         @OA\Property(property="discount_percent", type="number", format="float", example=10.00),
+     *                         @OA\Property(property="category_slug", type="string", example="masalar", description="Product category slug, null if no category"),
+     *                         @OA\Property(property="parentSlug", type="string", example="mebel", description="Parent category slug if category has parent, null otherwise"),
      *                         @OA\Property(
      *                             property="product_types",
      *                             type="array",
@@ -398,6 +400,9 @@ class ProductsController extends Controller
                 },
                 'types.translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
+                },
+                'categories.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
                 }
             ])
             ->active();
@@ -491,7 +496,7 @@ class ProductsController extends Controller
             // Get products with pagination
             $products = $productsQuery->paginate($perPage, ['*'], 'page', $page);
 
-            $productsData = $products->map(function ($product) {
+            $productsData = $products->map(function ($product) use ($languageId) {
                 $translation = $product->translates->first();
                 // Find main image - first try to find is_main=true, then fallback to first image
                 $mainImage = $product->images->where('is_main', true)->first();
@@ -499,6 +504,25 @@ class ProductsController extends Controller
                     $mainImage = $product->images->first();
                 }
                 
+                // Get category information
+                $categorySlug = null;
+                $parentSlug = null;
+                
+                if ($product->categories->isNotEmpty()) {
+                    // Get the first category (assuming products have one primary category)
+                    $category = $product->categories->first();
+                    $categoryTranslation = $category->translates->first();
+                    $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
+                    
+                    // Get parent slug if category has parent
+                    if ($category->parent_id) {
+                        $parentCategory = ProductCategory::find($category->parent_id);
+                        if ($parentCategory) {
+                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
+                            $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
+                        }
+                    }
+                }
                 
                 $productTypes = $product->types->map(function ($type) {
                     $translation = $type->translates->first();
@@ -516,6 +540,8 @@ class ProductsController extends Controller
                     'view_count' => $product->view_count,
                     'card_image' => $mainImage && $mainImage->image ? asset('storage/' . $mainImage->image) : asset('images/default_image.webp'),
                     'discount_percent' => $product->discount_percent,
+                    'category_slug' => $categorySlug,
+                    'parentSlug' => $parentSlug,
                     'product_types' => $productTypes
                 ];
             });
