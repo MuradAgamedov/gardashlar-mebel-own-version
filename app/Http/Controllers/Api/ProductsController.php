@@ -77,7 +77,7 @@ class ProductsController extends Controller
      *     @OA\Parameter(
      *         name="type_id",
      *         in="query",
-     *         description="Filter products by type IDs (array)",
+     *         description="Filter products by type IDs (can be single value or multiple: type_id=1&type_id=2)",
      *         required=false,
      *         @OA\Schema(type="array", @OA\Items(type="integer"), example={1, 2, 3})
      *     ),
@@ -403,12 +403,15 @@ class ProductsController extends Controller
             $minPrice = $request->get('min_price');
             $maxPrice = $request->get('max_price');
             
-            // Handle filters and colors parameters - convert to arrays if they come as single values
+            // Handle filters, colors, and type_id parameters - convert to arrays if they come as single values
             if (!is_array($filterIds)) {
                 $filterIds = $filterIds ? [$filterIds] : [];
             }
             if (!is_array($colorIds)) {
                 $colorIds = $colorIds ? [$colorIds] : [];
+            }
+            if (!is_array($typeIds)) {
+                $typeIds = $typeIds ? [$typeIds] : [];
             }
 
             // Build products query
@@ -419,7 +422,7 @@ class ProductsController extends Controller
                 'images' => function($query) use ($colorIds) {
                     $query->where('status', true)->orderBy('order');
                     if (!empty($colorIds) && is_array($colorIds)) {
-                        $query->whereIn('color_id', $colorIds);
+                        $query->whereIn('product_color_id', $colorIds);
                     }
                 },
                 'types.translates' => function($query) use ($languageId) {
@@ -469,7 +472,7 @@ class ProductsController extends Controller
             if (!empty($colorIds) && is_array($colorIds)) {
                 // Filter products that have images with any of these colors
                 $productsQuery->whereHas('images', function($query) use ($colorIds) {
-                    $query->whereIn('color_id', $colorIds)->where('status', true);
+                    $query->whereIn('product_color_id', $colorIds)->where('status', true);
                 });
             }
 
