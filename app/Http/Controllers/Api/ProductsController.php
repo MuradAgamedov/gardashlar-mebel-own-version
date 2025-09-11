@@ -84,14 +84,14 @@ class ProductsController extends Controller
      *     @OA\Parameter(
      *         name="filters",
      *         in="query",
-     *         description="Price filter IDs (array)",
+     *         description="Price filter IDs (can be single value or multiple: filters=1&filters=2)",
      *         required=false,
      *         @OA\Schema(type="array", @OA\Items(type="integer"), example={1, 2, 3})
      *     ),
      *     @OA\Parameter(
      *         name="color",
      *         in="query",
-     *         description="Filter products by color IDs (array) - products with images of these colors",
+     *         description="Filter products by color IDs (can be single value or multiple: color=1&color=2) - products with images of these colors",
      *         required=false,
      *         @OA\Schema(type="array", @OA\Items(type="integer"), example={1, 2, 3})
      *     ),
@@ -402,6 +402,14 @@ class ProductsController extends Controller
             $sort = $request->get('sort', 'view_count');
             $minPrice = $request->get('min_price');
             $maxPrice = $request->get('max_price');
+            
+            // Handle filters and colors parameters - convert to arrays if they come as single values
+            if (!is_array($filterIds)) {
+                $filterIds = $filterIds ? [$filterIds] : [];
+            }
+            if (!is_array($colorIds)) {
+                $colorIds = $colorIds ? [$colorIds] : [];
+            }
 
             // Build products query
             $productsQuery = Product::with([
