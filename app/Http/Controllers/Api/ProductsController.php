@@ -538,10 +538,10 @@ class ProductsController extends Controller
             // Get products with pagination
             $products = $productsQuery->paginate($perPage, ['*'], 'page', $page);
 
-            // Calculate min and max prices from the filtered products
-            $allFilteredProducts = $productsQuery->get();
-            $actualMinPrice = $allFilteredProducts->min('price');
-            $actualMaxPrice = $allFilteredProducts->max('price');
+            // Calculate min and max prices from ALL products in the database (not just filtered ones)
+            $allProducts = Product::active()->get();
+            $actualMinPrice = $allProducts->isNotEmpty() ? $allProducts->min('price') : null;
+            $actualMaxPrice = $allProducts->isNotEmpty() ? $allProducts->max('price') : null;
 
             $productsData = $products->map(function ($product) use ($languageId) {
                 $translation = $product->translates->first();
