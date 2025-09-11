@@ -612,8 +612,10 @@ class ProductsController extends Controller
                     'sort_translations' => $sortTranslations,
                     'products' => $productsData,
                     'pagination' => $paginationData,
-                    'min_price' => $appliedMinPrice,
-                    'max_price' => $appliedMaxPrice
+                    'applied_filters' => [
+                        'min_price' => $appliedMinPrice,
+                        'max_price' => $appliedMaxPrice
+                    ]
                 ]
             ]);
 
