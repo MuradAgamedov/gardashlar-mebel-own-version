@@ -538,6 +538,11 @@ class ProductsController extends Controller
             // Get products with pagination
             $products = $productsQuery->paginate($perPage, ['*'], 'page', $page);
 
+            // Calculate min and max prices from the filtered products
+            $allFilteredProducts = $productsQuery->get();
+            $actualMinPrice = $allFilteredProducts->min('price');
+            $actualMaxPrice = $allFilteredProducts->max('price');
+
             $productsData = $products->map(function ($product) use ($languageId) {
                 $translation = $product->translates->first();
                 // Find main image - first try to find is_main=true, then fallback to first image
@@ -613,8 +618,8 @@ class ProductsController extends Controller
                     'products' => $productsData,
                     'pagination' => $paginationData,
                     'applied_filters' => [
-                        'min_price' => $appliedMinPrice,
-                        'max_price' => $appliedMaxPrice
+                        'min_price' => $actualMinPrice,
+                        'max_price' => $actualMaxPrice
                     ]
                 ]
             ]);
