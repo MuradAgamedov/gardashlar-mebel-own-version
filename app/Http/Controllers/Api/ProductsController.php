@@ -232,8 +232,12 @@ class ProductsController extends Controller
      *                     @OA\Property(property="to", type="integer", example=12),
      *                     @OA\Property(property="has_more_pages", type="boolean", example=true)
      *                 ),
-     *                 @OA\Property(property="min_price", type="number", format="float", example=100.00),
-     *                 @OA\Property(property="max_price", type="number", format="float", example=500.00)
+     *                 @OA\Property(
+     *                     property="applied_filters",
+     *                     type="object",
+     *                     @OA\Property(property="min_price", type="number", format="float", example=100.00),
+     *                     @OA\Property(property="max_price", type="number", format="float", example=500.00)
+     *                 )
      *             )
      *         )
      *     ),
