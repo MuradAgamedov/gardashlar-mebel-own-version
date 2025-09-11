@@ -95,6 +95,20 @@ class ProductsController extends Controller
      *         required=false,
      *         @OA\Schema(type="array", @OA\Items(type="integer"), example={1, 2, 3})
      *     ),
+     *     @OA\Parameter(
+     *         name="min_price",
+     *         in="query",
+     *         description="Minimum price filter (direct price parameter)",
+     *         required=false,
+     *         @OA\Schema(type="number", format="float", example=100.00)
+     *     ),
+     *     @OA\Parameter(
+     *         name="max_price",
+     *         in="query",
+     *         description="Maximum price filter (direct price parameter)",
+     *         required=false,
+     *         @OA\Schema(type="number", format="float", example=500.00)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful operation",
@@ -386,6 +400,8 @@ class ProductsController extends Controller
             $filterIds = $request->get('filters', []);
             $colorIds = $request->get('color', []);
             $sort = $request->get('sort', 'view_count');
+            $minPrice = $request->get('min_price');
+            $maxPrice = $request->get('max_price');
 
             // Build products query
             $productsQuery = Product::with([
@@ -449,11 +465,26 @@ class ProductsController extends Controller
                 });
             }
 
-            // Filter by price range using filter IDs
+            // Filter by price range using filter IDs or direct price parameters
             $appliedMinPrice = null;
             $appliedMaxPrice = null;
             
-            if (!empty($filterIds) && is_array($filterIds)) {
+            // First check for direct price parameters
+            if ($minPrice !== null || $maxPrice !== null) {
+                $appliedMinPrice = $minPrice;
+                $appliedMaxPrice = $maxPrice;
+                
+                // Apply direct price range filter
+                if ($appliedMinPrice !== null) {
+                    $productsQuery->where('price', '>=', $appliedMinPrice);
+                }
+                
+                if ($appliedMaxPrice !== null) {
+                    $productsQuery->where('price', '<=', $appliedMaxPrice);
+                }
+            }
+            // If no direct price parameters, check for filter IDs
+            elseif (!empty($filterIds) && is_array($filterIds)) {
                 // Get price filters by IDs
                 $priceFilters = ProductPriceFilter::whereIn('id', $filterIds)->get();
                 
