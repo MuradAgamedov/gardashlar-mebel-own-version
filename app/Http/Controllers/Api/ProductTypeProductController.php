@@ -11,7 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use App\Traits\LocaleFromHeader;
 use OpenApi\Annotations as OA;
-
+use App\Models\ProductCategory;
 class ProductTypeProductController extends Controller
 {
     use LocaleFromHeader;
