@@ -157,8 +157,8 @@ class ProductTypeProductController extends Controller
                         'slug' => $translation ? $translation->slug : null,
                         'price' => $product->price,
                         'view_count' => $product->view_count ?? 0,
-                        'main_image' => $mainImage ? $mainImage->image_url : null,
-                        'types' => $product->types->map(function($type) {
+                        'card_image' => $mainImage ? $mainImage->image_url : null,
+                        'product_types' => $product->types->map(function($type) {
                             $typeTranslation = $type->translates->first();
                             return [
                                 'id' => $type->id,
