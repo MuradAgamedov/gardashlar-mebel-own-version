@@ -166,7 +166,7 @@ class ProductTypeProductController extends Controller
                         'slug' => $translation ? $translation->slug : null,
                         'price' => $product->price,
                         'view_count' => $product->view_count ?? 0,
-                        'card_image' => $mainImage ? $mainImage->image_url : null,
+                        'card_image' => $mainImage && $mainImage->image ? asset('storage/' . $mainImage->image) : asset('images/default_image.webp'),
                         'discount_percent' => $product->discount_percent,
                         'category_slug' => $categorySlug,
                         'parentSlug' => $parentSlug,
