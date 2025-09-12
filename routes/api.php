@@ -85,7 +85,7 @@ Route::get('/hero-products/{categoryId}', [HeroCategoryController::class, 'getPr
 Route::get('/product-types', [ProductTypeController::class, 'index'])->name('api.product-types.index');
 
 // ProductType Products API Routes
-Route::get('/product-types/{productTypeId}/products', [ProductTypeProductController::class, 'index'])->name('api.product-type-products.index');
+Route::get('/product-types/{productTypeId}', [ProductTypeProductController::class, 'index'])->name('api.product-type-products.index');
 
 // Why Choose Us API Routes
 Route::get('/why-choose-us', [WhyChooseUsController::class, 'index'])->name('api.why-choose-us.index');
