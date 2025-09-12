@@ -150,7 +150,16 @@ class ProductTypeProductController extends Controller
                     
                     // Get main image (is_main = true) or first image
                     $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
-                    
+                    $category = $product->categories->first();
+                    $categoryTranslation = $category->translates->first();
+                    $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
+                    if ($category->parent_id) {
+                        $parentCategory = ProductCategory::find($category->parent_id);
+                        if ($parentCategory) {
+                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
+                            $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
+                        }
+                    }
                     return [
                         'id' => $product->id,
                         'title' => $translation ? $translation->title : 'No title',
@@ -158,6 +167,9 @@ class ProductTypeProductController extends Controller
                         'price' => $product->price,
                         'view_count' => $product->view_count ?? 0,
                         'card_image' => $mainImage ? $mainImage->image_url : null,
+                        'discount_percent' => $product->discount_percent,
+                        'category_slug' => $categorySlug,
+                        'parentSlug' => $parentSlug,
                         'product_types' => $product->types->map(function($type) {
                             $typeTranslation = $type->translates->first();
                             return [
