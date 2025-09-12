@@ -154,7 +154,6 @@ class ProductTypeProductController extends Controller
                     return [
                         'id' => $product->id,
                         'title' => $translation ? $translation->title : 'No title',
-                        'description' => $translation ? $translation->description : null,
                         'slug' => $translation ? $translation->slug : null,
                         'price' => $product->price,
                         'view_count' => $product->view_count ?? 0,
