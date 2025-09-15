@@ -2143,9 +2143,6 @@ class ProductsController extends Controller
                     'images' => function($query) {
                         $query->where('status', true)->orderBy('order');
                     },
-                    'images.color' => function($query) {
-                        $query->select('product_colors.id', 'product_colors.color_code');
-                    },
                     'categories.translates' => function($query) use ($languageId) {
                         $query->where('language_id', $languageId);
                     },
@@ -2208,20 +2205,6 @@ class ProductsController extends Controller
                     ];
                 });
                 
-                // Get images with their colors
-                $imagesWithColors = $product->images->map(function($image) {
-                    return [
-                        'id' => $image->id,
-                        'image_url' => $image->image ? asset('storage/' . $image->image) : null,
-                        'is_main' => $image->is_main,
-                        'order' => $image->order,
-                        'color' => $image->color ? [
-                            'id' => $image->color->id,
-                            'color_code' => $image->color->color_code
-                        ] : null
-                    ];
-                })->sortBy('order')->values();
-                
                 return [
                     'id' => $product->id,
                     'title' => $translation ? $translation->title : '',
@@ -2233,8 +2216,7 @@ class ProductsController extends Controller
                     'category_slug' => $categorySlug,
                     'parentSlug' => $parentSlug,
                     'product_types' => $productTypes,
-                    'available_colors' => $availableColors,
-                    'images' => $imagesWithColors
+                    'available_colors' => $availableColors
                 ];
             });
             
