@@ -723,7 +723,7 @@ class ProductsController extends Controller
      *     @OA\Parameter(
      *         name="color_id",
      *         in="query",
-     *         description="Filter images by color ID. If not provided, shows images from the first available color.",
+     *         description="Filter images by color ID. If not provided, shows all images for the product.",
      *         required=false,
      *         @OA\Schema(type="integer", example=1)
      *     ),
@@ -792,6 +792,14 @@ class ProductsController extends Controller
                  *                                 @OA\Property(property="value", type="string", example="30x40cm")
                  *                             )
                  *                         )
+                 *                     )
+                 *                 ),
+                 *                 @OA\Property(
+                 *                     property="available_colors",
+                 *                     type="array",
+                 *                     @OA\Items(
+                 *                         @OA\Property(property="id", type="integer", example=1),
+                 *                         @OA\Property(property="color_code", type="string", example="#FF0000")
                  *                     )
                  *                 ),
                  *                 @OA\Property(
@@ -956,18 +964,17 @@ class ProductsController extends Controller
             // Get product images with color filtering
             $images = $product->images;
             
-            // If no color_id provided, get the first available color
-            if (!$colorId) {
-                $firstColorId = $images->where('color_id', '!=', null)->min('color_id');
-                if ($firstColorId) {
-                    $colorId = $firstColorId;
-                }
-            }
+            // Get available colors for this product
+            $availableColors = $images->where('product_color_id', '!=', null)
+                ->pluck('product_color_id')
+                ->unique()
+                ->values();
             
-            // Filter images by color_id if specified
+            // Filter images by product_color_id if specified
             if ($colorId) {
-                $images = $images->where('color_id', $colorId);
+                $images = $images->where('product_color_id', $colorId);
             }
+            // If no color_id provided, return all images (no filtering)
             
             $productImages = $images->map(function ($image) {
                 $imageData = [
@@ -978,8 +985,8 @@ class ProductsController extends Controller
                 ];
                 
                 // Only include color_id if it's not null
-                if ($image->color_id !== null) {
-                    $imageData['color_id'] = $image->color_id;
+                if ($image->product_color_id !== null) {
+                    $imageData['color_id'] = $image->product_color_id;
                 }
                 
                 return $imageData;
@@ -989,6 +996,18 @@ class ProductsController extends Controller
             $discountPrice = null;
             if ($product->discount_percent && $product->discount_percent > 0) {
                 $discountPrice = $product->price - ($product->price * $product->discount_percent / 100);
+            }
+
+            // Get color details for available colors
+            $availableColorDetails = [];
+            if ($availableColors->isNotEmpty()) {
+                $colors = ProductColor::whereIn('id', $availableColors)->get();
+                $availableColorDetails = $colors->map(function ($color) {
+                    return [
+                        'id' => $color->id,
+                        'color_code' => $color->color_code
+                    ];
+                });
             }
 
             $productData = [
@@ -1004,6 +1023,7 @@ class ProductsController extends Controller
                 'product_accordions' => $productAccordions,
                 'product_details' => $productDetails,
                 'product_detail_values' => $productDetailValues,
+                'available_colors' => $availableColorDetails,
                 'images' => $productImages
             ];
 
