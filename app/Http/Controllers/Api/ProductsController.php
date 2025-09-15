@@ -1667,6 +1667,12 @@ class ProductsController extends Controller
      *         required=true,
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="color_id", type="integer", example=1, description="Product color ID (optional)")
+     *         )
+     *     ),
      *     @OA\SecurityRequirement(name="bearerAuth"),
      *     @OA\Response(
      *         response=200,
@@ -1677,7 +1683,8 @@ class ProductsController extends Controller
      *             @OA\Property(property="data", type="object", 
      *                 properties={
      *                     @OA\Property(property="is_compared", type="boolean", example=true),
-     *                     @OA\Property(property="compare_count", type="integer", example=2)
+     *                     @OA\Property(property="compare_count", type="integer", example=2),
+     *                     @OA\Property(property="color_id", type="integer", example=1, nullable=true)
      *                 }
      *             )
      *         )
@@ -1706,6 +1713,7 @@ class ProductsController extends Controller
     {
         try {
             $userId = $request->user()->id;
+            $colorId = $request->input('color_id');
 
             // Check if product exists
             $product = Product::active()->find($id);
@@ -1717,8 +1725,17 @@ class ProductsController extends Controller
                 ], 404);
             }
 
+            // Validate color_id if provided
+            if ($colorId && !ProductColor::find($colorId)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Rəng tapılmadı',
+                    'data' => null
+                ], 404);
+            }
+
             // Check if already in compare list
-            if (ProductCompare::isCompared($userId, $id)) {
+            if (ProductCompare::isCompared($userId, $id, $colorId)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Məhsul artıq müqayisə siyahısındadır',
@@ -1737,14 +1754,15 @@ class ProductsController extends Controller
             }
 
             // Add to compare
-            ProductCompare::addToCompare($userId, $id);
+            ProductCompare::addToCompare($userId, $id, $colorId);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Məhsul müqayisə siyahısına əlavə edildi',
                 'data' => [
                     'is_compared' => true,
-                    'compare_count' => $compareCount + 1
+                    'compare_count' => $compareCount + 1,
+                    'color_id' => $colorId
                 ]
             ], 200);
 
@@ -1771,6 +1789,12 @@ class ProductsController extends Controller
      *         required=true,
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="color_id", type="integer", example=1, description="Product color ID (optional)")
+     *         )
+     *     ),
      *     @OA\SecurityRequirement(name="bearerAuth"),
      *     @OA\Response(
      *         response=200,
@@ -1781,7 +1805,8 @@ class ProductsController extends Controller
      *             @OA\Property(property="data", type="object", 
      *                 properties={
      *                     @OA\Property(property="is_compared", type="boolean", example=false),
-     *                     @OA\Property(property="compare_count", type="integer", example=1)
+     *                     @OA\Property(property="compare_count", type="integer", example=1),
+     *                     @OA\Property(property="color_id", type="integer", example=1, nullable=true)
      *                 }
      *             )
      *         )
@@ -1801,6 +1826,7 @@ class ProductsController extends Controller
     {
         try {
             $userId = $request->user()->id;
+            $colorId = $request->input('color_id');
 
             // Check if product exists
             $product = Product::active()->find($id);
@@ -1813,7 +1839,7 @@ class ProductsController extends Controller
             }
 
             // Remove from compare
-            ProductCompare::removeFromCompare($userId, $id);
+            ProductCompare::removeFromCompare($userId, $id, $colorId);
 
             $compareCount = ProductCompare::getCompareCount($userId);
 
@@ -1822,7 +1848,8 @@ class ProductsController extends Controller
                 'message' => 'Məhsul müqayisə siyahısından silindi',
                 'data' => [
                     'is_compared' => false,
-                    'compare_count' => $compareCount
+                    'compare_count' => $compareCount,
+                    'color_id' => $colorId
                 ]
             ], 200);
 
@@ -1870,7 +1897,12 @@ class ProductsController extends Controller
      *                 @OA\Property(property="types", type="array", @OA\Items(type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="title", type="string", example="Yemək masası")
-     *                 ))
+     *                 )),
+     *                 @OA\Property(property="color_id", type="integer", example=1, nullable=true),
+     *                 @OA\Property(property="color", type="object", nullable=true,
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="color_code", type="string", example="#FF0000")
+     *                 )
      *             )),
      *             @OA\Property(property="compare_count", type="integer", example=3)
      *         )
@@ -1899,7 +1931,8 @@ class ProductsController extends Controller
                     },
                     'product.images' => function($query) {
                         $query->where('status', true)->orderBy('order');
-                    }
+                    },
+                    'color'
                 ])
                 ->where('user_id', $userId)
                 ->whereHas('product', function($query) {
@@ -1966,7 +1999,12 @@ class ProductsController extends Controller
                         'main_image' => $mainImage ? $mainImage->image_url : asset('images/default_image.webp'),
                         'description' => $translation ? $translation->description : null,
                         'categories' => $categories,
-                        'types' => $types
+                        'types' => $types,
+                        'color_id' => $compare->color_id,
+                        'color' => $compare->color ? [
+                            'id' => $compare->color->id,
+                            'color_code' => $compare->color->color_code
+                        ] : null
                     ];
                 })->filter(function ($item) {
                     // Filter out items without title or slug

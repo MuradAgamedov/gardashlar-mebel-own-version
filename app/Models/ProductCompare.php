@@ -12,11 +12,13 @@ class ProductCompare extends Model
     protected $fillable = [
         'user_id',
         'product_id',
+        'color_id',
     ];
 
     protected $casts = [
         'user_id' => 'integer',
         'product_id' => 'integer',
+        'color_id' => 'integer',
     ];
 
     /**
@@ -36,34 +38,58 @@ class ProductCompare extends Model
     }
 
     /**
+     * Get the color of the compared product
+     */
+    public function color()
+    {
+        return $this->belongsTo(ProductColor::class, 'color_id');
+    }
+
+    /**
      * Check if a user has compared a specific product
      */
-    public static function isCompared($userId, $productId)
+    public static function isCompared($userId, $productId, $colorId = null)
     {
-        return static::where('user_id', $userId)
-                    ->where('product_id', $productId)
-                    ->exists();
+        $query = static::where('user_id', $userId)
+                      ->where('product_id', $productId);
+        
+        if ($colorId !== null) {
+            $query->where('color_id', $colorId);
+        }
+        
+        return $query->exists();
     }
 
     /**
      * Add a product to compare
      */
-    public static function addToCompare($userId, $productId)
+    public static function addToCompare($userId, $productId, $colorId = null)
     {
-        return static::firstOrCreate([
+        $data = [
             'user_id' => $userId,
             'product_id' => $productId,
-        ]);
+        ];
+        
+        if ($colorId !== null) {
+            $data['color_id'] = $colorId;
+        }
+        
+        return static::firstOrCreate($data);
     }
 
     /**
      * Remove a product from compare
      */
-    public static function removeFromCompare($userId, $productId)
+    public static function removeFromCompare($userId, $productId, $colorId = null)
     {
-        return static::where('user_id', $userId)
-                    ->where('product_id', $productId)
-                    ->delete();
+        $query = static::where('user_id', $userId)
+                      ->where('product_id', $productId);
+        
+        if ($colorId !== null) {
+            $query->where('color_id', $colorId);
+        }
+        
+        return $query->delete();
     }
 
     /**
