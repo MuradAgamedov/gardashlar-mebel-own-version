@@ -2080,4 +2080,88 @@ class ProductsController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * @OA\Post(
+     *     path="/api/products/favorites/check",
+     *     operationId="checkFavoriteProducts",
+     *     tags={"Products"},
+     *     summary="Check if products exist (for non-registered users)",
+     *     description="Check if provided product IDs exist and are active",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="product_ids", type="array", @OA\Items(type="integer"), example={1, 2, 3, 4}, description="Array of product IDs to check")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="existing_products", type="array", @OA\Items(type="integer"), example={1, 2, 3}),
+     *                 @OA\Property(property="non_existing_products", type="array", @OA\Items(type="integer"), example={4}),
+     *                 @OA\Property(property="total_requested", type="integer", example=4),
+     *                 @OA\Property(property="total_existing", type="integer", example=3),
+     *                 @OA\Property(property="total_non_existing", type="integer", example=1)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid request",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validation error"),
+     *             @OA\Property(property="data", type="null")
+     *         )
+     *     )
+     * )
+     */
+    public function checkFavoriteProducts(Request $request)
+    {
+        try {
+            // Validate request
+            $request->validate([
+                'product_ids' => 'required|array|min:1|max:50',
+                'product_ids.*' => 'required|integer|min:1'
+            ]);
+
+            $productIds = $request->input('product_ids', []);
+            
+            // Get existing active products
+            $existingProducts = Product::active()
+                ->whereIn('id', $productIds)
+                ->pluck('id')
+                ->toArray();
+            
+            // Find non-existing products
+            $nonExistingProducts = array_diff($productIds, $existingProducts);
+            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'existing_products' => array_values($existingProducts),
+                    'non_existing_products' => array_values($nonExistingProducts),
+                    'total_requested' => count($productIds),
+                    'total_existing' => count($existingProducts),
+                    'total_non_existing' => count($nonExistingProducts)
+                ]
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? []),
+                'data' => null
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Məhsulları yoxlayarkən xəta baş verdi: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
+    }
 }
