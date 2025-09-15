@@ -1389,17 +1389,23 @@ class ProductsController extends Controller
      *         required=true,
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="color_id", type="integer", example=1, description="Product color ID (optional)")
+     *         )
+     *     ),
      *     @OA\SecurityRequirement(name="bearerAuth"),
      *     @OA\Response(
      *         response=200,
      *         description="Product removed from favorites successfully",
      *         @OA\JsonContent(
-
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Məhsul seçilmişlərdən silindi"),
      *             @OA\Property(property="data", type="object",
      *                 properties={
-     *                     @OA\Property(property="is_favorited", type="boolean", example=false)
+     *                     @OA\Property(property="is_favorited", type="boolean", example=false),
+     *                     @OA\Property(property="color_id", type="integer", example=1, nullable=true)
      *                 }
      *             )
      *         )
@@ -1492,7 +1498,26 @@ class ProductsController extends Controller
      *                 @OA\Property(property="slug", type="string", example="modern-masa"),
      *                 @OA\Property(property="price", type="number", example=299.99),
      *                 @OA\Property(property="discount_percent", type="number", example=10),
-     *                 @OA\Property(property="main_image", type="string", example="https://example.com/storage/products/image.jpg")
+     *                 @OA\Property(property="main_image", type="string", example="https://example.com/storage/products/image.jpg"),
+     *                 @OA\Property(property="color_id", type="integer", example=1, nullable=true),
+     *                 @OA\Property(property="color", type="object", nullable=true,
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="color_code", type="string", example="#FF0000")
+     *                 ),
+     *                 @OA\Property(property="available_colors", type="array", @OA\Items(type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="color_code", type="string", example="#FF0000")
+     *                 )),
+     *                 @OA\Property(property="images", type="array", @OA\Items(type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="image_url", type="string", example="https://example.com/storage/products/image.jpg"),
+     *                     @OA\Property(property="is_main", type="boolean", example=true),
+     *                     @OA\Property(property="order", type="integer", example=1),
+     *                     @OA\Property(property="color", type="object", nullable=true,
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="color_code", type="string", example="#FF0000")
+     *                     )
+     *                 ))
      *             )),
      *             @OA\Property(property="pagination", type="object",
      *                 @OA\Property(property="current_page", type="integer", example=1),
@@ -1525,6 +1550,8 @@ class ProductsController extends Controller
                     'product.images' => function($query) {
                         $query->where('status', true)->orderBy('order');
                     },
+                    'product.images.color',
+                    'product.colors',
                     'color'
                 ])
                 ->where('user_id', $userId)
@@ -1552,6 +1579,28 @@ class ProductsController extends Controller
                     // Get main image
                     $mainImage = $product->images()->where('status', true)->first();
 
+                    // Get all available colors for this product
+                    $availableColors = $product->colors->map(function($color) {
+                        return [
+                            'id' => $color->id,
+                            'color_code' => $color->color_code
+                        ];
+                    });
+
+                    // Get images with their colors
+                    $imagesWithColors = $product->images->where('status', true)->map(function($image) {
+                        return [
+                            'id' => $image->id,
+                            'image_url' => $image->image_url,
+                            'is_main' => $image->is_main,
+                            'order' => $image->order,
+                            'color' => $image->color ? [
+                                'id' => $image->color->id,
+                                'color_code' => $image->color->color_code
+                            ] : null
+                        ];
+                    })->sortBy('order')->values();
+
                     return [
                         'id' => $product->id,
                         'title' => $translation ? $translation->title : null,
@@ -1563,7 +1612,9 @@ class ProductsController extends Controller
                         'color' => $favorite->color ? [
                             'id' => $favorite->color->id,
                             'color_code' => $favorite->color->color_code
-                        ] : null
+                        ] : null,
+                        'available_colors' => $availableColors,
+                        'images' => $imagesWithColors
                     ];
                 })->filter(function ($item) {
                     // Filter out items without title or slug

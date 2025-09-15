@@ -64,6 +64,21 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 
+    /**
+     * Get all colors available for this product through images
+     */
+    public function colors()
+    {
+        return $this->hasManyThrough(
+            ProductColor::class,
+            ProductImage::class,
+            'product_id', // Foreign key on ProductImage table
+            'id', // Foreign key on ProductColor table
+            'id', // Local key on Product table
+            'product_color_id' // Local key on ProductImage table
+        )->distinct();
+    }
+
     public function details()
     {
         return $this->hasMany(ProductDetail::class);
