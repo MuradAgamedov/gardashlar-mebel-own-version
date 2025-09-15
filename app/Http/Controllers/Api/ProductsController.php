@@ -1296,6 +1296,12 @@ class ProductsController extends Controller
     *         required=true,
     *         @OA\Schema(type="integer", example=1)
     *     ),
+    *     @OA\RequestBody(
+    *         required=false,
+    *         @OA\JsonContent(
+    *             @OA\Property(property="color_id", type="integer", example=1, description="Product color ID (optional)")
+    *         )
+    *     ),
     *     @OA\SecurityRequirement(name="bearerAuth"),
     *     @OA\Response(
     *         response=200,
@@ -1306,7 +1312,8 @@ class ProductsController extends Controller
     *             @OA\Property(
     *                 property="data",
     *                 type="object",
-    *                 @OA\Property(property="is_favorited", type="boolean", example=true)
+    *                 @OA\Property(property="is_favorited", type="boolean", example=true),
+    *                 @OA\Property(property="color_id", type="integer", example=1, nullable=true)
     *             )
     *         )
     *     ),
@@ -1517,7 +1524,8 @@ class ProductsController extends Controller
                     },
                     'product.images' => function($query) {
                         $query->where('status', true)->orderBy('order');
-                    }
+                    },
+                    'color'
                 ])
                 ->where('user_id', $userId)
                 ->whereHas('product', function($query) {
@@ -1550,7 +1558,12 @@ class ProductsController extends Controller
                         'slug' => $translation ? $translation->slug : null,
                         'price' => $product->price,
                         'discount_percent' => $product->discount_percent,
-                        'main_image' => $mainImage ? $mainImage->image_url : asset('images/default_image.webp')
+                        'main_image' => $mainImage ? $mainImage->image_url : asset('images/default_image.webp'),
+                        'color_id' => $favorite->color_id,
+                        'color' => $favorite->color ? [
+                            'id' => $favorite->color->id,
+                            'color_code' => $favorite->color->color_code
+                        ] : null
                     ];
                 })->filter(function ($item) {
                     // Filter out items without title or slug
