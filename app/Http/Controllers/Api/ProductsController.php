@@ -2143,11 +2143,17 @@ class ProductsController extends Controller
                     'images' => function($query) {
                         $query->where('status', true)->orderBy('order');
                     },
+                    'images.color' => function($query) {
+                        $query->select('id', 'color_code');
+                    },
                     'categories.translates' => function($query) use ($languageId) {
                         $query->where('language_id', $languageId);
                     },
                     'types.translates' => function($query) use ($languageId) {
                         $query->where('language_id', $languageId);
+                    },
+                    'colors' => function($query) {
+                        $query->select('id', 'color_code');
                     }
                 ])
                 ->get();
@@ -2194,6 +2200,28 @@ class ProductsController extends Controller
                     ];
                 });
                 
+                // Get available colors for this product
+                $availableColors = $product->colors->map(function($color) {
+                    return [
+                        'id' => $color->id,
+                        'color_code' => $color->color_code
+                    ];
+                });
+                
+                // Get images with their colors
+                $imagesWithColors = $product->images->map(function($image) {
+                    return [
+                        'id' => $image->id,
+                        'image_url' => $image->image ? asset('storage/' . $image->image) : null,
+                        'is_main' => $image->is_main,
+                        'order' => $image->order,
+                        'color' => $image->color ? [
+                            'id' => $image->color->id,
+                            'color_code' => $image->color->color_code
+                        ] : null
+                    ];
+                })->sortBy('order')->values();
+                
                 return [
                     'id' => $product->id,
                     'title' => $translation ? $translation->title : '',
@@ -2204,19 +2232,15 @@ class ProductsController extends Controller
                     'discount_percent' => $product->discount_percent,
                     'category_slug' => $categorySlug,
                     'parentSlug' => $parentSlug,
-                    'product_types' => $productTypes
+                    'product_types' => $productTypes,
+                    'available_colors' => $availableColors,
+                    'images' => $imagesWithColors
                 ];
             });
             
             return response()->json([
                 'success' => true,
-                'data' => [
-                    'existing_products' => $productsData,
-                    'non_existing_products' => array_values($nonExistingProducts),
-                    'total_requested' => count($productIds),
-                    'total_existing' => count($existingProducts),
-                    'total_non_existing' => count($nonExistingProducts)
-                ]
+                'data' => $productsData
             ], 200);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
