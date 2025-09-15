@@ -2144,7 +2144,7 @@ class ProductsController extends Controller
                         $query->where('status', true)->orderBy('order');
                     },
                     'images.color' => function($query) {
-                        $query->select('id', 'color_code');
+                        $query->select('product_colors.id', 'product_colors.color_code');
                     },
                     'categories.translates' => function($query) use ($languageId) {
                         $query->where('language_id', $languageId);
@@ -2153,7 +2153,7 @@ class ProductsController extends Controller
                         $query->where('language_id', $languageId);
                     },
                     'colors' => function($query) {
-                        $query->select('id', 'color_code');
+                        $query->select('product_colors.id', 'product_colors.color_code');
                     }
                 ])
                 ->get();
