@@ -2130,19 +2130,88 @@ class ProductsController extends Controller
 
             $productIds = $request->input('product_ids', []);
             
-            // Get existing active products
+            // Get language ID from header using trait
+            $languageId = $this->getLanguageIdFromHeader($request);
+            
+            // Get existing active products with all relationships
             $existingProducts = Product::active()
                 ->whereIn('id', $productIds)
-                ->pluck('id')
-                ->toArray();
+                ->with([
+                    'translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'images' => function($query) {
+                        $query->where('status', true)->orderBy('order');
+                    },
+                    'categories.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'types.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    }
+                ])
+                ->get();
             
             // Find non-existing products
-            $nonExistingProducts = array_diff($productIds, $existingProducts);
+            $existingProductIds = $existingProducts->pluck('id')->toArray();
+            $nonExistingProducts = array_diff($productIds, $existingProductIds);
+            
+            // Format existing products data
+            $productsData = $existingProducts->map(function ($product) use ($languageId) {
+                $translation = $product->translates->first();
+                
+                // Find main image - first try to find is_main=true, then fallback to first image
+                $mainImage = $product->images->where('is_main', true)->first();
+                if (!$mainImage) {
+                    $mainImage = $product->images->first();
+                }
+                
+                // Get category information
+                $categorySlug = null;
+                $parentSlug = null;
+                
+                if ($product->categories->isNotEmpty()) {
+                    // Get the first category (assuming products have one primary category)
+                    $category = $product->categories->first();
+                    $categoryTranslation = $category->translates->first();
+                    $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
+                    
+                    // Get parent slug if category has parent
+                    if ($category->parent_id) {
+                        $parentCategory = ProductCategory::find($category->parent_id);
+                        if ($parentCategory) {
+                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
+                            $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
+                        }
+                    }
+                }
+                
+                $productTypes = $product->types->map(function ($type) {
+                    $translation = $type->translates->first();
+                    return [
+                        'id' => $type->id,
+                        'title' => $translation ? $translation->title : ''
+                    ];
+                });
+                
+                return [
+                    'id' => $product->id,
+                    'title' => $translation ? $translation->title : '',
+                    'slug' => $translation ? $translation->slug : '',
+                    'price' => $product->price,
+                    'view_count' => $product->view_count,
+                    'card_image' => $mainImage && $mainImage->image ? asset('storage/' . $mainImage->image) : asset('images/default_image.webp'),
+                    'discount_percent' => $product->discount_percent,
+                    'category_slug' => $categorySlug,
+                    'parentSlug' => $parentSlug,
+                    'product_types' => $productTypes
+                ];
+            });
             
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'existing_products' => array_values($existingProducts),
+                    'existing_products' => $productsData,
                     'non_existing_products' => array_values($nonExistingProducts),
                     'total_requested' => count($productIds),
                     'total_existing' => count($existingProducts),
