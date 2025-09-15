@@ -41,7 +41,8 @@ class ProjectImageController extends Controller
     public function store(Request $request, Project $project)
     {
         $validator = Validator::make($request->all(), [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'images' => 'required|array|min:1|max:10',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'status' => 'boolean',
         ]);
 
@@ -52,28 +53,52 @@ class ProjectImageController extends Controller
         }
 
         try {
-            // Handle image upload
-            if ($request->hasFile('image')) {
-                $imagePath = $this->imageService->upload($request->file('image'), 'projects');
-            }
+            $uploadedImages = [];
+            $errors = [];
 
             // Get max order
             $maxOrder = $project->images()->max('order') ?? 0;
 
-            $projectImage = $project->images()->create([
-                'image' => $imagePath,
-                'is_main_image' => false, // Always false for new images
-                'order' => $maxOrder + 1,
-                'status' => $request->boolean('status', true),
-            ]);
+            // Handle multiple image uploads
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $index => $image) {
+                    try {
+                        $imagePath = $this->imageService->upload($image, 'projects');
+                        
+                        $projectImage = $project->images()->create([
+                            'image' => $imagePath,
+                            'is_main_image' => false, // Always false for new images
+                            'order' => $maxOrder + $index + 1,
+                            'status' => $request->boolean('status', true),
+                        ]);
 
-            return redirect()->route('admin.projects.images.index', $project)
-                ->with('success', 'Image added successfully!');
+                        $uploadedImages[] = $projectImage;
+                    } catch (\Exception $e) {
+                        $errors[] = "Error uploading image " . ($index + 1) . ": " . $e->getMessage();
+                        \Log::error('Error uploading project image ' . ($index + 1) . ': ' . $e->getMessage());
+                    }
+                }
+            }
+
+            if (count($uploadedImages) > 0) {
+                $message = count($uploadedImages) . ' image(s) uploaded successfully!';
+                if (count($errors) > 0) {
+                    $message .= ' However, ' . count($errors) . ' image(s) failed to upload.';
+                }
+                
+                return redirect()->route('admin.projects.images.index', $project)
+                    ->with('success', $message)
+                    ->with('upload_errors', $errors);
+            } else {
+                return redirect()->back()
+                    ->with('error', 'No images were uploaded successfully. ' . implode(' ', $errors))
+                    ->withInput();
+            }
 
         } catch (\Exception $e) {
-            \Log::error('Error creating project image: ' . $e->getMessage());
+            \Log::error('Error creating project images: ' . $e->getMessage());
             return redirect()->back()
-                ->with('error', 'Error creating image: ' . $e->getMessage())
+                ->with('error', 'Error creating images: ' . $e->getMessage())
                 ->withInput();
         }
     }
