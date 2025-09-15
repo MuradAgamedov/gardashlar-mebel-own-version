@@ -1326,6 +1326,7 @@ class ProductsController extends Controller
     {
         try {
             $userId = $request->user()->id;
+            $colorId = $request->input('color_id');
 
             // Check if product exists
             $product = Product::active()->find($id);
@@ -1337,14 +1338,24 @@ class ProductsController extends Controller
                 ], 404);
             }
 
+            // Validate color_id if provided
+            if ($colorId && !ProductColor::find($colorId)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Rəng tapılmadı',
+                    'data' => null
+                ], 404);
+            }
+
             // Add to favorites
-            ProductFavorite::addToFavorites($userId, $id);
+            ProductFavorite::addToFavorites($userId, $id, $colorId);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Məhsul seçilmişlərə əlavə edildi',
                 'data' => [
-                    'is_favorited' => true
+                    'is_favorited' => true,
+                    'color_id' => $colorId
                 ]
             ], 200);
 
@@ -1401,6 +1412,7 @@ class ProductsController extends Controller
     {
         try {
             $userId = $request->user()->id;
+            $colorId = $request->input('color_id');
 
             // Check if product exists
             $product = Product::active()->find($id);
@@ -1413,13 +1425,14 @@ class ProductsController extends Controller
             }
 
             // Remove from favorites
-            ProductFavorite::removeFromFavorites($userId, $id);
+            ProductFavorite::removeFromFavorites($userId, $id, $colorId);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Məhsul seçilmişlərdən silindi',
                 'data' => [
-                    'is_favorited' => false
+                    'is_favorited' => false,
+                    'color_id' => $colorId
                 ]
             ], 200);
 
