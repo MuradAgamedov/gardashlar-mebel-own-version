@@ -102,7 +102,7 @@
                                         </div>
                                     @enderror
                                     <small class="form-text text-muted">
-                                        Supported formats: JPEG, PNG, JPG, GIF, WebP. Maximum size: 2MB per image. You can select up to 10 images at once.
+                                        Supported formats: JPEG, PNG, JPG, GIF, WebP. Maximum size: 2MB per image. You can select multiple images at once.
                                     </small>
                                     <div id="selectedFiles" class="mt-3"></div>
                                 </div>
@@ -153,15 +153,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (this.files && this.files.length > 0) {
             selectedFiles.innerHTML = '';
             
-            // Validate file count
-            if (this.files.length > 10) {
+            // Optional: Add file count warning for very large selections
+            if (this.files.length > 100) {
                 selectedFiles.innerHTML = `
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <strong>Error:</strong> You can only select up to 10 images at once. Please select fewer images.
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <strong>Warning:</strong> You have selected ${this.files.length} images. This may take a while to upload.
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 `;
-                return;
             }
             
             // Process each file
