@@ -208,6 +208,23 @@
                                                         @enderror
                                                     </div>
                                                     
+                                                    <!-- SEO Text -->
+                                                    <div class="col-md-12">
+                                                        <label class="form-label">SEO Text</label>
+                                                        <textarea class="form-control ckeditor @error("translations.{$language->id}.seo_text") is-invalid @enderror" 
+                                                                  name="translations[{{ $language->id }}][seo_text]" 
+                                                                  id="seo_text_{{ $language->id }}"
+                                                                  rows="8"
+                                                                  placeholder="SEO text content for {{ $language->lang_name }}">{{ old("translations.{$language->id}.seo_text", $translation ? $translation->seo_text : '') }}</textarea>
+                                                        @error("translations.{$language->id}.seo_text")
+                                                            <div class="invalid-feedback">
+                                                                {{ $message }}
+                                                            </div>
+                                                        @enderror
+                                                        <small class="form-text text-muted">
+                                                            Rich text content for SEO purposes. Use the editor to format your content.
+                                                        </small>
+                                                    </div>
                                                     
                                                     <!-- Image Alt Text -->
                                                     <div class="col-md-12">
@@ -257,7 +274,34 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // No CKEditor initialization needed
+    // Initialize CKEditor for seo_text fields
+    const seoTextElements = document.querySelectorAll('.ckeditor');
+    seoTextElements.forEach(function(element) {
+        if (element.id && element.id.startsWith('seo_text_')) {
+            ClassicEditor.create(element, {
+                toolbar: {
+                    items: [
+                        'heading', '|',
+                        'bold', 'italic', 'underline', '|',
+                        'bulletedList', 'numberedList', '|',
+                        'outdent', 'indent', '|',
+                        'blockQuote', 'insertTable', '|',
+                        'undo', 'redo'
+                    ]
+                },
+                language: 'en',
+                table: {
+                    contentToolbar: [
+                        'tableColumn',
+                        'tableRow',
+                        'mergeTableCells'
+                    ]
+                }
+            }).catch(error => {
+                console.error('Error initializing CKEditor:', error);
+            });
+        }
+    });
 });
 
 // Image preview for category image
