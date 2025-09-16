@@ -10,6 +10,7 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
+        'project_category_id',
         'view_count',
         'order',
         'status',
@@ -34,6 +35,11 @@ class Product extends Model
     public function types()
     {
         return $this->belongsToMany(ProductType::class, 'product_product_type');
+    }
+
+    public function projectCategory()
+    {
+        return $this->belongsTo(ProjectCategory::class);
     }
 
     /**
