@@ -211,8 +211,9 @@
                                                     <!-- SEO Content -->
                                                     <div class="col-md-12">
                                                         <label class="form-label">SEO Content</label>
-                                                        <textarea class="form-control @error("translations.{$language->id}.seo_content") is-invalid @enderror" 
+                                                        <textarea class="form-control ckeditor @error("translations.{$language->id}.seo_content") is-invalid @enderror" 
                                                                   name="translations[{{ $language->id }}][seo_content]" 
+                                                                  id="seo_content_{{ $language->id }}"
                                                                   rows="8"
                                                                   placeholder="SEO content for {{ $language->lang_name }} (long text)">{{ old("translations.{$language->id}.seo_content", $translation ? $translation->seo_content : '') }}</textarea>
                                                         @error("translations.{$language->id}.seo_content")

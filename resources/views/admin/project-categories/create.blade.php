@@ -193,8 +193,9 @@
                                                     <!-- SEO Content -->
                                                     <div class="col-md-12">
                                                         <label class="form-label">SEO Content</label>
-                                                        <textarea class="form-control @error("translations.{$language->id}.seo_content") is-invalid @enderror" 
+                                                        <textarea class="form-control ckeditor @error("translations.{$language->id}.seo_content") is-invalid @enderror" 
                                                                   name="translations[{{ $language->id }}][seo_content]" 
+                                                                  id="seo_content_{{ $language->id }}"
                                                                   rows="8"
                                                                   placeholder="SEO content for {{ $language->lang_name }} (long text)">{{ old("translations.{$language->id}.seo_content") }}</textarea>
                                                         @error("translations.{$language->id}.seo_content")
@@ -255,7 +256,30 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-
+    // Initialize CKEditor for SEO Content fields
+    const seoContentTextareas = document.querySelectorAll('.ckeditor');
+    seoContentTextareas.forEach(function(textarea) {
+        if (textarea.id.startsWith('seo_content_')) {
+            CKEDITOR.replace(textarea.id, {
+                height: 300,
+                toolbar: [
+                    { name: 'document', items: [ 'Source', '-', 'NewPage', 'Preview', 'Print', '-', 'Templates' ] },
+                    { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+                    { name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll', '-', 'Scayt' ] },
+                    { name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
+                    '/',
+                    { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'CopyFormatting', 'RemoveFormat' ] },
+                    { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl' ] },
+                    { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+                    { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar', 'PageBreak', 'Iframe' ] },
+                    '/',
+                    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+                    { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+                    { name: 'tools', items: [ 'Maximize', 'ShowBlocks' ] }
+                ]
+            });
+        }
+    });
 });
 
 // Image preview for category image
