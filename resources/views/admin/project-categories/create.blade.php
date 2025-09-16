@@ -190,6 +190,23 @@
                                                         @enderror
                                                     </div>
                                                     
+                                                    <!-- SEO Content -->
+                                                    <div class="col-md-12">
+                                                        <label class="form-label">SEO Content</label>
+                                                        <textarea class="form-control @error("translations.{$language->id}.seo_content") is-invalid @enderror" 
+                                                                  name="translations[{{ $language->id }}][seo_content]" 
+                                                                  rows="8"
+                                                                  placeholder="SEO content for {{ $language->lang_name }} (long text)">{{ old("translations.{$language->id}.seo_content") }}</textarea>
+                                                        @error("translations.{$language->id}.seo_content")
+                                                            <div class="invalid-feedback">
+                                                                {{ $message }}
+                                                            </div>
+                                                        @enderror
+                                                        <small class="form-text text-muted">
+                                                            Long text content for SEO purposes in {{ $language->lang_name }}.
+                                                        </small>
+                                                    </div>
+                                                    
                                                     <!-- Image Alt Text -->
                                                     <div class="col-md-12">
                                                         <label class="form-label">Image Alt Text</label>
