@@ -75,6 +75,7 @@ class ProductCategoryController extends Controller
             'translates.*.seo_title' => 'nullable|string|max:255',
             'translates.*.seo_keywords' => 'nullable|string',
             'translates.*.seo_description' => 'nullable|string',
+            'translates.*.seo_text' => 'nullable|string',
         ], [
             'translates.required' => 'At least one language translation is required.',
             'translates.*.title.required' => 'Title is required for all languages.',
@@ -106,6 +107,7 @@ class ProductCategoryController extends Controller
                     'seo_title' => trim($translate['seo_title'] ?? ''),
                     'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
                     'seo_description' => trim($translate['seo_description'] ?? ''),
+                    'seo_text' => trim($translate['seo_text'] ?? ''),
                     'image_alt_text' => trim($translate['image_alt_text'] ?? ''),
                 ]);
             }
@@ -162,6 +164,7 @@ class ProductCategoryController extends Controller
             'translates.*.seo_title' => 'nullable|string|max:255',
             'translates.*.seo_keywords' => 'nullable|string',
             'translates.*.seo_description' => 'nullable|string',
+            'translates.*.seo_text' => 'nullable|string',
         ];
 
         // Add unique validation for slug only if it has changed
@@ -230,6 +233,7 @@ class ProductCategoryController extends Controller
                         'seo_title' => trim($translate['seo_title'] ?? ''),
                         'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
                         'seo_description' => trim($translate['seo_description'] ?? ''),
+                        'seo_text' => trim($translate['seo_text'] ?? ''),
                         'image_alt_text' => trim($translate['image_alt_text'] ?? ''),
                     ]);
                 } else {
@@ -241,6 +245,7 @@ class ProductCategoryController extends Controller
                         'seo_title' => trim($translate['seo_title'] ?? ''),
                         'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
                         'seo_description' => trim($translate['seo_description'] ?? ''),
+                        'seo_text' => trim($translate['seo_text'] ?? ''),
                         'image_alt_text' => trim($translate['image_alt_text'] ?? ''),
                     ]);
                 }
