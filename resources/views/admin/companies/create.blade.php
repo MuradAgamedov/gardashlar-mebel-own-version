@@ -100,7 +100,7 @@
                                                            name="translates[{{ $language->id }}][title]" 
                                                            value="{{ old("translates.{$language->id}.title") }}"
                                                            placeholder="Enter title"
-                                                           required>
+                                                           @if($index === 0) required @else data-required="true" @endif>
                                                     @error("translates.{$language->id}.title")
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -127,7 +127,7 @@
                                                     <input type="file" class="form-control @error("translates.{$language->id}.card_image") is-invalid @enderror" 
                                                            name="translates[{{ $language->id }}][card_image]" 
                                                            id="card-image-{{ $language->id }}"
-                                                           accept="image/*" required>
+                                                           accept="image/*" @if($index === 0) required @else data-required="true" @endif>
                                                     @error("translates.{$language->id}.card_image")
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -167,7 +167,7 @@
                                                     <input type="file" class="form-control @error("translates.{$language->id}.inner_image") is-invalid @enderror" 
                                                            name="translates[{{ $language->id }}][inner_image]" 
                                                            id="inner-image-{{ $language->id }}"
-                                                           accept="image/*" required>
+                                                           accept="image/*" @if($index === 0) required @else data-required="true" @endif>
                                                     @error("translates.{$language->id}.inner_image")
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -200,7 +200,8 @@
                                                       name="translates[{{ $language->id }}][description]" 
                                                       id="editor-{{ $language->id }}"
                                                       rows="8"
-                                                      placeholder="Enter description">{{ old("translates.{$language->id}.description") }}</textarea>
+                                                      placeholder="Enter description"
+                                                      @if($index === 0) required @else data-required="true" @endif>{{ old("translates.{$language->id}.description") }}</textarea>
                                             @error("translates.{$language->id}.description")
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -242,6 +243,56 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('form');
     if (form) {
         form.setAttribute('novalidate', 'novalidate');
+        
+        // Remove required attributes from all inputs in inactive tabs to prevent browser validation
+        document.querySelectorAll('.tab-pane:not(.show) input[required], .tab-pane:not(.show) textarea[required]').forEach(function(input) {
+            input.removeAttribute('required');
+            input.dataset.required = 'true'; // Store original required state
+        });
+        
+        // Also handle inputs that already have data-required="true"
+        document.querySelectorAll('input[data-required="true"], textarea[data-required="true"]').forEach(function(input) {
+            input.removeAttribute('required');
+        });
+        
+        // Restore required attributes when tabs become active
+        document.querySelectorAll('.nav-link[data-bs-toggle="tab"]').forEach(function(tab) {
+            tab.addEventListener('shown.bs.tab', function(e) {
+                const targetId = e.target.getAttribute('data-bs-target');
+                const targetPane = document.querySelector(targetId);
+                
+                // Remove required from all inputs in other tabs
+                document.querySelectorAll('.tab-pane input[required], .tab-pane textarea[required]').forEach(function(input) {
+                    if (!targetPane.contains(input)) {
+                        input.removeAttribute('required');
+                        input.dataset.required = 'true';
+                    }
+                });
+                
+                // Add required back to inputs in the active tab
+                if (targetPane) {
+                    targetPane.querySelectorAll('input[data-required="true"], textarea[data-required="true"]').forEach(function(input) {
+                        input.setAttribute('required', 'required');
+                        input.removeAttribute('data-required');
+                    });
+                }
+            });
+        });
+        
+        // Additional prevention of browser validation
+        form.addEventListener('invalid', function(e) {
+            e.preventDefault();
+            return false;
+        }, true);
+        
+        // Override form validation methods
+        form.checkValidity = function() {
+            return true;
+        };
+        
+        form.reportValidity = function() {
+            return true;
+        };
     }
     // Image preview for each language
     @foreach($languages as $language)
@@ -377,8 +428,8 @@ document.addEventListener('DOMContentLoaded', function() {
             let firstEmptyField = null;
             let firstEmptyTabId = null;
 
-            // Check all required text inputs
-            document.querySelectorAll('input[required], textarea[required]').forEach(function(input) {
+            // Check all required inputs (including those with data-required)
+            document.querySelectorAll('input[required], textarea[required], input[data-required="true"], textarea[data-required="true"]').forEach(function(input) {
                 if (input.type === 'file') {
                     // Handle file inputs
                     if (!input.files || input.files.length === 0) {
