@@ -138,15 +138,13 @@
                                                            class="btn btn-sm btn-outline-primary">
                                                             <i class="material-icons-outlined">edit</i>
                                                         </a>
-                                                        <form method="POST" action="{{ route('admin.companies.destroy', $company->id) }}" 
-                                                              style="display: inline-block;" 
-                                                              onsubmit="return confirm('Are you sure you want to delete this company?')">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                                <i class="material-icons-outlined">delete</i>
-                                                            </button>
-                                                        </form>
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-outline-danger delete-btn" 
+                                                                data-id="{{ $company->id }}"
+                                                                data-title="{{ $mainTranslate?->title ?? 'This company' }}"
+                                                                data-url="{{ route('admin.companies.destroy', $company->id) }}">
+                                                            <i class="material-icons-outlined">delete</i>
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -175,6 +173,7 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Sortable
@@ -214,7 +213,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Delete functionality is now handled by simple form submission
+    // Delete confirmation with SweetAlert
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const title = this.dataset.title;
+            const url = this.dataset.url;
+            
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Are you sure you want to delete "${title}" company?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Create form and submit
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = url;
+                    form.innerHTML = `
+                        @csrf
+                        @method('DELETE')
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        });
+    });
 });
 </script>
 
