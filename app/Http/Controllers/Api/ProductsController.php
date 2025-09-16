@@ -2144,7 +2144,7 @@ class ProductsController extends Controller
                         $query->where('status', true)->orderBy('order');
                     },
                     'images.color' => function($query) {
-                        $query->select('product_colors.id', 'product_colors.color_code', 'product_colors.color_id');
+                        $query->select('product_colors.id', 'product_colors.color_code');
                     },
                     'categories.translates' => function($query) use ($languageId) {
                         $query->where('language_id', $languageId);
@@ -2217,8 +2217,7 @@ class ProductsController extends Controller
                         'order' => $image->order,
                         'color' => $image->color ? [
                             'id' => $image->color->id,
-                            'color_code' => $image->color->color_code,
-                            'color_id' => $image->color->color_id
+                            'color_code' => $image->color->color_code
                         ] : null
                     ];
                 })->sortBy('order')->values();
@@ -2339,7 +2338,7 @@ class ProductsController extends Controller
                         $query->where('status', true)->orderBy('order');
                     },
                     'images.color' => function($query) {
-                        $query->select('product_colors.id', 'product_colors.color_code', 'product_colors.color_id');
+                        $query->select('product_colors.id', 'product_colors.color_code');
                     },
                     'categories.translates' => function($query) use ($languageId) {
                         $query->where('language_id', $languageId);
@@ -2412,8 +2411,7 @@ class ProductsController extends Controller
                         'order' => $image->order,
                         'color' => $image->color ? [
                             'id' => $image->color->id,
-                            'color_code' => $image->color->color_code,
-                            'color_id' => $image->color->color_id
+                            'color_code' => $image->color->color_code
                         ] : null
                     ];
                 })->sortBy('order')->values();
