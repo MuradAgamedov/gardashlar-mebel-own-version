@@ -312,6 +312,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 form.addEventListener('submit', function() {
                     editor.updateSourceElement();
                 });
+
+                // Handle validation errors by focusing on the editor
+                textarea.addEventListener('invalid', function() {
+                    editor.editing.view.focus();
+                });
+
+                // Override the focus method to focus on the editor instead of textarea
+                textarea.focus = function() {
+                    editor.editing.view.focus();
+                };
             })
             .catch(error => {
                 console.error(error);
