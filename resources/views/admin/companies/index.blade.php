@@ -138,12 +138,15 @@
                                                            class="btn btn-sm btn-outline-primary">
                                                             <i class="material-icons-outlined">edit</i>
                                                         </a>
-                                                        <button type="button" 
-                                                                class="btn btn-sm btn-outline-danger delete-btn" 
-                                                                data-id="{{ $company->id }}"
-                                                                data-title="{{ $mainTranslate?->title ?? 'This company' }}">
-                                                            <i class="material-icons-outlined">delete</i>
-                                                        </button>
+                                                        <form method="POST" action="{{ route('admin.companies.destroy', $company->id) }}" 
+                                                              style="display: inline-block;" 
+                                                              onsubmit="return confirm('Are you sure you want to delete this company?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                <i class="material-icons-outlined">delete</i>
+                                                            </button>
+                                                        </form>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -172,7 +175,6 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Sortable
@@ -212,57 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Delete confirmation
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const id = this.dataset.id;
-            const title = this.dataset.title;
-            
-            Swal.fire({
-                title: 'Are you sure?',
-                text: `Are you sure you want to delete "${title}" company?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete!',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Create a proper DELETE request using fetch
-                    fetch(`/admin/companies/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            // Reload the page to show updated list
-                            window.location.reload();
-                        } else {
-                            throw new Error('Delete failed');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        // Fallback to form submission
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = `/admin/companies/${id}`;
-                        form.innerHTML = `
-                            @csrf
-                            @method('DELETE')
-                        `;
-                        document.body.appendChild(form);
-                        form.submit();
-                    });
-                }
-            });
-        });
-    });
+    // Delete functionality is now handled by simple form submission
 });
 </script>
 
