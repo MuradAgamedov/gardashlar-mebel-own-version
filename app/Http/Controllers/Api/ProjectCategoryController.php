@@ -43,7 +43,6 @@ class ProjectCategoryController extends Controller
      *                 @OA\Property(property="seo_title", type="string", example="Soft Furniture Designs - Gardashlar"),
      *                 @OA\Property(property="seo_keywords", type="string", example="soft furniture, design, gardashlar"),
      *                 @OA\Property(property="seo_description", type="string", example="High quality soft furniture designs by Gardashlar"),
-     *                 @OA\Property(property="seo_text", type="string", example="<p>Rich text content for SEO purposes</p>"),
      *                 @OA\Property(property="image_alt_text", type="string", example="Soft furniture design category image"),
      *                 @OA\Property(property="image_url", type="string", example="https://example.com/category-image.jpg"),
      *                 @OA\Property(property="products", type="array", @OA\Items(type="object",
@@ -128,7 +127,6 @@ class ProjectCategoryController extends Controller
             'seo_title' => $translation ? $translation->seo_title : null,
             'seo_keywords' => $translation ? $translation->seo_keywords : null,
             'seo_description' => $translation ? $translation->seo_description : null,
-            'seo_text' => $translation ? $translation->seo_text : null,
             'image_alt_text' => $translation ? $translation->image_alt_text : null,
             'image_url' => $category->image_url,
             'products' => $products

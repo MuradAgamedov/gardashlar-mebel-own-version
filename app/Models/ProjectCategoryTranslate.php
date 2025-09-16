@@ -17,7 +17,6 @@ class ProjectCategoryTranslate extends Model
         'seo_title',
         'seo_keywords',
         'seo_description',
-        'seo_text',
         'image_alt_text',
     ];
 
