@@ -238,7 +238,11 @@
 <script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    alert('Scripts are working!');
+    // Prevent browser's default validation behavior
+    const form = document.querySelector('form');
+    if (form) {
+        form.setAttribute('novalidate', 'novalidate');
+    }
     // Image preview for each language
     @foreach($languages as $language)
         // Card image preview
@@ -324,16 +328,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 textarea.reportValidity = function() {
                     return true;
                 };
+
+                // Handle validation state changes
+                const updateValidationState = () => {
+                    const editorElement = editor.ui.getEditableElement();
+                    if (textarea.classList.contains('is-invalid')) {
+                        editorElement.classList.add('is-invalid');
+                    } else {
+                        editorElement.classList.remove('is-invalid');
+                    }
+                };
+
+                // Watch for class changes on the textarea
+                const observer = new MutationObserver(updateValidationState);
+                observer.observe(textarea, { attributes: true, attributeFilter: ['class'] });
+                
+                // Initial state
+                updateValidationState();
             })
             .catch(error => {
                 console.error(error);
             });
     });
 
-    // Override form validation to handle CKEditor fields
+    // Override form validation to handle CKEditor fields and tabbed form controls
     const form = document.querySelector('form');
     if (form) {
         form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+            
             // Update all CKEditor instances before validation
             document.querySelectorAll('.ckeditor').forEach(function(textarea) {
                 if (textarea._ckeditor) {
@@ -341,65 +364,147 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Check if any required CKEditor fields are empty
+            // Clear previous validation errors
+            document.querySelectorAll('.is-invalid').forEach(function(element) {
+                element.classList.remove('is-invalid');
+            });
+            document.querySelectorAll('.invalid-feedback').forEach(function(element) {
+                element.remove();
+            });
+
+            // Check if any required fields are empty
             let hasEmptyFields = false;
             let firstEmptyField = null;
+            let firstEmptyTabId = null;
 
-            document.querySelectorAll('.ckeditor').forEach(function(textarea) {
-                if (textarea._ckeditor) {
-                    const content = textarea._ckeditor.getData().trim();
-                    if (!content) {
+            // Check all required text inputs
+            document.querySelectorAll('input[required], textarea[required]').forEach(function(input) {
+                if (input.type === 'file') {
+                    // Handle file inputs
+                    if (!input.files || input.files.length === 0) {
                         hasEmptyFields = true;
+                        input.classList.add('is-invalid');
                         
-                        // Store first empty field for focus
                         if (!firstEmptyField) {
-                            firstEmptyField = textarea;
+                            firstEmptyField = input;
+                            const pane = input.closest('.tab-pane');
+                            if (pane) {
+                                firstEmptyTabId = pane.getAttribute('id');
+                            }
                         }
                         
-                        // Add error styling
-                        textarea.classList.add('is-invalid');
-                        if (!textarea.nextElementSibling || !textarea.nextElementSibling.classList.contains('invalid-feedback')) {
+                        // Add error message
+                        if (!input.nextElementSibling || !input.nextElementSibling.classList.contains('invalid-feedback')) {
                             const errorDiv = document.createElement('div');
                             errorDiv.className = 'invalid-feedback';
                             errorDiv.textContent = 'This field is required.';
-                            textarea.parentNode.insertBefore(errorDiv, textarea.nextSibling);
+                            input.parentNode.insertBefore(errorDiv, input.nextSibling);
                         }
-                    } else {
-                        textarea.classList.remove('is-invalid');
-                        const errorDiv = textarea.nextElementSibling;
-                        if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
-                            errorDiv.remove();
+                    }
+                } else if (input.tagName === 'TEXTAREA' && input.classList.contains('ckeditor')) {
+                    // Handle CKEditor textareas
+                    if (input._ckeditor) {
+                        const content = input._ckeditor.getData().trim();
+                        if (!content) {
+                            hasEmptyFields = true;
+                            input.classList.add('is-invalid');
+                            
+                            if (!firstEmptyField) {
+                                firstEmptyField = input;
+                                const pane = input.closest('.tab-pane');
+                                if (pane) {
+                                    firstEmptyTabId = pane.getAttribute('id');
+                                }
+                            }
+                            
+                            // Add error message
+                            if (!input.nextElementSibling || !input.nextElementSibling.classList.contains('invalid-feedback')) {
+                                const errorDiv = document.createElement('div');
+                                errorDiv.className = 'invalid-feedback';
+                                errorDiv.textContent = 'This field is required.';
+                                input.parentNode.insertBefore(errorDiv, input.nextSibling);
+                            }
+                        }
+                    }
+                } else {
+                    // Handle regular text inputs
+                    if (!input.value.trim()) {
+                        hasEmptyFields = true;
+                        input.classList.add('is-invalid');
+                        
+                        if (!firstEmptyField) {
+                            firstEmptyField = input;
+                            const pane = input.closest('.tab-pane');
+                            if (pane) {
+                                firstEmptyTabId = pane.getAttribute('id');
+                            }
+                        }
+                        
+                        // Add error message
+                        if (!input.nextElementSibling || !input.nextElementSibling.classList.contains('invalid-feedback')) {
+                            const errorDiv = document.createElement('div');
+                            errorDiv.className = 'invalid-feedback';
+                            errorDiv.textContent = 'This field is required.';
+                            input.parentNode.insertBefore(errorDiv, input.nextSibling);
+                        }
+                    }
+                }
+            });
+
+            // Update tab error indicators
+            document.querySelectorAll('.nav-link').forEach(function(tab) {
+                const targetId = tab.getAttribute('data-bs-target');
+                if (targetId) {
+                    const tabPane = document.querySelector(targetId);
+                    if (tabPane) {
+                        const hasErrors = tabPane.querySelector('.is-invalid');
+                        if (hasErrors) {
+                            tab.style.borderColor = '#dc3545';
+                            tab.style.color = '#dc3545';
+                            if (!tab.querySelector('.text-danger')) {
+                                const errorIcon = document.createElement('i');
+                                errorIcon.className = 'material-icons-outlined text-danger ms-1';
+                                errorIcon.style.fontSize = '16px';
+                                errorIcon.textContent = 'error';
+                                tab.appendChild(errorIcon);
+                            }
+                        } else {
+                            tab.style.borderColor = '';
+                            tab.style.color = '';
+                            const errorIcon = tab.querySelector('.text-danger');
+                            if (errorIcon) {
+                                errorIcon.remove();
+                            }
                         }
                     }
                 }
             });
 
             if (hasEmptyFields) {
-                e.preventDefault();
-                
-                // Focus on first empty field and switch to its tab
-                if (firstEmptyField && firstEmptyField._focusEditor) {
-                    // Find the tab pane containing this textarea
-                    const pane = firstEmptyField.closest('.tab-pane');
-                    if (pane) {
-                        const tabId = pane.getAttribute('id');
-                        const tabTrigger = document.querySelector(`[data-bs-target="#${tabId}"]`);
-                        if (tabTrigger) {
-                            // Switch to the tab first
-                            const tab = new bootstrap.Tab(tabTrigger);
-                            tab.show();
-                            
-                            // Focus on editor after tab is shown
-                            setTimeout(() => {
-                                firstEmptyField._focusEditor();
-                            }, 100);
-                        }
-                    } else {
-                        firstEmptyField._focusEditor();
+                // Switch to the first tab with errors
+                if (firstEmptyTabId) {
+                    const tabTrigger = document.querySelector(`[data-bs-target="#${firstEmptyTabId}"]`);
+                    if (tabTrigger) {
+                        const tab = new bootstrap.Tab(tabTrigger);
+                        tab.show();
+                        
+                        // Focus on the first empty field after tab switch
+                        setTimeout(() => {
+                            if (firstEmptyField) {
+                                if (firstEmptyField.tagName === 'TEXTAREA' && firstEmptyField._focusEditor) {
+                                    firstEmptyField._focusEditor();
+                                } else {
+                                    firstEmptyField.focus();
+                                }
+                            }
+                        }, 200);
                     }
                 }
                 
                 return false;
+            } else {
+                // If no validation errors, submit the form
+                form.submit();
             }
         });
     }
@@ -452,6 +557,34 @@ document.addEventListener('DOMContentLoaded', function() {
     border: 1px solid #ced4da;
     border-bottom: none;
     border-radius: 0.375rem 0.375rem 0 0;
+}
+
+/* Form validation improvements */
+.form-control.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.ck.ck-editor__main > .ck-editor__editable.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.tab-pane:not(.show) {
+    display: none !important;
+}
+
+/* Smooth transitions for tab switching */
+.tab-pane {
+    transition: opacity 0.15s linear;
+}
+
+.tab-pane.fade {
+    opacity: 0;
+}
+
+.tab-pane.fade.show {
+    opacity: 1;
 }
 </style>
 @endpush 
