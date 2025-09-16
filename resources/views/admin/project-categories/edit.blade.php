@@ -208,6 +208,23 @@
                                                         @enderror
                                                     </div>
                                                     
+                                                    <!-- SEO Text -->
+                                                    <div class="col-md-12">
+                                                        <label class="form-label">SEO Text</label>
+                                                        <textarea class="form-control ckeditor @error("translations.{$language->id}.seo_text") is-invalid @enderror" 
+                                                                  name="translations[{{ $language->id }}][seo_text]" 
+                                                                  id="seo-text-{{ $language->id }}"
+                                                                  rows="8"
+                                                                  placeholder="Long SEO text for {{ $language->lang_name }}">{{ old("translations.{$language->id}.seo_text", $translation ? $translation->seo_text : '') }}</textarea>
+                                                        @error("translations.{$language->id}.seo_text")
+                                                            <div class="invalid-feedback">
+                                                                {{ $message }}
+                                                            </div>
+                                                        @enderror
+                                                        <small class="form-text text-muted">
+                                                            Detailed SEO content with rich text formatting.
+                                                        </small>
+                                                    </div>
                                                     
                                                     <!-- Image Alt Text -->
                                                     <div class="col-md-12">
@@ -255,9 +272,37 @@
 @endsection 
 
 @push('scripts')
+<script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // No CKEditor initialization needed
+    // Initialize CKEditor for SEO text fields
+    document.querySelectorAll('.ckeditor').forEach(function(textarea) {
+        ClassicEditor
+            .create(textarea, {
+                toolbar: {
+                    items: [
+                        'undo', 'redo',
+                        '|', 'heading',
+                        '|', 'bold', 'italic', 'underline',
+                        '|', 'fontColor', 'fontBackgroundColor',
+                        '|', 'link', 'blockQuote', 'insertTable',
+                        '|', 'bulletedList', 'numberedList',
+                        '|', 'outdent', 'indent',
+                        '|', 'alignment',
+                        '|', 'removeFormat'
+                    ]
+                },
+                language: 'en',
+                placeholder: 'Enter detailed SEO content...'
+            })
+            .then(editor => {
+                // Store editor reference
+                textarea._ckeditor = editor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
 });
 
 // Image preview for category image
@@ -277,6 +322,37 @@ if (imageInput) {
     });
 }
 </script>
+
+<style>
+/* CKEditor Styles */
+.ck-editor__editable {
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.ck.ck-editor__main > .ck-editor__editable {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+}
+
+.ck.ck-editor__main > .ck-editor__editable:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.ck.ck-toolbar {
+    border: 1px solid #ced4da;
+    border-bottom: none;
+    border-radius: 0.375rem 0.375rem 0 0;
+    background: #f8f9fa;
+}
+
+.ck.ck-editor {
+    margin-bottom: 1rem;
+}
+</style>
 @endpush
 
 @include('admin.partials.slug-generator') 

@@ -64,6 +64,7 @@ class ProjectCategoryController extends Controller
             'translations.*.seo_title' => 'nullable|string|max:255',
             'translations.*.seo_keywords' => 'nullable|string',
             'translations.*.seo_description' => 'nullable|string',
+            'translations.*.seo_text' => 'nullable|string',
             'translations.*.image_alt_text' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
@@ -89,6 +90,7 @@ class ProjectCategoryController extends Controller
                         'seo_title' => $translation['seo_title'] ?? null,
                         'seo_keywords' => $translation['seo_keywords'] ?? null,
                         'seo_description' => $translation['seo_description'] ?? null,
+                        'seo_text' => $translation['seo_text'] ?? null,
                         'image_alt_text' => $translation['image_alt_text'] ?? null,
                     ]);
                 }
@@ -132,6 +134,7 @@ class ProjectCategoryController extends Controller
             'translations.*.seo_title' => 'nullable|string|max:255',
             'translations.*.seo_keywords' => 'nullable|string',
             'translations.*.seo_description' => 'nullable|string',
+            'translations.*.seo_text' => 'nullable|string',
             'translations.*.image_alt_text' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
@@ -162,6 +165,7 @@ class ProjectCategoryController extends Controller
                             'seo_title' => $translation['seo_title'] ?? null,
                             'seo_keywords' => $translation['seo_keywords'] ?? null,
                             'seo_description' => $translation['seo_description'] ?? null,
+                            'seo_text' => $translation['seo_text'] ?? null,
                             'image_alt_text' => $translation['image_alt_text'] ?? null,
                         ]
                     );
