@@ -259,6 +259,9 @@ Route::get('/products/{id}/detail-values/{detailValueId}/details', [ProductsCont
 // Product Favorites Check API Route (No Authentication Required)
 Route::post('/products/favorites/dont-registered', [ProductsController::class, 'checkFavoriteProducts'])->name('api.products.favorites-check');
 
+// Product Card Check API Route (No Authentication Required)
+Route::post('/products/card/dont-registered', [ProductsController::class, 'checkCardProducts'])->name('api.products.card-check');
+
 // Product Favorites API Routes (Requires Authentication)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/products/{id}/favorite', [ProductsController::class, 'addToFavorites'])->name('api.products.add-favorite');
