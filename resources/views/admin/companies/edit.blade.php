@@ -265,6 +265,7 @@
 @push('scripts')
 <script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
 <script>
+    alert()
 document.addEventListener('DOMContentLoaded', function() {
     // Image preview for each language
     @foreach($languages as $language)
