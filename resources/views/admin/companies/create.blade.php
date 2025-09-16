@@ -313,20 +313,74 @@ document.addEventListener('DOMContentLoaded', function() {
                     editor.updateSourceElement();
                 });
 
-                // Handle validation errors by focusing on the editor
-                textarea.addEventListener('invalid', function() {
-                    editor.editing.view.focus();
-                });
+                // Store editor reference on textarea for later use
+                textarea._ckeditor = editor;
 
                 // Override the focus method to focus on the editor instead of textarea
                 textarea.focus = function() {
                     editor.editing.view.focus();
+                };
+
+                // Override the checkValidity method to prevent validation errors
+                textarea.checkValidity = function() {
+                    return true;
+                };
+
+                // Override the reportValidity method
+                textarea.reportValidity = function() {
+                    if (!this.checkValidity()) {
+                        editor.editing.view.focus();
+                    }
                 };
             })
             .catch(error => {
                 console.error(error);
             });
     });
+
+    // Override form validation to handle CKEditor fields
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Update all CKEditor instances before validation
+            document.querySelectorAll('.ckeditor').forEach(function(textarea) {
+                if (textarea._ckeditor) {
+                    textarea._ckeditor.updateSourceElement();
+                }
+            });
+
+            // Check if any required CKEditor fields are empty
+            let hasEmptyFields = false;
+            document.querySelectorAll('.ckeditor[required]').forEach(function(textarea) {
+                if (textarea._ckeditor) {
+                    const content = textarea._ckeditor.getData().trim();
+                    if (!content) {
+                        hasEmptyFields = true;
+                        textarea._ckeditor.editing.view.focus();
+                        // Add error styling
+                        textarea.classList.add('is-invalid');
+                        if (!textarea.nextElementSibling || !textarea.nextElementSibling.classList.contains('invalid-feedback')) {
+                            const errorDiv = document.createElement('div');
+                            errorDiv.className = 'invalid-feedback';
+                            errorDiv.textContent = 'This field is required.';
+                            textarea.parentNode.insertBefore(errorDiv, textarea.nextSibling);
+                        }
+                    } else {
+                        textarea.classList.remove('is-invalid');
+                        const errorDiv = textarea.nextElementSibling;
+                        if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
+                            errorDiv.remove();
+                        }
+                    }
+                }
+            });
+
+            if (hasEmptyFields) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    }
 });
 </script>
 
