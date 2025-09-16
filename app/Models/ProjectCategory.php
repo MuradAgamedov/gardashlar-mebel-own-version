@@ -40,6 +40,14 @@ class ProjectCategory extends Model
     }
 
     /**
+     * Get the projects for this category
+     */
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
+
+    /**
      * Scope for active project categories
      */
     public function scopeActive($query)

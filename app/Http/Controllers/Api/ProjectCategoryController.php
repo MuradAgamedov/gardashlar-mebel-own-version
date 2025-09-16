@@ -44,15 +44,7 @@ class ProjectCategoryController extends Controller
      *                 @OA\Property(property="seo_keywords", type="string", example="soft furniture, design, gardashlar"),
      *                 @OA\Property(property="seo_description", type="string", example="High quality soft furniture designs by Gardashlar"),
      *                 @OA\Property(property="image_alt_text", type="string", example="Soft furniture design category image"),
-     *                 @OA\Property(property="image_url", type="string", example="https://example.com/category-image.jpg"),
-     *                 @OA\Property(property="products", type="array", @OA\Items(type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="title", type="string", example="Product Title"),
-     *                     @OA\Property(property="slug", type="string", example="product-slug"),
-     *                     @OA\Property(property="price", type="number", example=99.99),
-     *                     @OA\Property(property="discount_percent", type="integer", example=10),
-     *                     @OA\Property(property="main_image", type="string", example="https://example.com/product-image.jpg")
-     *                 ))
+     *                 @OA\Property(property="image_url", type="string", example="https://example.com/category-image.jpg")
      *             ))
      *         )
      *     ),
@@ -77,12 +69,6 @@ class ProjectCategoryController extends Controller
                 $projectCategories = ProjectCategory::with([
                     'translates' => function($query) use ($languageId) {
                         $query->where('language_id', $languageId);
-                    },
-                    'products.translates' => function($query) use ($languageId) {
-                        $query->where('language_id', $languageId);
-                    },
-                    'products.images' => function($query) {
-                        $query->where('status', true)->orderBy('order');
                     }
                 ])
                 ->active()
@@ -100,26 +86,6 @@ class ProjectCategoryController extends Controller
                         $translation = $category->translates()->first();
                     }
 
-                    // Get products for this category
-                    $products = $category->products->map(function ($product) use ($languageId) {
-                        $productTranslation = $product->translates->first();
-                        $mainImage = $product->images->where('is_main', true)->first();
-                        if (!$mainImage) {
-                            $mainImage = $product->images->first();
-                        }
-
-                        return [
-                            'id' => $product->id,
-                            'title' => $productTranslation ? $productTranslation->title : null,
-                            'slug' => $productTranslation ? $productTranslation->slug : null,
-                            'price' => $product->price,
-                            'discount_percent' => $product->discount_percent,
-                            'main_image' => $mainImage ? asset('storage/' . $mainImage->image) : asset('images/default_image.webp'),
-                        ];
-                    })->filter(function ($item) {
-                        return !empty($item['title']) && !empty($item['slug']);
-                    })->values();
-
         return [
             'id' => $category->id,
             'title' => $translation ? $translation->title : null,
@@ -128,8 +94,7 @@ class ProjectCategoryController extends Controller
             'seo_keywords' => $translation ? $translation->seo_keywords : null,
             'seo_description' => $translation ? $translation->seo_description : null,
             'image_alt_text' => $translation ? $translation->image_alt_text : null,
-            'image_url' => $category->image_url,
-            'products' => $products
+            'image_url' => $category->image_url
         ];
                 })->filter(function ($item) {
                     // Filter out items without title or slug
