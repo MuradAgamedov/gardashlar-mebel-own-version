@@ -229,15 +229,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = `/admin/companies/${id}`;
-                    form.innerHTML = `
-                        @csrf
-                        @method('DELETE')
-                    `;
-                    document.body.appendChild(form);
-                    form.submit();
+                    // Create a proper DELETE request using fetch
+                    fetch(`/admin/companies/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Reload the page to show updated list
+                            window.location.reload();
+                        } else {
+                            throw new Error('Delete failed');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Fallback to form submission
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = `/admin/companies/${id}`;
+                        form.innerHTML = `
+                            @csrf
+                            @method('DELETE')
+                        `;
+                        document.body.appendChild(form);
+                        form.submit();
+                    });
                 }
             });
         });

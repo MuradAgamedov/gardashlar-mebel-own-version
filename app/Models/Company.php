@@ -15,6 +15,8 @@ class Company extends Model
         'status'
     ];
 
+    protected $primaryKey = 'id';
+
     protected $casts = [
         'status' => 'boolean',
         'order' => 'integer'
