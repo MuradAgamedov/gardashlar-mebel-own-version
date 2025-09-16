@@ -190,23 +190,6 @@
                                                         @enderror
                                                     </div>
                                                     
-                                                    <!-- SEO Content -->
-                                                    <div class="col-md-12">
-                                                        <label class="form-label">SEO Content</label>
-                                                        <textarea class="form-control ckeditor @error("translations.{$language->id}.seo_content") is-invalid @enderror" 
-                                                                  name="translations[{{ $language->id }}][seo_content]" 
-                                                                  id="seo_content_{{ $language->id }}"
-                                                                  rows="8"
-                                                                  placeholder="SEO content for {{ $language->lang_name }} (long text)">{{ old("translations.{$language->id}.seo_content") }}</textarea>
-                                                        @error("translations.{$language->id}.seo_content")
-                                                            <div class="invalid-feedback">
-                                                                {{ $message }}
-                                                            </div>
-                                                        @enderror
-                                                        <small class="form-text text-muted">
-                                                            Long text content for SEO purposes in {{ $language->lang_name }}.
-                                                        </small>
-                                                    </div>
                                                     
                                                     <!-- Image Alt Text -->
                                                     <div class="col-md-12">
@@ -256,42 +239,7 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize CKEditor for SEO Content fields
-    const seoContentTextareas = document.querySelectorAll('.ckeditor');
-    seoContentTextareas.forEach(function(textarea) {
-        if (textarea.id.startsWith('seo_content_')) {
-            ClassicEditor
-                .create(textarea, {
-                    toolbar: [
-                        'heading', '|',
-                        'bold', 'italic', 'underline', 'strikethrough', '|',
-                        'link', 'bulletedList', 'numberedList', '|',
-                        'outdent', 'indent', '|',
-                        'blockQuote', 'insertTable', '|',
-                        'undo', 'redo', '|',
-                        'fontSize', 'fontColor', 'fontBackgroundColor', '|',
-                        'alignment', '|',
-                        'specialCharacters', 'horizontalLine'
-                    ],
-                    heading: {
-                        options: [
-                            { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
-                            { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
-                            { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
-                            { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
-                            { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' }
-                        ]
-                    },
-                    placeholder: textarea.getAttribute('placeholder')
-                })
-                .then(editor => {
-                    console.log('CKEditor initialized for:', textarea.id);
-                })
-                .catch(error => {
-                    console.error('CKEditor error:', error);
-                });
-        }
-    });
+    // No CKEditor initialization needed
 });
 
 // Image preview for category image
