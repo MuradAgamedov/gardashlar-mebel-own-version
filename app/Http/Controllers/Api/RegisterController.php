@@ -20,20 +20,35 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
     {
+        // Validate required fields
+        $email = $request->input('email');
+        
+        // Check if email is provided
+        if (empty($email)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email is required',
+                'data' => [
+                    'error' => 'Email field cannot be empty',
+                    'received_data' => $request->all()
+                ]
+            ], 422);
+        }
+
         // Get registration data from frontend
         $userData = [
             'name' => $request->input('name'),
             'surname' => $request->input('surname'), 
             'phone' => $request->input('phone'),
-            'email' => $request->input('email'),
+            'email' => $email,
             'password' => $request->input('password'),
         ];
 
         // Generate OTP token
         $otpToken = $this->emailService->generateOTP();
         
-        // Send OTP to email
-        $emailSent = $this->emailService->sendOTP($userData['email'], $otpToken);
+        // Send OTP to email (with string type guarantee)
+        $emailSent = $this->emailService->sendOTP((string)$userData['email'], $otpToken);
 
         if ($emailSent) {
             return response()->json([
@@ -67,8 +82,29 @@ class RegisterController extends Controller
         $email = $request->input('email');
         $otpCode = $request->input('otp_code');
 
-        // Verify OTP using EmailService
-        $isVerified = $this->emailService->verifyOTP($email, $otpCode);
+        // Check if email and OTP code are provided
+        if (empty($email)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email is required',
+                'data' => [
+                    'error' => 'Email field cannot be empty'
+                ]
+            ], 422);
+        }
+
+        if (empty($otpCode)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP code is required',
+                'data' => [
+                    'error' => 'OTP code field cannot be empty'
+                ]
+            ], 422);
+        }
+
+        // Verify OTP using EmailService (with string type guarantee)
+        $isVerified = $this->emailService->verifyOTP((string)$email, (string)$otpCode);
 
         if ($isVerified) {
             return response()->json([
