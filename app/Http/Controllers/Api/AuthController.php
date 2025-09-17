@@ -855,4 +855,400 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Forgot Password - Send OTP
+     * 
+     * @OA\Post(
+     *     path="/forgot-password",
+     *     operationId="forgotPassword",
+     *     tags={"Authentication"},
+     *     summary="Send OTP for password reset",
+     *     description="Send OTP code to email for password reset process",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email"},
+     *             @OA\Property(property="email", type="string", format="email", example="user@example.com", description="Email address")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="OTP sent successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Şifrə yeniləmə üçün OTP kodu göndərildi"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="email", type="string", example="user@example.com"),
+     *                 @OA\Property(property="otp_sent", type="boolean", example=true)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Bu email ünvanı ilə istifadəçi tapılmadı")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=429,
+     *         description="Rate limit exceeded",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Çox tez-tez cəhd etmisiniz. Zəhmət olmasa gözləyin.")
+     *         )
+     *     )
+     * )
+     */
+    public function forgotPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ], [
+            'email.required' => 'Email ünvanı məcburidir',
+            'email.email' => 'Düzgün email ünvanı daxil edin',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Check if user exists
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bu email ünvanı ilə istifadəçi tapılmadı',
+                    'errors' => [
+                        'email' => ['Bu email ünvanı ilə qeydiyyatdan keçmiş istifadəçi yoxdur']
+                    ]
+                ], 404);
+            }
+
+            // Rate limiting: Check if OTP was sent recently (within 1 minute)
+            $recentOtp = \App\Models\OtpCode::where('contact_info', $request->email)
+                ->where('contact_type', 'email')
+                ->where('created_at', '>', \Carbon\Carbon::now()->subMinute())
+                ->first();
+
+            if ($recentOtp) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Çox tez-tez cəhd etmisiniz. Zəhmət olmasa 1 dəqiqə gözləyin.',
+                    'errors' => [
+                        'rate_limit' => ['1 dəqiqə ərzində yalnız bir dəfə OTP göndərə bilərsiniz']
+                    ]
+                ], 429);
+            }
+
+            // Generate and send OTP
+            $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            
+            // Store OTP in database with special purpose
+            \App\Models\OtpCode::create([
+                'contact_info' => $request->email,
+                'contact_type' => 'email',
+                'otp_code' => $otp,
+                'expires_at' => \Carbon\Carbon::now()->addMinutes(10),
+                'is_used' => false,
+                'purpose' => 'password_reset' // Special purpose for password reset
+            ]);
+            
+            // Send email
+            \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OTPMail($otp, 'Şifrə Yeniləmə'));
+            
+            \Log::info('Password reset OTP sent', [
+                'email' => $request->email,
+                'otp' => $otp
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Şifrə yeniləmə üçün OTP kodu göndərildi',
+                'data' => [
+                    'email' => $request->email,
+                    'otp_sent' => true
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Forgot password error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'email' => $request->email
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP göndərilməsi zamanı xəta baş verdi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Verify Reset Password OTP
+     * 
+     * @OA\Post(
+     *     path="/verify-reset-otp",
+     *     operationId="verifyResetOTP",
+     *     tags={"Authentication"},
+     *     summary="Verify OTP for password reset",
+     *     description="Verify OTP code for password reset process",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","otp_code"},
+     *             @OA\Property(property="email", type="string", format="email", example="user@example.com", description="Email address"),
+     *             @OA\Property(property="otp_code", type="string", example="123456", description="6-digit OTP code")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="OTP verified successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="OTP təsdiqləndi. İndi yeni şifrə təyin edə bilərsiniz"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="email", type="string", example="user@example.com"),
+     *                 @OA\Property(property="verified", type="boolean", example=true),
+     *                 @OA\Property(property="reset_token", type="string", example="abc123xyz")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Invalid OTP",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="OTP kodu düzgün deyil və ya vaxtı keçib")
+     *         )
+     *     )
+     * )
+     */
+    public function verifyResetOTP(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'otp_code' => 'required|string|size:6',
+        ], [
+            'email.required' => 'Email ünvanı məcburidir',
+            'email.email' => 'Düzgün email ünvanı daxil edin',
+            'otp_code.required' => 'OTP kodu məcburidir',
+            'otp_code.size' => 'OTP kodu 6 simvol olmalıdır',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Find the OTP record
+            $otpRecord = \App\Models\OtpCode::where('contact_info', $request->email)
+                ->where('contact_type', 'email')
+                ->where('is_used', false)
+                ->where('expires_at', '>', \Carbon\Carbon::now())
+                ->latest()
+                ->first();
+            
+            if (!$otpRecord || $otpRecord->otp_code !== $request->otp_code) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP kodu düzgün deyil və ya vaxtı keçib',
+                    'errors' => [
+                        'otp_code' => ['OTP kodu düzgün deyil və ya vaxtı keçib']
+                    ]
+                ], 422);
+            }
+
+            // Mark OTP as used
+            $otpRecord->markAsUsed();
+            
+            // Generate a temporary reset token
+            $resetToken = bin2hex(random_bytes(32));
+            
+            // Store reset token in cache for 10 minutes
+            \Cache::put("password_reset_token_{$resetToken}", $request->email, 600);
+            
+            \Log::info('Password reset OTP verified', [
+                'email' => $request->email,
+                'reset_token' => $resetToken
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP təsdiqləndi. İndi yeni şifrə təyin edə bilərsiniz',
+                'data' => [
+                    'email' => $request->email,
+                    'verified' => true,
+                    'reset_token' => $resetToken
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Verify reset OTP error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'email' => $request->email
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP təsdiqləməsi zamanı xəta baş verdi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Reset Password
+     * 
+     * @OA\Post(
+     *     path="/reset-password",
+     *     operationId="resetPassword",
+     *     tags={"Authentication"},
+     *     summary="Reset password with new password",
+     *     description="Set new password after OTP verification",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"reset_token","password","password_confirmation"},
+     *             @OA\Property(property="reset_token", type="string", example="abc123xyz", description="Reset token from verify-reset-otp"),
+     *             @OA\Property(property="password", type="string", example="newpassword123", description="New password (minimum 6 characters)"),
+     *             @OA\Property(property="password_confirmation", type="string", example="newpassword123", description="Password confirmation")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Password reset successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Şifrə uğurla yeniləndi"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="email", type="string", example="user@example.com"),
+     *                 @OA\Property(property="password_reset", type="boolean", example=true),
+     *                 @OA\Property(property="email_verified", type="boolean", example=true)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Invalid token or validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Reset token düzgün deyil və ya vaxtı keçib")
+     *         )
+     *     )
+     * )
+     */
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'reset_token' => 'required|string',
+            'password' => 'required|string|min:6|confirmed',
+            'password_confirmation' => 'required|string|min:6',
+        ], [
+            'reset_token.required' => 'Reset token məcburidir',
+            'password.required' => 'Şifrə məcburidir',
+            'password.min' => 'Şifrə ən azı 6 simvol olmalıdır',
+            'password.confirmed' => 'Şifrə təkrarı düzgün deyil',
+            'password_confirmation.required' => 'Şifrə təkrarı məcburidir',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Get email from cache using reset token
+            $email = \Cache::get("password_reset_token_{$request->reset_token}");
+            
+            if (!$email) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Reset token düzgün deyil və ya vaxtı keçib',
+                    'errors' => [
+                        'reset_token' => ['Reset token düzgün deyil və ya vaxtı keçib']
+                    ]
+                ], 422);
+            }
+
+            // Find user
+            $user = User::where('email', $email)->first();
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'İstifadəçi tapılmadı',
+                    'errors' => [
+                        'email' => ['Bu email ünvanı ilə istifadəçi tapılmadı']
+                    ]
+                ], 404);
+            }
+
+            // Update password
+            $user->password = Hash::make($request->password);
+            
+            // BONUS: If email not verified, verify it now
+            $emailVerified = false;
+            if (is_null($user->email_verified_at)) {
+                $user->email_verified_at = now();
+                $emailVerified = true;
+            }
+            
+            $user->save();
+            
+            // Remove reset token from cache
+            \Cache::forget("password_reset_token_{$request->reset_token}");
+            
+            \Log::info('Password reset successfully', [
+                'email' => $email,
+                'email_verified' => $emailVerified
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Şifrə uğurla yeniləndi' . ($emailVerified ? ' və email təsdiqləndi' : ''),
+                'data' => [
+                    'email' => $email,
+                    'password_reset' => true,
+                    'email_verified' => !is_null($user->email_verified_at),
+                    'email_verified_now' => $emailVerified
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Reset password error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'reset_token' => $request->reset_token
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Şifrə yeniləməsi zamanı xəta baş verdi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

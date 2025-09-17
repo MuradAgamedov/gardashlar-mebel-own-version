@@ -15,7 +15,8 @@ class OtpCode extends Model
         'contact_type',
         'otp_code',
         'expires_at',
-        'is_used'
+        'is_used',
+        'purpose'
     ];
 
     protected $casts = [

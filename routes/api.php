@@ -289,6 +289,11 @@ Route::post('/resend-otp', [AuthController::class, 'resendOTP'])->name('api.auth
 Route::post('/verify-otp', [AuthController::class, 'verifyOTP'])->name('api.auth.verify-otp');
 Route::post('/login', [AuthController::class, 'login'])->name('api.auth.login');
 
+// Password Reset API Routes
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('api.auth.forgot-password');
+Route::post('/verify-reset-otp', [AuthController::class, 'verifyResetOTP'])->name('api.auth.verify-reset-otp');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('api.auth.reset-password');
+
 // Protected routes (require authentication)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.auth.logout');
