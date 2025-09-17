@@ -75,8 +75,8 @@
 ```json
 {
     "reset_token": "abc123xyz789...",
-    "password": "newpassword123",
-    "password_confirmation": "newpassword123"
+    "password": "NewPassword123!",
+    "password_confirmation": "NewPassword123!"
 }
 ```
 
@@ -165,8 +165,8 @@ curl -X POST http://localhost:8000/api/reset-password \
   -H "Content-Type: application/json" \
   -d '{
     "reset_token": "abc123xyz789...",
-    "password": "newpassword123",
-    "password_confirmation": "newpassword123"
+    "password": "NewPassword123!",
+    "password_confirmation": "NewPassword123!"
   }'
 ```
 

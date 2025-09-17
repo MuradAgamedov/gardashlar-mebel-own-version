@@ -1135,8 +1135,8 @@ class AuthController extends Controller
      *         @OA\JsonContent(
      *             required={"reset_token","password","password_confirmation"},
      *             @OA\Property(property="reset_token", type="string", example="abc123xyz", description="Reset token from verify-reset-otp"),
-     *             @OA\Property(property="password", type="string", example="newpassword123", description="New password (minimum 6 characters)"),
-     *             @OA\Property(property="password_confirmation", type="string", example="newpassword123", description="Password confirmation")
+     *             @OA\Property(property="password", type="string", example="NewPassword123!", description="New password (minimum 8 characters, must contain uppercase, number, and special character)"),
+     *             @OA\Property(property="password_confirmation", type="string", example="NewPassword123!", description="Password confirmation")
      *         )
      *     ),
      *     @OA\Response(
@@ -1168,15 +1168,31 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'reset_token' => 'required|string',
-            'password' => 'required|string|min:6|confirmed',
-            'password_confirmation' => 'required|string|min:6',
+            'password' => 'required|string|min:8|confirmed',
+            'password_confirmation' => 'required|string|min:8',
         ], [
             'reset_token.required' => 'Reset token məcburidir',
             'password.required' => 'Şifrə məcburidir',
-            'password.min' => 'Şifrə ən azı 6 simvol olmalıdır',
+            'password.min' => 'Şifrə ən azı 8 simvol olmalıdır',
             'password.confirmed' => 'Şifrə təkrarı düzgün deyil',
             'password_confirmation.required' => 'Şifrə təkrarı məcburidir',
         ]);
+
+        // Additional password validation with regex (like RegisterController)
+        $validator->after(function ($validator) use ($request) {
+            $password = $request->password;
+            if (!empty($password)) {
+                if (!preg_match('/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/', $password)) {
+                    $validator->errors()->add('password', 'Şifrədə ən azı bir xüsusi simvol olmalıdır (!@#$%^&* və s.)');
+                }
+                if (!preg_match('/\d/', $password)) {
+                    $validator->errors()->add('password', 'Şifrədə ən azı bir rəqəm olmalıdır');
+                }
+                if (!preg_match('/[A-Z]/', $password)) {
+                    $validator->errors()->add('password', 'Şifrədə ən azı bir böyük hərf olmalıdır');
+                }
+            }
+        });
 
         if ($validator->fails()) {
             return response()->json([
