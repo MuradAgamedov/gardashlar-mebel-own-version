@@ -201,9 +201,12 @@ class RegisterController extends Controller
             $user->email_verified_at = now();
             $user->save();
 
+            // Generate authentication token (automatic login)
+            $token = $user->createToken('auth_token')->plainTextToken;
+
             return response()->json([
                 'success' => true,
-                'message' => 'Email verified successfully',
+                'message' => 'Email verified and logged in successfully',
                 'data' => [
                     'user' => [
                         'id' => $user->id,
@@ -213,8 +216,11 @@ class RegisterController extends Controller
                         'email' => $user->email,
                         'email_verified' => true
                     ],
+                    'token' => $token,
+                    'token_type' => 'Bearer',
                     'verified' => true,
-                    'message' => 'Your email has been verified successfully'
+                    'logged_in' => true,
+                    'message' => 'Registration completed and logged in successfully'
                 ]
             ], 200);
         } else {
