@@ -555,12 +555,13 @@ class AuthController extends Controller
      *     operationId="resendOTP",
      *     tags={"Authentication"},
      *     summary="Resend OTP code",
-     *     description="Resend OTP code to email or phone number",
+     *     description="Resend OTP code to email or phone number for registration or password reset",
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
      *             @OA\Property(property="email", type="string", format="email", example="user@example.com", description="Email address (optional if phone provided)"),
-     *             @OA\Property(property="phone", type="string", example="0504194230", description="Phone number (optional if email provided)")
+     *             @OA\Property(property="phone", type="string", example="0504194230", description="Phone number (optional if email provided)"),
+     *             @OA\Property(property="purpose", type="string", example="registration", description="Purpose: registration or password_reset (optional, defaults to registration)")
      *         )
      *     ),
      *     @OA\Response(
@@ -619,10 +620,12 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email',
+            'purpose' => 'nullable|string|in:registration,password_reset',
         ], [
             'phone.nullable' => 'Telefon nömrəsi seçimlidir',
             'email.nullable' => 'Email ünvanı seçimlidir',
             'email.email' => 'Düzgün email ünvanı daxil edin',
+            'purpose.in' => 'Purpose yalnız registration və ya password_reset ola bilər',
         ]);
 
         // Custom validation: either phone or email must be provided
@@ -643,6 +646,7 @@ class AuthController extends Controller
         try {
             $contactInfo = !empty($request->email) ? $request->email : $request->phone;
             $contactType = !empty($request->email) ? 'email' : 'phone';
+            $purpose = $request->purpose ?? 'registration';
 
             // Rate limiting: Check if OTP was sent recently (within 1 minute)
             $recentOtp = \App\Models\OtpCode::where('contact_info', $contactInfo)
@@ -671,11 +675,13 @@ class AuthController extends Controller
                         'contact_type' => 'email',
                         'otp_code' => $otp,
                         'expires_at' => \Carbon\Carbon::now()->addMinutes(10),
-                        'is_used' => false
+                        'is_used' => false,
+                        'purpose' => $purpose
                     ]);
                     
-                    // Send email
-                    \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OTPMail($otp));
+                    // Send email with appropriate subject
+                    $subject = $purpose === 'password_reset' ? 'Şifrə Yeniləmə' : 'OTP Kodu';
+                    \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OTPMail($otp, $subject));
                     $otpSent = true;
                     
                     \Log::info('OTP resent successfully', [
