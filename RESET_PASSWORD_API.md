@@ -141,7 +141,7 @@
 ✅ **OTP Expiration** - 10 minutes validity  
 ✅ **Reset Token Security** - Temporary tokens with 10-minute expiry  
 ✅ **Email Verification Bonus** - Automatically verifies email if not verified  
-✅ **Password Validation** - Minimum 6 characters with confirmation  
+✅ **Strong Password Validation** - Minimum 8 characters, uppercase, number, special character  
 ✅ **Comprehensive Logging** - All actions logged for debugging  
 ✅ **Azerbaijani Messages** - User-friendly error messages  
 
