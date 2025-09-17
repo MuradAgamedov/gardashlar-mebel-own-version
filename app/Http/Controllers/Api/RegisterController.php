@@ -35,49 +35,49 @@ class RegisterController extends Controller
 
         // Check required fields
         if (empty($name)) {
-            $errors['name'] = 'Name is required';
+            $errors['name'] = __('Name is required');
         }
 
         if (empty($surname)) {
-            $errors['surname'] = 'Surname is required';
+            $errors['surname'] = __('Surname is required');
         }
 
         if (!empty($phone) && !preg_match('/^(?:\+\d{1,3})?\d{1,4}\d{7,10}$/', $phone)) {
-            $errors['phone'] = 'Invalid phone number format';
+            $errors['phone'] = __('Invalid phone number format');
         }
 
         if (empty($email)) {
-            $errors['email'] = 'Email is required';
+            $errors['email'] = __('Email is required');
         } elseif (!preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i', $email)) {
-            $errors['email'] = 'Invalid email format';
+            $errors['email'] = __('Invalid email format');
         }
 
         if (empty($password)) {
-            $errors['password'] = 'Password is required';
+            $errors['password'] = __('Password is required');
         } else {
             // Password validation with regex
             if (strlen($password) < 8) {
-                $errors['password'] = 'Password must be at least 8 characters long';
+                $errors['password'] = __('Password must be at least 8 characters long');
             } elseif (!preg_match('/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/', $password)) {
-                $errors['password'] = 'Password must contain at least one special character';
+                $errors['password'] = __('Password must contain at least one special character');
             } elseif (!preg_match('/\d/', $password)) {
-                $errors['password'] = 'Password must contain at least one number';
+                $errors['password'] = __('Password must contain at least one number');
             } elseif (!preg_match('/[A-Z]/', $password)) {
-                $errors['password'] = 'Password must contain at least one uppercase letter';
+                $errors['password'] = __('Password must contain at least one uppercase letter');
             }
         }
 
         if (empty($passwordConfirmation)) {
-            $errors['password_confirmation'] = 'Password confirmation is required';
+            $errors['password_confirmation'] = __('Password confirmation is required');
         } elseif ($password !== $passwordConfirmation) {
-            $errors['password_confirmation'] = 'Password confirmation does not match';
+            $errors['password_confirmation'] = __('Password confirmation does not match');
         }
 
         // Return validation errors if any
         if (!empty($errors)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
+                'message' => __('Validation failed'),
                 'data' => [
                     'errors' => $errors
                 ]
@@ -89,9 +89,9 @@ class RegisterController extends Controller
         if ($existingUser) {
             return response()->json([
                 'success' => false,
-                'message' => 'User already exists',
+                'message' => __('User already exists'),
                 'data' => [
-                    'error' => 'A user with this email already exists'
+                    'error' => __('A user with this email already exists')
                 ]
             ], 422);
         }
@@ -116,7 +116,7 @@ class RegisterController extends Controller
             if ($emailSent) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'User registered successfully, OTP sent to email',
+                    'message' => __('User registered successfully, OTP sent to email'),
                     'data' => [
                         'user' => [
                             'id' => $user->id,
@@ -127,7 +127,7 @@ class RegisterController extends Controller
                             'email_verified' => false
                         ],
                         'otp_sent' => true,
-                        'message' => 'Please verify your email with the OTP code'
+                        'message' => __('Please verify your email with the OTP code')
                     ]
                 ], 201);
             } else {
@@ -135,18 +135,18 @@ class RegisterController extends Controller
                 $user->delete();
                 return response()->json([
                     'success' => false,
-                    'message' => 'Registration failed - could not send OTP',
+                    'message' => __('Registration failed - could not send OTP'),
                     'data' => [
-                        'error' => 'Email sending failed'
+                        'error' => __('Email sending failed')
                     ]
                 ], 500);
             }
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Registration failed',
+                'message' => __('Registration failed'),
                 'data' => [
-                    'error' => 'Could not create user: ' . $e->getMessage()
+                    'error' => __('Could not create user') . ': ' . $e->getMessage()
                 ]
             ], 500);
         }
@@ -164,9 +164,9 @@ class RegisterController extends Controller
         if (empty($email)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Email is required',
+                'message' => __('Email is required'),
                 'data' => [
-                    'error' => 'Email field cannot be empty'
+                    'error' => __('Email field cannot be empty')
                 ]
             ], 422);
         }
@@ -174,9 +174,9 @@ class RegisterController extends Controller
         if (empty($otpCode)) {
             return response()->json([
                 'success' => false,
-                'message' => 'OTP code is required',
+                'message' => __('OTP code is required'),
                 'data' => [
-                    'error' => 'OTP code field cannot be empty'
+                    'error' => __('OTP code field cannot be empty')
                 ]
             ], 422);
         }
@@ -186,9 +186,9 @@ class RegisterController extends Controller
         if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'User not found',
+                'message' => __('User not found'),
                 'data' => [
-                    'error' => 'No user found with this email address'
+                    'error' => __('No user found with this email address')
                 ]
             ], 404);
         }
@@ -206,7 +206,7 @@ class RegisterController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Email verified and logged in successfully',
+                'message' => __('Email verified and logged in successfully'),
                 'data' => [
                     'user' => [
                         'id' => $user->id,
@@ -220,17 +220,17 @@ class RegisterController extends Controller
                     'token_type' => 'Bearer',
                     'verified' => true,
                     'logged_in' => true,
-                    'message' => 'Registration completed and logged in successfully'
+                    'message' => __('Registration completed and logged in successfully')
                 ]
             ], 200);
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'OTP verification failed',
+                'message' => __('OTP verification failed'),
                 'data' => [
                     'email' => $email,
                     'verified' => false,
-                    'error' => 'Invalid or expired OTP code'
+                    'error' => __('Invalid or expired OTP code')
                 ]
             ], 422);
         }

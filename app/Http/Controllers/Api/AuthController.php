@@ -438,21 +438,8 @@ class AuthController extends Controller
                 ], 401);
             }
 
-            // Check if user is verified (has verified OTP)
-            $isVerified = false;
-            if (!empty($request->email)) {
-                $isVerified = OtpCode::where('contact_info', $request->email)
-                    ->where('contact_type', 'email')
-                    ->where('is_used', true)
-                    ->exists();
-            } elseif (!empty($request->phone)) {
-                $isVerified = OtpCode::where('contact_info', $request->phone)
-                    ->where('contact_type', 'phone')
-                    ->where('is_used', true)
-                    ->exists();
-            }
-
-            if (!$isVerified) {
+            // Check if user email is verified
+            if (is_null($user->email_verified_at)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Hesabınız hələ təsdiqlənməyib',
