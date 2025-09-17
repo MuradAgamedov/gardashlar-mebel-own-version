@@ -22,17 +22,64 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
     {
-        // Validate required fields
-        $email = $request->input('email');
-        
-        // Check if email is provided
+        // Get and validate input fields
+        $name = trim($request->input('name'));
+        $surname = trim($request->input('surname'));
+        $phone = trim($request->input('phone'));
+        $email = trim($request->input('email'));
+        $password = $request->input('password');
+        $passwordConfirmation = $request->input('password_confirmation');
+
+        // Validation errors array
+        $errors = [];
+
+        // Check required fields
+        if (empty($name)) {
+            $errors['name'] = 'Name is required';
+        }
+
+        if (empty($surname)) {
+            $errors['surname'] = 'Surname is required';
+        }
+
+        if (!empty($phone) && !preg_match('/^(?:\+\d{1,3})?\d{1,4}\d{7,10}$/', $phone)) {
+            $errors['phone'] = 'Invalid phone number format';
+        }
+
         if (empty($email)) {
+            $errors['email'] = 'Email is required';
+        } elseif (!preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i', $email)) {
+            $errors['email'] = 'Invalid email format';
+        }
+
+        if (empty($password)) {
+            $errors['password'] = 'Password is required';
+        } else {
+            // Password validation with regex
+            if (strlen($password) < 8) {
+                $errors['password'] = 'Password must be at least 8 characters long';
+            } elseif (!preg_match('/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/', $password)) {
+                $errors['password'] = 'Password must contain at least one special character';
+            } elseif (!preg_match('/\d/', $password)) {
+                $errors['password'] = 'Password must contain at least one number';
+            } elseif (!preg_match('/[A-Z]/', $password)) {
+                $errors['password'] = 'Password must contain at least one uppercase letter';
+            }
+        }
+
+        if (empty($passwordConfirmation)) {
+            $errors['password_confirmation'] = 'Password confirmation is required';
+        } elseif ($password !== $passwordConfirmation) {
+            $errors['password_confirmation'] = 'Password confirmation does not match';
+        }
+
+        // Return validation errors if any
+        if (!empty($errors)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Email is required',
+                'message' => 'Validation failed',
                 'data' => [
-                    'error' => 'Email field cannot be empty',
-                    'received_data' => $request->all()
+                    'errors' => $errors
                 ]
             ], 422);
         }
@@ -52,11 +99,11 @@ class RegisterController extends Controller
         // Save user to database immediately (but unverified)
         try {
             $user = User::create([
-                'name' => $request->input('name'),
-                'surname' => $request->input('surname'),
-                'phone' => $request->input('phone'),
+                'name' => $name,
+                'surname' => $surname,
+                'phone' => $phone,
                 'email' => $email,
-                'password' => Hash::make($request->input('password')),
+                'password' => Hash::make($password),
                 'email_verified_at' => null, // Not verified yet
             ]);
 
