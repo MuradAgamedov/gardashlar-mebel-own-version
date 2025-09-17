@@ -285,6 +285,7 @@ Route::post('/auth/register', [RegisterController::class, 'register'])->name('ap
 Route::post('/auth/verify-otp', [RegisterController::class, 'verifyOtp'])->name('api.auth.verify-otp');
 Route::post('/register', [AuthController::class, 'register'])->name('api.auth.register.old');
 Route::post('/send-otp', [AuthController::class, 'sendOTP'])->name('api.auth.send-otp');
+Route::post('/resend-otp', [AuthController::class, 'resendOTP'])->name('api.auth.resend-otp');
 Route::post('/verify-otp', [AuthController::class, 'verifyOTP'])->name('api.auth.verify-otp');
 Route::post('/login', [AuthController::class, 'login'])->name('api.auth.login');
 
