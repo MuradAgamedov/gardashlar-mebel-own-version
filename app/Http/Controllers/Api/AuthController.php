@@ -439,6 +439,13 @@ class AuthController extends Controller
             }
 
             // Check if user email is verified
+            \Log::info('Login verification check', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'email_verified_at' => $user->email_verified_at,
+                'is_null_check' => is_null($user->email_verified_at)
+            ]);
+            
             if (is_null($user->email_verified_at)) {
                 return response()->json([
                     'success' => false,
@@ -469,9 +476,12 @@ class AuthController extends Controller
                 'data' => [
                     'user' => [
                         'id' => $user->id,
-                        'full_name' => $user->full_name,
+                        'name' => $user->name,
+                        'surname' => $user->surname,
                         'phone' => $user->phone,
                         'email' => $user->email,
+                        'email_verified' => !is_null($user->email_verified_at),
+                        'email_verified_at' => $user->email_verified_at ? $user->email_verified_at->toDateTimeString() : null
                     ],
                     'token' => $token,
                     'token_type' => 'Bearer'
