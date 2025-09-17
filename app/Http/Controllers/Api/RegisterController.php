@@ -214,12 +214,14 @@ class RegisterController extends Controller
                         'surname' => $user->surname,
                         'phone' => $user->phone,
                         'email' => $user->email,
-                        'email_verified' => true
+                        'email_verified' => true,
+                        'email_verified_at' => $user->email_verified_at->toDateTimeString()
                     ],
                     'token' => $token,
                     'token_type' => 'Bearer',
                     'verified' => true,
                     'logged_in' => true,
+                    'verification_date' => $user->email_verified_at->toDateTimeString(),
                     'message' => __('Registration completed and logged in successfully')
                 ]
             ], 200);
