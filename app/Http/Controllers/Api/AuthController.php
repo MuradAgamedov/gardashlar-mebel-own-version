@@ -548,6 +548,190 @@ class AuthController extends Controller
     }
 
     /**
+     * Resend OTP
+     * 
+     * @OA\Post(
+     *     path="/resend-otp",
+     *     operationId="resendOTP",
+     *     tags={"Authentication"},
+     *     summary="Resend OTP code",
+     *     description="Resend OTP code to email or phone number",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="email", type="string", format="email", example="user@example.com", description="Email address (optional if phone provided)"),
+     *             @OA\Property(property="phone", type="string", example="0504194230", description="Phone number (optional if email provided)")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="OTP resent successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="OTP kodu yenidən göndərildi"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="contact_type", type="string", example="email"),
+     *                 @OA\Property(property="contact_info", type="string", example="user@example.com"),
+     *                 @OA\Property(property="otp_sent", type="boolean", example=true)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validation failed"),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(property="contact_info", type="array", @OA\Items(type="string"))
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=429,
+     *         description="Rate limit exceeded",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Çox tez-tez cəhd etmisiniz. Zəhmət olmasa gözləyin."),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object",
+     *                 @OA\Property(property="rate_limit", type="array", @OA\Items(type="string"))
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="OTP kodu göndərilə bilmədi")
+     *         )
+     *     )
+     * )
+     */
+    public function resendOTP(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email',
+        ], [
+            'phone.nullable' => 'Telefon nömrəsi seçimlidir',
+            'email.nullable' => 'Email ünvanı seçimlidir',
+            'email.email' => 'Düzgün email ünvanı daxil edin',
+        ]);
+
+        // Custom validation: either phone or email must be provided
+        $validator->after(function ($validator) use ($request) {
+            if (empty($request->phone) && empty($request->email)) {
+                $validator->errors()->add('contact_info', 'Telefon nömrəsi və ya email ünvanından ən azı biri məcburidir');
+            }
+        });
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $contactInfo = !empty($request->email) ? $request->email : $request->phone;
+            $contactType = !empty($request->email) ? 'email' : 'phone';
+
+            // Rate limiting: Check if OTP was sent recently (within 1 minute)
+            $recentOtp = \App\Models\OtpCode::where('contact_info', $contactInfo)
+                ->where('contact_type', $contactType)
+                ->where('created_at', '>', \Carbon\Carbon::now()->subMinute())
+                ->first();
+
+            if ($recentOtp) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Çox tez-tez cəhd etmisiniz. Zəhmət olmasa 1 dəqiqə gözləyin.',
+                    'errors' => [
+                        'rate_limit' => ['1 dəqiqə ərzində yalnız bir dəfə OTP göndərə bilərsiniz']
+                    ]
+                ], 429);
+            }
+
+            $otpSent = false;
+
+            if (!empty($request->email)) {
+                $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+                try {
+                    // Store OTP in database
+                    \App\Models\OtpCode::create([
+                        'contact_info' => $request->email,
+                        'contact_type' => 'email',
+                        'otp_code' => $otp,
+                        'expires_at' => \Carbon\Carbon::now()->addMinutes(10),
+                        'is_used' => false
+                    ]);
+                    
+                    // Send email
+                    \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OTPMail($otp));
+                    $otpSent = true;
+                    
+                    \Log::info('OTP resent successfully', [
+                        'email' => $request->email,
+                        'otp' => $otp
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to resend OTP via email', [
+                        'email' => $request->email,
+                        'error' => $e->getMessage()
+                    ]);
+                    $otpSent = false;
+                }
+            } elseif (!empty($request->phone)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Telefon nömrəsi ilə OTP göndərilməsi hələ mövcud deyil',
+                    'errors' => [
+                        'phone' => ['Telefon nömrəsi ilə OTP göndərilməsi hələ mövcud deyil']
+                    ]
+                ], 422);
+            }
+
+            if ($otpSent) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'OTP kodu yenidən göndərildi',
+                    'data' => [
+                        'contact_type' => $contactType,
+                        'contact_info' => $contactInfo,
+                        'otp_sent' => true
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP kodu göndərilə bilmədi. Zəhmət olmasa yenidən cəhd edin.'
+                ], 500);
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Resend OTP error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $request->all()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP yenidən göndərilməsi zamanı xəta baş verdi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Verify OTP
      * 
      * @OA\Post(
