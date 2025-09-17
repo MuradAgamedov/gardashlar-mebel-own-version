@@ -37,58 +37,81 @@ class RegisterController extends Controller
             ], 422);
         }
 
-        // Get registration data from frontend
-        $userData = [
-            'name' => $request->input('name'),
-            'surname' => $request->input('surname'), 
-            'phone' => $request->input('phone'),
-            'email' => $email,
-            'password' => $request->input('password'),
-        ];
-
-        // Generate OTP token
-        $otpToken = $this->emailService->generateOTP();
-        
-        // Send OTP to email (with string type guarantee)
-        $emailSent = $this->emailService->sendOTP((string)$userData['email'], $otpToken);
-
-        if ($emailSent) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Registration data received and OTP sent to email',
-                'data' => [
-                    'user' => $userData,
-                    'otp_sent' => true,
-                    'email' => $userData['email'],
-                    'message' => 'OTP token sent to your email address'
-                ]
-            ], 201);
-        } else {
+        // Check if user already exists
+        $existingUser = User::where('email', $email)->first();
+        if ($existingUser) {
             return response()->json([
                 'success' => false,
-                'message' => 'Registration failed - could not send OTP',
+                'message' => 'User already exists',
                 'data' => [
-                    'user' => $userData,
-                    'otp_sent' => false,
-                    'error' => 'Email sending failed'
+                    'error' => 'A user with this email already exists'
+                ]
+            ], 422);
+        }
+
+        // Save user to database immediately (but unverified)
+        try {
+            $user = User::create([
+                'name' => $request->input('name'),
+                'surname' => $request->input('surname'),
+                'phone' => $request->input('phone'),
+                'email' => $email,
+                'password' => Hash::make($request->input('password')),
+                'email_verified_at' => null, // Not verified yet
+            ]);
+
+            // Generate OTP token
+            $otpToken = $this->emailService->generateOTP();
+            
+            // Send OTP to email
+            $emailSent = $this->emailService->sendOTP($email, $otpToken);
+
+            if ($emailSent) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'User registered successfully, OTP sent to email',
+                    'data' => [
+                        'user' => [
+                            'id' => $user->id,
+                            'name' => $user->name,
+                            'surname' => $user->surname,
+                            'phone' => $user->phone,
+                            'email' => $user->email,
+                            'email_verified' => false
+                        ],
+                        'otp_sent' => true,
+                        'message' => 'Please verify your email with the OTP code'
+                    ]
+                ], 201);
+            } else {
+                // Delete user if email sending failed
+                $user->delete();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Registration failed - could not send OTP',
+                    'data' => [
+                        'error' => 'Email sending failed'
+                    ]
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Registration failed',
+                'data' => [
+                    'error' => 'Could not create user: ' . $e->getMessage()
                 ]
             ], 500);
         }
     }
 
     /**
-     * Verify OTP and save user to database
+     * Verify OTP and mark email as verified
      */
     public function verifyOtp(Request $request)
     {
         $email = $request->input('email');
         $otpCode = $request->input('otp_code');
-        
-        // Get user registration data for saving after verification
-        $name = $request->input('name');
-        $surname = $request->input('surname');
-        $phone = $request->input('phone');
-        $password = $request->input('password');
 
         // Check if email and OTP code are provided
         if (empty($email)) {
@@ -111,59 +134,42 @@ class RegisterController extends Controller
             ], 422);
         }
 
-        // Verify OTP using EmailService (with string type guarantee)
+        // Find user by email
+        $user = User::where('email', $email)->first();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found',
+                'data' => [
+                    'error' => 'No user found with this email address'
+                ]
+            ], 404);
+        }
+
+        // Verify OTP using EmailService
         $isVerified = $this->emailService->verifyOTP((string)$email, (string)$otpCode);
 
         if ($isVerified) {
-            try {
-                // Check if user already exists
-                $existingUser = User::where('email', $email)->first();
-                
-                if ($existingUser) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'User already exists',
-                        'data' => [
-                            'error' => 'A user with this email already exists'
-                        ]
-                    ], 422);
-                }
+            // Mark email as verified
+            $user->email_verified_at = now();
+            $user->save();
 
-                // Save user to database after successful OTP verification
-                $user = User::create([
-                    'name' => $name,
-                    'surname' => $surname,
-                    'phone' => $phone,
-                    'email' => $email,
-                    'password' => Hash::make($password),
-                ]);
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'OTP verified and user registered successfully',
-                    'data' => [
-                        'user' => [
-                            'id' => $user->id,
-                            'name' => $user->name,
-                            'surname' => $user->surname,
-                            'phone' => $user->phone,
-                            'email' => $user->email,
-                        ],
-                        'verified' => true,
-                        'registered' => true,
-                        'message' => 'Registration completed successfully'
-                    ]
-                ], 201);
-
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Registration failed after OTP verification',
-                    'data' => [
-                        'error' => 'Could not save user data: ' . $e->getMessage()
-                    ]
-                ], 500);
-            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Email verified successfully',
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'surname' => $user->surname,
+                        'phone' => $user->phone,
+                        'email' => $user->email,
+                        'email_verified' => true
+                    ],
+                    'verified' => true,
+                    'message' => 'Your email has been verified successfully'
+                ]
+            ], 200);
         } else {
             return response()->json([
                 'success' => false,
