@@ -46,8 +46,7 @@ Authorization: Bearer {your_access_token}
             "surname": "Əliyev",
             "phone": "+994501234567",
             "email": "veli@example.com",
-            "email_verified_at": "2024-01-01T12:00:00.000000Z",
-            "pending_email": null
+            "email_verified_at": "2024-01-01T12:00:00.000000Z"
         },
         "otp_sent": false
     }

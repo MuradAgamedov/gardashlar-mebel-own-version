@@ -1421,7 +1421,6 @@ class AuthController extends Controller
                         'phone' => $user->phone,
                         'email' => $user->email,
                         'email_verified_at' => $user->email_verified_at,
-                        'pending_email' => $user->pending_email,
                     ],
                     'otp_sent' => $otpSent
                 ]
@@ -1573,7 +1572,6 @@ class AuthController extends Controller
                         'phone' => $user->phone,
                         'email' => $user->email,
                         'email_verified_at' => $user->email_verified_at,
-                        'pending_email' => $user->pending_email,
                     ]
                 ]
             ]);
