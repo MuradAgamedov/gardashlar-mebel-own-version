@@ -1304,7 +1304,7 @@ class AuthController extends Controller
      *                 property="data",
      *                 type="object",
      *                 @OA\Property(property="user", ref="#/components/schemas/User"),
-     *                 @OA\Property(property="email_verification_required", type="boolean", example=false)
+     *                 @OA\Property(property="otp_sent", type="boolean", example=false)
      *             )
      *         )
      *     ),
@@ -1361,7 +1361,7 @@ class AuthController extends Controller
                 ], 422);
             }
 
-            $emailVerificationRequired = false;
+            $otpSent = false;
             $oldEmail = $user->email;
 
             // Update basic fields
@@ -1387,7 +1387,7 @@ class AuthController extends Controller
                         $user->pending_email_token = \Str::random(60);
                         $user->pending_email_expires_at = now()->addMinutes(15);
                         
-                        $emailVerificationRequired = true;
+                        $otpSent = true;
                         
                         // Send OTP to new email
                         $this->emailService->sendOTP($request->email, 'email_change');
@@ -1410,7 +1410,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => $emailVerificationRequired ? 
+                'message' => $otpSent ? 
                     'Profil yeniləndi. Yeni email ünvanınıza təsdiq kodu göndərildi' : 
                     'Profil uğurla yeniləndi',
                 'data' => [
@@ -1423,7 +1423,7 @@ class AuthController extends Controller
                         'email_verified_at' => $user->email_verified_at,
                         'pending_email' => $user->pending_email,
                     ],
-                    'email_verification_required' => $emailVerificationRequired
+                    'otp_sent' => $otpSent
                 ]
             ]);
 
