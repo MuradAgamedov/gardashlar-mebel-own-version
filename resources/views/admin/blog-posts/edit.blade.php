@@ -53,7 +53,7 @@
                         <h5>Edit Blog Post</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.blog-posts.update', $blogPost) }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('admin.blog-posts.update', $blogPost) }}" method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
                             @method('PUT')
                             
