@@ -194,3 +194,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endsection 
+@include('admin.partials.slug-generator') 
