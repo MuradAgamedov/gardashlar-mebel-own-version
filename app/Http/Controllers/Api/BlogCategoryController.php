@@ -97,7 +97,7 @@ class BlogCategoryController extends Controller
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
             $page = $request->get('page', 1);
-            $perPage = min($request->get('per_page', 10), 50); // Max 50 per page
+            $perPage = min($request->get('per_page', 10000), 50); // Max 50 per page
             
             $cacheKey = "api:blog-categories:lang:{$languageId}:page:{$page}:per_page:{$perPage}";
 
