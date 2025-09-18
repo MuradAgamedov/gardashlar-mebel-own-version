@@ -57,4 +57,36 @@ class User extends Authenticatable
             'pending_email_expires_at' => 'datetime',
         ];
     }
+
+    /**
+     * Get the user's favorite products
+     */
+    public function favorites()
+    {
+        return $this->hasMany(ProductFavorite::class);
+    }
+
+    /**
+     * Get the user's compared products
+     */
+    public function compares()
+    {
+        return $this->hasMany(ProductCompare::class);
+    }
+
+    /**
+     * Get the user's full name
+     */
+    public function getFullNameAttribute()
+    {
+        return trim($this->name . ' ' . $this->surname);
+    }
+
+    /**
+     * Scope for verified users
+     */
+    public function scopeVerified($query)
+    {
+        return $query->whereNotNull('email_verified_at');
+    }
 }

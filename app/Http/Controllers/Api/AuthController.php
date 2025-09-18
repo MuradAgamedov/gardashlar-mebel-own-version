@@ -1703,4 +1703,90 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get user profile data
+     * 
+     * @OA\Get(
+     *     path="/user/profile",
+     *     summary="Get user profile data",
+     *     description="Get authenticated user's profile information without relationships",
+     *     tags={"Profile"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="User profile data retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="İstifadəçi məlumatları uğurla alındı"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John"),
+     *                 @OA\Property(property="surname", type="string", example="Doe"),
+     *                 @OA\Property(property="full_name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", example="user@example.com"),
+     *                 @OA\Property(property="phone", type="string", example="0504194230"),
+     *                 @OA\Property(property="email_verified_at", type="string", format="date-time", example="2024-01-01T12:00:00.000Z"),
+     *                 @OA\Property(property="pending_email", type="string", example="newemail@example.com", description="New email waiting for verification"),
+     *                 @OA\Property(property="pending_email_expires_at", type="string", format="date-time", example="2024-01-01T12:10:00.000Z"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2024-01-01T10:00:00.000Z"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2024-01-01T12:00:00.000Z")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Unauthorized")
+     *         )
+     *     )
+     * )
+     */
+    public function getUserProfile()
+    {
+        try {
+            $user = auth()->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'İstifadəçi tapılmadı'
+                ], 401);
+            }
+
+            // Return only user's own data without relationships
+            $userData = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'surname' => $user->surname,
+                'full_name' => $user->full_name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'email_verified_at' => $user->email_verified_at,
+                'pending_email' => $user->pending_email,
+                'pending_email_expires_at' => $user->pending_email_expires_at,
+                'created_at' => $user->created_at,
+                'updated_at' => $user->updated_at,
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'İstifadəçi məlumatları uğurla alındı',
+                'data' => $userData
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'İstifadəçi məlumatları alınarkən xəta baş verdi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
