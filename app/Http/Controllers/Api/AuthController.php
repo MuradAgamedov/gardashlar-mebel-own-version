@@ -1605,4 +1605,102 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Resend OTP for email change
+     * 
+     * @OA\Post(
+     *     path="/profile/resend-email-otp",
+     *     summary="Resend OTP for email change",
+     *     description="Resend OTP code to pending email for profile email change",
+     *     tags={"Profile"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="OTP resent successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="OTP kodu yenidən göndərildi"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="otp_sent", type="boolean", example=true),
+     *                 @OA\Property(property="expires_at", type="string", format="date-time", example="2024-01-01T12:10:00.000Z")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="No pending email found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Aktiv email dəyişmə sorğusu yoxdur"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function resendEmailChangeOTP(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            
+            // Check if user has pending email
+            if (!$user->pending_email) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Aktiv email dəyişmə sorğusu yoxdur',
+                    'errors' => [
+                        'pending_email' => ['Email dəyişmə sorğusu tapılmadı']
+                    ]
+                ], 422);
+            }
+
+            // Update expiry time
+            $user->pending_email_expires_at = now()->addMinutes(10);
+            $user->save();
+            
+            // Send new OTP
+            $otpSent = $this->emailService->sendOTP($user->pending_email, 'email_change');
+            
+            if ($otpSent) {
+                \Log::info('Email change OTP resent', [
+                    'user_id' => $user->id,
+                    'pending_email' => $user->pending_email
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'OTP kodu yenidən göndərildi',
+                    'data' => [
+                        'otp_sent' => true,
+                        'expires_at' => now()->addMinutes(10)->toISOString()
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP göndərilə bilmədi',
+                    'errors' => [
+                        'otp' => ['OTP göndərilməsi zamanı xəta baş verdi']
+                    ]
+                ], 500);
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Resend email change OTP error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP yenidən göndərilməsi zamanı xəta baş verdi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

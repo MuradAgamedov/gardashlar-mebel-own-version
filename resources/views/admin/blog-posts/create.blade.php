@@ -53,7 +53,7 @@
                         <h5>Create New Blog Post</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.blog-posts.store') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('admin.blog-posts.store') }}" method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
                             
                             <!-- Basic Information -->

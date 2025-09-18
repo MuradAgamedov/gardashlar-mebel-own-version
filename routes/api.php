@@ -301,4 +301,5 @@ Route::middleware('auth:sanctum')->group(function () {
     // Profile API Routes
     Route::post('/profile/update', [AuthController::class, 'updateProfile'])->name('api.profile.update');
     Route::post('/profile/confirm-email', [AuthController::class, 'confirmEmailChange'])->name('api.profile.confirm-email');
+    Route::post('/profile/resend-email-otp', [AuthController::class, 'resendEmailChangeOTP'])->name('api.profile.resend-email-otp');
 });
