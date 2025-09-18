@@ -127,6 +127,7 @@ class RegisterController extends Controller
                             'email_verified' => false
                         ],
                         'otp_sent' => true,
+                        'expires_at' => now()->addMinutes(10)->toISOString(),
                         'message' => __('Please verify your email with the OTP code')
                     ]
                 ], 201);

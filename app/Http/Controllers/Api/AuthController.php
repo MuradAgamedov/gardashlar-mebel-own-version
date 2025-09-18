@@ -77,7 +77,8 @@ class AuthController extends Controller
      *                 ),
      *                 @OA\Property(property="otp_sent", type="boolean", example=true),
      *                 @OA\Property(property="contact_type", type="string", example="email"),
-     *                 @OA\Property(property="contact_info", type="string", example="user@example.com")
+     *                 @OA\Property(property="contact_info", type="string", example="user@example.com"),
+     *                 @OA\Property(property="expires_at", type="string", format="date-time", example="2024-01-01T12:10:00.000Z")
      *             )
      *         )
      *     ),
@@ -220,7 +221,8 @@ class AuthController extends Controller
                     ],
                     'otp_sent' => true,
                     'contact_type' => $contactType,
-                    'contact_info' => $contactInfo
+                    'contact_info' => $contactInfo,
+                    'expires_at' => now()->addMinutes(10)->toISOString()
                 ]
             ];
 
@@ -281,7 +283,8 @@ class AuthController extends Controller
                         'message' => 'OTP kodu email ünvanına göndərildi',
                         'data' => [
                             'contact_type' => 'email',
-                            'contact_info' => $request->email
+                            'contact_info' => $request->email,
+                            'expires_at' => now()->addMinutes(10)->toISOString()
                         ]
                     ]);
                 }
@@ -575,7 +578,8 @@ class AuthController extends Controller
      *                 type="object",
      *                 @OA\Property(property="contact_type", type="string", example="email"),
      *                 @OA\Property(property="contact_info", type="string", example="user@example.com"),
-     *                 @OA\Property(property="otp_sent", type="boolean", example=true)
+     *                 @OA\Property(property="otp_sent", type="boolean", example=true),
+     *                 @OA\Property(property="expires_at", type="string", format="date-time", example="2024-01-01T12:10:00.000Z")
      *             )
      *         )
      *     ),
@@ -712,7 +716,8 @@ class AuthController extends Controller
                     'data' => [
                         'contact_type' => $contactType,
                         'contact_info' => $contactInfo,
-                        'otp_sent' => true
+                        'otp_sent' => true,
+                        'expires_at' => now()->addMinutes(10)->toISOString()
                     ]
                 ]);
             } else {
@@ -888,7 +893,8 @@ class AuthController extends Controller
      *                 property="data",
      *                 type="object",
      *                 @OA\Property(property="email", type="string", example="user@example.com"),
-     *                 @OA\Property(property="otp_sent", type="boolean", example=true)
+     *                 @OA\Property(property="otp_sent", type="boolean", example=true),
+     *                 @OA\Property(property="expires_at", type="string", format="date-time", example="2024-01-01T12:10:00.000Z")
      *             )
      *         )
      *     ),
@@ -982,7 +988,8 @@ class AuthController extends Controller
                 'message' => 'Şifrə yeniləmə üçün OTP kodu göndərildi',
                 'data' => [
                     'email' => $request->email,
-                    'otp_sent' => true
+                    'otp_sent' => true,
+                    'expires_at' => now()->addMinutes(10)->toISOString()
                 ]
             ]);
 
@@ -1304,7 +1311,8 @@ class AuthController extends Controller
      *                 property="data",
      *                 type="object",
      *                 @OA\Property(property="user", ref="#/components/schemas/User"),
-     *                 @OA\Property(property="otp_sent", type="boolean", example=false)
+     *                 @OA\Property(property="otp_sent", type="boolean", example=false),
+     *                 @OA\Property(property="expires_at", type="string", format="date-time", example="2024-01-01T12:10:00.000Z", description="OTP expiration time (only present when otp_sent=true)")
      *             )
      *         )
      *     ),
@@ -1385,7 +1393,7 @@ class AuthController extends Controller
                         // Set pending email for verification
                         $user->pending_email = $request->email;
                         $user->pending_email_token = \Str::random(60);
-                        $user->pending_email_expires_at = now()->addMinutes(15);
+                        $user->pending_email_expires_at = now()->addMinutes(10);
                         
                         $otpSent = true;
                         
@@ -1408,22 +1416,29 @@ class AuthController extends Controller
 
             $user->save();
 
+            $responseData = [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'surname' => $user->surname,
+                    'phone' => $user->phone,
+                    'email' => $user->email,
+                    'email_verified_at' => $user->email_verified_at,
+                ],
+                'otp_sent' => $otpSent
+            ];
+
+            // Add expires_at only if OTP was sent
+            if ($otpSent) {
+                $responseData['expires_at'] = now()->addMinutes(10)->toISOString();
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => $otpSent ? 
                     'Profil yeniləndi. Yeni email ünvanınıza təsdiq kodu göndərildi' : 
                     'Profil uğurla yeniləndi',
-                'data' => [
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'surname' => $user->surname,
-                        'phone' => $user->phone,
-                        'email' => $user->email,
-                        'email_verified_at' => $user->email_verified_at,
-                    ],
-                    'otp_sent' => $otpSent
-                ]
+                'data' => $responseData
             ]);
 
         } catch (\Exception $e) {
