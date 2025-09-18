@@ -20,22 +20,25 @@ class EmailService
     /**
      * Send OTP to email
      */
-    public function sendOTP(string $email, string $otp): bool
+    public function sendOTP(string $email, string $purpose = 'verification'): bool
     {
         try {
+            $otp = $this->generateOTP();
+            
             // Store OTP in database
             OtpCode::create([
                 'contact_info' => $email,
                 'contact_type' => 'email',
                 'otp_code' => $otp,
                 'expires_at' => Carbon::now()->addMinutes(10), // 10 minutes expiry
-                'is_used' => false
+                'is_used' => false,
+                'purpose' => $purpose
             ]);
 
             // Send actual email using OTPMail class
             Mail::to($email)->send(new OTPMail($otp));
             
-            \Log::info("OTP email sent successfully to: {$email}");
+            \Log::info("OTP email sent successfully to: {$email} for purpose: {$purpose}");
             return true;
         } catch (\Exception $e) {
             \Log::error("Failed to send OTP to email: {$email}", [
@@ -49,12 +52,18 @@ class EmailService
     /**
      * Verify OTP
      */
-    public function verifyOTP(string $email, string $otp): bool
+    public function verifyOTP(string $email, string $otp, string $purpose = 'verification'): bool
     {
-        $otpRecord = OtpCode::findValidOtp($email, 'email');
+        $otpRecord = OtpCode::where('contact_info', $email)
+            ->where('contact_type', 'email')
+            ->where('purpose', $purpose)
+            ->where('is_used', false)
+            ->where('expires_at', '>', Carbon::now())
+            ->latest()
+            ->first();
         
         if (!$otpRecord) {
-            \Log::warning("No valid OTP found for email: {$email}");
+            \Log::warning("No valid OTP found for email: {$email} with purpose: {$purpose}");
             return false;
         }
 
@@ -66,7 +75,7 @@ class EmailService
         // Mark OTP as used
         $otpRecord->markAsUsed();
         
-        \Log::info("OTP verified successfully for email: {$email}");
+        \Log::info("OTP verified successfully for email: {$email} with purpose: {$purpose}");
         return true;
     }
 

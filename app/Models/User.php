@@ -24,6 +24,9 @@ class User extends Authenticatable
         'phone',
         'email',
         'password',
+        'pending_email',
+        'pending_email_token',
+        'pending_email_expires_at',
     ];
 
     protected $casts = [
@@ -51,6 +54,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'pending_email_expires_at' => 'datetime',
         ];
     }
 }

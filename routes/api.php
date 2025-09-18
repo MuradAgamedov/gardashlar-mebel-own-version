@@ -297,4 +297,8 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('
 // Protected routes (require authentication)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.auth.logout');
+    
+    // Profile API Routes
+    Route::post('/profile/update', [AuthController::class, 'updateProfile'])->name('api.profile.update');
+    Route::post('/profile/confirm-email', [AuthController::class, 'confirmEmailChange'])->name('api.profile.confirm-email');
 });

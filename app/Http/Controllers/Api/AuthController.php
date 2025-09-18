@@ -1273,4 +1273,319 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Update user profile
+     * 
+     * @OA\Post(
+     *     path="/profile/update",
+     *     summary="Update user profile",
+     *     description="Update user profile information including name, surname, phone, and email",
+     *     tags={"Profile"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="name", type="string", example="John"),
+     *             @OA\Property(property="surname", type="string", example="Doe"),
+     *             @OA\Property(property="phone", type="string", example="+994501234567"),
+     *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Profil uğurla yeniləndi"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="user", ref="#/components/schemas/User"),
+     *                 @OA\Property(property="email_verification_required", type="boolean", example=false)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validation failed"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Unauthorized")
+     *         )
+     *     )
+     * )
+     */
+    public function updateProfile(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            
+            $validator = Validator::make($request->all(), [
+                'name' => 'sometimes|required|string|max:255',
+                'surname' => 'sometimes|required|string|max:255',
+                'phone' => 'sometimes|nullable|string|max:20|unique:users,phone,' . $user->id,
+                'email' => 'sometimes|nullable|email|unique:users,email,' . $user->id,
+            ], [
+                'name.required' => 'Ad məcburidir',
+                'name.string' => 'Ad mətn formatında olmalıdır',
+                'name.max' => 'Ad 255 simvoldan çox ola bilməz',
+                'surname.required' => 'Soyad məcburidir',
+                'surname.string' => 'Soyad mətn formatında olmalıdır',
+                'surname.max' => 'Soyad 255 simvoldan çox ola bilməz',
+                'phone.string' => 'Telefon nömrəsi mətn formatında olmalıdır',
+                'phone.max' => 'Telefon nömrəsi 20 simvoldan çox ola bilməz',
+                'phone.unique' => 'Bu telefon nömrəsi artıq istifadə olunub',
+                'email.email' => 'Düzgün email ünvanı daxil edin',
+                'email.unique' => 'Bu email ünvanı artıq istifadə olunub',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $emailVerificationRequired = false;
+            $oldEmail = $user->email;
+
+            // Update basic fields
+            if ($request->has('name')) {
+                $user->name = $request->name;
+            }
+            
+            if ($request->has('surname')) {
+                $user->surname = $request->surname;
+            }
+            
+            if ($request->has('phone')) {
+                $user->phone = $request->phone;
+            }
+
+            // Handle email change with pending verification
+            if ($request->has('email') && $request->email !== $oldEmail) {
+                if ($request->email) {
+                    // Set pending email for verification
+                    $user->pending_email = $request->email;
+                    $user->pending_email_token = \Str::random(60);
+                    $user->pending_email_expires_at = now()->addMinutes(15);
+                    
+                    $emailVerificationRequired = true;
+                    
+                    // Send OTP to new email
+                    $this->emailService->sendOTP($request->email, 'email_change');
+                    
+                    \Log::info('Email change requested', [
+                        'user_id' => $user->id,
+                        'old_email' => $oldEmail,
+                        'new_email' => $request->email
+                    ]);
+                } else {
+                    // If email is being set to null/empty
+                    $user->email = null;
+                    $user->email_verified_at = null;
+                }
+            }
+
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => $emailVerificationRequired ? 
+                    'Profil yeniləndi. Yeni email ünvanınıza təsdiq kodu göndərildi' : 
+                    'Profil uğurla yeniləndi',
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'surname' => $user->surname,
+                        'phone' => $user->phone,
+                        'email' => $user->email,
+                        'email_verified_at' => $user->email_verified_at,
+                        'pending_email' => $user->pending_email,
+                    ],
+                    'email_verification_required' => $emailVerificationRequired
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Profile update error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Profil yeniləməsi zamanı xəta baş verdi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Confirm email change
+     * 
+     * @OA\Post(
+     *     path="/profile/confirm-email",
+     *     summary="Confirm email change",
+     *     description="Confirm email change with OTP code",
+     *     tags={"Profile"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="otp_code", type="string", example="123456")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Email confirmed successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Email uğurla təsdiqləndi"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="user", ref="#/components/schemas/User")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Invalid OTP or expired",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="OTP kod düzgün deyil və ya vaxtı keçib"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+    public function confirmEmailChange(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            
+            $validator = Validator::make($request->all(), [
+                'otp_code' => 'required|string|size:6',
+            ], [
+                'otp_code.required' => 'OTP kod məcburidir',
+                'otp_code.string' => 'OTP kod mətn formatında olmalıdır',
+                'otp_code.size' => 'OTP kod 6 rəqəm olmalıdır',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Check if user has pending email
+            if (!$user->pending_email) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Email dəyişmə sorğusu tapılmadı',
+                    'errors' => [
+                        'pending_email' => ['Aktiv email dəyişmə sorğusu yoxdur']
+                    ]
+                ], 422);
+            }
+
+            // Check if pending email token is expired
+            if ($user->pending_email_expires_at && $user->pending_email_expires_at->isPast()) {
+                // Clear expired pending email
+                $user->update([
+                    'pending_email' => null,
+                    'pending_email_token' => null,
+                    'pending_email_expires_at' => null,
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Email dəyişmə sorğusunun vaxtı keçib',
+                    'errors' => [
+                        'expired' => ['Zəhmət olmasa yenidən cəhd edin']
+                    ]
+                ], 422);
+            }
+
+            // Verify OTP
+            $otpValid = $this->emailService->verifyOTP($user->pending_email, $request->otp_code, 'email_change');
+            
+            if (!$otpValid) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP kod düzgün deyil',
+                    'errors' => [
+                        'otp_code' => ['OTP kod düzgün deyil']
+                    ]
+                ], 422);
+            }
+
+            // Update email and clear pending fields
+            $oldEmail = $user->email;
+            $user->email = $user->pending_email;
+            $user->email_verified_at = now();
+            $user->pending_email = null;
+            $user->pending_email_token = null;
+            $user->pending_email_expires_at = null;
+            $user->save();
+
+            \Log::info('Email change confirmed', [
+                'user_id' => $user->id,
+                'old_email' => $oldEmail,
+                'new_email' => $user->email
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email uğurla təsdiqləndi və dəyişdirildi',
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'surname' => $user->surname,
+                        'phone' => $user->phone,
+                        'email' => $user->email,
+                        'email_verified_at' => $user->email_verified_at,
+                        'pending_email' => $user->pending_email,
+                    ]
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Email confirmation error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Email təsdiqi zamanı xəta baş verdi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
