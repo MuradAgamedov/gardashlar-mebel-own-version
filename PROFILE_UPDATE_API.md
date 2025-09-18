@@ -49,7 +49,7 @@ Authorization: Bearer {your_access_token}
             "email_verified_at": "2024-01-01T12:00:00.000000Z",
             "pending_email": null
         },
-        "email_verification_required": false
+        "otp_sent": false
     }
 }
 ```
@@ -69,7 +69,7 @@ Authorization: Bearer {your_access_token}
             "email_verified_at": "2024-01-01T12:00:00.000000Z",
             "pending_email": "veli.aliyev@example.com"
         },
-        "email_verification_required": true
+        "otp_sent": true
     }
 }
 ```
