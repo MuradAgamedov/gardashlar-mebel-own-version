@@ -1378,28 +1378,32 @@ class AuthController extends Controller
             }
 
             // Handle email change with pending verification
-            if ($request->has('email') && $request->email !== $oldEmail) {
-                if ($request->email) {
-                    // Set pending email for verification
-                    $user->pending_email = $request->email;
-                    $user->pending_email_token = \Str::random(60);
-                    $user->pending_email_expires_at = now()->addMinutes(15);
-                    
-                    $emailVerificationRequired = true;
-                    
-                    // Send OTP to new email
-                    $this->emailService->sendOTP($request->email, 'email_change');
-                    
-                    \Log::info('Email change requested', [
-                        'user_id' => $user->id,
-                        'old_email' => $oldEmail,
-                        'new_email' => $request->email
-                    ]);
-                } else {
-                    // If email is being set to null/empty
-                    $user->email = null;
-                    $user->email_verified_at = null;
+            if ($request->has('email')) {
+                if ($request->email !== $oldEmail) {
+                    // Email həqiqətən dəyişib
+                    if ($request->email) {
+                        // Set pending email for verification
+                        $user->pending_email = $request->email;
+                        $user->pending_email_token = \Str::random(60);
+                        $user->pending_email_expires_at = now()->addMinutes(15);
+                        
+                        $emailVerificationRequired = true;
+                        
+                        // Send OTP to new email
+                        $this->emailService->sendOTP($request->email, 'email_change');
+                        
+                        \Log::info('Email change requested', [
+                            'user_id' => $user->id,
+                            'old_email' => $oldEmail,
+                            'new_email' => $request->email
+                        ]);
+                    } else {
+                        // If email is being set to null/empty
+                        $user->email = null;
+                        $user->email_verified_at = null;
+                    }
                 }
+                // Əgər email eyni qalıbsa, heç bir şey etmirik
             }
 
             $user->save();
