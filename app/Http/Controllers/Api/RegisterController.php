@@ -107,11 +107,8 @@ class RegisterController extends Controller
                 'email_verified_at' => null, // Not verified yet
             ]);
 
-            // Generate OTP token
-            $otpToken = $this->emailService->generateOTP();
-            
-            // Send OTP to email
-            $emailSent = $this->emailService->sendOTP($email, $otpToken);
+            // Send OTP to email (OTP generation is handled inside sendOTP method)
+            $emailSent = $this->emailService->sendOTP($email, 'verification');
 
             if ($emailSent) {
                 return response()->json([

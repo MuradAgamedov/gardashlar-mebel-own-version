@@ -176,7 +176,8 @@ class AuthController extends Controller
                         'contact_type' => 'email',
                         'otp_code' => $otp,
                         'expires_at' => \Carbon\Carbon::now()->addMinutes(10),
-                        'is_used' => false
+                        'is_used' => false,
+                        'purpose' => 'verification'
                     ]);
                     
                     // Send email directly like TestEmail command
@@ -274,8 +275,7 @@ class AuthController extends Controller
 
         try {
             if (!empty($request->email)) {
-                $otp = $this->emailService->generateOTP();
-                $sent = $this->emailService->sendOTP($request->email, $otp);
+                $sent = $this->emailService->sendOTP($request->email, 'verification');
                 
                 if ($sent) {
                     return response()->json([
