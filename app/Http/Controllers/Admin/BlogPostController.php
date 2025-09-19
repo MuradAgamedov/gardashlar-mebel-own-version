@@ -158,7 +158,7 @@ class BlogPostController extends Controller
             Log::error('Error creating blog post: ' . $e->getMessage());
             
             return back()->withInput()
-                ->with('error', 'Error creating blog post. Please try again.');
+                ->with('error', 'Error creating blog post. Please try again.'.$e->getMessage());
         }
     }
 
