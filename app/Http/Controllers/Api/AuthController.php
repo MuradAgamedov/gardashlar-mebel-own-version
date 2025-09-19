@@ -1765,14 +1765,8 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'surname' => $user->surname,
-                'full_name' => $user->full_name,
                 'email' => $user->email,
                 'phone' => $user->phone,
-                'email_verified_at' => $user->email_verified_at,
-                'pending_email' => $user->pending_email,
-                'pending_email_expires_at' => $user->pending_email_expires_at,
-                'created_at' => $user->created_at,
-                'updated_at' => $user->updated_at,
             ];
 
             return response()->json([
