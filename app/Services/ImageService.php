@@ -9,76 +9,70 @@ use Illuminate\Support\Str;
 class ImageService
 {
     /**
-     * Upload an image file
+     * Şəkli yüklə və həmişə WebP kimi saxla
      *
      * @param UploadedFile $file
      * @param string $path
      * @param array $options
-     * @return string|false
+     * @return string
+     * @throws \Exception
      */
     public function upload(UploadedFile $file, string $path = 'uploads', array $options = [])
     {
         try {
-            // Default options
             $defaultOptions = [
                 'disk' => 'public',
                 'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                'generate_unique_name' => true, // Həmişə unikal ad yarat
+                'generate_unique_name' => true,
+                'quality' => 85, // WebP keyfiyyəti (0-100)
+                'max_width' => null,  // istəsən ölçü limitləri də qoya bilərsən
+                'max_height' => null,
             ];
-
             $options = array_merge($defaultOptions, $options);
 
-            // Validate file
             if (!$this->validateFile($file, $options)) {
                 throw new \Exception('File validation failed. Check file type and validity.');
             }
 
-            // Check disk availability
+            // Qovluğu yoxla/yara
             if (!Storage::disk($options['disk'])->exists($path)) {
-                // Try to create directory
-                try {
-                    Storage::disk($options['disk'])->makeDirectory($path);
-                } catch (\Exception $e) {
-                    throw new \Exception('Unable to create upload directory. Check storage permissions.');
-                }
+                Storage::disk($options['disk'])->makeDirectory($path);
             }
 
-            // Generate filename
-            $filename = $this->generateFilename($file, $options['generate_unique_name']);
+            // Fayl adı (.webp uzantısı ilə)
+            $webpName = $this->generateFilenameWithExtension($file, 'webp', $options['generate_unique_name']);
+            $relativePath = trim($path, '/').'/'.$webpName;
 
-            // Store file
-            $filePath = $file->storeAs($path, $filename, $options['disk']);
+            // Orijinal faylı müvəqqəti yolundan oxu və WebP-ə çevir
+            $webpBinary = $this->convertToWebp($file, $options['quality'], $options['max_width'], $options['max_height']);
 
-            if ($filePath) {
-                // Verify file was actually stored
-                if (!Storage::disk($options['disk'])->exists($filePath)) {
-                    throw new \Exception('File was not properly stored. Check storage permissions.');
-                }
-                
-                return $filePath;
+            if ($webpBinary === null) {
+                throw new \Exception('WebP conversion failed.');
             }
 
-            throw new \Exception('File storage failed. File path is null.');
+            // Storage-a yaz
+            $saved = Storage::disk($options['disk'])->put($relativePath, $webpBinary, 'public');
+            if (!$saved) {
+                throw new \Exception('Unable to save WebP file to storage.');
+            }
+
+            // Yekun yoxlama
+            if (!Storage::disk($options['disk'])->exists($relativePath)) {
+                throw new \Exception('File was not properly stored. Check storage permissions.');
+            }
+
+            return $relativePath;
 
         } catch (\Exception $e) {
             \Log::error('Image upload failed: ' . $e->getMessage(), [
                 'file' => $file->getClientOriginalName(),
                 'size' => $file->getSize(),
                 'mime_type' => $file->getMimeType(),
-                'path' => $path,
-                'options' => $options
             ]);
             throw new \Exception('Image upload failed: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Delete an image file
-     *
-     * @param string $path
-     * @param string $disk
-     * @return bool
-     */
     public function delete(string $path, string $disk = 'public'): bool
     {
         try {
@@ -89,7 +83,7 @@ class ImageService
                 }
                 return $result;
             }
-            return true; // File doesn't exist, consider it deleted
+            return true;
         } catch (\Exception $e) {
             \Log::error('Image delete failed: ' . $e->getMessage(), [
                 'path' => $path,
@@ -99,36 +93,16 @@ class ImageService
         }
     }
 
-    /**
-     * Update an image (delete old, upload new)
-     *
-     * @param UploadedFile $file
-     * @param string|null $oldPath
-     * @param string $path
-     * @param array $options
-     * @return string|false
-     */
     public function update(UploadedFile $file, ?string $oldPath = null, string $path = 'uploads', array $options = [])
     {
-        // Delete old file if exists
         if ($oldPath) {
             $this->delete($oldPath, $options['disk'] ?? 'public');
         }
-
-        // Upload new file
         return $this->upload($file, $path, $options);
     }
 
-    /**
-     * Validate uploaded file
-     *
-     * @param UploadedFile $file
-     * @param array $options
-     * @return bool
-     */
     private function validateFile(UploadedFile $file, array $options): bool
     {
-        // Check if file is valid
         if (!$file->isValid()) {
             $errorMessages = [
                 UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
@@ -139,102 +113,144 @@ class ImageService
                 UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
                 UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.',
             ];
-            
             $errorMessage = $errorMessages[$file->getError()] ?? 'Unknown upload error occurred.';
             throw new \Exception('File is not valid. Error: ' . $errorMessage);
         }
 
-        // Check file type by extension
         $extension = strtolower($file->getClientOriginalExtension());
         if (!in_array($extension, $options['allowed_types'])) {
             throw new \Exception('File type not allowed. Allowed types: ' . implode(', ', $options['allowed_types']) . '. Got: ' . $extension);
         }
 
-        // Check MIME type
         $mimeType = $file->getMimeType();
-        $allowedMimeTypes = [
-            'image/jpeg',
-            'image/png', 
-            'image/gif',
-            'image/webp'
-        ];
-        
+        $allowedMimeTypes = ['image/jpeg','image/png','image/gif','image/webp'];
         if (!in_array($mimeType, $allowedMimeTypes)) {
             throw new \Exception('Invalid MIME type. Allowed types: ' . implode(', ', $allowedMimeTypes) . '. Got: ' . $mimeType);
         }
 
-        // Additional image validation
-        try {
-            $imageInfo = getimagesize($file->getPathname());
-            if ($imageInfo === false) {
-                throw new \Exception('Unable to read image file. File may be corrupted.');
-            }
-        } catch (\Exception $e) {
-            throw new \Exception('Image validation failed: ' . $e->getMessage());
+        $imageInfo = @getimagesize($file->getPathname());
+        if ($imageInfo === false) {
+            throw new \Exception('Unable to read image file. File may be corrupted.');
         }
 
         return true;
     }
 
     /**
-     * Generate unique filename
-     *
-     * @param UploadedFile $file
-     * @param bool $unique
-     * @return string
+     * GD ilə WebP-ə çevrilmə (şəffaflıq, ölçü limitləri və s.)
      */
-    private function generateFilename(UploadedFile $file, bool $unique = true): string
+    private function convertToWebp(UploadedFile $file, int $quality = 85, ?int $maxWidth = null, ?int $maxHeight = null): ?string
     {
-        $extension = strtolower($file->getClientOriginalExtension());
-        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        
-        if ($unique) {
-            // Daha oxunaqlı format: original_name_timestamp_random.ext
-            $randomNumber = mt_rand(1000, 9999); // 4 rəqəmli random ədəd
-            $timestamp = time();
-            $filename = Str::slug($originalName) . '_' . $timestamp . '_' . $randomNumber . '.' . $extension;
-        } else {
-            // Sadə format: original_name.ext
-            $filename = Str::slug($originalName) . '.' . $extension;
+        // GD tələb olunur
+        if (!function_exists('imagewebp')) {
+            throw new \Exception('GD WebP support is not available. Enable PHP-GD with WebP.');
         }
 
-        return $filename;
+        $mime = $file->getMimeType();
+        $srcPath = $file->getPathname();
+
+        // Orijinaldan image resource yarat
+        switch ($mime) {
+            case 'image/jpeg':
+                $image = @imagecreatefromjpeg($srcPath);
+                break;
+            case 'image/png':
+                $image = @imagecreatefrompng($srcPath);
+                break;
+            case 'image/gif':
+                $image = @imagecreatefromgif($srcPath);
+                break;
+            case 'image/webp':
+                // Artıq webp-dirsə də yenidən oxuyub yazaq (keyfiyyət normalizasiya)
+                $image = @imagecreatefromwebp($srcPath);
+                break;
+            default:
+                $image = null;
+        }
+
+        if (!$image) {
+            return null;
+        }
+
+        // İstəyə görə ölçünü limitlə (proportionally)
+        $origW = imagesx($image);
+        $origH = imagesy($image);
+
+        $targetW = $origW;
+        $targetH = $origH;
+
+        if ($maxWidth || $maxHeight) {
+            $ratio = $origW / $origH;
+
+            if ($maxWidth && $targetW > $maxWidth) {
+                $targetW = $maxWidth;
+                $targetH = (int) round($maxWidth / $ratio);
+            }
+
+            if ($maxHeight && $targetH > $maxHeight) {
+                $targetH = $maxHeight;
+                $targetW = (int) round($maxHeight * $ratio);
+            }
+        }
+
+        if ($targetW !== $origW || $targetH !== $origH) {
+            $resized = imagecreatetruecolor($targetW, $targetH);
+
+            // PNG/GIF şəffaflıq üçün alpha ayarları
+            if (in_array($mime, ['image/png','image/gif'])) {
+                imagealphablending($resized, false);
+                imagesavealpha($resized, true);
+                $transparent = imagecolorallocatealpha($resized, 0, 0, 0, 127);
+                imagefilledrectangle($resized, 0, 0, $targetW, $targetH, $transparent);
+            }
+
+            imagecopyresampled($resized, $image, 0, 0, 0, 0, $targetW, $targetH, $origW, $origH);
+            imagedestroy($image);
+            $image = $resized;
+        }
+
+        // Şəffaflıq üçün alpha saxla (PNG/GIF mənbələrində)
+        imagealphablending($image, false);
+        imagesavealpha($image, true);
+
+        // Output-u buffer-ə yaz
+        ob_start();
+        $ok = imagewebp($image, null, max(0, min(100, $quality)));
+        imagedestroy($image);
+
+        if (!$ok) {
+            ob_end_clean();
+            return null;
+        }
+
+        $data = ob_get_clean();
+        return $data === false ? null : $data;
     }
 
-    /**
-     * Get full URL for image
-     *
-     * @param string $path
-     * @param string $disk
-     * @return string
-     */
+    private function generateFilenameWithExtension(UploadedFile $file, string $forceExtension, bool $unique = true): string
+    {
+        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        if ($unique) {
+            $randomNumber = mt_rand(1000, 9999);
+            $timestamp = time();
+            return Str::slug($originalName) . '_' . $timestamp . '_' . $randomNumber . '.' . $forceExtension;
+        }
+        return Str::slug($originalName) . '.' . $forceExtension;
+    }
+
     public function getUrl(string $path, string $disk = 'public'): string
     {
         if (empty($path)) {
             return '';
         }
-
         return Storage::disk($disk)->url($path);
     }
 
-    /**
-     * Check if file exists
-     *
-     * @param string $path
-     * @param string $disk
-     * @return bool
-     */
     public function exists(string $path, string $disk = 'public'): bool
     {
         return Storage::disk($disk)->exists($path);
     }
 
-    /**
-     * Format bytes to human readable format
-     *
-     * @param int $bytes
-     * @return string
-     */
     private function formatBytes(int $bytes): string
     {
         if ($bytes === 0) return '0 Bytes';
@@ -243,4 +259,4 @@ class ImageService
         $i = floor(log($bytes) / log($k));
         return round($bytes / pow($k, $i), 2) . ' ' . $sizes[$i];
     }
-} 
+}

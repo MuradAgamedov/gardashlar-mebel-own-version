@@ -5,12 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Report;
 use App\Models\Language;
-
+use App\Services\ImageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ReportController extends Controller
 {
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
 
 
     /**
@@ -67,7 +72,7 @@ class ReportController extends Controller
         // Handle PDF upload
         $pdfPath = null;
         if ($request->hasFile('pdf')) {
-            $pdfPath = $request->file('pdf')->store('reports', 'public');
+            $pdfPath = $this->imageService->upload($request->file('pdf'), 'reports');
         }
 
         // Create report
@@ -138,10 +143,10 @@ class ReportController extends Controller
         if ($request->hasFile('pdf')) {
             // Delete old PDF
             if ($report->pdf) {
-                Storage::disk('public')->delete($report->pdf);
+                $this->imageService->delete($report->pdf);
             }
             
-            $pdfPath = $request->file('pdf')->store('reports', 'public');
+            $pdfPath = $this->imageService->upload($request->file('pdf'), 'reports');
             $pdfData['pdf'] = $pdfPath;
         }
 
