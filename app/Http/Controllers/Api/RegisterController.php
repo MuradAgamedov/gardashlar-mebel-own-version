@@ -192,7 +192,7 @@ class RegisterController extends Controller
         }
 
         // Verify OTP using EmailService
-        $isVerified = $this->emailService->verifyOTP((string)$email, (string)$otpCode);
+        $isVerified = $this->emailService->verifyOTP((string)$email, (string)$otpCode, 'verification');
 
         if ($isVerified) {
             // Mark email as verified
