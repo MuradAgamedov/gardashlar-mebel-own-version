@@ -108,7 +108,7 @@ class RegisterController extends Controller
             ]);
 
             // Send OTP to email (OTP generation is handled inside sendOTP method)
-            $emailSent = $this->emailService->sendOTP($email, 'verification');
+            $emailSent = $this->emailService->sendOTP($email, 'registration');
 
             if ($emailSent) {
                 return response()->json([
@@ -192,7 +192,7 @@ class RegisterController extends Controller
         }
 
         // Verify OTP using EmailService
-        $isVerified = $this->emailService->verifyOTP((string)$email, (string)$otpCode, 'verification');
+        $isVerified = $this->emailService->verifyOTP((string)$email, (string)$otpCode, 'registration');
 
         if ($isVerified) {
             // Mark email as verified
