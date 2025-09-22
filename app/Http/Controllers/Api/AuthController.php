@@ -825,7 +825,7 @@ class AuthController extends Controller
             $contactInfo = '';
 
             if (!empty($request->email)) {
-                $otpVerified = $this->emailService->verifyOTP($request->email, $request->otp_code);
+                $otpVerified = $this->emailService->verifyOTP($request->email, $request->otp_code, 'registration');
                 $contactType = 'email';
                 $contactInfo = $request->email;
             } elseif (!empty($request->phone)) {
