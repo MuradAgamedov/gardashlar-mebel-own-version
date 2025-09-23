@@ -323,3 +323,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush 
+
+@include('admin.partials.slug-generator') 
