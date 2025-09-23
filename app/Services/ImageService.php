@@ -47,7 +47,22 @@ class ImageService
             $webpBinary = $this->convertToWebp($file, $options['quality'], $options['max_width'], $options['max_height']);
 
             if ($webpBinary === null) {
-                throw new \Exception('WebP conversion failed.');
+                // WebP uğursuz olarsa, orijinal formatda saxla
+                \Log::warning('WebP conversion failed, saving in original format', [
+                    'file' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getMimeType()
+                ]);
+                
+                $originalExtension = strtolower($file->getClientOriginalExtension());
+                $originalName = $this->generateFilenameWithExtension($file, $originalExtension, $options['generate_unique_name']);
+                $relativePath = trim($path, '/').'/'.$originalName;
+                
+                $saved = Storage::disk($options['disk'])->putFileAs($path, $file, $originalName, 'public');
+                if (!$saved) {
+                    throw new \Exception('Failed to save original image file.');
+                }
+                
+                return $relativePath;
             }
 
             // Storage-a yaz
@@ -146,6 +161,11 @@ class ImageService
             throw new \Exception('GD WebP support is not available. Enable PHP-GD with WebP.');
         }
 
+        // WebP dəstəyini yoxla
+        if (!function_exists('imagecreatefromwebp') || !function_exists('imagewebp')) {
+            throw new \Exception('WebP support is not enabled in PHP GD extension.');
+        }
+
         $mime = $file->getMimeType();
         $srcPath = $file->getPathname();
 
@@ -220,11 +240,24 @@ class ImageService
 
         if (!$ok) {
             ob_end_clean();
-            return null;
+            \Log::error('WebP encoding failed', [
+                'quality' => $quality,
+                'target_width' => $targetW,
+                'target_height' => $targetH,
+                'original_width' => $origW,
+                'original_height' => $origH,
+                'mime_type' => $mime
+            ]);
+            throw new \Exception('WebP encoding failed. Check image quality and dimensions.');
         }
 
         $data = ob_get_clean();
-        return $data === false ? null : $data;
+        if ($data === false) {
+            \Log::error('Failed to get WebP data from output buffer');
+            return null;
+        }
+        
+        return $data;
     }
 
     private function generateFilenameWithExtension(UploadedFile $file, string $forceExtension, bool $unique = true): string
