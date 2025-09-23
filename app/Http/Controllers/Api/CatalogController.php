@@ -83,7 +83,7 @@ class CatalogController extends Controller
                 
                 return [
                     'id' => $catalog->id,
-                    'id' => $catalog->title,
+                    'title' => $translation->catalog_year,
 
                 ];
             });
