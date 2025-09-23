@@ -1345,7 +1345,7 @@ class AuthController extends Controller
             $validator = Validator::make($request->all(), [
                 'name' => 'sometimes|required|string|max:255',
                 'surname' => 'sometimes|required|string|max:255',
-                'phone' => 'sometimes|nullable|string|max:20|unique:users,phone,' . $user->id,
+                'phone' => 'sometimes|nullable|string|max:20',
                 'email' => 'sometimes|nullable|email|unique:users,email,' . $user->id,
             ], [
                 'name.required' => 'Ad məcburidir',
@@ -1356,7 +1356,6 @@ class AuthController extends Controller
                 'surname.max' => 'Soyad 255 simvoldan çox ola bilməz',
                 'phone.string' => 'Telefon nömrəsi mətn formatında olmalıdır',
                 'phone.max' => 'Telefon nömrəsi 20 simvoldan çox ola bilməz',
-                'phone.unique' => 'Bu telefon nömrəsi artıq istifadə olunub',
                 'email.email' => 'Düzgün email ünvanı daxil edin',
                 'email.unique' => 'Bu email ünvanı artıq istifadə olunub',
             ]);
