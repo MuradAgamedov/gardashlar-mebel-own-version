@@ -573,6 +573,7 @@ class ProjectController extends Controller
                         'slug' => $similarTranslation ? $similarTranslation->slug : null,
                         'company_name' => $similarTranslation ? $similarTranslation->company_name : null,
                         'category_slug' => $similarCategoryTranslation ? $similarCategoryTranslation->slug : null,
+                        'category_title' => $similarCategoryTranslation ? $similarCategoryTranslation->title : null,
                         'main_image' => $similarMainImage ? $similarMainImage->image_url : asset('images/default_image.webp')
                     ];
                 });
