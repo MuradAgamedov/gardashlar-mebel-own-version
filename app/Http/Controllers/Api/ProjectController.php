@@ -457,6 +457,7 @@ class ProjectController extends Controller
      *                 @OA\Property(property="seo_keywords", type="string", example="soft furniture, modern design, gardashlar"),
      *                 @OA\Property(property="seo_description", type="string", example="High quality modern soft furniture design by Gardashlar"),
      *                 @OA\Property(property="category_slug", type="string", example="yumshaq-mebeller"),
+     *                 @OA\Property(property="category_title", type="string", example="Yumşaq Mebellər"),
      *                 @OA\Property(property="images", type="array", @OA\Items(type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="image_url", type="string", example="https://example.com/storage/projects/image.jpg"),
@@ -588,6 +589,7 @@ class ProjectController extends Controller
                     'seo_keywords' => $translation ? $translation->seo_keywords : null,
                     'seo_description' => $translation ? $translation->seo_description : null,
                     'category_slug' => $categoryTranslation ? $categoryTranslation->slug : null,
+                    'category_title' => $categoryTranslation ? $categoryTranslation->title : null,
                     'images' => $project->images->map(function ($image) {
                         return [
                             'id' => $image->id,
