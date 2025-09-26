@@ -79,32 +79,36 @@ class BlogPostController extends Controller
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(
      *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="title", type="string", example="Blog Post Title"),
-     *                     @OA\Property(property="slug", type="string", example="blog-post-slug"),
-     *                     @OA\Property(property="card_image_url", type="string", example="https://example.com/image.jpg"),
-     *                     @OA\Property(property="card_description", type="string", example="Short description for card"),
-     *                     @OA\Property(property="category_slug", type="string", example="category-slug")
-     *                 )
-     *             ),
-     *             @OA\Property(
-     *                 property="pagination",
      *                 type="object",
-     *                 @OA\Property(property="current_page", type="integer", example=1),
-     *                 @OA\Property(property="last_page", type="integer", example=5),
-     *                 @OA\Property(property="per_page", type="integer", example=10),
-     *                 @OA\Property(property="total", type="integer", example=50)
-     *             ),
-     *             @OA\Property(
-     *                 property="sort_options",
-     *                 type="array",
-     *                 @OA\Items(
+     *                 @OA\Property(
+     *                     property="blogs",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="title", type="string", example="Blog Post Title"),
+     *                         @OA\Property(property="slug", type="string", example="blog-post-slug"),
+     *                         @OA\Property(property="card_image_url", type="string", example="https://example.com/image.jpg"),
+     *                         @OA\Property(property="card_description", type="string", example="Short description for card"),
+     *                         @OA\Property(property="category_slug", type="string", example="category-slug")
+     *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="pagination",
      *                     type="object",
-     *                     @OA\Property(property="value", type="string", example="newest"),
-     *                     @OA\Property(property="label", type="string", example="newest")
+     *                     @OA\Property(property="current_page", type="integer", example=1),
+     *                     @OA\Property(property="last_page", type="integer", example=5),
+     *                     @OA\Property(property="per_page", type="integer", example=10),
+     *                     @OA\Property(property="total", type="integer", example=50)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="sort_options",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="value", type="string", example="newest"),
+     *                         @OA\Property(property="label", type="string", example="newest")
+     *                     )
      *                 )
      *             )
      *         )
@@ -179,16 +183,18 @@ class BlogPostController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $data,
-                'pagination' => [
-                    'current_page' => $blogPosts->currentPage(),
-                    'last_page' => $blogPosts->lastPage(),
-                    'per_page' => $blogPosts->perPage(),
-                    'total' => $blogPosts->total(),
-                ],
-                'sort_options' => [
-                    ['value' => 'newest', 'label' => 'newest'],
-                    ['value' => 'oldest', 'label' => 'oldest']
+                'data' => [
+                    'blogs' => $data,
+                    'pagination' => [
+                        'current_page' => $blogPosts->currentPage(),
+                        'last_page' => $blogPosts->lastPage(),
+                        'per_page' => $blogPosts->perPage(),
+                        'total' => $blogPosts->total(),
+                    ],
+                    'sort_options' => [
+                        ['value' => 'newest', 'label' => 'newest'],
+                        ['value' => 'oldest', 'label' => 'oldest']
+                    ]
                 ]
             ], 200);
 
