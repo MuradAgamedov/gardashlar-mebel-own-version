@@ -33,6 +33,7 @@ use App\Http\Controllers\Admin\SiteUsageRulesController;
 use App\Http\Controllers\Admin\PrivacyPolicyController;
 use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\Admin\AdministrationController;
+use App\Http\Controllers\Admin\ActionController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\SuggestionController;
 use App\Http\Controllers\Admin\IndividualProjectOrderController;
@@ -472,6 +473,12 @@ Route::post('blog-posts/{blogPost}/images', [BlogImageController::class, 'store'
 Route::put('blog-posts/{blogPost}/images/{blogImage}', [BlogImageController::class, 'update'])->name('blog-posts.images.update');
 Route::delete('blog-posts/{blogPost}/images/{blogImage}', [BlogImageController::class, 'destroy'])->name('blog-posts.images.destroy');
 Route::post('blog-posts/{blogPost}/images/reorder', [BlogImageController::class, 'reorder'])->name('blog-posts.images.reorder');
+
+        // Actions routes
+        Route::resource('actions', ActionController::class);
+        Route::get('actions/{action}/products', [ActionController::class, 'products'])->name('actions.products');
+        Route::post('actions/{action}/add-product', [ActionController::class, 'addProduct'])->name('actions.add-product');
+        Route::delete('actions/{action}/remove-product', [ActionController::class, 'removeProduct'])->name('actions.remove-product');
 
         // Image Upload route for CKEditor
         Route::post('upload/image', [CompanyManagementController::class, 'uploadImage'])->name('upload.image');

@@ -57,4 +57,14 @@ class Company extends Model
     {
         return $query->orderBy('order');
     }
+
+    public function actions()
+    {
+        return $this->hasMany(Action::class);
+    }
+
+    public function companyProducts()
+    {
+        return $this->hasMany(CompanyProduct::class);
+    }
 }
