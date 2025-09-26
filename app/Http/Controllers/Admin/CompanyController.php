@@ -198,18 +198,12 @@ class CompanyController extends Controller
     }
 
     /**
-     * Show company actions and products management
+     * Show company products management
      */
     public function actions(Company $company, Request $request)
     {
-        $company->load(['translates.language', 'actions.translates.language']);
+        $company->load(['translates.language']);
         
-        // Get all actions for this company
-        $actions = $company->actions()
-            ->with(['translates.language', 'companyProducts.product.translates.language'])
-            ->ordered()
-            ->get();
-
         // Get all products with pagination and search
         $query = Product::with(['translates.language', 'companyProducts' => function($q) use ($company) {
             $q->where('company_id', $company->id);
@@ -225,43 +219,41 @@ class CompanyController extends Controller
 
         $products = $query->paginate(20);
 
-        return view('admin.companies.actions', compact('company', 'actions', 'products'));
+        return view('admin.companies.actions', compact('company', 'products'));
     }
 
     /**
-     * Add product to action
+     * Add product to company
      */
     public function addProductToAction(Request $request, Company $company)
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'action_id' => 'required|exists:actions,id',
         ]);
 
         try {
-            // Check if product is already in this action
+            // Check if product is already added to this company
             $existing = CompanyProduct::where('company_id', $company->id)
-                ->where('action_id', $request->action_id)
                 ->where('product_id', $request->product_id)
                 ->first();
 
             if ($existing) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Product is already in this action'
+                    'message' => 'Product is already added to this company'
                 ], 400);
             }
 
             CompanyProduct::create([
                 'company_id' => $company->id,
                 'product_id' => $request->product_id,
-                'action_id' => $request->action_id,
-                'is_action_product' => true,
+                'action_id' => null,
+                'is_action_product' => false,
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Product added to action successfully'
+                'message' => 'Product added to company successfully'
             ]);
 
         } catch (\Exception $e) {
@@ -273,24 +265,22 @@ class CompanyController extends Controller
     }
 
     /**
-     * Remove product from action
+     * Remove product from company
      */
     public function removeProductFromAction(Request $request, Company $company)
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'action_id' => 'required|exists:actions,id',
         ]);
 
         try {
             CompanyProduct::where('company_id', $company->id)
-                ->where('action_id', $request->action_id)
                 ->where('product_id', $request->product_id)
                 ->delete();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Product removed from action successfully'
+                'message' => 'Product removed from company successfully'
             ]);
 
         } catch (\Exception $e) {
