@@ -140,8 +140,6 @@ class BlogPostController extends Controller
                 $sort = 'newest'; // Default to newest if invalid sort provided
             }
             
-            // Debug: Log the sort parameter
-            \Log::info('Sort parameter: ' . $sort);
             
             $cacheKey = "api:blog-posts-v2:lang:{$languageId}:page:{$page}:per_page:{$perPage}:sort:{$sort}";
             if ($categorySlug) {
@@ -155,7 +153,14 @@ class BlogPostController extends Controller
                         'category.translates' => fn($q) => $q->where('language_id', $languageId)
                     ]);
 
-                // Apply sorting
+                // Filter by category slug if provided
+                if ($categorySlug) {
+                    $query->whereHas('category.translates', function($q) use ($categorySlug) {
+                        $q->where('slug', $categorySlug);
+                    });
+                }
+
+                // Apply sorting after all filters
                 switch ($sort) {
                     case 'oldest':
                         $query->orderBy('published_at', 'asc');
@@ -164,13 +169,6 @@ class BlogPostController extends Controller
                     default:
                         $query->orderBy('published_at', 'desc');
                         break;
-                }
-
-                // Filter by category slug if provided
-                if ($categorySlug) {
-                    $query->whereHas('category.translates', function($q) use ($categorySlug) {
-                        $q->where('slug', $categorySlug);
-                    });
                 }
 
                 return $query->paginate($perPage);
