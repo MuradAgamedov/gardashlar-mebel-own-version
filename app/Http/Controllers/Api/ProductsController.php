@@ -403,6 +403,19 @@ class ProductsController extends Controller
             $minPrice = $request->get('min_price');
             $maxPrice = $request->get('max_price');
             
+            // Get category seo_text if category_slug is provided
+            $categorySeoText = null;
+            if ($categorySlug) {
+                $selectedCategory = ProductCategory::whereHas('translates', function($query) use ($categorySlug, $languageId) {
+                    $query->where('slug', $categorySlug)->where('language_id', $languageId);
+                })->first();
+                
+                if ($selectedCategory) {
+                    $categoryTranslation = $selectedCategory->translates()->where('language_id', $languageId)->first();
+                    $categorySeoText = $categoryTranslation ? $categoryTranslation->seo_text : null;
+                }
+            }
+            
             // Handle filters, colors, and type_id parameters - convert to arrays if they come as single values
             if (!is_array($filterIds)) {
                 $filterIds = $filterIds ? [$filterIds] : [];
@@ -589,10 +602,7 @@ class ProductsController extends Controller
                     'discount_percent' => $product->discount_percent,
                     'category_slug' => $categorySlug,
                     'parentSlug' => $parentSlug,
-                    'product_types' => $productTypes,
-                    'seo_title' => $translation ? $translation->seo_title : null,
-                    'seo_keywords' => $translation ? $translation->seo_keywords : null,
-                    'seo_description' => $translation ? $translation->seo_description : null
+                    'product_types' => $productTypes
                 ];
             });
 
@@ -623,7 +633,8 @@ class ProductsController extends Controller
                     'applied_filters' => [
                         'min_price' => $actualMinPrice,
                         'max_price' => $actualMaxPrice
-                    ]
+                    ],
+                    'category_seo_text' => $categorySeoText
                 ]
             ]);
 
@@ -664,7 +675,6 @@ class ProductsController extends Controller
                 'seo_title' => $translation ? $translation->seo_title : null,
                 'seo_keywords' => $translation ? $translation->seo_keywords : null,
                 'seo_description' => $translation ? $translation->seo_description : null,
-                'seo_text' => $translation ? $translation->seo_text : null,
                 'parentSlug' => $parentSlug,
                 'children' => []
             ];
