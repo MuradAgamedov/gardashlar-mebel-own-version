@@ -672,9 +672,6 @@ class ProductsController extends Controller
                 'id' => $category->id,
                 'title' => $translation ? $translation->title : '',
                 'slug' => $translation ? $translation->slug : '',
-                'seo_title' => $translation ? $translation->seo_title : null,
-                'seo_keywords' => $translation ? $translation->seo_keywords : null,
-                'seo_description' => $translation ? $translation->seo_description : null,
                 'parentSlug' => $parentSlug,
                 'children' => []
             ];
