@@ -54,6 +54,7 @@ use App\Http\Controllers\Api\CustomerRightsController;
 use App\Http\Controllers\Api\DeliveryPaymentController;
 use App\Http\Controllers\Api\WarrantyPolicyController;
 use App\Http\Controllers\Api\RefundPolicyController;
+use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\CompanyManagementController;
 use App\Http\Controllers\Api\SiteUsageRulesController;
 use App\Http\Controllers\Api\SuggestionController;
@@ -242,6 +243,10 @@ Route::get('/refund-policy', [RefundPolicyController::class, 'index'])->name('ap
 
 // Company Management API Routes
 Route::get('/company-management', [CompanyManagementController::class, 'index'])->name('api.company-management.index');
+
+// Companies API Routes
+Route::get('/companies', [CompanyController::class, 'index'])->name('api.companies.index');
+Route::get('/companies/{id}', [CompanyController::class, 'show'])->name('api.companies.show');
 
 // Site Usage Rules API Routes
 Route::get('/site-usage-rules', [SiteUsageRulesController::class, 'index'])->name('api.site-usage-rules.index');
