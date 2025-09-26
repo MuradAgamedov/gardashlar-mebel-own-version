@@ -40,15 +40,8 @@ class CompanyController extends Controller
      *                 property="data",
      *                 type="array",
      *                 @OA\Items(
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="order", type="integer", example=1),
-     *                     @OA\Property(property="status", type="boolean", example=true),
-     *                     @OA\Property(property="title", type="string", example="Company Title"),
-     *                     @OA\Property(property="description", type="string", example="Company description"),
      *                     @OA\Property(property="card_image_url", type="string", example="https://example.com/storage/companies/card_image.jpg", nullable=true),
-     *                     @OA\Property(property="card_image_alt_text", type="string", example="Card Image", nullable=true),
-     *                     @OA\Property(property="created_at", type="string", format="datetime"),
-     *                     @OA\Property(property="updated_at", type="string", format="datetime")
+     *                     @OA\Property(property="card_image_alt_text", type="string", example="Card Image", nullable=true)
      *                 )
      *             )
      *         )
@@ -92,15 +85,8 @@ class CompanyController extends Controller
                 $translation = $company->translates->first();
                 
                 return [
-                    'id' => $company->id,
-                    'order' => $company->order,
-                    'status' => $company->status,
-                    'title' => $translation ? $translation->title : '',
-                    'description' => $translation ? $translation->description : '',
                     'card_image_url' => $translation && $translation->card_image ? asset('storage/' . $translation->card_image) : null,
                     'card_image_alt_text' => $translation ? $translation->card_image_alt_text : null,
-                    'created_at' => $company->created_at,
-                    'updated_at' => $company->updated_at,
                 ];
             });
 
@@ -148,15 +134,8 @@ class CompanyController extends Controller
      *             @OA\Property(
      *                 property="data",
      *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="order", type="integer", example=1),
-     *                 @OA\Property(property="status", type="boolean", example=true),
-     *                 @OA\Property(property="title", type="string", example="Company Title"),
-     *                 @OA\Property(property="description", type="string", example="Company description"),
      *                 @OA\Property(property="card_image_url", type="string", example="https://example.com/storage/companies/card_image.jpg", nullable=true),
-     *                 @OA\Property(property="card_image_alt_text", type="string", example="Card Image", nullable=true),
-     *                 @OA\Property(property="created_at", type="string", format="datetime"),
-     *                 @OA\Property(property="updated_at", type="string", format="datetime")
+     *                 @OA\Property(property="card_image_alt_text", type="string", example="Card Image", nullable=true)
      *             )
      *         )
      *     ),
@@ -212,15 +191,8 @@ class CompanyController extends Controller
             $translation = $company->translates->first();
 
             $companyData = [
-                'id' => $company->id,
-                'order' => $company->order,
-                'status' => $company->status,
-                'title' => $translation ? $translation->title : '',
-                'description' => $translation ? $translation->description : '',
                 'card_image_url' => $translation && $translation->card_image ? asset('storage/' . $translation->card_image) : null,
                 'card_image_alt_text' => $translation ? $translation->card_image_alt_text : null,
-                'created_at' => $company->created_at,
-                'updated_at' => $company->updated_at,
             ];
 
             return response()->json([
