@@ -134,6 +134,12 @@
                                                 <td>{{ $company->order }}</td>
                                                 <td>
                                                     <div class="btn-group" role="group">
+                                                        <a href="{{ route('admin.companies.actions', $company->id) }}" 
+                                                           class="btn btn-sm btn-outline-success" 
+                                                           title="Manage Products & Actions">
+                                                            <i class="material-icons-outlined">inventory</i>
+                                                            Məhsul Əlavə Et
+                                                        </a>
                                                         <a href="{{ route('admin.companies.edit', $company->id) }}" 
                                                            class="btn btn-sm btn-outline-primary">
                                                             <i class="material-icons-outlined">edit</i>

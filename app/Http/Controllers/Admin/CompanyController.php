@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Action;
 use App\Models\Company;
+use App\Models\CompanyProduct;
 use App\Models\CompanyTranslate;
 use App\Models\Language;
+use App\Models\Product;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -191,6 +194,110 @@ class CompanyController extends Controller
 
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Show company actions and products management
+     */
+    public function actions(Company $company, Request $request)
+    {
+        $company->load(['translates.language', 'actions.translates.language']);
+        
+        // Get all actions for this company
+        $actions = $company->actions()
+            ->with(['translates.language', 'companyProducts.product.translates.language'])
+            ->ordered()
+            ->get();
+
+        // Get all products with pagination and search
+        $query = Product::with(['translates.language', 'companyProducts' => function($q) use ($company) {
+            $q->where('company_id', $company->id);
+        }]);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('translates', function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $products = $query->paginate(20);
+
+        return view('admin.companies.actions', compact('company', 'actions', 'products'));
+    }
+
+    /**
+     * Add product to action
+     */
+    public function addProductToAction(Request $request, Company $company)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'action_id' => 'required|exists:actions,id',
+        ]);
+
+        try {
+            // Check if product is already in this action
+            $existing = CompanyProduct::where('company_id', $company->id)
+                ->where('action_id', $request->action_id)
+                ->where('product_id', $request->product_id)
+                ->first();
+
+            if ($existing) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product is already in this action'
+                ], 400);
+            }
+
+            CompanyProduct::create([
+                'company_id' => $company->id,
+                'product_id' => $request->product_id,
+                'action_id' => $request->action_id,
+                'is_action_product' => true,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product added to action successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error adding product: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove product from action
+     */
+    public function removeProductFromAction(Request $request, Company $company)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'action_id' => 'required|exists:actions,id',
+        ]);
+
+        try {
+            CompanyProduct::where('company_id', $company->id)
+                ->where('action_id', $request->action_id)
+                ->where('product_id', $request->product_id)
+                ->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product removed from action successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error removing product: ' . $e->getMessage()
+            ], 500);
         }
     }
 }
