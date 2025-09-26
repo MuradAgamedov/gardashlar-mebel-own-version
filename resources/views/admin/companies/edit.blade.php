@@ -266,7 +266,6 @@
 <script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    alert('Scripts are working!');
     // Image preview for each language
     @foreach($languages as $language)
         // Card image preview

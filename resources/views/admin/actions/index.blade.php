@@ -119,7 +119,7 @@
 
                     <!-- Pagination -->
                     <div class="d-flex justify-content-center">
-                        {{ $actions->appends(request()->query())->links() }}
+                        {{ $actions->appends(request()->query())->links('pagination::bootstrap-4') }}
                     </div>
                 </div>
             </div>
