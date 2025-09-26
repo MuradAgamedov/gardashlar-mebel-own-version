@@ -155,6 +155,14 @@ class Product extends Model
         return $translation ? $translation->slug : 'no-slug';
     }
 
+    /**
+     * Get company products for this product
+     */
+    public function companyProducts()
+    {
+        return $this->hasMany(CompanyProduct::class);
+    }
+
     // Auto-increment order
     protected static function boot()
     {
