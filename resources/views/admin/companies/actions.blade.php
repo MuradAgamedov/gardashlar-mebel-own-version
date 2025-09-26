@@ -68,9 +68,8 @@
                                                 <!-- Action Badge -->
                                                 @if($isInAnyAction)
                                                     <div class="position-absolute top-0 end-0 m-2">
-                                                        <span class="badge bg-success">
+                                                        <span class="badge bg-success" title="Company-də">
                                                             <i class="material-icons-outlined" style="font-size: 1rem;">check</i>
-                                                            Company-də
                                                         </span>
                                                     </div>
                                                 @endif
