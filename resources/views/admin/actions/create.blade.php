@@ -10,9 +10,8 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="card-title mb-0">Create New Action</h4>
-                        <a href="{{ route('admin.actions.index') }}" class="btn btn-secondary">
+                        <a href="{{ route('admin.actions.index') }}" class="btn btn-secondary" title="Back to Actions">
                             <i class="material-icons-outlined">arrow_back</i>
-                            Back to Actions
                         </a>
                     </div>
                 </div>

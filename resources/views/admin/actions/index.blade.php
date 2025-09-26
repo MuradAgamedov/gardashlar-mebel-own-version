@@ -10,9 +10,8 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="card-title mb-0">Actions Management</h4>
-                        <a href="{{ route('admin.actions.create') }}" class="btn btn-primary">
+                        <a href="{{ route('admin.actions.create') }}" class="btn btn-primary" title="Add New Action">
                             <i class="material-icons-outlined">add</i>
-                            Add New Action
                         </a>
                     </div>
                 </div>

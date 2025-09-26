@@ -11,17 +11,14 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="card-title mb-0">Action Details</h4>
                         <div class="d-flex gap-2">
-                            <a href="{{ route('admin.actions.products', $action) }}" class="btn btn-warning">
+                            <a href="{{ route('admin.actions.products', $action) }}" class="btn btn-warning" title="Manage Products">
                                 <i class="material-icons-outlined">inventory</i>
-                                Manage Products
                             </a>
-                            <a href="{{ route('admin.actions.edit', $action) }}" class="btn btn-primary">
+                            <a href="{{ route('admin.actions.edit', $action) }}" class="btn btn-primary" title="Edit">
                                 <i class="material-icons-outlined">edit</i>
-                                Edit
                             </a>
-                            <a href="{{ route('admin.actions.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('admin.actions.index') }}" class="btn btn-secondary" title="Back to Actions">
                                 <i class="material-icons-outlined">arrow_back</i>
-                                Back to Actions
                             </a>
                         </div>
                     </div>
