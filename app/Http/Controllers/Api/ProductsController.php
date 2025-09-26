@@ -589,7 +589,10 @@ class ProductsController extends Controller
                     'discount_percent' => $product->discount_percent,
                     'category_slug' => $categorySlug,
                     'parentSlug' => $parentSlug,
-                    'product_types' => $productTypes
+                    'product_types' => $productTypes,
+                    'seo_title' => $translation ? $translation->seo_title : null,
+                    'seo_keywords' => $translation ? $translation->seo_keywords : null,
+                    'seo_description' => $translation ? $translation->seo_description : null
                 ];
             });
 
@@ -658,9 +661,10 @@ class ProductsController extends Controller
                 'id' => $category->id,
                 'title' => $translation ? $translation->title : '',
                 'slug' => $translation ? $translation->slug : '',
-                'seo_title' => $translation ? $translation->seo_title : '',
-                'seo_keywords' => $translation ? $translation->seo_keywords : '',
-                'seo_description' => $translation ? $translation->seo_description : '',
+                'seo_title' => $translation ? $translation->seo_title : null,
+                'seo_keywords' => $translation ? $translation->seo_keywords : null,
+                'seo_description' => $translation ? $translation->seo_description : null,
+                'seo_text' => $translation ? $translation->seo_text : null,
                 'parentSlug' => $parentSlug,
                 'children' => []
             ];
