@@ -40,6 +40,7 @@ class CompanyController extends Controller
      *                 property="data",
      *                 type="array",
      *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="card_image_url", type="string", example="https://example.com/storage/companies/card_image.jpg", nullable=true),
      *                     @OA\Property(property="card_image_alt_text", type="string", example="Card Image", nullable=true)
      *                 )
@@ -85,6 +86,7 @@ class CompanyController extends Controller
                 $translation = $company->translates->first();
                 
                 return [
+                    'id' => $company->id,
                     'card_image_url' => $translation && $translation->card_image ? asset('storage/' . $translation->card_image) : null,
                     'card_image_alt_text' => $translation ? $translation->card_image_alt_text : null,
                 ];
@@ -109,8 +111,8 @@ class CompanyController extends Controller
      *     path="/api/companies/{id}",
      *     operationId="getCompany",
      *     tags={"Companies"},
-     *     summary="Get company by ID",
-     *     description="Returns a specific company with translation based on locale header",
+     *     summary="Get company details with products",
+     *     description="Returns company details including inner image, title and associated products",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -134,8 +136,20 @@ class CompanyController extends Controller
      *             @OA\Property(
      *                 property="data",
      *                 type="object",
-     *                 @OA\Property(property="card_image_url", type="string", example="https://example.com/storage/companies/card_image.jpg", nullable=true),
-     *                 @OA\Property(property="card_image_alt_text", type="string", example="Card Image", nullable=true)
+     *                 @OA\Property(property="title", type="string", example="Company Title"),
+     *                 @OA\Property(property="inner_image", type="string", example="https://example.com/storage/companies/inner_image.jpg", nullable=true),
+     *                 @OA\Property(property="inner_image_alt_text", type="string", example="Inner Image", nullable=true),
+     *                 @OA\Property(
+     *                     property="products",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="title", type="string", example="Product Title"),
+     *                         @OA\Property(property="description", type="string", example="Product Description"),
+     *                         @OA\Property(property="price", type="number", format="float", example=99.99),
+     *                         @OA\Property(property="image", type="string", example="https://example.com/storage/products/image.jpg", nullable=true)
+     *                     )
+     *                 )
      *             )
      *         )
      *     ),
@@ -172,11 +186,16 @@ class CompanyController extends Controller
                 ], 400);
             }
 
-            // Get company with cache
+            // Get company with products and cache
             $company = Cache::remember("company_{$id}_{$languageId}", 3600, function () use ($id, $languageId) {
-                return Company::with(['translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                }])
+                return Company::with([
+                    'translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'companyProducts.product.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    }
+                ])
                 ->active()
                 ->find($id);
             });
@@ -190,9 +209,25 @@ class CompanyController extends Controller
 
             $translation = $company->translates->first();
 
+            // Get products data
+            $products = $company->companyProducts->map(function ($companyProduct) {
+                $product = $companyProduct->product;
+                $productTranslation = $product->translates->first();
+                
+                return [
+                    'id' => $product->id,
+                    'title' => $productTranslation ? $productTranslation->title : '',
+                    'description' => $productTranslation ? $productTranslation->description : '',
+                    'price' => $product->price,
+                    'image' => $productTranslation && $productTranslation->image ? asset('storage/' . $productTranslation->image) : null,
+                ];
+            });
+
             $companyData = [
-                'card_image_url' => $translation && $translation->card_image ? asset('storage/' . $translation->card_image) : null,
-                'card_image_alt_text' => $translation ? $translation->card_image_alt_text : null,
+                'title' => $translation ? $translation->title : '',
+                'inner_image' => $translation && $translation->inner_image ? asset('storage/' . $translation->inner_image) : null,
+                'inner_image_alt_text' => $translation ? $translation->inner_image_alt_text : null,
+                'products' => $products
             ];
 
             return response()->json([
@@ -208,4 +243,5 @@ class CompanyController extends Controller
             ], 500);
         }
     }
+
 }
