@@ -262,6 +262,7 @@ Route::get('/suggestions/{id}', [SuggestionController::class, 'show'])->name('ap
 
 // Products API Routes
 Route::get('/products', [ProductsController::class, 'categories'])->name('api.products.index');
+Route::get('/categories', [ProductsController::class, 'categoriesOnly'])->name('api.categories.index');
 Route::get('/products/{slug}', [ProductsController::class, 'show'])->name('api.products.show');
 Route::get('/products/{id}/details', [ProductsController::class, 'details'])->name('api.products.details');
 Route::get('/products/{id}/detail-values', [ProductsController::class, 'detailValues'])->name('api.products.detail-values');

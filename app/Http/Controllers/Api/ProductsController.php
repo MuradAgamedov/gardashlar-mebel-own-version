@@ -2464,4 +2464,63 @@ class ProductsController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/categories",
+     *     summary="Get all product categories with hierarchical structure",
+     *     tags={"Products"},
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language ID (1=az, 2=en, 3=ru)",
+     *         required=false,
+     *         @OA\Schema(type="integer", default=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Categories retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Categories retrieved successfully"),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="categories", type="array", @OA\Items(type="object"))
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function categoriesOnly(Request $request)
+    {
+        try {
+            $languageId = $this->getLanguageIdFromHeader($request);
+
+            // Get categories with translations
+            $categories = Cache::rememberForever("product_categories_{$languageId}", function () use ($languageId) {
+                return ProductCategory::with(['translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }])
+                ->active()
+                ->ordered()
+                ->get();
+            });
+
+            // Build hierarchical structure
+            $categoriesData = $this->buildHierarchy($categories);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Categories retrieved successfully',
+                'data' => [
+                    'categories' => $categoriesData
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving categories: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
