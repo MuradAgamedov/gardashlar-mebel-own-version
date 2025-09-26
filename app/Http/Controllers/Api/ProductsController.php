@@ -634,7 +634,7 @@ class ProductsController extends Controller
                         'min_price' => $actualMinPrice,
                         'max_price' => $actualMaxPrice
                     ],
-                    'category_seo_text' => $categorySeoText
+                    'seo_text' => $categorySeoText
                 ]
             ]);
 
