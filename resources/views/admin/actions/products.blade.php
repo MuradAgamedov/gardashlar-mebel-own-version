@@ -16,9 +16,8 @@
                                 - {{ $action->company->translate()->first()->title ?? 'No Company' }}
                             </p>
                         </div>
-                        <a href="{{ route('admin.actions.index') }}" class="btn btn-secondary">
+                        <a href="{{ route('admin.actions.index') }}" class="btn btn-secondary" title="Back to Actions">
                             <i class="material-icons-outlined">arrow_back</i>
-                            Back to Actions
                         </a>
                     </div>
                 </div>
@@ -84,15 +83,15 @@
                                         <div class="mt-auto">
                                             @if($isInAction)
                                                 <button type="button" class="btn btn-danger btn-sm w-100" 
-                                                        onclick="removeProduct({{ $product->id }})">
+                                                        onclick="removeProduct({{ $product->id }})"
+                                                        title="Remove from Action">
                                                     <i class="material-icons-outlined">remove</i>
-                                                    Remove from Action
                                                 </button>
                                             @else
                                                 <button type="button" class="btn btn-success btn-sm w-100" 
-                                                        onclick="addProduct({{ $product->id }})">
+                                                        onclick="addProduct({{ $product->id }})"
+                                                        title="Add to Action">
                                                     <i class="material-icons-outlined">add</i>
-                                                    Add to Action
                                                 </button>
                                             @endif
                                         </div>

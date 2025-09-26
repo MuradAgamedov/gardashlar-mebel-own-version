@@ -85,15 +85,15 @@
                                                 <div class="mt-auto">
                                                     @if($isInAnyAction)
                                                         <button type="button" class="btn btn-danger btn-sm w-100" 
-                                                                onclick="removeFromCompany({{ $product->id }})">
+                                                                onclick="removeFromCompany({{ $product->id }})"
+                                                                title="Company-dən Çıxar">
                                                             <i class="material-icons-outlined">remove</i>
-                                                            Company-dən Çıxar
                                                         </button>
                                                     @else
                                                         <button type="button" class="btn btn-success btn-sm w-100" 
-                                                                onclick="addToCompany({{ $product->id }})">
+                                                                onclick="addToCompany({{ $product->id }})"
+                                                                title="Company-ə Əlavə Et">
                                                             <i class="material-icons-outlined">add</i>
-                                                            Company-ə Əlavə Et
                                                         </button>
                                                     @endif
                                                 </div>
