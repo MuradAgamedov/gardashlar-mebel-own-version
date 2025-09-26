@@ -11,17 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('company_products', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('company_id')->constrained()->onDelete('cascade');
-            $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->foreignId('action_id')->nullable()->constrained()->onDelete('cascade');
-            $table->boolean('is_action_product')->default(false);
-            $table->integer('order')->default(0);
-            $table->timestamps();
-            
-            $table->unique(['company_id', 'product_id']);
-        });
+        if (!Schema::hasTable('company_products')) {
+            Schema::create('company_products', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('company_id')->constrained()->onDelete('cascade');
+                $table->foreignId('product_id')->constrained()->onDelete('cascade');
+                $table->foreignId('action_id')->nullable()->constrained()->onDelete('cascade');
+                $table->boolean('is_action_product')->default(false);
+                $table->integer('order')->default(0);
+                $table->timestamps();
+                
+                $table->unique(['company_id', 'product_id']);
+            });
+        }
     }
 
     /**
