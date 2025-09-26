@@ -145,9 +145,21 @@ class CompanyController extends Controller
      *                     @OA\Items(
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="title", type="string", example="Product Title"),
-     *                         @OA\Property(property="description", type="string", example="Product Description"),
+     *                         @OA\Property(property="slug", type="string", example="product-slug"),
      *                         @OA\Property(property="price", type="number", format="float", example=99.99),
-     *                         @OA\Property(property="image", type="string", example="https://example.com/storage/products/image.jpg", nullable=true)
+     *                         @OA\Property(property="view_count", type="integer", example=150),
+     *                         @OA\Property(property="card_image", type="string", example="https://example.com/storage/products/image.jpg"),
+     *                         @OA\Property(property="discount_percent", type="number", format="float", example=10.5),
+     *                         @OA\Property(property="category_slug", type="string", example="category-slug", nullable=true),
+     *                         @OA\Property(property="parentSlug", type="string", example="parent-category-slug", nullable=true),
+     *                         @OA\Property(
+     *                             property="product_types",
+     *                             type="array",
+     *                             @OA\Items(
+     *                                 @OA\Property(property="id", type="integer", example=1),
+     *                                 @OA\Property(property="title", type="string", example="Product Type")
+     *                             )
+     *                         )
      *                     )
      *                 )
      *             )
@@ -192,8 +204,21 @@ class CompanyController extends Controller
                     'translates' => function($query) use ($languageId) {
                         $query->where('language_id', $languageId);
                     },
-                    'companyProducts.product.translates' => function($query) use ($languageId) {
-                        $query->where('language_id', $languageId);
+                    'companyProducts.product' => function($query) {
+                        $query->with([
+                            'translates' => function($q) use ($languageId) {
+                                $q->where('language_id', $languageId);
+                            },
+                            'images' => function($q) {
+                                $q->where('status', true)->orderBy('order');
+                            },
+                            'types.translates' => function($q) use ($languageId) {
+                                $q->where('language_id', $languageId);
+                            },
+                            'categories.translates' => function($q) use ($languageId) {
+                                $q->where('language_id', $languageId);
+                            }
+                        ]);
                     }
                 ])
                 ->active()
@@ -210,16 +235,55 @@ class CompanyController extends Controller
             $translation = $company->translates->first();
 
             // Get products data
-            $products = $company->companyProducts->map(function ($companyProduct) {
+            $products = $company->companyProducts->map(function ($companyProduct) use ($languageId) {
                 $product = $companyProduct->product;
                 $productTranslation = $product->translates->first();
+                
+                // Find main image - first try to find is_main=true, then fallback to first image
+                $mainImage = $product->images->where('is_main', true)->first();
+                if (!$mainImage) {
+                    $mainImage = $product->images->first();
+                }
+                
+                // Get category information
+                $categorySlug = null;
+                $parentSlug = null;
+                
+                if ($product->categories->isNotEmpty()) {
+                    // Get the first category (assuming products have one primary category)
+                    $category = $product->categories->first();
+                    $categoryTranslation = $category->translates->first();
+                    $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
+                    
+                    // Get parent slug if category has parent
+                    if ($category->parent_id) {
+                        $parentCategory = \App\Models\ProductCategory::find($category->parent_id);
+                        if ($parentCategory) {
+                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
+                            $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
+                        }
+                    }
+                }
+                
+                $productTypes = $product->types->map(function ($type) {
+                    $translation = $type->translates->first();
+                    return [
+                        'id' => $type->id,
+                        'title' => $translation ? $translation->title : ''
+                    ];
+                });
                 
                 return [
                     'id' => $product->id,
                     'title' => $productTranslation ? $productTranslation->title : '',
-                    'description' => $productTranslation ? $productTranslation->description : '',
+                    'slug' => $productTranslation ? $productTranslation->slug : '',
                     'price' => $product->price,
-                    'image' => $productTranslation && $productTranslation->image ? asset('storage/' . $productTranslation->image) : null,
+                    'view_count' => $product->view_count,
+                    'card_image' => $mainImage && $mainImage->image ? asset('storage/' . $mainImage->image) : asset('images/default_image.webp'),
+                    'discount_percent' => $product->discount_percent,
+                    'category_slug' => $categorySlug,
+                    'parentSlug' => $parentSlug,
+                    'product_types' => $productTypes
                 ];
             });
 
