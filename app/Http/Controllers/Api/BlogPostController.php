@@ -64,10 +64,11 @@ class BlogPostController extends Controller
      *     @OA\Parameter(
      *         name="sort",
      *         in="query",
-     *         description="Sort blog posts by: newest, oldest",
+     *         description="Sort blog posts by: newest (Ən yeni), oldest (Ən köhnə). Invalid values will default to newest.",
      *         required=false,
      *         @OA\Schema(
      *             type="string",
+     *             enum={"newest", "oldest"},
      *             example="newest"
      *         )
      *     ),
@@ -107,7 +108,7 @@ class BlogPostController extends Controller
      *                     @OA\Items(
      *                         type="object",
      *                         @OA\Property(property="value", type="string", example="newest"),
-     *                         @OA\Property(property="label", type="string", example="newest")
+     *                         @OA\Property(property="label", type="string", example="Ən yeni")
      *                     )
      *                 )
      *             )
@@ -133,7 +134,16 @@ class BlogPostController extends Controller
             $categorySlug = $request->get('category_slug');
             $sort = $request->get('sort', 'newest');
             
-            $cacheKey = "api:blog-posts:lang:{$languageId}:page:{$page}:per_page:{$perPage}:sort:{$sort}";
+            // Validate sort parameter
+            $allowedSorts = ['newest', 'oldest'];
+            if (!in_array($sort, $allowedSorts)) {
+                $sort = 'newest'; // Default to newest if invalid sort provided
+            }
+            
+            // Debug: Log the sort parameter
+            \Log::info('Sort parameter: ' . $sort);
+            
+            $cacheKey = "api:blog-posts-v2:lang:{$languageId}:page:{$page}:per_page:{$perPage}:sort:{$sort}";
             if ($categorySlug) {
                 $cacheKey .= ":category:{$categorySlug}";
             }
@@ -192,8 +202,8 @@ class BlogPostController extends Controller
                         'total' => $blogPosts->total(),
                     ],
                     'sort_options' => [
-                        ['value' => 'newest', 'label' => 'newest'],
-                        ['value' => 'oldest', 'label' => 'oldest']
+                        ['value' => 'newest', 'label' => 'Ən yeni'],
+                        ['value' => 'oldest', 'label' => 'Ən köhnə']
                     ]
                 ]
             ], 200);
