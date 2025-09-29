@@ -200,38 +200,22 @@ class CompanyController extends Controller
                 ], 400);
             }
     
-            // Get sort option from request
+            // Get sort option and pagination params
             $sort = $request->get('sort', 'view_count');
+            $perPage = $request->get('per_page', 12);
+            $page = $request->get('page', 1);
     
-            // Get company with products and cache (slug-a görə)
+            // Get company
             $company = Cache::remember("company_{$slug}_{$languageId}", 3600, function () use ($slug, $languageId) {
-                return Company::with([
-                    'translates' => function($query) use ($languageId) {
+                return Company::with(['translates' => function($query) use ($languageId) {
                         $query->where('language_id', $languageId);
-                    },
-                    'companyProducts.product' => function($query) use ($languageId) {
-                        $query->with([
-                            'translates' => function($q) use ($languageId) {
-                                $q->where('language_id', $languageId);
-                            },
-                            'images' => function($q) {
-                                $q->where('status', true)->orderBy('order');
-                            },
-                            'types.translates' => function($q) use ($languageId) {
-                                $q->where('language_id', $languageId);
-                            },
-                            'categories.translates' => function($q) use ($languageId) {
-                                $q->where('language_id', $languageId);
-                            }
-                        ]);
-                    }
-                ])
-                ->active()
-                ->whereHas('translates', function($q) use ($slug, $languageId) {
-                    $q->where('language_id', $languageId)
-                      ->where('slug', $slug);
-                })
-                ->first();
+                    }])
+                    ->active()
+                    ->whereHas('translates', function($q) use ($slug, $languageId) {
+                        $q->where('language_id', $languageId)
+                          ->where('slug', $slug);
+                    })
+                    ->first();
             });
     
             if (!$company) {
@@ -269,11 +253,53 @@ class CompanyController extends Controller
                 return $sortData;
             });
     
-            // Map company products with sorting
-            $productsQuery = $company->companyProducts->map(function ($companyProduct) use ($languageId) {
-                $product = $companyProduct->product;
-                $productTranslation = $product->translates->first();
+            // Products query
+            $productsQuery = Product::query()
+                ->whereHas('companyProducts', function($q) use ($company) {
+                    $q->where('company_id', $company->id);
+                })
+                ->with([
+                    'translates' => function($q) use ($languageId) {
+                        $q->where('language_id', $languageId);
+                    },
+                    'images' => function($q) {
+                        $q->where('status', true)->orderBy('order');
+                    },
+                    'types.translates' => function($q) use ($languageId) {
+                        $q->where('language_id', $languageId);
+                    },
+                    'categories.translates' => function($q) use ($languageId) {
+                        $q->where('language_id', $languageId);
+                    }
+                ])
+                ->active();
     
+            // Apply sorting
+            switch($sort) {
+                case 'price_asc':
+                    $productsQuery->orderBy('price', 'asc');
+                    break;
+                case 'price_desc':
+                    $productsQuery->orderBy('price', 'desc');
+                    break;
+                case 'newest':
+                    $productsQuery->orderBy('created_at', 'desc');
+                    break;
+                case 'oldest':
+                    $productsQuery->orderBy('created_at', 'asc');
+                    break;
+                case 'view_count':
+                default:
+                    $productsQuery->orderBy('view_count', 'desc');
+                    break;
+            }
+    
+            // Paginate
+            $productsPaginated = $productsQuery->paginate($perPage, ['*'], 'page', $page);
+    
+            // Map products
+            $products = $productsPaginated->map(function($product) use ($languageId) {
+                $translation = $product->translates->first();
                 $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
     
                 $categorySlug = null;
@@ -285,11 +311,9 @@ class CompanyController extends Controller
                     $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
     
                     if ($category->parent_id) {
-                        $parentCategory = \App\Models\ProductCategory::find($category->parent_id);
+                        $parentCategory = ProductCategory::find($category->parent_id);
                         if ($parentCategory) {
-                            $parentTranslation = $parentCategory->translates()
-                                ->where('language_id', $languageId)
-                                ->first();
+                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
                             $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
                         }
                     }
@@ -305,13 +329,11 @@ class CompanyController extends Controller
     
                 return [
                     'id' => $product->id,
-                    'title' => $productTranslation ? $productTranslation->title : '',
-                    'slug' => $productTranslation ? $productTranslation->slug : '',
+                    'title' => $translation ? $translation->title : '',
+                    'slug' => $translation ? $translation->slug : '',
                     'price' => $product->price,
                     'view_count' => $product->view_count,
-                    'card_image' => $mainImage && $mainImage->image
-                        ? asset('storage/' . $mainImage->image)
-                        : asset('images/default_image.webp'),
+                    'card_image' => $mainImage && $mainImage->image ? asset('storage/' . $mainImage->image) : asset('images/default_image.webp'),
                     'discount_percent' => $product->discount_percent,
                     'category_slug' => $categorySlug,
                     'parentSlug' => $parentSlug,
@@ -319,25 +341,26 @@ class CompanyController extends Controller
                 ];
             });
     
-            // Apply sorting
-            $products = match($sort) {
-                'price_asc' => $productsQuery->sortBy('price')->values(),
-                'price_desc' => $productsQuery->sortByDesc('price')->values(),
-                'newest' => $productsQuery->sortByDesc('id')->values(), // created_at yoxsa id
-                'oldest' => $productsQuery->sortBy('id')->values(),
-                default => $productsQuery->sortByDesc('view_count')->values(),
-            };
+            // Pagination data
+            $paginationData = [
+                'current_page' => $productsPaginated->currentPage(),
+                'per_page' => $productsPaginated->perPage(),
+                'total' => $productsPaginated->total(),
+                'last_page' => $productsPaginated->lastPage(),
+                'from' => $productsPaginated->firstItem(),
+                'to' => $productsPaginated->lastItem(),
+                'has_more_pages' => $productsPaginated->hasMorePages()
+            ];
     
             $companyData = [
                 'title' => $translation ? $translation->title : '',
                 'description' => $translation ? $translation->description : null,
-                'inner_image' => $translation && $translation->inner_image
-                    ? asset('storage/' . $translation->inner_image)
-                    : null,
+                'inner_image' => $translation && $translation->inner_image ? asset('storage/' . $translation->inner_image) : null,
                 'inner_image_alt_text' => $translation ? $translation->inner_image_alt_text : null,
                 'products' => $products,
                 'sort_options' => $sortOptions,
-                'sort_translations' => $sortTranslations
+                'sort_translations' => $sortTranslations,
+                'pagination' => $paginationData
             ];
     
             return response()->json([
@@ -353,6 +376,7 @@ class CompanyController extends Controller
             ], 500);
         }
     }
+    
     
     
 
