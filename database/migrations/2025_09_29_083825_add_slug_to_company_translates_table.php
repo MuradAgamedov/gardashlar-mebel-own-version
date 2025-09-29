@@ -12,7 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('company_translates', function (Blueprint $table) {
-            $table->string('slug')->unique()->after('title');
+            // Əvvəlcə slug sütununu nullable elə ki, migration problemsiz keçsin
+            if (!Schema::hasColumn('company_translates', 'slug')) {
+                $table->string('slug')->nullable()->after('title');
+            }
+        });
+
+        // Mövcud sətirlər üçün unikal slug dəyərləri doldurmaq
+        DB::table('company_translates')
+            ->whereNull('slug')
+            ->orWhere('slug', '')
+            ->update([
+                'slug' => DB::raw("CONCAT('temp-slug-', id)")
+            ]);
+
+        // Slug sütununa unique index əlavə et
+        Schema::table('company_translates', function (Blueprint $table) {
+            $table->unique('slug');
         });
     }
 
@@ -22,6 +38,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('company_translates', function (Blueprint $table) {
+            $table->dropUnique(['slug']);
             $table->dropColumn('slug');
         });
     }
