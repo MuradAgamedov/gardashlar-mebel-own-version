@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 use App\Models\Dictionary;
 use App\Models\Product;
+use App\Models\ProductCategory;
 
 use App\Http\Controllers\Controller;
 use App\Traits\LocaleFromHeader;
