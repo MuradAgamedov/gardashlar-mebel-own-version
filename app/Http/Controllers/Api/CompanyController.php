@@ -87,6 +87,8 @@ class CompanyController extends Controller
                 
                 return [
                     'id' => $company->id,
+                    'slug' => $translation ? $translation->slug : null,
+
                     'card_image_url' => $translation && $translation->card_image ? asset('storage/' . $translation->card_image) : null,
                     'card_image_alt_text' => $translation ? $translation->card_image_alt_text : null,
                 ];
