@@ -200,6 +200,9 @@ class CompanyController extends Controller
                 ], 400);
             }
     
+            // Get sort option from request
+            $sort = $request->get('sort', 'view_count');
+    
             // Get company with products and cache (slug-a görə)
             $company = Cache::remember("company_{$slug}_{$languageId}", 3600, function () use ($slug, $languageId) {
                 return Company::with([
@@ -240,8 +243,34 @@ class CompanyController extends Controller
     
             $translation = $company->translates->first();
     
-            // Products map hissəsi sənin kodundan dəyişməz qaldı
-            $products = $company->companyProducts->map(function ($companyProduct) use ($languageId) {
+            // Sort options & translations
+            $sortOptions = [
+                ['value' => 'price_asc', 'label' => 'price_asc'],
+                ['value' => 'price_desc', 'label' => 'price_desc'],
+                ['value' => 'newest', 'label' => 'newest'],
+                ['value' => 'oldest', 'label' => 'oldest'],
+                ['value' => 'view_count', 'label' => 'view_count']
+            ];
+    
+            $sortTranslations = Cache::rememberForever("sort_translations_{$languageId}", function () use ($languageId) {
+                $sortKeywords = [
+                    'price_asc' => 'price_asc',
+                    'price_desc' => 'price_desc', 
+                    'newest' => 'newest',
+                    'oldest' => 'oldest',
+                    'view_count' => 'view_count'
+                ];
+    
+                $sortData = [];
+                foreach ($sortKeywords as $key => $keyword) {
+                    $sortData[$key] = Dictionary::getValue($keyword, $languageId);
+                }
+    
+                return $sortData;
+            });
+    
+            // Map company products with sorting
+            $productsQuery = $company->companyProducts->map(function ($companyProduct) use ($languageId) {
                 $product = $companyProduct->product;
                 $productTranslation = $product->translates->first();
     
@@ -290,6 +319,15 @@ class CompanyController extends Controller
                 ];
             });
     
+            // Apply sorting
+            $products = match($sort) {
+                'price_asc' => $productsQuery->sortBy('price')->values(),
+                'price_desc' => $productsQuery->sortByDesc('price')->values(),
+                'newest' => $productsQuery->sortByDesc('id')->values(), // created_at yoxsa id
+                'oldest' => $productsQuery->sortBy('id')->values(),
+                default => $productsQuery->sortByDesc('view_count')->values(),
+            };
+    
             $companyData = [
                 'title' => $translation ? $translation->title : '',
                 'description' => $translation ? $translation->description : null,
@@ -297,7 +335,9 @@ class CompanyController extends Controller
                     ? asset('storage/' . $translation->inner_image)
                     : null,
                 'inner_image_alt_text' => $translation ? $translation->inner_image_alt_text : null,
-                'products' => $products
+                'products' => $products,
+                'sort_options' => $sortOptions,
+                'sort_translations' => $sortTranslations
             ];
     
             return response()->json([
@@ -313,6 +353,7 @@ class CompanyController extends Controller
             ], 500);
         }
     }
+    
     
 
 }
