@@ -99,7 +99,7 @@
                                          role="tabpanel" 
                                          aria-labelledby="tab-{{ $language->id }}">
                                         
-                                        <!-- Title Section -->
+                                       <!-- Title Section -->
                                         <div class="form-section mb-4">
                                             <h6 class="section-title">
                                                 <i class="material-icons-outlined me-2">title</i>
@@ -109,16 +109,36 @@
                                                 <div class="col-md-12">
                                                     <div class="form-floating mb-3">
                                                         <input type="text" 
-                                                               class="form-control @error("translates.{$language->id}.title") is-invalid @enderror" 
-                                                               name="translates[{{ $language->id }}][title]" 
-                                                               id="title-{{ $language->id }}"
-                                                               value="{{ old("translates.{$language->id}.title") }}"
-                                                               placeholder="Enter company title"
-                                                               @if($index === 0) required @else data-required="true" @endif>
+                                                            class="form-control @error("translates.{$language->id}.title") is-invalid @enderror" 
+                                                            name="translates[{{ $language->id }}][title]" 
+                                                            id="title-{{ $language->id }}"
+                                                            value="{{ old("translates.{$language->id}.title") }}"
+                                                            placeholder="Enter company title"
+                                                            @if($index === 0) required @else data-required="true" @endif>
                                                         <label for="title-{{ $language->id }}">Company Title *</label>
                                                         @error("translates.{$language->id}.title")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- 🔹 Slug Section -->
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-floating mb-3">
+                                                        <input type="text" 
+                                                            class="form-control @error("translates.{$language->id}.slug") is-invalid @enderror" 
+                                                            name="translates[{{ $language->id }}][slug]" 
+                                                            id="slug-{{ $language->id }}"
+                                                            value="{{ old("translates.{$language->id}.slug") }}"
+                                                            placeholder="Enter company slug"
+                                                            @if($index === 0) required @else data-required="true" @endif>
+                                                        <label for="slug-{{ $language->id }}">Slug *</label>
+                                                        @error("translates.{$language->id}.slug")
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                        <div class="form-text">Slug unikal olmalıdır (məs: <code>my-company</code>)</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -323,7 +343,7 @@
     </div>
 </div>
 @endsection
-
+@include('admin.partials.slug-generator') 
 @push('scripts')
 <script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
 <script>
