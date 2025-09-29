@@ -91,7 +91,6 @@ class CompanyController extends Controller
 
                     'card_image_url' => $translation && $translation->card_image ? asset('storage/' . $translation->card_image) : null,
                     'card_image_alt_text' => $translation ? $translation->card_image_alt_text : null,
-                    'description' => $translation ? $translation->description : null,
                 ];
             });
 
@@ -293,6 +292,7 @@ class CompanyController extends Controller
     
             $companyData = [
                 'title' => $translation ? $translation->title : '',
+                'description' => $translation ? $translation->description : null,
                 'inner_image' => $translation && $translation->inner_image
                     ? asset('storage/' . $translation->inner_image)
                     : null,
