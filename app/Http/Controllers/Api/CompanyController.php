@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
+use App\Models\Dictionary;
 use App\Http\Controllers\Controller;
 use App\Traits\LocaleFromHeader;
 use App\Models\Company;
