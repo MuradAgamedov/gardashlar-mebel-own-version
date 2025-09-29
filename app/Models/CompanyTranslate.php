@@ -18,7 +18,8 @@ class CompanyTranslate extends Model
         'card_image_alt_text',
         'inner_image',
         'inner_image_alt_text',
-        'description'
+        'description',
+        "slug"
     ];
 
     public function company(): BelongsTo
