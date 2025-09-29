@@ -183,12 +183,12 @@ class CompanyController extends Controller
      *     )
      * )
      */
-    public function show(Request $request, $id)
+    public function show(Request $request, $slug)
     {
         try {
             // Get language ID from header
             $languageId = $this->getLanguageIdFromHeader($request);
-            
+    
             // Validate language ID
             $language = Language::find($languageId);
             if (!$language) {
@@ -197,14 +197,14 @@ class CompanyController extends Controller
                     'message' => 'Invalid language ID'
                 ], 400);
             }
-
-            // Get company with products and cache
-            $company = Cache::remember("company_{$id}_{$languageId}", 3600, function () use ($id, $languageId) {
+    
+            // Get company with products and cache (slug-a görə)
+            $company = Cache::remember("company_{$slug}_{$languageId}", 3600, function () use ($slug, $languageId) {
                 return Company::with([
                     'translates' => function($query) use ($languageId) {
                         $query->where('language_id', $languageId);
                     },
-                    'companyProducts.product' => function($query) {
+                    'companyProducts.product' => function($query) use ($languageId) {
                         $query->with([
                             'translates' => function($q) use ($languageId) {
                                 $q->where('language_id', $languageId);
@@ -222,49 +222,48 @@ class CompanyController extends Controller
                     }
                 ])
                 ->active()
-                ->find($id);
+                ->whereHas('translates', function($q) use ($slug, $languageId) {
+                    $q->where('language_id', $languageId)
+                      ->where('slug', $slug);
+                })
+                ->first();
             });
-
+    
             if (!$company) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Company not found'
                 ], 404);
             }
-
+    
             $translation = $company->translates->first();
-
-            // Get products data
+    
+            // Products map hissəsi sənin kodundan dəyişməz qaldı
             $products = $company->companyProducts->map(function ($companyProduct) use ($languageId) {
                 $product = $companyProduct->product;
                 $productTranslation = $product->translates->first();
-                
-                // Find main image - first try to find is_main=true, then fallback to first image
-                $mainImage = $product->images->where('is_main', true)->first();
-                if (!$mainImage) {
-                    $mainImage = $product->images->first();
-                }
-                
-                // Get category information
+    
+                $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
+    
                 $categorySlug = null;
                 $parentSlug = null;
-                
+    
                 if ($product->categories->isNotEmpty()) {
-                    // Get the first category (assuming products have one primary category)
                     $category = $product->categories->first();
                     $categoryTranslation = $category->translates->first();
                     $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
-                    
-                    // Get parent slug if category has parent
+    
                     if ($category->parent_id) {
                         $parentCategory = \App\Models\ProductCategory::find($category->parent_id);
                         if ($parentCategory) {
-                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
+                            $parentTranslation = $parentCategory->translates()
+                                ->where('language_id', $languageId)
+                                ->first();
                             $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
                         }
                     }
                 }
-                
+    
                 $productTypes = $product->types->map(function ($type) {
                     $translation = $type->translates->first();
                     return [
@@ -272,34 +271,38 @@ class CompanyController extends Controller
                         'title' => $translation ? $translation->title : ''
                     ];
                 });
-                
+    
                 return [
                     'id' => $product->id,
                     'title' => $productTranslation ? $productTranslation->title : '',
                     'slug' => $productTranslation ? $productTranslation->slug : '',
                     'price' => $product->price,
                     'view_count' => $product->view_count,
-                    'card_image' => $mainImage && $mainImage->image ? asset('storage/' . $mainImage->image) : asset('images/default_image.webp'),
+                    'card_image' => $mainImage && $mainImage->image
+                        ? asset('storage/' . $mainImage->image)
+                        : asset('images/default_image.webp'),
                     'discount_percent' => $product->discount_percent,
                     'category_slug' => $categorySlug,
                     'parentSlug' => $parentSlug,
                     'product_types' => $productTypes
                 ];
             });
-
+    
             $companyData = [
                 'title' => $translation ? $translation->title : '',
-                'inner_image' => $translation && $translation->inner_image ? asset('storage/' . $translation->inner_image) : null,
+                'inner_image' => $translation && $translation->inner_image
+                    ? asset('storage/' . $translation->inner_image)
+                    : null,
                 'inner_image_alt_text' => $translation ? $translation->inner_image_alt_text : null,
                 'products' => $products
             ];
-
+    
             return response()->json([
                 'success' => true,
                 'message' => 'Company retrieved successfully',
                 'data' => $companyData
             ]);
-
+    
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -307,5 +310,6 @@ class CompanyController extends Controller
             ], 500);
         }
     }
+    
 
 }

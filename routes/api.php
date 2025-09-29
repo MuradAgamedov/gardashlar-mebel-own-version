@@ -247,7 +247,7 @@ Route::get('/company-management', [CompanyManagementController::class, 'index'])
 
 // Companies API Routes
 Route::get('/companies', [CompanyController::class, 'index'])->name('api.companies.index');
-Route::get('/companies/{id}', [CompanyController::class, 'show'])->name('api.companies.show');
+Route::get('/companies/{slug}', [CompanyController::class, 'show'])->name('api.companies.show');
 
 // Actions API Routes
 Route::get('/actions', [ActionController::class, 'index'])->name('api.actions.index');
