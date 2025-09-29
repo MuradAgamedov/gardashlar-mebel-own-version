@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Action;
 use App\Models\Company;
 use App\Models\CompanyProduct;
 use App\Models\CompanyTranslate;
@@ -12,6 +11,8 @@ use App\Models\Product;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
@@ -40,6 +41,7 @@ class CompanyController extends Controller
             'translates' => 'required|array',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.title' => 'required|string|max:255',
+            'translates.*.slug' => 'nullable|string|max:255|unique:company_translates,slug',
             'translates.*.card_image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'translates.*.card_image_alt_text' => 'nullable|string|max:255',
             'translates.*.inner_image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -63,6 +65,9 @@ class CompanyController extends Controller
                     'company_id' => $company->id,
                     'language_id' => $translate['language_id'],
                     'title' => $translate['title'],
+                    'slug' => !empty($translate['slug']) 
+                        ? Str::slug($translate['slug']) 
+                        : Str::slug($translate['title']),
                     'card_image' => $cardImagePath,
                     'card_image_alt_text' => $translate['card_image_alt_text'] ?? null,
                     'inner_image' => $innerImagePath,
@@ -95,6 +100,13 @@ class CompanyController extends Controller
             'translates' => 'required|array',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.title' => 'required|string|max:255',
+            'translates.*.slug' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('company_translates', 'slug')
+                    ->ignore($company->id, 'company_id')
+            ],
             'translates.*.card_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'translates.*.card_image_alt_text' => 'nullable|string|max:255',
             'translates.*.inner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -112,6 +124,9 @@ class CompanyController extends Controller
             foreach ($request->input('translates') as $translate) {
                 $translateData = [
                     'title' => $translate['title'],
+                    'slug' => !empty($translate['slug']) 
+                        ? Str::slug($translate['slug']) 
+                        : Str::slug($translate['title']),
                     'card_image_alt_text' => $translate['card_image_alt_text'] ?? null,
                     'inner_image_alt_text' => $translate['inner_image_alt_text'] ?? null,
                     'description' => $translate['description'],
@@ -198,13 +213,12 @@ class CompanyController extends Controller
     }
 
     /**
-     * Show company products management
+     * Company product management
      */
     public function actions(Company $company, Request $request)
     {
         $company->load(['translates.language']);
         
-        // Get all products with pagination and search
         $query = Product::with(['translates.language', 'companyProducts' => function($q) use ($company) {
             $q->where('company_id', $company->id);
         }]);
@@ -222,9 +236,6 @@ class CompanyController extends Controller
         return view('admin.companies.actions', compact('company', 'products'));
     }
 
-    /**
-     * Add product to company
-     */
     public function addProductToAction(Request $request, Company $company)
     {
         $request->validate([
@@ -232,7 +243,6 @@ class CompanyController extends Controller
         ]);
 
         try {
-            // Check if product is already added to this company
             $existing = CompanyProduct::where('company_id', $company->id)
                 ->where('product_id', $request->product_id)
                 ->first();
@@ -264,9 +274,6 @@ class CompanyController extends Controller
         }
     }
 
-    /**
-     * Remove product from company
-     */
     public function removeProductFromAction(Request $request, Company $company)
     {
         $request->validate([

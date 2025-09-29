@@ -98,33 +98,40 @@
                                          role="tabpanel" 
                                          aria-labelledby="tab-{{ $language->id }}">
                                         
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Title *</label>
-                                                    <input type="text" class="form-control @error("translates.{$language->id}.title") is-invalid @enderror" 
-                                                           name="translates[{{ $language->id }}][title]" 
-                                                           value="{{ old("translates.{$language->id}.title", $translate?->title) }}"
-                                                           placeholder="Enter title"
-                                                           required>
-                                                    @error("translates.{$language->id}.title")
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Card Image Alt Text</label>
-                                                    <input type="text" class="form-control @error("translates.{$language->id}.card_image_alt_text") is-invalid @enderror" 
-                                                           name="translates[{{ $language->id }}][card_image_alt_text]" 
-                                                           value="{{ old("translates.{$language->id}.card_image_alt_text", $translate?->card_image_alt_text) }}"
-                                                           placeholder="Enter card image alt text">
-                                                    @error("translates.{$language->id}.card_image_alt_text")
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                        </div>
+                                         <div class="row">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label class="form-label">Title *</label>
+            <input type="text" 
+                   class="form-control @error("translates.{$language->id}.title") is-invalid @enderror" 
+                   name="translates[{{ $language->id }}][title]" 
+                   value="{{ old("translates.{$language->id}.title", $translate?->title) }}"
+                   placeholder="Enter title"
+                   required>
+            @error("translates.{$language->id}.title")
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <!-- 🔹 Slug field -->
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label class="form-label">Slug *</label>
+            <input type="text" 
+                   class="form-control @error("translates.{$language->id}.slug") is-invalid @enderror" 
+                   name="translates[{{ $language->id }}][slug]" 
+                   value="{{ old("translates.{$language->id}.slug", $translate?->slug) }}"
+                   placeholder="Enter slug"
+                   required>
+            @error("translates.{$language->id}.slug")
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+            <div class="form-text">Unique slug (e.g. <code>my-company</code>)</div>
+        </div>
+    </div>
+</div>
+
 
                                         <div class="row">
                                             <div class="col-md-6">
