@@ -14,6 +14,7 @@ class Comment extends Model
         'product_id',
         'text',
         'status',
+        "is_read"
     ];
     protected $casts = [
         'is_read' => 'boolean', // indi is_read həmişə true/false olacaq
