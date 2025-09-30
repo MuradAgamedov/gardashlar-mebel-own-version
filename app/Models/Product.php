@@ -261,7 +261,6 @@ public function apiData($languageId = null, $colorId = null)
 
         if ($category->parent_id) {
             $parentCategory = ProductCategory::find($category->parent_id);
-            dd($parentCategory);
             if ($parentCategory) {
                 $parentTr = $parentCategory->translates()->where('language_id', $languageId)->first();
                 $parentSlug = $parentTr ? $parentTr->slug : null;
