@@ -27,7 +27,6 @@
                 <td>{{ $comment->product->id ?? '---' }}</td>
                 <td>{{ $comment->text }}</td>
                 <td>
-                    @dd((int) $comment->is_read )
                 @if((int) $comment->is_read === 1)
     <span class="badge bg-success">Oxundu</span>
 @else
