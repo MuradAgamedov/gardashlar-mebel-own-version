@@ -30,7 +30,7 @@
                 @if($comment->is_read)
     <span class="badge bg-success">Oxundu</span>
 @else
-    <a href="{{ route('comments.read', $comment->id) }}" class="btn btn-sm btn-warning" title="Oxundu kimi qeyd et">
+    <a href="{{ route('admin.comments.read', $comment->id) }}" class="btn btn-sm btn-warning" title="Oxundu kimi qeyd et">
         Oxundu
     </a>
 @endif
