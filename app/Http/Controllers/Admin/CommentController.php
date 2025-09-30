@@ -27,7 +27,6 @@ class CommentController extends Controller
     public function markAsRead($id)
     {
         $comment = Comment::find($id);
-        dd($comment);
         $comment->update([
             'is_read' => $comment->is_read === 'active' ? 'passive' : 'active'
         ]);
