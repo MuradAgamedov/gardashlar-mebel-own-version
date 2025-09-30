@@ -29,7 +29,7 @@
                 <td>
                 
                 @if($comment->is_read === 'active')
-                <a href="{{ route('admin.comments.read', $comment->id) }}" class="btn btn-sm btn-warning">
+                <a href="{{ route('admin.comments.read', $comment->id) }}" class="btn btn-sm btn-success">
                 Oxundu
     </a>
 @else
