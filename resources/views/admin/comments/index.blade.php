@@ -27,19 +27,17 @@
                 <td>{{ $comment->product->id ?? '---' }}</td>
                 <td>{{ $comment->text }}</td>
                 <td>
-                    @if($comment->status === 'read')
-                        <span class="badge bg-success">Oxundu</span>
-                    @else
-                        <form action="{{ route('admin.comments.read', $comment->id) }}" method="POST" style="display:inline">
-                            @csrf
-                            <button type="submit" class="btn btn-sm btn-warning" title="Oxundu kimi qeyd et">
-                                <!-- Check SVG icon -->
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-circle" viewBox="0 0 16 16">
-                                  <path d="M2.5 8a5.5 5.5 0 1 1 11 0 5.5 5.5 0 0 1-11 0zm5.354-1.646a.5.5 0 0 0-.708.708L8.293 8l-.647.646a.5.5 0 0 0 .708.708L9 8.707l1.646 1.647a.5.5 0 0 0 .708-.708L9.707 8l1.647-1.646a.5.5 0 0 0-.708-.708L9 7.293 7.854 6.354z"/>
-                                </svg>
-                            </button>
-                        </form>
-                    @endif
+                @if($comment->status === 'approved')
+                    <span class="badge bg-success">Oxundu</span>
+                @else
+                    <form action="{{ route('admin.comments.read', $comment->id) }}" method="POST" style="display:inline">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-warning" title="Oxundu kimi qeyd et">
+                            Oxundu
+                        </button>
+                    </form>
+                @endif
+
                 </td>
                 <td>
                     <form action="{{ route('admin.comments.destroy', $comment->id) }}" method="POST" style="display:inline">
