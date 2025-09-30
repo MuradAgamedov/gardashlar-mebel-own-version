@@ -26,6 +26,7 @@ class CommentController extends Controller
     }
     public function markAsRead(Comment $comment)
     {
+        dd(!(int)$comment->is_read);
         $comment->update(['is_read' => !(int)$comment->is_read]);
         return redirect()->back()->with('success', 'Şərh statusu yeniləndi');
     }
