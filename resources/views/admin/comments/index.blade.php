@@ -27,16 +27,17 @@
                 <td>{{ $comment->product->id ?? '---' }}</td>
                 <td>{{ $comment->text }}</td>
                 <td>
-                @if($comment->status === 'approved')
-                    <span class="badge bg-success">Oxundu</span>
-                @else
-                    <form action="{{ route('admin.comments.read', $comment->id) }}" method="POST" style="display:inline">
-                        @csrf
-                        <button type="submit" class="btn btn-sm btn-warning" title="Oxundu kimi qeyd et">
-                            Oxundu
-                        </button>
-                    </form>
-                @endif
+                @if($comment->is_read)
+    <span class="badge bg-success">Oxundu</span>
+@else
+    <form action="{{ route('admin.comments.read', $comment->id) }}" method="POST" style="display:inline">
+        @csrf
+        <button type="submit" class="btn btn-sm btn-warning" title="Oxundu kimi qeyd et">
+            Oxundu
+        </button>
+    </form>
+@endif
+
 
                 </td>
                 <td>

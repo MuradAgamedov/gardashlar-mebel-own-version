@@ -25,10 +25,11 @@ class CommentController extends Controller
         return redirect()->route('admin.comments.index')->with('success', 'Şərh silindi');
     }
 
-        public function markAsRead(Comment $comment)
-        {
-            $comment->update(['status' => 'approved']);
-            return redirect()->back()->with('success', 'Şərh oxundu kimi qeyd edildi');
-        }
+    public function markAsRead(Comment $comment)
+    {
+        $comment->update(['is_read' => true]);
+        return redirect()->back()->with('success', 'Şərh oxundu kimi qeyd edildi');
+    }
+    
         
 }
