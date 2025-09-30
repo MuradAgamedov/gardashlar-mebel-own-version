@@ -33,8 +33,8 @@
                         <form action="{{ route('admin.comments.read', $comment->id) }}" method="POST" style="display:inline">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-warning" title="Oxundu kimi qeyd et">
-                                <i class="bi bi-check2-circle"></i>
-                            </button>
+    <i class="bi bi-check2-circle"></i>
+</button>
                         </form>
                     @endif
                 </td>
@@ -42,8 +42,8 @@
                     <form action="{{ route('admin.comments.destroy', $comment->id) }}" method="POST" style="display:inline">
                         @csrf @method('DELETE')
                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Əminsiniz?')">
-                            <i class="bi bi-trash"></i>
-                        </button>
+    <i class="bi bi-trash"></i>
+</button>
                     </form>
                 </td>
             </tr>
