@@ -29,7 +29,9 @@
                 <td>
                 
                 @if($comment->is_read === 'active')
-    <span class="badge bg-success">Oxundu</span>
+                <a href="{{ route('admin.comments.read', $comment->id) }}" class="btn btn-sm btn-warning">
+                Oxundu
+    </a>
 @else
     <a href="{{ route('admin.comments.read', $comment->id) }}" class="btn btn-sm btn-warning">
         Oxunmayıb
