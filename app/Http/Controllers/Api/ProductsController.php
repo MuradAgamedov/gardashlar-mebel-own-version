@@ -838,219 +838,220 @@ class ProductsController extends Controller
      * )
      */
     public function show(Request $request, $slug)
-    {
-        try {
-            $languageId = $this->getLanguageIdFromHeader($request);
-            $colorId = $request->get('color_id');
-            
-            if (!$languageId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid language'
-                ], 400);
-            }
-
-            // Find product by slug (any language)
-            $product = Product::with([
-                'translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                },
-                'types.translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                },
-                'tags.translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                },
-                'accordions.translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                },
-                'details' => function($query) {
-                    $query->orderBy('order');
-                },
-                'details.translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                },
-                'detailValues' => function($query) {
-                    $query->orderBy('order');
-                },
-                'detailValues.translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                },
-                'detailValues.details' => function($query) {
-                    $query->orderBy('order');
-                },
-                'detailValues.details.translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                },
-                'images' => function($query) {
-                    $query->where('status', true)->orderBy('order');
-                }
-            ])->whereHas('translates', function($query) use ($slug) {
-                $query->where('slug', $slug);
-            })->first();
-
-            if (!$product) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Product not found'
-                ], 404);
-            }
-
-            // Get translation for the requested language
-            $translation = $product->translates->first();
-
-            // Get product types
-            $productTypes = $product->types->map(function ($type) {
-                $translation = $type->translates->first();
-                return [
-                    'id' => $type->id,
-                    'title' => $translation ? $translation->title : ''
-                ];
-            });
-
-            // Get product tags
-            $productTags = $product->tags->map(function ($tag) {
-                $translation = $tag->translates->first();
-                return [
-                    'id' => $tag->id,
-                    'title' => $translation ? $translation->title : ''
-                ];
-            });
-
-            // Get product accordions
-            $productAccordions = $product->accordions->map(function ($accordion) {
-                $translation = $accordion->translates->first();
-                return [
-                    'id' => $accordion->id,
-                    'title' => $translation ? $translation->title : '',
-                    'content' => $translation ? $translation->description : ''
-                ];
-            });
-
-            // Get product details (already ordered by order field from database)
-            $productDetails = $product->details->map(function ($detail) {
-                $translation = $detail->translates->first();
-                return [
-                    'id' => $detail->id,
-                    'keyword' => $translation ? $translation->keyword : '',
-                    'value' => $translation ? $translation->value : ''
-                ];
-            })->filter(function ($detail) {
-                // Only include details that have both keyword and value
-                return !empty($detail['keyword']) && !empty($detail['value']);
-            })->values();
-
-            // Get product detail values (already ordered by order field from database)
-            $productDetailValues = $product->detailValues->map(function ($detailValue) use ($languageId) {
-                $translation = $detailValue->translates->first();
-                
-                // Load details for this specific detail value with translations
-                $details = $detailValue->details()
-                    ->with(['translates' => function($query) use ($languageId) {
-                        $query->where('language_id', $languageId);
-                    }])
-                    ->orderBy('order')
-                    ->get()
-                    ->map(function ($detail) {
-                        $detailTranslation = $detail->translates->first();
-                        return [
-                            'id' => $detail->id,
-                            'keyword' => $detailTranslation ? $detailTranslation->keyword : '',
-                            'value' => $detailTranslation ? $detailTranslation->value : ''
-                        ];
-                    })
-                    ->filter(function ($detail) {
-                        // Only include details that have both keyword and value
-                        return !empty($detail['keyword']) && !empty($detail['value']);
-                    })
-                    ->values();
-                
-                return [
-                    'id' => $detailValue->id,
-                    'keyword' => $translation ? $translation->keyword : '',
-                    'details' => $details
-                ];
-            });
-
-            // Get product images with color filtering
-            $images = $product->images;
-            
-            // Get available colors for this product
-            $availableColors = $images->where('product_color_id', '!=', null)
-                ->pluck('product_color_id')
-                ->unique()
-                ->values();
-            
-            // Filter images by product_color_id if specified
-            if ($colorId) {
-                $images = $images->where('product_color_id', $colorId);
-            }
-            // If no color_id provided, return all images (no filtering)
-            
-            $productImages = $images->map(function ($image) {
-                $imageData = [
-                    'id' => $image->id,
-                    'image_url' => $image->image ? asset('storage/' . $image->image) : null,
-                    'is_main' => $image->is_main,
-                    'order' => $image->order
-                ];
-                
-                // Only include color_id if it's not null
-                if ($image->product_color_id !== null) {
-                    $imageData['color_id'] = $image->product_color_id;
-                }
-                
-                return $imageData;
-            });
-
-            // Calculate discount price
-            $discountPrice = null;
-            if ($product->discount_percent && $product->discount_percent > 0) {
-                $discountPrice = $product->price - ($product->price * $product->discount_percent / 100);
-            }
-
-            // Get color details for available colors
-            $availableColorDetails = [];
-            if ($availableColors->isNotEmpty()) {
-                $colors = ProductColor::whereIn('id', $availableColors)->get();
-                $availableColorDetails = $colors->map(function ($color) {
-                    return [
-                        'id' => $color->id,
-                        'color_code' => $color->color_code
-                    ];
-                });
-            }
-
-            $productData = [
-                'id' => $product->id,
-                'title' => $translation ? $translation->title : '',
-                'slug' => $translation ? $translation->slug : '',
-                'price' => $product->price,
-                'discount_price' => $discountPrice,
-                'discount_percent' => $product->discount_percent,
-                'view_count' => $product->view_count,
-                'product_types' => $productTypes,
-                'product_tags' => $productTags,
-                'product_accordions' => $productAccordions,
-                'product_details' => $productDetails,
-                'product_detail_values' => $productDetailValues,
-                'available_colors' => $availableColorDetails,
-                'images' => $productImages
-            ];
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Product retrieved successfully',
-                'data' => $productData
-            ]);
-
-        } catch (\Exception $e) {
+{
+    try {
+        $languageId = $this->getLanguageIdFromHeader($request);
+        $colorId = $request->get('color_id');
+        
+        if (!$languageId) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error retrieving product: ' . $e->getMessage()
-            ], 500);
+                'message' => 'Invalid language'
+            ], 400);
         }
+
+        // Find product by slug (any language)
+        $product = Product::with([
+            'translates' => function($query) use ($languageId) {
+                $query->where('language_id', $languageId);
+            },
+            'types.translates' => function($query) use ($languageId) {
+                $query->where('language_id', $languageId);
+            },
+            'tags.translates' => function($query) use ($languageId) {
+                $query->where('language_id', $languageId);
+            },
+            'accordions.translates' => function($query) use ($languageId) {
+                $query->where('language_id', $languageId);
+            },
+            'details' => function($query) {
+                $query->orderBy('order');
+            },
+            'details.translates' => function($query) use ($languageId) {
+                $query->where('language_id', $languageId);
+            },
+            'detailValues' => function($query) {
+                $query->orderBy('order');
+            },
+            'detailValues.translates' => function($query) use ($languageId) {
+                $query->where('language_id', $languageId);
+            },
+            'detailValues.details' => function($query) {
+                $query->orderBy('order');
+            },
+            'detailValues.details.translates' => function($query) use ($languageId) {
+                $query->where('language_id', $languageId);
+            },
+            'categories.translates' => function($query) use ($languageId) {
+                $query->where('language_id', $languageId);
+            },
+            'images' => function($query) {
+                $query->where('status', true)->orderBy('order');
+            }
+        ])->whereHas('translates', function($query) use ($slug) {
+            $query->where('slug', $slug);
+        })->first();
+
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product not found'
+            ], 404);
+        }
+
+        // Translation
+        $translation = $product->translates->first();
+
+        // Types
+        $productTypes = $product->types->map(function ($type) {
+            $translation = $type->translates->first();
+            return [
+                'id' => $type->id,
+                'title' => $translation ? $translation->title : ''
+            ];
+        });
+
+        // Tags
+        $productTags = $product->tags->map(function ($tag) {
+            $translation = $tag->translates->first();
+            return [
+                'id' => $tag->id,
+                'title' => $translation ? $translation->title : ''
+            ];
+        });
+
+        // Accordions
+        $productAccordions = $product->accordions->map(function ($accordion) {
+            $translation = $accordion->translates->first();
+            return [
+                'id' => $accordion->id,
+                'title' => $translation ? $translation->title : '',
+                'content' => $translation ? $translation->description : ''
+            ];
+        });
+
+        // Details
+        $productDetails = $product->details->map(function ($detail) {
+            $translation = $detail->translates->first();
+            return [
+                'id' => $detail->id,
+                'keyword' => $translation ? $translation->keyword : '',
+                'value' => $translation ? $translation->value : ''
+            ];
+        })->filter(fn($d) => $d['keyword'] && $d['value'])->values();
+
+        // Detail values
+        $productDetailValues = $product->detailValues->map(function ($detailValue) use ($languageId) {
+            $translation = $detailValue->translates->first();
+            
+            $details = $detailValue->details()
+                ->with(['translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }])
+                ->orderBy('order')
+                ->get()
+                ->map(function ($detail) {
+                    $detailTranslation = $detail->translates->first();
+                    return [
+                        'id' => $detail->id,
+                        'keyword' => $detailTranslation ? $detailTranslation->keyword : '',
+                        'value' => $detailTranslation ? $detailTranslation->value : ''
+                    ];
+                })
+                ->filter(fn($d) => $d['keyword'] && $d['value'])
+                ->values();
+            
+            return [
+                'id' => $detailValue->id,
+                'keyword' => $translation ? $translation->keyword : '',
+                'details' => $details
+            ];
+        });
+
+        // Images (with color filter)
+        $images = $product->images;
+        $availableColors = $images->where('product_color_id', '!=', null)
+            ->pluck('product_color_id')
+            ->unique()
+            ->values();
+
+        if ($colorId) {
+            $images = $images->where('product_color_id', $colorId);
+        }
+
+        $productImages = $images->map(function ($image) {
+            $imageData = [
+                'id' => $image->id,
+                'image_url' => $image->image ? asset('storage/' . $image->image) : null,
+                'is_main' => $image->is_main,
+                'order' => $image->order
+            ];
+            if ($image->product_color_id !== null) {
+                $imageData['color_id'] = $image->product_color_id;
+            }
+            return $imageData;
+        });
+
+        // Discount price
+        $discountPrice = null;
+        if ($product->discount_percent && $product->discount_percent > 0) {
+            $discountPrice = $product->price - ($product->price * $product->discount_percent / 100);
+        }
+
+        // Available color details
+        $availableColorDetails = [];
+        if ($availableColors->isNotEmpty()) {
+            $colors = ProductColor::whereIn('id', $availableColors)->get();
+            $availableColorDetails = $colors->map(function ($color) {
+                return [
+                    'id' => $color->id,
+                    'color_code' => $color->color_code
+                ];
+            });
+        }
+
+        // Categories (with slug & title)
+        $productCategories = $product->categories->map(function ($category) use ($languageId) {
+            $translation = $category->translates->first();
+            return [
+                'id' => $category->id,
+                'title' => $translation ? $translation->title : '',
+                'slug' => $translation ? $translation->slug : ''
+            ];
+        });
+
+        $productData = [
+            'id' => $product->id,
+            'title' => $translation ? $translation->title : '',
+            'slug' => $translation ? $translation->slug : '',
+            'price' => $product->price,
+            'discount_price' => $discountPrice,
+            'discount_percent' => $product->discount_percent,
+            'view_count' => $product->view_count,
+            'product_types' => $productTypes,
+            'product_tags' => $productTags,
+            'product_accordions' => $productAccordions,
+            'product_details' => $productDetails,
+            'product_detail_values' => $productDetailValues,
+            'available_colors' => $availableColorDetails,
+            'images' => $productImages,
+            'categories' => $productCategories // ✅ əlavə olundu
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product retrieved successfully',
+            'data' => $productData
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error retrieving product: ' . $e->getMessage()
+        ], 500);
     }
+}
+
 
     /**
      * @OA\Get(

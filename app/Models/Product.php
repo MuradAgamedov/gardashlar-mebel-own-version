@@ -186,12 +186,12 @@ public function apiData($languageId = null, $colorId = null)
         $languageId = app()->getLocale();
     }
 
-    // Məhsulun tərcüməsi
+    // Tərcümə
     $translation = $this->translates()
         ->where('language_id', $languageId)
         ->first();
 
-    // Məhsul tipləri
+    // Product types
     $productTypes = $this->types->map(function ($type) use ($languageId) {
         $tr = $type->translates()->where('language_id', $languageId)->first();
         return [
@@ -200,7 +200,7 @@ public function apiData($languageId = null, $colorId = null)
         ];
     });
 
-    // Məhsul detallarını gətiririk
+    // Product details
     $productDetails = $this->details()->orderBy('order')->get()->map(function ($detail) use ($languageId) {
         $tr = $detail->translates()->where('language_id', $languageId)->first();
         return [
@@ -210,7 +210,7 @@ public function apiData($languageId = null, $colorId = null)
         ];
     })->filter(fn($d) => $d['keyword'] && $d['value'])->values();
 
-    // Məhsul detail values
+    // Product detail values
     $productDetailValues = $this->detailValues()->orderBy('order')->get()->map(function ($dv) use ($languageId) {
         $tr = $dv->translates()->where('language_id', $languageId)->first();
         $details = $dv->details()->orderBy('order')->get()->map(function ($detail) use ($languageId) {
@@ -229,14 +229,16 @@ public function apiData($languageId = null, $colorId = null)
         ];
     });
 
-    // Yalnız card_image
+    // Main (card) image
     $cardImageModel = $this->images()->where('status', true)->where('is_main', true)->first();
     $cardImage = $cardImageModel ? [
         'id' => $cardImageModel->id,
         'image_url' => $cardImageModel->image ? asset('storage/'.$cardImageModel->image) : null,
+        'color_id' => $cardImageModel->product_color_id ?? null,
+        'order' => $cardImageModel->order
     ] : null;
 
-    // Rənglər
+    // Colors
     $availableColors = $this->images()->whereNotNull('product_color_id')->pluck('product_color_id')->unique()->values();
     $availableColorDetails = [];
     if ($availableColors->isNotEmpty()) {
@@ -246,6 +248,24 @@ public function apiData($languageId = null, $colorId = null)
                 'color_code' => $color->color_code
             ];
         });
+    }
+
+    // Category & Parent Slug məntiqi
+    $categorySlug = null;
+    $parentSlug = null;
+
+    if ($this->categories->isNotEmpty()) {
+        $category = $this->categories->first(); // əsas category
+        $catTranslation = $category->translates()->where('language_id', $languageId)->first();
+        $categorySlug = $catTranslation ? $catTranslation->slug : null;
+
+        if ($category->parent_id) {
+            $parentCategory = ProductCategory::find($category->parent_id);
+            if ($parentCategory) {
+                $parentTr = $parentCategory->translates()->where('language_id', $languageId)->first();
+                $parentSlug = $parentTr ? $parentTr->slug : null;
+            }
+        }
     }
 
     // Discount qiymət
@@ -266,9 +286,13 @@ public function apiData($languageId = null, $colorId = null)
         'product_details' => $productDetails,
         'product_detail_values' => $productDetailValues,
         'available_colors' => $availableColorDetails,
-        'card_image' => $cardImage
+        'card_image' => $cardImage,
+        'category_slug' => $categorySlug,
+        'parent_slug' => $parentSlug
     ];
 }
+
+
 
 
 
