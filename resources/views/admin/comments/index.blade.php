@@ -33,8 +33,11 @@
                         <form action="{{ route('admin.comments.read', $comment->id) }}" method="POST" style="display:inline">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-warning" title="Oxundu kimi qeyd et">
-    <i class="bi bi-check2-circle"></i>
-</button>
+                                <!-- Check SVG icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2-circle" viewBox="0 0 16 16">
+                                  <path d="M2.5 8a5.5 5.5 0 1 1 11 0 5.5 5.5 0 0 1-11 0zm5.354-1.646a.5.5 0 0 0-.708.708L8.293 8l-.647.646a.5.5 0 0 0 .708.708L9 8.707l1.646 1.647a.5.5 0 0 0 .708-.708L9.707 8l1.647-1.646a.5.5 0 0 0-.708-.708L9 7.293 7.854 6.354z"/>
+                                </svg>
+                            </button>
                         </form>
                     @endif
                 </td>
@@ -42,8 +45,11 @@
                     <form action="{{ route('admin.comments.destroy', $comment->id) }}" method="POST" style="display:inline">
                         @csrf @method('DELETE')
                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Əminsiniz?')">
-    <i class="bi bi-trash"></i>
-</button>
+                            <!-- Trash SVG icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                              <path d="M5.5 5.5A.5.5 0 0 1 6 5h4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5H6a.5.5 0 0 1-.5-.5v-7zM4.118 4 4 4.059V4h8v.059L11.882 4H4.118zM2.5 3h11a.5.5 0 0 1 0 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a.5.5 0 0 1 0-1z"/>
+                            </svg>
+                        </button>
                     </form>
                 </td>
             </tr>
