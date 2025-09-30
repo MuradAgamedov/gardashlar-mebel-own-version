@@ -28,13 +28,10 @@
                 <td>{{ $comment->text }}</td>
                 <td>
                 
-                @if(!$comment->is_read)
-    <span class="badge bg-success">Oxundu</span>
-@else
-    <a href="{{ route('admin.comments.read', $comment->id) }}" class="btn btn-sm btn-warning" title="Oxundu kimi qeyd et">
-        Oxundu
-    </a>
-@endif
+                <a href="{{ route('admin.comments.read', $comment->id) }}" class="btn btn-sm {{ $comment->is_read ? 'btn-success' : 'btn-warning' }}" title="Oxundu kimi qeyd et">
+    {{ $comment->is_read ? 'Oxundu' : 'Oxunmayıb' }}
+</a>
+
 
 
                 </td>
