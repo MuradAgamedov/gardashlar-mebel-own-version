@@ -31,8 +31,7 @@ class CommentController extends Controller
         } else {
             $ck = 1;
         }
-        dd($ck);
-        $comment->update(['is_read' => !(int)$comment->is_read]);
+        $comment->update(['is_read' => $ck]);
         return redirect()->back()->with('success', 'Şərh statusu yeniləndi');
     }
     
