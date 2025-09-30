@@ -29,13 +29,13 @@
                 <td>
                    <!-- Approve button -->
     @if($comment->status === 'approved')
-        <a href="{{ route('comments.approve', $comment->id) }}" 
+        <a href="{{ route('admin.comments.approve', $comment->id) }}" 
            class="btn btn-sm btn-primary" 
            title="Təsdiqi ləğv et">
            Təsdiqlənib
         </a>
     @else
-        <a href="{{ route('comments.approve', $comment->id) }}" 
+        <a href="{{ route('admin.comments.approve', $comment->id) }}" 
            class="btn btn-sm btn-secondary" 
            title="Təsdiqlə">
            Təsdiqlənməyib
