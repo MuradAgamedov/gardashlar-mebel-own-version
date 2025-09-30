@@ -27,8 +27,7 @@
                 <td>{{ $comment->product->id ?? '---' }}</td>
                 <td>{{ $comment->text }}</td>
                 <td>
-                    @dd($comment->is_read)
-                @if($comment->is_read)
+                @if((int)$comment->is_read)
     <span class="badge bg-success">Oxundu</span>
 @else
     <a href="{{ route('admin.comments.read', $comment->id) }}" class="btn btn-sm btn-warning" title="Oxundu kimi qeyd et">
