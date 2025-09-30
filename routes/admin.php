@@ -480,6 +480,8 @@ Route::get('comments', [CommentController::class, 'index'])->name('comments.inde
 Route::get('admin/comments/{comment}/read', [CommentController::class, 'markAsRead'])->name('comments.read');
 
 Route::delete('comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+Route::get('admin/comments/{comment}/approve', [CommentController::class, 'toggleApprove'])
+    ->name('comments.approve');
 
 
 Route::post('blog-posts/{blogPost}/images', [BlogImageController::class, 'store'])->name('blog-posts.images.store');

@@ -36,7 +36,15 @@ class CommentController extends Controller
     }
     
     
-    
+    public function toggleApprove(Comment $comment)
+{
+    $comment->update([
+        'status' => $comment->status === 'approved' ? 'pending' : 'approved'
+    ]);
+
+    return redirect()->back()->with('success', 'Şərhin təsdiq statusu dəyişdirildi');
+}
+
     
     
         

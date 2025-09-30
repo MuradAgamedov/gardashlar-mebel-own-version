@@ -27,7 +27,20 @@
                 <td>{{ $comment->product->id ?? '---' }}</td>
                 <td>{{ $comment->text }}</td>
                 <td>
-                
+                   <!-- Approve button -->
+    @if($comment->status === 'approved')
+        <a href="{{ route('comments.approve', $comment->id) }}" 
+           class="btn btn-sm btn-primary" 
+           title="Təsdiqi ləğv et">
+           Təsdiqlənib
+        </a>
+    @else
+        <a href="{{ route('comments.approve', $comment->id) }}" 
+           class="btn btn-sm btn-secondary" 
+           title="Təsdiqlə">
+           Təsdiqlənməyib
+        </a>
+    @endif
                 @if($comment->is_read === 'active')
                 <a href="{{ route('admin.comments.read', $comment->id) }}" class="btn btn-sm btn-success">
                 Oxundu
