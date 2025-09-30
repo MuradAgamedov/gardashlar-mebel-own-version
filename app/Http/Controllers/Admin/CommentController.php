@@ -27,9 +27,10 @@ class CommentController extends Controller
 
     public function markAsRead(Comment $comment)
     {
-        $comment->update(['is_read' => true]);
+        $comment->update(['is_read' => true]); // is_read sütunu true olur
         return redirect()->back()->with('success', 'Şərh oxundu kimi qeyd edildi');
     }
+    
     
         
 }
