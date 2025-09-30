@@ -291,7 +291,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/add-cart', [CartController::class, 'addCart'])->name('api.addCart');
     Route::get('/get-cart', [CartController::class, 'getCart'])->name('api.getCart');
 
-    Route::get('/add-comment', [CommentController::class, 'addComment'])->name('api.addComment');
+    Route::post('/add-comment', [CommentController::class, 'addComment'])->name('api.addComment');
 
 
 });
