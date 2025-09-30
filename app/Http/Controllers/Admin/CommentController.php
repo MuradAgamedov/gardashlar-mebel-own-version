@@ -26,13 +26,12 @@ class CommentController extends Controller
     }
     public function markAsRead(Comment $comment)
     {
-        if($comment->is_read) {
-            $ck = 0;
-        } else {
-            $ck = 1;
-        }
-        dd($ck);
-        $comment->update(['is_read' => $ck]);
+        // DB-də toggle
+        $comment->update(['is_read' => !$comment->is_read]);
+    
+        // Modeli yenilə ki, dd doğru göstərsin
+        $comment->refresh();
+    
         return redirect()->back()->with('success', 'Şərh statusu yeniləndi');
     }
     
