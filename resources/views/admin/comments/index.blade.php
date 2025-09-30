@@ -30,13 +30,9 @@
                 @if($comment->is_read)
     <span class="badge bg-success">Oxundu</span>
 @else
-<form action="{{ route('admin.comments.read', $comment->id) }}" method="POST" style="display:inline">
-    @csrf
-    <button type="submit" class="btn btn-sm btn-warning" title="Oxundu kimi qeyd et">
+    <a href="{{ route('comments.read', $comment->id) }}" class="btn btn-sm btn-warning" title="Oxundu kimi qeyd et">
         Oxundu
-    </button>
-</form>
-
+    </a>
 @endif
 
 
