@@ -24,8 +24,9 @@ class CommentController extends Controller
         $comment->delete();
         return redirect()->route('admin.comments.index')->with('success', 'Şərh silindi');
     }
-    public function markAsRead(Comment $comment)
+    public function markAsRead($id)
     {
+        dd($id);
         $comment->update([
             'is_read' => $comment->is_read === 'active' ? 'passive' : 'active'
         ]);
