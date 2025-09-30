@@ -472,6 +472,10 @@ Route::post('blog-posts/bulk-delete', [BlogPostController::class, 'bulkDelete'])
 
 // Blog Images routes
 Route::get('blog-posts/{blogPost}/images', [BlogImageController::class, 'index'])->name('blog-posts.images.index');
+Route::get('see_comments', [BlogImageController::class, 'index'])->name('blog-posts.images.index');
+
+
+
 Route::post('blog-posts/{blogPost}/images', [BlogImageController::class, 'store'])->name('blog-posts.images.store');
 Route::put('blog-posts/{blogPost}/images/{blogImage}', [BlogImageController::class, 'update'])->name('blog-posts.images.update');
 Route::delete('blog-posts/{blogPost}/images/{blogImage}', [BlogImageController::class, 'destroy'])->name('blog-posts.images.destroy');

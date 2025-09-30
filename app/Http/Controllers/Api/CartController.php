@@ -52,10 +52,14 @@ class CartController extends Controller
         // Hər cart item-i JSON formatına çevir
         $cartData = $carts->map(function ($cart) use ($languageId) { // languageId əlavə et
             return [
+               "success" => true,
+               "data" => [
                 'cart_id' => $cart->id,
                 'count' => $cart->count,
                 'product' => $cart->product ? $cart->product->apiData($languageId) : null,
                 'color_id' => $cart->color_id,
+               ],
+               "message" => "success"
             ];
         });
     
