@@ -229,14 +229,15 @@ public function apiData($languageId = null, $colorId = null)
         ];
     });
 
-    // Main (card) image
-    $cardImageModel = $this->images()->where('status', true)->where('is_main', true)->first();
-    $cardImage = $cardImageModel ? [
-        'id' => $cardImageModel->id,
-        'image_url' => $cardImageModel->image ? asset('storage/'.$cardImageModel->image) : null,
-        'color_id' => $cardImageModel->product_color_id ?? null,
-        'order' => $cardImageModel->order
-    ] : null;
+    // 🔹 Bütün şəkillər (order-lə işimiz yoxdur)
+    $images = $this->images()->where('status', true)->get()->map(function ($img) {
+        return [
+            'id' => $img->id,
+            'image_url' => $img->image ? asset('storage/'.$img->image) : null,
+            'color_id' => $img->product_color_id ?? null,
+            'is_main' => $img->is_main
+        ];
+    });
 
     // Colors
     $availableColors = $this->images()->whereNotNull('product_color_id')->pluck('product_color_id')->unique()->values();
@@ -286,11 +287,12 @@ public function apiData($languageId = null, $colorId = null)
         'product_details' => $productDetails,
         'product_detail_values' => $productDetailValues,
         'available_colors' => $availableColorDetails,
-        'card_image' => $cardImage,
+        'images' => $images, // 🔹 bütün şəkillər gəlir
         'category_slug' => $categorySlug,
         'parent_slug' => $parentSlug
     ];
 }
+
 
 
 public function similarData($languageId = null)
