@@ -477,7 +477,7 @@ Route::get('see_comments', [BlogImageController::class, 'index'])->name('blog-po
 
 
 Route::get('comments', [CommentController::class, 'index'])->name('comments.index');
-
+Route::post('comments/{comment}/read', [CommentController::class, 'markAsRead'])->name('comments.read');
 
 
 Route::post('blog-posts/{blogPost}/images', [BlogImageController::class, 'store'])->name('blog-posts.images.store');
