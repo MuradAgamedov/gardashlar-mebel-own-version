@@ -85,6 +85,7 @@ use App\Http\Controllers\Admin\ServiceFormController;
 use App\Http\Controllers\Admin\SuggestAPlaceFormController;
 use App\Http\Controllers\Admin\SuggestionsComplaintsFormController;
 use App\Http\Controllers\Admin\SubscriberController;
+use App\Http\Controllers\Admin\CommentController;
 
 Route::prefix('')->name('admin.')->group(function () {
     // Auth routes (no middleware)
