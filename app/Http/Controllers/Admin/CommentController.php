@@ -24,13 +24,12 @@ class CommentController extends Controller
         $comment->delete();
         return redirect()->route('admin.comments.index')->with('success', 'Şərh silindi');
     }
-
     public function markAsRead(Comment $comment)
     {
-        dd($comment);
-        $comment->update(['is_read' => true]); // is_read sütunu true olur
-        return redirect()->back()->with('success', 'Şərh oxundu kimi qeyd edildi');
+        $comment->update(['is_read' => !$comment->is_read]);
+        return redirect()->back()->with('success', 'Şərh statusu yeniləndi');
     }
+    
     
     
     
