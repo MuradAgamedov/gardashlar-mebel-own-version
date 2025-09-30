@@ -64,6 +64,7 @@ use App\Http\Controllers\Api\VacancyFormController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\CommentController;
 
 
 // Language API Routes
@@ -289,6 +290,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/add-cart', [CartController::class, 'addCart'])->name('api.addCart');
     Route::get('/get-cart', [CartController::class, 'getCart'])->name('api.getCart');
+
+    Route::get('/add-comment', [CommentController::class, 'addComment'])->name('api.addComment');
+
 
 });
 
