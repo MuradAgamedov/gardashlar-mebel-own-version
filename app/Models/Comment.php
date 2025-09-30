@@ -15,7 +15,9 @@ class Comment extends Model
         'text',
         'status',
     ];
-
+    protected $casts = [
+        'is_read' => 'boolean', // indi is_read həmişə true/false olacaq
+    ];
     public function user()
     {
         return $this->belongsTo(User::class);
