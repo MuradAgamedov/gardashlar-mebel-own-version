@@ -29,8 +29,9 @@ class CommentController extends Controller
         $comment = Comment::find($id);
      
         $comment->update([
-            'is_read' => "s"
+            'is_read' => $comment->is_read === 'active' ? 'passive' : 'active'
         ]);
+    
         return redirect()->back()->with('success', 'Şərh statusu yeniləndi');
     }
     
