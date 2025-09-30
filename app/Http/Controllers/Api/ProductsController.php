@@ -1010,16 +1010,18 @@ class ProductsController extends Controller
                 });
             }
     
-            // Categories (with slug, title, parent_slug)
+            // Categories (with slug, title, parent_slug, parent_title)
             $productCategories = $product->categories->map(function ($category) use ($languageId) {
                 $translation = $category->translates->first();
     
                 $parentSlug = null;
+                $parentTitle = null;
                 if ($category->parent_id) {
                     $parentCategory = ProductCategory::find($category->parent_id);
                     if ($parentCategory) {
                         $parentTr = $parentCategory->translates()->where('language_id', $languageId)->first();
                         $parentSlug = $parentTr ? $parentTr->slug : null;
+                        $parentTitle = $parentTr ? $parentTr->title : null;
                     }
                 }
     
@@ -1027,7 +1029,8 @@ class ProductsController extends Controller
                     'id' => $category->id,
                     'title' => $translation ? $translation->title : '',
                     'slug' => $translation ? $translation->slug : '',
-                    'parent_slug' => $parentSlug
+                    'parent_slug' => $parentSlug,
+                    'parent_title' => $parentTitle
                 ];
             });
     
