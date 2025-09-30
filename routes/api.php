@@ -63,6 +63,7 @@ use App\Http\Controllers\Api\ProductsController;
 use App\Http\Controllers\Api\VacancyFormController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RegisterController;
+use App\Http\Controllers\Api\CartController;
 
 
 // Language API Routes
@@ -285,6 +286,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/products/{id}/compare', [ProductsController::class, 'removeFromCompare'])->name('api.products.remove-compare');
     Route::get('/products/compare', [ProductsController::class, 'getCompareList'])->name('api.products.compare-list');
     Route::delete('/products/compare/clear', [ProductsController::class, 'clearCompareList'])->name('api.products.clear-compare');
+
+    Route::post('/add-cart', [CartController::class, 'addCart'])->name('api.addCart');
+    Route::get('/get-cart', [CartController::class, 'getCart'])->name('api.getCart');
+
 });
 
 // Subscriber API Routes

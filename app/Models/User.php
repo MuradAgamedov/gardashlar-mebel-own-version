@@ -89,4 +89,11 @@ class User extends Authenticatable
     {
         return $query->whereNotNull('email_verified_at');
     }
+
+    // User modelində əlavə et
+    public function cart()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
 }

@@ -175,4 +175,103 @@ class Product extends Model
             }
         });
     }
+
+
+    // User modelinə əlavə etmək lazım deyil, Product modelinə əlavə olunur
+
+// Product modelində əlavə et
+public function apiData($languageId = null, $colorId = null)
+{
+    if (!$languageId) {
+        $languageId = app()->getLocale();
+    }
+
+    // Məhsulun tərcüməsi
+    $translation = $this->translates()
+        ->where('language_id', $languageId)
+        ->first();
+
+    // Məhsul tipləri
+    $productTypes = $this->types->map(function ($type) use ($languageId) {
+        $tr = $type->translates()->where('language_id', $languageId)->first();
+        return [
+            'id' => $type->id,
+            'title' => $tr ? $tr->title : ''
+        ];
+    });
+
+    // Məhsul detallarını gətiririk
+    $productDetails = $this->details()->orderBy('order')->get()->map(function ($detail) use ($languageId) {
+        $tr = $detail->translates()->where('language_id', $languageId)->first();
+        return [
+            'id' => $detail->id,
+            'keyword' => $tr ? $tr->keyword : '',
+            'value' => $tr ? $tr->value : ''
+        ];
+    })->filter(fn($d) => $d['keyword'] && $d['value'])->values();
+
+    // Məhsul detail values
+    $productDetailValues = $this->detailValues()->orderBy('order')->get()->map(function ($dv) use ($languageId) {
+        $tr = $dv->translates()->where('language_id', $languageId)->first();
+        $details = $dv->details()->orderBy('order')->get()->map(function ($detail) use ($languageId) {
+            $dtr = $detail->translates()->where('language_id', $languageId)->first();
+            return [
+                'id' => $detail->id,
+                'keyword' => $dtr ? $dtr->keyword : '',
+                'value' => $dtr ? $dtr->value : ''
+            ];
+        })->filter(fn($d) => $d['keyword'] && $d['value'])->values();
+
+        return [
+            'id' => $dv->id,
+            'keyword' => $tr ? $tr->keyword : '',
+            'details' => $details
+        ];
+    });
+
+    // Yalnız card_image
+    $cardImageModel = $this->images()->where('status', true)->where('is_main', true)->first();
+    $cardImage = $cardImageModel ? [
+        'id' => $cardImageModel->id,
+        'image_url' => $cardImageModel->image ? asset('storage/'.$cardImageModel->image) : null,
+    ] : null;
+
+    // Rənglər
+    $availableColors = $this->images()->whereNotNull('product_color_id')->pluck('product_color_id')->unique()->values();
+    $availableColorDetails = [];
+    if ($availableColors->isNotEmpty()) {
+        $availableColorDetails = ProductColor::whereIn('id', $availableColors)->get()->map(function ($color) {
+            return [
+                'id' => $color->id,
+                'color_code' => $color->color_code
+            ];
+        });
+    }
+
+    // Discount qiymət
+    $discountPrice = null;
+    if ($this->discount_percent > 0) {
+        $discountPrice = $this->price - ($this->price * $this->discount_percent / 100);
+    }
+
+    return [
+        'id' => $this->id,
+        'title' => $translation ? $translation->title : '',
+        'slug' => $translation ? $translation->slug : '',
+        'price' => $this->price,
+        'discount_price' => $discountPrice,
+        'discount_percent' => $this->discount_percent,
+        'view_count' => $this->view_count,
+        'product_types' => $productTypes,
+        'product_details' => $productDetails,
+        'product_detail_values' => $productDetailValues,
+        'available_colors' => $availableColorDetails,
+        'card_image' => $cardImage
+    ];
+}
+
+
+
+
+
 }
