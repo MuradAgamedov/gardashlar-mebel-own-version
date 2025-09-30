@@ -899,10 +899,8 @@ class ProductsController extends Controller
                 ], 404);
             }
     
-            // Translation
+            // --- Product detallı data (sənin əvvəlki show kodundakı kimi) ---
             $translation = $product->translates->first();
-    
-            // Types
             $productTypes = $product->types->map(function ($type) {
                 $translation = $type->translates->first();
                 return [
@@ -910,8 +908,6 @@ class ProductsController extends Controller
                     'title' => $translation ? $translation->title : ''
                 ];
             });
-    
-            // Tags
             $productTags = $product->tags->map(function ($tag) {
                 $translation = $tag->translates->first();
                 return [
@@ -919,8 +915,6 @@ class ProductsController extends Controller
                     'title' => $translation ? $translation->title : ''
                 ];
             });
-    
-            // Accordions
             $productAccordions = $product->accordions->map(function ($accordion) {
                 $translation = $accordion->translates->first();
                 return [
@@ -929,8 +923,6 @@ class ProductsController extends Controller
                     'content' => $translation ? $translation->description : ''
                 ];
             });
-    
-            // Details
             $productDetails = $product->details->map(function ($detail) {
                 $translation = $detail->translates->first();
                 return [
@@ -939,11 +931,8 @@ class ProductsController extends Controller
                     'value' => $translation ? $translation->value : ''
                 ];
             })->filter(fn($d) => $d['keyword'] && $d['value'])->values();
-    
-            // Detail values
             $productDetailValues = $product->detailValues->map(function ($detailValue) use ($languageId) {
                 $translation = $detailValue->translates->first();
-                
                 $details = $detailValue->details()
                     ->with(['translates' => function($query) use ($languageId) {
                         $query->where('language_id', $languageId);
@@ -960,7 +949,6 @@ class ProductsController extends Controller
                     })
                     ->filter(fn($d) => $d['keyword'] && $d['value'])
                     ->values();
-                
                 return [
                     'id' => $detailValue->id,
                     'keyword' => $translation ? $translation->keyword : '',
@@ -968,52 +956,45 @@ class ProductsController extends Controller
                 ];
             });
     
-            // Images (with color filter)
+            // Şəkillər (color filter ilə)
             $images = $product->images;
             $availableColors = $images->where('product_color_id', '!=', null)
-                ->pluck('product_color_id')
-                ->unique()
-                ->values();
-    
+                ->pluck('product_color_id')->unique()->values();
             if ($colorId) {
                 $images = $images->where('product_color_id', $colorId);
             }
-    
             $productImages = $images->map(function ($image) {
-                $imageData = [
+                $data = [
                     'id' => $image->id,
                     'image_url' => $image->image ? asset('storage/' . $image->image) : null,
                     'is_main' => $image->is_main,
                     'order' => $image->order
                 ];
                 if ($image->product_color_id !== null) {
-                    $imageData['color_id'] = $image->product_color_id;
+                    $data['color_id'] = $image->product_color_id;
                 }
-                return $imageData;
+                return $data;
             });
     
-            // Discount price
+            // Discount
             $discountPrice = null;
             if ($product->discount_percent && $product->discount_percent > 0) {
                 $discountPrice = $product->price - ($product->price * $product->discount_percent / 100);
             }
     
-            // Available color details
+            // Available colors
             $availableColorDetails = [];
             if ($availableColors->isNotEmpty()) {
                 $colors = ProductColor::whereIn('id', $availableColors)->get();
-                $availableColorDetails = $colors->map(function ($color) {
-                    return [
-                        'id' => $color->id,
-                        'color_code' => $color->color_code
-                    ];
-                });
+                $availableColorDetails = $colors->map(fn($c) => [
+                    'id' => $c->id,
+                    'color_code' => $c->color_code
+                ]);
             }
     
-            // Categories (with slug, title, parent_slug, parent_title)
+            // Categories (parent_slug və parent_title ilə)
             $productCategories = $product->categories->map(function ($category) use ($languageId) {
-                $translation = $category->translates->first();
-    
+                $tr = $category->translates->first();
                 $parentSlug = null;
                 $parentTitle = null;
                 if ($category->parent_id) {
@@ -1024,16 +1005,16 @@ class ProductsController extends Controller
                         $parentTitle = $parentTr ? $parentTr->title : null;
                     }
                 }
-    
                 return [
                     'id' => $category->id,
-                    'title' => $translation ? $translation->title : '',
-                    'slug' => $translation ? $translation->slug : '',
+                    'title' => $tr ? $tr->title : '',
+                    'slug' => $tr ? $tr->slug : '',
                     'parent_slug' => $parentSlug,
                     'parent_title' => $parentTitle
                 ];
             });
     
+            // Product əsas data
             $productData = [
                 'id' => $product->id,
                 'title' => $translation ? $translation->title : '',
@@ -1052,10 +1033,26 @@ class ProductsController extends Controller
                 'categories' => $productCategories
             ];
     
+            // --- Similar məhsullar (eyni kategoriyadan) ---
+            $similar = Product::whereHas('categories', function($q) use ($product) {
+                    $q->whereIn('product_categories.id', $product->categories->pluck('id'));
+                })
+                ->where('id', '!=', $product->id)
+                ->active()
+                ->take(8)
+                ->get();
+    
+            $similarData = $similar->map(function ($item) use ($languageId) {
+                return $item->similarData($languageId);
+            });
+    
             return response()->json([
                 'success' => true,
                 'message' => 'Product retrieved successfully',
-                'data' => $productData
+                'data' => [
+                    'product' => $productData,
+                    'similar_products' => $similarData
+                ]
             ]);
     
         } catch (\Exception $e) {

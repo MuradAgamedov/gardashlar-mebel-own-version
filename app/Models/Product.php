@@ -293,6 +293,79 @@ public function apiData($languageId = null, $colorId = null)
 }
 
 
+public function similarData($languageId = null)
+{
+    if (!$languageId) {
+        $languageId = app()->getLocale();
+    }
+
+    // Tərcümə
+    $translation = $this->translates()
+        ->where('language_id', $languageId)
+        ->first();
+
+    // Məhsul tipləri
+    $productTypes = $this->types->map(function ($type) use ($languageId) {
+        $tr = $type->translates()->where('language_id', $languageId)->first();
+        return [
+            'id' => $type->id,
+            'title' => $tr ? $tr->title : ''
+        ];
+    });
+
+    // Əsas şəkil
+    $mainImage = $this->images()
+        ->where('status', true)
+        ->orderBy('order')
+        ->first();
+
+    $cardImage = $mainImage && $mainImage->image
+        ? asset('storage/' . $mainImage->image)
+        : asset('images/default_image.webp');
+
+    // Discount qiymət
+    $discountPrice = null;
+    if ($this->discount_percent > 0) {
+        $discountPrice = $this->price - ($this->price * $this->discount_percent / 100);
+    }
+
+    // Kategoriyalar (parent_slug və parent_title ilə birlikdə)
+    $categories = $this->categories->map(function ($category) use ($languageId) {
+        $tr = $category->translates()->where('language_id', $languageId)->first();
+
+        $parentSlug = null;
+        $parentTitle = null;
+        if ($category->parent_id) {
+            $parentCategory = ProductCategory::find($category->parent_id);
+            if ($parentCategory) {
+                $parentTr = $parentCategory->translates()->where('language_id', $languageId)->first();
+                $parentSlug = $parentTr ? $parentTr->slug : null;
+                $parentTitle = $parentTr ? $parentTr->title : null;
+            }
+        }
+
+        return [
+            'id' => $category->id,
+            'title' => $tr ? $tr->title : '',
+            'slug' => $tr ? $tr->slug : '',
+            'parent_slug' => $parentSlug,
+            'parent_title' => $parentTitle,
+        ];
+    });
+
+    return [
+        'id' => $this->id,
+        'title' => $translation ? $translation->title : '',
+        'slug' => $translation ? $translation->slug : '',
+        'price' => $this->price,
+        'discount_price' => $discountPrice,
+        'discount_percent' => $this->discount_percent,
+        'view_count' => $this->view_count,
+        'card_image' => $cardImage,
+        'product_types' => $productTypes,
+        'categories' => $categories
+    ];
+}
 
 
 
