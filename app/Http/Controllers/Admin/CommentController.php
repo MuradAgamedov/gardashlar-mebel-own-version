@@ -46,14 +46,14 @@ class CommentController extends Controller
 }
 
     
+// Cavabların siyahısı
 public function answers(Comment $comment)
 {
-    // Əgər Comment modelində `answers` relation varsa
-    $answers = $comment->answers()->with('user')->latest()->get();
-
+    $answers = $comment->answers()->latest()->get();
     return view('admin.comments.answers', compact('comment', 'answers'));
 }
 
+// Cavab əlavə etmək
 public function storeAnswer(Request $request, Comment $comment)
 {
     $request->validate([
@@ -61,11 +61,17 @@ public function storeAnswer(Request $request, Comment $comment)
     ]);
 
     $comment->answers()->create([
-        'user_id' => auth()->id(),
         'text' => $request->text,
     ]);
 
     return redirect()->back()->with('success', 'Cavab əlavə olundu');
+}
+
+// Cavabı silmək
+public function destroyAnswer(CommentAnswer $answer)
+{
+    $answer->delete();
+    return redirect()->back()->with('success', 'Cavab silindi');
 }
 
         
