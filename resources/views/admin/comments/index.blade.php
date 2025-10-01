@@ -65,7 +65,7 @@
                     </form>
 
                   <!-- Reply button -->
-<a href="{{ route('comments.answers', $comment->id) }}" class="btn btn-sm btn-info" title="Cavab ver">
+<a href="{{ route('admin.comments.answers', $comment->id) }}" class="btn btn-sm btn-info" title="Cavab ver">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-reply" viewBox="0 0 16 16">
         <path d="M6.598 5.013a.5.5 0 0 1 .708.706L4.707 8H12.5a.5.5 0 0 1 0 1H4.707l2.599 2.281a.5.5 0 1 1-.707.706l-3.5-3.075a.5.5 0 0 1 0-.707l3.5-3.075z"/>
     </svg>
