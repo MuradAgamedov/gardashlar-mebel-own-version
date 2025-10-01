@@ -28,7 +28,7 @@ class Comment extends Model
     }
     public function answers()
 {
-    return $this->hasMany(Comment::class, 'parent_id'); // parent_id ilə cavablar
+    return $this->hasMany(Comment::class, 'comment_id'); // parent_id ilə cavablar
 }
 
 }
