@@ -6,7 +6,7 @@
     <p><strong>Şərh:</strong> {{ $comment->text }}</p>
 
     <!-- Cavab əlavə et form -->
-    <form action="{{ route('comments.answers.store', $comment->id) }}" method="POST">
+    <form action="{{ route('admin.comments.answers.store', $comment->id) }}" method="POST">
         @csrf
         <textarea name="text" class="form-control" placeholder="Cavab yazın" required></textarea>
         <button type="submit" class="btn btn-primary mt-2">Cavab əlavə et</button>
