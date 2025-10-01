@@ -9,7 +9,6 @@ use App\Models\ProductColor;
 use App\Models\ProductType;
 use App\Models\ProductPageCategory;
 use App\Models\Product;
-use App\Models\ProductFavorite;
 use App\Models\ProductCompare;
 use App\Models\Dictionary;
 use App\Models\Language;

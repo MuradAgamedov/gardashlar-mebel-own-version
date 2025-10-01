@@ -100,7 +100,7 @@ class Product extends Model
      */
     public function favorites()
     {
-        return $this->hasMany(ProductFavorite::class);
+        return $this->hasMany(Favorite::class);
     }
 
     /**

@@ -12,17 +12,18 @@ class Favorite extends Model
         'color_id',
     ];
 
-    // Əlaqələr
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    // Cart-a əlavə olunmuş məhsul
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
 
+    // Əgər color_id varsa, məhsulun rəngi
     public function color()
     {
         return $this->belongsTo(Color::class);
