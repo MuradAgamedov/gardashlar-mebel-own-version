@@ -99,44 +99,7 @@ class FavoriteController extends Controller
 
 
 
-     /**
-     * @OA\Post(
-     *     path="/api/products/favorites/check",
-     *     operationId="checkFavoriteProducts",
-     *     tags={"Products"},
-     *     summary="Check if products exist (for non-registered users)",
-     *     description="Check if provided product IDs exist and are active",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             @OA\Property(property="product_ids", type="array", @OA\Items(type="integer"), example={1, 2, 3, 4}, description="Array of product IDs to check")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful response",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="existing_products", type="array", @OA\Items(type="integer"), example={1, 2, 3}),
-     *                 @OA\Property(property="non_existing_products", type="array", @OA\Items(type="integer"), example={4}),
-     *                 @OA\Property(property="total_requested", type="integer", example=4),
-     *                 @OA\Property(property="total_existing", type="integer", example=3),
-     *                 @OA\Property(property="total_non_existing", type="integer", example=1)
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Invalid request",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Validation error"),
-     *             @OA\Property(property="data", type="null")
-     *         )
-     *     )
-     * )
-     */
+  
     public function checkFavoriteProducts(Request $request)
     {
         try {
