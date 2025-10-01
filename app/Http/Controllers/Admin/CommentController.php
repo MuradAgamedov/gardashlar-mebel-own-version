@@ -46,6 +46,27 @@ class CommentController extends Controller
 }
 
     
-    
+public function answers(Comment $comment)
+{
+    // Əgər Comment modelində `answers` relation varsa
+    $answers = $comment->answers()->with('user')->latest()->get();
+
+    return view('admin.comments.answers', compact('comment', 'answers'));
+}
+
+public function storeAnswer(Request $request, Comment $comment)
+{
+    $request->validate([
+        'text' => 'required|string|max:1000',
+    ]);
+
+    $comment->answers()->create([
+        'user_id' => auth()->id(),
+        'text' => $request->text,
+    ]);
+
+    return redirect()->back()->with('success', 'Cavab əlavə olundu');
+}
+
         
 }

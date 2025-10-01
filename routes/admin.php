@@ -479,6 +479,8 @@ Route::get('see_comments', [BlogImageController::class, 'index'])->name('blog-po
 Route::get('comments', [CommentController::class, 'index'])->name('comments.index');
 Route::get('admin/comments/{comment}/read', [CommentController::class, 'markAsRead'])->name('comments.read');
 
+
+
 Route::delete('comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 Route::get('admin/comments/{comment}/approve', [CommentController::class, 'toggleApprove'])
     ->name('comments.approve');

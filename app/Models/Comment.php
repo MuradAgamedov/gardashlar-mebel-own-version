@@ -26,5 +26,9 @@ class Comment extends Model
     {
         return $this->belongsTo(Product::class);
     }
-    
+    public function answers()
+{
+    return $this->hasMany(Comment::class, 'parent_id'); // parent_id ilə cavablar
+}
+
 }
