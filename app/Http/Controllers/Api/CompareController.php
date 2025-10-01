@@ -328,6 +328,25 @@ class CompareController extends Controller
     }
     
     
-    
+    public function removeCompare(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                "success" => false,
+                "message" => "You must be logged in!"
+            ], 401);
+        }
+
+        $deleted = ProductCompare::where('user_id', $user->id)
+            ->where('product_id', $request->product_id)
+            ->delete();
+
+        return response()->json([
+            'success' => (bool) $deleted,
+            'message' => $deleted ? 'Product removed from compare successfully!' : 'Product not found in compare list!'
+        ]);
+    }
     
 }

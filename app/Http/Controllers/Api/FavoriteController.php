@@ -87,7 +87,6 @@ class FavoriteController extends Controller
 
         $deleted = Favorite::where('user_id', $user->id)
             ->where('product_id', $request->product_id)
-            ->where('color_id', $request->color_id)
             ->delete();
 
         return response()->json([
