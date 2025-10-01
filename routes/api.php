@@ -65,6 +65,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\FavoriteController;
 
 
 // Language API Routes
@@ -276,12 +277,16 @@ Route::post('/products/favorites/dont-registered', [ProductsController::class, '
 // Product Card Check API Route (No Authentication Required)
 Route::post('/products/card/dont-registered', [ProductsController::class, 'checkCardProducts'])->name('api.products.card-check');
 
+
+
+
 // Product Favorites API Routes (Requires Authentication)
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/products/{id}/favorite', [ProductsController::class, 'addToFavorites'])->name('api.products.add-favorite');
-    Route::delete('/products/{id}/favorite', [ProductsController::class, 'removeFromFavorites'])->name('api.products.remove-favorite');
-    Route::get('/products/favorites', [ProductsController::class, 'getFavorites'])->name('api.products.favorites');
-    
+    Route::post('/add-favorite', [FavoriteController::class, 'addFavorite'])->name('api.addFavorite');
+    Route::get('/get-favorites', [FavoriteController::class, 'getFavorites'])->name('api.getFavorites');
+    Route::delete('/remove-favorite', [FavoriteController::class, 'removeFavorite'])->name('api.removeFavorite');
+
+
     // Product Compare API Routes (Requires Authentication)
     Route::post('/products/{id}/compare', [ProductsController::class, 'addToCompare'])->name('api.products.add-compare');
     Route::delete('/products/{id}/compare', [ProductsController::class, 'removeFromCompare'])->name('api.products.remove-compare');
@@ -290,7 +295,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/add-cart', [CartController::class, 'addCart'])->name('api.addCart');
     Route::get('/get-cart', [CartController::class, 'getCart'])->name('api.getCart');
+    Route::delete('/remove-cart', [CartController::class, 'removeCart'])->name('api.removeCart');
 
+
+    
     Route::post('/add-comment', [CommentController::class, 'addComment'])->name('api.addComment');
 
 
