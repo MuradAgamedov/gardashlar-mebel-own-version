@@ -99,7 +99,6 @@ class FavoriteController extends Controller
 
 
 
-  
     public function checkFavoriteProducts(Request $request)
     {
         try {
@@ -108,121 +107,101 @@ class FavoriteController extends Controller
                 'product_ids' => 'required|array|min:1|max:50',
                 'product_ids.*' => 'required|integer|min:1'
             ]);
-
+    
             $productIds = $request->input('product_ids', []);
-            
+    
             // Get language ID from header using trait
             $languageId = $this->getLanguageIdFromHeader($request);
-            
-            // Get existing active products with all relationships
+    
+            // Get existing active products with relationships
             $existingProducts = Product::active()
                 ->whereIn('id', $productIds)
                 ->with([
-                    'translates' => function($query) use ($languageId) {
-                        $query->where('language_id', $languageId);
-                    },
-                    'images' => function($query) {
-                        $query->where('status', true)->orderBy('order');
-                    },
-                    'images.color' => function($query) {
-                        $query->select('product_colors.id', 'product_colors.color_code');
-                    },
-                    'categories.translates' => function($query) use ($languageId) {
-                        $query->where('language_id', $languageId);
-                    },
-                    'types.translates' => function($query) use ($languageId) {
-                        $query->where('language_id', $languageId);
-                    },
-                    'colors' => function($query) {
-                        $query->select('product_colors.id', 'product_colors.color_code');
-                    }
+                    'translates' => fn($q) => $q->where('language_id', $languageId),
+                    'images' => fn($q) => $q->where('status', true)->orderBy('order'),
+                    'images.color' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
+                    'categories.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'types.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'colors' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
+                    'details',           // Assuming relation Product->details exists
+                    'detailValues'       // Assuming relation Product->detailValues exists
                 ])
                 ->get();
-            
-            // Find non-existing products
-            $existingProductIds = $existingProducts->pluck('id')->toArray();
-            $nonExistingProducts = array_diff($productIds, $existingProductIds);
-            
-            // Format existing products data
+    
+            // Map to desired response structure
             $productsData = $existingProducts->map(function ($product) use ($languageId) {
                 $translation = $product->translates->first();
-                
-                // Find main image - first try to find is_main=true, then fallback to first image
-                $mainImage = $product->images->where('is_main', true)->first();
-                if (!$mainImage) {
-                    $mainImage = $product->images->first();
-                }
-                
-                // Get category information
+    
+                // Main image
+                $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
+    
+                // Category & parent
                 $categorySlug = null;
                 $parentSlug = null;
-                
                 if ($product->categories->isNotEmpty()) {
-                    // Get the first category (assuming products have one primary category)
                     $category = $product->categories->first();
                     $categoryTranslation = $category->translates->first();
-                    $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
-                    
-                    // Get parent slug if category has parent
+                    $categorySlug = $categoryTranslation?->slug;
+    
                     if ($category->parent_id) {
                         $parentCategory = ProductCategory::find($category->parent_id);
-                        if ($parentCategory) {
-                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
-                            $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
-                        }
+                        $parentTranslation = $parentCategory?->translates()->where('language_id', $languageId)->first();
+                        $parentSlug = $parentTranslation?->slug;
                     }
                 }
-                
-                $productTypes = $product->types->map(function ($type) {
-                    $translation = $type->translates->first();
-                    return [
-                        'id' => $type->id,
-                        'title' => $translation ? $translation->title : ''
-                    ];
-                });
-                
-                // Get available colors for this product
-                $availableColors = $product->colors->map(function($color) {
-                    return [
-                        'id' => $color->id,
-                        'color_code' => $color->color_code
-                    ];
-                });
-                
-                // Get all images with their colors
-                $imagesWithColors = $product->images->map(function($image) {
-                    return [
-                        'id' => $image->id,
-                        'image_url' => $image->image ? asset('storage/' . $image->image) : null,
-                        'is_main' => $image->is_main,
-                        'order' => $image->order,
-                        'color' => $image->color ? [
-                            'id' => $image->color->id,
-                            'color_code' => $image->color->color_code
-                        ] : null
-                    ];
-                })->sortBy('order')->values();
-                
+    
+                // Product types
+                $productTypes = $product->types->map(fn($type) => [
+                    'id' => $type->id,
+                    'title' => $type->translates->first()?->title ?? ''
+                ]);
+    
+                // Available colors
+                $availableColors = $product->colors->map(fn($color) => [
+                    'id' => $color->id,
+                    'color_code' => $color->color_code
+                ]);
+    
+                // Images
+                $imagesWithColors = $product->images->map(fn($image) => [
+                    'id' => $image->id,
+                    'image_url' => $image->image ? asset('storage/' . $image->image) : null,
+                    'is_main' => $image->is_main,
+                    'order' => $image->order,
+                    'color' => $image->color ? [
+                        'id' => $image->color->id,
+                        'color_code' => $image->color->color_code
+                    ] : null
+                ])->sortBy('order')->values();
+    
+                // Discount price calculation
+                $discountPrice = $product->discount_percent > 0 
+                    ? round($product->price - ($product->price * $product->discount_percent / 100), 2)
+                    : null;
+    
                 return [
                     'id' => $product->id,
-                    'title' => $translation ? $translation->title : '',
-                    'slug' => $translation ? $translation->slug : '',
-                    'price' => $product->price,
-                    'view_count' => $product->view_count,
-                    'discount_percent' => $product->discount_percent,
-                    'category_slug' => $categorySlug,
-                    'parentSlug' => $parentSlug,
-                    'product_types' => $productTypes,
+                    'slug' => $translation?->slug ?? '',
+                    'title' => $translation?->title ?? '',
                     'available_colors' => $availableColors,
-                    'images' => $imagesWithColors
+                    'category_slug' => $categorySlug,
+                    'parent_slug' => $parentSlug,
+                    'discount_price' => $discountPrice,
+                    'discount_percent' => $product->discount_percent,
+                    'price' => $product->price,
+                    'images' => $imagesWithColors,
+                    'product_details' => $product->details ?? [],
+                    'product_detail_values' => $product->detailValues ?? [],
+                    'product_types' => $productTypes,
+                    'view_count' => $product->view_count
                 ];
             });
-            
+    
             return response()->json([
                 'success' => true,
                 'data' => $productsData
             ], 200);
-
+    
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -237,6 +216,7 @@ class FavoriteController extends Controller
             ], 500);
         }
     }
+    
 
  
 }
