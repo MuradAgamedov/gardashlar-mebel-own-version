@@ -484,7 +484,14 @@ Route::get('admin/comments/{comment}/read', [CommentController::class, 'markAsRe
 Route::delete('comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 Route::get('admin/comments/{comment}/approve', [CommentController::class, 'toggleApprove'])
     ->name('comments.approve');
+// Şərh cavabları
+Route::get('admin/comments/{comment}/answers', [CommentController::class, 'answers'])->name('comments.answers');
 
+// Cavab əlavə etmək
+Route::post('admin/comments/{comment}/answers', [CommentController::class, 'storeAnswer'])->name('comments.answers.store');
+
+// Cavabı silmək
+Route::delete('admin/comments/answers/{answer}', [CommentController::class, 'destroyAnswer'])->name('comments.answers.destroy');
 
 Route::post('blog-posts/{blogPost}/images', [BlogImageController::class, 'store'])->name('blog-posts.images.store');
 Route::put('blog-posts/{blogPost}/images/{blogImage}', [BlogImageController::class, 'update'])->name('blog-posts.images.update');
