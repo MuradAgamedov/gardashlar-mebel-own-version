@@ -10,15 +10,32 @@ class CommentAnswerSeeder extends Seeder
 {
     public function run()
     {
-        // 1. Əvvəlcə product_id = 2 olan şərhləri götürürük
-        $comments = Comment::where('product_id', 2)->get();
+        // 1. Product ID 47 üçün iki şərh əlavə edək
+        $commentsData = [
+            [
+                'user_id' => null, // admin tərəfindən yaradılır
+                'product_id' => 47,
+                'text' => 'Test şərh 1',
+                'status' => 'approved',
+                'is_read' => 'active'
+            ],
+            [
+                'user_id' => null,
+                'product_id' => 47,
+                'text' => 'Test şərh 2',
+                'status' => 'approved',
+                'is_read' => 'active'
+            ]
+        ];
 
-        foreach ($comments as $comment) {
-            // 2. Hər şərh üçün 3 cavab yaradaq
-            for ($i = 1; $i <= 3; $i++) {
+        foreach ($commentsData as $data) {
+            $comment = Comment::create($data);
+
+            // Hər şərh üçün 2 cavab əlavə edək
+            for ($i = 1; $i <= 2; $i++) {
                 CommentAnswer::create([
                     'comment_id' => $comment->id,
-                    'text' => "Bu, şərh #{$comment->id} üçün test cavabıdır $i",
+                    'text' => "Şərh #{$comment->id} üçün cavab $i",
                 ]);
             }
         }
