@@ -167,16 +167,28 @@ class FavoriteController extends Controller
                 ]);
     
                 // Images
-                $imagesWithColors = $product->images->map(fn($image) => [
-                    'id' => $image->id,
-                    'image_url' => $image->image ? asset('storage/' . $image->image) : null,
-                    'is_main' => $image->is_main,
-                    'order' => $image->order,
-                    'color' => $image->color ? [
-                        'id' => $image->color->id,
-                        'color_code' => $image->color->color_code
-                    ] : null
-                ])->sortBy('order')->values();
+                // Images
+$imagesWithColors = $product->images->map(fn($image) => [
+    'id' => $image->id,
+    'image_url' => $image->image ? asset('storage/' . $image->image) : null,
+    'is_main' => $image->is_main,
+    'order' => $image->order,
+    'color_id' => $image->product_color_id // nested color yox, sadəcə id
+])->sortBy('order')->values();
+
+// Əgər heç bir şəkil yoxdursa, default əlavə et
+if ($imagesWithColors->isEmpty()) {
+    $imagesWithColors = collect([
+        [
+            'id' => time(), // random id
+            'image_url' => asset('images/default_image.webp'),
+            'is_main' => false,
+            'order' => 0,
+            'color_id' => null
+        ]
+    ]);
+}
+
     
                 // Discount price calculation
                 $discountPrice = $product->discount_percent > 0 
