@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Favorite;
 use App\Models\Product;
+use App\Models\ProductCategory;
+
 use App\Traits\LocaleFromHeader;
 
 class FavoriteController extends Controller
@@ -143,55 +145,62 @@ class FavoriteController extends Controller
                 'product_ids' => 'required|array|min:1|max:50',
                 'product_ids.*' => 'required|integer|min:1'
             ]);
-    
+
             $productIds = $request->input('product_ids', []);
-            $user = $request->user();
+            
+            // Get language ID from header using trait
             $languageId = $this->getLanguageIdFromHeader($request);
-    
-            if ($user) {
-                // Qeydiyyatlı istifadəçi üçün compare DB-dən
-                $compareProductIds = ProductCompare::where('user_id', $user->id)
-                    ->whereIn('product_id', $productIds)
-                    ->pluck('product_id')
-                    ->toArray();
-            } else {
-                // Qeydə alınmamış istifadəçi üçün session
-                $guestCompare = $request->session()->get('guest_compare', []);
-                $compareProductIds = array_intersect($guestCompare, $productIds);
-            }
-    
-            // Məhsulları götür
+            
+            // Get existing active products with all relationships
             $existingProducts = Product::active()
-                ->whereIn('id', $compareProductIds)
+                ->whereIn('id', $productIds)
                 ->with([
-                    'translates' => fn($q) => $q->where('language_id', $languageId),
-                    'images' => fn($q) => $q->where('status', true)->orderBy('order'),
-                    'images.color' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
-                    'categories.translates' => fn($q) => $q->where('language_id', $languageId),
-                    'types.translates' => fn($q) => $q->where('language_id', $languageId),
-                    'colors' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
+                    'translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'images' => function($query) {
+                        $query->where('status', true)->orderBy('order');
+                    },
+                    'images.color' => function($query) {
+                        $query->select('product_colors.id', 'product_colors.color_code');
+                    },
+                    'categories.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'types.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'colors' => function($query) {
+                        $query->select('product_colors.id', 'product_colors.color_code');
+                    }
                 ])
                 ->get();
-    
-            // Tapılmayan məhsullar
+            
+            // Find non-existing products
             $existingProductIds = $existingProducts->pluck('id')->toArray();
             $nonExistingProducts = array_diff($productIds, $existingProductIds);
-    
-            // Format məhsulların məlumatı
+            
+            // Format existing products data
             $productsData = $existingProducts->map(function ($product) use ($languageId) {
                 $translation = $product->translates->first();
-    
+                
+                // Find main image - first try to find is_main=true, then fallback to first image
                 $mainImage = $product->images->where('is_main', true)->first();
-                if (!$mainImage) $mainImage = $product->images->first();
-    
+                if (!$mainImage) {
+                    $mainImage = $product->images->first();
+                }
+                
+                // Get category information
                 $categorySlug = null;
                 $parentSlug = null;
-    
+                
                 if ($product->categories->isNotEmpty()) {
+                    // Get the first category (assuming products have one primary category)
                     $category = $product->categories->first();
                     $categoryTranslation = $category->translates->first();
                     $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
-    
+                    
+                    // Get parent slug if category has parent
                     if ($category->parent_id) {
                         $parentCategory = ProductCategory::find($category->parent_id);
                         if ($parentCategory) {
@@ -200,7 +209,7 @@ class FavoriteController extends Controller
                         }
                     }
                 }
-    
+                
                 $productTypes = $product->types->map(function ($type) {
                     $translation = $type->translates->first();
                     return [
@@ -208,14 +217,16 @@ class FavoriteController extends Controller
                         'title' => $translation ? $translation->title : ''
                     ];
                 });
-    
+                
+                // Get available colors for this product
                 $availableColors = $product->colors->map(function($color) {
                     return [
                         'id' => $color->id,
                         'color_code' => $color->color_code
                     ];
                 });
-    
+                
+                // Get all images with their colors
                 $imagesWithColors = $product->images->map(function($image) {
                     return [
                         'id' => $image->id,
@@ -228,7 +239,7 @@ class FavoriteController extends Controller
                         ] : null
                     ];
                 })->sortBy('order')->values();
-    
+                
                 return [
                     'id' => $product->id,
                     'title' => $translation ? $translation->title : '',
@@ -243,12 +254,12 @@ class FavoriteController extends Controller
                     'images' => $imagesWithColors
                 ];
             });
-    
+            
             return response()->json([
                 'success' => true,
                 'data' => $productsData
             ], 200);
-    
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -263,7 +274,6 @@ class FavoriteController extends Controller
             ], 500);
         }
     }
-    
 
  
 }
