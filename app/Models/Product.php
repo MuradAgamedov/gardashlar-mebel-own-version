@@ -234,11 +234,25 @@ public function apiData($languageId = null, $colorId = null)
     $images = $this->images()->where('status', true)->get()->map(function ($img) {
         return [
             'id' => $img->id,
-            'image_url' => $img->image ? asset('storage/'.$img->image) : null,
+            'image_url' => $img->image ? asset('storage/' . $img->image) : null,
             'color_id' => $img->product_color_id ?? null,
             'is_main' => $img->is_main
         ];
     });
+    
+    // Əgər heç bir şəkil yoxdursa, default əlavə et
+    if ($images->isEmpty()) {
+        $images = collect([
+            [
+                'id' => time(), // random id
+                'image_url' => asset('images/default_image.webp'),
+                'color_id' => null,
+                'is_main' => false
+            ]
+        ]);
+    }
+    
+    
 
     // Available colors
     $availableColors = $this->images()->whereNotNull('product_color_id')->pluck('product_color_id')->unique()->values();
