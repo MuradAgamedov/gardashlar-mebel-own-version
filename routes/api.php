@@ -66,6 +66,7 @@ use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\CompareController;
 
 
 // Language API Routes
@@ -272,10 +273,10 @@ Route::get('/products/{id}/detail-values', [ProductsController::class, 'detailVa
 Route::get('/products/{id}/detail-values/{detailValueId}/details', [ProductsController::class, 'detailValueDetails'])->name('api.products.detail-value-details');
 
 // Product Favorites Check API Route (No Authentication Required)
-Route::post('/products/favorites/dont-registered', [ProductsController::class, 'checkFavoriteProducts'])->name('api.products.favorites-check');
+Route::post('/products/favorites/dont-registered', [FavoriteController::class, 'checkFavoriteProducts'])->name('api.products.favorites-check');
 
 // Product Card Check API Route (No Authentication Required)
-Route::post('/products/card/dont-registered', [ProductsController::class, 'checkCardProducts'])->name('api.products.card-check');
+Route::post('/products/card/dont-registered', [FavoriteController::class, 'checkCardProducts'])->name('api.products.card-check');
 
 
 
@@ -287,15 +288,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/remove-favorite', [FavoriteController::class, 'removeFavorite'])->name('api.removeFavorite');
 
 
-    // Product Compare API Routes (Requires Authentication)
-    Route::post('/products/{id}/compare', [ProductsController::class, 'addToCompare'])->name('api.products.add-compare');
-    Route::delete('/products/{id}/compare', [ProductsController::class, 'removeFromCompare'])->name('api.products.remove-compare');
-    Route::get('/products/compare', [ProductsController::class, 'getCompareList'])->name('api.products.compare-list');
-    Route::delete('/products/compare/clear', [ProductsController::class, 'clearCompareList'])->name('api.products.clear-compare');
+
 
     Route::post('/add-cart', [CartController::class, 'addCart'])->name('api.addCart');
     Route::get('/get-cart', [CartController::class, 'getCart'])->name('api.getCart');
     Route::delete('/remove-cart', [CartController::class, 'removeCart'])->name('api.removeCart');
+
+
+
+    Route::post('/add-compare', [CompareController::class, 'addCompare'])->name('api.addCompare');
+    Route::get('/get-compare', [CompareController::class, 'getCompare'])->name('api.getCompare');
+
+
 
 
     

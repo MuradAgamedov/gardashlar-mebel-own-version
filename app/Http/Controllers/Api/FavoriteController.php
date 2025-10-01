@@ -93,4 +93,377 @@ class FavoriteController extends Controller
             'message' => $deleted ? 'Favorite removed successfully!' : 'Favorite not found!'
         ]);
     }
+
+
+
+
+     /**
+     * @OA\Post(
+     *     path="/api/products/favorites/check",
+     *     operationId="checkFavoriteProducts",
+     *     tags={"Products"},
+     *     summary="Check if products exist (for non-registered users)",
+     *     description="Check if provided product IDs exist and are active",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="product_ids", type="array", @OA\Items(type="integer"), example={1, 2, 3, 4}, description="Array of product IDs to check")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="existing_products", type="array", @OA\Items(type="integer"), example={1, 2, 3}),
+     *                 @OA\Property(property="non_existing_products", type="array", @OA\Items(type="integer"), example={4}),
+     *                 @OA\Property(property="total_requested", type="integer", example=4),
+     *                 @OA\Property(property="total_existing", type="integer", example=3),
+     *                 @OA\Property(property="total_non_existing", type="integer", example=1)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid request",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validation error"),
+     *             @OA\Property(property="data", type="null")
+     *         )
+     *     )
+     * )
+     */
+    public function checkFavoriteProducts(Request $request)
+    {
+        try {
+            // Validate request
+            $request->validate([
+                'product_ids' => 'required|array|min:1|max:50',
+                'product_ids.*' => 'required|integer|min:1'
+            ]);
+
+            $productIds = $request->input('product_ids', []);
+            
+            // Get language ID from header using trait
+            $languageId = $this->getLanguageIdFromHeader($request);
+            
+            // Get existing active products with all relationships
+            $existingProducts = Product::active()
+                ->whereIn('id', $productIds)
+                ->with([
+                    'translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'images' => function($query) {
+                        $query->where('status', true)->orderBy('order');
+                    },
+                    'images.color' => function($query) {
+                        $query->select('product_colors.id', 'product_colors.color_code');
+                    },
+                    'categories.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'types.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'colors' => function($query) {
+                        $query->select('product_colors.id', 'product_colors.color_code');
+                    }
+                ])
+                ->get();
+            
+            // Find non-existing products
+            $existingProductIds = $existingProducts->pluck('id')->toArray();
+            $nonExistingProducts = array_diff($productIds, $existingProductIds);
+            
+            // Format existing products data
+            $productsData = $existingProducts->map(function ($product) use ($languageId) {
+                $translation = $product->translates->first();
+                
+                // Find main image - first try to find is_main=true, then fallback to first image
+                $mainImage = $product->images->where('is_main', true)->first();
+                if (!$mainImage) {
+                    $mainImage = $product->images->first();
+                }
+                
+                // Get category information
+                $categorySlug = null;
+                $parentSlug = null;
+                
+                if ($product->categories->isNotEmpty()) {
+                    // Get the first category (assuming products have one primary category)
+                    $category = $product->categories->first();
+                    $categoryTranslation = $category->translates->first();
+                    $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
+                    
+                    // Get parent slug if category has parent
+                    if ($category->parent_id) {
+                        $parentCategory = ProductCategory::find($category->parent_id);
+                        if ($parentCategory) {
+                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
+                            $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
+                        }
+                    }
+                }
+                
+                $productTypes = $product->types->map(function ($type) {
+                    $translation = $type->translates->first();
+                    return [
+                        'id' => $type->id,
+                        'title' => $translation ? $translation->title : ''
+                    ];
+                });
+                
+                // Get available colors for this product
+                $availableColors = $product->colors->map(function($color) {
+                    return [
+                        'id' => $color->id,
+                        'color_code' => $color->color_code
+                    ];
+                });
+                
+                // Get all images with their colors
+                $imagesWithColors = $product->images->map(function($image) {
+                    return [
+                        'id' => $image->id,
+                        'image_url' => $image->image ? asset('storage/' . $image->image) : null,
+                        'is_main' => $image->is_main,
+                        'order' => $image->order,
+                        'color' => $image->color ? [
+                            'id' => $image->color->id,
+                            'color_code' => $image->color->color_code
+                        ] : null
+                    ];
+                })->sortBy('order')->values();
+                
+                return [
+                    'id' => $product->id,
+                    'title' => $translation ? $translation->title : '',
+                    'slug' => $translation ? $translation->slug : '',
+                    'price' => $product->price,
+                    'view_count' => $product->view_count,
+                    'discount_percent' => $product->discount_percent,
+                    'category_slug' => $categorySlug,
+                    'parentSlug' => $parentSlug,
+                    'product_types' => $productTypes,
+                    'available_colors' => $availableColors,
+                    'images' => $imagesWithColors
+                ];
+            });
+            
+            return response()->json([
+                'success' => true,
+                'data' => $productsData
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? []),
+                'data' => null
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Məhsulları yoxlayarkən xəta baş verdi: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/products/card/dont-registered",
+     *     operationId="checkCardProducts",
+     *     tags={"Products"},
+     *     summary="Check if products exist for card (for non-registered users)",
+     *     description="Check if provided product IDs exist and are active for card functionality",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="product_ids", type="array", @OA\Items(type="integer"), example={1, 2, 3, 4}, description="Array of product IDs to check")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="title", type="string", example="Product Title"),
+     *                 @OA\Property(property="slug", type="string", example="product-slug"),
+     *                 @OA\Property(property="price", type="number", example=99.99),
+     *                 @OA\Property(property="view_count", type="integer", example=150),
+     *                 @OA\Property(property="discount_percent", type="integer", example=10),
+     *                 @OA\Property(property="category_slug", type="string", example="category-slug"),
+     *                 @OA\Property(property="parentSlug", type="string", example="parent-category-slug"),
+     *                 @OA\Property(property="product_types", type="array", @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="title", type="string", example="Type Title")
+     *                 )),
+     *                 @OA\Property(property="available_colors", type="array", @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="color_code", type="string", example="#FF0000")
+     *                 )),
+     *                 @OA\Property(property="images", type="array", @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="image_url", type="string", example="http://example.com/image.jpg"),
+     *                     @OA\Property(property="is_main", type="boolean", example=true),
+     *                     @OA\Property(property="order", type="integer", example=1),
+     *                     @OA\Property(property="color", type="object", nullable=true)
+     *                 ))
+     *             ))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid request",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validation error"),
+     *             @OA\Property(property="data", type="null")
+     *         )
+     *     )
+     * )
+     */
+    public function checkCardProducts(Request $request)
+    {
+        try {
+            // Validate request
+            $request->validate([
+                'product_ids' => 'required|array|min:1|max:50',
+                'product_ids.*' => 'required|integer|min:1'
+            ]);
+
+            $productIds = $request->input('product_ids', []);
+            
+            // Get language ID from header using trait
+            $languageId = $this->getLanguageIdFromHeader($request);
+            
+            // Get existing active products with all relationships
+            $existingProducts = Product::active()
+                ->whereIn('id', $productIds)
+                ->with([
+                    'translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'images' => function($query) {
+                        $query->where('status', true)->orderBy('order');
+                    },
+                    'images.color' => function($query) {
+                        $query->select('product_colors.id', 'product_colors.color_code');
+                    },
+                    'categories.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'types.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    },
+                    'colors' => function($query) {
+                        $query->select('product_colors.id', 'product_colors.color_code');
+                    }
+                ])
+                ->get();
+            
+            // Find non-existing products
+            $existingProductIds = $existingProducts->pluck('id')->toArray();
+            $nonExistingProducts = array_diff($productIds, $existingProductIds);
+            
+            // Format existing products data
+            $productsData = $existingProducts->map(function ($product) use ($languageId) {
+                $translation = $product->translates->first();
+                
+                // Find main image - first try to find is_main=true, then fallback to first image
+                $mainImage = $product->images->where('is_main', true)->first();
+                if (!$mainImage) {
+                    $mainImage = $product->images->first();
+                }
+                
+                // Get category information
+                $categorySlug = null;
+                $parentSlug = null;
+                
+                if ($product->categories->isNotEmpty()) {
+                    // Get the first category (assuming products have one primary category)
+                    $category = $product->categories->first();
+                    $categoryTranslation = $category->translates->first();
+                    $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
+                    
+                    // Get parent slug if category has parent
+                    if ($category->parent_id) {
+                        $parentCategory = ProductCategory::find($category->parent_id);
+                        if ($parentCategory) {
+                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
+                            $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
+                        }
+                    }
+                }
+                
+                $productTypes = $product->types->map(function ($type) {
+                    $translation = $type->translates->first();
+                    return [
+                        'id' => $type->id,
+                        'title' => $translation ? $translation->title : ''
+                    ];
+                });
+                
+                // Get available colors for this product
+                $availableColors = $product->colors->map(function($color) {
+                    return [
+                        'id' => $color->id,
+                        'color_code' => $color->color_code
+                    ];
+                });
+                
+                // Get all images with their colors
+                $imagesWithColors = $product->images->map(function($image) {
+                    return [
+                        'id' => $image->id,
+                        'image_url' => $image->image ? asset('storage/' . $image->image) : null,
+                        'is_main' => $image->is_main,
+                        'order' => $image->order,
+                        'color' => $image->color ? [
+                            'id' => $image->color->id,
+                            'color_code' => $image->color->color_code
+                        ] : null
+                    ];
+                })->sortBy('order')->values();
+                
+                return [
+                    'id' => $product->id,
+                    'title' => $translation ? $translation->title : '',
+                    'slug' => $translation ? $translation->slug : '',
+                    'price' => $product->price,
+                    'view_count' => $product->view_count,
+                    'discount_percent' => $product->discount_percent,
+                    'category_slug' => $categorySlug,
+                    'parentSlug' => $parentSlug,
+                    'product_types' => $productTypes,
+                    'available_colors' => $availableColors,
+                    'images' => $imagesWithColors
+                ];
+            });
+            
+            return response()->json([
+                'success' => true,
+                'data' => $productsData
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? []),
+                'data' => null
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Məhsulları yoxlayarkən xəta baş verdi: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
+    }
 }
