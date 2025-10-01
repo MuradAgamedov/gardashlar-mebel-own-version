@@ -272,11 +272,16 @@ Route::get('/products/{id}/details', [ProductsController::class, 'details'])->na
 Route::get('/products/{id}/detail-values', [ProductsController::class, 'detailValues'])->name('api.products.detail-values');
 Route::get('/products/{id}/detail-values/{detailValueId}/details', [ProductsController::class, 'detailValueDetails'])->name('api.products.detail-value-details');
 
-// Product Favorites Check API Route (No Authentication Required)
 Route::post('/products/favorites/dont-registered', [FavoriteController::class, 'checkFavoriteProducts'])->name('api.products.favorites-check');
 
+Route::post('/products/compare/dont-registered', [CompareController::class, 'checkCompareProducts'])->name('api.products.compare-check');
+
+
+
+
+
 // Product Card Check API Route (No Authentication Required)
-Route::post('/products/card/dont-registered', [FavoriteController::class, 'checkCardProducts'])->name('api.products.card-check');
+Route::post('/products/card/dont-registered', [CardController::class, 'checkCardProducts'])->name('api.products.card-check');
 
 
 
@@ -293,7 +298,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/add-cart', [CartController::class, 'addCart'])->name('api.addCart');
     Route::get('/get-cart', [CartController::class, 'getCart'])->name('api.getCart');
     Route::delete('/remove-cart', [CartController::class, 'removeCart'])->name('api.removeCart');
-
+    Route::delete('/remove-compare', [CompareController::class, 'removeCompare'])->name('api.removeCompare');
 
 
     Route::post('/add-compare', [CompareController::class, 'addCompare'])->name('api.addCompare');

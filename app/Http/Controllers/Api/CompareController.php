@@ -191,6 +191,142 @@ class CompareController extends Controller
         ]);
     }
     
+
+    public function checkCompareProducts(Request $request)
+    {
+        try {
+            $user = $request->user();
+    
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You must be logged in!',
+                    'data' => null
+                ], 401);
+            }
+    
+            // Validate request
+            $request->validate([
+                'product_ids' => 'required|array|min:1|max:50',
+                'product_ids.*' => 'required|integer|min:1'
+            ]);
+    
+            $productIds = $request->input('product_ids');
+    
+            // Yalnız istifadəçinin compare-də olan məhsulları yoxla
+            $compareProductIds = ProductCompare::where('user_id', $user->id)
+                ->whereIn('product_id', $productIds)
+                ->pluck('product_id')
+                ->toArray();
+    
+            if (empty($compareProductIds)) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'existing_products' => [],
+                        'non_existing_product_ids' => $productIds
+                    ],
+                    'message' => 'No products from your list found in compare.'
+                ]);
+            }
+    
+            $languageId = $request->header('language_id') ?? Language::getMainLanguage()->id;
+    
+            $existingProducts = Product::active()
+                ->whereIn('id', $compareProductIds)
+                ->with([
+                    'translates' => fn($q) => $q->where('language_id', $languageId),
+                    'images' => fn($q) => $q->where('status', true)->orderBy('order'),
+                    'images.color' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
+                    'categories.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'types.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'colors' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code')
+                ])
+                ->get();
+    
+            $existingProductIds = $existingProducts->pluck('id')->toArray();
+            $nonExistingProductIds = array_diff($productIds, $existingProductIds);
+    
+            $productsData = $existingProducts->map(function ($product) use ($languageId) {
+                $translation = $product->translates->first();
+    
+                $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
+    
+                $categorySlug = null;
+                $parentSlug = null;
+    
+                if ($product->categories->isNotEmpty()) {
+                    $category = $product->categories->first();
+                    $categoryTranslation = $category->translates->first();
+                    $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
+    
+                    if ($category->parent_id) {
+                        $parentCategory = ProductCategory::find($category->parent_id);
+                        if ($parentCategory) {
+                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
+                            $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
+                        }
+                    }
+                }
+    
+                $productTypes = $product->types->map(fn($type) => [
+                    'id' => $type->id,
+                    'title' => $type->translates->first()?->title ?? ''
+                ]);
+    
+                $availableColors = $product->colors->map(fn($color) => [
+                    'id' => $color->id,
+                    'color_code' => $color->color_code
+                ]);
+    
+                $imagesWithColors = $product->images->map(fn($image) => [
+                    'id' => $image->id,
+                    'image_url' => $image->image ? asset('storage/' . $image->image) : null,
+                    'is_main' => $image->is_main,
+                    'order' => $image->order,
+                    'color' => $image->color ? [
+                        'id' => $image->color->id,
+                        'color_code' => $image->color->color_code
+                    ] : null
+                ])->sortBy('order')->values();
+    
+                return [
+                    'id' => $product->id,
+                    'title' => $translation ? $translation->title : '',
+                    'slug' => $translation ? $translation->slug : '',
+                    'price' => $product->price,
+                    'discount_percent' => $product->discount_percent,
+                    'category_slug' => $categorySlug,
+                    'parent_category_slug' => $parentSlug,
+                    'product_types' => $productTypes,
+                    'available_colors' => $availableColors,
+                    'images' => $imagesWithColors
+                ];
+            });
+    
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'existing_products' => $productsData,
+                    'non_existing_product_ids' => array_values($nonExistingProductIds),
+                ]
+            ]);
+    
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? []),
+                'data' => null
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error checking compare products: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
+    }
+    
     
     
     

@@ -86,4 +86,115 @@ class CartController extends Controller
             'message' => $deleted ? 'Product removed from cart successfully!' : 'Product not found in cart!'
         ]);
     }
+
+
+    public function removeCompare(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                "success" => false,
+                "message" => "You must be logged in!"
+            ], 401);
+        }
+
+        $deleted = ProductCompare::where('user_id', $user->id)
+            ->where('product_id', $request->product_id)
+            ->delete();
+
+        return response()->json([
+            'success' => (bool) $deleted,
+            'message' => $deleted ? 'Product removed from compare successfully!' : 'Product not found in compare list!'
+        ]);
+    }
+
+    public function checkCompareProducts(Request $request)
+{
+    try {
+        // Validate request
+        $request->validate([
+            'product_ids' => 'required|array|min:1|max:50',
+            'product_ids.*' => 'required|integer|min:1'
+        ]);
+
+        $productIds = $request->input('product_ids', []);
+        $user = $request->user();
+        $languageId = $this->getLanguageIdFromHeader($request);
+
+        if ($user) {
+            // İstifadəçi varsa, compare DB-dən götür
+            $compareProductIds = ProductCompare::where('user_id', $user->id)
+                ->whereIn('product_id', $productIds)
+                ->pluck('product_id')
+                ->toArray();
+        } else {
+            // Qeydiyyatsız üçün session
+            $guestCompare = $request->session()->get('guest_compare', []);
+            $compareProductIds = array_intersect($guestCompare, $productIds);
+        }
+
+        // Məhsulları DB-dən götür
+        $products = Product::whereIn('id', $compareProductIds)
+            ->active()
+            ->with([
+                'translates' => fn($q) => $q->where('language_id', $languageId),
+                'images' => fn($q) => $q->where('status', true)->orderBy('order'),
+                'categories.translates' => fn($q) => $q->where('language_id', $languageId),
+            ])
+            ->get()
+            ->map(function ($product) use ($languageId) {
+                $translation = $product->translates->first();
+                $mainImage = $product->images->where('is_main', true)->first();
+                if (!$mainImage) $mainImage = $product->images->first();
+
+                $category = $product->categories->first();
+                $categorySlug = $category ? $category->translates->first()?->slug : null;
+                $parentSlug = $category && $category->parent_id
+                    ? $category->parent->translates->first()?->slug
+                    : null;
+
+                return [
+                    'id' => $product->id,
+                    'title' => $translation ? $translation->title : '',
+                    'slug' => $translation ? $translation->slug : '',
+                    'price' => $product->price,
+                    'discount_percent' => $product->discount_percent,
+                    'category_slug' => $categorySlug,
+                    'parent_slug' => $parentSlug,
+                    'images' => $product->images->map(fn($img) => [
+                        'id' => $img->id,
+                        'image_url' => $img->image ? asset('storage/' . $img->image) : null,
+                        'is_main' => $img->is_main
+                    ]),
+                ];
+            });
+
+        // Tapılmayan məhsullar
+        $existingProductIds = $products->pluck('id')->toArray();
+        $nonExistingProducts = array_diff($productIds, $existingProductIds);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'products' => $products,
+                'not_found' => array_values($nonExistingProducts)
+            ]
+        ], 200);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? []),
+            'data' => null
+        ], 400);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error checking compare products: ' . $e->getMessage(),
+            'data' => null
+        ], 500);
+    }
+}
+
 }
