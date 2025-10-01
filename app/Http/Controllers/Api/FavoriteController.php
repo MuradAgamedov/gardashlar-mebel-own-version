@@ -123,8 +123,8 @@ class FavoriteController extends Controller
                     'categories.translates' => fn($q) => $q->where('language_id', $languageId),
                     'types.translates' => fn($q) => $q->where('language_id', $languageId),
                     'colors' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
-                    'details',           // Assuming relation Product->details exists
-                    'detailValues'       // Assuming relation Product->detailValues exists
+                    'details',
+                    'detailValues'
                 ])
                 ->get();
     
@@ -135,18 +135,23 @@ class FavoriteController extends Controller
                 // Main image
                 $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
     
-                // Category & parent
+                // Category & parent category (slug + title)
                 $categorySlug = null;
+                $categoryTitle = null;
                 $parentSlug = null;
+                $parentTitle = null;
+    
                 if ($product->categories->isNotEmpty()) {
                     $category = $product->categories->first();
                     $categoryTranslation = $category->translates->first();
                     $categorySlug = $categoryTranslation?->slug;
+                    $categoryTitle = $categoryTranslation?->title;
     
                     if ($category->parent_id) {
                         $parentCategory = ProductCategory::find($category->parent_id);
                         $parentTranslation = $parentCategory?->translates()->where('language_id', $languageId)->first();
                         $parentSlug = $parentTranslation?->slug;
+                        $parentTitle = $parentTranslation?->title;
                     }
                 }
     
@@ -185,7 +190,9 @@ class FavoriteController extends Controller
                     'title' => $translation?->title ?? '',
                     'available_colors' => $availableColors,
                     'category_slug' => $categorySlug,
+                    'category_title' => $categoryTitle,
                     'parent_slug' => $parentSlug,
+                    'parent_title' => $parentTitle,
                     'discount_price' => $discountPrice,
                     'discount_percent' => $product->discount_percent,
                     'price' => $product->price,
@@ -216,6 +223,7 @@ class FavoriteController extends Controller
             ], 500);
         }
     }
+    
     
 
  

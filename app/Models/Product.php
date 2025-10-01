@@ -182,6 +182,7 @@ class Product extends Model
 // Product modelində əlavə et
 public function apiData($languageId = null, $colorId = null)
 {
+    // Default language
     if (!$languageId) {
         $languageId = app()->getLocale();
     }
@@ -229,7 +230,7 @@ public function apiData($languageId = null, $colorId = null)
         ];
     });
 
-    // 🔹 Bütün şəkillər (order-lə işimiz yoxdur)
+    // Bütün şəkillər
     $images = $this->images()->where('status', true)->get()->map(function ($img) {
         return [
             'id' => $img->id,
@@ -239,7 +240,7 @@ public function apiData($languageId = null, $colorId = null)
         ];
     });
 
-    // Colors
+    // Available colors
     $availableColors = $this->images()->whereNotNull('product_color_id')->pluck('product_color_id')->unique()->values();
     $availableColorDetails = [];
     if ($availableColors->isNotEmpty()) {
@@ -251,20 +252,24 @@ public function apiData($languageId = null, $colorId = null)
         });
     }
 
-    // Category & Parent Slug məntiqi
+    // Category & Parent Category (slug və title)
     $categorySlug = null;
+    $categoryTitle = null;
     $parentSlug = null;
+    $parentTitle = null;
 
     if ($this->categories->isNotEmpty()) {
         $category = $this->categories->first(); // əsas category
         $catTranslation = $category->translates()->where('language_id', $languageId)->first();
         $categorySlug = $catTranslation ? $catTranslation->slug : null;
+        $categoryTitle = $catTranslation ? $catTranslation->title : null;
 
         if ($category->parent_id) {
             $parentCategory = ProductCategory::find($category->parent_id);
             if ($parentCategory) {
                 $parentTr = $parentCategory->translates()->where('language_id', $languageId)->first();
                 $parentSlug = $parentTr ? $parentTr->slug : null;
+                $parentTitle = $parentTr ? $parentTr->title : null;
             }
         }
     }
@@ -287,9 +292,11 @@ public function apiData($languageId = null, $colorId = null)
         'product_details' => $productDetails,
         'product_detail_values' => $productDetailValues,
         'available_colors' => $availableColorDetails,
-        'images' => $images, // 🔹 bütün şəkillər gəlir
+        'images' => $images,
         'category_slug' => $categorySlug,
-        'parent_slug' => $parentSlug
+        'category_title' => $categoryTitle,
+        'parent_slug' => $parentSlug,
+        'parent_title' => $parentTitle
     ];
 }
 
