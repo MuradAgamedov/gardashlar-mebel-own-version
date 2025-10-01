@@ -109,7 +109,7 @@ class CartController extends Controller
         ]);
     }
 
-    public function checkCompareProducts(Request $request)
+    public function checkCardProducts(Request $request)
 {
     try {
         // Validate request
