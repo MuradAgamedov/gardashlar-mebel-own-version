@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
+use App\Models\CommentAnswer;
+
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
