@@ -90,7 +90,6 @@ class CartController extends Controller
 
 
 
-
     public function checkCardProducts(Request $request)
     {
         try {
@@ -111,8 +110,8 @@ class CartController extends Controller
                     ->pluck('product_id')
                     ->toArray();
             } else {
-                // Qeydiyyatsız user üçün session istifadə edilmir
-                $compareProductIds = $productIds; 
+                // Guest üçün sadəcə gələn id-ləri yoxlayırıq
+                $compareProductIds = $productIds;
             }
     
             // Məhsulları DB-dən götür
@@ -151,32 +150,27 @@ class CartController extends Controller
                     ];
                 });
     
-            // Tapılmayan məhsullar
-            $existingProductIds = $products->pluck('id')->toArray();
-            $nonExistingProducts = array_diff($productIds, $existingProductIds);
-    
             return response()->json([
                 'success' => true,
-                'data' => [
-                    'products' => $products,
-                    'not_found' => array_values($nonExistingProducts)
-                ]
-            ], 200);
+                'data' => $products,
+                'message' => true
+            ]);
     
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? []),
-                'data' => null
+                'data' => null,
+                'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? [])
             ], 400);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error checking compare products: ' . $e->getMessage(),
-                'data' => null
+                'data' => null,
+                'message' => 'Error checking compare products: ' . $e->getMessage()
             ], 500);
         }
     }
+    
     
 
 }
