@@ -135,7 +135,7 @@ class FavoriteController extends Controller
      *     )
      * )
      */
-    public function checkCompareProducts(Request $request)
+    public function checkFavoriteProducts(Request $request)
     {
         try {
             // Validate request

@@ -281,7 +281,7 @@ Route::post('/products/compare/dont-registered', [CompareController::class, 'che
 
 
 // Product Card Check API Route (No Authentication Required)
-Route::post('/products/card/dont-registered', [CardController::class, 'checkCardProducts'])->name('api.products.card-check');
+Route::post('/products/card/dont-registered', [CartController::class, 'checkCardProducts'])->name('api.products.card-check');
 
 
 
