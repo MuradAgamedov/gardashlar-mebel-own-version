@@ -1012,7 +1012,16 @@ class ProductsController extends Controller
                     'parent_title' => $parentTitle
                 ];
             });
-    
+                // Comments ilə birlikdə əlavə et
+            $comments = $product->comments()->with('user', 'answers')->get()->map(function ($comment) {
+                return [
+                    'id' => $comment->id,
+                    'user_name' => $comment->user ? $comment->user->name . ' ' . $comment->user->surname : 'Unknown',
+                    'text' => $comment->text,
+                    'answers' => $comment->answers->pluck('text') // sadəcə text
+                ];
+            });
+
             // Product əsas data
             $productData = [
                 'id' => $product->id,
@@ -1029,7 +1038,8 @@ class ProductsController extends Controller
                 'product_detail_values' => $productDetailValues,
                 'available_colors' => $availableColorDetails,
                 'images' => $productImages,
-                'categories' => $productCategories
+                'categories' => $productCategories,
+                'comments' => $comments 
             ];
     
             // --- Similar məhsullar (eyni kategoriyadan) ---
