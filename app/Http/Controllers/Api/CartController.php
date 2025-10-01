@@ -110,91 +110,129 @@ class CartController extends Controller
     }
 
     public function checkCardProducts(Request $request)
-{
-    try {
-        // Validate request
-        $request->validate([
-            'product_ids' => 'required|array|min:1|max:50',
-            'product_ids.*' => 'required|integer|min:1'
-        ]);
-
-        $productIds = $request->input('product_ids', []);
-        $user = $request->user();
-        $languageId = $this->getLanguageIdFromHeader($request);
-
-        if ($user) {
-            // İstifadəçi varsa, compare DB-dən götür
-            $compareProductIds = ProductCompare::where('user_id', $user->id)
-                ->whereIn('product_id', $productIds)
-                ->pluck('product_id')
-                ->toArray();
-        } else {
-            // Qeydiyyatsız üçün session
-            $guestCompare = $request->session()->get('guest_compare', []);
-            $compareProductIds = array_intersect($guestCompare, $productIds);
+    {
+        try {
+            // Validate request
+            $request->validate([
+                'product_ids' => 'required|array|min:1|max:50',
+                'product_ids.*' => 'required|integer|min:1'
+            ]);
+    
+            $productIds = $request->input('product_ids', []);
+            $user = $request->user();
+            $languageId = $this->getLanguageIdFromHeader($request);
+    
+            if ($user) {
+                // İstifadəçi varsa, compare DB-dən götür
+                $compareProductIds = ProductCompare::where('user_id', $user->id)
+                    ->whereIn('product_id', $productIds)
+                    ->pluck('product_id')
+                    ->toArray();
+            } else {
+                // Qeydiyyatsız üçün session
+                $guestCompare = $request->session()->get('guest_compare', []);
+                $compareProductIds = array_intersect($guestCompare, $productIds);
+            }
+    
+            // Məhsulları DB-dən götür
+            $products = Product::whereIn('id', $compareProductIds)
+                ->active()
+                ->with([
+                    'translates' => fn($q) => $q->where('language_id', $languageId),
+                    'images' => fn($q) => $q->where('status', true)->orderBy('order'),
+                    'images.color',
+                    'categories.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'types.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'colors',
+                    'details.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'detailValues.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'detailValues.details.translates' => fn($q) => $q->where('language_id', $languageId),
+                ])
+                ->get()
+                ->map(function ($product) use ($languageId) {
+                    $translation = $product->translates->first();
+                    $mainImage = $product->images->where('is_main', true)->first();
+                    if (!$mainImage) $mainImage = $product->images->first();
+    
+                    $category = $product->categories->first();
+                    $categorySlug = $category ? $category->translates->first()?->slug : null;
+                    $parentSlug = $category && $category->parent_id
+                        ? $category->parent->translates->first()?->slug
+                        : null;
+    
+                    return [
+                        'id' => $product->id,
+                        'title' => $translation ? $translation->title : '',
+                        'slug' => $translation ? $translation->slug : '',
+                        'price' => $product->price,
+                        'discount_price' => $product->discount_percent > 0 
+                            ? $product->price - ($product->price * $product->discount_percent / 100) 
+                            : null,
+                        'discount_percent' => $product->discount_percent,
+                        'category_slug' => $categorySlug,
+                        'parent_slug' => $parentSlug,
+                        'available_colors' => $product->colors->map(fn($color) => [
+                            'id' => $color->id,
+                            'color_code' => $color->color_code
+                        ]),
+                        'images' => $product->images->map(fn($img) => [
+                            'id' => $img->id,
+                            'image_url' => $img->image ? asset('storage/' . $img->image) : null,
+                            'is_main' => $img->is_main,
+                            'order' => $img->order,
+                            'color' => $img->color ? [
+                                'id' => $img->color->id,
+                                'color_code' => $img->color->color_code
+                            ] : null
+                        ])->sortBy('order')->values(),
+                        'product_details' => $product->details->map(fn($d) => [
+                            'id' => $d->id,
+                            'keyword' => $d->translates->first()?->keyword,
+                            'value' => $d->translates->first()?->value
+                        ]),
+                        'product_detail_values' => $product->detailValues->map(fn($v) => [
+                            'id' => $v->id,
+                            'keyword' => $v->translates->first()?->keyword,
+                            'details' => $v->details->map(fn($d) => [
+                                'id' => $d->id,
+                                'keyword' => $d->translates->first()?->keyword,
+                                'value' => $d->translates->first()?->value
+                            ])
+                        ]),
+                        'product_types' => $product->types->map(fn($t) => [
+                            'id' => $t->id,
+                            'title' => $t->translates->first()?->title
+                        ]),
+                        'view_count' => $product->view_count,
+                    ];
+                });
+    
+            // Tapılmayan məhsullar
+            $existingProductIds = $products->pluck('id')->toArray();
+            $nonExistingProducts = array_diff($productIds, $existingProductIds);
+    
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'products' => $products,
+                    'not_found' => array_values($nonExistingProducts)
+                ]
+            ], 200);
+    
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? []),
+                'data' => null
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error checking compare products: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
         }
-
-        // Məhsulları DB-dən götür
-        $products = Product::whereIn('id', $compareProductIds)
-            ->active()
-            ->with([
-                'translates' => fn($q) => $q->where('language_id', $languageId),
-                'images' => fn($q) => $q->where('status', true)->orderBy('order'),
-                'categories.translates' => fn($q) => $q->where('language_id', $languageId),
-            ])
-            ->get()
-            ->map(function ($product) use ($languageId) {
-                $translation = $product->translates->first();
-                $mainImage = $product->images->where('is_main', true)->first();
-                if (!$mainImage) $mainImage = $product->images->first();
-
-                $category = $product->categories->first();
-                $categorySlug = $category ? $category->translates->first()?->slug : null;
-                $parentSlug = $category && $category->parent_id
-                    ? $category->parent->translates->first()?->slug
-                    : null;
-
-                return [
-                    'id' => $product->id,
-                    'title' => $translation ? $translation->title : '',
-                    'slug' => $translation ? $translation->slug : '',
-                    'price' => $product->price,
-                    'discount_percent' => $product->discount_percent,
-                    'category_slug' => $categorySlug,
-                    'parent_slug' => $parentSlug,
-                    'images' => $product->images->map(fn($img) => [
-                        'id' => $img->id,
-                        'image_url' => $img->image ? asset('storage/' . $img->image) : null,
-                        'is_main' => $img->is_main
-                    ]),
-                ];
-            });
-
-        // Tapılmayan məhsullar
-        $existingProductIds = $products->pluck('id')->toArray();
-        $nonExistingProducts = array_diff($productIds, $existingProductIds);
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'products' => $products,
-                'not_found' => array_values($nonExistingProducts)
-            ]
-        ], 200);
-
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? []),
-            'data' => null
-        ], 400);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Error checking compare products: ' . $e->getMessage(),
-            'data' => null
-        ], 500);
     }
-}
+    
 
 }
