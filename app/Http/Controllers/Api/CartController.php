@@ -48,24 +48,42 @@ class CartController extends Controller
     {
         $languageId = $this->getLanguageIdFromHeader($request);
         $user = $request->user();
-
+    
         $carts = $user->cart()->with(['product.projectCategory', 'product.images'])->get();
-
-        $cartData = $carts->map(function ($cart) use ($languageId) {
+    
+        $cartData = $carts->map(function ($cart) use ($languageId, $user) {
+            $product = $cart->product ? $cart->product->apiData($languageId) : null;
+    
             return [
-                'cart_id' => $cart->id,
-                'count' => $cart->count,
-                'product' => $cart->product ? $cart->product->apiData($languageId) : null,
-                'color_id' => $cart->color_id,
+                'cart_id'   => $cart->id,
+                'count'     => $cart->count,
+                'color_id'  => $cart->color_id,
+                'product'   => $product,
+    
+                // 🔹 əlavə etdiklərin:
+                'inCart' => [
+                    'isActive' => true,
+                    'color_id' => $cart->color_id,
+                    'count'    => $cart->count,
+                ],
+                'inFavorite' => [
+                    'isActive' => $user->favorites()
+                                        ->where('product_id', $cart->product_id)
+                                        ->where('color_id', $cart->color_id)
+                                        ->exists(),
+                    'color_id' => $cart->color_id,
+                ],
+                'inCompare' => \App\Models\ProductCompare::where('product_id', $cart->product_id)->exists(),
             ];
         });
-
+    
         return response()->json([
             'success' => true,
-            "data" => $cartData,
-            "message" => true
+            "data"    => $cartData,
+            "message" => "Cart fetched successfully"
         ]);
     }
+    
 
     public function removeCart(Request $request)
     {

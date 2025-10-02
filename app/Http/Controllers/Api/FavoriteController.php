@@ -53,30 +53,51 @@ class FavoriteController extends Controller
     {
         $languageId = $this->getLanguageIdFromHeader($request);
         $user = $request->user();
-
+    
         if (!$user) {
             return response()->json([
                 "success" => false,
                 "message" => "You must be logged in!"
             ], 401);
         }
-
+    
         $favorites = $user->favorites()->with(['product.projectCategory', 'product.images'])->get();
-
-        $favoriteData = $favorites->map(function ($fav) use ($languageId) {
+    
+        $favoriteData = $favorites->map(function ($fav) use ($languageId, $user) {
+            $product = $fav->product ? $fav->product->apiData($languageId) : null;
+    
             return [
                 'favorite_id' => $fav->id,
-                'product' => $fav->product ? $fav->product->apiData($languageId) : null,
-                'color_id' => $fav->color_id,
+                'color_id'    => $fav->color_id,
+                'product'     => $product,
+    
+                // 🔹 Əlavə hissələr
+                'inFavorite' => [
+                    'isActive' => true,
+                    'color_id' => $fav->color_id,
+                ],
+                'inCart' => [
+                    'isActive' => $user->cart()
+                                       ->where('product_id', $fav->product_id)
+                                       ->where('color_id', $fav->color_id)
+                                       ->exists(),
+                    'color_id' => $fav->color_id,
+                    'count'    => optional($user->cart()
+                                               ->where('product_id', $fav->product_id)
+                                               ->where('color_id', $fav->color_id)
+                                               ->first())->count,
+                ],
+                'inCompare' => \App\Models\ProductCompare::where('product_id', $fav->product_id)->exists(),
             ];
         });
-
+    
         return response()->json([
             'success' => true,
-            "data" => $favoriteData,
-            "message" => true
+            "data"    => $favoriteData,
+            "message" => "Favorites fetched successfully"
         ]);
     }
+    
 
     /**
      * Favoriti sil
