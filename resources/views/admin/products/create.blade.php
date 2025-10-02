@@ -696,6 +696,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Product Categories Selection
+// Product Categories Selection (single but stored as array)
 document.addEventListener('DOMContentLoaded', function() {
     const categoriesInput = document.getElementById('categoriesInput');
     const categoriesDropdown = document.getElementById('categoriesDropdown');
@@ -731,7 +732,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function removeCategory(categoryId) {
-        selectedCategoryIds = selectedCategoryIds.filter(id => id !== categoryId);
+        selectedCategoryIds = [];
         renderSelectedCategories();
     }
     
@@ -742,7 +743,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function showCategoriesDropdown() {
         const searchTerm = categoriesInput.value.toLowerCase();
         const filteredCategories = availableCategories.filter(category => 
-            !selectedCategoryIds.includes(category.id) &&
             category.title.toLowerCase().includes(searchTerm)
         );
         
@@ -753,7 +753,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 option.className = 'tag-option';
                 option.textContent = category.title;
                 option.onclick = () => {
-                    selectedCategoryIds.push(category.id);
+                    // yalnız bir dənə seçilsin
+                    selectedCategoryIds = [category.id];
                     renderSelectedCategories();
                     categoriesInput.value = '';
                     hideCategoriesDropdown();
@@ -770,7 +771,6 @@ document.addEventListener('DOMContentLoaded', function() {
         categoriesDropdown.style.display = 'none';
     }
     
-    // Event listeners
     categoriesInput.addEventListener('input', showCategoriesDropdown);
     categoriesInput.addEventListener('focus', showCategoriesDropdown);
     
@@ -780,12 +780,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Initialize selected categories
+    // Initialize
     renderSelectedCategories();
     
-    // Make removeCategory function global
     window.removeCategory = removeCategory;
 });
+
 </script>
 @include('admin.partials.slug-generator')
 @endpush 
