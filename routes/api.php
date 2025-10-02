@@ -67,10 +67,14 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\CompareController;
+use App\Http\Controllers\Api\RoluteeteActionController;
+
 
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
+Route::get('/roluteete-actions', [RoluteeteActionController::class, 'index'])->name('api.roluteete-actions.index');
+
 
 // Dictionary API Routes
 Route::get('/dictionaries', [DictionaryController::class, 'index'])->name('api.dictionaries.index');
