@@ -15,51 +15,6 @@ class ProductTypeController extends Controller
 {
     use LocaleFromHeader;
 
-    /**
-     * @OA\Get(
-     *     path="/api/product-types",
-     *     operationId="getProductTypes",
-     *     tags={"Məhsul Növləri"},
-     *     summary="Get all active product types",
-     *     description="Returns a list of active product types with translations (id and title only)",
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language_id from languages api",
-     *         required=false,
-     *         @OA\Schema(
-     *             type="integer",
-     *             example=1
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful response",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="title", type="string", example="Electronics")
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving product types")
-     *         )
-     *     )
-     * )
-     */
     public function index(Request $request): JsonResponse
     {
         try {

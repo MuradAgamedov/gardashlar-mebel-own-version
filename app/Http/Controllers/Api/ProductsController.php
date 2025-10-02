@@ -16,248 +16,11 @@ use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
-/**
- * @OA\Tag(
- *     name="Products",
- *     description="API Endpoints for products and product categories"
- * )
- * 
- * @OA\SecurityScheme(
- *     securityScheme="bearerAuth",
- *     type="http",
- *     scheme="bearer",
- *     bearerFormat="JWT"
- * )
- */
+
 class ProductsController extends Controller
 {
     use LocaleFromHeader;
 
-    /**
-     * @OA\Get(
-     *     path="/api/products",
-     *     summary="Get all product categories with hierarchical structure",
-     *     tags={"Products"},
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language ID (1=az, 2=en, 3=ru)",
-     *         required=false,
-     *         @OA\Schema(type="integer", default=1)
-     *     ),
-     *     @OA\Parameter(
-     *         name="page",
-     *         in="query",
-     *         description="Page number",
-     *         required=false,
-     *         @OA\Schema(type="integer", default=1)
-     *     ),
-     *     @OA\Parameter(
-     *         name="per_page",
-     *         in="query",
-     *         description="Number of products per page",
-     *         required=false,
-     *         @OA\Schema(type="integer", default=12)
-     *     ),
-     *     @OA\Parameter(
-     *         name="category_slug",
-     *         in="query",
-     *         description="Filter products by category slug. If parent category, returns products from all children + parent. If child category, returns only products from that category.",
-     *         required=false,
-     *         @OA\Schema(type="string", example="masalar")
-     *     ),
-     *     @OA\Parameter(
-     *         name="sort",
-     *         in="query",
-     *         description="Sort products by: price_asc, price_desc, newest, oldest, view_count",
-     *         required=false,
-     *         @OA\Schema(type="string", example="price_asc")
-     *     ),
-     *     @OA\Parameter(
-     *         name="type_id",
-     *         in="query",
-     *         description="Filter products by type IDs (can be single value or multiple: type_id=1&type_id=2)",
-     *         required=false,
-     *         @OA\Schema(type="array", @OA\Items(type="integer"), example={1, 2, 3})
-     *     ),
-     *     @OA\Parameter(
-     *         name="filters",
-     *         in="query",
-     *         description="Price filter IDs (can be single value or multiple: filters=1&filters=2)",
-     *         required=false,
-     *         @OA\Schema(type="array", @OA\Items(type="integer"), example={1, 2, 3})
-     *     ),
-     *     @OA\Parameter(
-     *         name="color",
-     *         in="query",
-     *         description="Filter products by color IDs (can be single value or multiple: color=1&color=2) - products with images of these colors",
-     *         required=false,
-     *         @OA\Schema(type="array", @OA\Items(type="integer"), example={1, 2, 3})
-     *     ),
-     *     @OA\Parameter(
-     *         name="min_price",
-     *         in="query",
-     *         description="Minimum price filter (direct price parameter)",
-     *         required=false,
-     *         @OA\Schema(type="number", format="float", example=100.00)
-     *     ),
-     *     @OA\Parameter(
-     *         name="max_price",
-     *         in="query",
-     *         description="Maximum price filter (direct price parameter)",
-     *         required=false,
-     *         @OA\Schema(type="number", format="float", example=500.00)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Product categories retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(
-     *                     property="categories",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="title", type="string", example="Ana Kategori"),
-     *                         @OA\Property(property="slug", type="string", example="ana-kategori"),
-     *                         @OA\Property(property="seo_title", type="string", example="Ana Kategori - Gardashlar"),
-     *                         @OA\Property(property="seo_keywords", type="string", example="ana kategori, gardashlar, mebel"),
-     *                         @OA\Property(property="seo_description", type="string", example="Ana kategori haqqında təsvir"),
-     *                         @OA\Property(property="parentSlug", type="string", example=null, description="Parent category slug if parent_id exists, null otherwise"),
-     *                         @OA\Property(
-     *                             property="children",
-     *                             type="array",
-     *                             @OA\Items(
-     *                                 @OA\Property(property="id", type="integer", example=2),
-     *                                 @OA\Property(property="title", type="string", example="Alt Kategori 1"),
-     *                                 @OA\Property(property="slug", type="string", example="alt-kategori-1"),
-     *                                 @OA\Property(property="seo_title", type="string", example="Alt Kategori 1 - Gardashlar"),
-     *                                 @OA\Property(property="seo_keywords", type="string", example="alt kategori, gardashlar"),
-     *                                 @OA\Property(property="seo_description", type="string", example="Alt kategori haqqında təsvir"),
-     *                                 @OA\Property(property="parentSlug", type="string", example="ana-kategori", description="Parent category slug if parent_id exists, null otherwise"),
-     *                                 @OA\Property(property="children", type="array", @OA\Items())
-     *                             )
-     *                         )
-     *                     )
-     *                 ),
-     *                 @OA\Property(
-     *                     property="product_price_filters",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="title", type="string", example="0-100 AZN"),
-     *                         @OA\Property(property="min_price", type="number", format="float", example=0.00),
-     *                         @OA\Property(property="max_price", type="number", format="float", example=100.00)
-     *                     )
-     *                 ),
-     *                 @OA\Property(
-     *                     property="product_colors",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="color_code", type="string", example="#FF0000")
-     *                     )
-     *                 ),
-     *                 @OA\Property(
-     *                     property="product_types",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="title", type="string", example="Masa")
-     *                     )
-     *                 ),
-     *                 @OA\Property(
-     *                     property="product_page_categories",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="title", type="string", example="Ofis"),
-     *                         @OA\Property(property="slug", type="string", example="ofis"),
-     *                         @OA\Property(property="parentSlug", type="string", example=null, description="Parent category slug if parent_id exists, null otherwise")
-     *                     )
-     *                 ),
-     *                 @OA\Property(
-     *                     property="sort_options",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         @OA\Property(property="value", type="string", example="price_asc"),
-     *                         @OA\Property(property="label", type="string", example="price_asc")
-     *                     )
-     *                 ),
-     *                 @OA\Property(
-     *                     property="sort_translations",
-     *                     type="object",
-     *                     @OA\Property(property="price_asc", type="string", example="Qiymət artımına görə (ucuzdan bahaya)"),
-     *                     @OA\Property(property="price_desc", type="string", example="Qiymət azalmaya görə (bahadan ucuza)"),
-     *                     @OA\Property(property="newest", type="string", example="Ən yenilər (ən son əlavə olunan məhsullar əvvəl göstərilir)"),
-     *                     @OA\Property(property="oldest", type="string", example="Ən köhnələr (əvvəl əlavə olunan məhsullar əvvəl göstərilir)"),
-     *                     @OA\Property(property="view_count", type="string", example="Ən çox baxılanlar")
-     *                 ),
-     *                 @OA\Property(
-     *                     property="products",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="title", type="string", example="Masa"),
-     *                         @OA\Property(property="slug", type="string", example="masa-1"),
-     *                         @OA\Property(property="price", type="number", format="float", example=299.99),
-     *                         @OA\Property(property="view_count", type="integer", example=150),
-     *                         @OA\Property(property="card_image", type="string", example="https://admin.gardaslar.coder.az/storage/products/... or https://admin.gardaslar.coder.az/images/default_image.webp"),
-     *                         @OA\Property(property="discount_percent", type="number", format="float", example=10.00),
-     *                         @OA\Property(property="category_slug", type="string", example="masalar", description="Product category slug, null if no category"),
-     *                         @OA\Property(property="parentSlug", type="string", example="mebel", description="Parent category slug if category has parent, null otherwise"),
-     *                         @OA\Property(
-     *                             property="product_types",
-     *                             type="array",
-     *                             @OA\Items(
-     *                                 @OA\Property(property="id", type="integer", example=1),
-     *                                 @OA\Property(property="title", type="string", example="Masa")
-     *                             )
-     *                         )
-     *                     )
-     *                 ),
-     *                 @OA\Property(
-     *                     property="pagination",
-     *                     type="object",
-     *                     @OA\Property(property="current_page", type="integer", example=1),
-     *                     @OA\Property(property="per_page", type="integer", example=12),
-     *                     @OA\Property(property="total", type="integer", example=100),
-     *                     @OA\Property(property="last_page", type="integer", example=9),
-     *                     @OA\Property(property="from", type="integer", example=1),
-     *                     @OA\Property(property="to", type="integer", example=12),
-     *                     @OA\Property(property="has_more_pages", type="boolean", example=true)
-     *                 ),
-     *                 @OA\Property(
-     *                     property="applied_filters",
-     *                     type="object",
-     *                     @OA\Property(property="min_price", type="number", format="float", example=100.00),
-     *                     @OA\Property(property="max_price", type="number", format="float", example=500.00)
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Invalid language ID",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Invalid language ID")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving product categories")
-     *         )
-     *     )
-     * )
-     */
     public function categories(Request $request)
     {
         try {
@@ -568,12 +331,10 @@ class ProductsController extends Controller
                 $parentSlug = null;
                 
                 if ($product->categories->isNotEmpty()) {
-                    // Get the first category (assuming products have one primary category)
                     $category = $product->categories->first();
                     $categoryTranslation = $category->translates->first();
                     $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
                     
-                    // Get parent slug if category has parent
                     if ($category->parent_id) {
                         $parentCategory = ProductCategory::find($category->parent_id);
                         if ($parentCategory) {
@@ -590,7 +351,27 @@ class ProductsController extends Controller
                         'title' => $translation ? $translation->title : ''
                     ];
                 });
-                
+            
+                // ✨ Yeni əlavə: inCart, inFavorite, inCompare
+                $user = auth('sanctum')->user();
+                $inCart = false;
+                $inFavorite = false;
+                $inCompare = false;
+            
+                if ($user) {
+                    $inCart = \App\Models\Cart::where('user_id', $user->id)
+                        ->where('product_id', $product->id)
+                        ->exists();
+            
+                    $inFavorite = \App\Models\Favorite::where('user_id', $user->id)
+                        ->where('product_id', $product->id)
+                        ->exists();
+            
+                    $inCompare = \App\Models\Compare::where('user_id', $user->id)
+                        ->where('product_id', $product->id)
+                        ->exists();
+                }
+            
                 return [
                     'id' => $product->id,
                     'title' => $translation ? $translation->title : '',
@@ -601,9 +382,13 @@ class ProductsController extends Controller
                     'discount_percent' => $product->discount_percent,
                     'category_slug' => $categorySlug,
                     'parentSlug' => $parentSlug,
-                    'product_types' => $productTypes
+                    'product_types' => $productTypes,
+                    'inCart' => $inCart,
+                    'inFavorite' => $inFavorite,
+                    'inCompare' => $inCompare,
                 ];
             });
+            
 
             // Pagination data
             $paginationData = [

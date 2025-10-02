@@ -301,48 +301,73 @@ class CompanyController extends Controller
             $productsPaginated = $productsQuery->paginate($perPage, ['*'], 'page', $page);
     
             // Map products
-            $products = $productsPaginated->map(function($product) use ($languageId) {
-                $translation = $product->translates->first();
-                $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
-    
-                $categorySlug = null;
-                $parentSlug = null;
-    
-                if ($product->categories->isNotEmpty()) {
-                    $category = $product->categories->first();
-                    $categoryTranslation = $category->translates->first();
-                    $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
-    
-                    if ($category->parent_id) {
-                        $parentCategory = ProductCategory::find($category->parent_id);
-                        if ($parentCategory) {
-                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
-                            $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
-                        }
-                    }
-                }
-    
-                $productTypes = $product->types->map(function ($type) {
-                    $translation = $type->translates->first();
-                    return [
-                        'id' => $type->id,
-                        'title' => $translation ? $translation->title : ''
-                    ];
-                });
-    
-                return [
-                    'id' => $product->id,
-                    'title' => $translation ? $translation->title : '',
-                    'slug' => $translation ? $translation->slug : '',
-                    'price' => $product->price,
-                    'view_count' => $product->view_count,
-                    'card_image' => $mainImage && $mainImage->image ? asset('storage/' . $mainImage->image) : asset('images/default_image.webp'),
-                    'discount_percent' => $product->discount_percent,
-                    'category_slug' => $categorySlug,
-                    'parentSlug' => $parentSlug,
-                    'product_types' => $productTypes
-                ];
-            });
+           // Map products
+$products = $productsPaginated->map(function($product) use ($languageId) {
+    $translation = $product->translates->first();
+    $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
+
+    $categorySlug = null;
+    $parentSlug = null;
+
+    if ($product->categories->isNotEmpty()) {
+        $category = $product->categories->first();
+        $categoryTranslation = $category->translates->first();
+        $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
+
+        if ($category->parent_id) {
+            $parentCategory = ProductCategory::find($category->parent_id);
+            if ($parentCategory) {
+                $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
+                $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
+            }
+        }
+    }
+
+    $productTypes = $product->types->map(function ($type) {
+        $translation = $type->translates->first();
+        return [
+            'id' => $type->id,
+            'title' => $translation ? $translation->title : ''
+        ];
+    });
+
+    // 🔑 Yeni əlavə: inCart, inFavorite, inCompare
+    $user = auth('sanctum')->user();
+    $inCart = false;
+    $inFavorite = false;
+    $inCompare = false;
+
+    if ($user) {
+        $inCart = \App\Models\Cart::where('user_id', $user->id)
+            ->where('product_id', $product->id)
+            ->exists();
+
+        $inFavorite = \App\Models\Favorite::where('user_id', $user->id)
+            ->where('product_id', $product->id)
+            ->exists();
+
+        $inCompare = \App\Models\Compare::where('user_id', $user->id)
+            ->where('product_id', $product->id)
+            ->exists();
+    }
+
+    return [
+        'id' => $product->id,
+        'title' => $translation ? $translation->title : '',
+        'slug' => $translation ? $translation->slug : '',
+        'price' => $product->price,
+        'view_count' => $product->view_count,
+        'card_image' => $mainImage && $mainImage->image ? asset('storage/' . $mainImage->image) : asset('images/default_image.webp'),
+        'discount_percent' => $product->discount_percent,
+        'category_slug' => $categorySlug,
+        'parentSlug' => $parentSlug,
+        'product_types' => $productTypes,
+        'inCart' => $inCart,
+        'inFavorite' => $inFavorite,
+        'inCompare' => $inCompare,
+    ];
+});
+
     
             // Pagination data
             $paginationData = [
