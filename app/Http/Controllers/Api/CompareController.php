@@ -203,119 +203,143 @@ class CompareController extends Controller
     public function checkCompareProducts(Request $request)
     {
         try {
-      
-    
             $languageId = $request->header('language_id') ?? Language::getMainLanguage()->id;
     
-            // 🔹 Compare product IDs for the user
+            // 🔹 Compare product IDs (auth olmadan)
             $compareProductIds = ProductCompare::pluck('product_id')->toArray();
     
             if (empty($compareProductIds)) {
                 return response()->json([
                     'success' => true,
-                    'data' => ['products' => []],
-                    'message' => 'No products in compare list.'
+                    'message' => 'No products in compare list.',
+                    'data' => [
+                        'categories' => [],
+                        'products' => [],
+                        'selected_category' => null,
+                    ]
                 ]);
             }
     
-            // Optional filter by category_slug
-            $categorySlug = $request->query('category_slug', null);
-    
-            $productsQuery = Product::active()
-                ->whereIn('id', $compareProductIds)
-                ->with([
-                    'translates' => fn($q) => $q->where('language_id', $languageId),
-                    'images' => fn($q) => $q->where('status', true)->orderBy('order'),
-                    'images.color' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
-                    'categories.translates' => fn($q) => $q->where('language_id', $languageId),
-                    'types.translates' => fn($q) => $q->where('language_id', $languageId),
-                    'colors' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code')
-                ]);
-    
-            $products = $productsQuery->get();
-    
-            // 🔹 Filter by category_slug if provided
-            if ($categorySlug) {
-                $products = $products->filter(function ($product) use ($languageId, $categorySlug) {
-                    return $product->categories->first()?->translates->first()?->slug === $categorySlug;
+            // 🔹 Bütün category-ləri çıxar
+            $categories = ProductCategory::whereNotNull('parent_id')
+                ->whereHas('products', fn($q) => $q->whereIn('products.id', $compareProductIds)->active())
+                ->active()
+                ->ordered()
+                ->get()
+                ->map(function ($category) use ($languageId) {
+                    $translate = $category->translate($languageId);
+                    return [
+                        'id' => $category->id,
+                        'title' => $translate ? $translate->title : null,
+                        'slug' => $translate ? $translate->slug : null,
+                        'parent_slug' => $category->parent ? $category->parent->translate($languageId)->slug ?? null : null,
+                    ];
                 });
-            } else {
-                // Əgər göndərilməzsə, ilk category-dən məhsulları götür
-                $firstCategoryId = $products->first()->categories->first()?->id ?? null;
-                if ($firstCategoryId) {
-                    $products = $products->filter(function ($product) use ($firstCategoryId) {
-                        return $product->categories->first()?->id === $firstCategoryId;
-                    });
-                }
+    
+            if ($categories->isEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'No categories with compare products.',
+                    'data' => [
+                        'categories' => [],
+                        'products' => [],
+                        'selected_category' => null,
+                    ],
+                ]);
             }
     
-            $productsData = $products->map(function ($product) use ($languageId) {
-                $translation = $product->translates->first();
+            // 🔹 Selected category
+            $categorySlug = $request->query('category_slug');
+            $selectedCategory = $categorySlug
+                ? $categories->firstWhere('slug', $categorySlug)
+                : $categories->first();
     
-                $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
-    
-                $categorySlug = null;
-                $parentSlug = null;
-    
-                if ($product->categories->isNotEmpty()) {
-                    $category = $product->categories->first();
-                    $categoryTranslation = $category->translates->first();
-                    $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
-    
-                    if ($category->parent_id) {
-                        $parentCategory = ProductCategory::find($category->parent_id);
-                        if ($parentCategory) {
-                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
-                            $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
-                        }
-                    }
-                }
-    
-                $productTypes = $product->types->map(fn($type) => [
-                    'id' => $type->id,
-                    'title' => $type->translates->first()?->title ?? ''
+            if (!$selectedCategory) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Selected category not found in compare list.',
                 ]);
+            }
     
-                $availableColors = $product->colors->map(fn($color) => [
-                    'id' => $color->id,
-                    'color_code' => $color->color_code
-                ]);
+            // 🔹 Products in selected category
+            $products = Product::whereIn('id', $compareProductIds)
+                ->where('category_id', $selectedCategory['id'])
+                ->active()
+                ->ordered()
+                ->get()
+                ->map(function ($product) use ($languageId) {
+                    $translation = $product->translate($languageId);
     
-                $imagesWithColors = $product->images->map(fn($image) => [
-                    'id' => $image->id,
-                    'image_url' => $image->image ? asset('storage/' . $image->image) : null,
-                    'is_main' => $image->is_main,
-                    'order' => $image->order,
-                    'color_id' =>  $image->color ?  $image->color->id : null
-                ])->sortBy('order')->values();
+                    $mainImage = $product->images()->where('status', true)->where('is_main', true)->first()
+                        ?? $product->images()->where('status', true)->first();
     
-                return [
-                    'id' => $product->id,
-                    'title' => $translation ? $translation->title : '',
-                    'slug' => $translation ? $translation->slug : '',
-                    'price' => $product->price,
-                    'discount_percent' => $product->discount_percent,
-                    'category_slug' => $categorySlug,
-                    'parent_category_slug' => $parentSlug,
-                    'product_types' => $productTypes,
-                    'available_colors' => $availableColors,
-                    'images' => $imagesWithColors
-                ];
-            });
+                    $cardImage = $mainImage && $mainImage->image
+                        ? asset('storage/' . $mainImage->image)
+                        : asset('images/default_image.webp');
+    
+                    $cardImageAltText = $mainImage && $mainImage->image_alt_text ? $mainImage->image_alt_text : null;
+    
+                    $discountPrice = $product->discount_percent > 0
+                        ? $product->price - ($product->price * $product->discount_percent / 100)
+                        : null;
+    
+                    $details = $product->details()->ordered()->get()->map(function ($detail) use ($languageId) {
+                        $tr = $detail->translate($languageId);
+                        return [
+                            'id' => $detail->id,
+                            'keyword' => $tr ? $tr->keyword : null,
+                            'value' => $tr ? $tr->value : null,
+                        ];
+                    });
+    
+                    $detailValues = $product->detailValues()->ordered()->get()->map(function ($value) use ($languageId) {
+                        $tr = $value->translate($languageId);
+    
+                        $nestedDetails = $value->details()->ordered()->get()->map(function ($d) use ($languageId) {
+                            $dTr = $d->translate($languageId);
+                            return [
+                                'id' => $d->id,
+                                'keyword' => $dTr ? $dTr->keyword : null,
+                                'value' => $dTr ? $dTr->value : null,
+                            ];
+                        });
+    
+                        return [
+                            'id' => $value->id,
+                            'keyword' => $tr ? $tr->keyword : null,
+                            'details' => $nestedDetails,
+                        ];
+                    });
+    
+                    $category = $product->category;
+                    $categorySlug = $category ? $category->translate($languageId)->slug ?? null : null;
+                    $parentCategorySlug = $category && $category->parent ? $category->parent->translate($languageId)->slug ?? null : null;
+    
+                    return [
+                        'id' => $product->id,
+                        'title' => $translation ? $translation->title : '',
+                        'price' => $product->price,
+                        'discount_price' => $discountPrice,
+                        'discount_percent' => $product->discount_percent,
+                        'card_image' => $cardImage,
+                        'card_image_alt_text' => $cardImageAltText,
+                        'details' => $details,
+                        'detail_values' => $detailValues,
+                        'category_slug' => $categorySlug,
+                        'parent_category_slug' => $parentCategorySlug,
+                    ];
+                });
     
             return response()->json([
                 'success' => true,
+                'message' => 'Compare list fetched successfully.',
                 'data' => [
-                    'products' => $productsData,
-                ]
+                    'categories' => $categories,
+                    'products' => $products,
+                    'selected_category' => $selectedCategory,
+                ],
             ]);
     
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? []),
-                'data' => null
-            ], 400);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -324,6 +348,7 @@ class CompareController extends Controller
             ], 500);
         }
     }
+    
     
     
     
