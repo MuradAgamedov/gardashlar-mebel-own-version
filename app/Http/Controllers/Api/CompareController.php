@@ -260,10 +260,7 @@ class CompareController extends Controller
                     'image_url' => $image->image ? asset('storage/' . $image->image) : null,
                     'is_main' => $image->is_main,
                     'order' => $image->order,
-                    'color' => $image->color ? [
-                        'id' => $image->color->id,
-                        'color_code' => $image->color->color_code
-                    ] : null
+                    'color_id' =>  $image->color->id
                 ])->sortBy('order')->values();
     
                 return [
