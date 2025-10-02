@@ -261,9 +261,9 @@ class CompareController extends Controller
                 ]);
             }
     
-            // 🔹 Products in selected category
+            // 🔹 Products in selected category (pivot-dan filter)
             $products = Product::whereIn('id', $compareProductIds)
-                ->where('category_id', $selectedCategory['id'])
+                ->whereHas('categories', fn($q) => $q->where('product_categories.id', $selectedCategory['id']))
                 ->active()
                 ->ordered()
                 ->get()
@@ -311,9 +311,12 @@ class CompareController extends Controller
                         ];
                     });
     
-                    $category = $product->category;
+                    // 🔹 Category info
+                    $category = $product->categories->first();
                     $categorySlug = $category ? $category->translate($languageId)->slug ?? null : null;
-                    $parentCategorySlug = $category && $category->parent ? $category->parent->translate($languageId)->slug ?? null : null;
+                    $parentCategorySlug = $category && $category->parent
+                        ? $category->parent->translate($languageId)->slug ?? null
+                        : null;
     
                     return [
                         'id' => $product->id,
@@ -348,6 +351,7 @@ class CompareController extends Controller
             ], 500);
         }
     }
+    
     
     
     
