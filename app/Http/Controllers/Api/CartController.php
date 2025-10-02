@@ -98,7 +98,6 @@ class CartController extends Controller
 
         $deleted = Cart::where('user_id', $user->id)
             ->where('product_id', $request->product_id)
-            ->where('color_id', $request->color_id)
             ->delete();
 
         return response()->json([
