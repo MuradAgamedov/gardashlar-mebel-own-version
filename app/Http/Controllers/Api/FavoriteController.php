@@ -21,30 +21,32 @@ class FavoriteController extends Controller
     {
         $languageId = $this->getLanguageIdFromHeader($request);
         $user = $request->user();
-
+    
         if (!$user) {
             return response()->json([
                 "success" => false,
                 "message" => "You must be logged in to complete this transaction!"
             ], 401);
         }
-
-        // Favorite əlavə et və ya varsa təkrar etmə
+    
+        // Mövcud product varsa yeni duplicate yaratma, yalnız update et
         $favorite = Favorite::updateOrCreate(
             [
-                'user_id' => $user->id,
+                'user_id'    => $user->id,
                 'product_id' => $request->product_id,
-                'color_id' => $request->color_id,
             ],
-            []
+            [
+                'color_id'   => $request->color_id,
+            ]
         );
-
+    
         return response()->json([
             'success' => true,
             'message' => 'Product added to favorites successfully!',
             'data' => $favorite
         ]);
     }
+    
 
     /**
      * Favoritləri gətir
