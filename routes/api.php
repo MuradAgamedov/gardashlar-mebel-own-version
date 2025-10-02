@@ -297,6 +297,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/remove-favorite', [FavoriteController::class, 'removeFavorite'])->name('api.removeFavorite');
 
 
+    Route::post('/roluteete-actions/add', [\App\Http\Controllers\Api\RoluteeteActionController::class, 'add']);
+
 
 
     Route::post('/add-cart', [CartController::class, 'addCart'])->name('api.addCart');
