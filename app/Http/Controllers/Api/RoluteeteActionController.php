@@ -28,7 +28,6 @@ class RoluteeteActionController extends Controller
                     'image'   => $action->image ? asset('storage/' . $action->image) : null,
                     'percent' => $action->percent,
                     'title'   => $tr ? $tr->title : null,
-                    'type'    => $tr ? $tr->type : null,
                 ];
             });
 
