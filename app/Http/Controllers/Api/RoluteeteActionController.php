@@ -25,7 +25,6 @@ class RoluteeteActionController extends Controller
                 $tr = $action->translates->first();
                 return [
                     'id'      => $action->id,
-                    'image'   => $action->image ? asset('storage/' . $action->image) : null,
                     'percent' => $action->percent,
                     'title'   => $tr ? $tr->title : null,
                 ];
