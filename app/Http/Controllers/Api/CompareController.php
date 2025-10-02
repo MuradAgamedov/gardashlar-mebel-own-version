@@ -195,16 +195,7 @@ class CompareController extends Controller
     public function checkCompareProducts(Request $request)
     {
         try {
-            $user = $request->user();
-    
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'You must be logged in!',
-                    'data' => null
-                ], 401);
-            }
-    
+          
             // Validate request
             $request->validate([
                 'product_ids' => 'required|array|min:1|max:50',
@@ -213,27 +204,12 @@ class CompareController extends Controller
     
             $productIds = $request->input('product_ids');
     
-            // Yalnız istifadəçinin compare-də olan məhsulları yoxla
-            $compareProductIds = ProductCompare::where('user_id', $user->id)
-                ->whereIn('product_id', $productIds)
-                ->pluck('product_id')
-                ->toArray();
-    
-            if (empty($compareProductIds)) {
-                return response()->json([
-                    'success' => true,
-                    'data' => [
-                        'existing_products' => [],
-                        'non_existing_product_ids' => $productIds
-                    ],
-                    'message' => 'No products from your list found in compare.'
-                ]);
-            }
+          
     
             $languageId = $request->header('language_id') ?? Language::getMainLanguage()->id;
     
             $existingProducts = Product::active()
-                ->whereIn('id', $compareProductIds)
+                ->whereIn('id', $productIds)
                 ->with([
                     'translates' => fn($q) => $q->where('language_id', $languageId),
                     'images' => fn($q) => $q->where('status', true)->orderBy('order'),
@@ -307,8 +283,7 @@ class CompareController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'existing_products' => $productsData,
-                    'non_existing_product_ids' => array_values($nonExistingProductIds),
+                    'products' => $productsData,
                 ]
             ]);
     
