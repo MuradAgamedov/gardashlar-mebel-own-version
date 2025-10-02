@@ -203,18 +203,12 @@ class CompareController extends Controller
     public function checkCompareProducts(Request $request)
     {
         try {
-            $user = $request->user();
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unauthorized',
-                ], 401);
-            }
+      
     
             $languageId = $request->header('language_id') ?? Language::getMainLanguage()->id;
     
             // 🔹 Compare product IDs for the user
-            $compareProductIds = ProductCompare::where('user_id', $user->id)->pluck('product_id')->toArray();
+            $compareProductIds = ProductCompare::pluck('product_id')->toArray();
     
             if (empty($compareProductIds)) {
                 return response()->json([
