@@ -736,40 +736,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function removeCategory(categoryId) {
-        selectedCategoryIds = selectedCategoryIds.filter(id => id !== categoryId);
-        renderSelectedCategories();
-    }
+    selectedCategoryIds = [];
+    renderSelectedCategories();
+}
+
     
     function updateCategoriesHiddenInput() {
         categoriesHiddenInput.value = JSON.stringify(selectedCategoryIds);
     }
     
     function showCategoriesDropdown() {
-        const searchTerm = categoriesInput.value.toLowerCase();
-        const filteredCategories = availableCategories.filter(category => 
-            !selectedCategoryIds.includes(category.id) &&
-            category.title.toLowerCase().includes(searchTerm)
-        );
-        
-        if (filteredCategories.length > 0) {
-            categoriesDropdown.innerHTML = '';
-            filteredCategories.forEach(category => {
-                const option = document.createElement('div');
-                option.className = 'tag-option';
-                option.textContent = category.title;
-                option.onclick = () => {
-                    selectedCategoryIds.push(category.id);
-                    renderSelectedCategories();
-                    categoriesInput.value = '';
-                    hideCategoriesDropdown();
-                };
-                categoriesDropdown.appendChild(option);
-            });
-            categoriesDropdown.style.display = 'block';
-        } else {
-            hideCategoriesDropdown();
-        }
+    const searchTerm = categoriesInput.value.toLowerCase();
+    const filteredCategories = availableCategories.filter(category => 
+        category.title.toLowerCase().includes(searchTerm)
+    );
+    
+    if (filteredCategories.length > 0) {
+        categoriesDropdown.innerHTML = '';
+        filteredCategories.forEach(category => {
+            const option = document.createElement('div');
+            option.className = 'tag-option';
+            option.textContent = category.title;
+            option.onclick = () => {
+                // 👇 yalnız bir dənə seçməyə icazə veririk
+                selectedCategoryIds = [category.id];
+                renderSelectedCategories();
+                categoriesInput.value = '';
+                hideCategoriesDropdown();
+            };
+            categoriesDropdown.appendChild(option);
+        });
+        categoriesDropdown.style.display = 'block';
+    } else {
+        hideCategoriesDropdown();
     }
+}
+
     
     function hideCategoriesDropdown() {
         categoriesDropdown.style.display = 'none';
