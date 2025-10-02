@@ -95,5 +95,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(Cart::class);
     }
-
+    public function roluteeteActions()
+    {
+        return $this->hasMany(UserRoluteeteAction::class);
+    }
 }

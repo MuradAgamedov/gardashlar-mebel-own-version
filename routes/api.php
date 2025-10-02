@@ -298,7 +298,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     Route::post('/roluteete-actions/add', [\App\Http\Controllers\Api\RoluteeteActionController::class, 'add']);
-
+    Route::get('/roluteete-actions/my', [RoluteeteActionController::class, 'getUserActions']);
 
 
     Route::post('/add-cart', [CartController::class, 'addCart'])->name('api.addCart');
