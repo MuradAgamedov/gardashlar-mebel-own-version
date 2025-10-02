@@ -30,6 +30,13 @@
           <h6>Pages</h6>
         </a>
       </li>
+
+      <li class="sidebar-list">
+        <a class="sidebar-link" href="{{ route('admin.roluteete-actions.index') }}">
+          <i class="fas fa-file-alt"></i>
+          <h6>Roluteete Actions</h6>
+        </a>
+      </li>
       <li class="sidebar-list">
         <a class="sidebar-link" href="{{ route('admin.comments.index') }}">
           <i class="fas fa-file-alt"></i>

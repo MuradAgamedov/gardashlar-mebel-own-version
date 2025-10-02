@@ -86,6 +86,8 @@ use App\Http\Controllers\Admin\SuggestAPlaceFormController;
 use App\Http\Controllers\Admin\SuggestionsComplaintsFormController;
 use App\Http\Controllers\Admin\SubscriberController;
 use App\Http\Controllers\Admin\CommentController;
+use App\Http\Controllers\Admin\RoluteeteActionController;
+
 
 Route::prefix('')->name('admin.')->group(function () {
     // Auth routes (no middleware)
@@ -99,6 +101,13 @@ Route::prefix('')->name('admin.')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('clear-cache', [DashboardController::class, 'clearCache'])->name('clear-cache');
+
+
+        
+        Route::resource('roluteete-actions', RoluteeteActionController::class);
+        Route::patch('roluteete-actions/{id}/toggle-status', [RoluteeteActionController::class, 'toggleStatus'])
+        ->name('roluteete-actions.toggleStatus');
+    
         
         // Language routes
         Route::resource('languages', LanguageController::class);
