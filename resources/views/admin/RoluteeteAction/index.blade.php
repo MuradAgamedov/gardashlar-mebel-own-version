@@ -56,7 +56,6 @@
                                     <th>Image</th>
                                     <th>Title</th>
                                     <th>Status</th>
-                                    <th>Created At</th>
                                     <th class="text-center">Actions</th>
                                 </tr>
                             </thead>
@@ -92,7 +91,6 @@
                                             </form>
                                         </td>
 
-                                        <td>{{ $action->created_at->format('d.m.Y H:i') }}</td>
 
                                         {{-- Actions --}}
                                         <td class="text-center">
