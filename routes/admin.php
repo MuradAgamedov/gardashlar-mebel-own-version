@@ -87,6 +87,7 @@ use App\Http\Controllers\Admin\SuggestionsComplaintsFormController;
 use App\Http\Controllers\Admin\SubscriberController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\RoluteeteActionController;
+use App\Http\Controllers\Admin\CreditCardController;
 
 
 Route::prefix('')->name('admin.')->group(function () {
@@ -99,8 +100,13 @@ Route::prefix('')->name('admin.')->group(function () {
     Route::middleware('admin.auth')->group(function () {
         // Dashboard routes
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('clear-cache', [DashboardController::class, 'clearCache'])->name('clear-cache');
+
+
+        Route::resource('credit-cards', CreditCardController::class);
+        Route::post('credit-cards/reorder', [CreditCardController::class, 'reorder'])->name('credit-cards.reorder');
 
 
         
