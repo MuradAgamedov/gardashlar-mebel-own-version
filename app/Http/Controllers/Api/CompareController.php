@@ -123,86 +123,23 @@ class CompareController extends Controller
             ->ordered()
             ->get()
             ->map(function ($product) use ($languageId, $user) {
-                $translation = $product->translate($languageId);
+                // 🟢 Bütün məlumatları Product modelindəki apiData-dan alırıq
+                $data = $product->apiData($languageId);
     
-                // Card image
-                $mainImage = $product->images()->where('status', true)->where('is_main', true)->first();
-                $cardImage = $mainImage && $mainImage->image
-                    ? asset('storage/' . $mainImage->image)
-                    : asset('images/default_image.webp');
-                $cardImageAltText = $mainImage && $mainImage->image_alt_text
-                    ? $mainImage->image_alt_text
-                    : null;
-    
-                // Discount
-                $discountPrice = $product->discount_percent > 0
-                    ? $product->price - ($product->price * $product->discount_percent / 100)
-                    : null;
-    
-                // Details
-                $details = $product->details()->ordered()->get()->map(function ($detail) use ($languageId) {
-                    $tr = $detail->translate($languageId);
-                    return [
-                        'id' => $detail->id,
-                        'keyword' => $tr ? $tr->keyword : null,
-                        'value' => $tr ? $tr->value : null,
-                    ];
-                });
-    
-                // Detail values + nested details
-                $detailValues = $product->detailValues()->ordered()->get()->map(function ($value) use ($languageId) {
-                    $tr = $value->translate($languageId);
-    
-                    $nestedDetails = $value->details()->ordered()->get()->map(function ($d) use ($languageId) {
-                        $dTr = $d->translate($languageId);
-                        return [
-                            'id' => $d->id,
-                            'keyword' => $dTr ? $dTr->keyword : null,
-                            'value' => $dTr ? $dTr->value : null,
-                        ];
-                    });
-    
-                    return [
-                        'id' => $value->id,
-                        'keyword' => $tr ? $tr->keyword : null,
-                        'details' => $nestedDetails,
-                    ];
-                });
-    
-                // Category slugs (belongsToMany-dən)
-                $category = $product->categories->first();
-                $categorySlug = $category ? $category->translate($languageId)->slug ?? null : null;
-                $parentCategorySlug = $category && $category->parent ? $category->parent->translate($languageId)->slug ?? null : null;
-    
-                // 🔹 inCart, inFavorite, inCompare
-                $inCart = \App\Models\Cart::where('user_id', $user->id)
+                // 🔹 əlavə olaraq istifadəçiyə aid flag-lər
+                $data['inCart'] = \App\Models\Cart::where('user_id', $user->id)
                     ->where('product_id', $product->id)
                     ->exists();
     
-                $inFavorite = \App\Models\Favorite::where('user_id', $user->id)
+                $data['inFavorite'] = \App\Models\Favorite::where('user_id', $user->id)
                     ->where('product_id', $product->id)
                     ->exists();
     
-                $inCompare = \App\Models\ProductCompare::where('user_id', $user->id)
+                $data['inCompare'] = \App\Models\ProductCompare::where('user_id', $user->id)
                     ->where('product_id', $product->id)
                     ->exists();
     
-                return [
-                    'id' => $product->id,
-                    'title' => $translation ? $translation->title : '',
-                    'price' => $product->price,
-                    'discount_price' => $discountPrice,
-                    'discount_percent' => $product->discount_percent,
-                    'card_image' => $cardImage,
-                    'card_image_alt_text' => $cardImageAltText,
-                    'details' => $details,
-                    'detail_values' => $detailValues,
-                    'category_slug' => $categorySlug,
-                    'parent_category_slug' => $parentCategorySlug,
-                    'inCart' => $inCart,
-                    'inFavorite' => $inFavorite,
-                    'inCompare' => $inCompare,
-                ];
+                return $data;
             });
     
         return response()->json([

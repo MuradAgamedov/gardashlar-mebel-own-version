@@ -192,17 +192,16 @@ public function apiData($languageId = null, $colorId = null)
         ->where('language_id', $languageId)
         ->first();
 
-    // 🔹 Product types
+    // Product types
     $productTypes = $this->types->map(function ($type) use ($languageId) {
         $tr = $type->translates()->where('language_id', $languageId)->first();
         return [
             'id' => $type->id,
-            'title' => $tr ? $tr->title : '',
-            'slug' => $tr ? $tr->slug : null,
+            'title' => $tr ? $tr->title : ''
         ];
     });
 
-    // 🔹 Product details
+    // Product details
     $productDetails = $this->details()->orderBy('order')->get()->map(function ($detail) use ($languageId) {
         $tr = $detail->translates()->where('language_id', $languageId)->first();
         return [
@@ -212,7 +211,7 @@ public function apiData($languageId = null, $colorId = null)
         ];
     })->filter(fn($d) => $d['keyword'] && $d['value'])->values();
 
-    // 🔹 Product detail values
+    // Product detail values
     $productDetailValues = $this->detailValues()->orderBy('order')->get()->map(function ($dv) use ($languageId) {
         $tr = $dv->translates()->where('language_id', $languageId)->first();
         $details = $dv->details()->orderBy('order')->get()->map(function ($detail) use ($languageId) {
@@ -231,47 +230,43 @@ public function apiData($languageId = null, $colorId = null)
         ];
     });
 
-    // 🔹 Bütün şəkillər
-    $images = $this->images()->where('status', true)->get()->map(function ($img) {
-        return [
-            'id' => $img->id,
-            'image_url' => $img->image ? asset('storage/' . $img->image) : null,
-            'color_id' => $img->product_color_id ?? null,
-            'is_main' => $img->is_main
-        ];
-    });
+    // Bütün şəkillər
+  $images = $this->images()->where('status', true)->get()->map(function ($img) {
+    return [
+        'id' => $img->id,
+        'image_url' => $img->image ? asset('storage/' . $img->image) : null,
+        'color_id' => $img->product_color_id ?? null,
+        'is_main' => $img->is_main
+    ];
+});
 
-    // Əgər heç bir şəkil yoxdursa, default əlavə et
-    if ($images->isEmpty()) {
-        $images = collect([[
+// Əgər heç bir şəkil yoxdursa, default əlavə et
+if ($images->isEmpty()) {
+    $images = collect([
+        [
             'id' => time(), // random id
             'image_url' => asset('images/default_image.webp'),
             'color_id' => null,
             'is_main' => false
-        ]]);
-    }
+        ]
+    ]);
+}
 
-    // 🔹 Available colors
-    $availableColors = $this->images()
-        ->whereNotNull('product_color_id')
-        ->pluck('product_color_id')
-        ->unique()
-        ->values();
+    
 
+    // Available colors
+    $availableColors = $this->images()->whereNotNull('product_color_id')->pluck('product_color_id')->unique()->values();
     $availableColorDetails = [];
     if ($availableColors->isNotEmpty()) {
-        $availableColorDetails = ProductColor::whereIn('id', $availableColors)->get()->map(function ($color) use ($languageId) {
-            $tr = $color->translates()->where('language_id', $languageId)->first();
+        $availableColorDetails = ProductColor::whereIn('id', $availableColors)->get()->map(function ($color) {
             return [
                 'id' => $color->id,
-                'title' => $tr ? $tr->title : null,
-                'slug' => $tr ? $tr->slug : null,
-                'color_code' => $color->color_code,
+                'color_code' => $color->color_code
             ];
         });
     }
 
-    // 🔹 Category & Parent Category (slug və title)
+    // Category & Parent Category (slug və title)
     $categorySlug = null;
     $categoryTitle = null;
     $parentSlug = null;
@@ -293,7 +288,7 @@ public function apiData($languageId = null, $colorId = null)
         }
     }
 
-    // 🔹 Discount qiymət
+    // Discount qiymət
     $discountPrice = null;
     if ($this->discount_percent > 0) {
         $discountPrice = $this->price - ($this->price * $this->discount_percent / 100);
@@ -318,6 +313,7 @@ public function apiData($languageId = null, $colorId = null)
         'parent_title' => $parentTitle
     ];
 }
+
 
 
 public function similarData($languageId = null)
