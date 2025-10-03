@@ -72,7 +72,7 @@
                                                 <td>{{ $card->title }}</td>
                                                 <td>
                                                     @if($card->image)
-                                                        <img src="{{ asset($card->image) }}" alt="Card Image" style="max-height: 50px;">
+                                                        <img src="{{ asset('storage/'.$card->image) }}" alt="Card Image" style="max-height: 50px;">
                                                     @else
                                                         <span class="text-muted">No image</span>
                                                     @endif

@@ -74,7 +74,7 @@
                             <div class="mb-3">
                                 <label class="form-label d-block">Preview:</label>
                                 <img id="imagePreview" 
-                                     src="{{ $creditCard->image ? asset($creditCard->image) : '#' }}" 
+                                     src="{{ $creditCard->image ? asset('storage/'.$creditCard->image) : '#' }}" 
                                      alt="Preview"
                                      style="max-height: 150px; border:1px solid #ddd; padding:4px; border-radius:6px; {{ $creditCard->image ? '' : 'display:none;' }}">
                             </div>
