@@ -29,9 +29,9 @@ class PaymentController extends Controller
             'memberId'    => $data['member_id'],
             'language'    => $lang,
             'installment' => (int) $data['months'],
-            'successUrl'  => env('PAYMENT_SUCCESS_URL', 'https://your-frontend.com/payment-success'),
-            'cancelUrl'   => env('PAYMENT_CANCEL_URL', 'https://your-frontend.com/payment-cancel'),
-            'declineUrl'  => env('PAYMENT_DECLINE_URL', 'https://your-frontend.com/payment-decline'),
+            'successUrl'  => route('payment.success', [], true),
+            'cancelUrl'   => route('payment.cancel', [], true),
+            'declineUrl'  => route('payment.decline', [], true),
         ];
 
         $response = PaymentLoginHelper::withAuth()->post($baseUrl.'/transactions/taksit', $payload);
@@ -56,36 +56,98 @@ class PaymentController extends Controller
     }
 
     /**
-     * Bankdan callback (success/cancel/decline)
+     * Success nəticəsi
      */
-    public function callback(Request $request)
+    public function success(Request $request)
     {
-        $result = $request->query('result');
-        $up     = $request->query('up');
+        $data = $this->decodeUp($request->query('up'));
+        Log::info('Payment Success', $data);
 
-        $decoded = null;
-        if ($up) {
-            $decoded = $this->decodeUp($up);
-            Log::info('UP callback decoded', ['data' => $decoded]);
-        }
+        // Laravel blade view göstərə bilərsən:
+        return view('payment.success', ['data' => $data]);
 
-        return response()->json([
-            'success' => $result === 'success',
-            'status'  => $result,
-            'data'    => $decoded,
-        ]);
+        // əgər frontend route-a göndərmək istəsən:
+        // return redirect()->away("https://telebe.az/payment-success?status=success");
     }
 
-    private function decodeUp(string $base64)
+    /**
+     * Cancel nəticəsi
+     */
+    public function cancel(Request $request)
     {
+        $data = $this->decodeUp($request->query('up'));
+        Log::info('Payment Cancel', $data);
+
+        return view('payment.cancel', ['data' => $data]);
+    }
+
+    /**
+     * Decline nəticəsi
+     */
+    public function decline(Request $request)
+    {
+        $data = $this->decodeUp($request->query('up'));
+        Log::info('Payment Decline', $data);
+
+        return view('payment.decline', ['data' => $data]);
+    }
+
+    private function decodeUp(?string $base64): array
+    {
+        if (!$base64) return [];
         try {
             $json = base64_decode($base64, true);
-            if ($json === false) return null;
-            $arr = json_decode($json, true);
-            return is_array($arr) ? $arr : null;
+            return json_decode($json, true) ?: [];
         } catch (\Throwable $e) {
             Log::error('UP decode error: '.$e->getMessage());
-            return null;
+            return [];
         }
     }
+
+
+
+    /**
+ * Nağd ödəniş (birdəfəlik)
+ */
+public function startCash(Request $request)
+{
+    $data = $request->validate([
+        'amount'    => ['required', 'numeric', 'min:1'],
+        'member_id' => ['required', 'string'],
+        'language'  => ['nullable', 'in:AZ,EN,RU'],
+    ]);
+
+    $lang = $data['language'] ?? 'EN';
+    $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
+
+    $payload = [
+        'amount'     => (float) $data['amount'],
+        'memberId'   => $data['member_id'],
+        'language'   => $lang,
+        'successUrl' => route('payment.success', [], true),
+        'cancelUrl'  => route('payment.cancel', [], true),
+        'declineUrl' => route('payment.decline', [], true),
+    ];
+
+    $response = PaymentLoginHelper::withAuth()->post($baseUrl.'/transactions/pay', $payload);
+
+    if ($response->successful()) {
+        $body = $response->json();
+        $redirectUrl = is_array($body) ? ($body['url'] ?? null) : (string) $response->body();
+
+        if ($redirectUrl) {
+            return response()->json([
+                'success' => true,
+                'redirect_url' => $redirectUrl,
+            ]);
+        }
+
+        Log::error('Cash Payment: URL not found', ['body' => $response->body()]);
+        return response()->json(['success' => false, 'message' => 'Ödəniş linki tapılmadı'], 422);
+    }
+
+    Log::error('Cash Payment failed', ['body' => $response->body()]);
+    return response()->json(['success' => false, 'message' => 'Ödəniş sorğusu uğursuz oldu'], 500);
+}
+
 }

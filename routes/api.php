@@ -74,7 +74,7 @@ use App\Http\Controllers\Api\Payment\PaymentController;
 
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
-Route::get('/roluteete-actions', [RoluteeteActionController::class, 'index'])->name('api.roluteete-actions.index');
+Route::get('/roulette-actions', [RoluteeteActionController::class, 'index'])->name('api.roluteete-actions.index');
 
 
 // Dictionary API Routes
@@ -354,3 +354,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::post('/payment/installment', [PaymentController::class, 'startInstallment']);
 Route::get('/payment/callback', [PaymentController::class, 'callback']);
+Route::post('/payment/cash', [PaymentController::class, 'startCash']);
+
