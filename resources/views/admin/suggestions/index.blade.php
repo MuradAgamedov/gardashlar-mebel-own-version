@@ -86,7 +86,7 @@
                                             <input type="checkbox" class="form-check-input" id="selectAllHeader">
                                         </th>
                                         <th width="50">Sıra</th>
-                                        <th width="80">Şəkil</th>
+                                        <th width="100">Şəkil</th>
                                         <th>Başlıq</th>
                                         <th>Dillər</th>
                                         <th width="80">Status</th>
@@ -111,12 +111,30 @@
                                             </td>
                                             <td>
                                                 @if($suggestion->image)
-                                                    <img src="{{ asset('storage/' . $suggestion->image) }}" 
-                                                         alt="{{ $suggestion->translate()?->image_alt_text }}" 
-                                                         class="img-thumbnail" 
-                                                         style="width: 50px; height: 50px; object-fit: cover;">
+                                                    <a href="javascript:void(0);" 
+                                                       data-bs-toggle="modal" 
+                                                       data-bs-target="#imageModal-{{ $suggestion->id }}">
+                                                        <img src="{{ asset('storage/' . $suggestion->image) }}" 
+                                                             alt="{{ $suggestion->translate()?->image_alt_text }}" 
+                                                             class="img-thumbnail" 
+                                                             style="width: 80px; height: 120px; object-fit: cover; cursor: pointer;">
+                                                    </a>
+
+                                                    <!-- Modal -->
+                                                    <div class="modal fade" id="imageModal-{{ $suggestion->id }}" tabindex="-1" aria-labelledby="imageModalLabel-{{ $suggestion->id }}" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                            <div class="modal-content">
+                                                                <div class="modal-body text-center p-0">
+                                                                    <img src="{{ asset('storage/' . $suggestion->image) }}" 
+                                                                         alt="{{ $suggestion->translate()?->image_alt_text }}" 
+                                                                         class="img-fluid" 
+                                                                         style="max-height: 90vh;">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 @else
-                                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 120px;">
                                                         <i class="material-icons-outlined text-muted">image</i>
                                                     </div>
                                                 @endif
