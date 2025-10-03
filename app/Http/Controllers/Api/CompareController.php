@@ -107,7 +107,7 @@ class CompareController extends Controller
         $categorySlug = $request->query('category_slug');
         $selectedCategory = $categorySlug
             ? $categories->firstWhere('slug', $categorySlug)
-            : $categories->first(); // göndərilməzsə ilk category
+            : $categories->first();
     
         if (!$selectedCategory) {
             return response()->json([
@@ -116,7 +116,7 @@ class CompareController extends Controller
             ]);
         }
     
-        // 🔹 Products in selected category (belongsToMany ilə filter)
+        // 🔹 Products in selected category
         $products = Product::whereIn('id', $compareProductIds)
             ->whereHas('categories', function ($q) use ($selectedCategory) {
                 $q->where('product_categories.id', $selectedCategory['id']);
@@ -125,23 +125,111 @@ class CompareController extends Controller
             ->ordered()
             ->get()
             ->map(function ($product) use ($languageId, $user) {
-                // 🟢 Bütün məlumatları Product modelindəki apiData-dan alırıq
-                $data = $product->apiData($languageId);
+                $translation = $product->translate($languageId);
     
-                // 🔹 əlavə olaraq istifadəçiyə aid flag-lər
-                $data['inCart'] = \App\Models\Cart::where('user_id', $user->id)
-                    ->where('product_id', $product->id)
-                    ->exists();
+                $mainImage = $product->images()->where('status', true)->where('is_main', true)->first()
+                    ?? $product->images()->where('status', true)->first();
     
-                $data['inFavorite'] = \App\Models\Favorite::where('user_id', $user->id)
-                    ->where('product_id', $product->id)
-                    ->exists();
+                $cardImage = $mainImage && $mainImage->image
+                    ? asset('storage/' . $mainImage->image)
+                    : asset('images/default_image.webp');
     
-                $data['inCompare'] = \App\Models\ProductCompare::where('user_id', $user->id)
-                    ->where('product_id', $product->id)
-                    ->exists();
+                $cardImageAltText = $mainImage && $mainImage->image_alt_text ? $mainImage->image_alt_text : null;
     
-                return $data;
+                $discountPrice = $product->discount_percent > 0
+                    ? $product->price - ($product->price * $product->discount_percent / 100)
+                    : null;
+    
+                // 🔹 Məhsul detalları
+                $details = $product->details()->ordered()->get()->map(function ($detail) use ($languageId) {
+                    $tr = $detail->translate($languageId);
+                    return [
+                        'id' => $detail->id,
+                        'keyword' => $tr ? $tr->keyword : null,
+                        'value' => $tr ? $tr->value : null,
+                    ];
+                });
+    
+                $detailValues = $product->detailValues()->ordered()->get()->map(function ($value) use ($languageId) {
+                    $tr = $value->translate($languageId);
+    
+                    $nestedDetails = $value->details()->ordered()->get()->map(function ($d) use ($languageId) {
+                        $dTr = $d->translate($languageId);
+                        return [
+                            'id' => $d->id,
+                            'keyword' => $dTr ? $dTr->keyword : null,
+                            'value' => $dTr ? $dTr->value : null,
+                        ];
+                    });
+    
+                    return [
+                        'id' => $value->id,
+                        'keyword' => $tr ? $tr->keyword : null,
+                        'details' => $nestedDetails,
+                    ];
+                });
+    
+                // 🔹 Məhsul tipləri
+                $productTypes = $product->types->map(function ($type) use ($languageId) {
+                    $tr = $type->translates()->where('language_id', $languageId)->first();
+                    return [
+                        'id' => $type->id,
+                        'title' => $tr ? $tr->title : '',
+                        'slug' => $tr ? $tr->slug : null,
+                    ];
+                });
+    
+                // 🔹 Mövcud rənglər
+                $availableColors = $product->images()
+                    ->whereNotNull('product_color_id')
+                    ->pluck('product_color_id')
+                    ->unique()
+                    ->values();
+    
+                $availableColorDetails = [];
+                if ($availableColors->isNotEmpty()) {
+                    $availableColorDetails = ProductColor::whereIn('id', $availableColors)->get()->map(function ($color) {
+                        return [
+                            'id' => $color->id,
+                            'color_code' => $color->color_code,
+                        ];
+                    });
+                }
+    
+                // 🔹 Category info
+                $category = $product->categories->first();
+                $categorySlug = $category ? $category->translate($languageId)->slug ?? null : null;
+                $parentCategorySlug = $category && $category->parent
+                    ? $category->parent->translate($languageId)->slug ?? null
+                    : null;
+    
+                return [
+                    'id' => $product->id,
+                    'title' => $translation ? $translation->title : '',
+                    'slug' => $translation ? $translation->slug : '',
+                    'price' => $product->price,
+                    'discount_price' => $discountPrice,
+                    'discount_percent' => $product->discount_percent,
+                    'card_image' => $cardImage,
+                    'card_image_alt_text' => $cardImageAltText,
+                    'details' => $details,
+                    'detail_values' => $detailValues,
+                    'product_types' => $productTypes,
+                    'available_colors' => $availableColorDetails,
+                    'category_slug' => $categorySlug,
+                    'parent_category_slug' => $parentCategorySlug,
+    
+                    // 🔹 əlavə olaraq flag-lər
+                    'inCart' => \App\Models\Cart::where('user_id', $user->id)
+                        ->where('product_id', $product->id)
+                        ->exists(),
+                    'inFavorite' => \App\Models\Favorite::where('user_id', $user->id)
+                        ->where('product_id', $product->id)
+                        ->exists(),
+                    'inCompare' => \App\Models\ProductCompare::where('user_id', $user->id)
+                        ->where('product_id', $product->id)
+                        ->exists(),
+                ];
             });
     
         return response()->json([
