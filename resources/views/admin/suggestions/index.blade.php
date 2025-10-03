@@ -45,9 +45,9 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Bütün Tövsiyyələr</h5>
                             <div class="d-flex gap-2">
-                                                                 <button type="button" class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
-                                     <i class="material-icons-outlined">delete</i>
-                                 </button>
+                                <button type="button" class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
+                                    <i class="material-icons-outlined">delete</i>
+                                </button>
                                 <a href="{{ route('admin.suggestions.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
                                 </a>
@@ -89,7 +89,6 @@
                                         <th width="80">Şəkil</th>
                                         <th>Başlıq</th>
                                         <th>Dillər</th>
-                                        <th width="80">PDF</th>
                                         <th width="80">Status</th>
                                         <th width="150">Əməliyyatlar</th>
                                     </tr>
@@ -136,17 +135,6 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="d-flex gap-1">
-                                                    @if($suggestion->pdf)
-                                                        <a href="{{ asset('storage/' . $suggestion->pdf) }}" target="_blank" class="btn btn-sm btn-outline-danger" title="PDF yüklə">
-                                                            <i class="material-icons-outlined" style="font-size: 16px;">picture_as_pdf</i>
-                                                        </a>
-                                                    @else
-                                                        <span class="text-muted">-</span>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td>
                                                 @if($suggestion->status)
                                                     <span class="badge bg-success">Aktiv</span>
                                                 @else
@@ -166,9 +154,9 @@
                                                 </div>
                                             </td>
                                         </tr>
-                                                                         @empty
-                                         <tr>
-                                             <td colspan="8" class="text-center py-4">
+                                    @empty
+                                        <tr>
+                                            <td colspan="7" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">lightbulb</i>
                                                     <p class="mt-2">Tövsiyyə tapılmadı</p>
@@ -239,11 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateDeleteButton() {
         const checkedBoxes = document.querySelectorAll('.suggestion-checkbox:checked');
-        if (checkedBoxes.length > 0) {
-            deleteSelectedBtn.style.display = 'inline-block';
-        } else {
-            deleteSelectedBtn.style.display = 'none';
-        }
+        deleteSelectedBtn.style.display = checkedBoxes.length > 0 ? 'inline-block' : 'none';
     }
 
     function selectAll(checked) {
@@ -289,17 +273,17 @@ document.addEventListener('DOMContentLoaded', function() {
             confirmButtonText: 'Bəli, sil!',
             cancelButtonText: 'Ləğv et'
         }).then((result) => {
-                         if (result.isConfirmed) {
-                 const form = document.createElement('form');
-                 form.method = 'POST';
-                 form.action = '{{ route("admin.suggestions.deleteSelected") }}';
-                 form.innerHTML = `
-                     @csrf
-                     ${selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('')}
-                 `;
-                 document.body.appendChild(form);
-                 form.submit();
-             }
+            if (result.isConfirmed) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{{ route("admin.suggestions.deleteSelected") }}';
+                form.innerHTML = `
+                    @csrf
+                    ${selectedIds.map(id => `<input type="hidden" name="ids[]" value="${id}">`).join('')}
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
         });
     });
 
@@ -310,9 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
             handle: '.drag-handle',
             animation: 150,
             onEnd: function(evt) {
-                const suggestions = Array.from(sortableList.children).map((row, index) => {
-                    return row.getAttribute('data-id');
-                });
+                const suggestions = Array.from(sortableList.children).map((row) => row.getAttribute('data-id'));
 
                 fetch('{{ route("admin.suggestions.reorder") }}', {
                     method: 'POST',
@@ -324,9 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success) {
-                        // Success - no alert needed
-                    } else {
+                    if (!data.success) {
                         Swal.fire({
                             title: 'Xəta!',
                             text: data.message || 'Tövsiyyələri yenidən sıralamaq mümkün olmadı',
@@ -334,9 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     }
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+                .catch(error => console.error('Error:', error));
             }
         });
     }
@@ -382,18 +360,8 @@ document.addEventListener('DOMContentLoaded', function() {
     align-items: center;
     justify-content: center;
 }
-
-.drag-handle:active {
-    cursor: grabbing;
-}
-
-.sortable-ghost {
-    opacity: 0.5;
-    background-color: #f8f9fa;
-}
-
-.sortable-chosen {
-    background-color: #e3f2fd;
-}
+.drag-handle:active { cursor: grabbing; }
+.sortable-ghost { opacity: 0.5; background-color: #f8f9fa; }
+.sortable-chosen { background-color: #e3f2fd; }
 </style>
-@endpush 
+@endpush

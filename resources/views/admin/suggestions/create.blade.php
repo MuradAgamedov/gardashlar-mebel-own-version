@@ -76,17 +76,6 @@
                                                 <div class="image-preview mt-2" id="image-preview"></div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">PDF</label>
-                                            <input type="file" 
-                                                   class="form-control @error('pdf') is-invalid @enderror" 
-                                                   name="pdf" 
-                                                   accept=".pdf">
-                                            @error('pdf')
-                                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                            @enderror
-                                            <div class="form-text">Maksimum ölçü: 10MB. Format: PDF</div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -270,4 +259,4 @@ document.addEventListener('DOMContentLoaded', function() {
     border-color: #e9ecef #e9ecef #dee2e6;
 }
 </style>
-@endpush 
+@endpush
