@@ -68,6 +68,7 @@ use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\CompareController;
 use App\Http\Controllers\Api\RoluteeteActionController;
+use App\Http\Controllers\Api\Payment\PaymentController;
 
 
 
@@ -347,3 +348,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile/confirm-email', [AuthController::class, 'confirmEmailChange'])->name('api.profile.confirm-email');
     Route::post('/profile/resend-email-otp', [AuthController::class, 'resendEmailChangeOTP'])->name('api.profile.resend-email-otp');
 });
+
+
+
+
+Route::post('/payment/installment', [PaymentController::class, 'startInstallment']);
+Route::get('/payment/callback', [PaymentController::class, 'callback']);
