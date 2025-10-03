@@ -303,6 +303,7 @@ class CompareController extends Controller
                         ? $product->price - ($product->price * $product->discount_percent / 100)
                         : null;
     
+                    // 🔹 Məhsul detalları
                     $details = $product->details()->ordered()->get()->map(function ($detail) use ($languageId) {
                         $tr = $detail->translate($languageId);
                         return [
@@ -331,6 +332,36 @@ class CompareController extends Controller
                         ];
                     });
     
+                    // 🔹 Məhsul tipləri
+                    $productTypes = $product->types->map(function ($type) use ($languageId) {
+                        $tr = $type->translates()->where('language_id', $languageId)->first();
+                        return [
+                            'id' => $type->id,
+                            'title' => $tr ? $tr->title : '',
+                            'slug' => $tr ? $tr->slug : null,
+                        ];
+                    });
+    
+                    // 🔹 Mövcud rənglər
+                    $availableColors = $product->images()
+                        ->whereNotNull('product_color_id')
+                        ->pluck('product_color_id')
+                        ->unique()
+                        ->values();
+    
+                    $availableColorDetails = [];
+                    if ($availableColors->isNotEmpty()) {
+                        $availableColorDetails = ProductColor::whereIn('id', $availableColors)->get()->map(function ($color) use ($languageId) {
+                            $tr = $color->translates()->where('language_id', $languageId)->first();
+                            return [
+                                'id' => $color->id,
+                                'title' => $tr ? $tr->title : null,
+                                'slug' => $tr ? $tr->slug : null,
+                                'color_code' => $color->color_code,
+                            ];
+                        });
+                    }
+    
                     // 🔹 Category info
                     $category = $product->categories->first();
                     $categorySlug = $category ? $category->translate($languageId)->slug ?? null : null;
@@ -341,6 +372,7 @@ class CompareController extends Controller
                     return [
                         'id' => $product->id,
                         'title' => $translation ? $translation->title : '',
+                        'slug' => $translation ? $translation->slug : '',
                         'price' => $product->price,
                         'discount_price' => $discountPrice,
                         'discount_percent' => $product->discount_percent,
@@ -348,6 +380,8 @@ class CompareController extends Controller
                         'card_image_alt_text' => $cardImageAltText,
                         'details' => $details,
                         'detail_values' => $detailValues,
+                        'product_types' => $productTypes,
+                        'available_colors' => $availableColorDetails,
                         'category_slug' => $categorySlug,
                         'parent_category_slug' => $parentCategorySlug,
                     ];
