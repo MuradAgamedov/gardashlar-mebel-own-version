@@ -30,12 +30,13 @@ class CartController extends Controller
             [
                 'user_id' => $user->id,
                 'product_id' => $request->product_id,
-                'color_id' => $request->color_id,
             ],
             [
-                'count' => $request->count,
+                'color_id' => $request->color_id,
+                'count'    => $request->count,
             ]
         );
+        
 
         return response()->json([
             'success' => true,
