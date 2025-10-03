@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductCompare;
+use App\Models\ProductColor;
+
 use App\Models\Language;
 
 class CompareController extends Controller
@@ -218,7 +220,7 @@ class CompareController extends Controller
                 ]);
             }
     
-            // 🔹 Products in selected category (pivot-dan filter)
+            // 🔹 Products in selected category
             $products = Product::whereIn('id', $compareProductIds)
                 ->whereHas('categories', fn($q) => $q->where('product_categories.id', $selectedCategory['id']))
                 ->active()
@@ -279,7 +281,7 @@ class CompareController extends Controller
                         ];
                     });
     
-                    // 🔹 Mövcud rənglər
+                    // 🔹 Mövcud rənglər (yalnız color_code)
                     $availableColors = $product->images()
                         ->whereNotNull('product_color_id')
                         ->pluck('product_color_id')
@@ -288,12 +290,9 @@ class CompareController extends Controller
     
                     $availableColorDetails = [];
                     if ($availableColors->isNotEmpty()) {
-                        $availableColorDetails = ProductColor::whereIn('id', $availableColors)->get()->map(function ($color) use ($languageId) {
-                            $tr = $color->translates()->where('language_id', $languageId)->first();
+                        $availableColorDetails = ProductColor::whereIn('id', $availableColors)->get()->map(function ($color) {
                             return [
                                 'id' => $color->id,
-                                'title' => $tr ? $tr->title : null,
-                                'slug' => $tr ? $tr->slug : null,
                                 'color_code' => $color->color_code,
                             ];
                         });
