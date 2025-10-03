@@ -70,37 +70,41 @@ class RoluteeteActionController extends Controller
     }
 
     public function getUserActions(Request $request)
-{
-    $user = $request->user();
-
-    if (!$user) {
+    {
+        $user = $request->user();
+    
+        if (!$user) {
+            return response()->json([
+                "success" => false,
+                "message" => "You must be logged in to see your actions!"
+            ], 401);
+        }
+    
+        $languageId = $this->getLanguageIdFromHeader($request);
+    
+        $actions = $user->roluteeteActions()
+            ->with(['roluteeteAction.translates' => function($q) use ($languageId) {
+                $q->where('language_id', $languageId);
+            }])
+            ->get()
+            ->map(function ($userAction) {
+                $tr = $userAction->roluteeteAction->translates->first();
+    
+                return [
+                    'id'      => $userAction->roluteeteAction->id,
+                    'percent' => $userAction->roluteeteAction->percent,
+                    'title'   => $tr ? $tr->title : null,
+                    'used'    => $userAction->used,
+                    'image'   => $userAction->roluteeteAction->image 
+                        ? asset('storage/' . $userAction->roluteeteAction->image) 
+                        : null,
+                ];
+            });
+    
         return response()->json([
-            "success" => false,
-            "message" => "You must be logged in to see your actions!"
-        ], 401);
+            'success' => true,
+            'data'    => $actions,
+        ]);
     }
-
-    $languageId = $this->getLanguageIdFromHeader($request);
-
-    $actions = $user->roluteeteActions()
-        ->with(['roluteeteAction.translates' => function($q) use ($languageId) {
-            $q->where('language_id', $languageId);
-        }])
-        ->get()
-        ->map(function ($userAction) {
-            $tr = $userAction->roluteeteAction->translates->first();
-            return [
-                'id'        => $userAction->roluteeteAction->id,
-                'percent'   => $userAction->roluteeteAction->percent,
-                'title'     => $tr ? $tr->title : null,
-                'used'      => $userAction->used,
-            ];
-        });
-
-    return response()->json([
-        'success' => true,
-        'data'    => $actions,
-    ]);
-}
-
+    
 }
