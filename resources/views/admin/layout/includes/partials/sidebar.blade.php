@@ -37,7 +37,12 @@
           <h6>Roluteete Actions</h6>
         </a>
       </li>
-
+      <li class="sidebar-list">
+        <a class="sidebar-link" href="{{ route('admin.orders.index') }}">
+          <i class="fas fa-file-alt"></i>
+          <h6>Orders</h6>
+        </a>
+      </li>
       <li class="sidebar-list">
         <a class="sidebar-link" href="{{ route('admin.credit-cards.index') }}">
           <i class="fas fa-file-alt"></i>

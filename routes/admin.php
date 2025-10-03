@@ -88,6 +88,7 @@ use App\Http\Controllers\Admin\SubscriberController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\RoluteeteActionController;
 use App\Http\Controllers\Admin\CreditCardController;
+use App\Http\Controllers\Admin\PaymentController;
 
 
 Route::prefix('')->name('admin.')->group(function () {
@@ -103,6 +104,9 @@ Route::prefix('')->name('admin.')->group(function () {
         
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('clear-cache', [DashboardController::class, 'clearCache'])->name('clear-cache');
+
+        Route::get('orders', [PaymentController::class, 'index'])->name('orders.index');
+        
 
 
         Route::resource('credit-cards', CreditCardController::class);
