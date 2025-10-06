@@ -459,5 +459,30 @@ class CompareController extends Controller
             'message' => $deleted ? 'Product removed from compare successfully!' : 'Product not found in compare list!'
         ]);
     }
+
+
+    public function resetCompare(Request $request)
+    {
+        $user = $request->user();
+    
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized',
+            ], 401);
+        }
+    
+        // İstifadəçinin bütün compare məhsullarını sil
+        $deletedCount = \App\Models\ProductCompare::where('user_id', $user->id)->delete();
+    
+        return response()->json([
+            'success' => true,
+            'message' => $deletedCount > 0
+                ? 'All products removed from compare list successfully.'
+                : 'Compare list was already empty.',
+            'deleted_count' => $deletedCount,
+        ]);
+    }
+    
     
 }

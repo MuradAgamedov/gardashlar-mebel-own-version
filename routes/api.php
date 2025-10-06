@@ -306,6 +306,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/get-cart', [CartController::class, 'getCart'])->name('api.getCart');
     Route::delete('/remove-cart', [CartController::class, 'removeCart'])->name('api.removeCart');
     Route::delete('/remove-compare', [CompareController::class, 'removeCompare'])->name('api.removeCompare');
+    Route::post('/reset-compare', [CompareController::class, 'resetCompare'])->name('api.resetCompare');
 
 
     Route::post('/add-compare', [CompareController::class, 'addCompare'])->name('api.addCompare');
