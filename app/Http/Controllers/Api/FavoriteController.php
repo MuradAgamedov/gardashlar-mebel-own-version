@@ -63,33 +63,42 @@ class FavoriteController extends Controller
             ], 401);
         }
     
-        $favorites = $user->favorites()->with(['product.projectCategory', 'product.images'])->get();
+        // Eager load product with all necessary relations
+        $favorites = $user->favorites()->with([
+            'product.translates' => fn($q) => $q->where('language_id', $languageId),
+            'product.images',
+            'product.colors',
+            'product.details.translates' => fn($q) => $q->where('language_id', $languageId),
+            'product.detailValues.translates' => fn($q) => $q->where('language_id', $languageId),
+            'product.types.translates' => fn($q) => $q->where('language_id', $languageId),
+            'product.categories.translates' => fn($q) => $q->where('language_id', $languageId),
+        ])->get();
     
-        $favoriteData = $favorites->map(function ($fav) use ($languageId, $user) {
+        // Geri plan üçün cart və compare məlumatlarını əvvəlcədən götür
+        $cartItems = $user->cart()->get()->keyBy(fn($item) => $item->product_id . '-' . $item->color_id);
+        $compareIds = \App\Models\ProductCompare::whereIn('product_id', $favorites->pluck('product_id'))->pluck('product_id')->toArray();
+    
+        $favoriteData = $favorites->map(function ($fav) use ($languageId, $user, $cartItems, $compareIds) {
             $product = $fav->product ? $fav->product->apiData($languageId) : null;
+    
+            // Cart və compare status
+            $cartKey = $fav->product_id . '-' . $fav->color_id;
+            $inCart = $cartItems[$cartKey] ?? null;
     
             return [
                 'favorite_id' => $fav->id,
                 'color_id'    => $fav->color_id,
                 'product'     => $product,
-    
-                // 🔹 Əlavə hissələr
                 'inFavorite' => [
                     'isActive' => true,
                     'color_id' => $fav->color_id,
                 ],
                 'inCart' => [
-                    'isActive' => $user->cart()
-                                       ->where('product_id', $fav->product_id)
-                                       ->where('color_id', $fav->color_id)
-                                       ->exists(),
+                    'isActive' => $inCart ? true : false,
                     'color_id' => $fav->color_id,
-                    'count'    => optional($user->cart()
-                                               ->where('product_id', $fav->product_id)
-                                               ->where('color_id', $fav->color_id)
-                                               ->first())->count,
+                    'count'    => $inCart?->count ?? 0,
                 ],
-                'inCompare' => \App\Models\ProductCompare::where('product_id', $fav->product_id)->exists(),
+                'inCompare' => in_array($fav->product_id, $compareIds),
             ];
         });
     
