@@ -135,7 +135,7 @@ class FavoriteController extends Controller
             // Get language ID from header using trait
             $languageId = $this->getLanguageIdFromHeader($request);
     
-            // Get existing active products with relationships
+            // Get existing active products with relationships and translations
             $existingProducts = Product::active()
                 ->whereIn('id', $productIds)
                 ->with([
@@ -145,8 +145,8 @@ class FavoriteController extends Controller
                     'categories.translates' => fn($q) => $q->where('language_id', $languageId),
                     'types.translates' => fn($q) => $q->where('language_id', $languageId),
                     'colors' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
-                    'details',
-                    'detailValues'
+                    'details.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'detailValues.translates' => fn($q) => $q->where('language_id', $languageId),
                 ])
                 ->get();
     
@@ -190,28 +190,39 @@ class FavoriteController extends Controller
                 ]);
     
                 // Images
-                // Images
-$imagesWithColors = $product->images->map(fn($image) => [
-    'id' => $image->id,
-    'image_url' => $image->image ? asset('storage/' . $image->image) : null,
-    'is_main' => $image->is_main,
-    'order' => $image->order,
-    'color_id' => $image->product_color_id // nested color yox, sadəcə id
-])->sortBy('order')->values();
-
-// Əgər heç bir şəkil yoxdursa, default əlavə et
-if ($imagesWithColors->isEmpty()) {
-    $imagesWithColors = collect([
-        [
-            'id' => time(), // random id
-            'image_url' => asset('images/default_image.webp'),
-            'is_main' => false,
-            'order' => 0,
-            'color_id' => null
-        ]
-    ]);
-}
-
+                $imagesWithColors = $product->images->map(fn($image) => [
+                    'id' => $image->id,
+                    'image_url' => $image->image ? asset('storage/' . $image->image) : null,
+                    'is_main' => $image->is_main,
+                    'order' => $image->order,
+                    'color_id' => $image->product_color_id
+                ])->sortBy('order')->values();
+    
+                if ($imagesWithColors->isEmpty()) {
+                    $imagesWithColors = collect([
+                        [
+                            'id' => time(),
+                            'image_url' => asset('images/default_image.webp'),
+                            'is_main' => false,
+                            'order' => 0,
+                            'color_id' => null
+                        ]
+                    ]);
+                }
+    
+                // Product details with translation
+                $productDetails = $product->details->map(fn($detail) => [
+                    'id' => $detail->id,
+                    'keyword' => $detail->translate($languageId)?->keyword ?? '',
+                    'value' => $detail->translate($languageId)?->value ?? '',
+                ]);
+    
+                // Product detail values with translation
+                $productDetailValues = $product->detailValues->map(fn($value) => [
+                    'id' => $value->id,
+                    'keyword' => $value->translate($languageId)?->keyword ?? '',
+                    'value' => $value->translate($languageId)?->value ?? '',
+                ]);
     
                 // Discount price calculation
                 $discountPrice = $product->discount_percent > 0 
@@ -231,8 +242,8 @@ if ($imagesWithColors->isEmpty()) {
                     'discount_percent' => $product->discount_percent,
                     'price' => $product->price,
                     'images' => $imagesWithColors,
-                    'product_details' => $product->details ?? [],
-                    'product_detail_values' => $product->detailValues ?? [],
+                    'product_details' => $productDetails,
+                    'product_detail_values' => $productDetailValues,
                     'product_types' => $productTypes,
                     'view_count' => $product->view_count
                 ];

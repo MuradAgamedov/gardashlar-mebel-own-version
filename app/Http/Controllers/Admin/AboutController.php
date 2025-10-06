@@ -9,14 +9,12 @@ use App\Models\Language;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use App\Repositories\AboutRepository;
 class AboutController extends Controller
 {
-    protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(public ImageService $imageService, public AboutRepository $repository)
     {
-        $this->imageService = $imageService;
     }
 
     /**
@@ -24,7 +22,7 @@ class AboutController extends Controller
      */
     public function index()
     {
-        $abouts = About::with('translates.language')->ordered()->get();
+        $abouts = $this->repository->getAbout();
 
         return view('admin.abouts.index', compact('abouts'));
     }

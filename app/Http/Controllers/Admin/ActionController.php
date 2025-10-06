@@ -12,12 +12,16 @@ use App\Models\Product;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\CompanyRepository;
+use App\Repositories\ActionRepository;
+
+
 
 class ActionController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(ImageService $imageService, public ActionRepository $repository,  public CompanyRepository $companyRepository)
     {
         $this->imageService = $imageService;
     }
@@ -27,24 +31,10 @@ class ActionController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Action::with(['company', 'translates.language']);
+        $actions = $this->repository->getAction($request);
 
-        // Search functionality
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->whereHas('translates', function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
 
-        // Filter by company
-        if ($request->filled('company_id')) {
-            $query->where('company_id', $request->company_id);
-        }
-
-        $actions = $query->ordered()->paginate(15);
-        $companies = Company::with('translates.language')->active()->ordered()->get();
+        $companies = $this->companyRepository->getCompanies();
 
         return view('admin.actions.index', compact('actions', 'companies'));
     }

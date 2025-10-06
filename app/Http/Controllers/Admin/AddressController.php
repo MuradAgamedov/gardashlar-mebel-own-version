@@ -10,17 +10,21 @@ use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Repositories\AddressRepository;
 
 class AddressController extends Controller
 {
+
+    public function __construct(public AddressRepository $repository)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $addressTypes = AddressType::with(['translates.language', 'addresses.translates.language'])
-            ->ordered()
-            ->get();
+        $addressTypes = $this->repository->getAddresses();
 
         return view('admin.addresses.index', compact('addressTypes'));
     }

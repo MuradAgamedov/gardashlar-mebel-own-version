@@ -13,19 +13,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
-
+use App\Repositories\CompanyRepository;
 class CompanyController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(ImageService $imageService, public CompanyRepository $repository)
     {
         $this->imageService = $imageService;
     }
 
     public function index()
     {
-        $companies = Company::with('translates.language')->ordered()->get();
+        $companies = $this->repository->getCompanies();
         return view('admin.companies.index', compact('companies'));
     }
 
