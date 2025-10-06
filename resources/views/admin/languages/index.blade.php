@@ -46,7 +46,6 @@
                             <h5>Languages List</h5>
                             <a href="{{ route('admin.languages.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New Language
                             </a>
                         </div>
                     </div>

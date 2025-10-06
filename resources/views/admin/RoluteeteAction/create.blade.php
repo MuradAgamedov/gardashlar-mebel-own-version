@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Create Roluteete Action')
+@section('title', 'Create Roulette Action')
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Create Roluteete Action</h3>
+                    <h3>Create Roulette Action</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,7 +18,7 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.roluteete-actions.index') }}">Actions</a>
+                            <a href="{{ route('admin.roulette-actions.index') }}">Actions</a>
                         </li>
                         <li class="breadcrumb-item active">Create</li>
                     </ol>
@@ -46,7 +46,7 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('admin.roluteete-actions.store') }}" 
+                        <form action="{{ route('admin.roulette-actions.store') }}" 
                               method="POST" enctype="multipart/form-data">
                             @csrf
 
@@ -137,7 +137,7 @@
                             {{-- Buttons --}}
                             <div class="d-flex gap-2 mt-3">
                                 <button type="submit" class="btn btn-primary">Save</button>
-                                <a href="{{ route('admin.roluteete-actions.index') }}" class="btn btn-secondary">Cancel</a>
+                                <a href="{{ route('admin.roulette-actions.index') }}" class="btn btn-secondary">Cancel</a>
                             </div>
 
                         </form>

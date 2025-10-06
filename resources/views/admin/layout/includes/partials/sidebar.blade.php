@@ -32,9 +32,9 @@
       </li>
 
       <li class="sidebar-list">
-        <a class="sidebar-link" href="{{ route('admin.roluteete-actions.index') }}">
+        <a class="sidebar-link" href="{{ route('admin.roulette-actions.index') }}">
           <i class="fas fa-file-alt"></i>
-          <h6>Roluteete Actions</h6>
+          <h6>Roulette Actions</h6>
         </a>
       </li>
       <li class="sidebar-list">

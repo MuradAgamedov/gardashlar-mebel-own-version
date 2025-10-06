@@ -54,7 +54,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <button type="button" class="btn btn-danger" onclick="confirmBulkDelete()">
-                                    <i class="fas fa-trash"></i> Delete Selected
+                                    <i class="fas fa-trash"></i> 
                                 </button>
                             </div>
                         </div>
@@ -93,7 +93,7 @@
                                         <button type="button" 
                                                 class="btn btn-danger btn-sm" 
                                                 onclick="confirmDelete({{ $subscriber->id }}, '{{ $subscriber->email }}')">
-                                            <i class="fas fa-trash"></i> Delete
+                                            <i class="fas fa-trash"></i> 
                                         </button>
                                     </td>
                                 </tr>

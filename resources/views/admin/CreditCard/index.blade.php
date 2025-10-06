@@ -44,7 +44,7 @@
                             <div class="col-md-6">
                                 <div class="d-flex justify-content-end gap-2">
                                     <a href="{{ route('admin.credit-cards.create') }}" class="btn btn-primary">
-                                        <i class="material-icons-outlined">add</i> New Card
+                                        <i class="material-icons-outlined">add</i> 
                                     </a>
                                 </div>
                             </div>

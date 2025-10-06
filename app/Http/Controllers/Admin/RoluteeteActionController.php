@@ -58,7 +58,7 @@ class RoluteeteActionController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.roluteete-actions.index')
+        return redirect()->route('admin.roulette-actions.index')
                          ->with('success', 'Roluteete Action created successfully!');
     }
 
@@ -111,7 +111,7 @@ class RoluteeteActionController extends Controller
             }
         }
 
-        return redirect()->route('admin.roluteete-actions.index')
+        return redirect()->route('admin.roulette-actions.index')
                          ->with('success', 'Roluteete Action updated successfully!');
     }
 
@@ -126,7 +126,7 @@ class RoluteeteActionController extends Controller
 
         $action->delete();
 
-        return redirect()->route('admin.roluteete-actions.index')
+        return redirect()->route('admin.roulette-actions.index')
                          ->with('success', 'Roluteete Action deleted successfully!');
     }
 
@@ -137,7 +137,7 @@ class RoluteeteActionController extends Controller
     $action->status = !$action->status;
     $action->save();
 
-    return redirect()->route('admin.roluteete-actions.index')
+    return redirect()->route('admin.roulette-actions.index')
                      ->with('success', 'Status changed successfully!');
 }
 

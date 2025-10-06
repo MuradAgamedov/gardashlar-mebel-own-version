@@ -47,8 +47,8 @@
                             </form>
                         </div>
                         <div class="col-md-3">
-                            <a href="{{ route('admin.vacancy-forms.index') }}" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Clear Filters
+                            <a style="width: max-content" href="{{ route('admin.vacancy-forms.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> 
                             </a>
                         </div>
                     </div>

@@ -289,7 +289,6 @@
                                                     <p class="mt-2">No products found</p>
                                                     @if(request('search') || request('category') || request('type') || request('status'))
                                                         <a href="{{ route('admin.products.index') }}" class="btn btn-outline-primary me-2">
-                                                            Clear Filters
                                                         </a>
                                                     @endif
                                                     <a href="{{ route('admin.products.create') }}" class="btn btn-primary">

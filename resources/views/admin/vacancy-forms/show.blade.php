@@ -137,14 +137,14 @@
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger">
-                                        <i class="fas fa-trash"></i> Delete Form
+                                        <i class="fas fa-trash"></i> 
                                     </button>
                                 </form>
                                 
                                 <div>
                                     <a href="mailto:{{ $form->email }}?subject=Re: Your Job Application" 
                                        class="btn btn-info">
-                                        <i class="fas fa-reply"></i> Reply via Email
+                                        <i class="fas fa-reply"></i> 
                                     </a>
                                 </div>
                             </div>

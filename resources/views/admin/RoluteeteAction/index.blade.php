@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'RoluteeteActions')
+@section('title', 'Roulette Actions')
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>RoluteeteActions</h3>
+                    <h3>Roulette Actions</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">RoluteeteActions</li>
+                        <li class="breadcrumb-item active">Roulette Actions</li>
                     </ol>
                 </div>
             </div>
@@ -31,7 +31,7 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Actions</h5>
-                            <a href="{{ route('admin.roluteete-actions.create') }}" class="btn btn-primary">
+                            <a href="{{ route('admin.roulette-actions.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
                         </div>
@@ -77,7 +77,7 @@
 
                                         {{-- 👁 Status --}}
                                         <td class="text-center">
-                                            <form action="{{ route('admin.roluteete-actions.toggleStatus', $action->id) }}" 
+                                            <form action="{{ route('admin.roulette-actions.toggleStatus', $action->id) }}" 
                                                   method="POST">
                                                 @csrf
                                                 @method('PATCH')
@@ -96,13 +96,13 @@
                                         <td class="text-center">
                                             <div class="d-flex justify-content-center gap-2">
                                                 {{-- Edit --}}
-                                                <a href="{{ route('admin.roluteete-actions.edit', $action->id) }}" 
+                                                <a href="{{ route('admin.roulette-actions.edit', $action->id) }}" 
                                                    class="btn btn-sm btn-warning" title="Edit">
                                                     <i class="material-icons-outlined">edit</i>
                                                 </a>
 
                                                 {{-- Delete --}}
-                                                <form action="{{ route('admin.roluteete-actions.destroy', $action->id) }}" 
+                                                <form action="{{ route('admin.roulette-actions.destroy', $action->id) }}" 
                                                       method="POST" 
                                                       onsubmit="return confirm('Silmək istədiyinizə əminsiniz?');">
                                                     @csrf
