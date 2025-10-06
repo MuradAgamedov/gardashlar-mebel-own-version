@@ -17,6 +17,7 @@ class PaymentController extends Controller
     public function startInstallment(Request $request)
     {
         $data = $request->validate([
+            'product_id'      => 'required|exists:products,id',
             'full_name'       => 'required|string|max:255',
             'phone'           => 'required|string|max:50',
             'email'           => 'required|email|max:255',
@@ -30,9 +31,10 @@ class PaymentController extends Controller
         $lang = $data['language'] ?? 'EN';
         $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
 
-        // 🔹 Order yaradılır (pending, unpaid)
+        // 🔹 Order yaradılır
         $order = Order::create([
             'user_id'        => $request->user()->id ?? null,
+            'product_id'     => $data['product_id'],
             'full_name'      => $data['full_name'],
             'phone'          => $data['phone'],
             'email'          => $data['email'],
@@ -85,6 +87,7 @@ class PaymentController extends Controller
     public function startCash(Request $request)
     {
         $data = $request->validate([
+            'product_id'      => 'required|exists:products,id',
             'full_name'       => 'required|string|max:255',
             'phone'           => 'required|string|max:50',
             'email'           => 'required|email|max:255',
@@ -97,9 +100,10 @@ class PaymentController extends Controller
         $lang = $data['language'] ?? 'EN';
         $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
 
-        // 🔹 Order yaradılır (pending, unpaid)
+        // 🔹 Order yaradılır
         $order = Order::create([
             'user_id'        => $request->user()->id ?? null,
+            'product_id'     => $data['product_id'],
             'full_name'      => $data['full_name'],
             'phone'          => $data['phone'],
             'email'          => $data['email'],

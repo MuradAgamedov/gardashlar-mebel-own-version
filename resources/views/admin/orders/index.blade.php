@@ -15,6 +15,7 @@
                     <th>Phone</th>
                     <th>Email</th>
                     <th>City</th>
+                    <th>Product</th>
                     <th>Status</th>
                     <th>Payment Status</th>
                     <th>Actions</th>
@@ -28,6 +29,7 @@
                     <td>{{ $order->phone }}</td>
                     <td>{{ $order->email }}</td>
                     <td>{{ $order->city }}</td>
+                    <td>{{ $order->product?->name ?? '—' }}</td> {{-- Məhsul adı --}}
                     <td><span class="badge bg-info">{{ $order->status }}</span></td>
                     <td><span class="badge bg-success">{{ $order->payment_status }}</span></td>
                     <td>
@@ -46,6 +48,7 @@
                             data-month="{{ $order->month }}"
                             data-monthly_price="{{ $order->monthly_price }}"
                             data-text="{{ $order->text }}"
+                            data-product="{{ $order->product?->name ?? '—' }}"
                         >
                             Show
                         </button>
@@ -88,6 +91,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 <p><strong>Phone:</strong> ${this.dataset.phone}</p>
                 <p><strong>Email:</strong> ${this.dataset.email}</p>
                 <p><strong>City:</strong> ${this.dataset.city}</p>
+                <p><strong>Product:</strong> ${this.dataset.product}</p>
                 <p><strong>Status:</strong> ${this.dataset.status}</p>
                 <p><strong>Payment Status:</strong> ${this.dataset.payment_status}</p>
                 <p><strong>Delivery Method:</strong> ${this.dataset.delivery_method ?? '-'}</p>

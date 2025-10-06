@@ -11,6 +11,7 @@ class Order extends Model
 
     protected $fillable = [
         'user_id',
+        'product_id', // 🔹 əlavə olundu
         'full_name',
         'phone',
         'email',
@@ -23,7 +24,7 @@ class Order extends Model
         'month',
         'monthly_price',
         'status',
-        'payment_status', // 🔹 əlavə olundu
+        'payment_status',
     ];
 
     /**
@@ -32,5 +33,13 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Məhsulla əlaqə (Order belongs to Product)
+     */
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 }
