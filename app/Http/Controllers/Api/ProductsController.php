@@ -900,20 +900,37 @@ class ProductsController extends Controller
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
-            
+    
             if (!$languageId) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid language'
                 ], 400);
             }
-
-            $product = Product::findOrFail($id);
-            $details = $product->details()->with(['translates' => function($query) use ($languageId) {
-                $query->where('language_id', $languageId);
-            }])->get();
-
-            $detailsData = $details->map(function ($detail) {
+    
+            // Product with translations and relations
+            $product = Product::with([
+                'translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                },
+                'images' => function($q) {
+                    $q->where('status', true)->orderBy('order');
+                },
+                'categories.translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                },
+                'types.translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                },
+                'details.translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                }
+            ])->findOrFail($id);
+    
+            $translation = $product->translates->first();
+    
+            // ✳️ Product details
+            $detailsData = $product->details->map(function ($detail) {
                 $translation = $detail->translates->first();
                 return [
                     'id' => $detail->id,
@@ -921,13 +938,159 @@ class ProductsController extends Controller
                     'value' => $translation ? $translation->value : ''
                 ];
             });
-
+    
+            // ✳️ User
+            $user = auth('sanctum')->user();
+    
+            // ✳️ inCart
+            $inCart = [
+                'isActive' => false,
+                'color_id' => null,
+                'count' => null,
+            ];
+    
+            if ($user) {
+                $cartItem = \App\Models\Cart::where('user_id', $user->id)
+                    ->where('product_id', $product->id)
+                    ->first();
+    
+                if ($cartItem) {
+                    $inCart['isActive'] = true;
+                    $inCart['color_id'] = $cartItem->product_color_id ?? null;
+                    $inCart['count'] = $cartItem->count ?? null;
+                }
+            }
+    
+            // ✳️ inFavorite
+            $inFavorite = [
+                'isActive' => false,
+                'color_id' => null,
+            ];
+    
+            if ($user) {
+                $favoriteItem = \App\Models\Favorite::where('user_id', $user->id)
+                    ->where('product_id', $product->id)
+                    ->first();
+    
+                if ($favoriteItem) {
+                    $inFavorite['isActive'] = true;
+                    $inFavorite['color_id'] = $favoriteItem->product_color_id ?? null;
+                }
+            }
+    
+            // ✳️ inCompare
+            $inCompare = false;
+            if ($user) {
+                $inCompare = \App\Models\Compare::where('user_id', $user->id)
+                    ->where('product_id', $product->id)
+                    ->exists();
+            }
+    
+            // ✳️ Similar products
+            $similarProductsQuery = Product::with([
+                'translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                },
+                'images' => function($query) {
+                    $query->where('status', true)->orderBy('order');
+                },
+                'types.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                },
+                'categories.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }
+            ])
+            ->active()
+            ->whereHas('categories', function($q) use ($product) {
+                $q->whereIn('product_categories.id', $product->categories->pluck('id'));
+            })
+            ->where('id', '!=', $product->id)
+            ->limit(8);
+    
+            $similarProducts = $similarProductsQuery->get();
+    
+            $similarProductsData = $similarProducts->map(function ($product) use ($languageId, $user) {
+                $translation = $product->translates->first();
+                $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
+    
+                // --- inCart
+                $inCart = [
+                    'isActive' => false,
+                    'color_id' => null,
+                    'count' => null,
+                ];
+                if ($user) {
+                    $cartItem = \App\Models\Cart::where('user_id', $user->id)
+                        ->where('product_id', $product->id)
+                        ->first();
+                    if ($cartItem) {
+                        $inCart['isActive'] = true;
+                        $inCart['color_id'] = $cartItem->product_color_id ?? null;
+                        $inCart['count'] = $cartItem->count ?? null;
+                    }
+                }
+    
+                // --- inFavorite
+                $inFavorite = [
+                    'isActive' => false,
+                    'color_id' => null,
+                ];
+                if ($user) {
+                    $favItem = \App\Models\Favorite::where('user_id', $user->id)
+                        ->where('product_id', $product->id)
+                        ->first();
+                    if ($favItem) {
+                        $inFavorite['isActive'] = true;
+                        $inFavorite['color_id'] = $favItem->product_color_id ?? null;
+                    }
+                }
+    
+                // --- inCompare
+                $inCompare = false;
+                if ($user) {
+                    $inCompare = \App\Models\Compare::where('user_id', $user->id)
+                        ->where('product_id', $product->id)
+                        ->exists();
+                }
+    
+                return [
+                    'id' => $product->id,
+                    'title' => $translation ? $translation->title : '',
+                    'slug' => $translation ? $translation->slug : '',
+                    'price' => $product->price,
+                    'view_count' => $product->view_count,
+                    'card_image' => $mainImage && $mainImage->image
+                        ? asset('storage/' . $mainImage->image)
+                        : asset('images/default_image.webp'),
+                    'discount_percent' => $product->discount_percent,
+                    'inCart' => $inCart,
+                    'inFavorite' => $inFavorite,
+                    'inCompare' => $inCompare,
+                ];
+            });
+    
             return response()->json([
                 'success' => true,
                 'message' => 'Product details retrieved successfully',
-                'data' => $detailsData
+                'data' => [
+                    'product' => [
+                        'id' => $product->id,
+                        'title' => $translation ? $translation->title : '',
+                        'slug' => $translation ? $translation->slug : '',
+                        'price' => $product->price,
+                        'view_count' => $product->view_count,
+                        'discount_percent' => $product->discount_percent,
+                        'images' => $product->images->map(fn($img) => asset('storage/' . $img->image)),
+                        'details' => $detailsData,
+                        'inCart' => $inCart,
+                        'inFavorite' => $inFavorite,
+                        'inCompare' => $inCompare
+                    ],
+                    'similar_products' => $similarProductsData
+                ]
             ]);
-
+    
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -935,6 +1098,8 @@ class ProductsController extends Controller
             ], 500);
         }
     }
+    
+    
 
     /**
      * @OA\Get(
