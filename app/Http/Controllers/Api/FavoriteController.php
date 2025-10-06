@@ -226,13 +226,22 @@ class FavoriteController extends Controller
                     'value' => $detail->translate($languageId)?->value ?? '',
                 ]);
     
-                // Product detail values with translation
-                $productDetailValues = $product->detailValues->map(fn($value) => [
-                    'id' => $value->id,
-                    'keyword' => $value->translate($languageId)?->keyword ?? '',
-                    'value' => $value->translate($languageId)?->value ?? '',
-                ]);
-    
+            // Product detail values with translation
+$productDetailValues = $product->detailValues->map(fn($value) => [
+    'id' => $value->id,
+    'order' => $value->order,
+    // Translate model-dən gəlir
+    'keyword' => $value->translate($languageId)?->keyword ?? '',
+    'value' => $value->translate($languageId)?->value ?? '',
+    // Lazım olsa details-i də əlavə edə bilərsən
+    'details' => $value->details->map(fn($detail) => [
+        'id' => $detail->id,
+        'order' => $detail->order,
+        'keyword' => $detail->translate($languageId)?->keyword ?? '',
+        'value' => $detail->translate($languageId)?->value ?? '',
+    ])
+]);
+
                 // Discount price calculation
                 $discountPrice = $product->discount_percent > 0 
                     ? round($product->price - ($product->price * $product->discount_percent / 100), 2)

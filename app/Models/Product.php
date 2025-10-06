@@ -187,132 +187,57 @@ public function apiData($languageId = null, $colorId = null)
         $languageId = app()->getLocale();
     }
 
-    // Tərcümə
-    $translation = $this->translates()
-        ->where('language_id', $languageId)
-        ->first();
+    // Translation
+    $translation = $this->translates()->where('language_id', $languageId)->first();
 
     // Product types
-    $productTypes = $this->types->map(function ($type) use ($languageId) {
-        $tr = $type->translates()->where('language_id', $languageId)->first();
-        return [
-            'id' => $type->id,
-            'title' => $tr ? $tr->title : ''
-        ];
-    });
+    $productTypes = $this->types->map(fn($type) => [
+        'id' => $type->id,
+        'title' => $type->translates()->where('language_id', $languageId)->first()?->title ?? ''
+    ]);
 
     // Product details
-    $productDetails = $this->details()->orderBy('order')->get()->map(function ($detail) use ($languageId) {
-        $tr = $detail->translates()->where('language_id', $languageId)->first();
-        return [
+    $productDetails = $this->details()->orderBy('order')->get()->map(fn($detail) => [
+        'id' => $detail->id,
+        'keyword' => $detail->translate($languageId)?->keyword ?? '',
+        'value' => $detail->translate($languageId)?->value ?? ''
+    ])->filter(fn($d) => $d['keyword'] && $d['value'])->values();
+
+    // Product detail values with nested details
+    $productDetailValues = $this->detailValues()->orderBy('order')->get()->map(fn($dv) => [
+        'id' => $dv->id,
+        'keyword' => $dv->translate($languageId)?->keyword ?? '',
+        'value' => $dv->translate($languageId)?->value ?? '',
+        'details' => $dv->details()->orderBy('order')->get()->map(fn($detail) => [
             'id' => $detail->id,
-            'keyword' => $tr ? $tr->keyword : '',
-            'value' => $tr ? $tr->value : ''
-        ];
-    })->filter(fn($d) => $d['keyword'] && $d['value'])->values();
+            'keyword' => $detail->translate($languageId)?->keyword ?? '',
+            'value' => $detail->translate($languageId)?->value ?? ''
+        ])->filter(fn($d) => $d['keyword'] && $d['value'])->values()
+    ]);
 
-    // Product detail values
-    $productDetailValues = $this->detailValues()->orderBy('order')->get()->map(function ($dv) use ($languageId) {
-        $tr = $dv->translates()->where('language_id', $languageId)->first();
-        $details = $dv->details()->orderBy('order')->get()->map(function ($detail) use ($languageId) {
-            $dtr = $detail->translates()->where('language_id', $languageId)->first();
-            return [
-                'id' => $detail->id,
-                'keyword' => $dtr ? $dtr->keyword : '',
-                'value' => $dtr ? $dtr->value : ''
-            ];
-        })->filter(fn($d) => $d['keyword'] && $d['value'])->values();
-
-        return [
-            'id' => $dv->id,
-            'keyword' => $tr ? $tr->keyword : '',
-            'details' => $details
-        ];
-    });
-
-    // Bütün şəkillər
-  $images = $this->images()->where('status', true)->get()->map(function ($img) {
-    return [
+    // Images
+    $images = $this->images()->where('status', true)->orderBy('order')->get()->map(fn($img) => [
         'id' => $img->id,
-        'image_url' => $img->image ? asset('storage/' . $img->image) : null,
+        'image_url' => $img->image ? asset('storage/' . $img->image) : asset('images/default_image.webp'),
         'color_id' => $img->product_color_id ?? null,
         'is_main' => $img->is_main
-    ];
-});
-
-// Əgər heç bir şəkil yoxdursa, default əlavə et
-if ($images->isEmpty()) {
-    $images = collect([
-        [
-            'id' => time(), // random id
-            'image_url' => asset('images/default_image.webp'),
-            'color_id' => null,
-            'is_main' => false
-        ]
     ]);
-}
-
-    
-
-    // Available colors
-    $availableColors = $this->images()->whereNotNull('product_color_id')->pluck('product_color_id')->unique()->values();
-    $availableColorDetails = [];
-    if ($availableColors->isNotEmpty()) {
-        $availableColorDetails = ProductColor::whereIn('id', $availableColors)->get()->map(function ($color) {
-            return [
-                'id' => $color->id,
-                'color_code' => $color->color_code
-            ];
-        });
-    }
-
-    // Category & Parent Category (slug və title)
-    $categorySlug = null;
-    $categoryTitle = null;
-    $parentSlug = null;
-    $parentTitle = null;
-
-    if ($this->categories->isNotEmpty()) {
-        $category = $this->categories->first(); // əsas category
-        $catTranslation = $category->translates()->where('language_id', $languageId)->first();
-        $categorySlug = $catTranslation ? $catTranslation->slug : null;
-        $categoryTitle = $catTranslation ? $catTranslation->title : null;
-
-        if ($category->parent_id) {
-            $parentCategory = ProductCategory::find($category->parent_id);
-            if ($parentCategory) {
-                $parentTr = $parentCategory->translates()->where('language_id', $languageId)->first();
-                $parentSlug = $parentTr ? $parentTr->slug : null;
-                $parentTitle = $parentTr ? $parentTr->title : null;
-            }
-        }
-    }
-
-    // Discount qiymət
-    $discountPrice = null;
-    if ($this->discount_percent > 0) {
-        $discountPrice = $this->price - ($this->price * $this->discount_percent / 100);
-    }
 
     return [
         'id' => $this->id,
-        'title' => $translation ? $translation->title : '',
-        'slug' => $translation ? $translation->slug : '',
+        'slug' => $translation?->slug ?? '',
+        'title' => $translation?->title ?? '',
         'price' => $this->price,
-        'discount_price' => $discountPrice,
         'discount_percent' => $this->discount_percent,
-        'view_count' => $this->view_count,
+        'discount_price' => $this->discount_percent > 0 ? round($this->price - ($this->price * $this->discount_percent / 100), 2) : null,
         'product_types' => $productTypes,
         'product_details' => $productDetails,
         'product_detail_values' => $productDetailValues,
-        'available_colors' => $availableColorDetails,
         'images' => $images,
-        'category_slug' => $categorySlug,
-        'category_title' => $categoryTitle,
-        'parent_slug' => $parentSlug,
-        'parent_title' => $parentTitle
+        'view_count' => $this->view_count
     ];
 }
+
 
 
 
