@@ -124,7 +124,7 @@
                                 </div>
                                 
                                 <div class="col-md-6">
-                                    <label class="form-label">Discount Percent (%)</label>
+                                    <label class="form-label">Discount price (%)</label>
                                     <input type="number" 
                                            class="form-control @error('discount_price') is-invalid @enderror" 
                                            name="discount_price" 
