@@ -59,7 +59,6 @@ Route::prefix('')->name('admin.')->group(function () {
         require __DIR__.'/web/addresses.php';
         require __DIR__.'/web/emails.php';
         require __DIR__.'/web/maps.php';
-        require __DIR__.'/web/project-categories.php';
         require __DIR__.'/web/hero.php';
         require __DIR__.'/web/projects.php';
         require __DIR__.'/web/products.php';
@@ -73,124 +72,6 @@ Route::prefix('')->name('admin.')->group(function () {
         require __DIR__.'/web/social-networks.php';
         require __DIR__.'/web/currencies.php';
         require __DIR__.'/web/actions.php';
-
-
-        
- 
-
-        
-   
-
-        
-  
-    
-        
- 
-        
-       
-   
-        
-
-
-      
- 
-
-
-
-        
-        
-       
-   
- 
-        
-       
-
-        
-
-      
-        
-
-        
-     
-      
-        
-
-
-        
-        
- 
-
-
-
-   
-  
-   
-        
-
-    
-       
-  
-      
-    
-        
- 
-
-        
-
-
-        
-     
-
-   
-        
-      
-
-        
-
-     
-
-
-
-
-
-      
-        
-        
-     
-
-        
-
-
-        
-
-      
-        
-     
-
-
-
-
-
-
-
-
-    
-   
-
-
-       
-        
-     
-    
-
-    
-
-     
-
-
-
-
-
 
        
     });

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ProjectVideoController;
 use App\Http\Controllers\Admin\ProjectImageController;
 use App\Http\Controllers\Admin\HomePageProjectCategoryController;
 use App\Http\Controllers\Admin\HomePageProjectController;
+use App\Http\Controllers\Admin\ProjectCategoryController;
   
 Route::resource('projects', ProjectController::class);
 Route::post('projects/reorder', [ProjectController::class, 'reorder'])->name('projects.reorder');
