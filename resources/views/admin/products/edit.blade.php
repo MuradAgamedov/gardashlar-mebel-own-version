@@ -126,14 +126,14 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Discount Percent (%)</label>
                                     <input type="number" 
-                                           class="form-control @error('discount_percent') is-invalid @enderror" 
-                                           name="discount_percent" 
-                                           value="{{ old('discount_percent', $product->discount_percent) }}"
+                                           class="form-control @error('discount_price') is-invalid @enderror" 
+                                           name="discount_price" 
+                                           value="{{ old('discount_price', $product->discount_price) }}"
                                            min="0" 
                                            max="100" 
                                            step="0.01"
                                            placeholder="0.00">
-                                    @error('discount_percent')
+                                    @error('discount_price')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>

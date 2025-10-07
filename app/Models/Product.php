@@ -14,17 +14,18 @@ class Product extends Model
         'view_count',
         'order',
         'status',
-        'discount_percent',
-        'price'
+        'price',
+        'discount_price', // əlavə edildi
     ];
-
+    
     protected $casts = [
         'view_count' => 'integer',
         'order' => 'integer',
         'status' => 'boolean',
-        'discount_percent' => 'decimal:2',
-        'price' => 'decimal:2'
+        'price' => 'decimal:2',
+        'discount_price' => 'decimal:2', // əlavə edildi
     ];
+    
 
     // Relationships
     public function categories()
