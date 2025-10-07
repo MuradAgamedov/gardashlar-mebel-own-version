@@ -222,10 +222,10 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                @if($product->discount_percent > 0)
+                                                @if($product->discount_price > 0)
                                                     <span class="badge badge-light-danger">
                                                         <i class="material-icons-outlined" style="font-size: 12px;">local_offer</i>
-                                                        {{ $product->discount_percent }}%
+                                                        {{ $product->discount_price }}%
                                                     </span>
                                                 @else
                                                     <span class="badge badge-light-secondary">No discount</span>

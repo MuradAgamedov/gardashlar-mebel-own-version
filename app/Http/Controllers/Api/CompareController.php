@@ -136,9 +136,7 @@ class CompareController extends Controller
     
                 $cardImageAltText = $mainImage && $mainImage->image_alt_text ? $mainImage->image_alt_text : null;
     
-                $discountPrice = $product->discount_percent > 0
-                    ? $product->price - ($product->price * $product->discount_percent / 100)
-                    : null;
+       
     
                 // 🔹 Məhsul detalları
                 $details = $product->details()->ordered()->get()->map(function ($detail) use ($languageId) {
@@ -208,8 +206,7 @@ class CompareController extends Controller
                     'title' => $translation ? $translation->title : '',
                     'slug' => $translation ? $translation->slug : '',
                     'price' => $product->price,
-                    'discount_price' => $discountPrice,
-                    'discount_percent' => $product->discount_percent,
+                    'discount_price' => $product->discount_price,
                     'card_image' => $cardImage,
                     'card_image_alt_text' => $cardImageAltText,
                     'details' => $details,
@@ -330,10 +327,6 @@ class CompareController extends Controller
 
                 $cardImageAltText = $mainImage && $mainImage->image_alt_text ? $mainImage->image_alt_text : null;
 
-                $discountPrice = $product->discount_percent > 0
-                    ? $product->price - ($product->price * $product->discount_percent / 100)
-                    : null;
-
                 // 🔹 Məhsul detalları
                 $details = $product->details()->ordered()->get()->map(function ($detail) use ($languageId) {
                     $tr = $detail->translate($languageId);
@@ -402,8 +395,7 @@ class CompareController extends Controller
                     'title' => $translation ? $translation->title : '',
                     'slug' => $translation ? $translation->slug : '',
                     'price' => $product->price,
-                    'discount_price' => $discountPrice,
-                    'discount_percent' => $product->discount_percent,
+                    'discount_price' => $product->discount_price,
                     'card_image' => $cardImage,
                     'card_image_alt_text' => $cardImageAltText,
                     'details' => $details,

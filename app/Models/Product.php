@@ -229,8 +229,7 @@ public function apiData($languageId = null, $colorId = null)
         'slug' => $translation?->slug ?? '',
         'title' => $translation?->title ?? '',
         'price' => $this->price,
-        'discount_percent' => $this->discount_percent,
-        'discount_price' => $this->discount_percent > 0 ? round($this->price - ($this->price * $this->discount_percent / 100), 2) : null,
+        'discount_price' => $this->discount_price,
         'product_types' => $productTypes,
         'product_details' => $productDetails,
         'product_detail_values' => $productDetailValues,
@@ -272,11 +271,6 @@ public function similarData($languageId = null)
         ? asset('storage/' . $mainImage->image)
         : asset('images/default_image.webp');
 
-    // Discount qiymət
-    $discountPrice = null;
-    if ($this->discount_percent > 0) {
-        $discountPrice = $this->price - ($this->price * $this->discount_percent / 100);
-    }
 
     // Kategoriyalar (parent_slug və parent_title ilə birlikdə)
     $categories = $this->categories->map(function ($category) use ($languageId) {
@@ -307,8 +301,7 @@ public function similarData($languageId = null)
         'title' => $translation ? $translation->title : '',
         'slug' => $translation ? $translation->slug : '',
         'price' => $this->price,
-        'discount_price' => $discountPrice,
-        'discount_percent' => $this->discount_percent,
+        'discount_price' => $this->discount_price,
         'view_count' => $this->view_count,
         'card_image' => $cardImage,
         'product_types' => $productTypes,

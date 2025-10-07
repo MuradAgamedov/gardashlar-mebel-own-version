@@ -108,7 +108,7 @@ class HeroCategoryController extends Controller
                     'title' => $translate->title ?? null,
                     'slug' => $translate->slug ?? null,
                     'price' => $product->price ?? null,
-                    'discount_percent' => $product->discount_percent ?? 0,
+                    'discount_price' => $product->discount_price ?? 0,
                     'main_image_url' => $mainImage ? $mainImage->image_url : null,
                     // ✅ Yeni boolean-lar
                     'inCart' => in_array($product->id, $cartIds),

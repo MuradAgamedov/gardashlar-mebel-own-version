@@ -379,7 +379,7 @@ class ProductsController extends Controller
                     'price' => $product->price,
                     'view_count' => $product->view_count,
                     'card_image' => $mainImage && $mainImage->image ? asset('storage/' . $mainImage->image) : asset('images/default_image.webp'),
-                    'discount_percent' => $product->discount_percent,
+                    'discount_price' => $product->discount_price,
                     'category_slug' => $categorySlug,
                     'parentSlug' => $parentSlug,
                     'product_types' => $productTypes,
@@ -814,19 +814,14 @@ class ProductsController extends Controller
                     'answers' => $c->answers->pluck('text'),
                 ]);
     
-            // --- Discount
-            $discountPrice = $product->discount_percent
-                ? $product->price - ($product->price * $product->discount_percent / 100)
-                : null;
-    
+       
             // --- Product Data
             $productData = [
                 'id' => $product->id,
                 'title' => $translation ? $translation->title : '',
                 'slug' => $translation ? $translation->slug : '',
                 'price' => $product->price,
-                'discount_price' => $discountPrice,
-                'discount_percent' => $product->discount_percent,
+                'discount_price' => $product->discount_price,
                 'view_count' => $product->view_count,
                 'product_types' => $productTypes,
                 'product_tags' => $productTags,
@@ -894,7 +889,7 @@ class ProductsController extends Controller
                     'title' => $translation ? $translation->title : '',
                     'slug' => $translation ? $translation->slug : '',
                     'price' => $item->price,
-                    'discount_percent' => $item->discount_percent,
+                    'discount_price' => $item->discount_price,
                     'card_image' => $mainImage && $mainImage->image
                         ? asset('storage/' . $mainImage->image)
                         : asset('images/default_image.webp'),
@@ -1128,7 +1123,7 @@ class ProductsController extends Controller
                     'card_image' => $mainImage && $mainImage->image
                         ? asset('storage/' . $mainImage->image)
                         : asset('images/default_image.webp'),
-                    'discount_percent' => $product->discount_percent,
+                    'discount_price' => $product->discount_price,
                     'inCart' => $inCart,
                     'inFavorite' => $inFavorite,
                     'inCompare' => $inCompare,
@@ -1145,7 +1140,7 @@ class ProductsController extends Controller
                         'slug' => $translation ? $translation->slug : '',
                         'price' => $product->price,
                         'view_count' => $product->view_count,
-                        'discount_percent' => $product->discount_percent,
+                        'discount_price' => $product->discount_price,
                         'images' => $product->images->map(fn($img) => asset('storage/' . $img->image)),
                         'details' => $detailsData,
                         'inCart' => $inCart,

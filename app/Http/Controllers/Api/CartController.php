@@ -209,10 +209,7 @@ class CartController extends Controller
                 
 
     
-                // Discount price
-                $discountPrice = $product->discount_percent > 0
-                    ? round($product->price - ($product->price * $product->discount_percent / 100), 2)
-                    : null;
+             
     
                 return [
                     'id' => $product->id,
@@ -223,8 +220,7 @@ class CartController extends Controller
                     'category_title' => $categoryTitle,
                     'parent_slug' => $parentSlug,
                     'parent_title' => $parentTitle,
-                    'discount_price' => $discountPrice,
-                    'discount_percent' => $product->discount_percent,
+                    'discount_price' => $product->discount_price,
                     'price' => $product->price,
                     'images' => $imagesWithColors,
                     'product_details' => $product->details ?? collect(),

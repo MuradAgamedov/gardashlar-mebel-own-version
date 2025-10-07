@@ -243,10 +243,7 @@ $productDetailValues = $product->detailValues->map(fn($value) => [
 ]);
 
                 // Discount price calculation
-                $discountPrice = $product->discount_percent > 0 
-                    ? round($product->price - ($product->price * $product->discount_percent / 100), 2)
-                    : null;
-    
+            
                 return [
                     'id' => $product->id,
                     'slug' => $translation?->slug ?? '',
@@ -256,8 +253,7 @@ $productDetailValues = $product->detailValues->map(fn($value) => [
                     'category_title' => $categoryTitle,
                     'parent_slug' => $parentSlug,
                     'parent_title' => $parentTitle,
-                    'discount_price' => $discountPrice,
-                    'discount_percent' => $product->discount_percent,
+                    'discount_price' => $product->discount_price,
                     'price' => $product->price,
                     'images' => $imagesWithColors,
                     'product_details' => $productDetails,
