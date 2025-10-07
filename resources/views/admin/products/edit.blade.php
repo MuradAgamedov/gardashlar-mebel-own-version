@@ -55,7 +55,7 @@
                         <h5>Edit Product</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.products.update', $product) }}" method="POST">
+                        <form action="{{ route('admin.products.update', $product) }}" method="POST" novalidate>
                             @csrf
                             @method('PUT')
                             <input type="hidden" name="current_page" value="{{ request('page', 1) }}">
