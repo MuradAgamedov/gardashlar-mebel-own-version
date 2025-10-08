@@ -13,12 +13,12 @@ use Illuminate\Validation\Rule;
 
 /**
  * Authentication Controller
- * 
+ *
  * @OA\Server(
  *     url="http://127.0.0.1:8000/api",
  *     description="Local API Server"
  * )
- * 
+ *
  * @OA\SecurityScheme(
  *     securityScheme="bearerAuth",
  *     type="http",
@@ -38,80 +38,7 @@ class AuthController extends Controller
         $this->phoneService = $phoneService;
     }
 
-    /**
-     * Register a new user
-     * 
-     * @OA\Post(
-     *     path="/register",
-     *     operationId="registerUser",
-     *     tags={"Authentication"},
-     *     summary="Register a new user",
-     *     description="Register a new user with email or phone number and send OTP for verification",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"full_name","password","password_confirmation"},
-     *             @OA\Property(property="full_name", type="string", example="John Doe", description="Full name of the user"),
-     *             @OA\Property(property="email", type="string", format="email", example="user@example.com", description="Email address (optional if phone provided)"),
-     *             @OA\Property(property="phone", type="string", example="0504194230", description="Phone number (optional if email provided)"),
-     *             @OA\Property(property="password", type="string", example="password123", description="Password (minimum 6 characters)"),
-     *             @OA\Property(property="password_confirmation", type="string", example="password123", description="Password confirmation")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=201,
-     *         description="User registered successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="İstifadəçi uğurla qeydiyyatdan keçdi və OTP kodu göndərildi"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(
-     *                     property="user",
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="full_name", type="string", example="John Doe"),
-     *                     @OA\Property(property="phone", type="string", example="0504194230"),
-     *                     @OA\Property(property="email", type="string", example="user@example.com")
-     *                 ),
-     *                 @OA\Property(property="otp_sent", type="boolean", example=true),
-     *                 @OA\Property(property="contact_type", type="string", example="email"),
-     *                 @OA\Property(property="contact_info", type="string", example="user@example.com"),
-     *                 @OA\Property(property="expires_at", type="string", format="date-time", example="2024-01-01T12:10:00.000Z")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Validation failed"),
-     *             @OA\Property(
-     *                 property="errors",
-     *                 type="object",
-     *                 @OA\Property(property="full_name", type="array", @OA\Items(type="string")),
-     *                 @OA\Property(property="email", type="array", @OA\Items(type="string")),
-     *                 @OA\Property(property="password", type="array", @OA\Items(type="string"))
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="OTP kodu göndərilə bilmədi"),
-     *             @OA\Property(
-     *                 property="errors",
-     *                 type="object",
-     *                 @OA\Property(property="otp", type="array", @OA\Items(type="string"))
-     *             )
-     *         )
-     *     )
-     * )
-     */
+
     public function register(Request $request)
     {
         // Debug: Log incoming request data
@@ -179,7 +106,7 @@ class AuthController extends Controller
                         'is_used' => false,
                         'purpose' => 'verification'
                     ]);
-                    
+
                     // Send email directly like TestEmail command
                     \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OTPMail($otp));
                     $otpSent = true;
@@ -235,7 +162,7 @@ class AuthController extends Controller
                 'trace' => $e->getTraceAsString(),
                 'data' => $request->all()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Qeydiyyat zamanı xəta baş verdi',
@@ -244,9 +171,7 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Send OTP for registration
-     */
+
     public function sendOTP(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -276,7 +201,7 @@ class AuthController extends Controller
         try {
             if (!empty($request->email)) {
                 $sent = $this->emailService->sendOTP($request->email, 'verification');
-                
+
                 if ($sent) {
                     return response()->json([
                         'success' => true,
@@ -312,88 +237,7 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Login user
-     * 
-     * @OA\Post(
-     *     path="/login",
-     *     operationId="loginUser",
-     *     tags={"Authentication"},
-     *     summary="Login user",
-     *     description="Login user with email/phone and password. Only verified users can login.",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"password"},
-     *             @OA\Property(property="email", type="string", format="email", example="user@example.com", description="Email address (optional if phone provided)"),
-     *             @OA\Property(property="phone", type="string", example="0504194230", description="Phone number (optional if email provided)"),
-     *             @OA\Property(property="password", type="string", example="password123", description="Password")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Login successful",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Uğurla giriş edildi"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(
-     *                     property="user",
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="full_name", type="string", example="John Doe"),
-     *                     @OA\Property(property="phone", type="string", example="0504194230"),
-     *                     @OA\Property(property="email", type="string", example="user@example.com")
-     *                 ),
-     *                 @OA\Property(property="token", type="string", example="1|abc123..."),
-     *                 @OA\Property(property="token_type", type="string", example="Bearer")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Invalid credentials",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Email və ya şifrə düzgün deyil"),
-     *             @OA\Property(
-     *                 property="errors",
-     *                 type="object",
-     *                 @OA\Property(property="credentials", type="array", @OA\Items(type="string"))
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=403,
-     *         description="Account not verified",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Hesabınız hələ təsdiqlənməyib"),
-     *             @OA\Property(
-     *                 property="errors",
-     *                 type="object",
-     *                 @OA\Property(property="verification", type="array", @OA\Items(type="string"))
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Validation failed"),
-     *             @OA\Property(
-     *                 property="errors",
-     *                 type="object",
-     *                 @OA\Property(property="email", type="array", @OA\Items(type="string")),
-     *                 @OA\Property(property="password", type="array", @OA\Items(type="string"))
-     *             )
-     *         )
-     *     )
-     * )
-     */
+
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -448,7 +292,7 @@ class AuthController extends Controller
                 'email_verified_at' => $user->email_verified_at,
                 'is_null_check' => is_null($user->email_verified_at)
             ]);
-            
+
             if (is_null($user->email_verified_at)) {
                 return response()->json([
                     'success' => false,
@@ -507,7 +351,7 @@ class AuthController extends Controller
 
     /**
      * Logout user
-     * 
+     *
      * @OA\Post(
      *     path="/logout",
      *     operationId="logoutUser",
@@ -552,7 +396,7 @@ class AuthController extends Controller
 
     /**
      * Resend OTP
-     * 
+     *
      * @OA\Post(
      *     path="/resend-otp",
      *     operationId="resendOTP",
@@ -682,12 +526,12 @@ class AuthController extends Controller
                         'is_used' => false,
                         'purpose' => $purpose
                     ]);
-                    
+
                     // Send email with appropriate subject
                     $subject = $purpose === 'password_reset' ? 'Şifrə Yeniləmə' : 'OTP Kodu';
                     \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OTPMail($otp, $subject));
                     $otpSent = true;
-                    
+
                     \Log::info('OTP resent successfully', [
                         'email' => $request->email,
                         'otp' => $otp
@@ -733,7 +577,7 @@ class AuthController extends Controller
                 'trace' => $e->getTraceAsString(),
                 'data' => $request->all()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'OTP yenidən göndərilməsi zamanı xəta baş verdi',
@@ -744,7 +588,7 @@ class AuthController extends Controller
 
     /**
      * Verify OTP
-     * 
+     *
      * @OA\Post(
      *     path="/verify-otp",
      *     operationId="verifyOTP",
@@ -869,7 +713,7 @@ class AuthController extends Controller
 
     /**
      * Forgot Password - Send OTP
-     * 
+     *
      * @OA\Post(
      *     path="/forgot-password",
      *     operationId="forgotPassword",
@@ -964,7 +808,7 @@ class AuthController extends Controller
 
             // Generate and send OTP
             $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-            
+
             // Store OTP in database with special purpose
             \App\Models\OtpCode::create([
                 'contact_info' => $request->email,
@@ -974,10 +818,10 @@ class AuthController extends Controller
                 'is_used' => false,
                 'purpose' => 'password_reset' // Special purpose for password reset
             ]);
-            
+
             // Send email
             \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OTPMail($otp, 'Şifrə Yeniləmə'));
-            
+
             \Log::info('Password reset OTP sent', [
                 'email' => $request->email,
                 'otp' => $otp
@@ -999,7 +843,7 @@ class AuthController extends Controller
                 'trace' => $e->getTraceAsString(),
                 'email' => $request->email
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'OTP göndərilməsi zamanı xəta baş verdi',
@@ -1010,7 +854,7 @@ class AuthController extends Controller
 
     /**
      * Verify Reset Password OTP
-     * 
+     *
      * @OA\Post(
      *     path="/verify-reset-otp",
      *     operationId="verifyResetOTP",
@@ -1078,7 +922,7 @@ class AuthController extends Controller
                 ->where('expires_at', '>', \Carbon\Carbon::now())
                 ->latest()
                 ->first();
-            
+
             if (!$otpRecord || $otpRecord->otp_code !== $request->otp_code) {
                 return response()->json([
                     'success' => false,
@@ -1091,13 +935,13 @@ class AuthController extends Controller
 
             // Mark OTP as used
             $otpRecord->markAsUsed();
-            
+
             // Generate a temporary reset token
             $resetToken = bin2hex(random_bytes(32));
-            
+
             // Store reset token in cache for 10 minutes
             \Cache::put("password_reset_token_{$resetToken}", $request->email, 600);
-            
+
             \Log::info('Password reset OTP verified', [
                 'email' => $request->email,
                 'reset_token' => $resetToken
@@ -1119,7 +963,7 @@ class AuthController extends Controller
                 'trace' => $e->getTraceAsString(),
                 'email' => $request->email
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'OTP təsdiqləməsi zamanı xəta baş verdi',
@@ -1130,7 +974,7 @@ class AuthController extends Controller
 
     /**
      * Reset Password
-     * 
+     *
      * @OA\Post(
      *     path="/reset-password",
      *     operationId="resetPassword",
@@ -1212,7 +1056,7 @@ class AuthController extends Controller
         try {
             // Get email from cache using reset token
             $email = \Cache::get("password_reset_token_{$request->reset_token}");
-            
+
             if (!$email) {
                 return response()->json([
                     'success' => false,
@@ -1237,19 +1081,19 @@ class AuthController extends Controller
 
             // Update password
             $user->password = Hash::make($request->password);
-            
+
             // BONUS: If email not verified, verify it now
             $emailVerified = false;
             if (is_null($user->email_verified_at)) {
                 $user->email_verified_at = now();
                 $emailVerified = true;
             }
-            
+
             $user->save();
-            
+
             // Remove reset token from cache
             \Cache::forget("password_reset_token_{$request->reset_token}");
-            
+
             \Log::info('Password reset successfully', [
                 'email' => $email,
                 'email_verified' => $emailVerified
@@ -1272,7 +1116,7 @@ class AuthController extends Controller
                 'trace' => $e->getTraceAsString(),
                 'reset_token' => $request->reset_token
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Şifrə yeniləməsi zamanı xəta baş verdi',
@@ -1283,7 +1127,7 @@ class AuthController extends Controller
 
     /**
      * Update user profile
-     * 
+     *
      * @OA\Post(
      *     path="/profile/update",
      *     summary="Update user profile",
@@ -1341,7 +1185,7 @@ class AuthController extends Controller
     {
         try {
             $user = auth()->user();
-            
+
             $validator = Validator::make($request->all(), [
                 'name' => 'sometimes|required|string|max:255',
                 'surname' => 'sometimes|required|string|max:255',
@@ -1375,11 +1219,11 @@ class AuthController extends Controller
             if ($request->has('name')) {
                 $user->name = $request->name;
             }
-            
+
             if ($request->has('surname')) {
                 $user->surname = $request->surname;
             }
-            
+
             if ($request->has('phone')) {
                 $user->phone = $request->phone;
             }
@@ -1393,12 +1237,12 @@ class AuthController extends Controller
                         $user->pending_email = $request->email;
                         $user->pending_email_token = \Str::random(60);
                         $user->pending_email_expires_at = now()->addMinutes(10);
-                        
+
                         $otpSent = true;
-                        
+
                         // Send OTP to new email
                         $this->emailService->sendOTP($request->email, 'email_change');
-                        
+
                         \Log::info('Email change requested', [
                             'user_id' => $user->id,
                             'old_email' => $oldEmail,
@@ -1434,8 +1278,8 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => $otpSent ? 
-                    'Profil yeniləndi. Yeni email ünvanınıza təsdiq kodu göndərildi' : 
+                'message' => $otpSent ?
+                    'Profil yeniləndi. Yeni email ünvanınıza təsdiq kodu göndərildi' :
                     'Profil uğurla yeniləndi',
                 'data' => $responseData
             ]);
@@ -1446,7 +1290,7 @@ class AuthController extends Controller
                 'trace' => $e->getTraceAsString(),
                 'user_id' => auth()->id()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Profil yeniləməsi zamanı xəta baş verdi',
@@ -1457,7 +1301,7 @@ class AuthController extends Controller
 
     /**
      * Confirm email change
-     * 
+     *
      * @OA\Post(
      *     path="/profile/confirm-email",
      *     summary="Confirm email change",
@@ -1501,7 +1345,7 @@ class AuthController extends Controller
     {
         try {
             $user = auth()->user();
-            
+
             $validator = Validator::make($request->all(), [
                 'otp_code' => 'required|string|size:6',
             ], [
@@ -1549,7 +1393,7 @@ class AuthController extends Controller
 
             // Verify OTP
             $otpValid = $this->emailService->verifyOTP($user->pending_email, $request->otp_code, 'email_change');
-            
+
             if (!$otpValid) {
                 return response()->json([
                     'success' => false,
@@ -1596,7 +1440,7 @@ class AuthController extends Controller
                 'trace' => $e->getTraceAsString(),
                 'user_id' => auth()->id()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Email təsdiqi zamanı xəta baş verdi',
@@ -1607,7 +1451,7 @@ class AuthController extends Controller
 
     /**
      * Resend OTP for email change
-     * 
+     *
      * @OA\Post(
      *     path="/profile/resend-email-otp",
      *     summary="Resend OTP for email change",
@@ -1645,7 +1489,7 @@ class AuthController extends Controller
     {
         try {
             $user = auth()->user();
-            
+
             // Check if user has pending email
             if (!$user->pending_email) {
                 return response()->json([
@@ -1660,10 +1504,10 @@ class AuthController extends Controller
             // Update expiry time
             $user->pending_email_expires_at = now()->addMinutes(10);
             $user->save();
-            
+
             // Send new OTP
             $otpSent = $this->emailService->sendOTP($user->pending_email, 'email_change');
-            
+
             if ($otpSent) {
                 \Log::info('Email change OTP resent', [
                     'user_id' => $user->id,
@@ -1694,7 +1538,7 @@ class AuthController extends Controller
                 'trace' => $e->getTraceAsString(),
                 'user_id' => auth()->id()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'OTP yenidən göndərilməsi zamanı xəta baş verdi',
@@ -1705,7 +1549,7 @@ class AuthController extends Controller
 
     /**
      * Get user profile data
-     * 
+     *
      * @OA\Get(
      *     path="/user/profile",
      *     summary="Get user profile data",
@@ -1751,7 +1595,7 @@ class AuthController extends Controller
     {
         try {
             $user = auth()->user();
-            
+
             if (!$user) {
                 return response()->json([
                     'success' => false,

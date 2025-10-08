@@ -356,4 +356,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::post('/payment/installment', [PaymentController::class, 'startInstallment']);
 Route::get('/payment/callback', [PaymentController::class, 'callback']);
 Route::post('/payment/cash', [PaymentController::class, 'startCash']);
+Route::post('/payment/products', [PaymentController::class, 'getProducts'])->name('api.payment.products');
+Route::post('/payment/temporary-order', [PaymentController::class, 'createTemporaryOrder'])->name('api.payment.temporary-order.create');
+Route::get('/payment/temporary-order/{orderId}', [PaymentController::class, 'getTemporaryOrder'])->name('api.payment.temporary-order.get');
 
