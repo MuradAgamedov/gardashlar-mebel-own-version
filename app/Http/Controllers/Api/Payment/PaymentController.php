@@ -227,27 +227,35 @@ class PaymentController extends Controller
         try {
             $data = $request->validate([
                 'product_id'      => 'required|exists:products,id',
-                'full_name'       => 'nullable|string|max:255',
-                'phone'           => 'nullable|string|max:50',
+                'full_name'       => 'required|string|max:255',
+                'phone'           => 'required|string|max:50',
+                'email'           => 'required|email|max:255',
+                'city'            => 'required|string|max:255',
                 'address'         => 'nullable|string',
-                'total_price'     => 'required|numeric|min:0',
+                'amount'          => 'required|numeric|min:1',
+                'months'          => 'required|in:2,3,6,9,12',
+                'member_id'       => 'required|string',
+                'language'        => 'nullable|in:AZ,EN,RU',
             ]);
+
+            // Calculate monthly price
+            $monthlyPrice = $data['amount'] / $data['months'];
 
             // Create temporary order
             $order = Order::create([
                 'user_id'        => $request->user()->id ?? null,
                 'product_id'     => $data['product_id'],
-                'full_name'      => $data['full_name'] ?? null,
-                'phone'          => $data['phone'] ?? null,
-                'email'          => null,
-                'city'           => null,
+                'full_name'      => $data['full_name'],
+                'phone'          => $data['phone'],
+                'email'          => $data['email'],
+                'city'           => $data['city'],
                 'address'        => $data['address'] ?? null,
                 'order_id'       => strtoupper(Str::random(12)),
-                'delivery_method'=> null,
-                'payment_method' => null,
-                'selected_card'  => null,
-                'month'          => null,
-                'monthly_price'  => null,
+                'delivery_method'=> 'installment',
+                'payment_method' => 'card',
+                'selected_card'  => $data['member_id'],
+                'month'          => $data['months'],
+                'monthly_price'  => $monthlyPrice,
                 'status'         => 'temporary',
                 'payment_status' => 'unpaid',
             ]);
