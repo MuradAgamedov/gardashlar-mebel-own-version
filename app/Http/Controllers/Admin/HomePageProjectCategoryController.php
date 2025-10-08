@@ -8,17 +8,20 @@ use App\Models\HomePageProjectCategory;
 use App\Models\ProjectCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use App\Repositories\HomePageProjectCategoryRepository;
 
 class HomePageProjectCategoryController extends Controller
 {
+    public function __construct(public HomePageProjectCategoryRepository $repository)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(): View
     {
-        $homePageProjectCategories = HomePageProjectCategory::with('projectCategory.translates')
-            ->ordered()
-            ->get();
+        $homePageProjectCategories = $this->repository->getHomePageProjectCategories();
 
         return view('admin.home-page-project-categories.index', compact('homePageProjectCategories'));
     }
@@ -28,10 +31,7 @@ class HomePageProjectCategoryController extends Controller
      */
     public function create(): View
     {
-        $projectCategories = ProjectCategory::with('translates')
-            ->active()
-            ->ordered()
-            ->get();
+        $projectCategories = $this->repository->getActiveProjectCategories();
 
         return view('admin.home-page-project-categories.create', compact('projectCategories'));
     }
@@ -69,10 +69,7 @@ class HomePageProjectCategoryController extends Controller
     public function edit(string $id): View
     {
         $homePageProjectCategory = HomePageProjectCategory::with('projectCategory.translates')->findOrFail($id);
-        $projectCategories = ProjectCategory::with('translates')
-            ->active()
-            ->ordered()
-            ->get();
+        $projectCategories = $this->repository->getActiveProjectCategories();
 
         return view('admin.home-page-project-categories.edit', compact('homePageProjectCategory', 'projectCategories'));
     }

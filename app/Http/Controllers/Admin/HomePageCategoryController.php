@@ -7,22 +7,21 @@ use App\Models\HomePageCategory;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\HomePageCategoryRepository;
 
 class HomePageCategoryController extends Controller
 {
+    public function __construct(public HomePageCategoryRepository $repository)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $homePageCategories = HomePageCategory::with('productCategory.translates.language')
-            ->ordered()
-            ->get();
-            
-        $allCategories = ProductCategory::with('translates.language')
-            ->whereNotIn('id', $homePageCategories->pluck('product_category_id'))
-            ->ordered()
-            ->get();
+        $homePageCategories = $this->repository->getHomePageCategories();
+        $allCategories = $this->repository->getAvailableCategories($homePageCategories);
             
         return view('admin.home-page-categories.index', compact('homePageCategories', 'allCategories'));
     }
@@ -32,14 +31,7 @@ class HomePageCategoryController extends Controller
      */
     public function create()
     {
-        $categories = ProductCategory::with('translates.language')
-            ->whereNotExists(function ($query) {
-                $query->select(DB::raw(1))
-                      ->from('home_page_categories')
-                      ->whereRaw('home_page_categories.product_category_id = product_categories.id');
-            })
-            ->ordered()
-            ->get();
+        $categories = $this->repository->getCategoriesForCreate();
             
         return view('admin.home-page-categories.create', compact('categories'));
     }
@@ -81,17 +73,7 @@ class HomePageCategoryController extends Controller
      */
     public function edit(HomePageCategory $homePageCategory)
     {
-        $categories = ProductCategory::with('translates.language')
-            ->where(function ($query) use ($homePageCategory) {
-                $query->where('id', $homePageCategory->product_category_id)
-                      ->orWhereNotExists(function ($subQuery) {
-                          $subQuery->select(DB::raw(1))
-                                   ->from('home_page_categories')
-                                   ->whereRaw('home_page_categories.product_category_id = product_categories.id');
-                      });
-            })
-            ->ordered()
-            ->get();
+        $categories = $this->repository->getCategoriesForEdit($homePageCategory);
             
         return view('admin.home-page-categories.edit', compact('homePageCategory', 'categories'));
     }
