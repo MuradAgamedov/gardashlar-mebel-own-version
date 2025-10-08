@@ -10,12 +10,6 @@ class ImageService
 {
     /**
      * Şəkli yüklə və həmişə WebP kimi saxla
-     *
-     * @param UploadedFile $file
-     * @param string $path
-     * @param array $options
-     * @return string
-     * @throws \Exception
      */
     public function upload(UploadedFile $file, string $path = 'uploads', array $options = [])
     {
@@ -24,9 +18,6 @@ class ImageService
                 'disk' => 'public',
                 'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
                 'generate_unique_name' => true,
-                'quality' => 85, // WebP keyfiyyəti (0-100)
-                'max_width' => null,  // istəsən ölçü limitləri də qoya bilərsən
-                'max_height' => null,
             ];
             $options = array_merge($defaultOptions, $options);
 
@@ -41,10 +32,10 @@ class ImageService
 
             // Fayl adı (.webp uzantısı ilə)
             $webpName = $this->generateFilenameWithExtension($file, 'webp', $options['generate_unique_name']);
-            $relativePath = trim($path, '/').'/'.$webpName;
+            $relativePath = trim($path, '/') . '/' . $webpName;
 
             // Orijinal faylı müvəqqəti yolundan oxu və WebP-ə çevir
-            $webpBinary = $this->convertToWebp($file, $options['quality'], $options['max_width'], $options['max_height']);
+            $webpBinary = $this->convertToWebp($file);
 
             if ($webpBinary === null) {
                 // WebP uğursuz olarsa, orijinal formatda saxla
@@ -52,16 +43,16 @@ class ImageService
                     'file' => $file->getClientOriginalName(),
                     'mime_type' => $file->getMimeType()
                 ]);
-                
+
                 $originalExtension = strtolower($file->getClientOriginalExtension());
                 $originalName = $this->generateFilenameWithExtension($file, $originalExtension, $options['generate_unique_name']);
-                $relativePath = trim($path, '/').'/'.$originalName;
-                
+                $relativePath = trim($path, '/') . '/' . $originalName;
+
                 $saved = Storage::disk($options['disk'])->putFileAs($path, $file, $originalName, 'public');
                 if (!$saved) {
                     throw new \Exception('Failed to save original image file.');
                 }
-                
+
                 return $relativePath;
             }
 
@@ -138,7 +129,7 @@ class ImageService
         }
 
         $mimeType = $file->getMimeType();
-        $allowedMimeTypes = ['image/jpeg','image/png','image/gif','image/webp'];
+        $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         if (!in_array($mimeType, $allowedMimeTypes)) {
             throw new \Exception('Invalid MIME type. Allowed types: ' . implode(', ', $allowedMimeTypes) . '. Got: ' . $mimeType);
         }
@@ -152,61 +143,59 @@ class ImageService
     }
 
     /**
-     * GD ilə WebP-ə çevrilmə (şəffaflıq, ölçü limitləri və s.)
+     * GD ilə WebP-ə çevrilmə (keyfiyyət dərəcəsi olmadan)
      */
-    private function convertToWebp(UploadedFile $file, int $quality = 85, ?int $maxWidth = null, ?int $maxHeight = null): ?string
-{
-    if (!function_exists('imagewebp')) {
-        throw new \Exception('PHP-GD WebP support is not available.');
+    private function convertToWebp(UploadedFile $file): ?string
+    {
+        if (!function_exists('imagewebp')) {
+            throw new \Exception('PHP-GD WebP support is not available.');
+        }
+
+        $mime = $file->getMimeType();
+        $srcPath = $file->getPathname();
+
+        // Şəkil resursu yarat
+        switch ($mime) {
+            case 'image/jpeg':
+                $image = @imagecreatefromjpeg($srcPath);
+                break;
+            case 'image/png':
+                $image = @imagecreatefrompng($srcPath);
+                if ($image !== false) {
+                    imagepalettetotruecolor($image);
+                    imagealphablending($image, false);
+                    imagesavealpha($image, true);
+                }
+                break;
+            case 'image/gif':
+                $image = @imagecreatefromgif($srcPath);
+                break;
+            case 'image/webp':
+                $image = @imagecreatefromwebp($srcPath);
+                break;
+            default:
+                $image = null;
+        }
+
+        if (!$image) {
+            \Log::error('Image resource creation failed', ['mime' => $mime, 'path' => $srcPath]);
+            return null;
+        }
+
+        // Keyfiyyətlə bağlı heç bir parametr yoxdur (default WebP)
+        ob_start();
+        $ok = imagewebp($image);
+        imagedestroy($image);
+
+        if (!$ok) {
+            ob_end_clean();
+            \Log::error('WebP encoding failed', ['mime' => $mime]);
+            return null;
+        }
+
+        $data = ob_get_clean();
+        return $data === false ? null : $data;
     }
-
-    $mime = $file->getMimeType();
-    $srcPath = $file->getPathname();
-
-    // Şəkil resursu yarat
-    switch ($mime) {
-        case 'image/jpeg':
-            $image = @imagecreatefromjpeg($srcPath);
-            break;
-        case 'image/png':
-            $image = @imagecreatefrompng($srcPath);
-            if ($image !== false) {
-                // PNG şəffaflıq problemi üçün düzəliş
-                imagepalettetotruecolor($image);
-                imagealphablending($image, false);
-                imagesavealpha($image, true);
-            }
-            break;
-        case 'image/gif':
-            $image = @imagecreatefromgif($srcPath);
-            break;
-        case 'image/webp':
-            $image = @imagecreatefromwebp($srcPath);
-            break;
-        default:
-            $image = null;
-    }
-
-    if (!$image) {
-        \Log::error('Image resource creation failed', ['mime' => $mime, 'path' => $srcPath]);
-        return null;
-    }
-
-    // Şəkli olduğu kimi saxlayırıq (ölçü limiti yoxdur)
-    ob_start();
-    $ok = imagewebp($image, null, $quality);
-    imagedestroy($image);
-
-    if (!$ok) {
-        ob_end_clean();
-        \Log::error('WebP encoding failed', ['mime' => $mime, 'quality' => $quality]);
-        return null;
-    }
-
-    $data = ob_get_clean();
-    return $data === false ? null : $data;
-}
-
 
     private function generateFilenameWithExtension(UploadedFile $file, string $forceExtension, bool $unique = true): string
     {
