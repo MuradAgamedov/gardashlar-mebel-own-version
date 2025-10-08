@@ -52,10 +52,11 @@ class ProductImageController extends Controller
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
             'product_color_id' => 'nullable|exists:product_colors,id'
         ]);
-        dd($request->all());
         
 
         try {
+        dd($request->all());
+
             foreach ($request->file('images') as $imageFile) {
                 $imagePath = $this->imageService->upload($imageFile, 'products');
                 
