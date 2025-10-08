@@ -171,7 +171,11 @@ class ProductImageController extends Controller
         try {
             // Remove main flag from all other images of this product
             $this->repository->removeMainFromOthers($product->id, $image->id);
-rn response()->json(['success' => true]);
+
+            // Set this image as main
+            $image->update(['is_main' => true]);
+
+            return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()]);
         }
