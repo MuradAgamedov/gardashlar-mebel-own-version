@@ -14,11 +14,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use App\Repositories\CompanyRepository;
+use App\Repositories\LanguageRepository;
 class CompanyController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService, public CompanyRepository $repository)
+    public function __construct(
+        ImageService $imageService, 
+        public CompanyRepository $repository,
+        public LanguageRepository $languageRepository
+    )
     {
         $this->imageService = $imageService;
     }
@@ -31,7 +36,7 @@ class CompanyController extends Controller
 
     public function create()
     {
-        $languages = Language::getActiveLanguages();
+        $languages = $this->languageRepository->getActiveLanguages();
         return view('admin.companies.create', compact('languages'));
     }
 
@@ -90,7 +95,7 @@ class CompanyController extends Controller
     public function edit(Company $company)
     {
         $company->load('translates');
-        $languages = Language::getActiveLanguages();
+        $languages = $this->languageRepository->getActiveLanguages();
         return view('admin.companies.edit', compact('company', 'languages'));
     }
 

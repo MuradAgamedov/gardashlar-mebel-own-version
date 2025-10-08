@@ -9,31 +9,25 @@ use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use App\Repositories\DictionaryRepository;
+use App\Repositories\LanguageRepository;
 
 class DictionaryController extends Controller
 {
+    public function __construct(
+        public DictionaryRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request): View
     {
-        $query = Dictionary::with('translates.language');
-        
-        // Search functionality
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('keyword', 'like', "%{$search}%")
-                  ->orWhereHas('translates', function($translateQuery) use ($search) {
-                      $translateQuery->where('value', 'like', "%{$search}%");
-                  });
-            });
-        }
-        
-
-        
-        $dictionaries = $query->get();
-        $languages = Language::active()->orderBy('order')->get();
+        $dictionaries = $this->repository->getDictionaries($request);
+        $languages = $this->languageRepository->getActiveLanguages();
         
         return view('admin.dictionaries.index', compact('dictionaries', 'languages'));
     }
@@ -43,7 +37,7 @@ class DictionaryController extends Controller
      */
     public function create(): View
     {
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageRepository->getActiveLanguages();
         return view('admin.dictionaries.create', compact('languages'));
     }
 
@@ -89,7 +83,7 @@ class DictionaryController extends Controller
      */
     public function edit(Dictionary $dictionary): View
     {
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageRepository->getActiveLanguages();
         $translations = $dictionary->translates->keyBy('language_id');
         return view('admin.dictionaries.edit', compact('dictionary', 'languages', 'translations'));
     }

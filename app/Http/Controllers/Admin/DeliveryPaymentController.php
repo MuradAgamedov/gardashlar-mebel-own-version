@@ -7,9 +7,14 @@ use App\Models\DeliveryPayment;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use App\Repositories\LanguageRepository;
 
 class DeliveryPaymentController extends Controller
 {
+    public function __construct(public LanguageRepository $languageRepository)
+    {
+    }
+
     /**
      * Display the specified resource.
      */
@@ -21,7 +26,7 @@ class DeliveryPaymentController extends Controller
             $deliveryPayment = DeliveryPayment::create(['status' => true]);
         }
         
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.delivery-payment.edit', compact('deliveryPayment', 'languages'));
     }
@@ -31,7 +36,7 @@ class DeliveryPaymentController extends Controller
      */
     public function update(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Translation validation
         foreach ($languages as $language) {

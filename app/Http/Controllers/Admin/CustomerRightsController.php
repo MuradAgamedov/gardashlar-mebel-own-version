@@ -7,9 +7,14 @@ use App\Models\CustomerRights;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use App\Repositories\LanguageRepository;
 
 class CustomerRightsController extends Controller
 {
+    public function __construct(public LanguageRepository $languageRepository)
+    {
+    }
+
     /**
      * Display the specified resource.
      */
@@ -21,7 +26,7 @@ class CustomerRightsController extends Controller
             $customerRights = CustomerRights::create(['status' => true]);
         }
         
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.customer-rights.edit', compact('customerRights', 'languages'));
     }
@@ -31,7 +36,7 @@ class CustomerRightsController extends Controller
      */
     public function update(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Translation validation
         foreach ($languages as $language) {

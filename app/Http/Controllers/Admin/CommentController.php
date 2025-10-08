@@ -5,14 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\CommentAnswer;
-
 use Illuminate\Http\Request;
+use App\Repositories\CommentRepository;
 
 class CommentController extends Controller
 {
+    public function __construct(public CommentRepository $repository)
+    {
+    }
+
     public function index()
     {
-        $comments = Comment::with(['user','product'])->latest()->paginate(10);
+        $comments = $this->repository->getComments();
         return view("admin.comments.index", compact('comments'));
     }
 

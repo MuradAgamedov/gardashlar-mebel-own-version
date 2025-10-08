@@ -7,15 +7,20 @@ use App\Models\Currency;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use App\Repositories\CurrencyRepository;
 
 class CurrencyController extends Controller
 {
+    public function __construct(public CurrencyRepository $repository)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(): View
     {
-        $currencies = Currency::ordered()->get();
+        $currencies = $this->repository->getCurrencies();
         return view('admin.currencies.index', compact('currencies'));
     }
 

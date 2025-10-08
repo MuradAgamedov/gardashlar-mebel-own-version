@@ -5,36 +5,20 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
 use Illuminate\Http\Request;
+use App\Repositories\ContactMessageRepository;
 
 class ContactMessageController extends Controller
 {
+    public function __construct(public ContactMessageRepository $repository)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = ContactMessage::query();
-
-        // Search functionality
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('city', 'like', "%{$search}%");
-            });
-        }
-
-        // Filter by read status
-        if ($request->has('status') && $request->status !== '') {
-            if ($request->status === 'unread') {
-                $query->unread();
-            } elseif ($request->status === 'read') {
-                $query->read();
-            }
-        }
-
-        $messages = $query->orderBy('created_at', 'desc')->paginate(20);
+        $messages = $this->repository->getMessages($request);
 
         return view('admin.contact-messages.index', compact('messages'));
     }

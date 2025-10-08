@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Faq;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Repositories\FaqRepository;
+use App\Repositories\LanguageRepository;
 
 class FaqController extends Controller
 {

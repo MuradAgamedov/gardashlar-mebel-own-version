@@ -6,15 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Models\Email;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Repositories\EmailRepository;
 
 class EmailController extends Controller
 {
+    public function __construct(public EmailRepository $repository)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $emails = Email::ordered()->get();
+        $emails = $this->repository->getEmails();
         return view('admin.emails.index', compact('emails'));
     }
 

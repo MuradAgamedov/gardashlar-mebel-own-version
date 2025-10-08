@@ -6,12 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\CreditCard;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use App\Repositories\CreditCardRepository;
 
 class CreditCardController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(ImageService $imageService, public CreditCardRepository $repository)
     {
         $this->imageService = $imageService;
     }
@@ -21,7 +22,7 @@ class CreditCardController extends Controller
      */
     public function index()
     {
-        $creditCards = CreditCard::orderBy('order')->get();
+        $creditCards = $this->repository->getCreditCards();
         return view('admin.CreditCard.index', compact('creditCards'));
     }
 
