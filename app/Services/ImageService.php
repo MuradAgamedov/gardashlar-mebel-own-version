@@ -45,7 +45,6 @@ class ImageService
 
             // Orijinal faylı müvəqqəti yolundan oxu və WebP-ə çevir
             $webpBinary = $this->convertToWebp($file, $options['quality'], $options['max_width'], $options['max_height']);
-            dd($webpBinary);
 
             if ($webpBinary === null) {
                 // WebP uğursuz olarsa, orijinal formatda saxla
@@ -156,110 +155,58 @@ class ImageService
      * GD ilə WebP-ə çevrilmə (şəffaflıq, ölçü limitləri və s.)
      */
     private function convertToWebp(UploadedFile $file, int $quality = 85, ?int $maxWidth = null, ?int $maxHeight = null): ?string
-    {
-        // GD tələb olunur
-        if (!function_exists('imagewebp')) {
-            throw new \Exception('GD WebP support is not available. Enable PHP-GD with WebP.');
-        }
-
-        // WebP dəstəyini yoxla
-        if (!function_exists('imagecreatefromwebp') || !function_exists('imagewebp')) {
-            throw new \Exception('WebP support is not enabled in PHP GD extension.');
-        }
-
-        $mime = $file->getMimeType();
-        $srcPath = $file->getPathname();
-
-        // Orijinaldan image resource yarat
-        switch ($mime) {
-            case 'image/jpeg':
-                $image = @imagecreatefromjpeg($srcPath);
-                break;
-            case 'image/png':
-                $image = @imagecreatefrompng($srcPath);
-                break;
-            case 'image/gif':
-                $image = @imagecreatefromgif($srcPath);
-                break;
-            case 'image/webp':
-                // Artıq webp-dirsə də yenidən oxuyub yazaq (keyfiyyət normalizasiya)
-                $image = @imagecreatefromwebp($srcPath);
-                break;
-            default:
-                $image = null;
-        }
-
-        if (!$image) {
-            return null;
-        }
-
-        // İstəyə görə ölçünü limitlə (proportionally)
-        $origW = imagesx($image);
-        $origH = imagesy($image);
-
-        $targetW = $origW;
-        $targetH = $origH;
-
-        if ($maxWidth || $maxHeight) {
-            $ratio = $origW / $origH;
-
-            if ($maxWidth && $targetW > $maxWidth) {
-                $targetW = $maxWidth;
-                $targetH = (int) round($maxWidth / $ratio);
-            }
-
-            if ($maxHeight && $targetH > $maxHeight) {
-                $targetH = $maxHeight;
-                $targetW = (int) round($maxHeight * $ratio);
-            }
-        }
-
-        if ($targetW !== $origW || $targetH !== $origH) {
-            $resized = imagecreatetruecolor($targetW, $targetH);
-
-            // PNG/GIF şəffaflıq üçün alpha ayarları
-            if (in_array($mime, ['image/png','image/gif'])) {
-                imagealphablending($resized, false);
-                imagesavealpha($resized, true);
-                $transparent = imagecolorallocatealpha($resized, 0, 0, 0, 127);
-                imagefilledrectangle($resized, 0, 0, $targetW, $targetH, $transparent);
-            }
-
-            imagecopyresampled($resized, $image, 0, 0, 0, 0, $targetW, $targetH, $origW, $origH);
-            imagedestroy($image);
-            $image = $resized;
-        }
-
-        // Şəffaflıq üçün alpha saxla (PNG/GIF mənbələrində)
-        imagealphablending($image, false);
-        imagesavealpha($image, true);
-
-        // Output-u buffer-ə yaz
-        ob_start();
-        $ok = imagewebp($image, null, max(0, min(100, $quality)));
-        imagedestroy($image);
-
-        if (!$ok) {
-            ob_end_clean();
-            \Log::error('WebP encoding failed', [
-                'quality' => $quality,
-                'target_width' => $targetW,
-                'target_height' => $targetH,
-                'original_width' => $origW,
-                'original_height' => $origH,
-                'mime_type' => $mime
-            ]);
-            throw new \Exception('WebP encoding failed. Check image quality and dimensions.');
-        }
-
-        $data = ob_get_clean();
-        if ($data === false) {
-            \Log::error('Failed to get WebP data from output buffer');
-            return null;
-        }
-        
-        return $data;
+{
+    if (!function_exists('imagewebp')) {
+        throw new \Exception('PHP-GD WebP support is not available.');
     }
+
+    $mime = $file->getMimeType();
+    $srcPath = $file->getPathname();
+
+    // Şəkil resursu yarat
+    switch ($mime) {
+        case 'image/jpeg':
+            $image = @imagecreatefromjpeg($srcPath);
+            break;
+        case 'image/png':
+            $image = @imagecreatefrompng($srcPath);
+            if ($image !== false) {
+                // PNG şəffaflıq problemi üçün düzəliş
+                imagepalettetotruecolor($image);
+                imagealphablending($image, false);
+                imagesavealpha($image, true);
+            }
+            break;
+        case 'image/gif':
+            $image = @imagecreatefromgif($srcPath);
+            break;
+        case 'image/webp':
+            $image = @imagecreatefromwebp($srcPath);
+            break;
+        default:
+            $image = null;
+    }
+
+    if (!$image) {
+        \Log::error('Image resource creation failed', ['mime' => $mime, 'path' => $srcPath]);
+        return null;
+    }
+
+    // Şəkli olduğu kimi saxlayırıq (ölçü limiti yoxdur)
+    ob_start();
+    $ok = imagewebp($image, null, $quality);
+    imagedestroy($image);
+
+    if (!$ok) {
+        ob_end_clean();
+        \Log::error('WebP encoding failed', ['mime' => $mime, 'quality' => $quality]);
+        return null;
+    }
+
+    $data = ob_get_clean();
+    return $data === false ? null : $data;
+}
+
 
     private function generateFilenameWithExtension(UploadedFile $file, string $forceExtension, bool $unique = true): string
     {
