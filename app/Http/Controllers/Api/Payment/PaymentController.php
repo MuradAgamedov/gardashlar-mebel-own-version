@@ -445,119 +445,97 @@ class PaymentController extends Controller
                 'product_ids' => 'required|array|min:1|max:50',
                 'product_ids.*' => 'required|integer|min:1'
             ]);
-    
+
             $productIds = $request->input('product_ids', []);
-    
+
             // Get language ID from header using trait
             $languageId = $this->getLanguageIdFromHeader($request);
-    
+
             // Get existing active products with relationships and translations
             $existingProducts = Product::active()
                 ->whereIn('id', $productIds)
                 ->with([
                     'translates' => fn($q) => $q->where('language_id', $languageId),
                     'images' => fn($q) => $q->where('status', true)->orderBy('order'),
-                    'images.color:id,color_code',
+                    'images.color' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
                     'categories.translates' => fn($q) => $q->where('language_id', $languageId),
                     'types.translates' => fn($q) => $q->where('language_id', $languageId),
-                    'colors:id,color_code',
-                    'details.translates' => fn($q) => $q->where('language_id', $languageId),
-                    'detailValues.translates' => fn($q) => $q->where('language_id', $languageId),
-                    'detailValues.details.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'colors' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
+           
                 ])
                 ->get();
-    
-            if ($existingProducts->isEmpty()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Heç bir məhsul tapılmadı.',
-                    'data' => []
-                ], 404);
-            }
-    
+
             // Map to desired response structure
             $productsData = $existingProducts->map(function ($product) use ($languageId) {
                 $translation = $product->translates->first();
+
+                // Main image
                 $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
-    
-                // Product types
-                $productTypes = $product->types->map(fn($type) => [
-                    'id' => $type->id ?? null,
-                    'title' => $type->translates->first()?->title ?? ''
-                ]);
-    
+
+           
+                
+
                 // Available colors
                 $availableColors = $product->colors->map(fn($color) => [
-                    'id' => $color->id ?? null,
-                    'color_code' => $color->color_code ?? ''
+                    'id' => $color->id,
+                    'color_code' => $color->color_code
                 ]);
-    
+
                 // Images
                 $imagesWithColors = $product->images->map(fn($image) => [
-                    'id' => $image->id ?? null,
-                    'image_url' => $image->image ? asset('storage/' . $image->image) : asset('images/default_image.webp'),
-                    'is_main' => (bool)($image->is_main ?? false),
-                    'order' => $image->order ?? 0,
-                    'color_id' => $image->product_color_id ?? null
+                    'id' => $image->id,
+                    'image_url' => $image->image ? asset('storage/' . $image->image) : null,
+                    'is_main' => $image->is_main,
+                    'order' => $image->order,
+                    'color_id' => $image->product_color_id
                 ])->sortBy('order')->values();
-    
-                // Product details
-                $productDetails = optional($product->details)->map(fn($detail) => [
-                    'id' => $detail->id ?? null,
-                    'keyword' => $detail->translates->first()?->keyword ?? '',
-                    'value' => $detail->translates->first()?->value ?? '',
-                ]) ?? collect();
-    
-                // Product detail values
-                $productDetailValues = optional($product->detailValues)->map(fn($value) use ($languageId) => [
-                    'id' => $value->id ?? null,
-                    'order' => $value->order ?? 0,
-                    'keyword' => $value->translates->first()?->keyword ?? '',
-                    'value' => $value->translates->first()?->value ?? '',
-                    'details' => optional($value->details)->map(fn($detail) => [
-                        'id' => $detail->id ?? null,
-                        'order' => $detail->order ?? 0,
-                        'keyword' => $detail->translates->first()?->keyword ?? '',
-                        'value' => $detail->translates->first()?->value ?? '',
-                    ]) ?? collect()
-                ]) ?? collect();
-    
+
+                if ($imagesWithColors->isEmpty()) {
+                    $imagesWithColors = collect([
+                        [
+                            'id' => time(),
+                            'image_url' => asset('images/default_image.webp'),
+                            'is_main' => false,
+                            'order' => 0,
+                            'color_id' => null
+                        ]
+                    ]);
+                }
+
+              
                 return [
-                    'id' => $product->id ?? null,
+                    'id' => $product->id,
                     'slug' => $translation?->slug ?? '',
                     'title' => $translation?->title ?? '',
                     'available_colors' => $availableColors,
-                    'types' => $productTypes,
-                    'discount_price' => $product->discount_price ?? null,
-                    'price' => $product->price ?? null,
+
+        
+                    'discount_price' => $product->discount_price,
+                    'price' => $product->price,
                     'images' => $imagesWithColors,
-                    'details' => $productDetails,
-                    'detail_values' => $productDetailValues
+               
                 ];
             });
-    
+
             return response()->json([
                 'success' => true,
                 'data' => $productsData
             ], 200);
-    
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validasiya xətası: ' . implode(', ', $e->errors()['product_ids'] ?? []),
+                'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? []),
                 'data' => null
             ], 400);
-    
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Məhsulları gətirərkən xəta baş verdi.',
-                'error' => config('app.debug') ? $e->getMessage() : null,
+                'message' => 'Məhsulları yoxlayarkən xəta baş verdi: ' . $e->getMessage(),
                 'data' => null
             ], 500);
         }
     }
-    
 
     private function decodeUp(?string $base64): array
     {
