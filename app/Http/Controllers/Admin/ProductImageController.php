@@ -47,6 +47,7 @@ class ProductImageController extends Controller
      */
     public function store(Request $request, Product $product)
     {
+        dd($request->all());
         $request->validate([
             'images' => 'required|array',
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
