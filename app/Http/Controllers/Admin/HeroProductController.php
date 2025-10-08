@@ -7,17 +7,20 @@ use App\Models\HeroProduct;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\HeroProductRepository;
 
 class HeroProductController extends Controller
 {
+    public function __construct(public HeroProductRepository $repository)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $heroProducts = HeroProduct::with('product.translates.language', 'product.categories.translates.language')
-            ->ordered()
-            ->get();
+        $heroProducts = $this->repository->getHeroProducts();
             
         return view('admin.hero-products.index', compact('heroProducts'));
     }
@@ -139,15 +142,7 @@ class HeroProductController extends Controller
         $search = $request->input('search');
         $excludeIds = $request->input('exclude_ids', []);
 
-        $products = Product::with(['translates.language', 'categories.translates.language'])
-            ->whereHas('translates', function ($query) use ($search) {
-                $query->where('title', 'like', '%' . $search . '%');
-            })
-            ->whereNotIn('id', $excludeIds)
-            ->active()
-            ->ordered()
-            ->limit(10)
-            ->get();
+        $products = $this->repository->searchProducts($search, $excludeIds);
 
         $results = [];
         foreach ($products as $product) {

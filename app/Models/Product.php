@@ -204,18 +204,7 @@ public function apiData($languageId = null, $colorId = null)
         'value' => $detail->translate($languageId)?->value ?? ''
     ])->filter(fn($d) => $d['keyword'] && $d['value'])->values();
 
-    // Product detail values with nested details
-    $productDetailValues = $this->detailValues()->orderBy('order')->get()->map(fn($dv) => [
-        'id' => $dv->id,
-        'keyword' => $dv->translate($languageId)?->keyword ?? '',
-        'value' => $dv->translate($languageId)?->value ?? '',
-        'details' => $dv->details()->orderBy('order')->get()->map(fn($detail) => [
-            'id' => $detail->id,
-            'keyword' => $detail->translate($languageId)?->keyword ?? '',
-            'value' => $detail->translate($languageId)?->value ?? ''
-        ])->filter(fn($d) => $d['keyword'] && $d['value'])->values()
-    ]);
-
+ 
     // Images
     $images = $this->images()->where('status', true)->orderBy('order')->get()->map(fn($img) => [
         'id' => $img->id,
@@ -232,9 +221,12 @@ public function apiData($languageId = null, $colorId = null)
         'discount_price' => $this->discount_price,
         'product_types' => $productTypes,
         'product_details' => $productDetails,
-        'product_detail_values' => $productDetailValues,
         'images' => $images,
-        'view_count' => $this->view_count
+        'view_count' => $this->view_count,
+        'available_colors' => $this->colors->map(fn($color) => [
+            'id' => $color->id,
+            'color_code' => $color->color_code
+        ]),
     ];
 }
 

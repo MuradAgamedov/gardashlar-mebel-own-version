@@ -5,13 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use App\Repositories\OrderRepository;
 
 class PaymentController extends Controller
 {
+    public function __construct(public OrderRepository $repository)
+    {
+    }
+
     public function index(Request $request)
     {
         // pagination
-        $orders = Order::latest()->paginate(10);
+        $orders = $this->repository->getOrders();
 
         return view("admin.orders.index", compact('orders'));
     }

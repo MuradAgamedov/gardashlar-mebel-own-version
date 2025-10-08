@@ -5,23 +5,19 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ProductColor;
 use Illuminate\Http\Request;
+use App\Repositories\ProductColorRepository;
 
 class ProductColorController extends Controller
 {
+    public function __construct(public ProductColorRepository $repository)
+    {
+    }
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = ProductColor::query();
-        
-        // Search functionality
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where('color_code', 'like', "%{$search}%");
-        }
-        
-        $productColors = $query->orderBy('created_at', 'desc')->paginate(30);
+        $productColors = $this->repository->getProductColors($request);
         
         return view('admin.product-colors.index', compact('productColors'));
     }

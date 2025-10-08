@@ -6,9 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\BecomeAPartner;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Repositories\LanguageRepository;
 
 class BecomeAPartnerController extends Controller
 {
+    public function __construct(public LanguageRepository $languageRepository)
+    {
+    }
+
     /**
      * Show the form for editing the partner section.
      */
@@ -16,7 +21,7 @@ class BecomeAPartnerController extends Controller
     {
         $becomeAPartner = BecomeAPartner::getFirstOrCreate();
         $becomeAPartner->load('translates.language');
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.become-a-partner.edit', compact('becomeAPartner', 'languages'));
     }
@@ -26,7 +31,7 @@ class BecomeAPartnerController extends Controller
      */
     public function update(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Translation validation
         foreach ($languages as $language) {

@@ -9,17 +9,24 @@ use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Repositories\AddressTypeRepository;
+use App\Repositories\LanguageRepository;
 
 class AddressTypeController extends Controller
 {
+    public function __construct(
+        public AddressTypeRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $addressTypes = AddressType::with(['translates.language'])
-            ->ordered()
-            ->get();
+        $addressTypes = $this->repository->getAddressTypes();
 
         return view('admin.address-types.index', compact('addressTypes'));
     }
@@ -29,7 +36,7 @@ class AddressTypeController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.address-types.create', compact('languages'));
     }
 
@@ -81,7 +88,7 @@ class AddressTypeController extends Controller
      */
     public function edit(AddressType $addressType)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         $addressType->load('translates.language');
         
         return view('admin.address-types.edit', compact('addressType', 'languages'));

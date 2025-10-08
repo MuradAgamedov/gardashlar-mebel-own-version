@@ -7,12 +7,13 @@ use App\Models\HomePageDiscount;
 use App\Models\Language;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use App\Repositories\LanguageRepository;
 
 class HomePageDiscountController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(ImageService $imageService, public LanguageRepository $languageRepository)
     {
         $this->imageService = $imageService;
     }
@@ -28,7 +29,7 @@ class HomePageDiscountController extends Controller
             $homePageDiscount = HomePageDiscount::create();
         }
         
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.home-page-discount.edit', compact('homePageDiscount', 'languages'));
     }
@@ -38,7 +39,7 @@ class HomePageDiscountController extends Controller
      */
     public function update(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Translation validation
         foreach ($languages as $language) {

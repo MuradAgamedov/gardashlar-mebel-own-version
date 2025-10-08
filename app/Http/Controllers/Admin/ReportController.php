@@ -5,16 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Report;
 use App\Models\Language;
-use App\Services\ImageService;
+use App\Services\FileService;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
-    protected $imageService;
+    protected $fileService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(FileService $fileService)
     {
-        $this->imageService = $imageService;
+        $this->fileService = $fileService;
     }
 
 
@@ -47,11 +47,10 @@ class ReportController extends Controller
         
         // Base validation
         $request->validate([
-            'pdf' => 'nullable|file|mimes:pdf|max:10240', // 10MB max for PDF
+            'pdf' => 'nullable|file|mimes:pdf', // 10MB max for PDF
             'status' => 'boolean',
         ], [
             'pdf.mimes' => 'PDF must be a file of type: pdf.',
-            'pdf.max' => 'PDF may not be greater than 10MB.',
             'status.boolean' => 'Status must be true or false.',
         ]);
 
@@ -72,7 +71,7 @@ class ReportController extends Controller
         // Handle PDF upload
         $pdfPath = null;
         if ($request->hasFile('pdf')) {
-            $pdfPath = $this->imageService->upload($request->file('pdf'), 'reports');
+            $pdfPath = $this->fileService->upload($request->file('pdf'), 'reports');
         }
 
         // Create report
@@ -116,11 +115,10 @@ class ReportController extends Controller
         
         // Base validation
         $request->validate([
-            'pdf' => 'nullable|file|mimes:pdf|max:10240', // 10MB max for PDF
+            'pdf' => 'nullable|file|mimes:pdf', // 10MB max for PDF
             'status' => 'boolean',
         ], [
             'pdf.mimes' => 'PDF must be a file of type: pdf.',
-            'pdf.max' => 'PDF may not be greater than 10MB.',
             'status.boolean' => 'Status must be true or false.',
         ]);
 
@@ -143,10 +141,10 @@ class ReportController extends Controller
         if ($request->hasFile('pdf')) {
             // Delete old PDF
             if ($report->pdf) {
-                $this->imageService->delete($report->pdf);
+                $this->fileService->delete($report->pdf);
             }
             
-            $pdfPath = $this->imageService->upload($request->file('pdf'), 'reports');
+            $pdfPath = $this->fileService->upload($request->file('pdf'), 'reports');
             $pdfData['pdf'] = $pdfPath;
         }
 

@@ -9,17 +9,24 @@ use App\Models\ProjectCategory;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Repositories\HomePageProjectRepository;
+use App\Repositories\LanguageRepository;
 
 class HomePageProjectController extends Controller
 {
+    public function __construct(
+        public HomePageProjectRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $homePageProjects = HomePageProject::with(['project.translates.language', 'projectCategory.translates.language'])
-            ->orderBy('order')
-            ->get();
+        $homePageProjects = $this->repository->getHomePageProjects();
 
         return view('admin.home-page-projects.index', compact('homePageProjects'));
     }
@@ -29,14 +36,9 @@ class HomePageProjectController extends Controller
      */
     public function create()
     {
-        $mainLanguage = Language::getMainLanguage();
-        $projects = Project::with(['translates' => function($query) use ($mainLanguage) {
-            $query->where('language_id', $mainLanguage->id);
-        }])->get();
-        
-        $categories = ProjectCategory::with(['translates' => function($query) use ($mainLanguage) {
-            $query->where('language_id', $mainLanguage->id);
-        }])->get();
+        $mainLanguage = $this->languageRepository->getMainLanguage();
+        $projects = $this->repository->getProjectsWithMainLanguage($mainLanguage);
+        $categories = $this->repository->getCategoriesWithMainLanguage($mainLanguage);
 
         return view('admin.home-page-projects.create', compact('projects', 'categories', 'mainLanguage'));
     }
@@ -93,14 +95,9 @@ class HomePageProjectController extends Controller
      */
     public function edit(HomePageProject $homePageProject)
     {
-        $mainLanguage = Language::getMainLanguage();
-        $projects = Project::with(['translates' => function($query) use ($mainLanguage) {
-            $query->where('language_id', $mainLanguage->id);
-        }])->get();
-        
-        $categories = ProjectCategory::with(['translates' => function($query) use ($mainLanguage) {
-            $query->where('language_id', $mainLanguage->id);
-        }])->get();
+        $mainLanguage = $this->languageRepository->getMainLanguage();
+        $projects = $this->repository->getProjectsWithMainLanguage($mainLanguage);
+        $categories = $this->repository->getCategoriesWithMainLanguage($mainLanguage);
 
         return view('admin.home-page-projects.edit', compact('homePageProject', 'projects', 'categories', 'mainLanguage'));
     }
@@ -164,13 +161,9 @@ class HomePageProjectController extends Controller
     public function getProjectsByCategory(Request $request)
     {
         $categoryId = $request->input('category_id');
-        $mainLanguage = Language::getMainLanguage();
+        $mainLanguage = $this->languageRepository->getMainLanguage();
         
-        $projects = Project::with(['translates' => function($query) use ($mainLanguage) {
-            $query->where('language_id', $mainLanguage->id);
-        }])
-        ->where('project_category_id', $categoryId)
-        ->get();
+        $projects = $this->repository->getProjectsByCategory($categoryId, $mainLanguage);
         
         return response()->json($projects);
     }

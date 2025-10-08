@@ -6,16 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Models\Phone;
 use App\Models\PhoneType;
 use Illuminate\Http\Request;
+use App\Repositories\PhoneRepository;
 
 class PhoneController extends Controller
 {
+    public function __construct(public PhoneRepository $repository)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $phones = Phone::with('phoneType.translates.language')->orderBy('order')->get();
-        $phoneTypes = PhoneType::with('translates.language')->orderBy('order')->get();
+        $phones = $this->repository->getPhones();
+        $phoneTypes = $this->repository->getPhoneTypes();
         
         return view('admin.phones.index', compact('phones', 'phoneTypes'));
     }
@@ -25,7 +30,7 @@ class PhoneController extends Controller
      */
     public function create()
     {
-        $phoneTypes = PhoneType::with('translates.language')->active()->ordered()->get();
+        $phoneTypes = $this->repository->getActivePhoneTypes();
         return view('admin.phones.create', compact('phoneTypes'));
     }
 
@@ -91,7 +96,7 @@ class PhoneController extends Controller
     public function edit(Phone $phone)
     {
         $phone->load('phoneType.translates.language');
-        $phoneTypes = PhoneType::with('translates.language')->active()->ordered()->get();
+        $phoneTypes = $this->repository->getActivePhoneTypes();
         
         return view('admin.phones.edit', compact('phone', 'phoneTypes'));
     }

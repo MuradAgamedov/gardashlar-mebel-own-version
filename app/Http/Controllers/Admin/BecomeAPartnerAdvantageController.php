@@ -7,12 +7,18 @@ use App\Models\BecomeAPartnerAdvantage;
 use App\Models\Language;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use App\Repositories\BecomeAPartnerAdvantageRepository;
+use App\Repositories\LanguageRepository;
 
 class BecomeAPartnerAdvantageController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(
+        ImageService $imageService,
+        public BecomeAPartnerAdvantageRepository $repository,
+        public LanguageRepository $languageRepository
+    )
     {
         $this->imageService = $imageService;
     }
@@ -22,8 +28,8 @@ class BecomeAPartnerAdvantageController extends Controller
      */
     public function index()
     {
-        $advantages = BecomeAPartnerAdvantage::with('translates.language')->orderBy('order')->get();
-        $languages = Language::all();
+        $advantages = $this->repository->getAdvantages();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.become-a-partner-advantages.index', compact('advantages', 'languages'));
     }
@@ -33,7 +39,7 @@ class BecomeAPartnerAdvantageController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.become-a-partner-advantages.create', compact('languages'));
     }
 
@@ -42,7 +48,7 @@ class BecomeAPartnerAdvantageController extends Controller
      */
     public function store(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Base validation
         $request->validate([
@@ -125,7 +131,7 @@ class BecomeAPartnerAdvantageController extends Controller
     public function edit(BecomeAPartnerAdvantage $becomeAPartnerAdvantage)
     {
         $becomeAPartnerAdvantage->load('translates.language');
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.become-a-partner-advantages.edit', compact('becomeAPartnerAdvantage', 'languages'));
     }
@@ -135,7 +141,7 @@ class BecomeAPartnerAdvantageController extends Controller
      */
     public function update(Request $request, BecomeAPartnerAdvantage $becomeAPartnerAdvantage)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Base validation
         $request->validate([

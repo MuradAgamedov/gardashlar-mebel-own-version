@@ -37,9 +37,15 @@ class PaymentController extends Controller
         $lang = $data['language'] ?? 'EN';
         $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
 
+        // Get user ID if token exists
+        $userId = null;
+        if ($request->bearerToken() && $request->user()) {
+            $userId = $request->user()->id;
+        }
+
         // Create order
         $order = Order::create([
-            'user_id'        => $request->user()->id ?? null,
+            'user_id'        => $userId,
             'product_id'     => $data['product_id'],
             'full_name'      => $data['full_name'],
             'phone'          => $data['phone'],
@@ -108,9 +114,15 @@ class PaymentController extends Controller
         $lang = $data['language'] ?? 'EN';
         $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
 
+        // Get user ID if token exists
+        $userId = null;
+        if ($request->bearerToken() && $request->user()) {
+            $userId = $request->user()->id;
+        }
+
         // Create order
         $order = Order::create([
-            'user_id'        => $request->user()->id ?? null,
+            'user_id'        => $userId,
             'product_id'     => $data['product_id'],
             'full_name'      => $data['full_name'],
             'phone'          => $data['phone'],
@@ -227,27 +239,41 @@ class PaymentController extends Controller
         try {
             $data = $request->validate([
                 'product_id'      => 'required|exists:products,id',
-                'full_name'       => 'nullable|string|max:255',
-                'phone'           => 'nullable|string|max:50',
+                'full_name'       => 'required|string|max:255',
+                'phone'           => 'required|string|max:50',
+                'email'           => 'required|email|max:255',
+                'city'            => 'required|string|max:255',
                 'address'         => 'nullable|string',
-                'total_price'     => 'required|numeric|min:0',
+                'amount'          => 'required|numeric|min:1',
+                'months'          => 'required|in:2,3,6,9,12',
+                'member_id'       => 'required|string',
+                'language'        => 'nullable|in:AZ,EN,RU',
             ]);
+
+            // Calculate monthly price
+            $monthlyPrice = $data['amount'] / $data['months'];
+
+            // Get user ID if token exists
+            $userId = null;
+            if ($request->bearerToken() && $request->user()) {
+                $userId = $request->user()->id;
+            }
 
             // Create temporary order
             $order = Order::create([
-                'user_id'        => $request->user()->id ?? null,
+                'user_id'        => $userId,
                 'product_id'     => $data['product_id'],
-                'full_name'      => $data['full_name'] ?? null,
-                'phone'          => $data['phone'] ?? null,
-                'email'          => null,
-                'city'           => null,
+                'full_name'      => $data['full_name'],
+                'phone'          => $data['phone'],
+                'email'          => $data['email'],
+                'city'           => $data['city'],
                 'address'        => $data['address'] ?? null,
                 'order_id'       => strtoupper(Str::random(12)),
-                'delivery_method'=> null,
-                'payment_method' => null,
-                'selected_card'  => null,
-                'month'          => null,
-                'monthly_price'  => null,
+                'delivery_method'=> 'installment',
+                'payment_method' => 'card',
+                'selected_card'  => $data['member_id'],
+                'month'          => $data['months'],
+                'monthly_price'  => $monthlyPrice,
                 'status'         => 'temporary',
                 'payment_status' => 'unpaid',
             ]);
@@ -461,8 +487,7 @@ class PaymentController extends Controller
                     'categories.translates' => fn($q) => $q->where('language_id', $languageId),
                     'types.translates' => fn($q) => $q->where('language_id', $languageId),
                     'colors' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
-                    'details.translates' => fn($q) => $q->where('language_id', $languageId),
-                    'detailValues.translates' => fn($q) => $q->where('language_id', $languageId),
+           
                 ])
                 ->get();
 
@@ -473,31 +498,8 @@ class PaymentController extends Controller
                 // Main image
                 $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
 
-                // Category & parent category (slug + title)
-                $categorySlug = null;
-                $categoryTitle = null;
-                $parentSlug = null;
-                $parentTitle = null;
-
-                if ($product->categories->isNotEmpty()) {
-                    $category = $product->categories->first();
-                    $categoryTranslation = $category->translates->first();
-                    $categorySlug = $categoryTranslation?->slug;
-                    $categoryTitle = $categoryTranslation?->title;
-
-                    if ($category->parent_id) {
-                        $parentCategory = ProductCategory::find($category->parent_id);
-                        $parentTranslation = $parentCategory?->translates()->where('language_id', $languageId)->first();
-                        $parentSlug = $parentTranslation?->slug;
-                        $parentTitle = $parentTranslation?->title;
-                    }
-                }
-
-                // Product types
-                $productTypes = $product->types->map(fn($type) => [
-                    'id' => $type->id,
-                    'title' => $type->translates->first()?->title ?? ''
-                ]);
+           
+                
 
                 // Available colors
                 $availableColors = $product->colors->map(fn($color) => [
@@ -526,42 +528,17 @@ class PaymentController extends Controller
                     ]);
                 }
 
-                // Product details with translation
-                $productDetails = $product->details->map(fn($detail) => [
-                    'id' => $detail->id,
-                    'keyword' => $detail->translate($languageId)?->keyword ?? '',
-                    'value' => $detail->translate($languageId)?->value ?? '',
-                ]);
-
-                // Product detail values with translation
-                $productDetailValues = $product->detailValues->map(fn($value) => [
-                    'id' => $value->id,
-                    'order' => $value->order,
-                    'keyword' => $value->translate($languageId)?->keyword ?? '',
-                    'value' => $value->translate($languageId)?->value ?? '',
-                    'details' => $value->details->map(fn($detail) => [
-                        'id' => $detail->id,
-                        'order' => $detail->order,
-                        'keyword' => $detail->translate($languageId)?->keyword ?? '',
-                        'value' => $detail->translate($languageId)?->value ?? '',
-                    ])
-                ]);
-
+              
                 return [
                     'id' => $product->id,
-                    'slug' => $translation?->slug ?? '',
                     'title' => $translation?->title ?? '',
                     'available_colors' => $availableColors,
-                    'category_slug' => $categorySlug,
-                    'category_title' => $categoryTitle,
-                    'parent_slug' => $parentSlug,
-                    'parent_title' => $parentTitle,
+
+        
                     'discount_price' => $product->discount_price,
                     'price' => $product->price,
                     'images' => $imagesWithColors,
-                    'product_details' => $productDetails,
-                    'product_types' => $productTypes,
-                    'view_count' => $product->view_count
+               
                 ];
             });
 

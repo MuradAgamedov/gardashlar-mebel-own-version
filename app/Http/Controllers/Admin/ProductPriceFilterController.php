@@ -8,15 +8,23 @@ use App\Models\ProductPriceFilterTranslate;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\ProductPriceFilterRepository;
+use App\Repositories\LanguageRepository;
 
 class ProductPriceFilterController extends Controller
 {
+    public function __construct(
+        public ProductPriceFilterRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $filters = ProductPriceFilter::with('translates.language')->ordered()->get();
+        $filters = $this->repository->getFilters();
 
         return view('admin.product-price-filters.index', compact('filters'));
     }
@@ -26,7 +34,7 @@ class ProductPriceFilterController extends Controller
      */
     public function create()
     {
-        $languages = Language::getActiveLanguages();
+        $languages = $this->languageRepository->getActiveLanguages();
         return view('admin.product-price-filters.create', compact('languages'));
     }
 
@@ -89,7 +97,7 @@ class ProductPriceFilterController extends Controller
     public function edit(ProductPriceFilter $productPriceFilter)
     {
         $productPriceFilter->load('translates');
-        $languages = Language::getActiveLanguages();
+        $languages = $this->languageRepository->getActiveLanguages();
         return view('admin.product-price-filters.edit', compact('productPriceFilter', 'languages'));
     }
 
@@ -176,7 +184,7 @@ class ProductPriceFilterController extends Controller
 
         try {
             foreach ($request->input('items') as $index => $id) {
-                ProductPriceFilter::where('id', $id)->update(['order' => $index + 1]);
+                $this->repository->updateOrder($id, $index + 1);
             }
 
             return response()->json(['success' => true]);

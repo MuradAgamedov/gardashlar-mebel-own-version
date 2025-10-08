@@ -8,12 +8,13 @@ use App\Models\BlogPost;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Repositories\BlogImageRepository;
 
 class BlogImageController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(ImageService $imageService, public BlogImageRepository $repository)
     {
         $this->imageService = $imageService;
     }
@@ -23,7 +24,7 @@ class BlogImageController extends Controller
      */
     public function index(BlogPost $blogPost)
     {
-        $images = $blogPost->images()->get();
+        $images = $this->repository->getImagesByPost($blogPost);
         
         return view('admin.blog-images.index', compact('blogPost', 'images'));
     }

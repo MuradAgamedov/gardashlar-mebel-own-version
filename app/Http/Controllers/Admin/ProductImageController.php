@@ -8,12 +8,16 @@ use App\Models\Product;
 use App\Models\ProductColor;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use App\Repositories\ProductImageRepository;
 
 class ProductImageController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(
+        ImageService $imageService,
+        public ProductImageRepository $repository
+    )
     {
         $this->imageService = $imageService;
     }
@@ -23,19 +27,8 @@ class ProductImageController extends Controller
      */
     public function index(Product $product, Request $request)
     {
-        $query = $product->images()->with('color');
-        
-        // Filter by color
-        if ($request->has('color_id') && $request->color_id !== '') {
-            if ($request->color_id === 'no-color') {
-                $query->whereNull('product_color_id');
-            } else {
-                $query->where('product_color_id', $request->color_id);
-            }
-        }
-        
-        $images = $query->ordered()->get();
-        $colors = \App\Models\ProductColor::all();
+        $images = $this->repository->getProductImages($product, $request);
+        $colors = $this->repository->getAllColors();
         
         return view('admin.product-images.index', compact('product', 'images', 'colors'));
     }
@@ -45,7 +38,7 @@ class ProductImageController extends Controller
      */
     public function create(Product $product)
     {
-        $colors = ProductColor::all();
+        $colors = $this->repository->getAllColors();
         return view('admin.product-images.create', compact('product', 'colors'));
     }
 
@@ -56,20 +49,22 @@ class ProductImageController extends Controller
     {
         $request->validate([
             'images' => 'required|array',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
             'product_color_id' => 'nullable|exists:product_colors,id'
         ]);
+        
 
         try {
+
             foreach ($request->file('images') as $imageFile) {
+         
                 $imagePath = $this->imageService->upload($imageFile, 'products');
                 
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'product_color_id' => $request->input('product_color_id'),
-                    'image' => $imagePath,
-                    'status' => true
-                ]);
+                $this->repository->createImage(
+                    $product->id,
+                    $request->input('product_color_id'),
+                    $imagePath
+                );
             }
 
             return redirect()->route('admin.products.images.index', $product)
@@ -93,7 +88,7 @@ class ProductImageController extends Controller
      */
     public function edit(Product $product, ProductImage $image)
     {
-        $colors = ProductColor::all();
+        $colors = $this->repository->getAllColors();
         return view('admin.product-images.edit', compact('product', 'image', 'colors'));
     }
 
@@ -103,7 +98,7 @@ class ProductImageController extends Controller
     public function update(Request $request, Product $product, ProductImage $image)
     {
         $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
             'status' => 'boolean',
             'product_color_id' => 'nullable|exists:product_colors,id'
         ]);
@@ -162,7 +157,7 @@ class ProductImageController extends Controller
 
         try {
             foreach ($request->input('items') as $index => $id) {
-                ProductImage::where('id', $id)->update(['order' => $index + 1]);
+                $this->repository->updateOrder($id, $index + 1);
             }
 
             return response()->json(['success' => true]);
@@ -178,9 +173,7 @@ class ProductImageController extends Controller
     {
         try {
             // Remove main flag from all other images of this product
-            ProductImage::where('product_id', $product->id)
-                ->where('id', '!=', $image->id)
-                ->update(['is_main' => false]);
+            $this->repository->removeMainFromOthers($product->id, $image->id);
 
             // Set this image as main
             $image->update(['is_main' => true]);

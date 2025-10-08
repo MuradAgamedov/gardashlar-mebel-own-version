@@ -7,12 +7,13 @@ use App\Models\Kiv;
 use App\Models\KivCategory;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use App\Repositories\KivRepository;
 
 class KivController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(ImageService $imageService, public KivRepository $repository)
     {
         $this->imageService = $imageService;
     }
@@ -22,15 +23,8 @@ class KivController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Kiv::with('category.translates');
-        
-        // Category filter
-        if ($request->filled('category_id')) {
-            $query->where('kiv_category_id', $request->category_id);
-        }
-        
-        $kivs = $query->orderBy('order')->get();
-        $categories = KivCategory::with('translates')->orderBy('order')->get();
+        $kivs = $this->repository->getKivs($request);
+        $categories = $this->repository->getCategories();
         
         return view('admin.kivs.index', compact('kivs', 'categories'));
     }
@@ -40,7 +34,7 @@ class KivController extends Controller
      */
     public function create()
     {
-        $categories = KivCategory::with('translates')->orderBy('order')->get();
+        $categories = $this->repository->getCategories();
         return view('admin.kivs.create', compact('categories'));
     }
 
@@ -102,7 +96,7 @@ class KivController extends Controller
     public function edit(Kiv $kiv)
     {
         $kiv->load('category.translates');
-        $categories = KivCategory::with('translates')->orderBy('order')->get();
+        $categories = $this->repository->getCategories();
         
         return view('admin.kivs.edit', compact('kiv', 'categories'));
     }

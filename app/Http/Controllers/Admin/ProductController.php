@@ -11,49 +11,25 @@ use App\Models\ProductTag;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Repositories\ProductRepository;
+use App\Repositories\LanguageRepository;
 
 class ProductController extends Controller
 {
+    public function __construct(
+        public ProductRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Product::with(['categories', 'types', 'translates.language', 'tags']);
-        
-        // Search functionality
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->whereHas('translates', function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-        
-        // Category filter
-        if ($request->filled('category')) {
-            $query->whereHas('categories', function($q) use ($request) {
-                $q->where('product_categories.id', $request->input('category'));
-            });
-        }
-        
-        // Type filter
-        if ($request->filled('type')) {
-            $query->whereHas('types', function($q) use ($request) {
-                $q->where('product_types.id', $request->input('type'));
-            });
-        }
-        
-        // Status filter
-        if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
-        }
-        
-        $products = $query->ordered()->paginate(30);
-        
-        // Get categories and types for filters
-        $categories = ProductCategory::active()->whereNotNull('parent_id')->ordered()->get();
-        $types = ProductType::active()->ordered()->get();
+        $products = $this->repository->getProducts($request);
+        $categories = $this->repository->getActiveSubcategories();
+        $types = $this->repository->getActiveTypes();
         
         return view('admin.products.index', compact('products', 'categories', 'types'));
     }
@@ -63,10 +39,10 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = ProductCategory::active()->whereNotNull('parent_id')->ordered()->get();
-        $types = ProductType::active()->ordered()->get();
-        $tags = ProductTag::active()->ordered()->get();
-        $languages = Language::all();
+        $categories = $this->repository->getActiveSubcategories();
+        $types = $this->repository->getActiveTypes();
+        $tags = $this->repository->getActiveTags();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.products.create', compact('categories', 'types', 'tags', 'languages'));
     }
@@ -166,10 +142,10 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $product->load(['translates.language', 'tags']);
-        $categories = ProductCategory::active()->whereNotNull('parent_id')->ordered()->get();
-        $types = ProductType::active()->ordered()->get();
-        $tags = ProductTag::active()->ordered()->get();
-        $languages = Language::all();
+        $categories = $this->repository->getActiveSubcategories();
+        $types = $this->repository->getActiveTypes();
+        $tags = $this->repository->getActiveTags();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.products.edit', compact('product', 'categories', 'types', 'tags', 'languages'));
     }

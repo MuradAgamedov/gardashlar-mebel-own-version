@@ -9,15 +9,24 @@ use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use App\Repositories\BlogCategoryRepository;
+use App\Repositories\LanguageRepository;
 
 class BlogCategoryController extends Controller
 {
+    public function __construct(
+        public BlogCategoryRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(): View
     {
-        $categories = BlogCategory::with('translates.language')->orderBy('order')->get();
+        $categories = $this->repository->getCategories();
         return view('admin.blog-categories.index', compact('categories'));
     }
 
@@ -26,7 +35,7 @@ class BlogCategoryController extends Controller
      */
     public function create(): View
     {
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageRepository->getActiveLanguages();
         return view('admin.blog-categories.create', compact('languages'));
     }
 
@@ -35,7 +44,7 @@ class BlogCategoryController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageRepository->getActiveLanguages();
         
         // Base validation
         $request->validate([
@@ -97,7 +106,7 @@ class BlogCategoryController extends Controller
     public function edit(BlogCategory $blogCategory): View
     {
         $blogCategory->load('translates.language');
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageRepository->getActiveLanguages();
         $translations = $blogCategory->translates->keyBy('language_id');
         
         return view('admin.blog-categories.edit', compact('blogCategory', 'languages', 'translations'));
@@ -108,7 +117,7 @@ class BlogCategoryController extends Controller
      */
     public function update(Request $request, BlogCategory $blogCategory): RedirectResponse
     {
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageRepository->getActiveLanguages();
         
         // Base validation
         $request->validate([

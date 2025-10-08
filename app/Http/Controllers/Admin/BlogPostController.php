@@ -10,12 +10,20 @@ use App\Models\Language;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Repositories\BlogPostRepository;
+use App\Repositories\BlogCategoryRepository;
+use App\Repositories\LanguageRepository;
 
 class BlogPostController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(
+        ImageService $imageService,
+        public BlogPostRepository $repository,
+        public BlogCategoryRepository $categoryRepository,
+        public LanguageRepository $languageRepository
+    )
     {
         $this->imageService = $imageService;
     }
@@ -25,39 +33,8 @@ class BlogPostController extends Controller
      */
     public function index(Request $request)
     {
-        $query = BlogPost::with(['category.translates', 'translates.language']);
-
-        // Filter by category
-        if ($request->filled('category_id')) {
-            $query->where('blog_category_id', $request->category_id);
-        }
-
-        // Filter by status
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // Search by title
-        if ($request->filled('search')) {
-            $searchTerm = $request->search;
-            $query->whereHas('translates', function($q) use ($searchTerm) {
-                $q->where('title', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('card_description', 'like', '%' . $searchTerm . '%');
-            });
-        }
-
-        // Search functionality
-        if ($request->filled('search')) {
-            $searchTerm = $request->search;
-            $query->whereHas('translates', function($q) use ($searchTerm) {
-                $q->where('title', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('description', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('card_description', 'like', '%' . $searchTerm . '%');
-            });
-        }
-
-        $blogPosts = $query->orderBy('created_at', 'desc')->get();
-        $categories = BlogCategory::with('translates')->active()->ordered()->get();
+        $blogPosts = $this->repository->getPosts($request);
+        $categories = $this->categoryRepository->getCategories();
 
         return view('admin.blog-posts.index', compact('blogPosts', 'categories'));
     }
@@ -67,8 +44,8 @@ class BlogPostController extends Controller
      */
     public function create()
     {
-        $categories = BlogCategory::with('translates')->active()->ordered()->get();
-        $languages = Language::active()->orderBy('order')->get();
+        $categories = $this->categoryRepository->getCategories();
+        $languages = $this->languageRepository->getActiveLanguages();
 
         return view('admin.blog-posts.create', compact('categories', 'languages'));
     }
@@ -168,8 +145,8 @@ class BlogPostController extends Controller
     public function edit(BlogPost $blogPost)
     {
         $blogPost->load(['category.translates', 'translates.language']);
-        $categories = BlogCategory::with('translates')->active()->ordered()->get();
-        $languages = Language::active()->orderBy('order')->get();
+        $categories = $this->categoryRepository->getCategories();
+        $languages = $this->languageRepository->getActiveLanguages();
 
         return view('admin.blog-posts.edit', compact('blogPost', 'categories', 'languages'));
     }

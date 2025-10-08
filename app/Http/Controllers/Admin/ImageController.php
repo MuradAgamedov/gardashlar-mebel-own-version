@@ -9,12 +9,18 @@ use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Services\ImageService;
+use App\Repositories\ImageRepository;
+use App\Repositories\LanguageRepository;
 
 class ImageController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(
+        ImageService $imageService,
+        public ImageRepository $repository,
+        public LanguageRepository $languageRepository
+    )
     {
         $this->imageService = $imageService;
     }
@@ -24,7 +30,7 @@ class ImageController extends Controller
      */
     public function index()
     {
-        $images = Image::with('translates.language')->get();
+        $images = $this->repository->getImages();
         return view('admin.images.index', compact('images'));
     }
 
@@ -33,7 +39,7 @@ class ImageController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.images.create', compact('languages'));
     }
 
@@ -85,7 +91,7 @@ class ImageController extends Controller
      */
     public function edit(Image $image)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         $translations = $image->translates->keyBy('language_id');
         return view('admin.images.edit', compact('image', 'languages', 'translations'));
     }

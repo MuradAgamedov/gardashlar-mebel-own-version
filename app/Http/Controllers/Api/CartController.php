@@ -50,22 +50,51 @@ class CartController extends Controller
         $languageId = $this->getLanguageIdFromHeader($request);
         $user = $request->user();
     
-        $carts = $user->cart()->with(['product.projectCategory', 'product.images'])->get();
+        $carts = $user->cart()->with(['product.details.translates', 'product.images', 'product.types.translates', 'product.categories.translates', 'product.colors'])->get();
     
         $cartData = $carts->map(function ($cart) use ($languageId, $user) {
-            $product = $cart->product ? $cart->product->apiData($languageId) : null;
+            $product = $cart->product;
+    
+            $productData = $product ? [
+                'id' => $product->id,
+                'title' => $product->translate($languageId)?->title ?? '',
+                'slug' => $product->translate($languageId)?->slug ?? '',
+                'price' => $product->price,
+                'discount_price' => $product->discount_price,
+                'view_count' => $product->view_count,
+                'images' => $product->images->map(fn($image) => [
+                    'id' => $image->id,
+                    'image_url' => $image->image ? asset('storage/' . $image->image) : asset('images/default_image.webp'),
+                    'is_main' => $image->is_main,
+                    'color_id' => $image->product_color_id
+                ])->sortBy('order')->values(),
+                'available_colors' => $product->colors->map(fn($color) => [
+                    'id' => $color->id,
+                    'color_code' => $color->color_code
+                ]),
+                'product_types' => $product->types->map(fn($type) => [
+                    'id' => $type->id,
+                    'title' => $type->translates->first()?->title ?? ''
+                ]),
+                'product_details' => $product->details->map(function($detail) use ($languageId) {
+                    $translation = $detail->translates->first();
+                    return [
+                        'id' => $detail->id,
+                        'keyword' => $translation?->keyword ?? '',
+                        'value' => $translation?->value ?? '',
+                    ];
+                }),
+            ] : null;
     
             return [
-                'cart_id'   => $cart->id,
-                'count'     => $cart->count,
-                'color_id'  => $cart->color_id,
-                'product'   => $product,
-    
-                // 🔹 əlavə etdiklərin:
+                'cart_id' => $cart->id,
+                'count' => $cart->count,
+                'color_id' => $cart->color_id,
+                'product' => $productData,
                 'inCart' => [
                     'isActive' => true,
                     'color_id' => $cart->color_id,
-                    'count'    => $cart->count,
+                    'count' => $cart->count,
                 ],
                 'inFavorite' => [
                     'isActive' => $user->favorites()
@@ -80,8 +109,8 @@ class CartController extends Controller
     
         return response()->json([
             'success' => true,
-            "data"    => $cartData,
-            "message" => "Cart fetched successfully"
+            'data' => $cartData,
+            'message' => 'Cart fetched successfully'
         ]);
     }
     
@@ -112,7 +141,6 @@ class CartController extends Controller
     public function checkCardProducts(Request $request)
     {
         try {
-            // Validate request
             $request->validate([
                 'product_ids' => 'required|array|min:1|max:50',
                 'product_ids.*' => 'required|integer|min:1'
@@ -122,18 +150,10 @@ class CartController extends Controller
             $user = $request->user();
             $languageId = $this->getLanguageIdFromHeader($request);
     
-            // İstifadəçi yoxlanışı
-            if ($user) {
-                $compareProductIds = ProductCompare::where('user_id', $user->id)
-                    ->whereIn('product_id', $productIds)
-                    ->pluck('product_id')
-                    ->toArray();
-            } else {
-                // Guest üçün sadəcə gələn id-ləri yoxlayırıq
-                $compareProductIds = $productIds;
-            }
+            $compareProductIds = $user 
+                ? ProductCompare::where('user_id', $user->id)->whereIn('product_id', $productIds)->pluck('product_id')->toArray()
+                : $productIds;
     
-            // Məhsulları DB-dən götür
             $existingProducts = Product::active()
                 ->whereIn('id', $compareProductIds)
                 ->with([
@@ -143,24 +163,15 @@ class CartController extends Controller
                     'categories.translates' => fn($q) => $q->where('language_id', $languageId),
                     'types.translates' => fn($q) => $q->where('language_id', $languageId),
                     'colors' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
-                    'details.translates',
-                    'detailValues.translates',
+                    'details.translates' => fn($q) => $q->where('language_id', $languageId),
                 ])
                 ->get();
     
-            // Map to frontend-friendly structure
             $productsData = $existingProducts->map(function ($product) use ($languageId) {
                 $translation = $product->translates->first();
-    
-                // Main image
                 $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
     
-                // Category & parent category
-                $categorySlug = null;
-                $categoryTitle = null;
-                $parentSlug = null;
-                $parentTitle = null;
-    
+                $categorySlug = $categoryTitle = $parentSlug = $parentTitle = null;
                 if ($product->categories->isNotEmpty()) {
                     $category = $product->categories->first();
                     $categoryTranslation = $category->translates->first();
@@ -175,41 +186,33 @@ class CartController extends Controller
                     }
                 }
     
-                // Product types
                 $productTypes = $product->types->map(fn($type) => [
                     'id' => $type->id,
                     'title' => $type->translates->first()?->title ?? ''
                 ]);
     
-                // Available colors
                 $availableColors = $product->colors->map(fn($color) => [
                     'id' => $color->id,
                     'color_code' => $color->color_code
                 ]);
     
-                // Images
                 $imagesWithColors = $product->images->map(fn($image) => [
                     'id' => $image->id,
                     'image_url' => $image->image ? asset('storage/' . $image->image) : null,
                     'is_main' => $image->is_main,
-                    'color_id' => $image->product_color_id // nested color yox, sadəcə id
+                    'color_id' => $image->product_color_id
                 ])->sortBy('order')->values();
-                
-                // Əgər heç bir şəkil yoxdursa, default əlavə et
+    
                 if ($imagesWithColors->isEmpty()) {
                     $imagesWithColors = collect([
                         [
-                            'id' => time(), // random id
+                            'id' => time(),
                             'image_url' => asset('images/default_image.webp'),
                             'is_main' => false,
                             'color_id' => null
                         ]
                     ]);
                 }
-                
-
-    
-             
     
                 return [
                     'id' => $product->id,
@@ -223,8 +226,14 @@ class CartController extends Controller
                     'discount_price' => $product->discount_price,
                     'price' => $product->price,
                     'images' => $imagesWithColors,
-                    'product_details' => $product->details ?? collect(),
-                    'product_detail_values' => $product->detailValues ?? collect(),
+                    'product_details' => $product->details->map(function($detail) use ($languageId) {
+                        $translation = $detail->translates->first();
+                        return [
+                            'id' => $detail->id,
+                            'keyword' => $translation?->keyword ?? '',
+                            'value' => $translation?->value ?? '',
+                        ];
+                    }),
                     'product_types' => $productTypes,
                     'view_count' => $product->view_count
                 ];

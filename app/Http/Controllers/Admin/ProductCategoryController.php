@@ -9,42 +9,24 @@ use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Repositories\ProductCategoryRepository;
+use App\Repositories\LanguageRepository;
 
 class ProductCategoryController extends Controller
 {
+    public function __construct(
+        public ProductCategoryRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = ProductCategory::with(['translates.language', 'parent.translates.language', 'children.translates.language']);
-        
-        // Search functionality
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            
-            // Get categories that match the search criteria
-            $matchingCategoryIds = ProductCategory::whereHas('translates', function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('slug', 'like', "%{$search}%")
-                  ->orWhere('seo_title', 'like', "%{$search}%");
-            })->pluck('id');
-            
-            // Get parent IDs of matching subcategories
-            $parentIds = ProductCategory::whereIn('id', $matchingCategoryIds)
-                ->whereNotNull('parent_id')
-                ->pluck('parent_id');
-            
-            // Combine matching categories and their parents
-            $allMatchingIds = $matchingCategoryIds->merge($parentIds)->unique();
-            
-            $query->whereIn('id', $allMatchingIds);
-        }
-        
-        $categories = $query->ordered()->get();
-            
-        // Get all categories for parent selection in forms
-        $allCategories = ProductCategory::with('translates.language')->ordered()->get();
+        $categories = $this->repository->getCategories($request);
+        $allCategories = $this->repository->getAllCategories();
         
         return view('admin.product-categories.index', compact('categories', 'allCategories'));
     }
@@ -54,8 +36,8 @@ class ProductCategoryController extends Controller
      */
     public function create()
     {
-        $languages = Language::active()->orderBy('order')->get();
-        $categories = ProductCategory::with('translates.language')->root()->ordered()->get();
+        $languages = $this->languageRepository->getActiveLanguages();
+        $categories = $this->repository->getRootCategories();
         return view('admin.product-categories.create', compact('languages', 'categories'));
     }
 
@@ -137,12 +119,8 @@ class ProductCategoryController extends Controller
     public function edit(ProductCategory $productCategory)
     {
         $productCategory->load('translates.language');
-        $languages = Language::active()->orderBy('order')->get();
-        $categories = ProductCategory::with('translates.language')
-            ->where('id', '!=', $productCategory->id) // Prevent self-selection
-            ->root()
-            ->ordered()
-            ->get();
+        $languages = $this->languageRepository->getActiveLanguages();
+        $categories = $this->repository->getRootCategoriesExcept($productCategory->id);
         return view('admin.product-categories.edit', compact('productCategory', 'languages', 'categories'));
     }
 

@@ -6,16 +6,25 @@ use App\Http\Controllers\Controller;
 use App\Models\PhoneType;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Repositories\PhoneTypeRepository;
+use App\Repositories\LanguageRepository;
 
 class PhoneTypeController extends Controller
 {
+    public function __construct(
+        public PhoneTypeRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $phoneTypes = PhoneType::with('translates.language')->orderBy('order')->get();
-        $languages = Language::all();
+        $phoneTypes = $this->repository->getPhoneTypes();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.phone-types.index', compact('phoneTypes', 'languages'));
     }
@@ -25,7 +34,7 @@ class PhoneTypeController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.phone-types.create', compact('languages'));
     }
 
@@ -34,7 +43,7 @@ class PhoneTypeController extends Controller
      */
     public function store(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Combined validation
         $validationRules = [];
@@ -84,7 +93,7 @@ class PhoneTypeController extends Controller
     public function edit(PhoneType $phoneType)
     {
         $phoneType->load('translates.language');
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.phone-types.edit', compact('phoneType', 'languages'));
     }
@@ -94,7 +103,7 @@ class PhoneTypeController extends Controller
      */
     public function update(Request $request, PhoneType $phoneType)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Combined validation
         $validationRules = [];

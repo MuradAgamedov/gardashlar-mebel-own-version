@@ -65,7 +65,7 @@ class HeroCategoryController extends Controller
                     ->with([
                         'product.translates' => fn($q) => $q->where('language_id', $languageId),
                         'product.images' => fn($q) => $q->active()->ordered(),
-                        'product.categories' => fn($q) => $q->where('product_categories.id', $categoryId)
+                        'product.categories.translates' => fn($q) => $q->where('language_id', $languageId),
                     ])
                     ->get()
                     ->filter(function ($heroProduct) use ($categoryId) {
@@ -73,7 +73,7 @@ class HeroCategoryController extends Controller
                     });
             });
     
-            // ✨ User yoxlama
+            // ✨ İstifadəçi məlumatı
             $user = auth('sanctum')->user();
             $cartIds = $favIds = $compareIds = [];
     
@@ -97,11 +97,32 @@ class HeroCategoryController extends Controller
             }
     
             // ✨ Map nəticələri
-            $heroProducts = $heroProducts->map(function ($heroProduct) use ($cartIds, $favIds, $compareIds) {
+            $heroProducts = $heroProducts->map(function ($heroProduct) use ($cartIds, $favIds, $compareIds, $languageId) {
                 $product = $heroProduct->product;
                 $translate = $product->translates->first();
     
+                // Əsas şəkil
                 $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
+    
+                // Kateqoriya slug-ları
+                $categorySlug = null;
+                $parentSlug = null;
+    
+                if ($product->categories->isNotEmpty()) {
+                    $category = $product->categories->first();
+                    $categoryTranslation = $category->translates->first();
+                    $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
+    
+                    if ($category->parent_id) {
+                        $parentCategory = \App\Models\ProductCategory::find($category->parent_id);
+                        if ($parentCategory) {
+                            $parentTranslation = $parentCategory->translates()
+                                ->where('language_id', $languageId)
+                                ->first();
+                            $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
+                        }
+                    }
+                }
     
                 return [
                     'id' => $product->id,
@@ -110,6 +131,11 @@ class HeroCategoryController extends Controller
                     'price' => $product->price ?? null,
                     'discount_price' => $product->discount_price ?? 0,
                     'main_image_url' => $mainImage ? $mainImage->image_url : null,
+    
+                    // ✅ Yeni sahələr
+                    'category_slug' => $categorySlug,
+                    'parentSlug' => $parentSlug,
+    
                     // ✅ Yeni boolean-lar
                     'inCart' => in_array($product->id, $cartIds),
                     'inFavorite' => in_array($product->id, $favIds),
@@ -130,5 +156,6 @@ class HeroCategoryController extends Controller
             ], 500);
         }
     }
+    
     
 } 

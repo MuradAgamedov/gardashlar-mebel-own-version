@@ -8,11 +8,13 @@ use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use App\Services\ImageService;
+use App\Repositories\LanguageRepository;
 
 class CompanyManagementController extends Controller
 {
     protected $imageService;
-    public function __construct(ImageService $imageService)
+    
+    public function __construct(ImageService $imageService, public LanguageRepository $languageRepository)
     {
         $this->imageService = $imageService;
     }
@@ -28,7 +30,7 @@ class CompanyManagementController extends Controller
             $companyManagement = CompanyManagement::create();
         }
         
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.company-management.edit', compact('companyManagement', 'languages'));
     }
@@ -38,7 +40,7 @@ class CompanyManagementController extends Controller
      */
     public function update(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
 
         try {
             $companyManagement = CompanyManagement::first();

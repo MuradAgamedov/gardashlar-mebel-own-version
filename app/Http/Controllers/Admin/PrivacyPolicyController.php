@@ -9,21 +9,25 @@ use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use App\Repositories\LanguageRepository;
+use App\Repositories\PrivacyPolicyRepository;
 
 class PrivacyPolicyController extends Controller
 {
+    public function __construct(
+        public LanguageRepository $languageRepository,
+        public PrivacyPolicyRepository $repository
+    )
+    {
+    }
+
     /**
      * Show the form for editing the privacy policy.
      */
     public function edit()
     {
-        $privacyPolicy = PrivacyPolicy::with('translates')->first();
-        
-        if (!$privacyPolicy) {
-            $privacyPolicy = PrivacyPolicy::create();
-        }
-        
-        $languages = Language::getActiveLanguages();
+        $privacyPolicy = $this->repository->getOrCreatePrivacyPolicy();
+        $languages = $this->languageRepository->getActiveLanguages();
         
         return view('admin.privacy-policy.edit', compact('privacyPolicy', 'languages'));
     }
@@ -48,11 +52,7 @@ class PrivacyPolicyController extends Controller
         try {
             DB::beginTransaction();
 
-            $privacyPolicy = PrivacyPolicy::first();
-            
-            if (!$privacyPolicy) {
-                $privacyPolicy = PrivacyPolicy::create();
-            }
+            $privacyPolicy = $this->repository->getOrCreatePrivacyPolicy();
 
             \Log::info('Privacy Policy ID:', ['id' => $privacyPolicy->id]);
 
@@ -77,7 +77,7 @@ class PrivacyPolicyController extends Controller
             \Log::info('Privacy Policy updated successfully');
 
             // Clear cache for all languages
-            $languages = Language::getActiveLanguages();
+            $languages = $this->languageRepository->getActiveLanguages();
             foreach ($languages as $language) {
                 Cache::forget("privacy_policy_{$language->id}");
             }

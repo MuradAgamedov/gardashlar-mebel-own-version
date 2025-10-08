@@ -7,12 +7,18 @@ use App\Models\Catalog;
 use App\Models\Language;
 use App\Services\FileService;
 use Illuminate\Http\Request;
+use App\Repositories\CatalogRepository;
+use App\Repositories\LanguageRepository;
 
 class CatalogController extends Controller
 {
     protected $fileService;
 
-    public function __construct(FileService $fileService)
+    public function __construct(
+        FileService $fileService,
+        public CatalogRepository $repository,
+        public LanguageRepository $languageRepository
+    )
     {
         $this->fileService = $fileService;
     }
@@ -22,8 +28,8 @@ class CatalogController extends Controller
      */
     public function index()
     {
-        $catalogs = Catalog::with('translates.language')->orderBy('order')->get();
-        $languages = Language::all();
+        $catalogs = $this->repository->getCatalogs();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.catalogs.index', compact('catalogs', 'languages'));
     }
@@ -33,7 +39,7 @@ class CatalogController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.catalogs.create', compact('languages'));
     }
 
@@ -42,7 +48,7 @@ class CatalogController extends Controller
      */
     public function store(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Combined validation
         $validationRules = [
@@ -125,7 +131,7 @@ class CatalogController extends Controller
     public function edit(Catalog $catalog)
     {
         $catalog->load('translates.language');
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.catalogs.edit', compact('catalog', 'languages'));
     }
@@ -135,7 +141,7 @@ class CatalogController extends Controller
      */
     public function update(Request $request, Catalog $catalog)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Combined validation
         $validationRules = [

@@ -8,15 +8,23 @@ use App\Models\ProductDetail;
 use App\Models\ProductDetailTranslate;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Repositories\LanguageRepository;
+use App\Repositories\ProductDetailRepository;
 
 class ProductDetailController extends Controller
 {
+    public function __construct(
+        public LanguageRepository $languageRepository,
+        public ProductDetailRepository $repository
+    )
+    {
+    }
     /**
      * Display a listing of the resource.
      */
     public function index(Product $product)
     {
-        $details = $product->details()->with(['translates.language'])->ordered()->get();
+        $details = $this->repository->getProductDetails($product);
         return view('admin.product-details.index', compact('product', 'details'));
     }
 
@@ -25,7 +33,7 @@ class ProductDetailController extends Controller
      */
     public function create(Product $product)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.product-details.create', compact('product', 'languages'));
     }
 
@@ -42,10 +50,8 @@ class ProductDetailController extends Controller
         ]);
 
         // Create product detail
-        $productDetail = ProductDetail::create([
-            'product_id' => $product->id,
-            'order' => ProductDetail::where('product_id', $product->id)->max('order') + 1
-        ]);
+        $order = $this->repository->getNextOrder($product->id);
+        $productDetail = $this->repository->createDetail($product->id, $order);
 
         // Create translations
         foreach ($request->translates as $translate) {
@@ -75,7 +81,7 @@ class ProductDetailController extends Controller
      */
     public function edit(Product $product, ProductDetail $detail)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         $detail->load(['translates.language']);
         return view('admin.product-details.edit', compact('product', 'detail', 'languages'));
     }
@@ -132,7 +138,7 @@ class ProductDetailController extends Controller
         ]);
 
         foreach ($request->items as $index => $id) {
-            ProductDetail::where('id', $id)->update(['order' => $index + 1]);
+            $this->repository->updateOrder($id, $index + 1);
         }
 
         return response()->json(['success' => true]);
@@ -148,7 +154,7 @@ class ProductDetailController extends Controller
             'ids.*' => 'exists:product_details,id'
         ]);
 
-        $details = ProductDetail::whereIn('id', $request->ids)->get();
+        $details = $this->repository->getDetailsByIds($request->ids);
         
         foreach ($details as $detail) {
             $detail->translates()->delete();

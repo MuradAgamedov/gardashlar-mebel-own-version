@@ -8,26 +8,24 @@ use App\Models\IndividualProjectOrderTranslate;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\IndividualProjectOrderRepository;
+use App\Repositories\LanguageRepository;
 
 class IndividualProjectOrderController extends Controller
 {
+    public function __construct(
+        public IndividualProjectOrderRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = IndividualProjectOrder::with('translates.language');
-        
-        // Search functionality
-        if ($request->has('search') && !empty($request->search)) {
-            $search = $request->search;
-            $query->whereHas('translates', function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-        
-        $individualProjectOrders = $query->ordered()->get();
+        $individualProjectOrders = $this->repository->getIndividualProjectOrders($request);
 
         return view('admin.individual-project-orders.index', compact('individualProjectOrders'));
     }
@@ -37,7 +35,7 @@ class IndividualProjectOrderController extends Controller
      */
     public function create()
     {
-        $languages = Language::getActiveLanguages();
+        $languages = $this->languageRepository->getActiveLanguages();
         return view('admin.individual-project-orders.create', compact('languages'));
     }
 
@@ -89,7 +87,7 @@ class IndividualProjectOrderController extends Controller
     public function edit(IndividualProjectOrder $individualProjectOrder)
     {
         $individualProjectOrder->load('translates');
-        $languages = Language::getActiveLanguages();
+        $languages = $this->languageRepository->getActiveLanguages();
         
         return view('admin.individual-project-orders.edit', compact('individualProjectOrder', 'languages'));
     }
