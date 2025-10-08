@@ -69,7 +69,6 @@ class FavoriteController extends Controller
             'product.images',
             'product.colors',
             'product.details.translates' => fn($q) => $q->where('language_id', $languageId),
-            'product.detailValues.translates' => fn($q) => $q->where('language_id', $languageId),
             'product.types.translates' => fn($q) => $q->where('language_id', $languageId),
             'product.categories.translates' => fn($q) => $q->where('language_id', $languageId),
         ])->get();
