@@ -45,6 +45,7 @@ class ProjectImageController extends Controller
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
             'status' => 'boolean',
         ]);
+        dd(1);
 
         if ($validator->fails()) {
             return redirect()->back()
