@@ -8,15 +8,24 @@ use App\Models\OurGoalTranslate;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Repositories\OurGoalRepository;
+use App\Repositories\LanguageRepository;
 
 class OurGoalController extends Controller
 {
+    public function __construct(
+        public OurGoalRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $ourGoals = OurGoal::with('translates.language')->ordered()->get();
+        $ourGoals = $this->repository->getOurGoals();
         return view('admin.our-goals.index', compact('ourGoals'));
     }
 
@@ -25,7 +34,7 @@ class OurGoalController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.our-goals.create', compact('languages'));
     }
 
@@ -75,7 +84,7 @@ class OurGoalController extends Controller
      */
     public function edit(OurGoal $ourGoal)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         $translations = $ourGoal->translates->keyBy('language_id');
         return view('admin.our-goals.edit', compact('ourGoal', 'languages', 'translations'));
     }

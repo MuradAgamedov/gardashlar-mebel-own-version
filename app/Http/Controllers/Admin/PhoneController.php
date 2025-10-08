@@ -25,7 +25,7 @@ class PhoneController extends Controller
      */
     public function create()
     {
-        $phoneTypes = PhoneType::with('translates.language')->active()->ordered()->get();
+        $phoneTypes = $this->repository->getActivePhoneTypes();
         return view('admin.phones.create', compact('phoneTypes'));
     }
 
@@ -91,7 +91,7 @@ class PhoneController extends Controller
     public function edit(Phone $phone)
     {
         $phone->load('phoneType.translates.language');
-        $phoneTypes = PhoneType::with('translates.language')->active()->ordered()->get();
+        $phoneTypes = $this->repository->getActivePhoneTypes();
         
         return view('admin.phones.edit', compact('phone', 'phoneTypes'));
     }

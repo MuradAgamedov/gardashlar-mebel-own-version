@@ -5,15 +5,20 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Repositories\LanguageRepository;
 
 class LanguageController extends Controller
 {
+    public function __construct(public LanguageRepository $repository)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $languages = Language::orderBy('order')->get();
+        $languages = $this->repository->getAllLanguages();
         return view('admin.languages.index', compact('languages'));
     }
 

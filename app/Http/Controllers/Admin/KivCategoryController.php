@@ -6,16 +6,25 @@ use App\Http\Controllers\Controller;
 use App\Models\KivCategory;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Repositories\KivCategoryRepository;
+use App\Repositories\LanguageRepository;
 
 class KivCategoryController extends Controller
 {
+    public function __construct(
+        public KivCategoryRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $categories = KivCategory::with('translates.language')->orderBy('order')->get();
-        $languages = Language::all();
+        $categories = $this->repository->getCategories();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.kiv-categories.index', compact('categories', 'languages'));
     }
@@ -25,7 +34,7 @@ class KivCategoryController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.kiv-categories.create', compact('languages'));
     }
 
@@ -34,7 +43,7 @@ class KivCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Base validation
         $request->validate([
@@ -81,7 +90,7 @@ class KivCategoryController extends Controller
     public function edit(KivCategory $kivCategory)
     {
         $kivCategory->load('translates.language');
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.kiv-categories.edit', compact('kivCategory', 'languages'));
     }
@@ -91,7 +100,7 @@ class KivCategoryController extends Controller
      */
     public function update(Request $request, KivCategory $kivCategory)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Base validation
         $request->validate([

@@ -7,12 +7,18 @@ use App\Models\PartnerSlider;
 use App\Models\Language;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use App\Repositories\PartnerSliderRepository;
+use App\Repositories\LanguageRepository;
 
 class PartnerSliderController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(
+        ImageService $imageService,
+        public PartnerSliderRepository $repository,
+        public LanguageRepository $languageRepository
+    )
     {
         $this->imageService = $imageService;
     }
@@ -22,8 +28,8 @@ class PartnerSliderController extends Controller
      */
     public function index()
     {
-        $sliders = PartnerSlider::with('translates.language')->orderBy('order')->get();
-        $languages = Language::all();
+        $sliders = $this->repository->getPartnerSliders();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.partner-sliders.index', compact('sliders', 'languages'));
     }
@@ -33,7 +39,7 @@ class PartnerSliderController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.partner-sliders.create', compact('languages'));
     }
 

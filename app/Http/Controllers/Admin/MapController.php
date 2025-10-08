@@ -6,15 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Models\Map;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Repositories\MapRepository;
 
 class MapController extends Controller
 {
+    public function __construct(public MapRepository $repository)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $maps = Map::ordered()->get();
+        $maps = $this->repository->getMaps();
         return view('admin.maps.index', compact('maps'));
     }
 

@@ -6,15 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Models\Page;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Repositories\PageRepository;
+use App\Repositories\LanguageRepository;
 
 class PageController extends Controller
 {
+    public function __construct(
+        public PageRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $pages = Page::with(['translates.language'])->orderBy('order')->get();
+        $pages = $this->repository->getPages();
         return view('admin.pages.index', compact('pages'));
     }
 
@@ -23,7 +32,7 @@ class PageController extends Controller
      */
     public function create()
     {
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageRepository->getActiveLanguages();
         return view('admin.pages.create', compact('languages'));
     }
 
@@ -99,7 +108,7 @@ class PageController extends Controller
     public function edit(string $id)
     {
         $page = Page::with(['translates.language'])->findOrFail($id);
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageRepository->getActiveLanguages();
         return view('admin.pages.edit', compact('page', 'languages'));
     }
 
