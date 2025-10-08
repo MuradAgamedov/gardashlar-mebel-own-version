@@ -7,22 +7,20 @@ use App\Models\ProductPageCategory;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\ProductPageCategoryRepository;
 
 class ProductPageCategoryController extends Controller
 {
+    public function __construct(public ProductPageCategoryRepository $repository)
+    {
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $productPageCategories = ProductPageCategory::with('productCategory.translates.language')
-            ->ordered()
-            ->get();
-            
-        $allCategories = ProductCategory::with('translates.language')
-            ->whereNotIn('id', $productPageCategories->pluck('product_category_id'))
-            ->ordered()
-            ->get();
+        $productPageCategories = $this->repository->getProductPageCategories();
+        $allCategories = $this->repository->getUnusedCategories($productPageCategories->pluck('product_category_id'));
             
         return view('admin.product-page-categories.index', compact('productPageCategories', 'allCategories'));
     }
@@ -32,14 +30,7 @@ class ProductPageCategoryController extends Controller
      */
     public function create()
     {
-        $categories = ProductCategory::with('translates.language')
-            ->whereNotExists(function ($query) {
-                $query->select(DB::raw(1))
-                      ->from('product_page_categories')
-                      ->whereRaw('product_page_categories.product_category_id = product_categories.id');
-            })
-            ->ordered()
-            ->get();
+        $categories = $this->repository->getCategoriesNotInProductPage();
             
         return view('admin.product-page-categories.create', compact('categories'));
     }
@@ -81,17 +72,7 @@ class ProductPageCategoryController extends Controller
      */
     public function edit(ProductPageCategory $productPageCategory)
     {
-        $categories = ProductCategory::with('translates.language')
-            ->where(function ($query) use ($productPageCategory) {
-                $query->where('id', $productPageCategory->product_category_id)
-                      ->orWhereNotExists(function ($subQuery) {
-                          $subQuery->select(DB::raw(1))
-                                   ->from('product_page_categories')
-                                   ->whereRaw('product_page_categories.product_category_id = product_categories.id');
-                      });
-            })
-            ->ordered()
-            ->get();
+        $categories = $this->repository->getCategoriesForEdit($productPageCategory->product_category_id);
             
         return view('admin.product-page-categories.edit', compact('productPageCategory', 'categories'));
     }
@@ -148,7 +129,7 @@ class ProductPageCategoryController extends Controller
 
         try {
             foreach ($request->input('items') as $index => $id) {
-                ProductPageCategory::where('id', $id)->update(['order' => $index + 1]);
+                $this->repository->updateOrder($id, $index + 1);
             }
 
             return response()->json(['success' => true]);

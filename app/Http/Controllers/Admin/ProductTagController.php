@@ -8,17 +8,23 @@ use App\Models\ProductTagTranslate;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Repositories\ProductTagRepository;
+use App\Repositories\LanguageRepository;
 
 class ProductTagController extends Controller
 {
+    public function __construct(
+        public ProductTagRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $productTags = ProductTag::with('translates.language')
-            ->ordered()
-            ->get();
+        $productTags = $this->repository->getTags();
             
         return view('admin.product-tags.index', compact('productTags'));
     }
@@ -28,7 +34,7 @@ class ProductTagController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.product-tags.create', compact('languages'));
     }
 
@@ -81,7 +87,7 @@ class ProductTagController extends Controller
      */
     public function edit(ProductTag $productTag)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         $productTag->load('translates.language');
         
         return view('admin.product-tags.edit', compact('productTag', 'languages'));
@@ -166,7 +172,7 @@ class ProductTagController extends Controller
 
         try {
             foreach ($request->input('items') as $index => $id) {
-                ProductTag::where('id', $id)->update(['order' => $index + 1]);
+                $this->repository->updateOrder($id, $index + 1);
             }
 
             return response()->json(['success' => true]);

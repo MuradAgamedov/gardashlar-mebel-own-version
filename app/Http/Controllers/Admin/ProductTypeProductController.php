@@ -8,35 +8,21 @@ use App\Models\ProductType;
 use App\Models\HomePageTypeProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\ProductTypeProductRepository;
 
 class ProductTypeProductController extends Controller
 {
+    public function __construct(public ProductTypeProductRepository $repository)
+    {
+    }
     /**
      * Display products for a specific product type
      */
     public function index(Request $request, $productTypeId)
     {
-        $productType = ProductType::findOrFail($productTypeId);
-        
-        $query = Product::whereHas('types', function($q) use ($productTypeId) {
-            $q->where('product_types.id', $productTypeId);
-        })->with(['types', 'categories', 'translates']);
-
-        // Search functionality
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->whereHas('translates', function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        $products = $query->orderBy('order')->paginate(20);
-
-        // Get products that are already on homepage for this type
-        $homePageProductIds = HomePageTypeProduct::where('product_type_id', $productTypeId)
-            ->pluck('product_id')
-            ->toArray();
+        $productType = $this->repository->getProductType($productTypeId);
+        $products = $this->repository->getProductsByType($productTypeId, $request);
+        $homePageProductIds = $this->repository->getHomePageProductIds($productTypeId);
 
         return view('admin.product-type-products.index', compact('products', 'productType', 'homePageProductIds'));
     }
@@ -47,9 +33,7 @@ class ProductTypeProductController extends Controller
     public function toggleHomePage(Request $request, $productTypeId, $productId)
     {
         try {
-            $existing = HomePageTypeProduct::where('product_type_id', $productTypeId)
-                ->where('product_id', $productId)
-                ->first();
+            $existing = $this->repository->checkHomePageStatus($productTypeId, $productId);
 
             if ($existing) {
                 // Remove from homepage
@@ -58,10 +42,7 @@ class ProductTypeProductController extends Controller
                 $isOnHomepage = false;
             } else {
                 // Add to homepage
-                HomePageTypeProduct::create([
-                    'product_type_id' => $productTypeId,
-                    'product_id' => $productId,
-                ]);
+                $this->repository->addToHomePage($productTypeId, $productId);
                 $message = 'Product added to homepage';
                 $isOnHomepage = true;
             }
@@ -87,17 +68,7 @@ class ProductTypeProductController extends Controller
     {
         $search = $request->search;
         
-        $products = Product::whereHas('types', function($q) use ($productTypeId) {
-            $q->where('product_types.id', $productTypeId);
-        })
-        ->whereHas('translates', function($q) use ($search) {
-            $q->where('title', 'like', "%{$search}%")
-              ->orWhere('description', 'like', "%{$search}%");
-        })
-        ->with(['translates', 'types', 'categories'])
-        ->orderBy('order')
-        ->limit(10)
-        ->get();
+        $products = $this->repository->searchProductsByType($productTypeId, $search);
 
         return response()->json([
             'success' => true,

@@ -6,25 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Models\ProductType;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Repositories\ProductTypeRepository;
+use App\Repositories\LanguageRepository;
 
 class ProductTypeController extends Controller
 {
+    public function __construct(
+        public ProductTypeRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = ProductType::with('translates.language');
-        
-        // Search functionality
-        if ($request->has('search') && !empty($request->search)) {
-            $search = $request->search;
-            $query->whereHas('translates', function ($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%');
-            });
-        }
-        
-        $types = $query->ordered()->get();
+        $types = $this->repository->getTypes($request);
         return view('admin.product-types.index', compact('types'));
     }
 
@@ -33,7 +32,7 @@ class ProductTypeController extends Controller
      */
     public function create()
     {
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageRepository->getActiveLanguages();
         return view('admin.product-types.create', compact('languages'));
     }
 
@@ -92,7 +91,7 @@ class ProductTypeController extends Controller
     public function edit(ProductType $productType)
     {
         $productType->load('translates.language');
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageRepository->getActiveLanguages();
         return view('admin.product-types.edit', compact('productType', 'languages'));
     }
 
@@ -171,7 +170,7 @@ class ProductTypeController extends Controller
             $items = $request->input('items', []);
             
             foreach ($items as $index => $itemId) {
-                ProductType::where('id', $itemId)->update(['order' => $index + 1]);
+                $this->repository->updateOrder($itemId, $index + 1);
             }
 
             return response()->json(['success' => true]);

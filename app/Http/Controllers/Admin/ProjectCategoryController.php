@@ -11,12 +11,18 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use App\Services\ImageService;
+use App\Repositories\ProjectCategoryRepository;
+use App\Repositories\LanguageRepository;
 
 class ProjectCategoryController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(
+        ImageService $imageService,
+        public ProjectCategoryRepository $repository,
+        public LanguageRepository $languageRepository
+    )
     {
         $this->imageService = $imageService;
     }
@@ -26,7 +32,7 @@ class ProjectCategoryController extends Controller
      */
     private function clearProjectCategoriesCache()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         foreach ($languages as $language) {
             Cache::forget("api:project-categories:all:lang:{$language->id}");
         }
@@ -37,7 +43,7 @@ class ProjectCategoryController extends Controller
      */
     public function index()
     {
-        $projectCategories = ProjectCategory::with('translates.language')->ordered()->get();
+        $projectCategories = $this->repository->getProjectCategories();
         return view('admin.project-categories.index', compact('projectCategories'));
     }
 
@@ -46,7 +52,7 @@ class ProjectCategoryController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.project-categories.create', compact('languages'));
     }
 
@@ -115,7 +121,7 @@ class ProjectCategoryController extends Controller
      */
     public function edit(ProjectCategory $projectCategory)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         $translations = $projectCategory->translates->keyBy('language_id');
         return view('admin.project-categories.edit', compact('projectCategory', 'languages', 'translations'));
     }
@@ -217,7 +223,7 @@ class ProjectCategoryController extends Controller
 
         try {
             foreach ($request->items as $index => $id) {
-                ProjectCategory::where('id', $id)->update(['order' => $index + 1]);
+                $this->repository->updateOrder($id, $index + 1);
             }
 
             // Clear cache after reordering
@@ -241,7 +247,7 @@ class ProjectCategoryController extends Controller
         ]);
 
         try {
-            $deletedCount = ProjectCategory::whereIn('id', $request->ids)->delete();
+            $deletedCount = $this->repository->bulkDelete($request->ids);
             
             // Clear cache after bulk deleting
             $this->clearProjectCategoriesCache();
