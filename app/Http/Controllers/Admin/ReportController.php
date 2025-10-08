@@ -47,11 +47,10 @@ class ReportController extends Controller
         
         // Base validation
         $request->validate([
-            'pdf' => 'nullable|file|mimes:pdf|max:10240', // 10MB max for PDF
+            'pdf' => 'nullable|file|mimes:pdf', // 10MB max for PDF
             'status' => 'boolean',
         ], [
             'pdf.mimes' => 'PDF must be a file of type: pdf.',
-            'pdf.max' => 'PDF may not be greater than 10MB.',
             'status.boolean' => 'Status must be true or false.',
         ]);
 
@@ -116,11 +115,10 @@ class ReportController extends Controller
         
         // Base validation
         $request->validate([
-            'pdf' => 'nullable|file|mimes:pdf|max:10240', // 10MB max for PDF
+            'pdf' => 'nullable|file|mimes:pdf', // 10MB max for PDF
             'status' => 'boolean',
         ], [
             'pdf.mimes' => 'PDF must be a file of type: pdf.',
-            'pdf.max' => 'PDF may not be greater than 10MB.',
             'status.boolean' => 'Status must be true or false.',
         ]);
 
