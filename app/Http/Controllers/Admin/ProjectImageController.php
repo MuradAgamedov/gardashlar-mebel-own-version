@@ -42,7 +42,7 @@ class ProjectImageController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'images' => 'required|array|min:1|max:100',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
             'status' => 'boolean',
         ]);
 
