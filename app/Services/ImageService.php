@@ -29,6 +29,7 @@ class ImageService
                 'max_height' => null,
             ];
             $options = array_merge($defaultOptions, $options);
+            dd($options);
 
             if (!$this->validateFile($file, $options)) {
                 throw new \Exception('File validation failed. Check file type and validity.');

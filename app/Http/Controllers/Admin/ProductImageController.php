@@ -57,7 +57,7 @@ class ProductImageController extends Controller
         try {
 
             foreach ($request->file('images') as $imageFile) {
-                dd(1);
+         
                 $imagePath = $this->imageService->upload($imageFile, 'products');
                 
                 $this->repository->createImage(
