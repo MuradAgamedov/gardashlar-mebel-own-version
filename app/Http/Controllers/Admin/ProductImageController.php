@@ -55,7 +55,6 @@ class ProductImageController extends Controller
         
 
         try {
-        dd($request->all());
 
             foreach ($request->file('images') as $imageFile) {
                 $imagePath = $this->imageService->upload($imageFile, 'products');
@@ -66,6 +65,7 @@ class ProductImageController extends Controller
                     $imagePath
                 );
             }
+            dd($request->all());
 
             return redirect()->route('admin.products.images.index', $product)
                 ->with('success', 'Images uploaded successfully.');
