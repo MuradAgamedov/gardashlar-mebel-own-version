@@ -37,9 +37,15 @@ class PaymentController extends Controller
         $lang = $data['language'] ?? 'EN';
         $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
 
+        // Get user ID if token exists
+        $userId = null;
+        if ($request->bearerToken() && $request->user()) {
+            $userId = $request->user()->id;
+        }
+
         // Create order
         $order = Order::create([
-            'user_id'        => $request->user()->id ?? null,
+            'user_id'        => $userId,
             'product_id'     => $data['product_id'],
             'full_name'      => $data['full_name'],
             'phone'          => $data['phone'],
@@ -108,9 +114,15 @@ class PaymentController extends Controller
         $lang = $data['language'] ?? 'EN';
         $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
 
+        // Get user ID if token exists
+        $userId = null;
+        if ($request->bearerToken() && $request->user()) {
+            $userId = $request->user()->id;
+        }
+
         // Create order
         $order = Order::create([
-            'user_id'        => $request->user()->id ?? null,
+            'user_id'        => $userId,
             'product_id'     => $data['product_id'],
             'full_name'      => $data['full_name'],
             'phone'          => $data['phone'],
@@ -241,9 +253,15 @@ class PaymentController extends Controller
             // Calculate monthly price
             $monthlyPrice = $data['amount'] / $data['months'];
 
+            // Get user ID if token exists
+            $userId = null;
+            if ($request->bearerToken() && $request->user()) {
+                $userId = $request->user()->id;
+            }
+
             // Create temporary order
             $order = Order::create([
-                'user_id'        => $request->user()->id ?? null,
+                'user_id'        => $userId,
                 'product_id'     => $data['product_id'],
                 'full_name'      => $data['full_name'],
                 'phone'          => $data['phone'],
