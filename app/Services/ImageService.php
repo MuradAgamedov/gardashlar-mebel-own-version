@@ -42,10 +42,10 @@ class ImageService
             // Fayl adı (.webp uzantısı ilə)
             $webpName = $this->generateFilenameWithExtension($file, 'webp', $options['generate_unique_name']);
             $relativePath = trim($path, '/').'/'.$webpName;
-            dd($webpName);
 
             // Orijinal faylı müvəqqəti yolundan oxu və WebP-ə çevir
             $webpBinary = $this->convertToWebp($file, $options['quality'], $options['max_width'], $options['max_height']);
+            dd($webpBinary);
 
             if ($webpBinary === null) {
                 // WebP uğursuz olarsa, orijinal formatda saxla
