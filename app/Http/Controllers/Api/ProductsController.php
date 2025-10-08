@@ -293,22 +293,23 @@ class ProductsController extends Controller
             // Apply sorting
             switch ($sort) {
                 case 'price_asc':
-                    $productsQuery->orderBy('price', 'asc');
+                    $productsQuery->orderBy('price', 'asc')->orderBy('id', 'desc');
                     break;
                 case 'price_desc':
-                    $productsQuery->orderBy('price', 'desc');
+                    $productsQuery->orderBy('price', 'desc')->orderBy('id', 'desc');
                     break;
                 case 'newest':
-                    $productsQuery->orderBy('created_at', 'desc');
+                    $productsQuery->orderBy('created_at', 'desc')->orderBy('id', 'desc');
                     break;
                 case 'oldest':
-                    $productsQuery->orderBy('created_at', 'asc');
+                    $productsQuery->orderBy('created_at', 'asc')->orderBy('id', 'asc');
                     break;
                 case 'view_count':
                 default:
-                    $productsQuery->orderBy('view_count', 'desc');
+                    $productsQuery->orderBy('view_count', 'desc')->orderBy('id', 'desc');
                     break;
             }
+            
 
             // Get products with pagination
             $products = $productsQuery->paginate($perPage, ['*'], 'page', $page);
