@@ -25,33 +25,36 @@ class ProductsController extends Controller
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
-    
+            
             if (!$languageId) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid language'
                 ], 400);
             }
-    
-            // Get categories
-            $categories = ProductCategory::with(['translates' => function($query) use ($languageId) {
-                $query->where('language_id', $languageId);
-            }])
-            ->active()
-            ->ordered()
-            ->get();
-    
+
+            $categories = Cache::rememberForever("product_categories_{$languageId}", function () use ($languageId) {
+                return ProductCategory::with(['translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }])
+                ->active()
+                ->ordered()
+                ->get();
+            });
+
             // Build hierarchical structure
             $categoriesData = $this->buildHierarchy($categories);
-    
+
             // Get product price filters
-            $priceFilters = ProductPriceFilter::with(['translates' => function($query) use ($languageId) {
-                $query->where('language_id', $languageId);
-            }])
-            ->active()
-            ->ordered()
-            ->get();
-    
+            $priceFilters = Cache::rememberForever("product_price_filters_{$languageId}", function () use ($languageId) {
+                return ProductPriceFilter::with(['translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }])
+                ->active()
+                ->ordered()
+                ->get();
+            });
+
             $priceFiltersData = $priceFilters->map(function ($filter) {
                 $translation = $filter->translates->first();
                 return [
@@ -61,25 +64,29 @@ class ProductsController extends Controller
                     'max_price' => $filter->max_price
                 ];
             });
-    
+
             // Get product colors
-            $productColors = ProductColor::all();
-    
+            $productColors = Cache::rememberForever("product_colors", function () {
+                return ProductColor::all();
+            });
+
             $productColorsData = $productColors->map(function ($color) {
                 return [
                     'id' => $color->id,
                     'color_code' => $color->color_code
                 ];
             });
-    
+
             // Get product types
-            $productTypes = ProductType::with(['translates' => function($query) use ($languageId) {
-                $query->where('language_id', $languageId);
-            }])
-            ->active()
-            ->ordered()
-            ->get();
-    
+            $productTypes = Cache::rememberForever("product_types_{$languageId}", function () use ($languageId) {
+                return ProductType::with(['translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }])
+                ->active()
+                ->ordered()
+                ->get();
+            });
+
             $productTypesData = $productTypes->map(function ($type) {
                 $translation = $type->translates->first();
                 return [
@@ -87,19 +94,22 @@ class ProductsController extends Controller
                     'title' => $translation ? $translation->title : ''
                 ];
             });
-    
+
             // Get product page categories
-            $productPageCategories = ProductPageCategory::with(['productCategory.translates' => function($query) use ($languageId) {
-                $query->where('language_id', $languageId);
-            }])
-            ->active()
-            ->ordered()
-            ->get();
-    
+            $productPageCategories = Cache::rememberForever("product_page_categories_{$languageId}", function () use ($languageId) {
+                return ProductPageCategory::with(['productCategory.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }])
+                ->active()
+                ->ordered()
+                ->get();
+            });
+
             $productPageCategoriesData = $productPageCategories->map(function ($pageCategory) use ($languageId) {
                 $category = $pageCategory->productCategory;
                 $translation = $category ? $category->translates->first() : null;
-    
+                
+                // Get parent slug if parent_id exists
                 $parentSlug = null;
                 if ($category && $category->parent_id) {
                     $parentCategory = ProductCategory::find($category->parent_id);
@@ -108,7 +118,7 @@ class ProductsController extends Controller
                         $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
                     }
                 }
-    
+                
                 return [
                     'id' => $pageCategory->id,
                     'title' => $translation ? $translation->title : '',
@@ -116,7 +126,7 @@ class ProductsController extends Controller
                     'parentSlug' => $parentSlug
                 ];
             });
-    
+
             // Get sort options for frontend select
             $sortOptions = [
                 ['value' => 'price_asc', 'label' => 'price_asc'],
@@ -125,31 +135,60 @@ class ProductsController extends Controller
                 ['value' => 'oldest', 'label' => 'oldest'],
                 ['value' => 'view_count', 'label' => 'view_count']
             ];
-    
+
+            // Get sort translations from dictionary
+            $sortTranslations = Cache::rememberForever("sort_translations_{$languageId}", function () use ($languageId) {
+                $sortKeywords = [
+                    'price_asc' => 'price_asc',
+                    'price_desc' => 'price_desc', 
+                    'newest' => 'newest',
+                    'oldest' => 'oldest',
+                    'view_count' => 'view_count'
+                ];
+
+                $sortData = [];
+                foreach ($sortKeywords as $key => $keyword) {
+                    $sortData[$key] = Dictionary::getValue($keyword, $languageId);
+                }
+
+                return $sortData;
+            });
+
             // Get pagination parameters
             $perPage = $request->get('per_page', 12);
             $page = $request->get('page', 1);
             $categorySlug = $request->get('category_slug');
-            $typeIds = (array) $request->get('type_id', []);
-            $filterIds = (array) $request->get('filters', []);
-            $colorIds = (array) $request->get('color', []);
+            $typeIds = $request->get('type_id', []);
+            $filterIds = $request->get('filters', []);
+            $colorIds = $request->get('color', []);
             $sort = $request->get('sort', 'view_count');
             $minPrice = $request->get('min_price');
             $maxPrice = $request->get('max_price');
-    
+            
             // Get category seo_text if category_slug is provided
             $categorySeoText = null;
             if ($categorySlug) {
                 $selectedCategory = ProductCategory::whereHas('translates', function($query) use ($categorySlug, $languageId) {
                     $query->where('slug', $categorySlug)->where('language_id', $languageId);
                 })->first();
-    
+                
                 if ($selectedCategory) {
                     $categoryTranslation = $selectedCategory->translates()->where('language_id', $languageId)->first();
                     $categorySeoText = $categoryTranslation ? $categoryTranslation->seo_text : null;
                 }
             }
-    
+            
+            // Handle filters, colors, and type_id parameters - convert to arrays if they come as single values
+            if (!is_array($filterIds)) {
+                $filterIds = $filterIds ? [$filterIds] : [];
+            }
+            if (!is_array($colorIds)) {
+                $colorIds = $colorIds ? [$colorIds] : [];
+            }
+            if (!is_array($typeIds)) {
+                $typeIds = $typeIds ? [$typeIds] : [];
+            }
+
             // Build products query
             $productsQuery = Product::with([
                 'translates' => function($query) use ($languageId) {
@@ -157,7 +196,7 @@ class ProductsController extends Controller
                 },
                 'images' => function($query) use ($colorIds) {
                     $query->where('status', true)->orderBy('order');
-                    if (!empty($colorIds)) {
+                    if (!empty($colorIds) && is_array($colorIds)) {
                         $query->whereIn('product_color_id', $colorIds);
                     }
                 },
@@ -168,51 +207,90 @@ class ProductsController extends Controller
                     $query->where('language_id', $languageId);
                 }
             ])
-            ->select('products.*')
-            ->distinct()
             ->active();
-    
-            // Filter by category
+
+            // Filter by category if category_slug is provided
             if ($categorySlug) {
+                // Get the category by slug (any language)
                 $category = ProductCategory::whereHas('translates', function($query) use ($categorySlug) {
                     $query->where('slug', $categorySlug);
                 })->first();
-    
+                
                 if ($category) {
+                    // Check if it's a parent category (has children)
                     $children = ProductCategory::where('parent_id', $category->id)->pluck('id');
-                    $categoryIds = $children->isNotEmpty()
-                        ? $children->push($category->id)->toArray()
-                        : [$category->id];
-    
+                    
+                    if ($children->isNotEmpty()) {
+                        // If parent category, get products from all children + parent itself
+                        $categoryIds = $children->push($category->id)->toArray();
+                    } else {
+                        // If child category, get products only from this category
+                        $categoryIds = [$category->id];
+                    }
+                    
+                    // Filter products that belong to any of these categories
                     $productsQuery->whereHas('categories', function($query) use ($categoryIds) {
                         $query->whereIn('product_categories.id', $categoryIds);
                     });
                 }
             }
-    
-            // Filter by types
-            if (!empty($typeIds)) {
+
+            // Filter by types if type_ids array is provided
+            if (!empty($typeIds) && is_array($typeIds)) {
+                // Filter products that belong to any of these types
                 $productsQuery->whereHas('types', function($query) use ($typeIds) {
                     $query->whereIn('product_types.id', $typeIds);
                 });
             }
-    
-            // Filter by colors
-            if (!empty($colorIds)) {
+
+            // Filter by colors if color_ids array is provided
+            if (!empty($colorIds) && is_array($colorIds)) {
+                // Filter products that have images with any of these colors
                 $productsQuery->whereHas('images', function($query) use ($colorIds) {
                     $query->whereIn('product_color_id', $colorIds)->where('status', true);
                 });
             }
-    
-            // Filter by price
-            if ($minPrice !== null) {
-                $productsQuery->where('price', '>=', $minPrice);
+
+            // Filter by price range using filter IDs or direct price parameters
+            $appliedMinPrice = null;
+            $appliedMaxPrice = null;
+            
+            // First check for direct price parameters
+            if ($minPrice !== null || $maxPrice !== null) {
+                $appliedMinPrice = $minPrice;
+                $appliedMaxPrice = $maxPrice;
+                
+                // Apply direct price range filter
+                if ($appliedMinPrice !== null) {
+                    $productsQuery->where('price', '>=', $appliedMinPrice);
+                }
+                
+                if ($appliedMaxPrice !== null) {
+                    $productsQuery->where('price', '<=', $appliedMaxPrice);
+                }
             }
-            if ($maxPrice !== null) {
-                $productsQuery->where('price', '<=', $maxPrice);
+            // If no direct price parameters, check for filter IDs
+            elseif (!empty($filterIds) && is_array($filterIds)) {
+                // Get price filters by IDs
+                $priceFilters = ProductPriceFilter::whereIn('id', $filterIds)->get();
+                
+                if ($priceFilters->isNotEmpty()) {
+                    // Get min and max prices from all selected filters
+                    $appliedMinPrice = $priceFilters->min('min_price');
+                    $appliedMaxPrice = $priceFilters->max('max_price');
+                    
+                    // Apply price range filter
+                    if ($appliedMinPrice !== null) {
+                        $productsQuery->where('price', '>=', $appliedMinPrice);
+                    }
+                    
+                    if ($appliedMaxPrice !== null) {
+                        $productsQuery->where('price', '<=', $appliedMaxPrice);
+                    }
+                }
             }
-    
-            // Sorting
+
+            // Apply sorting
             switch ($sort) {
                 case 'price_asc':
                     $productsQuery->orderBy('price', 'asc');
@@ -231,31 +309,32 @@ class ProductsController extends Controller
                     $productsQuery->orderBy('view_count', 'desc');
                     break;
             }
-    
-            // Always add a secondary stable order
-            $productsQuery->orderBy('id', 'desc');
-    
-            // Pagination
+
+            // Get products with pagination
             $products = $productsQuery->paginate($perPage, ['*'], 'page', $page);
-    
-            // Global price range
+
+            // Calculate min and max prices from ALL products in the database (not just filtered ones)
             $allProducts = Product::active()->get();
-            $actualMinPrice = $allProducts->min('price');
-            $actualMaxPrice = $allProducts->max('price');
-    
-            // Map product data
+            $actualMinPrice = $allProducts->isNotEmpty() ? $allProducts->min('price') : null;
+            $actualMaxPrice = $allProducts->isNotEmpty() ? $allProducts->max('price') : null;
+
             $productsData = $products->map(function ($product) use ($languageId) {
                 $translation = $product->translates->first();
-                $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
-    
+                // Find main image - first try to find is_main=true, then fallback to first image
+                $mainImage = $product->images->where('is_main', true)->first();
+                if (!$mainImage) {
+                    $mainImage = $product->images->first();
+                }
+                
+                // Get category information
                 $categorySlug = null;
                 $parentSlug = null;
-    
+                
                 if ($product->categories->isNotEmpty()) {
                     $category = $product->categories->first();
                     $categoryTranslation = $category->translates->first();
                     $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
-    
+                    
                     if ($category->parent_id) {
                         $parentCategory = ProductCategory::find($category->parent_id);
                         if ($parentCategory) {
@@ -264,7 +343,7 @@ class ProductsController extends Controller
                         }
                     }
                 }
-    
+                
                 $productTypes = $product->types->map(function ($type) {
                     $translation = $type->translates->first();
                     return [
@@ -272,16 +351,27 @@ class ProductsController extends Controller
                         'title' => $translation ? $translation->title : ''
                     ];
                 });
-    
+            
+                // ✨ Yeni əlavə: inCart, inFavorite, inCompare
                 $user = auth('sanctum')->user();
-                $inCart = $inFavorite = $inCompare = false;
-    
+                $inCart = false;
+                $inFavorite = false;
+                $inCompare = false;
+            
                 if ($user) {
-                    $inCart = \App\Models\Cart::where('user_id', $user->id)->where('product_id', $product->id)->exists();
-                    $inFavorite = \App\Models\Favorite::where('user_id', $user->id)->where('product_id', $product->id)->exists();
-                    $inCompare = \App\Models\Compare::where('user_id', $user->id)->where('product_id', $product->id)->exists();
+                    $inCart = \App\Models\Cart::where('user_id', $user->id)
+                        ->where('product_id', $product->id)
+                        ->exists();
+            
+                    $inFavorite = \App\Models\Favorite::where('user_id', $user->id)
+                        ->where('product_id', $product->id)
+                        ->exists();
+            
+                    $inCompare = \App\Models\Compare::where('user_id', $user->id)
+                        ->where('product_id', $product->id)
+                        ->exists();
                 }
-    
+            
                 return [
                     'id' => $product->id,
                     'title' => $translation ? $translation->title : '',
@@ -298,7 +388,9 @@ class ProductsController extends Controller
                     'inCompare' => $inCompare,
                 ];
             });
-    
+            
+
+            // Pagination data
             $paginationData = [
                 'current_page' => $products->currentPage(),
                 'per_page' => $products->perPage(),
@@ -308,7 +400,7 @@ class ProductsController extends Controller
                 'to' => $products->lastItem(),
                 'has_more_pages' => $products->hasMorePages()
             ];
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'Product categories retrieved successfully',
@@ -319,6 +411,7 @@ class ProductsController extends Controller
                     'product_types' => $productTypesData,
                     'product_page_categories' => $productPageCategoriesData,
                     'sort_options' => $sortOptions,
+                    'sort_translations' => $sortTranslations,
                     'products' => $productsData,
                     'pagination' => $paginationData,
                     'applied_filters' => [
@@ -328,7 +421,7 @@ class ProductsController extends Controller
                     'seo_text' => $categorySeoText
                 ]
             ]);
-    
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -336,7 +429,6 @@ class ProductsController extends Controller
             ], 500);
         }
     }
-    
 
     /**
      * Build hierarchical structure for categories
