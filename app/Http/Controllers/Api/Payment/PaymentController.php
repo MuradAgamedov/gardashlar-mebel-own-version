@@ -505,7 +505,6 @@ class PaymentController extends Controller
               
                 return [
                     'id' => $product->id,
-                    'slug' => $translation?->slug ?? '',
                     'title' => $translation?->title ?? '',
                     'available_colors' => $availableColors,
 
