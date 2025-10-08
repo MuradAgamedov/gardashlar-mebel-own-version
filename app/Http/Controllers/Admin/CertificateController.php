@@ -7,12 +7,18 @@ use App\Models\Certificate;
 use App\Models\Language;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use App\Repositories\CertificateRepository;
+use App\Repositories\LanguageRepository;
 
 class CertificateController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(
+        ImageService $imageService,
+        public CertificateRepository $repository,
+        public LanguageRepository $languageRepository
+    )
     {
         $this->imageService = $imageService;
     }
@@ -22,8 +28,8 @@ class CertificateController extends Controller
      */
     public function index()
     {
-        $certificates = Certificate::with('translates.language')->orderBy('order')->get();
-        $languages = Language::all();
+        $certificates = $this->repository->getCertificates();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.certificates.index', compact('certificates', 'languages'));
     }
@@ -33,7 +39,7 @@ class CertificateController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.certificates.create', compact('languages'));
     }
 
@@ -42,7 +48,7 @@ class CertificateController extends Controller
      */
     public function store(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Base validation
         $request->validate([
@@ -125,7 +131,7 @@ class CertificateController extends Controller
     public function edit(Certificate $certificate)
     {
         $certificate->load('translates.language');
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.certificates.edit', compact('certificate', 'languages'));
     }
@@ -135,7 +141,7 @@ class CertificateController extends Controller
      */
     public function update(Request $request, Certificate $certificate)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Base validation
         $request->validate([

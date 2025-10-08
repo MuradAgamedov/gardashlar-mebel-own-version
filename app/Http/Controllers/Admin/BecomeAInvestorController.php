@@ -6,9 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\BecomeAInvestor;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Repositories\LanguageRepository;
 
 class BecomeAInvestorController extends Controller
 {
+    public function __construct(public LanguageRepository $languageRepository)
+    {
+    }
+
     /**
      * Show the form for editing the investor section.
      */
@@ -16,7 +21,7 @@ class BecomeAInvestorController extends Controller
     {
         $becomeAInvestor = BecomeAInvestor::getFirstOrCreate();
         $becomeAInvestor->load('translates.language');
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.become-a-investor.edit', compact('becomeAInvestor', 'languages'));
     }
@@ -26,7 +31,7 @@ class BecomeAInvestorController extends Controller
      */
     public function update(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Translation validation
         foreach ($languages as $language) {

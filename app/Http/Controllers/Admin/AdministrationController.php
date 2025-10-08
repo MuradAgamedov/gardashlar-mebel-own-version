@@ -9,12 +9,13 @@ use App\Models\Language;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\AdministrationRepository;
 
 class AdministrationController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(ImageService $imageService, public AdministrationRepository $repository)
     {
         $this->imageService = $imageService;
     }
@@ -24,7 +25,8 @@ class AdministrationController extends Controller
      */
     public function index()
     {
-        $administrations = Administration::with('translates.language')->ordered()->get();
+        $administrations = $this->repository->getAdministrations();
+
         return view('admin.administrations.index', compact('administrations'));
     }
 

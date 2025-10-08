@@ -7,12 +7,18 @@ use App\Models\BecomeAInvestorAdvantage;
 use App\Models\Language;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use App\Repositories\BecomeAInvestorAdvantageRepository;
+use App\Repositories\LanguageRepository;
 
 class BecomeAInvestorAdvantageController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(
+        ImageService $imageService, 
+        public BecomeAInvestorAdvantageRepository $repository,
+        public LanguageRepository $languageRepository
+    )
     {
         $this->imageService = $imageService;
     }
@@ -22,8 +28,8 @@ class BecomeAInvestorAdvantageController extends Controller
      */
     public function index()
     {
-        $advantages = BecomeAInvestorAdvantage::with('translates.language')->orderBy('order')->get();
-        $languages = Language::all();
+        $advantages = $this->repository->getAdvantages();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.become-a-investor-advantages.index', compact('advantages', 'languages'));
     }
@@ -33,7 +39,7 @@ class BecomeAInvestorAdvantageController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.become-a-investor-advantages.create', compact('languages'));
     }
 
@@ -42,7 +48,7 @@ class BecomeAInvestorAdvantageController extends Controller
      */
     public function store(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Base validation
         $request->validate([
@@ -125,7 +131,7 @@ class BecomeAInvestorAdvantageController extends Controller
     public function edit(BecomeAInvestorAdvantage $becomeAInvestorAdvantage)
     {
         $becomeAInvestorAdvantage->load('translates.language');
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.become-a-investor-advantages.edit', compact('becomeAInvestorAdvantage', 'languages'));
     }
@@ -135,7 +141,7 @@ class BecomeAInvestorAdvantageController extends Controller
      */
     public function update(Request $request, BecomeAInvestorAdvantage $becomeAInvestorAdvantage)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Base validation
         $request->validate([

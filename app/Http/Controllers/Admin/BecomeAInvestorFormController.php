@@ -5,33 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\BecomeAInvestorForm;
 use Illuminate\Http\Request;
+use App\Repositories\BecomeAInvestorFormRepository;
 
 class BecomeAInvestorFormController extends Controller
 {
+    public function __construct(public BecomeAInvestorFormRepository $repository)
+    {
+    }
+
     public function index(Request $request)
     {
-        $query = BecomeAInvestorForm::query();
-
-        // Search functionality
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('mobile', 'like', "%{$search}%");
-            });
-        }
-
-        // Filter by read status
-        if ($request->filled('status')) {
-            if ($request->status === 'unread') {
-                $query->unread();
-            } elseif ($request->status === 'read') {
-                $query->read();
-            }
-        }
-
-        $forms = $query->orderBy('created_at', 'desc')->paginate(20);
+        $forms = $this->repository->getForms($request);
 
         return view('admin.become-a-investor-forms.index', compact('forms'));
     }
