@@ -7,22 +7,21 @@ use App\Models\HeroCategory;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\HeroCategoryRepository;
 
 class HeroCategoryController extends Controller
 {
+    public function __construct(public HeroCategoryRepository $repository)
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $heroCategories = HeroCategory::with('productCategory.translates.language')
-            ->ordered()
-            ->get();
-            
-        $allCategories = ProductCategory::with('translates.language')
-            ->whereNotIn('id', $heroCategories->pluck('product_category_id'))
-            ->ordered()
-            ->get();
+        $heroCategories = $this->repository->getHeroCategories();
+        $allCategories = $this->repository->getAvailableCategories($heroCategories);
             
         return view('admin.hero-categories.index', compact('heroCategories', 'allCategories'));
     }
@@ -32,14 +31,7 @@ class HeroCategoryController extends Controller
      */
     public function create()
     {
-        $categories = ProductCategory::with('translates.language')
-            ->whereNotExists(function ($query) {
-                $query->select(DB::raw(1))
-                      ->from('hero_categories')
-                      ->whereRaw('hero_categories.product_category_id = product_categories.id');
-            })
-            ->ordered()
-            ->get();
+        $categories = $this->repository->getCategoriesForCreate();
             
         return view('admin.hero-categories.create', compact('categories'));
     }
@@ -81,17 +73,7 @@ class HeroCategoryController extends Controller
      */
     public function edit(HeroCategory $heroCategory)
     {
-        $categories = ProductCategory::with('translates.language')
-            ->where(function ($query) use ($heroCategory) {
-                $query->where('id', $heroCategory->product_category_id)
-                      ->orWhereNotExists(function ($subQuery) {
-                          $subQuery->select(DB::raw(1))
-                                   ->from('hero_categories')
-                                   ->whereRaw('hero_categories.product_category_id = product_categories.id');
-                      });
-            })
-            ->ordered()
-            ->get();
+        $categories = $this->repository->getCategoriesForEdit($heroCategory);
             
         return view('admin.hero-categories.edit', compact('heroCategory', 'categories'));
     }

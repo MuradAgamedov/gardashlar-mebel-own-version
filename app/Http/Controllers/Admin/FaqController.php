@@ -11,23 +11,19 @@ use App\Repositories\LanguageRepository;
 
 class FaqController extends Controller
 {
+    public function __construct(
+        public FaqRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Faq::with(['translates.language']);
-        
-        // Search functionality
-        if ($request->has('search') && !empty($request->search)) {
-            $searchTerm = $request->search;
-            $query->whereHas('translates', function($q) use ($searchTerm) {
-                $q->where('question', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('answer', 'like', '%' . $searchTerm . '%');
-            });
-        }
-        
-        $faqs = $query->ordered()->get();
+        $faqs = $this->repository->getFaqs($request);
         return view('admin.faqs.index', compact('faqs'));
     }
 
@@ -36,7 +32,7 @@ class FaqController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.faqs.create', compact('languages'));
     }
 
@@ -45,7 +41,7 @@ class FaqController extends Controller
      */
     public function store(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
 
         // Translation validation - only for languages that have data
         foreach ($languages as $index => $language) {
@@ -111,7 +107,7 @@ class FaqController extends Controller
     public function edit(Faq $faq)
     {
         $faq->load(['translates.language']);
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.faqs.edit', compact('faq', 'languages'));
     }
 
@@ -120,7 +116,7 @@ class FaqController extends Controller
      */
     public function update(Request $request, Faq $faq)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
 
         // Translation validation - only for languages that have data
         foreach ($languages as $index => $language) {
