@@ -49,7 +49,7 @@ class ProductImageController extends Controller
     {
         $request->validate([
             'images' => 'required|array',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
             'product_color_id' => 'nullable|exists:product_colors,id'
         ]);
 
@@ -95,7 +95,7 @@ class ProductImageController extends Controller
     public function update(Request $request, Product $product, ProductImage $image)
     {
         $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
             'status' => 'boolean',
             'product_color_id' => 'nullable|exists:product_colors,id'
         ]);
