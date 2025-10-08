@@ -8,9 +8,13 @@ use App\Models\ProductAccordionTranslate;
 use App\Models\Product;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Repositories\LanguageRepository;
 
 class ProductAccordionController extends Controller
 {
+    public function __construct(public LanguageRepository $languageRepository)
+    {
+    }
     /**
      * Display a listing of the resource.
      */
@@ -26,7 +30,7 @@ class ProductAccordionController extends Controller
      */
     public function create(Product $product)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.product-accordions.create', compact('product', 'languages'));
     }
@@ -82,7 +86,7 @@ class ProductAccordionController extends Controller
     public function edit(Product $product, ProductAccordion $accordion)
     {
         $accordion->load(['translates.language']);
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.product-accordions.edit', compact('product', 'accordion', 'languages'));
     }
