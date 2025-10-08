@@ -53,6 +53,7 @@ class ProductImageController extends Controller
             'product_color_id' => 'nullable|exists:product_colors,id'
         ]);
         dd($request->all());
+        
 
         try {
             foreach ($request->file('images') as $imageFile) {
