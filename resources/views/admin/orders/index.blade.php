@@ -15,7 +15,7 @@
                     <th>Phone</th>
                     <th>Email</th>
                     <th>City</th>
-                    <th>Product</th>
+                    <th>Products</th>
                     <th>Status</th>
                     <th>Payment Status</th>
                     <th>Actions</th>
@@ -29,7 +29,21 @@
                     <td>{{ $order->phone }}</td>
                     <td>{{ $order->email }}</td>
                     <td>{{ $order->city }}</td>
-                    <td>{{ $order->product?->name ?? '—' }}</td> {{-- Məhsul adı --}}
+                    <td>
+                        @php
+                            $productIds = json_decode($order->product_ids ?? '[]', true);
+                            $products = \App\Models\Product::whereIn('id', $productIds)->get();
+                        @endphp
+                        @if($products->count() > 0)
+                            <ul class="list-unstyled mb-0">
+                                @foreach($products as $product)
+                                    <li>{{ $product->name ?? 'Unknown Product' }}</li>
+                                @endforeach
+                            </ul>
+                        @else
+                            —
+                        @endif
+                    </td>
                     <td><span class="badge bg-info">{{ $order->status }}</span></td>
                     <td><span class="badge bg-success">{{ $order->payment_status }}</span></td>
                     <td>
