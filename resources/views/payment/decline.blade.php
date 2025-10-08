@@ -51,24 +51,57 @@
   <div class="card">
     <h1>Ödəniş uğursuz oldu ⚠️</h1>
 
+    @if(isset($order))
     <div class="row">
-      <div class="label">Sifariş №</div>
-      <div class="value" id="orderId">12345</div>
+      <div class="label">Daxili Sifariş ID</div>
+      <div class="value">{{ $order->id }}</div>
     </div>
 
     <div class="row">
+      <div class="label">Sifariş Kodu</div>
+      <div class="value">{{ $order->order_id }}</div>
+    </div>
+
+    @if($order->full_name)
+    <div class="row">
+      <div class="label">Ad, Soyad</div>
+      <div class="value">{{ $order->full_name }}</div>
+    </div>
+    @endif
+
+    @if($order->phone)
+    <div class="row">
+      <div class="label">Telefon</div>
+      <div class="value">{{ $order->phone }}</div>
+    </div>
+    @endif
+
+    @if($order->address)
+    <div class="row">
+      <div class="label">Çatdırılma ünvanı</div>
+      <div class="value">{{ $order->address }}</div>
+    </div>
+    @endif
+
+    <div class="row">
       <div class="label">Status</div>
+      <div class="value">{{ ucfirst($order->payment_status) }}</div>
+    </div>
+    @endif
+
+    <div class="row">
+      <div class="label">Ödəniş Statusu</div>
       <div class="value" id="status">DECLINED</div>
     </div>
 
     <div class="row">
       <div class="label">Əməliyyat №</div>
-      <div class="value" id="transaction">39918</div>
+      <div class="value" id="transaction">—</div>
     </div>
 
     <div class="row">
       <div class="label">Kart</div>
-      <div class="value" id="cardMask">416974XXXXXX1778</div>
+      <div class="value" id="cardMask">—</div>
     </div>
 
     <div class="row">
@@ -78,7 +111,7 @@
 
     <div class="row">
       <div class="label">Məbləğ</div>
-      <div class="value" id="amount">50.00 AZN</div>
+      <div class="value" id="amount">—</div>
     </div>
   </div>
 
