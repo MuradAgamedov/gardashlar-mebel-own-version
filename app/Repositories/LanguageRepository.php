@@ -22,4 +22,10 @@ class LanguageRepository extends BaseRepository
     {
         return $this->language->getActiveLanguages();
     }
+
+    // Əsas dil
+    public function getMainLanguage()
+    {
+        return $this->language->getMainLanguage();
+    }
 }

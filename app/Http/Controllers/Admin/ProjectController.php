@@ -10,28 +10,26 @@ use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Repositories\ProjectRepository;
+use App\Repositories\LanguageRepository;
 
 
 class ProjectController extends Controller
 {
+    public function __construct(
+        public ProjectRepository $repository,
+        public LanguageRepository $languageRepository
+    )
+    {
+    }
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $mainLanguage = Language::getMainLanguage();
-        $categories = ProjectCategory::with(['translates' => function($query) use ($mainLanguage) {
-            $query->where('language_id', $mainLanguage->id);
-        }])->active()->ordered()->get();
-        
-        $query = Project::with(['translates.language', 'category.translates']);
-        
-        // Filter by category if selected
-        if ($request->filled('category_id')) {
-            $query->where('project_category_id', $request->category_id);
-        }
-        
-        $projects = $query->ordered()->get();
+        $mainLanguage = $this->languageRepository->getMainLanguage();
+        $categories = $this->repository->getActiveCategoriesWithMainLanguage($mainLanguage->id);
+        $projects = $this->repository->getProjects($request);
         
         return view('admin.projects.index', compact('projects', 'categories'));
     }
@@ -41,8 +39,8 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
-        $categories = ProjectCategory::with('translates')->active()->ordered()->get();
+        $languages = $this->languageRepository->getAllLanguages();
+        $categories = $this->repository->getActiveCategories();
         return view('admin.projects.create', compact('languages', 'categories'));
     }
 
@@ -105,8 +103,8 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        $languages = Language::all();
-        $categories = ProjectCategory::with('translates')->active()->ordered()->get();
+        $languages = $this->languageRepository->getAllLanguages();
+        $categories = $this->repository->getActiveCategories();
         $translations = $project->translates->keyBy('language_id');
         return view('admin.projects.edit', compact('project', 'languages', 'categories', 'translations'));
     }
@@ -223,7 +221,7 @@ class ProjectController extends Controller
 
         try {
             foreach ($request->items as $index => $id) {
-                Project::where('id', $id)->update(['order' => $index + 1]);
+                $this->repository->updateOrder($id, $index + 1);
             }
 
             return response()->json(['success' => true]);
@@ -244,7 +242,7 @@ class ProjectController extends Controller
         ]);
 
         try {
-            $deletedCount = Project::whereIn('id', $request->ids)->delete();
+            $deletedCount = $this->repository->bulkDelete($request->ids);
             
             return redirect()->route('admin.projects.index')
                 ->with('success', "{$deletedCount} project(s) deleted successfully!");
