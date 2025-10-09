@@ -25,7 +25,7 @@ class CreditCardController extends Controller
                     'title' => $card->title,
                     'image' => $card->image ? asset('storage/' . $card->image) : null,
                     'months' => $card->months
-                        ? array_map('trim', explode(',', $card->months))
+                        ? array_map('intval', array_map('trim', explode(',', $card->months)))
                         : [], // boş olarsa boş array qaytarır
                 ];
             }),
