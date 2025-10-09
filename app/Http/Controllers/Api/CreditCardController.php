@@ -15,7 +15,7 @@ class CreditCardController extends Controller
      */
     public function index(): JsonResponse
     {
-        $creditCards = CreditCard::ordered()->get(['id', 'title', 'image', 'order']);
+        $creditCards = CreditCard::ordered()->get(['id', 'title', 'image', 'months', 'order']);
         
         return response()->json([
             'success' => true,
@@ -24,8 +24,11 @@ class CreditCardController extends Controller
                     'id' => $card->id,
                     'title' => $card->title,
                     'image' => $card->image ? asset('storage/' . $card->image) : null,
+                    'months' => $card->months
+                        ? array_map('trim', explode(',', $card->months))
+                        : [], // boş olarsa boş array qaytarır
                 ];
-            })
+            }),
         ]);
     }
 }
