@@ -24,7 +24,6 @@ class CreditCardController extends Controller
                     'id' => $card->id,
                     'title' => $card->title,
                     'image' => $card->image ? asset('storage/' . $card->image) : null,
-                    'order' => $card->order
                 ];
             })
         ]);
