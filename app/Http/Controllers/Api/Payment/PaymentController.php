@@ -152,6 +152,7 @@ class PaymentController extends Controller
     {
         try {
             $data = $request->validate([
+                'order_id'        => 'nullable|string|exists:orders,order_id',
                 'product_ids'     => 'required|array|min:1',
                 'product_ids.*'   => 'exists:products,id',
                 'full_name'       => 'required|string|max:255',
@@ -162,6 +163,9 @@ class PaymentController extends Controller
                 'months'          => 'required|in:2,3,6,9,12',
                 'member_id'       => 'nullable|string',
                 'language'        => 'nullable|in:AZ,EN,RU',
+                'delivery_method' => 'required|in:delivery,pickup',
+                'payment_method'  => 'required|in:card,cash,installment',
+                'selected_card'   => 'nullable|string|max:255',
             ]);
 
             // Calculate monthly price
@@ -179,28 +183,53 @@ class PaymentController extends Controller
                 $memberId = mt_rand(1000000000, 9999999999);
             }
 
-            // Create temporary order
-            $order = Order::create([
-                'user_id'        => $userId,
-                'product_ids'    => json_encode($data['product_ids']),
-                'full_name'      => $data['full_name'],
-                'phone'          => $data['phone'],
-                'email'          => $data['email'],
-                'city'           => $data['city'],
-                'address'        => $data['address'] ?? null,
-                'order_id'       => strtoupper(Str::random(12)),
-                'delivery_method'=> 'installment',
-                'payment_method' => 'card',
-                'selected_card'  => $memberId,
-                'month'          => $data['months'],
-                'monthly_price'  => $monthlyPrice,
-                'status'         => 'temporary',
-                'payment_status' => 'unpaid',
-            ]);
+            // Check if we're updating an existing order
+            if (!empty($data['order_id'])) {
+                $order = Order::where('order_id', $data['order_id'])->firstOrFail();
+                
+                $order->update([
+                    'product_ids'    => json_encode($data['product_ids']),
+                    'full_name'      => $data['full_name'],
+                    'phone'          => $data['phone'],
+                    'email'          => $data['email'],
+                    'city'           => $data['city'],
+                    'address'        => $data['address'] ?? null,
+                    'delivery_method' => $data['delivery_method'],
+                    'payment_method' => $data['payment_method'],
+                    'selected_card'  => $data['selected_card'] ?? null,
+                    'month'          => $data['months'],
+                    'monthly_price'  => $monthlyPrice,
+                    'status'         => 'temporary',
+                    'payment_status' => 'unpaid',
+                ]);
+                
+                $message = 'Mövcud sifariş yeniləndi';
+            } else {
+                // Create new temporary order
+                $order = Order::create([
+                    'user_id'        => $userId,
+                    'product_ids'    => json_encode($data['product_ids']),
+                    'full_name'      => $data['full_name'],
+                    'phone'          => $data['phone'],
+                    'email'          => $data['email'],
+                    'city'           => $data['city'],
+                    'address'        => $data['address'] ?? null,
+                    'order_id'       => strtoupper(Str::random(12)),
+                    'delivery_method' => $data['delivery_method'],
+                    'payment_method' => $data['payment_method'],
+                    'selected_card'  => $data['selected_card'] ?? null,
+                    'month'          => $data['months'],
+                    'monthly_price'  => $monthlyPrice,
+                    'status'         => 'temporary',
+                    'payment_status' => 'unpaid',
+                ]);
+                
+                $message = 'Yeni müvəqqəti sifariş yaradıldı';
+            }
 
             return response()->json([
                 'success' => true,
-                'message' => 'Müvəqqəti sifariş yaradıldı',
+                'message' => $message,
                 'data' => [
                     'order_id' => $order->id
                 ]
