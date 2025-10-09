@@ -92,41 +92,38 @@ class CreditCardController extends Controller
      */
     public function update(Request $request, CreditCard $creditCard)
     {
-
-        
-
-        try {
-            $updateData = [
-                'title'  => $request->input('title'),
-                'months' => $request->input('months'),
-            ];
-
-            if ($request->hasFile('image')) {
-                $uploadedPath = $this->imageService->update(
-                    $request->file('image'),
-                    $creditCard->image,
-                    'credit-cards',
-                    [
-                        'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                    ]
-                );
-
-                if ($uploadedPath) {
-                    $updateData['image'] = $uploadedPath;
-                }
+        $request->validate([
+            'title'  => 'required|string|max:255',
+            'months' => 'nullable|string|max:255',
+            'image'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
+        ]);
+    
+        $updateData = [
+            'title'  => $request->input('title'),
+            'months' => $request->input('months'),
+        ];
+    
+        if ($request->hasFile('image')) {
+            $uploadedPath = $this->imageService->update(
+                $request->file('image'),
+                $creditCard->image,
+                'credit-cards',
+                [
+                    'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                ]
+            );
+    
+            if ($uploadedPath) {
+                $updateData['image'] = $uploadedPath;
             }
-
-            $creditCard->update($updateData);
-
-            return redirect()->route('admin.credit-cards.index')
-                ->with('success', 'Credit Card updated successfully!');
-
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Error updating credit card: ' . $e->getMessage())
-                ->withInput();
         }
+    
+        $creditCard->update($updateData);
+    
+        return redirect()->route('admin.credit-cards.index')
+            ->with('success', 'Credit Card updated successfully!');
     }
+    
 
     /**
      * Remove the specified resource from storage.
