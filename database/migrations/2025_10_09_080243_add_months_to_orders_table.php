@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             // 🔹 months sahəsi əlavə olunur
-            if (!Schema::hasColumn('orders', 'months')) {
-                $table->integer('months')->nullable()->after('monthly_price')->comment('Installment months count');
+            if (!Schema::hasColumn('orders')) {
+                $table->string('months')->nullable()->after('monthly_price')->comment('Installment months count');
             }
         });
     }
