@@ -98,7 +98,6 @@ class CreditCardController extends Controller
             'months' => 'nullable|string|max:255',
             'image'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
         ]);
-        dd(1);
 
         try {
             $updateData = [
@@ -126,6 +125,7 @@ class CreditCardController extends Controller
 
             return redirect()->route('admin.credit-cards.index')
                 ->with('success', 'Credit Card updated successfully!');
+                dd(1);
 
         } catch (\Exception $e) {
             return redirect()->back()
