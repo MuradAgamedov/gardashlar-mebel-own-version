@@ -190,7 +190,7 @@ class PaymentController extends Controller
     {
         try {
             $data = $request->validate([
-                'order_id' => "nullable|integer",
+                'order_id' => "nullable|string",
                 'product_ids'     => 'required|array|min:1',
                 'product_ids.*'   => 'exists:products,id',
                 'full_name'       => 'required|string|max:255',
