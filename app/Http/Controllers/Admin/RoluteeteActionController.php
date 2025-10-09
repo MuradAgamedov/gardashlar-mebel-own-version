@@ -2,31 +2,33 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\RoluteeteAction;
 use App\Models\RoluteeteActionTranslate;
 use App\Models\Language;
 use App\Services\ImageService;
+use App\Repositories\RoluteeteActionRepository;
 
 class RoluteeteActionController extends Controller
 {
     protected $imageService;
+    protected $repository;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(ImageService $imageService, RoluteeteActionRepository $repository)
     {
         $this->imageService = $imageService;
+        $this->repository = $repository;
     }
 
     public function index()
     {
-        $actions = RoluteeteAction::with('translates.language')->orderBy('id', 'desc')->get();
+        $actions = $this->repository->getAllForIndex();
         return view("admin.RoluteeteAction.index", compact('actions'));
     }
 
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->repository->getActiveLanguages();
         return view("admin.RoluteeteAction.create", compact('languages'));
     }
 

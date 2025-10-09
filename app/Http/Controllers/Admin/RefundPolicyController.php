@@ -3,25 +3,25 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\RefundPolicy;
-use App\Models\Language;
+use App\Repositories\RefundPolicyRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 class RefundPolicyController extends Controller
 {
+    protected $repository;
+
+    public function __construct(RefundPolicyRepository $repository)
+    {
+        $this->repository = $repository;
+    }
+
     /**
      * Display the specified resource.
      */
     public function edit()
     {
-        $refundPolicy = RefundPolicy::with(['translates.language'])->first();
-        
-        if (!$refundPolicy) {
-            $refundPolicy = RefundPolicy::create(['status' => true]);
-        }
-        
-        $languages = Language::all();
+        $refundPolicy = $this->repository->getRefundPolicyWithTranslations();
+        $languages = $this->repository->getActiveLanguages();
         
         return view('admin.refund-policy.edit', compact('refundPolicy', 'languages'));
     }
@@ -31,7 +31,7 @@ class RefundPolicyController extends Controller
      */
     public function update(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->repository->getActiveLanguages();
         
         // Translation validation
         foreach ($languages as $language) {
@@ -44,32 +44,8 @@ class RefundPolicyController extends Controller
         }
 
         try {
-            $refundPolicy = RefundPolicy::first();
+            $this->repository->updateRefundPolicy($request->input('translations', []));
             
-            if (!$refundPolicy) {
-                $refundPolicy = RefundPolicy::create([
-                    'status' => true,
-                ]);
-            }
-
-            // Update translations
-            foreach ($languages as $language) {
-                $translationData = $request->input("translations.{$language->id}", []);
-                
-                $refundPolicy->translates()->updateOrCreate(
-                    ['language_id' => $language->id],
-                    [
-                        'content' => trim($translationData['content'] ?? ''),
-                    ]
-                );
-            }
-
-            // Clear cache for all languages
-            $languages = Language::getActiveLanguages();
-            foreach ($languages as $language) {
-                Cache::forget("refund_policy_{$language->id}");
-            }
-
             return redirect()->back()
                 ->with('success', 'Refund Policy updated successfully!');
 

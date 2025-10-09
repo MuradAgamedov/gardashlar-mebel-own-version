@@ -3,28 +3,25 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Report;
-use App\Models\Language;
-use App\Services\FileService;
+use App\Repositories\ReportRepository;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
-    protected $fileService;
+    protected $repository;
 
-    public function __construct(FileService $fileService)
+    public function __construct(ReportRepository $repository)
     {
-        $this->fileService = $fileService;
+        $this->repository = $repository;
     }
-
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $reports = Report::with('translates.language')->orderBy('order')->get();
-        $languages = Language::all();
+        $reports = $this->repository->getAllReports();
+        $languages = $this->repository->getActiveLanguages();
         
         return view('admin.reports.index', compact('reports', 'languages'));
     }
@@ -34,7 +31,7 @@ class ReportController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->repository->getActiveLanguages();
         return view('admin.reports.create', compact('languages'));
     }
 
@@ -43,7 +40,7 @@ class ReportController extends Controller
      */
     public function store(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->repository->getActiveLanguages();
         
         // Base validation
         $request->validate([
@@ -66,33 +63,21 @@ class ReportController extends Controller
             ]);
         }
 
+        try {
+            $this->repository->createReport(
+                ['status' => $request->input('status')],
+                $request->input('translations', []),
+                $request->file('pdf')
+            );
 
+            return redirect()->route('admin.reports.index')
+                ->with('success', 'Report created successfully!');
 
-        // Handle PDF upload
-        $pdfPath = null;
-        if ($request->hasFile('pdf')) {
-            $pdfPath = $this->fileService->upload($request->file('pdf'), 'reports');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error creating report: ' . $e->getMessage())
+                ->withInput();
         }
-
-        // Create report
-        $report = Report::create([
-            'pdf' => $pdfPath,
-            'status' => $request->input('status'),
-        ]);
-
-        // Create translations
-        foreach ($languages as $language) {
-            $translationData = $request->input("translations.{$language->id}", []);
-            
-            $report->translates()->create([
-                'language_id' => $language->id,
-                'title' => trim($translationData['title'] ?? ''),
-                'description' => trim($translationData['description'] ?? ''),
-            ]);
-        }
-
-        return redirect()->route('admin.reports.index')
-            ->with('success', 'Report created successfully!');
     }
 
     /**
@@ -100,8 +85,8 @@ class ReportController extends Controller
      */
     public function edit(Report $report)
     {
-        $report->load('translates.language');
-        $languages = Language::all();
+        $report->load('translations.language');
+        $languages = $this->repository->getActiveLanguages();
         
         return view('admin.reports.edit', compact('report', 'languages'));
     }
@@ -111,11 +96,11 @@ class ReportController extends Controller
      */
     public function update(Request $request, Report $report)
     {
-        $languages = Language::all();
+        $languages = $this->repository->getActiveLanguages();
         
         // Base validation
         $request->validate([
-            'pdf' => 'nullable|file|mimes:pdf', // 10MB max for PDF
+            'pdf' => 'nullable|file|mimes:pdf',
             'status' => 'boolean',
         ], [
             'pdf.mimes' => 'PDF must be a file of type: pdf.',
@@ -134,40 +119,22 @@ class ReportController extends Controller
             ]);
         }
 
-
-
-        // Handle PDF upload
-        $pdfData = [];
-        if ($request->hasFile('pdf')) {
-            // Delete old PDF
-            if ($report->pdf) {
-                $this->fileService->delete($report->pdf);
-            }
-            
-            $pdfPath = $this->fileService->upload($request->file('pdf'), 'reports');
-            $pdfData['pdf'] = $pdfPath;
-        }
-
-        // Update report
-        $report->update(array_merge($pdfData, [
-            'status' => $request->input('status'),
-        ]));
-
-        // Update translations
-        foreach ($languages as $language) {
-            $translationData = $request->input("translations.{$language->id}", []);
-            
-            $report->translates()->updateOrCreate(
-                ['language_id' => $language->id],
-                [
-                    'title' => trim($translationData['title'] ?? ''),
-                    'description' => trim($translationData['description'] ?? ''),
-                ]
+        try {
+            $this->repository->updateReport(
+                $report,
+                ['status' => $request->input('status')],
+                $request->input('translations', []),
+                $request->file('pdf')
             );
-        }
 
-        return redirect()->route('admin.reports.index')
-            ->with('success', 'Report updated successfully!');
+            return redirect()->route('admin.reports.index')
+                ->with('success', 'Report updated successfully!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error updating report: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     /**
@@ -175,9 +142,14 @@ class ReportController extends Controller
      */
     public function destroy(Report $report)
     {
-        $report->delete();
-        return redirect()->route('admin.reports.index')
-            ->with('success', 'Report deleted successfully!');
+        try {
+            $this->repository->deleteReport($report);
+            return redirect()->route('admin.reports.index')
+                ->with('success', 'Report deleted successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error deleting report: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -190,10 +162,14 @@ class ReportController extends Controller
             'reports.*' => 'required|integer|exists:reports,id',
         ]);
 
-        foreach ($request->reports as $index => $reportId) {
-            Report::where('id', $reportId)->update(['order' => $index + 1]);
+        try {
+            $this->repository->reorderReports($request->reports);
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error reordering reports: ' . $e->getMessage()
+            ], 500);
         }
-
-        return response()->json(['success' => true]);
     }
 }
