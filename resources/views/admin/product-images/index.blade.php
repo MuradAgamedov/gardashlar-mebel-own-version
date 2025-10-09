@@ -48,17 +48,17 @@
                 <div class="card">
                     <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">Images for: {{ $product->translate()->title ?? 'No title' }}</h5>
+                        <h5 class="mb-0">Images for: {{ $product->translate()->title ?? 'No title' }}</h5>
 
-    <div class="d-flex align-items-center gap-2">
-        <a href="{{ route('admin.products.images.create', $product) }}" class="btn btn-primary">
-            <i class="material-icons-outlined">add</i>
-        </a>
-        <a href="{{ route('admin.products.index', $product) }}" class="btn btn-secondary">
-            <i class="material-icons-outlined">arrow_back</i>
-        </a>
-    </div>
-</div>
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{{ route('admin.products.images.create', $product) }}" class="btn btn-primary">
+                                <i class="material-icons-outlined">add</i>
+                            </a>
+                            <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
+                                <i class="material-icons-outlined">arrow_back</i>
+                            </a>
+                        </div>
+                    </div>
 
                     </div>
                     <div class="card-body">

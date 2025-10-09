@@ -161,7 +161,6 @@ class PaymentController extends Controller
                 'address'         => 'nullable|string',
                 'amount'          => 'required|numeric|min:1',
                 'months'          => 'required|in:2,3,6,9,12',
-                'member_id'       => 'nullable|string',
                 'language'        => 'nullable|in:AZ,EN,RU',
                 'delivery_method' => 'required|in:delivery,pickup',
                 'payment_method'  => 'required|in:card,cash,installment',

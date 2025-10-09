@@ -32,12 +32,12 @@
                     <td>
                         @php
                             $productIds = json_decode($order->product_ids ?? '[]', true);
-                            $products = \App\Models\Product::whereIn('id', $productIds)->get();
+                            $products = \App\Models\Product::whereIn('id', $productIds)->with('translations')->get();
                         @endphp
                         @if($products->count() > 0)
                             <ul class="list-unstyled mb-0">
                                 @foreach($products as $product)
-                                    <li>{{ $product->name ?? 'Unknown Product' }}</li>
+                                    <li>{{ $product->translate()?->title ?? 'Unknown Product' }}</li>
                                 @endforeach
                             </ul>
                         @else
@@ -63,7 +63,7 @@
                             data-amount="{{ $order->amount }}"
                             data-address="{{ $order->address }}"
                             data-text="{{ $order->text }}"
-                            data-product="{{ $order->product?->name ?? '—' }}"
+                            data-product="{{ $products->first() ? ($products->first()->translate()?->title ?? 'Unknown Product') : '—' }}"
                         >
                             Show
                         </button>
