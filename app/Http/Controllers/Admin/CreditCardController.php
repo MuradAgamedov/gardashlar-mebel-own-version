@@ -44,7 +44,7 @@ class CreditCardController extends Controller
             'months' => 'nullable|string|max:255',
             'image'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
         ]);
-
+        dd(1);
         try {
             $imagePath = null;
             if ($request->hasFile('image')) {
