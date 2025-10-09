@@ -303,7 +303,6 @@ class PaymentController extends Controller
             $order = Order::where('order_id', $orderId)
                 ->select([
                     'order_id',
-                    'product_ids',
                     'full_name',
                     'phone',
                     'email',

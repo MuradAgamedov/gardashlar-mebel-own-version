@@ -44,4 +44,12 @@ class Order extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    /**
+     * Seçilmiş kredit kartı ilə əlaqə
+     */
+    public function creditCard()
+    {
+        return $this->belongsTo(CreditCard::class, 'selected_card');
+    }
 }
