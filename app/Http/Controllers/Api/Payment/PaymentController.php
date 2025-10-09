@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\Order;
 use App\Models\CreditCard;
-use App\Models\Product;
 use App\Traits\LocaleFromHeader;
 use App\Helpers\PaymentLoginHelper;
 
@@ -57,36 +56,32 @@ class PaymentController extends Controller
     }
 
     /**
-     * 🔹 Online ödəniş (mövcud sifarişlə)
+     * 🔹 Online ödəniş
      */
     public function startOnline(Request $request)
     {
         $data = $request->validate([
-            'order_id'  => 'required|exists:orders,id',
-            'amount'    => 'required|numeric|min:1',
-            'member_id' => 'required|string',
-            'language'  => 'nullable|in:AZ,EN,RU',
+            'order_id' => 'required|exists:orders,id',
         ]);
 
         $order = Order::findOrFail($data['order_id']);
-        $lang = $data['language'] ?? 'EN';
+
         $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
 
-        $order->update([
-            'payment_method' => 'online',
-            'payment_status' => 'pending',
-            'status'         => 'processing',
-            'selected_card'  => $data['member_id'],
-        ]);
-
         $payload = [
-            'amount'     => (float) $data['amount'],
-            'memberId'   => $data['member_id'],
-            'language'   => $lang,
+            'amount'     => (float) $order->amount,
+            'memberId'   => $order->selected_card,
+            'language'   => $order->language ?? 'EN',
             'successUrl' => route('payment.success', ['order_id' => $order->id], true),
             'cancelUrl'  => route('payment.cancel', ['order_id' => $order->id], true),
             'declineUrl' => route('payment.decline', ['order_id' => $order->id], true),
         ];
+
+        $order->update([
+            'payment_method' => 'online',
+            'payment_status' => 'pending',
+            'status' => 'processing',
+        ]);
 
         $response = PaymentLoginHelper::withAuth()->post($baseUrl.'/transactions/pay', $payload);
 
@@ -116,35 +111,28 @@ class PaymentController extends Controller
     public function startInstallment(Request $request)
     {
         $data = $request->validate([
-            'order_id'   => 'required|exists:orders,id',
-            'amount'     => 'required|numeric|min:1',
-            'months'     => 'required|in:2,3,6,9,12',
-            'member_id'  => 'required|string',
-            'language'   => 'nullable|in:AZ,EN,RU',
+            'order_id' => 'required|exists:orders,id',
         ]);
 
         $order = Order::findOrFail($data['order_id']);
-        $lang = $data['language'] ?? 'EN';
+
         $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
+
+        $payload = [
+            'amount'      => (float) $order->amount,
+            'memberId'    => $order->selected_card,
+            'language'    => $order->language ?? 'EN',
+            'installment' => (int) $order->month,
+            'successUrl'  => route('payment.success', ['order_id' => $order->id], true),
+            'cancelUrl'   => route('payment.cancel', ['order_id' => $order->id], true),
+            'declineUrl'  => route('payment.decline', ['order_id' => $order->id], true),
+        ];
 
         $order->update([
             'payment_method' => 'installment',
             'payment_status' => 'pending',
             'status'         => 'processing',
-            'selected_card'  => $data['member_id'],
-            'month'          => $data['months'],
-            'monthly_price'  => $data['amount'] / $data['months'],
         ]);
-
-        $payload = [
-            'amount'      => (float) $data['amount'],
-            'memberId'    => $data['member_id'],
-            'language'    => $lang,
-            'installment' => (int) $data['months'],
-            'successUrl'  => route('payment.success', ['order_id' => $order->id], true),
-            'cancelUrl'   => route('payment.cancel', ['order_id' => $order->id], true),
-            'declineUrl'  => route('payment.decline', ['order_id' => $order->id], true),
-        ];
 
         $response = PaymentLoginHelper::withAuth()->post($baseUrl.'/transactions/taksit', $payload);
 
@@ -194,7 +182,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * 🔹 Müvəqqəti sifariş yaradılması (eyni qalır)
+     * 🔹 Müvəqqəti sifariş yaradılması
      */
     public function createTemporaryOrder(Request $request)
     {
@@ -245,6 +233,8 @@ class PaymentController extends Controller
                     'selected_card'   => $cardTitle,
                     'month'           => $data['months'],
                     'monthly_price'   => $monthlyPrice,
+                    'amount'          => $data['amount'],
+                    'language'        => $data['language'] ?? 'EN',
                     'status'          => 'temporary',
                     'payment_status'  => 'unpaid',
                 ]);
@@ -264,6 +254,8 @@ class PaymentController extends Controller
                     'selected_card'   => $cardTitle,
                     'month'           => $data['months'],
                     'monthly_price'   => $monthlyPrice,
+                    'amount'          => $data['amount'],
+                    'language'        => $data['language'] ?? 'EN',
                     'status'          => 'temporary',
                     'payment_status'  => 'unpaid',
                 ]);
@@ -295,121 +287,6 @@ class PaymentController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Müvəqqəti sifariş yaradılarkən xəta baş verdi',
-            ], 500);
-        }
-    }
-
-    /**
-     * 🔹 Base64 decode helper
-     */
-    private function decodeUp(?string $base64): array
-    {
-        if (!$base64) return [];
-        try {
-            $json = base64_decode($base64, true);
-            return json_decode($json, true) ?: [];
-        } catch (\Throwable $e) {
-            Log::error('UP decode error: '.$e->getMessage());
-            return [];
-        }
-    }
-
-
-    public function getProducts(Request $request)
-    {
-        try {
-            // Validate request
-            $request->validate([
-                'product_ids' => 'required|array|min:1|max:50',
-                'product_ids.*' => 'required|integer|min:1'
-            ]);
-
-            $productIds = $request->input('product_ids', []);
-
-            // Get language ID from header using trait
-            $languageId = $this->getLanguageIdFromHeader($request);
-
-            // Get existing active products with relationships and translations
-            $existingProducts = Product::active()
-                ->whereIn('id', $productIds)
-                ->with([
-                    'translates' => fn($q) => $q->where('language_id', $languageId),
-                    'images' => fn($q) => $q->where('status', true)->orderBy('order'),
-                    'images.color' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
-                    'categories.translates' => fn($q) => $q->where('language_id', $languageId),
-                    'types.translates' => fn($q) => $q->where('language_id', $languageId),
-                    'colors' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
-           
-                ])
-                ->get();
-
-            // Map to desired response structure
-            $productsData = $existingProducts->map(function ($product) use ($languageId) {
-                $translation = $product->translates->first();
-
-                // Main image
-                $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
-
-           
-                
-
-                // Available colors
-                $availableColors = $product->colors->map(fn($color) => [
-                    'id' => $color->id,
-                    'color_code' => $color->color_code
-                ]);
-
-                // Images
-                $imagesWithColors = $product->images->map(fn($image) => [
-                    'id' => $image->id,
-                    'image_url' => $image->image ? asset('storage/' . $image->image) : null,
-                    'is_main' => $image->is_main,
-                    'order' => $image->order,
-                    'color_id' => $image->product_color_id
-                ])->sortBy('order')->values();
-
-                if ($imagesWithColors->isEmpty()) {
-                    $imagesWithColors = collect([
-                        [
-                            'id' => time(),
-                            'image_url' => asset('images/default_image.webp'),
-                            'is_main' => false,
-                            'order' => 0,
-                            'color_id' => null
-                        ]
-                    ]);
-                }
-
-              
-                return [
-                    'id' => $product->id,
-                    'title' => $translation?->title ?? '',
-                    'available_colors' => $availableColors,
-
-        
-                    'discount_price' => $product->discount_price,
-                    'price' => $product->price,
-                    'images' => $imagesWithColors,
-               
-                ];
-            });
-
-            return response()->json([
-                'success' => true,
-                'data' => $productsData
-            ], 200);
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? []),
-                'data' => null
-            ], 400);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Məhsulları yoxlayarkən xəta baş verdi: ' . $e->getMessage(),
-                'data' => null
             ], 500);
         }
     }
