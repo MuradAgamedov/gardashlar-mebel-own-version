@@ -322,30 +322,11 @@ class PaymentController extends Controller
                 ])
                 ->firstOrFail();
 
-            // Decode the product_ids JSON
-            $productIds = json_decode($order->product_ids, true) ?? [];
-            
-            // Get products with translations
-            $products = Product::whereIn('id', $productIds)
-                ->with(['translates' => function($query) use ($order) {
-                    $query->where('language', strtoupper($order->language ?? 'az'));
-                }])
-                ->get(['id', 'price', 'discount_price']);
-
-            // Format the response
-            $orderData = $order->toArray();
-            $orderData['products'] = $products->map(function($product) {
-                return [
-                    'id' => $product->id,
-                    'title' => $product->translates->first()?->title ?? 'Unknown Product',
-                    'price' => $product->price,
-                    'discount_price' => $product->discount_price,
-                ];
-            });
+           
 
             return response()->json([
                 'success' => true,
-                'data' => $orderData
+                'data' => $order
             ]);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
