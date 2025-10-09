@@ -41,7 +41,6 @@
                                 @endforeach
                             </ul>
                         @else
-                            —
                         @endif
                     </td>
                     <td><span class="badge bg-info">{{ $order->status }}</span></td>
@@ -68,8 +67,6 @@
                             Show
                         </button>
                     </td>
-{{ ... }}
-                @endforeach
             </tbody>
         </table>
 
