@@ -302,7 +302,6 @@ class PaymentController extends Controller
         try {
             $order = Order::where('order_id', $orderId)
                 ->select([
-                    'id',
                     'order_id',
                     'user_id',
                     'product_ids',
