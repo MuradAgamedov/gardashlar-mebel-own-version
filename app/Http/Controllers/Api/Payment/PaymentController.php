@@ -3,36 +3,33 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
-use App\Enums\DeliveryMethod;
-use App\Enums\PaymentMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use App\Models\Product;
-use App\Models\ProductCategory;
 use App\Models\Order;
 use App\Traits\LocaleFromHeader;
+use App\Helpers\PaymentLoginHelper; // 🔹 UnitedPayment helper (auth ilə göndərmək üçün)
 
 class PaymentController extends Controller
 {
     use LocaleFromHeader;
 
     /**
-     * Payment və Delivery üçün map-lar (enum əvəzinə sadə array)
+     * Payment və Delivery üçün map-lar
      */
     private array $paymentMethods = [
         1 => 'cash',
-        2 => 'installment',
+        2 => 'online',
+        3 => 'installment',
     ];
 
     private array $deliveryMethods = [
-        1 => 'courier',
-        2 => 'pickup',
-        3 => 'express',
+        1 => 'store',
+        2 => 'delivery',
     ];
 
     /**
-     * Mövcud sifariş üçün nağd ödənişi təsdiqlə
+     * 🔹 Nağd ödəniş (yerində)
      */
     public function startCash(Request $request)
     {
@@ -55,13 +52,13 @@ class PaymentController extends Controller
                 'order_id' => $order->id,
                 'order_number' => $order->order_id,
                 'payment_status' => 'pending',
-                'status' => 'processing'
+                'status' => 'processing',
             ]
         ]);
     }
 
     /**
-     * Mövcud sifariş üçün kredit ödənişini təsdiqlə
+     * 🔹 Kredit (taksit) ödənişi
      */
     public function startInstallment(Request $request)
     {
@@ -92,7 +89,71 @@ class PaymentController extends Controller
     }
 
     /**
-     * Yeni əlavə olunan metod — order_id-yə görə payment başlat
+     * 🔹 Online ödəniş (United Payment API vasitəsilə)
+     */
+    public function startOnline(Request $request)
+    {
+        $data = $request->validate([
+            'full_name'       => 'required|string|max:255',
+            'phone'           => 'required|string|max:50',
+            'email'           => 'required|email|max:255',
+            'city'            => 'required|string|max:255',
+            'amount'          => 'required|numeric|min:1',
+            'member_id'       => 'required|string',
+            'language'        => 'nullable|in:AZ,EN,RU',
+        ]);
+
+        $lang = $data['language'] ?? 'EN';
+        $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
+
+        // 🔹 Order yaradılır (pending, unpaid)
+        $order = Order::create([
+            'user_id'        => $request->user()->id ?? null,
+            'full_name'      => $data['full_name'],
+            'phone'          => $data['phone'],
+            'email'          => $data['email'],
+            'city'           => $data['city'],
+            'order_id'       => strtoupper(Str::random(12)),
+            'delivery_method'=> 'delivery',
+            'payment_method' => 'online',
+            'selected_card'  => $data['member_id'],
+            'status'         => 'pending',
+            'payment_status' => 'unpaid',
+        ]);
+
+        $payload = [
+            'amount'     => (float) $data['amount'],
+            'memberId'   => $data['member_id'],
+            'language'   => $lang,
+            'successUrl' => route('payment.success', ['order_id' => $order->id], true),
+            'cancelUrl'  => route('payment.cancel', ['order_id' => $order->id], true),
+            'declineUrl' => route('payment.decline', ['order_id' => $order->id], true),
+        ];
+
+        $response = PaymentLoginHelper::withAuth()->post($baseUrl . '/transactions/pay', $payload);
+
+        if ($response->successful()) {
+            $body = $response->json();
+            $redirectUrl = is_array($body) ? ($body['url'] ?? null) : (string) $response->body();
+
+            if ($redirectUrl) {
+                return response()->json([
+                    'success' => true,
+                    'redirect_url' => $redirectUrl,
+                    'order_id' => $order->id,
+                ]);
+            }
+
+            Log::error('Online Payment: URL not found', ['body' => $response->body()]);
+            return response()->json(['success' => false, 'message' => 'Ödəniş linki tapılmadı'], 422);
+        }
+
+        Log::error('Online Payment failed', ['body' => $response->body()]);
+        return response()->json(['success' => false, 'message' => 'Ödəniş sorğusu uğursuz oldu'], 500);
+    }
+
+    /**
+     * 🔹 payment_method-ə görə yönləndirmə
      */
     public function pay(Request $request)
     {
@@ -102,35 +163,26 @@ class PaymentController extends Controller
 
         $order = Order::findOrFail($data['order_id']);
 
-        // Order-da payment_method integer şəklində saxlanılırsa:
+        // Əgər payment_method bazada stringdirsə yoxla
         $methodInt = is_numeric($order->payment_method)
-            ? (int) $order->payment_method
+            ? (int)$order->payment_method
             : array_search($order->payment_method, $this->paymentMethods);
 
-        $method = $this->paymentMethods[$methodInt] ?? null;
+        $method = $this->paymentMethods[$methodInt] ?? $order->payment_method;
 
-        if (!$method) {
-            return response()->json([
+        return match ($method) {
+            'cash' => $this->startCash($request),
+            'installment' => $this->startInstallment($request),
+            'online' => $this->startOnline($request),
+            default => response()->json([
                 'success' => false,
-                'message' => 'Ödəniş üsulu tanınmadı'
-            ], 400);
-        }
-
-        // Seçilən metoda görə yönləndiririk
-        if ($method === 'cash') {
-            return $this->startCash($request);
-        } elseif ($method === 'installment') {
-            return $this->startInstallment($request);
-        }
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Uyğun ödəniş metodu tapılmadı'
-        ], 400);
+                'message' => 'Uyğun ödəniş metodu tapılmadı',
+            ], 400),
+        };
     }
 
     /**
-     * Success nəticəsi
+     * 🔹 Success nəticəsi
      */
     public function success(Request $request)
     {
@@ -140,7 +192,7 @@ class PaymentController extends Controller
         if ($order) {
             $order->update([
                 'status' => 'completed',
-                'payment_status' => 'paid'
+                'payment_status' => 'paid',
             ]);
         }
 
@@ -151,7 +203,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * Cancel nəticəsi
+     * 🔹 Cancel nəticəsi
      */
     public function cancel(Request $request)
     {
@@ -161,7 +213,7 @@ class PaymentController extends Controller
         if ($order) {
             $order->update([
                 'status' => 'cancelled',
-                'payment_status' => 'unpaid'
+                'payment_status' => 'unpaid',
             ]);
         }
 
@@ -172,7 +224,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * Decline nəticəsi
+     * 🔹 Decline nəticəsi
      */
     public function decline(Request $request)
     {
@@ -182,7 +234,7 @@ class PaymentController extends Controller
         if ($order) {
             $order->update([
                 'status' => 'failed',
-                'payment_status' => 'failed'
+                'payment_status' => 'failed',
             ]);
         }
 
@@ -193,7 +245,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * Müvəqqəti sifariş yaradılması (map-lar istifadə olunur)
+     * 🔹 Müvəqqəti sifariş yaradılması
      */
     public function createTemporaryOrder(Request $request)
     {
@@ -223,7 +275,6 @@ class PaymentController extends Controller
                 : $data['amount'];
 
             $userId = optional($request->user())->id;
-            $memberId = $userId ?? mt_rand(1000000000, 9999999999);
 
             if (!empty($data['order_id'])) {
                 $order = Order::where('order_id', $data['order_id'])->firstOrFail();
@@ -278,28 +329,33 @@ class PaymentController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             Log::error('Temporary order creation failed', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
             return response()->json([
                 'success' => false,
-                'message' => 'Müvəqqəti sifariş yaradılarkən xəta baş verdi'
+                'message' => 'Müvəqqəti sifariş yaradılarkən xəta baş verdi',
             ], 500);
         }
     }
 
+    /**
+     * 🔹 Base64 decode helper
+     */
     private function decodeUp(?string $base64): array
     {
-        if (!$base64) return [];
+        if (!$base64) {
+            return [];
+        }
         try {
             $json = base64_decode($base64, true);
             return json_decode($json, true) ?: [];
         } catch (\Throwable $e) {
-            Log::error('UP decode error: '.$e->getMessage());
+            Log::error('UP decode error: ' . $e->getMessage());
             return [];
         }
     }

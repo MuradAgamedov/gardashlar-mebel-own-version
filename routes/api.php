@@ -357,10 +357,44 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-Route::post('/payment/installment', [PaymentController::class, 'startInstallment']);
-Route::get('/payment/callback', [PaymentController::class, 'callback']);
-Route::post('/payment/cash', [PaymentController::class, 'startCash']);
-Route::post('/payment/products', [PaymentController::class, 'getProducts'])->name('api.payment.products');
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Payment\PaymentController;
+
+/*
+|--------------------------------------------------------------------------
+| Payment Routes
+|--------------------------------------------------------------------------
+|
+| Burada bütün ödənişlərlə bağlı endpoint-lər cəmlənib.
+| Həm nağd, həm taksit, həm də online (ePay) ödənişlər burada idarə olunur.
+|
+*/
+
+// 🔹 Nağd ödəniş
+Route::post('/payment/cash', [PaymentController::class, 'startCash'])->name('api.payment.cash');
+
+// 🔹 Kredit (taksit) ödənişi
+Route::post('/payment/installment', [PaymentController::class, 'startInstallment'])->name('api.payment.installment');
+
+// 🔹 ePay (online) ödənişi
+Route::post('/payment/epay', [PaymentController::class, 'startOnline'])->name('api.payment.epay');
+
+// 🔹 Ödəniş növünə görə avtomatik yönləndirmə (pay metodu)
+Route::post('/payment/pay', [PaymentController::class, 'pay'])->name('api.payment.pay');
+
+// 🔹 Müvəqqəti sifariş yaratmaq və ya yeniləmək
 Route::post('/payment/temporary-order', [PaymentController::class, 'createTemporaryOrder'])->name('api.payment.temporary-order.create');
+
+// 🔹 Müvəqqəti sifarişi ID-yə görə gətirmək
 Route::get('/payment/temporary-order/{orderId}', [PaymentController::class, 'getTemporaryOrder'])->name('api.payment.temporary-order.get');
 
+// 🔹 Məhsulları ID-lərlə gətirmək (məsələn kredit səbəti üçün)
+Route::post('/payment/products', [PaymentController::class, 'getProducts'])->name('api.payment.products');
+
+// 🔹 Callback URL (əgər UnitedPayment və ya digər gateway-lərdən POST nəticə gəlirsə)
+Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('api.payment.callback');
+
+// 🔹 Ödəniş nəticələri
+Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
+Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
+Route::get('/payment/decline', [PaymentController::class, 'decline'])->name('payment.decline');
