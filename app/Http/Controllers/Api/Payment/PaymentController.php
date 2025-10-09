@@ -312,7 +312,6 @@ class PaymentController extends Controller
                     'payment_method',
                     'selected_card',
                     'month',
-                    'monthly_price',
                     'amount',
          
                 ])
