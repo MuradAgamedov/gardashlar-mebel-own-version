@@ -164,7 +164,7 @@ class PaymentController extends Controller
     public function pay(Request $request)
     {
         $data = $request->validate([
-            'order_id' => 'required|exists:orders,id',
+            'order_id' => 'required|exists:orders,order_id',
         ]);
 
         $order = Order::findOrFail($data['order_id']);
