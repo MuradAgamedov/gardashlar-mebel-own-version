@@ -10,6 +10,7 @@ class CreditCard extends Model
         'title',
         'order',
         'image',
+        'months'
     ];
 
     /**
