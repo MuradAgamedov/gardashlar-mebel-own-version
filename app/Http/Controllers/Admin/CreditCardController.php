@@ -40,7 +40,6 @@ class CreditCardController extends Controller
     public function store(Request $request)
     {
 
-        dd(1);
         $request->validate([
             'title'  => 'required|string|max:255',
             'months' => 'nullable|string|max:255',
@@ -93,6 +92,8 @@ class CreditCardController extends Controller
      */
     public function update(Request $request, CreditCard $creditCard)
     {
+        dd(1);
+
         $request->validate([
             'title'  => 'required|string|max:255',
             'months' => 'nullable|string|max:255',
