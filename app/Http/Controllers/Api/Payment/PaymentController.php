@@ -198,7 +198,7 @@ class PaymentController extends Controller
                 'email'           => 'required|email|max:255',
                 'city'            => 'required|string|max:255',
                 'address'         => 'nullable|string',
-                'amount'          => 'nullable|numeric|min:1',
+                'amount'          => 'nullable|numeric',
                 'months'          => 'nullable|in:2,3,6,9,12',
                 'language'        => 'nullable|in:az,en,ru',
                 'delivery_method' => 'required|integer|in:' . implode(',', array_keys($this->deliveryMethods)),
