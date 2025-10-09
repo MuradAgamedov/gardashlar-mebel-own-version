@@ -190,7 +190,6 @@ class PaymentController extends Controller
     {
         try {
             $data = $request->validate([
-                'order_id'        => 'nullable|string|exists:orders,order_id',
                 'product_ids'     => 'required|array|min:1',
                 'product_ids.*'   => 'exists:products,id',
                 'full_name'       => 'required|string|max:255',
@@ -224,7 +223,7 @@ class PaymentController extends Controller
             if (!empty($data['order_id'])) {
                 $order = Order::where('order_id', $data['order_id'])->firstOrFail();
                 $order->update([
-                    'product_ids'     => $data['product_ids'],
+                    'product_ids'     => json_encode($data['product_ids']),
                     'full_name'       => $data['full_name'],
                     'phone'           => $data['phone'],
                     'email'           => $data['email'],
