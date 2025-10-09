@@ -224,7 +224,7 @@ class PaymentController extends Controller
             if (!empty($data['order_id'])) {
                 $order = Order::where('order_id', $data['order_id'])->firstOrFail();
                 $order->update([
-                    'product_ids'     => json_encode($data['product_ids']),
+                    'product_ids'     => $data['product_ids'],
                     'full_name'       => $data['full_name'],
                     'phone'           => $data['phone'],
                     'email'           => $data['email'],
