@@ -57,15 +57,31 @@
                         <form action="{{ route('admin.credit-cards.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
+                            {{-- Title --}}
                             <div class="mb-3">
                                 <label class="form-label">Title <span class="text-danger">*</span></label>
-                                <input type="text" name="title" class="form-control" value="{{ old('title') }}" required>
+                                <input type="text" name="title" class="form-control" 
+                                       value="{{ old('title') }}" required>
                             </div>
 
+                            {{-- Months --}}
+                            <div class="mb-3">
+                                <label class="form-label">Months (e.g. 3, 6, 9, 12)</label>
+                                <input type="text" name="months" class="form-control" 
+                                       placeholder="Enter installment months (comma separated)"
+                                       value="{{ old('months') }}">
+                                <small class="form-text text-muted">
+                                    Məsələn: <strong>3, 6, 9, 12</strong> (vergüllə ayırın)
+                                </small>
+                            </div>
+
+                            {{-- Image --}}
                             <div class="mb-3">
                                 <label class="form-label">Image</label>
                                 <input type="file" name="image" class="form-control" id="imageInput">
-                                <small class="form-text text-muted">Allowed types: jpg, jpeg, png, gif, webp (max 2MB)</small>
+                                <small class="form-text text-muted">
+                                    Allowed types: jpg, jpeg, png, gif, webp (max 2MB)
+                                </small>
 
                                 {{-- Preview --}}
                                 <div class="mt-3">
@@ -74,6 +90,7 @@
                                 </div>
                             </div>
 
+                            {{-- Submit --}}
                             <div class="d-flex justify-content-end gap-2">
                                 <a href="{{ route('admin.credit-cards.index') }}" class="btn btn-secondary">
                                     <i class="material-icons-outlined">arrow_back</i> 

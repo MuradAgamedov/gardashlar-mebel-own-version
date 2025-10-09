@@ -58,19 +58,34 @@
                             @csrf
                             @method('PUT')
 
+                            {{-- Title --}}
                             <div class="mb-3">
                                 <label class="form-label">Title <span class="text-danger">*</span></label>
                                 <input type="text" name="title" class="form-control" 
                                        value="{{ old('title', $creditCard->title) }}" required>
                             </div>
 
+                            {{-- Months --}}
+                            <div class="mb-3">
+                                <label class="form-label">Months (e.g. 3, 6, 9, 12)</label>
+                                <input type="text" name="months" class="form-control" 
+                                       placeholder="Enter installment months (comma separated)"
+                                       value="{{ old('months', $creditCard->months) }}">
+                                <small class="form-text text-muted">
+                                    Məsələn: <strong>3, 6, 9, 12</strong> (vergüllə ayırın)
+                                </small>
+                            </div>
+
+                            {{-- Image Upload --}}
                             <div class="mb-3">
                                 <label class="form-label">Image</label>
                                 <input type="file" name="image" class="form-control" id="imageInput">
-                                <small class="form-text text-muted">Allowed types: jpg, jpeg, png, gif, webp (max 2MB)</small>
+                                <small class="form-text text-muted">
+                                    Allowed types: jpg, jpeg, png, gif, webp (max 2MB)
+                                </small>
                             </div>
 
-                            {{-- Cari şəkil və ya yeni seçilən şəkil preview --}}
+                            {{-- Preview --}}
                             <div class="mb-3">
                                 <label class="form-label d-block">Preview:</label>
                                 <img id="imagePreview" 
@@ -79,6 +94,7 @@
                                      style="max-height: 150px; border:1px solid #ddd; padding:4px; border-radius:6px; {{ $creditCard->image ? '' : 'display:none;' }}">
                             </div>
 
+                            {{-- Submit --}}
                             <div class="d-flex justify-content-end gap-2">
                                 <a href="{{ route('admin.credit-cards.index') }}" class="btn btn-secondary">
                                     <i class="material-icons-outlined">arrow_back</i> 

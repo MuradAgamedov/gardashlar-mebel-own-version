@@ -40,8 +40,9 @@ class CreditCardController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
+            'title'  => 'required|string|max:255',
+            'months' => 'nullable|string|max:255',
+            'image'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
         ]);
 
         try {
@@ -61,9 +62,10 @@ class CreditCardController extends Controller
             $lastOrder = CreditCard::max('order') ?? 0;
 
             CreditCard::create([
-                'title' => $request->input('title'),
-                'order' => $lastOrder + 1,
-                'image' => $imagePath,
+                'title'  => $request->input('title'),
+                'months' => $request->input('months'),
+                'order'  => $lastOrder + 1,
+                'image'  => $imagePath,
             ]);
 
             return redirect()->route('admin.credit-cards.index')
@@ -90,12 +92,17 @@ class CreditCardController extends Controller
     public function update(Request $request, CreditCard $creditCard)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
+            'title'  => 'required|string|max:255',
+            'months' => 'nullable|string|max:255',
+            'image'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
         ]);
 
         try {
-            $imageData = [];
+            $updateData = [
+                'title'  => $request->input('title'),
+                'months' => $request->input('months'),
+            ];
+
             if ($request->hasFile('image')) {
                 $uploadedPath = $this->imageService->update(
                     $request->file('image'),
@@ -108,13 +115,11 @@ class CreditCardController extends Controller
                 );
 
                 if ($uploadedPath) {
-                    $imageData['image'] = $uploadedPath;
+                    $updateData['image'] = $uploadedPath;
                 }
             }
 
-            $creditCard->update(array_merge($imageData, [
-                'title' => $request->input('title'),
-            ]));
+            $creditCard->update($updateData);
 
             return redirect()->route('admin.credit-cards.index')
                 ->with('success', 'Credit Card updated successfully!');
