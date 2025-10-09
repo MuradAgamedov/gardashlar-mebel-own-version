@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\CreditCard;
 use App\Traits\LocaleFromHeader;
 use App\Helpers\PaymentLoginHelper;
+use App\Models\Product;
 
 class PaymentController extends Controller
 {
