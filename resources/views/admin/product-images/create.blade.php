@@ -28,9 +28,7 @@
                             <a href="{{ route('admin.dashboard') }}">
                                 <i class="material-icons-outlined">home</i>
                             </a>
-                            <a href="{{ route('admin.products.images.index', $product) }}" class="btn btn-secondary">
-                                            <i class="material-icons-outlined">arrow_back</i>
-                                        </a>
+                            
                         </li>
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.products.index') }}">Products</a>
