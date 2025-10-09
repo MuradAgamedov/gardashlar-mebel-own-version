@@ -268,7 +268,7 @@ class PaymentController extends Controller
                 'success' => true,
                 'message' => $message,
                 'data' => [
-                    'order_id' => $order->id,
+                    'order_id' => $order->order_id,
                     'payment_method' => $paymentMethodName,
                     'delivery_method' => $deliveryMethodName,
                     'selected_card' => $cardTitle,
