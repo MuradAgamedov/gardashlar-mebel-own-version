@@ -91,7 +91,7 @@ class CreditCardController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
         ]);
 
         try {
