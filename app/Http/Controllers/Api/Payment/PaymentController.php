@@ -18,10 +18,21 @@ class PaymentController extends Controller
     use LocaleFromHeader;
 
     /**
+     * Payment və Delivery üçün map-lar (enum əvəzinə sadə array)
+     */
+    private array $paymentMethods = [
+        1 => 'cash',
+        2 => 'installment',
+    ];
+
+    private array $deliveryMethods = [
+        1 => 'courier',
+        2 => 'pickup',
+        3 => 'express',
+    ];
+
+    /**
      * Mövcud sifariş üçün nağd ödənişi təsdiqlə
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function startCash(Request $request)
     {
@@ -51,9 +62,6 @@ class PaymentController extends Controller
 
     /**
      * Mövcud sifariş üçün kredit ödənişini təsdiqlə
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function startInstallment(Request $request)
     {
@@ -81,6 +89,44 @@ class PaymentController extends Controller
                 'declineUrl' => route('payment.decline', ['order_id' => $order->id], true),
             ]
         ]);
+    }
+
+    /**
+     * Yeni əlavə olunan metod — order_id-yə görə payment başlat
+     */
+    public function pay(Request $request)
+    {
+        $data = $request->validate([
+            'order_id' => 'required|exists:orders,id',
+        ]);
+
+        $order = Order::findOrFail($data['order_id']);
+
+        // Order-da payment_method integer şəklində saxlanılırsa:
+        $methodInt = is_numeric($order->payment_method)
+            ? (int) $order->payment_method
+            : array_search($order->payment_method, $this->paymentMethods);
+
+        $method = $this->paymentMethods[$methodInt] ?? null;
+
+        if (!$method) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ödəniş üsulu tanınmadı'
+            ], 400);
+        }
+
+        // Seçilən metoda görə yönləndiririk
+        if ($method === 'cash') {
+            return $this->startCash($request);
+        } elseif ($method === 'installment') {
+            return $this->startInstallment($request);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Uyğun ödəniş metodu tapılmadı'
+        ], 400);
     }
 
     /**
@@ -147,7 +193,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * Create temporary order (without payment)
+     * Müvəqqəti sifariş yaradılması (map-lar istifadə olunur)
      */
     public function createTemporaryOrder(Request $request)
     {
@@ -157,77 +203,64 @@ class PaymentController extends Controller
                 'product_ids'     => 'required|array|min:1',
                 'product_ids.*'   => 'exists:products,id',
                 'full_name'       => 'required|string|max:255',
+                'phone'           => 'required|string|max:20',
                 'email'           => 'required|email|max:255',
                 'city'            => 'required|string|max:255',
                 'address'         => 'nullable|string',
                 'amount'          => 'nullable|numeric|min:1',
                 'months'          => 'nullable|in:2,3,6,9,12',
                 'language'        => 'nullable|in:AZ,EN,RU',
-                'delivery_method' => 'required|integer|in:'.implode(',', array_column(DeliveryMethod::cases(), 'value')),
-                'payment_method' => 'required|integer|in:'.implode(',', array_column(PaymentMethod::cases(), 'value')),
+                'delivery_method' => 'required|integer|in:' . implode(',', array_keys($this->deliveryMethods)),
+                'payment_method'  => 'required|integer|in:' . implode(',', array_keys($this->paymentMethods)),
                 'selected_card'   => 'nullable|string|max:255',
             ]);
 
-            // Calculate monthly price
-            $monthlyPrice = $data['amount'] / $data['months'];
+            $deliveryMethodName = $this->deliveryMethods[$data['delivery_method']];
+            $paymentMethodName  = $this->paymentMethods[$data['payment_method']];
 
-            // Convert to enum instances
-            $deliveryMethod = DeliveryMethod::from($data['delivery_method']);
-            $paymentMethod = PaymentMethod::from($data['payment_method']);
+            $monthlyPrice = isset($data['months']) && $data['months'] > 0
+                ? ($data['amount'] / $data['months'])
+                : $data['amount'];
 
-            // Get user ID and generate memberId if token exists
-            $userId = null;
-            $memberId = null;
+            $userId = optional($request->user())->id;
+            $memberId = $userId ?? mt_rand(1000000000, 9999999999);
 
-            if ($request->bearerToken() && $request->user()) {
-                $userId = $request->user()->id;
-                $memberId = $userId; // Use user ID as member_id if authenticated
-            } else {
-                // Generate a random 10-digit number for non-authenticated users
-                $memberId = mt_rand(1000000000, 9999999999);
-            }
-
-            // Check if we're updating an existing order
             if (!empty($data['order_id'])) {
                 $order = Order::where('order_id', $data['order_id'])->firstOrFail();
-                
                 $order->update([
-                    'product_ids'    => json_encode($data['product_ids']),
-                    'full_name'      => $data['full_name'],
-                    'phone'          => $data['phone'],
-                    'email'          => $data['email'],
-                    'city'           => $data['city'],
-                    'address'        => $data['address'] ?? null,
-                    'delivery_method' => $data['delivery_method'],
-                    'payment_method' => $data['payment_method'],
-                    'selected_card'  => $data['selected_card'] ?? null,
-                    'month'          => $data['months'],
-                    'monthly_price'  => $monthlyPrice,
-                    'status'         => 'temporary',
-                    'payment_status' => 'unpaid',
+                    'product_ids'     => json_encode($data['product_ids']),
+                    'full_name'       => $data['full_name'],
+                    'phone'           => $data['phone'],
+                    'email'           => $data['email'],
+                    'city'            => $data['city'],
+                    'address'         => $data['address'] ?? null,
+                    'delivery_method' => $deliveryMethodName,
+                    'payment_method'  => $paymentMethodName,
+                    'selected_card'   => $data['selected_card'] ?? null,
+                    'month'           => $data['months'],
+                    'monthly_price'   => $monthlyPrice,
+                    'status'          => 'temporary',
+                    'payment_status'  => 'unpaid',
                 ]);
-                
                 $message = 'Mövcud sifariş yeniləndi';
             } else {
-                // Create new temporary order
                 $order = Order::create([
-                    'user_id'        => $userId,
-                    'product_ids'    => json_encode($data['product_ids']),
-                    'full_name'      => $data['full_name'],
-                    'phone'          => $data['phone'],
-                    'email'          => $data['email'],
-                    'city'           => $data['city'],
-                    'address'        => $data['address'] ?? null,
-                    'order_id'       => strtoupper(Str::random(12)),
-                    'delivery_method' => $data['delivery_method'],
-                    'payment_method' => $data['payment_method'],
-                    'selected_card'  => $data['selected_card'] ?? null,
-                    'month'          => $data['months'],
-                    'monthly_price'  => $monthlyPrice,
-                    'status'         => 'temporary',
-                    'payment_status' => 'unpaid',
+                    'user_id'         => $userId,
+                    'product_ids'     => json_encode($data['product_ids']),
+                    'full_name'       => $data['full_name'],
+                    'phone'           => $data['phone'],
+                    'email'           => $data['email'],
+                    'city'            => $data['city'],
+                    'address'         => $data['address'] ?? null,
+                    'order_id'        => strtoupper(Str::random(12)),
+                    'delivery_method' => $deliveryMethodName,
+                    'payment_method'  => $paymentMethodName,
+                    'selected_card'   => $data['selected_card'] ?? null,
+                    'month'           => $data['months'],
+                    'monthly_price'   => $monthlyPrice,
+                    'status'          => 'temporary',
+                    'payment_status'  => 'unpaid',
                 ]);
-                
                 $message = 'Yeni müvəqqəti sifariş yaradıldı';
             }
 
@@ -235,7 +268,9 @@ class PaymentController extends Controller
                 'success' => true,
                 'message' => $message,
                 'data' => [
-                    'order_id' => $order->id
+                    'order_id' => $order->id,
+                    'payment_method' => $paymentMethodName,
+                    'delivery_method' => $deliveryMethodName,
                 ]
             ], 201);
 
@@ -253,264 +288,6 @@ class PaymentController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Müvəqqəti sifariş yaradılarkən xəta baş verdi'
-            ], 500);
-        }
-    }
-
-    /**
-     * Get temporary order by ID
-     */
-    public function getTemporaryOrder(Request $request, $orderId)
-    {
-        try {
-            $order = Order::with('product')->find($orderId);
-
-            if (!$order) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Sifariş tapılmadı'
-                ], 404);
-            }
-
-            // Get language ID from header
-            $languageId = $this->getLanguageIdFromHeader($request);
-
-            // Get product details
-            $product = $order->product;
-
-            if (!$product) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Məhsul tapılmadı'
-                ], 404);
-            }
-
-            // Load product relationships
-            $product->load([
-                'translates' => fn($q) => $q->where('language_id', $languageId),
-                'images' => fn($q) => $q->where('status', true)->orderBy('order'),
-                'images.color' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
-                'categories.translates' => fn($q) => $q->where('language_id', $languageId),
-                'types.translates' => fn($q) => $q->where('language_id', $languageId),
-                'colors' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
-                'details.translates' => fn($q) => $q->where('language_id', $languageId),
-            ]);
-
-            $translation = $product->translates->first();
-
-            // Category & parent category
-            $categorySlug = null;
-            $categoryTitle = null;
-            $parentSlug = null;
-            $parentTitle = null;
-
-            if ($product->categories->isNotEmpty()) {
-                $category = $product->categories->first();
-                $categoryTranslation = $category->translates->first();
-                $categorySlug = $categoryTranslation?->slug;
-                $categoryTitle = $categoryTranslation?->title;
-
-                if ($category->parent_id) {
-                    $parentCategory = ProductCategory::find($category->parent_id);
-                    $parentTranslation = $parentCategory?->translates()->where('language_id', $languageId)->first();
-                    $parentSlug = $parentTranslation?->slug;
-                    $parentTitle = $parentTranslation?->title;
-                }
-            }
-
-            // Product types
-            $productTypes = $product->types->map(fn($type) => [
-                'id' => $type->id,
-                'title' => $type->translates->first()?->title ?? ''
-            ]);
-
-            // Available colors
-            $availableColors = $product->colors->map(fn($color) => [
-                'id' => $color->id,
-                'color_code' => $color->color_code
-            ]);
-
-            // Images
-            $imagesWithColors = $product->images->map(fn($image) => [
-                'id' => $image->id,
-                'image_url' => $image->image ? asset('storage/' . $image->image) : null,
-                'is_main' => $image->is_main,
-                'order' => $image->order,
-                'color_id' => $image->product_color_id
-            ])->sortBy('order')->values();
-
-            if ($imagesWithColors->isEmpty()) {
-                $imagesWithColors = collect([
-                    [
-                        'id' => time(),
-                        'image_url' => asset('images/default_image.webp'),
-                        'is_main' => false,
-                        'order' => 0,
-                        'color_id' => null
-                    ]
-                ]);
-            }
-
-            // Product details
-            $productDetails = $product->details->map(fn($detail) => [
-                'id' => $detail->id,
-                'keyword' => $detail->translate($languageId)?->keyword ?? '',
-                'value' => $detail->translate($languageId)?->value ?? '',
-            ]);
-
-            // Calculate total price with discount
-            $price = $product->price;
-            $discountPrice = $product->discount_price;
-            $totalPrice = $discountPrice > 0 ? $discountPrice : $price;
-
-            $productData = [
-                'id' => $product->id,
-                'slug' => $translation?->slug ?? '',
-                'title' => $translation?->title ?? '',
-                'available_colors' => $availableColors,
-                'category_slug' => $categorySlug,
-                'category_title' => $categoryTitle,
-                'parent_slug' => $parentSlug,
-                'parent_title' => $parentTitle,
-                'discount_price' => $discountPrice,
-                'price' => $price,
-                'total_price' => $totalPrice,
-                'images' => $imagesWithColors,
-                'product_details' => $productDetails,
-                'product_types' => $productTypes,
-                'view_count' => $product->view_count
-            ];
-
-            // Order data
-            $orderData = [
-                'order_id' => $order->id,
-                'full_name' => $order->full_name,
-                'phone' => $order->phone,
-                'address' => $order->address,
-                'status' => $order->status,
-                'payment_status' => $order->payment_status,
-                'created_at' => $order->created_at,
-            ];
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'order' => $orderData,
-                    'product' => $productData
-                ]
-            ], 200);
-
-        } catch (\Exception $e) {
-            Log::error('Get temporary order failed', [
-                'order_id' => $orderId,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return response()->json([
-                'success' => false,
-                'message' => 'Sifariş məlumatları alınarkən xəta baş verdi'
-            ], 500);
-        }
-    }
-
-    /**
-     * Get products by IDs
-     */
-    public function getProducts(Request $request)
-    {
-        try {
-            // Validate request
-            $request->validate([
-                'product_ids' => 'required|array|min:1|max:50',
-                'product_ids.*' => 'required|integer|min:1'
-            ]);
-
-            $productIds = $request->input('product_ids', []);
-
-            // Get language ID from header using trait
-            $languageId = $this->getLanguageIdFromHeader($request);
-
-            // Get existing active products with relationships and translations
-            $existingProducts = Product::active()
-                ->whereIn('id', $productIds)
-                ->with([
-                    'translates' => fn($q) => $q->where('language_id', $languageId),
-                    'images' => fn($q) => $q->where('status', true)->orderBy('order'),
-                    'images.color' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
-                    'categories.translates' => fn($q) => $q->where('language_id', $languageId),
-                    'types.translates' => fn($q) => $q->where('language_id', $languageId),
-                    'colors' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
-
-                ])
-                ->get();
-
-            // Map to desired response structure
-            $productsData = $existingProducts->map(function ($product) use ($languageId) {
-                $translation = $product->translates->first();
-
-                // Main image
-                $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
-
-
-
-
-                // Available colors
-                $availableColors = $product->colors->map(fn($color) => [
-                    'id' => $color->id,
-                    'color_code' => $color->color_code
-                ]);
-
-                // Images
-                $imagesWithColors = $product->images->map(fn($image) => [
-                    'id' => $image->id,
-                    'image_url' => $image->image ? asset('storage/' . $image->image) : null,
-                    'is_main' => $image->is_main,
-                    'order' => $image->order,
-                    'color_id' => $image->product_color_id
-                ])->sortBy('order')->values();
-
-                if ($imagesWithColors->isEmpty()) {
-                    $imagesWithColors = collect([
-                        [
-                            'id' => time(),
-                            'image_url' => asset('images/default_image.webp'),
-                            'is_main' => false,
-                            'order' => 0,
-                            'color_id' => null
-                        ]
-                    ]);
-                }
-
-
-                return [
-                    'id' => $product->id,
-                    'title' => $translation?->title ?? '',
-                    'available_colors' => $availableColors,
-
-
-                    'discount_price' => $product->discount_price,
-                    'price' => $product->price,
-                    'images' => $imagesWithColors,
-
-                ];
-            });
-
-            return response()->json([
-                'success' => true,
-                'data' => $productsData
-            ], 200);
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? []),
-                'data' => null
-            ], 400);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Məhsulları yoxlayarkən xəta baş verdi: ' . $e->getMessage(),
-                'data' => null
             ], 500);
         }
     }
