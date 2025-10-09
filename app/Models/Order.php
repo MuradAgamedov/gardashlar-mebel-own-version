@@ -25,7 +25,8 @@ class Order extends Model
         'monthly_price',
         'status',
         'payment_status',
-        "amount"
+        "amount",
+        "address"
     ];
 
     /**
