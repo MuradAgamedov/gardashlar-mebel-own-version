@@ -32,7 +32,7 @@
                     <td>
                         @php
                             $productIds = json_decode($order->product_ids ?? '[]', true);
-                            $products = \App\Models\Product::whereIn('id', $productIds)->with('translations')->get();
+                            $products = \App\Models\Product::whereIn('id', $productIds)->with('translates')->get();
                         @endphp
                         @if($products->count() > 0)
                             <ul class="list-unstyled mb-0">
