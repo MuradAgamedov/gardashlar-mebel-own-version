@@ -111,7 +111,6 @@ class CreditCardController extends Controller
                     $creditCard->image,
                     'credit-cards',
                     [
-                        'max_size' => 2048,
                         'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
                     ]
                 );
@@ -125,7 +124,6 @@ class CreditCardController extends Controller
 
             return redirect()->route('admin.credit-cards.index')
                 ->with('success', 'Credit Card updated successfully!');
-                dd(1);
 
         } catch (\Exception $e) {
             return redirect()->back()
