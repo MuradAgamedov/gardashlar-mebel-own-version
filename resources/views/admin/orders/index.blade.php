@@ -2,7 +2,6 @@
 
 @section('title', 'Orders Management')
 
-@section('content')
 <div class="page-body">
     <div class="container-fluid">
         <h3 class="mb-4">Orders</h3>
@@ -18,57 +17,60 @@
                     <th>Products</th>
                     <th>Status</th>
                     <th>Payment Status</th>
+                    <th>Credit Card</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($orders as $order)
-                <tr>
-                    <td>{{ $order->id }}</td>
-                    <td>{{ $order->full_name }}</td>
-                    <td>{{ $order->phone }}</td>
-                    <td>{{ $order->email }}</td>
-                    <td>{{ $order->city }}</td>
-                    <td>
-                        @php
-                            $productIds = json_decode($order->product_ids ?? '[]', true);
-                            $products = \App\Models\Product::whereIn('id', $productIds)->with('translates')->get();
-                        @endphp
-                        @if($products->count() > 0)
-                            <ul class="list-unstyled mb-0">
-                                @foreach($products as $product)
-                                    <li>{{ $product->translate()?->title ?? 'Unknown Product' }}</li>
-                                @endforeach
-                            </ul>
-                        @else
-                            <span>—</span>
-                        @endif
-                    </td>
-                    <td><span class="badge bg-info">{{ $order->status }}</span></td>
-                    <td><span class="badge bg-success">{{ $order->payment_status }}</span></td>
-                    <td>
-                        <button 
-                            class="btn btn-sm btn-primary show-order"
-                            data-id="{{ $order->id }}"
-                            data-full_name="{{ $order->full_name }}"
-                            data-phone="{{ $order->phone }}"
-                            data-email="{{ $order->email }}"
-                            data-city="{{ $order->city }}"
-                            data-status="{{ $order->status }}"
-                            data-delivery_method="{{ $order->delivery_method }}"
-                            data-payment_method="{{ $order->payment_method }}"
-                            data-selected_card="{{ $order->selected_card }}"
-                            data-month="{{ $order->month }}"
-                            data-monthly_price="{{ $order->monthly_price }}"
-                            data-amount="{{ $order->amount }}"
-                            data-address="{{ $order->address }}"
-                            data-text="{{ $order->text }}"
-                            data-product="{{ $products->first() ? ($products->first()->translate()?->title ?? 'Unknown Product') : '—' }}"
-                        >
-                            Show
-                        </button>
-                    </td>
-                </tr>
+                    @php
+                        $productIds = json_decode($order->product_ids ?? '[]', true);
+                        $products = \App\Models\Product::whereIn('id', $productIds)->with('translates')->get();
+                        $order->load('creditCard');
+                    @endphp
+                    <tr>
+                        <td>{{ $order->id }}</td>
+                        <td>{{ $order->full_name }}</td>
+                        <td>{{ $order->phone }}</td>
+                        <td>{{ $order->email }}</td>
+                        <td>{{ $order->city }}</td>
+                        <td>
+                            @if($products->count() > 0)
+                                <ul class="list-unstyled mb-0">
+                                    @foreach($products as $product)
+                                        <li>{{ $product->translate()?->title ?? 'Unknown Product' }}</li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <span>—</span>
+                            @endif
+                        </td>
+                        <td><span class="badge bg-info">{{ $order->status }}</span></td>
+                        <td><span class="badge bg-success">{{ $order->payment_status }}</span></td>
+                        <td>{{ $order->creditCard ? $order->creditCard->title . ' (' . $order->creditCard->card_number . ')' : '—' }}</td>
+                        <td>
+                            <button 
+                                class="btn btn-sm btn-primary show-order"
+                                data-id="{{ $order->id }}"
+                                data-full_name="{{ $order->full_name }}"
+                                data-phone="{{ $order->phone }}"
+                                data-email="{{ $order->email }}"
+                                data-city="{{ $order->city }}"
+                                data-status="{{ $order->status }}"
+                                data-delivery_method="{{ $order->delivery_method }}"
+                                data-payment_method="{{ $order->payment_method }}"
+                                data-selected_card="{{ $order->creditCard ? $order->creditCard->title . ' (' . $order->creditCard->card_number . ')' : '—' }}"
+                                data-month="{{ $order->month }}"
+                                data-monthly_price="{{ $order->monthly_price }}"
+                                data-amount="{{ $order->amount }}"
+                                data-address="{{ $order->address }}"
+                                data-text="{{ $order->text }}"
+                                data-product="{{ $products->first() ? ($products->first()->translate()?->title ?? 'Unknown Product') : '—' }}"
+                            >
+                                Show
+                            </button>
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
@@ -82,7 +84,7 @@
 <!-- Modal -->
 <div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content">
+{{ ... }}
       <div class="modal-header">
         <h5 class="modal-title">Order Details</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

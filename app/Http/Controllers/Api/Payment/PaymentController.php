@@ -314,7 +314,6 @@ class PaymentController extends Controller
                     'month',
                     'monthly_price',
                     'amount',
-                    'status',
          
                 ])
                 ->firstOrFail();
