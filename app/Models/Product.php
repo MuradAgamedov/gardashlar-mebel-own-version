@@ -15,6 +15,7 @@ class Product extends Model
         'order',
         'status',
         'price',
+        'product_ids',
         'discount_price', // əlavə edildi
     ];
     

@@ -219,7 +219,7 @@ class PaymentController extends Controller
                 : $data['amount'];
 
             $userId = optional($request->user())->id;
-            dd($data);
+            
             if (!empty($data['order_id'])) {
                 $order = Order::where('order_id', $data['order_id'])->firstOrFail();
                 $order->update([
