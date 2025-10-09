@@ -51,7 +51,6 @@
                             <h5>Images for: {{ $product->translate()->title ?? 'No title' }}</h5>
                             <a href="{{ route('admin.products.images.create', $product) }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Upload Images
                             </a>
                         </div>
                     </div>
@@ -196,7 +195,6 @@
                                     <p>Upload images for this product to get started.</p>
                                     <a href="{{ route('admin.products.images.create', $product) }}" class="btn btn-primary">
                                         <i class="material-icons-outlined">upload</i>
-                                        Upload First Image
                                     </a>
                                 </div>
                             </div>
