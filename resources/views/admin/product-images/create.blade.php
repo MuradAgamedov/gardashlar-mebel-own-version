@@ -131,7 +131,6 @@
                                         </button>
                                         <a href="{{ route('admin.products.images.index', $product) }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">arrow_back</i>
-                                            Back to List
                                         </a>
                                     </div>
                                 </div>
