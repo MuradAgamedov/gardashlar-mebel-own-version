@@ -11,7 +11,7 @@ class Order extends Model
 
     protected $fillable = [
         'user_id',
-        'products_id', // 🔹 əlavə olundu
+        'product_ids', // 🔹 əlavə olundu
         'full_name',
         'phone',
         'email',
