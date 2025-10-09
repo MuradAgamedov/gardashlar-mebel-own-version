@@ -54,7 +54,7 @@
         <a href="{{ route('admin.products.images.create', $product) }}" class="btn btn-primary">
             <i class="material-icons-outlined">add</i>
         </a>
-        <a href="{{ route('admin.products.images.index', $product) }}" class="btn btn-secondary">
+        <a href="{{ route('admin.products.index', $product) }}" class="btn btn-secondary">
             <i class="material-icons-outlined">arrow_back</i>
         </a>
     </div>
