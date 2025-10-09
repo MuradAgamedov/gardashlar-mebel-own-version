@@ -165,12 +165,12 @@
                                                         @if($product->tags->count() > 0)
                                                             <div class="mt-1">
                                                                 @foreach($product->tags->take(3) as $tag)
-                                                                    <span class="badge bg-light text-dark me-1" style="font-size: 10px;">
+                                                                    <span style="color: black" class="badge bg-light text-dark me-1" style="font-size: 10px;">
                                                                         {{ $tag->translate()->title ?? 'No title' }}
                                                                     </span>
                                                                 @endforeach
                                                                 @if($product->tags->count() > 3)
-                                                                    <span class="badge bg-secondary" style="font-size: 10px;">
+                                                                    <span style="color: black" class="badge bg-secondary" style="font-size: 10px;">
                                                                         +{{ $product->tags->count() - 3 }}
                                                                     </span>
                                                                 @endif
