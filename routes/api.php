@@ -267,6 +267,10 @@ Route::get('/site-usage-rules', [SiteUsageRulesController::class, 'index'])->nam
 
 // Suggestions API Routes
 Route::get('/suggestions', [SuggestionController::class, 'index'])->name('api.suggestions.index');
+
+// Credit Cards API Routes
+Route::get('/credit-cards', [\App\Http\Controllers\Api\CreditCardController::class, 'index']);
+Route::get('/credit-cards/{id}', [\App\Http\Controllers\Api\CreditCardController::class, 'show']);
 Route::get('/suggestions/{id}', [SuggestionController::class, 'show'])->name('api.suggestions.show');
 
 // Products API Routes
