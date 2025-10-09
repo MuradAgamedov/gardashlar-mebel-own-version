@@ -7,16 +7,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\Order;
+use App\Models\CreditCard;
 use App\Traits\LocaleFromHeader;
-use App\Helpers\PaymentLoginHelper; // 🔹 UnitedPayment helper (auth ilə göndərmək üçün)
+use App\Helpers\PaymentLoginHelper;
 
 class PaymentController extends Controller
 {
     use LocaleFromHeader;
 
-    /**
-     * Payment və Delivery üçün map-lar
-     */
     private array $paymentMethods = [
         1 => 'cash',
         2 => 'online',
@@ -106,7 +104,6 @@ class PaymentController extends Controller
         $lang = $data['language'] ?? 'EN';
         $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
 
-        // 🔹 Order yaradılır (pending, unpaid)
         $order = Order::create([
             'user_id'        => $request->user()->id ?? null,
             'full_name'      => $data['full_name'],
@@ -163,7 +160,6 @@ class PaymentController extends Controller
 
         $order = Order::findOrFail($data['order_id']);
 
-        // Əgər payment_method bazada stringdirsə yoxla
         $methodInt = is_numeric($order->payment_method)
             ? (int)$order->payment_method
             : array_search($order->payment_method, $this->paymentMethods);
@@ -179,69 +175,6 @@ class PaymentController extends Controller
                 'message' => 'Uyğun ödəniş metodu tapılmadı',
             ], 400),
         };
-    }
-
-    /**
-     * 🔹 Success nəticəsi
-     */
-    public function success(Request $request)
-    {
-        $orderId = $request->query('order_id');
-        $order = Order::find($orderId);
-
-        if ($order) {
-            $order->update([
-                'status' => 'completed',
-                'payment_status' => 'paid',
-            ]);
-        }
-
-        $data = $this->decodeUp($request->query('up'));
-        Log::info('Payment Success', ['order_id' => $orderId, 'data' => $data]);
-
-        return view('payment.success', compact('order', 'data'));
-    }
-
-    /**
-     * 🔹 Cancel nəticəsi
-     */
-    public function cancel(Request $request)
-    {
-        $orderId = $request->query('order_id');
-        $order = Order::find($orderId);
-
-        if ($order) {
-            $order->update([
-                'status' => 'cancelled',
-                'payment_status' => 'unpaid',
-            ]);
-        }
-
-        $data = $this->decodeUp($request->query('up'));
-        Log::info('Payment Cancel', ['order_id' => $orderId, 'data' => $data]);
-
-        return view('payment.cancel', compact('order', 'data'));
-    }
-
-    /**
-     * 🔹 Decline nəticəsi
-     */
-    public function decline(Request $request)
-    {
-        $orderId = $request->query('order_id');
-        $order = Order::find($orderId);
-
-        if ($order) {
-            $order->update([
-                'status' => 'failed',
-                'payment_status' => 'failed',
-            ]);
-        }
-
-        $data = $this->decodeUp($request->query('up'));
-        Log::info('Payment Decline', ['order_id' => $orderId, 'data' => $data]);
-
-        return view('payment.decline', compact('order', 'data'));
     }
 
     /**
@@ -264,11 +197,18 @@ class PaymentController extends Controller
                 'language'        => 'nullable|in:AZ,EN,RU',
                 'delivery_method' => 'required|integer|in:' . implode(',', array_keys($this->deliveryMethods)),
                 'payment_method'  => 'required|integer|in:' . implode(',', array_keys($this->paymentMethods)),
-                'selected_card'   => 'nullable|string|max:255',
+                'selected_card'   => 'nullable|integer|exists:credit_cards,id',
             ]);
 
             $deliveryMethodName = $this->deliveryMethods[$data['delivery_method']];
             $paymentMethodName  = $this->paymentMethods[$data['payment_method']];
+
+            // 🔹 Kredit kartın adını tapırıq
+            $cardTitle = null;
+            if (!empty($data['selected_card'])) {
+                $card = CreditCard::find($data['selected_card']);
+                $cardTitle = $card?->title;
+            }
 
             $monthlyPrice = isset($data['months']) && $data['months'] > 0
                 ? ($data['amount'] / $data['months'])
@@ -287,7 +227,7 @@ class PaymentController extends Controller
                     'address'         => $data['address'] ?? null,
                     'delivery_method' => $deliveryMethodName,
                     'payment_method'  => $paymentMethodName,
-                    'selected_card'   => $data['selected_card'] ?? null,
+                    'selected_card'   => $cardTitle,
                     'month'           => $data['months'],
                     'monthly_price'   => $monthlyPrice,
                     'status'          => 'temporary',
@@ -306,7 +246,7 @@ class PaymentController extends Controller
                     'order_id'        => strtoupper(Str::random(12)),
                     'delivery_method' => $deliveryMethodName,
                     'payment_method'  => $paymentMethodName,
-                    'selected_card'   => $data['selected_card'] ?? null,
+                    'selected_card'   => $cardTitle,
                     'month'           => $data['months'],
                     'monthly_price'   => $monthlyPrice,
                     'status'          => 'temporary',
@@ -322,6 +262,7 @@ class PaymentController extends Controller
                     'order_id' => $order->id,
                     'payment_method' => $paymentMethodName,
                     'delivery_method' => $deliveryMethodName,
+                    'selected_card' => $cardTitle,
                 ]
             ], 201);
 
