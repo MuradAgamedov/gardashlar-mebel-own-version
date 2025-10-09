@@ -288,7 +288,7 @@ class PaymentController extends Controller
             ]);
             return response()->json([
                 'success' => false,
-                'message' => 'Müvəqqəti sifariş yaradılarkən xəta baş verdi',
+                'message' => $e->getMessage(),
             ], 500);
         }
 
