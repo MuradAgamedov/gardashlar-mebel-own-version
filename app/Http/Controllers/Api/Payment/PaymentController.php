@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Models\Order;
 use App\Models\CreditCard;
+use App\Models\Product;
 use App\Traits\LocaleFromHeader;
 use App\Helpers\PaymentLoginHelper;
-use App\Models\Product;
 
 class PaymentController extends Controller
 {
@@ -28,7 +28,7 @@ class PaymentController extends Controller
     ];
 
     /**
-     * 🔹 Nağd ödəniş (yerində)
+     * 🔹 Nağd ödəniş
      */
     public function startCash(Request $request)
     {
@@ -46,77 +46,37 @@ class PaymentController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Nağd ödəniş uğurla təsdiqləndi',
+            'message' => 'Nağd ödəniş təsdiqləndi',
             'data' => [
                 'order_id' => $order->id,
                 'order_number' => $order->order_id,
-                'payment_status' => 'pending',
                 'status' => 'processing',
+                'payment_status' => 'pending',
             ]
         ]);
     }
 
     /**
-     * 🔹 Kredit (taksit) ödənişi
-     */
-    public function startInstallment(Request $request)
-    {
-        $data = $request->validate([
-            'order_id' => 'required|exists:orders,id',
-        ]);
-
-        $order = Order::findOrFail($data['order_id']);
-
-        $order->update([
-            'payment_method' => 'installment',
-            'payment_status' => 'pending',
-            'status' => 'processing',
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Kredit ödənişi uğurla təsdiqləndi',
-            'data' => [
-                'order_id' => $order->id,
-                'order_number' => $order->order_id,
-                'payment_status' => 'pending',
-                'status' => 'processing',
-                'cancelUrl' => route('payment.cancel', ['order_id' => $order->id], true),
-                'declineUrl' => route('payment.decline', ['order_id' => $order->id], true),
-            ]
-        ]);
-    }
-
-    /**
-     * 🔹 Online ödəniş (United Payment API vasitəsilə)
+     * 🔹 Online ödəniş (mövcud sifarişlə)
      */
     public function startOnline(Request $request)
     {
         $data = $request->validate([
-            'full_name'       => 'required|string|max:255',
-            'phone'           => 'required|string|max:50',
-            'email'           => 'required|email|max:255',
-            'city'            => 'required|string|max:255',
-            'amount'          => 'required|numeric|min:1',
-            'member_id'       => 'required|string',
-            'language'        => 'nullable|in:AZ,EN,RU',
+            'order_id'  => 'required|exists:orders,id',
+            'amount'    => 'required|numeric|min:1',
+            'member_id' => 'required|string',
+            'language'  => 'nullable|in:AZ,EN,RU',
         ]);
 
+        $order = Order::findOrFail($data['order_id']);
         $lang = $data['language'] ?? 'EN';
         $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
 
-        $order = Order::create([
-            'user_id'        => $request->user()->id ?? null,
-            'full_name'      => $data['full_name'],
-            'phone'          => $data['phone'],
-            'email'          => $data['email'],
-            'city'           => $data['city'],
-            'order_id'       => strtoupper(Str::random(12)),
-            'delivery_method'=> 'delivery',
+        $order->update([
             'payment_method' => 'online',
+            'payment_status' => 'pending',
+            'status'         => 'processing',
             'selected_card'  => $data['member_id'],
-            'status'         => 'pending',
-            'payment_status' => 'unpaid',
         ]);
 
         $payload = [
@@ -128,11 +88,11 @@ class PaymentController extends Controller
             'declineUrl' => route('payment.decline', ['order_id' => $order->id], true),
         ];
 
-        $response = PaymentLoginHelper::withAuth()->post($baseUrl . '/transactions/pay', $payload);
+        $response = PaymentLoginHelper::withAuth()->post($baseUrl.'/transactions/pay', $payload);
 
         if ($response->successful()) {
             $body = $response->json();
-            $redirectUrl = is_array($body) ? ($body['url'] ?? null) : (string) $response->body();
+            $redirectUrl = $body['url'] ?? null;
 
             if ($redirectUrl) {
                 return response()->json([
@@ -151,6 +111,64 @@ class PaymentController extends Controller
     }
 
     /**
+     * 🔹 Kredit (taksit) ödənişi
+     */
+    public function startInstallment(Request $request)
+    {
+        $data = $request->validate([
+            'order_id'   => 'required|exists:orders,id',
+            'amount'     => 'required|numeric|min:1',
+            'months'     => 'required|in:2,3,6,9,12',
+            'member_id'  => 'required|string',
+            'language'   => 'nullable|in:AZ,EN,RU',
+        ]);
+
+        $order = Order::findOrFail($data['order_id']);
+        $lang = $data['language'] ?? 'EN';
+        $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
+
+        $order->update([
+            'payment_method' => 'installment',
+            'payment_status' => 'pending',
+            'status'         => 'processing',
+            'selected_card'  => $data['member_id'],
+            'month'          => $data['months'],
+            'monthly_price'  => $data['amount'] / $data['months'],
+        ]);
+
+        $payload = [
+            'amount'      => (float) $data['amount'],
+            'memberId'    => $data['member_id'],
+            'language'    => $lang,
+            'installment' => (int) $data['months'],
+            'successUrl'  => route('payment.success', ['order_id' => $order->id], true),
+            'cancelUrl'   => route('payment.cancel', ['order_id' => $order->id], true),
+            'declineUrl'  => route('payment.decline', ['order_id' => $order->id], true),
+        ];
+
+        $response = PaymentLoginHelper::withAuth()->post($baseUrl.'/transactions/taksit', $payload);
+
+        if ($response->successful()) {
+            $body = $response->json();
+            $redirectUrl = $body['url'] ?? null;
+
+            if ($redirectUrl) {
+                return response()->json([
+                    'success' => true,
+                    'redirect_url' => $redirectUrl,
+                    'order_id' => $order->id,
+                ]);
+            }
+
+            Log::error('Installment: URL not found', ['body' => $response->body()]);
+            return response()->json(['success' => false, 'message' => 'Ödəniş linki tapılmadı'], 422);
+        }
+
+        Log::error('Installment failed', ['body' => $response->body()]);
+        return response()->json(['success' => false, 'message' => 'Ödəniş sorğusu uğursuz oldu'], 500);
+    }
+
+    /**
      * 🔹 payment_method-ə görə yönləndirmə
      */
     public function pay(Request $request)
@@ -160,17 +178,14 @@ class PaymentController extends Controller
         ]);
 
         $order = Order::findOrFail($data['order_id']);
-
-        $methodInt = is_numeric($order->payment_method)
-            ? (int)$order->payment_method
-            : array_search($order->payment_method, $this->paymentMethods);
-
-        $method = $this->paymentMethods[$methodInt] ?? $order->payment_method;
+        $method = is_numeric($order->payment_method)
+            ? $this->paymentMethods[(int)$order->payment_method]
+            : $order->payment_method;
 
         return match ($method) {
-            'cash' => $this->startCash($request),
+            'cash'        => $this->startCash($request),
+            'online'      => $this->startOnline($request),
             'installment' => $this->startInstallment($request),
-            'online' => $this->startOnline($request),
             default => response()->json([
                 'success' => false,
                 'message' => 'Uyğun ödəniş metodu tapılmadı',
@@ -179,7 +194,7 @@ class PaymentController extends Controller
     }
 
     /**
-     * 🔹 Müvəqqəti sifariş yaradılması
+     * 🔹 Müvəqqəti sifariş yaradılması (eyni qalır)
      */
     public function createTemporaryOrder(Request $request)
     {
@@ -204,7 +219,6 @@ class PaymentController extends Controller
             $deliveryMethodName = $this->deliveryMethods[$data['delivery_method']];
             $paymentMethodName  = $this->paymentMethods[$data['payment_method']];
 
-            // 🔹 Kredit kartın adını tapırıq
             $cardTitle = null;
             if (!empty($data['selected_card'])) {
                 $card = CreditCard::find($data['selected_card']);
@@ -290,17 +304,16 @@ class PaymentController extends Controller
      */
     private function decodeUp(?string $base64): array
     {
-        if (!$base64) {
-            return [];
-        }
+        if (!$base64) return [];
         try {
             $json = base64_decode($base64, true);
             return json_decode($json, true) ?: [];
         } catch (\Throwable $e) {
-            Log::error('UP decode error: ' . $e->getMessage());
+            Log::error('UP decode error: '.$e->getMessage());
             return [];
         }
     }
+
 
     public function getProducts(Request $request)
     {
@@ -400,5 +413,4 @@ class PaymentController extends Controller
             ], 500);
         }
     }
-
 }
