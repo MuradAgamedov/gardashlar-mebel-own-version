@@ -210,10 +210,10 @@ class PaymentController extends Controller
             $paymentMethodName  = $this->paymentMethods[$data['payment_method']];
     
             // Kredit kartın adı (əgər varsa)
-            $cardTitle = null;
+            $cardId = null;
             if (!empty($data['selected_card'])) {
                 $card = CreditCard::find($data['selected_card']);
-                $cardTitle = $card?->title;
+                $cardId = $card?->id;
             }
     
             // Aylıq məbləğ hesablanır, əgər months gəlməyibsə null olacaq
@@ -233,7 +233,7 @@ class PaymentController extends Controller
                     'address'         => $data['address'] ?? null,
                     'delivery_method' => $deliveryMethodName,
                     'payment_method'  => $paymentMethodName,
-                    'selected_card'   => $cardTitle,
+                    'selected_card'   => $cardId,
                     'month'           => $monthValue,           // 👈 burda null da yaza bilər
                     'monthly_price'   => $monthlyPrice,
                     'amount'          => $data['amount'],
@@ -254,7 +254,7 @@ class PaymentController extends Controller
                     'order_id'        => strtoupper(Str::random(12)),
                     'delivery_method' => $deliveryMethodName,
                     'payment_method'  => $paymentMethodName,
-                    'selected_card'   => $cardTitle,
+                    'selected_card'   => $cardId,
                     'month'           => $monthValue,           // 👈 burada da null ola bilər
                     'monthly_price'   => $monthlyPrice,
                     'amount'          => $data['amount'],
