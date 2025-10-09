@@ -39,12 +39,14 @@ class CreditCardController extends Controller
      */
     public function store(Request $request)
     {
+
+        dd(1);
         $request->validate([
             'title'  => 'required|string|max:255',
             'months' => 'nullable|string|max:255',
             'image'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
         ]);
-        dd(1);
+       
         try {
             $imagePath = null;
             if ($request->hasFile('image')) {
