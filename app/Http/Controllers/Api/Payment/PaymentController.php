@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Illuminate\Support\Product;
+use App\Models\Product;
 
 use App\Models\Order;
 use App\Models\CreditCard;
