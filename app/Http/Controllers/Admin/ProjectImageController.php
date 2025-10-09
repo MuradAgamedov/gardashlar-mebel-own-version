@@ -5,17 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectImage;
+use App\Repositories\ProjectImageRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
-use App\Services\ImageService;
+use Illuminate\Support\Facades\Log;
 
 class ProjectImageController extends Controller
 {
-    protected $imageService;
-    public function __construct(ImageService $imageService)
+    protected $repository;
+     
+    public function __construct(ProjectImageRepository $repository)
     {
-        $this->imageService = $imageService;
+        $this->repository = $repository;
     }
 
     /**
@@ -23,16 +23,8 @@ class ProjectImageController extends Controller
      */
     public function index(Project $project)
     {
-        $images = $project->images()->orderBy('order')->get();
+        $images = $this->repository->getOrderedImages($project->id);
         return view('admin.project-images.index', compact('project', 'images'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(Project $project)
-    {
-        return view('admin.project-images.create', compact('project'));
     }
 
     /**
@@ -40,43 +32,16 @@ class ProjectImageController extends Controller
      */
     public function store(Request $request, Project $project)
     {
-        $validator = Validator::make($request->all(), [
-            'images' => 'required|array|min:1|max:100',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
         try {
             $uploadedImages = [];
             $errors = [];
 
-            // Get max order
-            $maxOrder = $project->images()->max('order') ?? 0;
-
-            // Handle multiple image uploads
             if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $index => $image) {
-                    try {
-                        $imagePath = $this->imageService->upload($image, 'projects');
-                        
-                        $projectImage = $project->images()->create([
-                            'image' => $imagePath,
-                            'is_main_image' => false, // Always false for new images
-                            'order' => $maxOrder + $index + 1,
-                            'status' => $request->boolean('status', true),
-                        ]);
-
-                        $uploadedImages[] = $projectImage;
-                    } catch (\Exception $e) {
-                        $errors[] = "Error uploading image " . ($index + 1) . ": " . $e->getMessage();
-                        \Log::error('Error uploading project image ' . ($index + 1) . ': ' . $e->getMessage());
-                    }
-                }
+                $uploadedImages = $this->repository->createImages(
+                    $project->id,
+                    $request->file('images'),
+                    $request->boolean('status', true)
+                );
             }
 
             if (count($uploadedImages) > 0) {
@@ -90,24 +55,15 @@ class ProjectImageController extends Controller
                     ->with('upload_errors', $errors);
             } else {
                 return redirect()->back()
-                    ->with('error', 'No images were uploaded successfully. ' . implode(' ', $errors))
+                    ->with('error', 'No images were uploaded successfully.')
                     ->withInput();
             }
-
         } catch (\Exception $e) {
-            \Log::error('Error creating project images: ' . $e->getMessage());
+            Log::error('Error creating project images: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Error creating images: ' . $e->getMessage())
                 ->withInput();
         }
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Project $project, ProjectImage $image)
-    {
-        return view('admin.project-images.show', compact('project', 'image'));
     }
 
     /**
@@ -123,39 +79,19 @@ class ProjectImageController extends Controller
      */
     public function update(Request $request, Project $project, ProjectImage $image)
     {
-        $validator = Validator::make($request->all(), [
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
         try {
             $data = [
                 'status' => $request->boolean('status', true),
             ];
 
-            // Handle image upload if new image is provided
-            if ($request->hasFile('image')) {
-                if ($image->image) {
-                    $this->imageService->delete($image->image);
-                }
-                $imagePath = $this->imageService->upload($request->file('image'), 'projects');
-                $data['image'] = $imagePath;
-            }
-
-
-
-            $image->update($data);
+            $newImage = $request->hasFile('image') ? $request->file('image') : null;
+            $this->repository->updateImage($image, $data, $newImage);
 
             return redirect()->route('admin.projects.images.index', $project)
                 ->with('success', 'Image updated successfully!');
 
         } catch (\Exception $e) {
-            \Log::error('Error updating project image: ' . $e->getMessage());
+            Log::error('Error updating project image: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Error updating image: ' . $e->getMessage())
                 ->withInput();
@@ -168,17 +104,13 @@ class ProjectImageController extends Controller
     public function destroy(Project $project, ProjectImage $image)
     {
         try {
-            if ($image->image) {
-                $this->imageService->delete($image->image);
-            }
-
-            $image->delete();
+            $this->repository->deleteImage($image);
 
             return redirect()->route('admin.projects.images.index', $project)
                 ->with('success', 'Image deleted successfully!');
 
         } catch (\Exception $e) {
-            \Log::error('Error deleting project image: ' . $e->getMessage());
+            Log::error('Error deleting project image: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Error deleting image: ' . $e->getMessage());
         }
@@ -190,17 +122,13 @@ class ProjectImageController extends Controller
     public function setMainImage(Project $project, ProjectImage $image)
     {
         try {
-            // Unmark all other images as main
-            $project->images()->update(['is_main_image' => false]);
-            
-            // Mark this image as main
-            $image->update(['is_main_image' => true]);
+            $this->repository->setMainImage($project->id, $image->id);
 
             return redirect()->route('admin.projects.images.index', $project)
                 ->with('success', 'Main image updated successfully!');
 
         } catch (\Exception $e) {
-            \Log::error('Error setting main image: ' . $e->getMessage());
+            Log::error('Error setting main image: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Error setting main image: ' . $e->getMessage());
         }
@@ -217,26 +145,18 @@ class ProjectImageController extends Controller
                 'items.*' => 'required|integer|exists:project_images,id'
             ]);
 
-            $items = $request->input('items', []);
-            
-            // Verify all images belong to this project
-            $projectImageIds = $project->images()->pluck('id')->toArray();
-            $validItems = array_intersect($items, $projectImageIds);
-            
-            if (count($validItems) !== count($items)) {
+            $success = $this->repository->reorderImages($project->id, $request->input('items', []));
+
+            if (!$success) {
                 return response()->json([
                     'success' => false, 
                     'message' => 'Some images do not belong to this project'
                 ]);
             }
-            
-            foreach ($validItems as $index => $itemId) {
-                $project->images()->where('id', $itemId)->update(['order' => $index + 1]);
-            }
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            \Log::error('Error reordering project images: ' . $e->getMessage());
+            Log::error('Error reordering project images: ' . $e->getMessage());
             return response()->json([
                 'success' => false, 
                 'message' => 'Error reordering images: ' . $e->getMessage()

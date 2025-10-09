@@ -198,7 +198,7 @@ class PaymentController extends Controller
                 'address'         => 'nullable|string',
                 'amount'          => 'nullable|numeric|min:1',
                 'months'          => 'nullable|in:2,3,6,9,12',
-                'language'        => 'nullable|in:AZ,EN,RU',
+                'language'        => 'nullable|in:az,en,ru',
                 'delivery_method' => 'required|integer|in:' . implode(',', array_keys($this->deliveryMethods)),
                 'payment_method'  => 'required|integer|in:' . implode(',', array_keys($this->paymentMethods)),
                 'selected_card'   => 'nullable|integer|exists:credit_cards,id',

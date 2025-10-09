@@ -12,16 +12,18 @@ use Illuminate\Http\Request;
 
 class ProductDetailsValuesDetailController extends Controller
 {
+    protected $repository;
+
+    public function __construct(ProductDetailsValuesDetailRepository $repository)
+    {
+        $this->repository = $repository;
+    }
     /**
      * Display a listing of the resource.
      */
     public function index(Product $product, ProductDetailValue $detailValue)
     {
-        $details = ProductDetailsValuesDetail::with(['translates.language'])
-            ->where('product_detail_value_id', $detailValue->id)
-            ->ordered()
-            ->get();
-            
+        $details = $this->repository->getDetailsByValueId($detailValue->id);
         return view('admin.product-details-values-details.index', compact('product', 'detailValue', 'details'));
     }
 

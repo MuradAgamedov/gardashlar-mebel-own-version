@@ -5,17 +5,25 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectVideo;
+use App\Repositories\ProjectVideoRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class ProjectVideoController extends Controller
 {
+    protected $repository;
+
+    public function __construct(ProjectVideoRepository $repository)
+    {
+        $this->repository = $repository;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Project $project)
     {
-        $videos = $project->videos()->ordered()->get();
+        $videos = $this->repository->getVideosByProject($project->id);
         return view('admin.project-videos.index', compact('project', 'videos'));
     }
 
@@ -38,8 +46,7 @@ class ProjectVideoController extends Controller
         ]);
 
         try {
-            ProjectVideo::create([
-                'project_id' => $project->id,
+            $this->repository->createVideo($project->id, [
                 'video_link' => $request->video_link,
                 'status' => $request->input('status', false),
             ]);
@@ -74,7 +81,7 @@ class ProjectVideoController extends Controller
         ]);
 
         try {
-            $video->update([
+            $this->repository->updateVideo($video, [
                 'video_link' => $request->video_link,
                 'status' => $request->input('status', false),
             ]);
@@ -96,7 +103,7 @@ class ProjectVideoController extends Controller
     public function destroy(Project $project, ProjectVideo $video)
     {
         try {
-            $video->delete();
+            $this->repository->deleteVideo($video);
             return redirect()->route('admin.projects.videos.index', $project)
                 ->with('success', 'Video deleted successfully.');
         } catch (\Exception $e) {
@@ -116,14 +123,11 @@ class ProjectVideoController extends Controller
         ]);
 
         try {
-            foreach ($request->items as $index => $id) {
-                ProjectVideo::where('id', $id)->update(['order' => $index + 1]);
-            }
-
+            $this->repository->reorderVideos($request->items);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             Log::error('Error reordering project videos: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Error reordering videos'], 500);
         }
     }
-} 
+}

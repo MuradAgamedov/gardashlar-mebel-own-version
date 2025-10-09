@@ -5,28 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductDetailValue;
-use App\Models\ProductDetailValueTranslate;
 use App\Models\Language;
+use App\Repositories\ProductDetailValueRepository;
 use Illuminate\Http\Request;
 
 class ProductDetailValueController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Product $product)
-    {
-        $detailValues = ProductDetailValue::with(['translates.language'])->where('product_id', $product->id)->ordered()->get();
-        return view('admin.product-detail-values.index', compact('product', 'detailValues'));
-    }
+    protected $repository;
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(Product $product)
+    public function __construct(ProductDetailValueRepository $repository)
     {
-        $languages = Language::all();
-        return view('admin.product-detail-values.create', compact('product', 'languages'));
+        $this->repository = $repository;
     }
 
     /**
@@ -40,33 +29,10 @@ class ProductDetailValueController extends Controller
             'translates.*.keyword' => 'required|string|max:255',
         ]);
 
-        // Create product detail value
-        $productDetailValue = ProductDetailValue::create([
-            'product_id' => $product->id,
-            'order' => ProductDetailValue::where('product_id', $product->id)->max('order') + 1
-        ]);
-
-        // Create translations
-        foreach ($request->translates as $translate) {
-            ProductDetailValueTranslate::create([
-                'product_detail_value_id' => $productDetailValue->id,
-                'language_id' => $translate['language_id'],
-                'keyword' => $translate['keyword'],
-            ]);
-        }
+        $this->repository->createValue($request->all(), $product->id);
 
         return redirect()->route('admin.products.detail-values.index', $product)
             ->with('success', 'Product detail value created successfully.');
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Product $product, ProductDetailValue $detailValue)
-    {
-        $languages = Language::all();
-        $detailValue->load(['translates.language']);
-        return view('admin.product-detail-values.edit', compact('product', 'detailValue', 'languages'));
     }
 
     /**
@@ -80,17 +46,7 @@ class ProductDetailValueController extends Controller
             'translates.*.keyword' => 'required|string|max:255',
         ]);
 
-        // Delete existing translations
-        $detailValue->translates()->delete();
-
-        // Create new translations
-        foreach ($request->translates as $translate) {
-            ProductDetailValueTranslate::create([
-                'product_detail_value_id' => $detailValue->id,
-                'language_id' => $translate['language_id'],
-                'keyword' => $translate['keyword'],
-            ]);
-        }
+        $this->repository->updateValue($detailValue, $request->all());
 
         return redirect()->route('admin.products.detail-values.index', $product)
             ->with('success', 'Product detail value updated successfully.');
@@ -101,8 +57,7 @@ class ProductDetailValueController extends Controller
      */
     public function destroy(Product $product, ProductDetailValue $detailValue)
     {
-        $detailValue->translates()->delete();
-        $detailValue->delete();
+        $this->repository->deleteValue($detailValue);
 
         return redirect()->route('admin.products.detail-values.index', $product)
             ->with('success', 'Product detail value deleted successfully.');
@@ -118,9 +73,7 @@ class ProductDetailValueController extends Controller
             'items.*' => 'exists:product_detail_values,id'
         ]);
 
-        foreach ($request->items as $index => $id) {
-            ProductDetailValue::where('id', $id)->update(['order' => $index + 1]);
-        }
+        $this->repository->reorder($request->items);
 
         return response()->json(['success' => true]);
     }
@@ -136,17 +89,18 @@ class ProductDetailValueController extends Controller
                 'ids.*' => 'exists:product_detail_values,id'
             ]);
 
-            $detailValues = ProductDetailValue::whereIn('id', $request->ids)->get();
-            
-            foreach ($detailValues as $detailValue) {
-                $detailValue->translates()->delete();
-                $detailValue->delete();
-            }
+            $this->repository->bulkDelete($request->ids);
 
-            return response()->json(['success' => true, 'message' => 'Selected detail values deleted successfully']);
+            return response()->json([
+                'success' => true, 
+                'message' => 'Selected detail values deleted successfully'
+            ]);
         } catch (\Exception $e) {
             \Log::error('Bulk delete error: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Error occurred while deleting: ' . $e->getMessage()], 500);
+            return response()->json([
+                'success' => false, 
+                'message' => 'Error occurred while deleting: ' . $e->getMessage()
+            ], 500);
         }
     }
 }
