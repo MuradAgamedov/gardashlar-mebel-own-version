@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Api\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Enums\DeliveryMethod;
+use App\Enums\PaymentMethod;
 use Illuminate\Http\Request;
-use App\Helpers\PaymentLoginHelper;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Order;
 use App\Traits\LocaleFromHeader;
-use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
@@ -162,13 +163,17 @@ class PaymentController extends Controller
                 'amount'          => 'required|numeric|min:1',
                 'months'          => 'required|in:2,3,6,9,12',
                 'language'        => 'nullable|in:AZ,EN,RU',
-                'delivery_method' => 'required|in:delivery,pickup',
-                'payment_method'  => 'required|in:card,cash,installment',
+                'delivery_method' => 'required|integer|in:'.implode(',', array_column(DeliveryMethod::cases(), 'value')),
+                'payment_method' => 'required|integer|in:'.implode(',', array_column(PaymentMethod::cases(), 'value')),
                 'selected_card'   => 'nullable|string|max:255',
             ]);
 
             // Calculate monthly price
             $monthlyPrice = $data['amount'] / $data['months'];
+
+            // Convert to enum instances
+            $deliveryMethod = DeliveryMethod::from($data['delivery_method']);
+            $paymentMethod = PaymentMethod::from($data['payment_method']);
 
             // Get user ID and generate memberId if token exists
             $userId = null;
