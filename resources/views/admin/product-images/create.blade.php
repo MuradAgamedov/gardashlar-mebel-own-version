@@ -127,7 +127,6 @@
                                     <div class="d-flex gap-2">
                                         <button type="submit" class="btn btn-primary">
                                             <i class="material-icons-outlined">upload</i>
-                                            Upload Images
                                         </button>
                                         <a href="{{ route('admin.products.images.index', $product) }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">arrow_back</i>
