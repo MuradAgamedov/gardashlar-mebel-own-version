@@ -387,6 +387,9 @@ Route::post('/payment/temporary-order', [PaymentController::class, 'createTempor
 // 🔹 Müvəqqəti sifarişi ID-yə görə gətirmək
 Route::get('/payment/temporary-order/{orderId}', [PaymentController::class, 'getTemporaryOrder'])->name('api.payment.temporary-order.get');
 
+// 🔹 Sifariş məlumatlarını order_id ilə gətirmək
+Route::get('/payment/order/{orderId}', [PaymentController::class, 'getOrder'])->name('api.payment.order.get');
+
 // 🔹 Məhsulları ID-lərlə gətirmək (məsələn kredit səbəti üçün)
 Route::post('/payment/products', [PaymentController::class, 'getProducts'])->name('api.payment.products');
 

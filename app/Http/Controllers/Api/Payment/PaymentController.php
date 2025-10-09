@@ -190,7 +190,7 @@ class PaymentController extends Controller
     {
         try {
             $data = $request->validate([
-                'order_id' => "nullable|string",
+                'order_id'        => "nullable|string",
                 'product_ids'     => 'required|array|min:1',
                 'product_ids.*'   => 'exists:products,id',
                 'full_name'       => 'required|string|max:255',
@@ -205,22 +205,23 @@ class PaymentController extends Controller
                 'payment_method'  => 'required|integer|in:' . implode(',', array_keys($this->paymentMethods)),
                 'selected_card'   => 'nullable|integer|exists:credit_cards,id',
             ]);
-
+    
             $deliveryMethodName = $this->deliveryMethods[$data['delivery_method']];
             $paymentMethodName  = $this->paymentMethods[$data['payment_method']];
-
+    
+            // Kredit kartın adı (əgər varsa)
             $cardTitle = null;
             if (!empty($data['selected_card'])) {
                 $card = CreditCard::find($data['selected_card']);
                 $cardTitle = $card?->title;
             }
-
-            $monthlyPrice = isset($data['months']) && $data['months'] > 0
-                ? ($data['amount'] / $data['months'])
-                : $data['amount'];
-
+    
+            // Aylıq məbləğ hesablanır, əgər months gəlməyibsə null olacaq
+            $monthValue = $data['months'] ?? null;
+            $monthlyPrice = $monthValue ? ($data['amount'] / $monthValue) : null;
+    
             $userId = optional($request->user())->id;
-            
+    
             if (!empty($data['order_id'])) {
                 $order = Order::where('order_id', $data['order_id'])->firstOrFail();
                 $order->update([
@@ -233,7 +234,7 @@ class PaymentController extends Controller
                     'delivery_method' => $deliveryMethodName,
                     'payment_method'  => $paymentMethodName,
                     'selected_card'   => $cardTitle,
-                    'month'           => $data['months'],
+                    'month'           => $monthValue,           // 👈 burda null da yaza bilər
                     'monthly_price'   => $monthlyPrice,
                     'amount'          => $data['amount'],
                     'language'        => $data['language'] ?? 'EN',
@@ -254,7 +255,7 @@ class PaymentController extends Controller
                     'delivery_method' => $deliveryMethodName,
                     'payment_method'  => $paymentMethodName,
                     'selected_card'   => $cardTitle,
-                    'month'           => $data['months'],
+                    'month'           => $monthValue,           // 👈 burada da null ola bilər
                     'monthly_price'   => $monthlyPrice,
                     'amount'          => $data['amount'],
                     'language'        => $data['language'] ?? 'EN',
@@ -263,18 +264,16 @@ class PaymentController extends Controller
                 ]);
                 $message = 'Yeni müvəqqəti sifariş yaradıldı';
             }
-
+    
             return response()->json([
                 'success' => true,
                 'message' => $message,
                 'data' => [
                     'order_id' => $order->order_id,
-                    'payment_method' => $paymentMethodName,
-                    'delivery_method' => $deliveryMethodName,
-                    'selected_card' => $cardTitle,
+              
                 ]
             ], 201);
-
+    
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -291,10 +290,83 @@ class PaymentController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
-
-        
     }
+    
 
+
+    /**
+     * 🔹 Get order details by order_id
+     */
+    public function getOrder(Request $request, $orderId)
+    {
+        try {
+            $order = Order::where('order_id', $orderId)
+                ->select([
+                    'id',
+                    'order_id',
+                    'user_id',
+                    'product_ids',
+                    'full_name',
+                    'phone',
+                    'email',
+                    'city',
+                    'address',
+                    'delivery_method',
+                    'payment_method',
+                    'selected_card',
+                    'month',
+                    'monthly_price',
+                    'amount',
+                    'language',
+                    'status',
+                    'payment_status',
+                    'created_at',
+                    'updated_at'
+                ])
+                ->firstOrFail();
+
+            // Decode the product_ids JSON
+            $productIds = json_decode($order->product_ids, true) ?? [];
+            
+            // Get products with translations
+            $products = Product::whereIn('id', $productIds)
+                ->with(['translates' => function($query) use ($order) {
+                    $query->where('language', strtoupper($order->language ?? 'az'));
+                }])
+                ->get(['id', 'price', 'discount_price']);
+
+            // Format the response
+            $orderData = $order->toArray();
+            $orderData['products'] = $products->map(function($product) {
+                return [
+                    'id' => $product->id,
+                    'title' => $product->translates->first()?->title ?? 'Unknown Product',
+                    'price' => $product->price,
+                    'discount_price' => $product->discount_price,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $orderData
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sifariş tapılmadı'
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('Order retrieval failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Xəta baş verdi'
+            ], 500);
+        }
+    }
 
     public function getProducts(Request $request)
     {
