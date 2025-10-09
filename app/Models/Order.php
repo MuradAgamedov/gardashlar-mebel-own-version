@@ -26,7 +26,7 @@ class Order extends Model
         'status',
         'payment_status',
         "amount",
-        "address"
+        "address",
     ];
 
     /**

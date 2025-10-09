@@ -204,6 +204,7 @@ class PaymentController extends Controller
                 'delivery_method' => 'required|integer|in:' . implode(',', array_keys($this->deliveryMethods)),
                 'payment_method'  => 'required|integer|in:' . implode(',', array_keys($this->paymentMethods)),
                 'selected_card'   => 'nullable|integer|exists:credit_cards,id',
+                "text" => 'nullable|string',
             ]);
     
             $deliveryMethodName = $this->deliveryMethods[$data['delivery_method']];
@@ -230,6 +231,8 @@ class PaymentController extends Controller
                     'phone'           => $data['phone'],
                     'email'           => $data['email'],
                     'city'            => $data['city'],
+                    'text'            => $data['text'],
+
                     'address'         => $data['address'] ?? null,
                     'delivery_method' => $deliveryMethodName,
                     'payment_method'  => $paymentMethodName,
@@ -261,6 +264,7 @@ class PaymentController extends Controller
                     'language'        => $data['language'] ?? 'EN',
                     'status'          => 'temporary',
                     'payment_status'  => 'unpaid',
+                    'text'            => $data['text'],
                 ]);
                 $message = 'Yeni müvəqqəti sifariş yaradıldı';
             }
@@ -313,7 +317,7 @@ class PaymentController extends Controller
                     'selected_card',
                     'month',
                     'amount',
-         
+                    'text'     
                 ])
                 ->firstOrFail();
 
