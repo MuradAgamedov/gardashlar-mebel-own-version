@@ -289,5 +289,107 @@ class PaymentController extends Controller
                 'message' => 'Müvəqqəti sifariş yaradılarkən xəta baş verdi',
             ], 500);
         }
+
+        
+    }
+
+
+    public function getProducts(Request $request)
+    {
+        try {
+            // Validate request
+            $request->validate([
+                'product_ids' => 'required|array|min:1|max:50',
+                'product_ids.*' => 'required|integer|min:1'
+            ]);
+
+            $productIds = $request->input('product_ids', []);
+
+            // Get language ID from header using trait
+            $languageId = $this->getLanguageIdFromHeader($request);
+
+            // Get existing active products with relationships and translations
+            $existingProducts = Product::active()
+                ->whereIn('id', $productIds)
+                ->with([
+                    'translates' => fn($q) => $q->where('language_id', $languageId),
+                    'images' => fn($q) => $q->where('status', true)->orderBy('order'),
+                    'images.color' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
+                    'categories.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'types.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'colors' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
+           
+                ])
+                ->get();
+
+            // Map to desired response structure
+            $productsData = $existingProducts->map(function ($product) use ($languageId) {
+                $translation = $product->translates->first();
+
+                // Main image
+                $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
+
+           
+                
+
+                // Available colors
+                $availableColors = $product->colors->map(fn($color) => [
+                    'id' => $color->id,
+                    'color_code' => $color->color_code
+                ]);
+
+                // Images
+                $imagesWithColors = $product->images->map(fn($image) => [
+                    'id' => $image->id,
+                    'image_url' => $image->image ? asset('storage/' . $image->image) : null,
+                    'is_main' => $image->is_main,
+                    'order' => $image->order,
+                    'color_id' => $image->product_color_id
+                ])->sortBy('order')->values();
+
+                if ($imagesWithColors->isEmpty()) {
+                    $imagesWithColors = collect([
+                        [
+                            'id' => time(),
+                            'image_url' => asset('images/default_image.webp'),
+                            'is_main' => false,
+                            'order' => 0,
+                            'color_id' => null
+                        ]
+                    ]);
+                }
+
+              
+                return [
+                    'id' => $product->id,
+                    'title' => $translation?->title ?? '',
+                    'available_colors' => $availableColors,
+
+        
+                    'discount_price' => $product->discount_price,
+                    'price' => $product->price,
+                    'images' => $imagesWithColors,
+               
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $productsData
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? []),
+                'data' => null
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Məhsulları yoxlayarkən xəta baş verdi: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
     }
 }

@@ -6,16 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Language;
 use App\Models\Service;
 use App\Models\ServiceAdvantage;
+use App\Repositories\ServiceAdvantageRepository;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 
 class ServiceAdvantageController extends Controller
 {
     protected $imageService;
+    protected $repository;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(ImageService $imageService, ServiceAdvantageRepository $repository)
     {
         $this->imageService = $imageService;
+        $this->repository = $repository;
     }
 
     /**
@@ -23,12 +26,9 @@ class ServiceAdvantageController extends Controller
      */
     public function index($serviceId)
     {
-        $service = Service::with(['translates.language'])->findOrFail($serviceId);
-        $advantages = ServiceAdvantage::with(['translates.language'])
-            ->where('service_id', $serviceId)
-            ->orderBy('order')
-            ->get();
-        $languages = Language::active()->orderBy('order')->get();
+        $service = $this->repository->getServiceWithTranslations($serviceId);
+        $advantages = $this->repository->getServiceAdvantages($serviceId);
+        $languages = $this->repository->getActiveLanguages();
         
         return view('admin.service-advantages.index', compact('service', 'advantages', 'languages'));
     }
@@ -38,8 +38,8 @@ class ServiceAdvantageController extends Controller
      */
     public function create($serviceId)
     {
-        $service = Service::with(['translates.language'])->findOrFail($serviceId);
-        $languages = Language::active()->orderBy('order')->get();
+        $service = $this->repository->getServiceWithTranslations($serviceId);
+        $languages = $this->repository->getActiveLanguages();
         return view('admin.service-advantages.create', compact('service', 'languages'));
     }
 
