@@ -80,6 +80,7 @@ class FileActionController extends Controller
             $parsedUrl = parse_url($url);
             $allowedHosts = [
                 'admin.gardaslar.coder.az',
+                'admin.gardashlar.com',
                 'localhost',
                 '127.0.0.1',
                 parse_url(config('app.url'), PHP_URL_HOST)
