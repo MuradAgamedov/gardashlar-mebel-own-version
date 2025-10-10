@@ -47,7 +47,7 @@ class ProductRepository extends BaseRepository
             $query->where('status', $request->input('status'));
         }
         
-        return $query->ordered()->paginate(30);
+        return $query->ordered()->orderBy('id', 'desc')->paginate(30);
     }
 
     // Aktiv alt kateqoriyaları gətir
