@@ -167,7 +167,7 @@ class PaymentController extends Controller
             'order_id' => 'required|exists:orders,order_id',
         ]);
 
-        $order = Order::findOrFail($data['order_id']);
+        $order = Order::where('order_id', $data['order_id'])->first();
         $method = is_numeric($order->payment_method)
             ? $this->paymentMethods[(int)$order->payment_method]
             : $order->payment_method;
