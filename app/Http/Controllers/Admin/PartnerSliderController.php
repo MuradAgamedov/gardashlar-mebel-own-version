@@ -9,18 +9,22 @@ use App\Services\ImageService;
 use Illuminate\Http\Request;
 use App\Repositories\PartnerSliderRepository;
 use App\Repositories\LanguageRepository;
+use Illuminate\Support\Facades\DB;
 
 class PartnerSliderController extends Controller
 {
     protected $imageService;
+    protected $repository;
+    protected $languageRepository;
 
     public function __construct(
         ImageService $imageService,
-        public PartnerSliderRepository $repository,
-        public LanguageRepository $languageRepository
-    )
-    {
+        PartnerSliderRepository $repository,
+        LanguageRepository $languageRepository
+    ) {
         $this->imageService = $imageService;
+        $this->repository = $repository;
+        $this->languageRepository = $languageRepository;
     }
 
     /**
@@ -30,7 +34,7 @@ class PartnerSliderController extends Controller
     {
         $sliders = $this->repository->getPartnerSliders();
         $languages = $this->languageRepository->getAllLanguages();
-        
+
         return view('admin.partner-sliders.index', compact('sliders', 'languages'));
     }
 
@@ -49,68 +53,67 @@ class PartnerSliderController extends Controller
     public function store(Request $request)
     {
         $languages = Language::all();
-        
-        // Base validation
+
+        // Validate main fields
         $request->validate([
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'status' => 'boolean',
+            'image'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'status' => 'nullable|boolean',
         ], [
             'image.image' => 'Image must be an image file.',
-            'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
-            'image.max' => 'Image may not be greater than 2MB.',
-            'status.boolean' => 'Status must be true or false.',
+            'image.mimes' => 'Image must be of type: jpg, jpeg, png, gif, webp.',
+            'image.max'   => 'Image size cannot exceed 2MB.',
         ]);
 
-        // Translation validation
+        // Validate translations
         foreach ($languages as $language) {
             $request->validate([
                 "translations.{$language->id}.title" => 'required|string|max:255',
             ], [
                 "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
+                "translations.{$language->id}.title.max" => "Title cannot exceed 255 characters for {$language->lang_code}.",
             ]);
         }
 
+        DB::beginTransaction();
         try {
-            // Handle image upload
+            // Upload image if exists
             $imagePath = null;
             if ($request->hasFile('image')) {
                 $imagePath = $this->imageService->upload(
                     $request->file('image'),
                     'partner-sliders',
                     [
-                        'max_size' => 2048,
-                        'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                        'max_size'       => 2048,
+                        'allowed_types'  => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
                     ]
                 );
-                
+
                 if (!$imagePath) {
-                    return redirect()->back()
-                        ->with('error', 'Failed to upload image.')
-                        ->withInput();
+                    throw new \Exception('Failed to upload image.');
                 }
             }
 
-            // Create slider
+            // Create PartnerSlider
             $slider = PartnerSlider::create([
-                'image' => $imagePath,
-                'status' => $request->input('status'),
+                'image'  => $imagePath,
+                'status' => $request->boolean('status'),
             ]);
 
-            // Create translations
+            // Save translations
             foreach ($languages as $language) {
-                $translationData = $request->input("translations.{$language->id}", []);
-                
+                $translation = $request->input("translations.{$language->id}");
                 $slider->translates()->create([
                     'language_id' => $language->id,
-                    'title' => trim($translationData['title'] ?? ''),
+                    'title'       => trim($translation['title'] ?? ''),
                 ]);
             }
 
+            DB::commit();
             return redirect()->route('admin.partner-sliders.index')
                 ->with('success', 'Partner slider created successfully!');
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            DB::rollBack();
             return redirect()->back()
                 ->with('error', 'Error creating partner slider: ' . $e->getMessage())
                 ->withInput();
@@ -124,7 +127,7 @@ class PartnerSliderController extends Controller
     {
         $partnerSlider->load('translates.language');
         $languages = Language::all();
-        
+
         return view('admin.partner-sliders.edit', compact('partnerSlider', 'languages'));
     }
 
@@ -134,72 +137,69 @@ class PartnerSliderController extends Controller
     public function update(Request $request, PartnerSlider $partnerSlider)
     {
         $languages = Language::all();
-        
-        // Base validation
+
+        // Validate main fields
         $request->validate([
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'status' => 'boolean',
+            'image'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'status' => 'nullable|boolean',
         ], [
             'image.image' => 'Image must be an image file.',
-            'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
-            'image.max' => 'Image may not be greater than 2MB.',
-            'status.boolean' => 'Status must be true or false.',
+            'image.mimes' => 'Image must be of type: jpg, jpeg, png, gif, webp.',
+            'image.max'   => 'Image size cannot exceed 2MB.',
         ]);
 
-        // Translation validation
+        // Validate translations
         foreach ($languages as $language) {
             $request->validate([
                 "translations.{$language->id}.title" => 'required|string|max:255',
             ], [
                 "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
+                "translations.{$language->id}.title.max" => "Title cannot exceed 255 characters for {$language->lang_code}.",
             ]);
         }
 
+        DB::beginTransaction();
         try {
-            // Handle image upload
-            $imageData = [];
+            // Handle image update
+            $updateData = [
+                'status' => $request->boolean('status'),
+            ];
+
             if ($request->hasFile('image')) {
-                $uploadedPath = $this->imageService->update(
+                $uploaded = $this->imageService->update(
                     $request->file('image'),
                     $partnerSlider->image,
                     'partner-sliders',
                     [
-                        'max_size' => 2048,
-                        'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                        'max_size'       => 2048,
+                        'allowed_types'  => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
                     ]
                 );
-                
-                if ($uploadedPath) {
-                    $imageData['image'] = $uploadedPath;
-                } else {
-                    return redirect()->back()
-                        ->with('error', 'Failed to upload image.')
-                        ->withInput();
+
+                if (!$uploaded) {
+                    throw new \Exception('Failed to upload image.');
                 }
+
+                $updateData['image'] = $uploaded;
             }
 
-            // Update slider
-            $partnerSlider->update(array_merge($imageData, [
-                'status' => $request->input('status'),
-            ]));
+            $partnerSlider->update($updateData);
 
             // Update translations
             foreach ($languages as $language) {
-                $translationData = $request->input("translations.{$language->id}", []);
-                
+                $translation = $request->input("translations.{$language->id}");
                 $partnerSlider->translates()->updateOrCreate(
                     ['language_id' => $language->id],
-                    [
-                        'title' => trim($translationData['title'] ?? ''),
-                    ]
+                    ['title' => trim($translation['title'] ?? '')]
                 );
             }
 
+            DB::commit();
             return redirect()->route('admin.partner-sliders.index')
                 ->with('success', 'Partner slider updated successfully!');
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            DB::rollBack();
             return redirect()->back()
                 ->with('error', 'Error updating partner slider: ' . $e->getMessage())
                 ->withInput();
@@ -215,19 +215,19 @@ class PartnerSliderController extends Controller
             $partnerSlider->delete();
             return redirect()->route('admin.partner-sliders.index')
                 ->with('success', 'Partner slider deleted successfully!');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return redirect()->back()
                 ->with('error', 'Error deleting partner slider: ' . $e->getMessage());
         }
     }
 
     /**
-     * Reorder sliders
+     * Reorder sliders (for drag & drop sorting)
      */
     public function reorder(Request $request)
     {
         $request->validate([
-            'sliders' => 'required|array',
+            'sliders'   => 'required|array',
             'sliders.*' => 'required|integer|exists:partner_sliders,id',
         ]);
 
@@ -237,8 +237,11 @@ class PartnerSliderController extends Controller
             }
 
             return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 }

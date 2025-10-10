@@ -50,12 +50,13 @@
                         @endif
 
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
-                                        <th width="50">Order</th>
+                                        <th width="50">#</th>
                                         <th width="100">Image</th>
                                         <th>Title</th>
+                                        <th>Link</th>
                                         <th width="80">Status</th>
                                         <th width="150">Actions</th>
                                     </tr>
@@ -66,15 +67,13 @@
                                             $firstTranslation = $slider->translates->first();
                                         @endphp
                                         <tr data-id="{{ $slider->id }}">
-                                            <td>
-                                                <div class="drag-handle">
-                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <circle cx="8" cy="8" r="1"></circle>
-                                                        <circle cx="16" cy="8" r="1"></circle>
-                                                        <circle cx="8" cy="16" r="1"></circle>
-                                                        <circle cx="16" cy="16" r="1"></circle>
-                                                    </svg>
-                                                </div>
+                                            <td class="drag-handle text-center">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <circle cx="8" cy="8" r="1"></circle>
+                                                    <circle cx="16" cy="8" r="1"></circle>
+                                                    <circle cx="8" cy="16" r="1"></circle>
+                                                    <circle cx="16" cy="16" r="1"></circle>
+                                                </svg>
                                             </td>
                                             <td>
                                                 @if($slider->image_url)
@@ -88,7 +87,15 @@
                                             <td>
                                                 {{ $firstTranslation ? $firstTranslation->title : 'No translation' }}
                                             </td>
-                                            
+                                            <td>
+                                                @if($slider->link)
+                                                    <a href="{{ $slider->link }}" target="_blank" class="text-primary text-decoration-underline">
+                                                        {{ Str::limit($slider->link, 30) }}
+                                                    </a>
+                                                @else
+                                                    <span class="text-muted">—</span>
+                                                @endif
+                                            </td>
                                             <td>
                                                 @if($slider->status)
                                                     <span class="badge bg-success">Active</span>
@@ -231,4 +238,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush 
+@endpush

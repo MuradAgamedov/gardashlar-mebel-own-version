@@ -14,6 +14,7 @@ class PartnerSlider extends Model
         'order',
         'status',
         'image',
+        'link', // 🔥 yeni əlavə edildi
     ];
 
     protected $casts = [
@@ -41,7 +42,7 @@ class PartnerSlider extends Model
         if (!$languageId) {
             $languageId = Language::where('is_default', true)->first()->id ?? 1;
         }
-        
+
         return $this->translates()->where('language_id', $languageId)->first();
     }
 

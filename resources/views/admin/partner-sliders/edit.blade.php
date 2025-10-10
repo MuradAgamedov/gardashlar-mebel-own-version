@@ -74,6 +74,23 @@
                                 </div>
                             </div>
 
+                            <!-- Link Section -->
+                            <div class="row mb-4">
+                                <div class="col-md-12">
+                                    <label for="link" class="form-label">Link (optional)</label>
+                                    <input type="url" 
+                                           class="form-control @error('link') is-invalid @enderror" 
+                                           id="link" 
+                                           name="link" 
+                                           placeholder="https://example.com" 
+                                           value="{{ old('link', $partnerSlider->link) }}">
+                                    @error('link')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <small class="form-text text-muted">Add a URL if you want the slider image to redirect somewhere.</small>
+                                </div>
+                            </div>
+
                             <!-- Status Section -->
                             <div class="row mb-4">
                                 <div class="col-md-12">
@@ -157,10 +174,10 @@
                                 <div class="col-md-12">
                                     <div class="d-flex gap-2">
                                         <button type="submit" class="btn btn-primary">
-                                            <i class="material-icons-outlined">save</i>
+                                            <i class="material-icons-outlined">save</i> Save
                                         </button>
                                         <a href="{{ route('admin.partner-sliders.index') }}" class="btn btn-secondary">
-                                            <i class="material-icons-outlined">cancel</i>
+                                            <i class="material-icons-outlined">cancel</i> Cancel
                                         </a>
                                     </div>
                                 </div>
@@ -212,7 +229,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (previewImage) {
                     previewImage.src = e.target.result;
                 } else {
-                    // Create new image element if it doesn't exist
                     const newImage = document.createElement('img');
                     newImage.id = 'preview-image';
                     newImage.src = e.target.result;
@@ -222,8 +238,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     imagePreview.innerHTML = '';
                     imagePreview.appendChild(newImage);
-                    imagePreview.appendChild(document.createElement('p')).textContent = 'New image preview';
-                    imagePreview.querySelector('p').className = 'text-muted mt-2';
+                    const text = document.createElement('p');
+                    text.textContent = 'New image preview';
+                    text.className = 'text-muted mt-2';
+                    imagePreview.appendChild(text);
                 }
             };
             reader.readAsDataURL(file);
@@ -243,4 +261,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush 
+@endpush
