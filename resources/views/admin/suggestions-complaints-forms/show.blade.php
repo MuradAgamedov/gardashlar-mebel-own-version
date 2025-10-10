@@ -34,13 +34,13 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5>Form Details</h5>
                         <div class="d-flex gap-2">
-                            <a href="{{ route('admin.suggestions-complaints.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('admin.suggestions-complaints-forms.index') }}" class="btn btn-secondary">
                                 <i class="material-icons-outlined">arrow_back</i> Back
                             </a>
                             <button type="button" 
                                     class="btn btn-danger delete-btn"
                                     data-title="{{ $form->name }}"
-                                    data-url="{{ route('admin.suggestions-complaints.destroy', $form->id) }}">
+                                    data-url="{{ route('admin.suggestions-complaints-forms.destroy', $form->id) }}">
                                 <i class="material-icons-outlined">delete</i> Delete
                             </button>
                         </div>
