@@ -84,7 +84,6 @@
 <!-- Modal -->
 <div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
-{{ ... }}
       <div class="modal-header">
         <h5 class="modal-title">Order Details</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
