@@ -163,25 +163,56 @@ class PaymentController extends Controller
      */
     public function pay(Request $request)
     {
-        $data = $request->validate([
-            'order_id' => 'required|exists:orders,order_id',
-        ]);
-
-        $order = Order::where('order_id', $data['order_id'])->first();
-        $method = is_numeric($order->payment_method)
-            ? $this->paymentMethods[(int)$order->payment_method]
-            : $order->payment_method;
-
-        return match ($method) {
-            'cash'        => $this->startCash($request),
-            'online'      => $this->startOnline($request),
-            'installment' => $this->startInstallment($request),
-            default => response()->json([
+        try {
+            $data = $request->validate([
+                'order_id' => 'required|exists:orders,order_id',
+            ]);
+    
+            $order = Order::where('order_id', $data['order_id'])->first();
+    
+            if (!$order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sifariş tapılmadı',
+                ], 404);
+            }
+    
+            $method = is_numeric($order->payment_method)
+                ? $this->paymentMethods[(int)$order->payment_method] ?? null
+                : $order->payment_method;
+    
+            if (!$method) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ödəniş metodu düzgün deyil',
+                ], 400);
+            }
+    
+            // Cavabı JSON olaraq qaytar
+            return match ($method) {
+                'cash'        => $this->startCash($request),
+                'online'      => $this->startOnline($request),
+                'installment' => $this->startInstallment($request),
+                default       => response()->json([
+                    'success' => false,
+                    'message' => 'Uyğun ödəniş metodu tapılmadı',
+                ], 400),
+            };
+    
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
                 'success' => false,
-                'message' => 'Uyğun ödəniş metodu tapılmadı',
-            ], 400),
-        };
+                'message' => 'Validation error',
+                'errors'  => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
+    
 
     /**
      * 🔹 Müvəqqəti sifariş yaradılması
