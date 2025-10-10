@@ -34,10 +34,10 @@ class PaymentController extends Controller
     public function startCash(Request $request)
     {
         $data = $request->validate([
-            'order_id' => 'required|exists:orders,id',
+            'order_id' => 'required|exists:orders,order_id',
         ]);
 
-        $order = Order::findOrFail($data['order_id']);
+        $order = Order::where('order_id', $data['order_id'])->first();
 
         $order->update([
             'payment_method' => 'cash',
@@ -63,10 +63,10 @@ class PaymentController extends Controller
     public function startOnline(Request $request)
     {
         $data = $request->validate([
-            'order_id' => 'required|exists:orders,id',
+            'order_id' => 'required|exists:orders,order_id',
         ]);
 
-        $order = Order::findOrFail($data['order_id']);
+        $order = Order::where('order_id', $data['order_id'])->first();
 
         $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
 
@@ -113,10 +113,10 @@ class PaymentController extends Controller
     public function startInstallment(Request $request)
     {
         $data = $request->validate([
-            'order_id' => 'required|exists:orders,id',
+            'order_id' => 'required|exists:orders,order_id',
         ]);
 
-        $order = Order::findOrFail($data['order_id']);
+        $order = Order::where('order_id', $data['order_id'])->first();
 
         $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
 
@@ -164,7 +164,9 @@ class PaymentController extends Controller
     public function pay(Request $request)
     {
         try {
-            $data = $request->all();
+            $data = $request->validate([
+                'order_id' => 'required|exists:orders,order_id',
+            ]);
     
             $order = Order::where('order_id', $data['order_id'])->first();
     
