@@ -18,7 +18,7 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.suggestions-complaints.index') }}">All Forms</a>
+                            <a href="{{ route('admin.suggestions-complaints-forms.index') }}">All Forms</a>
                         </li>
                         <li class="breadcrumb-item active">View</li>
                     </ol>
