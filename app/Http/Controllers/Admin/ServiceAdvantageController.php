@@ -12,7 +12,7 @@ class ServiceAdvantageController extends Controller
 {
     protected $imageService;
     protected $repository;
-{{ ... }}
+
     /**
      * Store a newly created resource in storage.
      */
@@ -23,7 +23,7 @@ class ServiceAdvantageController extends Controller
             'icon' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
             'translates' => 'required|array|min:1',
             'translates.*.language_id' => 'required|exists:languages,id',
-{{ ... }}
+
             'translates.*.title.required' => 'Title is required for all languages.',
             'translates.*.description.required' => 'Description is required for all languages.',
         ]);
@@ -66,7 +66,7 @@ class ServiceAdvantageController extends Controller
                 ->withInput();
         }
     }
-{{ ... }}
+
     /**
      * Update the specified resource in storage.
      */

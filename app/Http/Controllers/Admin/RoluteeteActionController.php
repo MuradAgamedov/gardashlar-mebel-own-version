@@ -7,7 +7,7 @@ use App\Models\RoluteeteAction;
 use App\Models\Language;
 use App\Services\ImageService;
 use App\Repositories\RoluteeteActionRepository;
-
+use App\Http\Controllers\Controller;
 class RoluteeteActionController extends Controller
 {
     protected $imageService;
