@@ -34,6 +34,7 @@ class PartnerSliderController extends Controller
                     'id' => $slider->id,
                     'image_url' => $slider->image_url,
                     'title' => $translation ? $translation->title : null,
+                    'link' => $slider->link,
                 ];
             });
 
