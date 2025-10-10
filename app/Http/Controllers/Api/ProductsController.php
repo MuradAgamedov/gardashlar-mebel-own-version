@@ -652,7 +652,7 @@ class ProductsController extends Controller
             ])
             ->whereHas('translates', fn($q) => $q->where('slug', $slug))
             ->first();
-    
+                
             if (!$product) {
                 return response()->json([
                     'success' => false,
@@ -661,7 +661,7 @@ class ProductsController extends Controller
             }
     
             $translation = $product->translates->first();
-    
+            $product->increment('view_count');
             // --- User Data
             $user = auth('sanctum')->user();
     
