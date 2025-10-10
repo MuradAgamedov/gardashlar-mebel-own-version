@@ -207,6 +207,7 @@ class ProductsController extends Controller
                     $query->where('language_id', $languageId);
                 }
             ])
+            ->orderBy('created_at', 'desc')
             ->active();
 
             // Filter by category if category_slug is provided
