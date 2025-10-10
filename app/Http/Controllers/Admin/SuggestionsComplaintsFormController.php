@@ -12,7 +12,7 @@ class SuggestionsComplaintsFormController extends Controller
     public function index()
     {
         $forms = SuggestionsComplaintsForm::orderBy('created_at', 'desc')->paginate(20);
-        return view('admin.suggestions-complaints-forms.index', compact('forms'));
+        return view('admin.suggestions-complaints.index', compact('forms'));
     }
 
     public function show($id)
@@ -24,7 +24,7 @@ class SuggestionsComplaintsFormController extends Controller
             $form->update(['is_read' => true]);
         }
         
-        return view('admin.suggestions-complaints-forms.show', compact('form'));
+        return view('admin.suggestions-complaints-forms.index', compact('forms'));
     }
 
     public function destroy($id)
