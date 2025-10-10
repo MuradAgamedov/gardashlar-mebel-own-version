@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\ProductDetailController;
 use App\Http\Controllers\Admin\ProductDetailValueController;
 use App\Http\Controllers\Admin\ProductDetailsValuesDetailController;
 use App\Http\Controllers\Admin\CommentController;
+use App\Http\Controllers\Admin\ImageController;
       
 Route::resource('product-categories', ProductCategoryController::class);
 Route::post('product-categories/reorder', [ProductCategoryController::class, 'reorder'])->name('product-categories.reorder');
