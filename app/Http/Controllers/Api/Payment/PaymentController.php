@@ -103,7 +103,7 @@ class PaymentController extends Controller
         }
 
         Log::error('Online Payment failed', ['body' => $response->body()]);
-        return response()->json(['success' => false, 'message' => 'Ödəniş sorğusu uğursuz oldu'], 500);
+        return response()->json(['success' => false, 'message' => $response->body()], 500);
     }
 
     /**
@@ -154,7 +154,7 @@ class PaymentController extends Controller
         }
 
         Log::error('Installment failed', ['body' => $response->body()]);
-        return response()->json(['success' => false, 'message' => 'Ödəniş sorğusu uğursuz oldu'], 500);
+        return response()->json(['success' => false, 'message' => $response->body()], 500);
     }
 
     /**
