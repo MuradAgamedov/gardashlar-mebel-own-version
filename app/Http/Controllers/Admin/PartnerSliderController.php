@@ -98,6 +98,7 @@ class PartnerSliderController extends Controller
             $slider = PartnerSlider::create([
                 'image'  => $imagePath,
                 'status' => $request->boolean('status'),
+                'link'   => $request->input('link'),
             ]);
 
             // Save translations
@@ -165,6 +166,7 @@ class PartnerSliderController extends Controller
             // Handle image update
             $updateData = [
                 'status' => $request->boolean('status'),
+                'link'   => $request->input('link'),
             ];
 
             if ($request->hasFile('image')) {

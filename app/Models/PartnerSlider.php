@@ -14,7 +14,7 @@ class PartnerSlider extends Model
         'order',
         'status',
         'image',
-        'link', // 🔥 yeni əlavə edildi
+        'link',
     ];
 
     protected $casts = [
