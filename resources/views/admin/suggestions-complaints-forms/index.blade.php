@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmButtonColor: '#d33'
         }).then(result => {
             if (result.isConfirmed) {
-                fetch('{{ route("admin.suggestions-complaints.delete-selected") }}', {
+                fetch('{{ route("admin.suggestions-complaints-forms.delete-selected") }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
