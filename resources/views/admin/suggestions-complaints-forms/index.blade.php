@@ -85,7 +85,7 @@
                                             <td>{{ $form->created_at->format('d.m.Y H:i') }}</td>
                                             <td>
                                                 <div class="d-flex gap-2">
-                                                    <a href="{{ route('admin.suggestions-complaints.show', $form->id) }}" class="btn btn-sm btn-primary">
+                                                    <a href="{{ route('admin.suggestions-complaints-forms.show', $form->id) }}" class="btn btn-sm btn-primary">
                                                         <i class="material-icons-outlined">visibility</i>
                                                     </a>
                                                     @if(!$form->is_read)
