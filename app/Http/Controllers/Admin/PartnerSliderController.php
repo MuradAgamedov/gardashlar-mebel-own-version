@@ -57,6 +57,7 @@ class PartnerSliderController extends Controller
         // Validate main fields
         $request->validate([
             'image'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'link'   => 'nullable|url',
             'status' => 'nullable|boolean',
         ], [
             'image.image' => 'Image must be an image file.',
@@ -142,6 +143,7 @@ class PartnerSliderController extends Controller
         $request->validate([
             'image'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
             'status' => 'nullable|boolean',
+            'link'   => 'nullable|url',
         ], [
             'image.image' => 'Image must be an image file.',
             'image.mimes' => 'Image must be of type: jpg, jpeg, png, gif, webp.',
