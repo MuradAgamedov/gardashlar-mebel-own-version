@@ -32,7 +32,7 @@ class ProductsController extends Controller
                     'message' => 'Invalid language'
                 ], 400);
             }
-
+    
             $categories = Cache::rememberForever("product_categories_{$languageId}", function () use ($languageId) {
                 return ProductCategory::with(['translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
@@ -41,10 +41,10 @@ class ProductsController extends Controller
                 ->ordered()
                 ->get();
             });
-
+    
             // Build hierarchical structure
             $categoriesData = $this->buildHierarchy($categories);
-
+    
             // Get product price filters
             $priceFilters = Cache::rememberForever("product_price_filters_{$languageId}", function () use ($languageId) {
                 return ProductPriceFilter::with(['translates' => function($query) use ($languageId) {
@@ -54,7 +54,7 @@ class ProductsController extends Controller
                 ->ordered()
                 ->get();
             });
-
+    
             $priceFiltersData = $priceFilters->map(function ($filter) {
                 $translation = $filter->translates->first();
                 return [
@@ -64,19 +64,19 @@ class ProductsController extends Controller
                     'max_price' => $filter->max_price
                 ];
             });
-
+    
             // Get product colors
             $productColors = Cache::rememberForever("product_colors", function () {
                 return ProductColor::all();
             });
-
+    
             $productColorsData = $productColors->map(function ($color) {
                 return [
                     'id' => $color->id,
                     'color_code' => $color->color_code
                 ];
             });
-
+    
             // Get product types
             $productTypes = Cache::rememberForever("product_types_{$languageId}", function () use ($languageId) {
                 return ProductType::with(['translates' => function($query) use ($languageId) {
@@ -86,7 +86,7 @@ class ProductsController extends Controller
                 ->ordered()
                 ->get();
             });
-
+    
             $productTypesData = $productTypes->map(function ($type) {
                 $translation = $type->translates->first();
                 return [
@@ -94,7 +94,7 @@ class ProductsController extends Controller
                     'title' => $translation ? $translation->title : ''
                 ];
             });
-
+    
             // Get product page categories
             $productPageCategories = Cache::rememberForever("product_page_categories_{$languageId}", function () use ($languageId) {
                 return ProductPageCategory::with(['productCategory.translates' => function($query) use ($languageId) {
@@ -104,12 +104,11 @@ class ProductsController extends Controller
                 ->ordered()
                 ->get();
             });
-
+    
             $productPageCategoriesData = $productPageCategories->map(function ($pageCategory) use ($languageId) {
                 $category = $pageCategory->productCategory;
                 $translation = $category ? $category->translates->first() : null;
                 
-                // Get parent slug if parent_id exists
                 $parentSlug = null;
                 if ($category && $category->parent_id) {
                     $parentCategory = ProductCategory::find($category->parent_id);
@@ -126,8 +125,8 @@ class ProductsController extends Controller
                     'parentSlug' => $parentSlug
                 ];
             });
-
-            // Get sort options for frontend select
+    
+            // Sort options
             $sortOptions = [
                 ['value' => 'price_asc', 'label' => 'price_asc'],
                 ['value' => 'price_desc', 'label' => 'price_desc'],
@@ -135,8 +134,7 @@ class ProductsController extends Controller
                 ['value' => 'oldest', 'label' => 'oldest'],
                 ['value' => 'view_count', 'label' => 'view_count']
             ];
-
-            // Get sort translations from dictionary
+    
             $sortTranslations = Cache::rememberForever("sort_translations_{$languageId}", function () use ($languageId) {
                 $sortKeywords = [
                     'price_asc' => 'price_asc',
@@ -145,16 +143,19 @@ class ProductsController extends Controller
                     'oldest' => 'oldest',
                     'view_count' => 'view_count'
                 ];
-
+    
                 $sortData = [];
                 foreach ($sortKeywords as $key => $keyword) {
                     $sortData[$key] = Dictionary::getValue($keyword, $languageId);
                 }
-
+    
                 return $sortData;
             });
-
-            // Get pagination parameters
+    
+            // === Yeni: search parametri ===
+            $searchQuery = $request->get('search'); // məsələn: ?search=table
+    
+            // Pagination və digər filterlər
             $perPage = $request->get('per_page', 12);
             $page = $request->get('page', 1);
             $categorySlug = $request->get('category_slug');
@@ -164,8 +165,8 @@ class ProductsController extends Controller
             $sort = $request->get('sort', 'view_count');
             $minPrice = $request->get('min_price');
             $maxPrice = $request->get('max_price');
-            
-            // Get category seo_text if category_slug is provided
+    
+            // SEO text
             $categorySeoText = null;
             if ($categorySlug) {
                 $selectedCategory = ProductCategory::whereHas('translates', function($query) use ($categorySlug, $languageId) {
@@ -177,19 +178,13 @@ class ProductsController extends Controller
                     $categorySeoText = $categoryTranslation ? $categoryTranslation->seo_text : null;
                 }
             }
-            
-            // Handle filters, colors, and type_id parameters - convert to arrays if they come as single values
-            if (!is_array($filterIds)) {
-                $filterIds = $filterIds ? [$filterIds] : [];
-            }
-            if (!is_array($colorIds)) {
-                $colorIds = $colorIds ? [$colorIds] : [];
-            }
-            if (!is_array($typeIds)) {
-                $typeIds = $typeIds ? [$typeIds] : [];
-            }
-
-            // Build products query
+    
+            // Convert filters to arrays
+            if (!is_array($filterIds)) $filterIds = $filterIds ? [$filterIds] : [];
+            if (!is_array($colorIds)) $colorIds = $colorIds ? [$colorIds] : [];
+            if (!is_array($typeIds)) $typeIds = $typeIds ? [$typeIds] : [];
+    
+            // === Məhsul query ===
             $productsQuery = Product::with([
                 'translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
@@ -207,136 +202,90 @@ class ProductsController extends Controller
                     $query->where('language_id', $languageId);
                 }
             ])
-            ->orderBy('created_at', 'desc')
             ->active();
-
-            // Filter by category if category_slug is provided
+    
+            // === Əgər search varsa, title-larda axtar ===
+            if ($searchQuery) {
+                $productsQuery->whereHas('translates', function($query) use ($languageId, $searchQuery) {
+                    $query->where('language_id', $languageId)
+                          ->where('title', 'like', '%' . $searchQuery . '%');
+                });
+            }
+    
+            // === Digər filterlər (category, type, color, price və s.) elə qalır ===
             if ($categorySlug) {
-                // Get the category by slug (any language)
                 $category = ProductCategory::whereHas('translates', function($query) use ($categorySlug) {
                     $query->where('slug', $categorySlug);
                 })->first();
                 
                 if ($category) {
-                    // Check if it's a parent category (has children)
                     $children = ProductCategory::where('parent_id', $category->id)->pluck('id');
-                    
-                    if ($children->isNotEmpty()) {
-                        // If parent category, get products from all children + parent itself
-                        $categoryIds = $children->push($category->id)->toArray();
-                    } else {
-                        // If child category, get products only from this category
-                        $categoryIds = [$category->id];
-                    }
-                    
-                    // Filter products that belong to any of these categories
+                    $categoryIds = $children->isNotEmpty() ? $children->push($category->id)->toArray() : [$category->id];
                     $productsQuery->whereHas('categories', function($query) use ($categoryIds) {
                         $query->whereIn('product_categories.id', $categoryIds);
                     });
                 }
             }
-
-            // Filter by types if type_ids array is provided
-            if (!empty($typeIds) && is_array($typeIds)) {
-                // Filter products that belong to any of these types
+    
+            if (!empty($typeIds)) {
                 $productsQuery->whereHas('types', function($query) use ($typeIds) {
                     $query->whereIn('product_types.id', $typeIds);
                 });
             }
-
-            // Filter by colors if color_ids array is provided
-            if (!empty($colorIds) && is_array($colorIds)) {
-                // Filter products that have images with any of these colors
+    
+            if (!empty($colorIds)) {
                 $productsQuery->whereHas('images', function($query) use ($colorIds) {
                     $query->whereIn('product_color_id', $colorIds)->where('status', true);
                 });
             }
-
-            // Filter by price range using filter IDs or direct price parameters
+    
+            // === Qiymət filteri (min/max və ya predefined range-lər) ===
             $appliedMinPrice = null;
             $appliedMaxPrice = null;
-            
-            // First check for direct price parameters
+    
             if ($minPrice !== null || $maxPrice !== null) {
                 $appliedMinPrice = $minPrice;
                 $appliedMaxPrice = $maxPrice;
-                
-                // Apply direct price range filter
-                if ($appliedMinPrice !== null) {
-                    $productsQuery->where('price', '>=', $appliedMinPrice);
-                }
-                
-                if ($appliedMaxPrice !== null) {
-                    $productsQuery->where('price', '<=', $appliedMaxPrice);
-                }
-            }
-            // If no direct price parameters, check for filter IDs
-            elseif (!empty($filterIds) && is_array($filterIds)) {
-                // Get price filters by IDs
+                if ($appliedMinPrice !== null) $productsQuery->where('price', '>=', $appliedMinPrice);
+                if ($appliedMaxPrice !== null) $productsQuery->where('price', '<=', $appliedMaxPrice);
+            } elseif (!empty($filterIds)) {
                 $priceFilters = ProductPriceFilter::whereIn('id', $filterIds)->get();
-                
                 if ($priceFilters->isNotEmpty()) {
-                    // Get min and max prices from all selected filters
                     $appliedMinPrice = $priceFilters->min('min_price');
                     $appliedMaxPrice = $priceFilters->max('max_price');
-                    
-                    // Apply price range filter
-                    if ($appliedMinPrice !== null) {
-                        $productsQuery->where('price', '>=', $appliedMinPrice);
-                    }
-                    
-                    if ($appliedMaxPrice !== null) {
-                        $productsQuery->where('price', '<=', $appliedMaxPrice);
-                    }
+                    if ($appliedMinPrice !== null) $productsQuery->where('price', '>=', $appliedMinPrice);
+                    if ($appliedMaxPrice !== null) $productsQuery->where('price', '<=', $appliedMaxPrice);
                 }
             }
-
-            // Apply sorting
+    
+            // === Sort əməliyyatları ===
             switch ($sort) {
-                case 'price_asc':
-                    $productsQuery->orderBy('price', 'asc')->orderBy('id', 'desc');
-                    break;
-                case 'price_desc':
-                    $productsQuery->orderBy('price', 'desc')->orderBy('id', 'desc');
-                    break;
-                case 'newest':
-                    $productsQuery->orderBy('created_at', 'desc')->orderBy('id', 'desc');
-                    break;
-                case 'oldest':
-                    $productsQuery->orderBy('created_at', 'asc')->orderBy('id', 'asc');
-                    break;
+                case 'price_asc': $productsQuery->orderBy('price', 'asc'); break;
+                case 'price_desc': $productsQuery->orderBy('price', 'desc'); break;
+                case 'newest': $productsQuery->orderBy('created_at', 'desc'); break;
+                case 'oldest': $productsQuery->orderBy('created_at', 'asc'); break;
                 case 'view_count':
-                default:
-                    $productsQuery->orderBy('view_count', 'desc')->orderBy('id', 'desc');
-                    break;
+                default: $productsQuery->orderBy('view_count', 'desc'); break;
             }
-            
-
-            // Get products with pagination
+    
+            // === Pagination ===
             $products = $productsQuery->paginate($perPage, ['*'], 'page', $page);
-
-            // Calculate min and max prices from ALL products in the database (not just filtered ones)
+    
+            // Min-max price (bütün məhsullardan)
             $allProducts = Product::active()->get();
             $actualMinPrice = $allProducts->isNotEmpty() ? $allProducts->min('price') : null;
             $actualMaxPrice = $allProducts->isNotEmpty() ? $allProducts->max('price') : null;
-
+    
             $productsData = $products->map(function ($product) use ($languageId) {
                 $translation = $product->translates->first();
-                // Find main image - first try to find is_main=true, then fallback to first image
-                $mainImage = $product->images->where('is_main', true)->first();
-                if (!$mainImage) {
-                    $mainImage = $product->images->first();
-                }
-                
-                // Get category information
+                $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
                 $categorySlug = null;
                 $parentSlug = null;
-                
+    
                 if ($product->categories->isNotEmpty()) {
                     $category = $product->categories->first();
                     $categoryTranslation = $category->translates->first();
                     $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
-                    
                     if ($category->parent_id) {
                         $parentCategory = ProductCategory::find($category->parent_id);
                         if ($parentCategory) {
@@ -345,7 +294,7 @@ class ProductsController extends Controller
                         }
                     }
                 }
-                
+    
                 $productTypes = $product->types->map(function ($type) {
                     $translation = $type->translates->first();
                     return [
@@ -353,27 +302,12 @@ class ProductsController extends Controller
                         'title' => $translation ? $translation->title : ''
                     ];
                 });
-            
-                // ✨ Yeni əlavə: inCart, inFavorite, inCompare
+    
                 $user = auth('sanctum')->user();
-                $inCart = false;
-                $inFavorite = false;
-                $inCompare = false;
-            
-                if ($user) {
-                    $inCart = \App\Models\Cart::where('user_id', $user->id)
-                        ->where('product_id', $product->id)
-                        ->exists();
-            
-                    $inFavorite = \App\Models\Favorite::where('user_id', $user->id)
-                        ->where('product_id', $product->id)
-                        ->exists();
-            
-                    $inCompare = \App\Models\Compare::where('user_id', $user->id)
-                        ->where('product_id', $product->id)
-                        ->exists();
-                }
-            
+                $inCart = $user ? \App\Models\Cart::where('user_id', $user->id)->where('product_id', $product->id)->exists() : false;
+                $inFavorite = $user ? \App\Models\Favorite::where('user_id', $user->id)->where('product_id', $product->id)->exists() : false;
+                $inCompare = $user ? \App\Models\Compare::where('user_id', $user->id)->where('product_id', $product->id)->exists() : false;
+    
                 return [
                     'id' => $product->id,
                     'title' => $translation ? $translation->title : '',
@@ -390,9 +324,7 @@ class ProductsController extends Controller
                     'inCompare' => $inCompare,
                 ];
             });
-            
-
-            // Pagination data
+    
             $paginationData = [
                 'current_page' => $products->currentPage(),
                 'per_page' => $products->perPage(),
@@ -402,7 +334,7 @@ class ProductsController extends Controller
                 'to' => $products->lastItem(),
                 'has_more_pages' => $products->hasMorePages()
             ];
-
+    
             return response()->json([
                 'success' => true,
                 'message' => 'Product categories retrieved successfully',
@@ -423,7 +355,7 @@ class ProductsController extends Controller
                     'seo_text' => $categorySeoText
                 ]
             ]);
-
+    
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -431,6 +363,7 @@ class ProductsController extends Controller
             ], 500);
         }
     }
+    
 
     /**
      * Build hierarchical structure for categories
@@ -498,131 +431,7 @@ class ProductsController extends Controller
         return $rootCategories;
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/products/{slug}",
-     *     summary="Get single product by slug",
-     *     tags={"Products"},
-     *     @OA\Parameter(
-     *         name="slug",
-     *         in="path",
-     *         description="Product slug",
-     *         required=true,
-     *         @OA\Schema(type="string", example="masa-1")
-     *     ),
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language code (az, en, ru)",
-     *         required=false,
-     *         @OA\Schema(type="string", default="az")
-     *     ),
-     *     @OA\Parameter(
-     *         name="color_id",
-     *         in="query",
-     *         description="Filter images by color ID. If not provided, shows all images for the product.",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Product retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="title", type="string", example="Masa"),
-     *                 @OA\Property(property="slug", type="string", example="masa-1"),
-     *                 @OA\Property(property="price", type="number", format="float", example=299.99),
-     *                 @OA\Property(property="discount_price", type="number", format="float", example=269.99, description="Calculated discount price if discount_percent > 0"),
-     *                 @OA\Property(property="discount_percent", type="number", format="float", example=10.00),
-     *                 @OA\Property(property="view_count", type="integer", example=150),
-     *                 @OA\Property(
-     *                     property="product_types",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="title", type="string", example="Masa")
-     *                     )
-     *                 ),
-     *                 @OA\Property(
-     *                     property="product_tags",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="title", type="string", example="Premium")
-     *                     )
-     *                 ),
-                      *                 @OA\Property(
-                 *                     property="product_accordions",
-                 *                     type="array",
-                 *                     @OA\Items(
-                 *                         @OA\Property(property="id", type="integer", example=1),
-                 *                         @OA\Property(property="title", type="string", example="Product Features"),
-                 *                         @OA\Property(property="content", type="string", example="Detailed product features and specifications")
-                 *                     )
-                 *                 ),
-                 *                 @OA\Property(
-                 *                     property="product_details",
-                 *                     type="array",
-                 *                     @OA\Items(
-                 *                         @OA\Property(property="id", type="integer", example=1),
-                 *                         @OA\Property(property="keyword", type="string", example="Material"),
-                 *                         @OA\Property(property="value", type="string", example="Wood")
-                 *                     )
-                 *                 ),
-                 *                 @OA\Property(
-                 *                     property="product_detail_values",
-                 *                     type="array",
-                 *                     @OA\Items(
-                 *                         @OA\Property(property="id", type="integer", example=1),
-                 *                         @OA\Property(property="keyword", type="string", example="Size"),
-                 *                         @OA\Property(
-                 *                             property="details",
-                 *                             type="array",
-                 *                             @OA\Items(
-                 *                                 @OA\Property(property="id", type="integer", example=1),
-                 *                                 @OA\Property(property="keyword", type="string", example="Small"),
-                 *                                 @OA\Property(property="value", type="string", example="30x40cm")
-                 *                             )
-                 *                         )
-                 *                     )
-                 *                 ),
-                 *                 @OA\Property(
-                 *                     property="available_colors",
-                 *                     type="array",
-                 *                     @OA\Items(
-                 *                         @OA\Property(property="id", type="integer", example=1),
-                 *                         @OA\Property(property="color_code", type="string", example="#FF0000")
-                 *                     )
-                 *                 ),
-                 *                 @OA\Property(
-     *                     property="images",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="image_url", type="string", example="https://admin.gardaslar.coder.az/storage/products/image.jpg"),
-     *                         @OA\Property(property="is_main", type="boolean", example=true),
-     *                         @OA\Property(property="order", type="integer", example=1),
-     *                         @OA\Property(property="color_id", type="integer", example=1, description="Only included if not null")
-     *                     )
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Product not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Product not found")
-     *         )
-     *     )
-     * )
-     */
+   
     public function show(Request $request, $slug)
     {
         try {
@@ -920,44 +729,6 @@ class ProductsController extends Controller
     
     
 
-    /**
-     * @OA\Get(
-     *     path="/api/products/{id}/details",
-     *     summary="Get product details",
-     *     tags={"Products"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="Product ID",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=45)
-     *     ),
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language code (az, en, ru)",
-     *         required=false,
-     *         @OA\Schema(type="string", default="az")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Product details retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="keyword", type="string", example="Material"),
-     *                     @OA\Property(property="value", type="string", example="Wood")
-     *                 )
-     *             )
-     *         )
-     *     )
-     * )
-     */
     public function details(Request $request, $id)
     {
         try {
@@ -1163,43 +934,7 @@ class ProductsController extends Controller
     
     
 
-    /**
-     * @OA\Get(
-     *     path="/api/products/{id}/detail-values",
-     *     summary="Get product detail values",
-     *     tags={"Products"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="Product ID",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=45)
-     *     ),
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language code (az, en, ru)",
-     *         required=false,
-     *         @OA\Schema(type="string", default="az")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Product detail values retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="keyword", type="string", example="Color Options")
-     *                 )
-     *             )
-     *         )
-     *     )
-     * )
-     */
+  
     public function detailValues(Request $request, $id)
     {
         try {
@@ -1239,51 +974,7 @@ class ProductsController extends Controller
         }
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/products/{id}/detail-values/{detailValueId}/details",
-     *     summary="Get product detail value details",
-     *     tags={"Products"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="Product ID",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=45)
-     *     ),
-     *     @OA\Parameter(
-     *         name="detailValueId",
-     *         in="path",
-     *         description="Detail Value ID",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language code (az, en, ru)",
-     *         required=false,
-     *         @OA\Schema(type="string", default="az")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Product detail value details retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="keyword", type="string", example="Red"),
-     *                     @OA\Property(property="value", type="string", example="Bright red color option")
-     *                 )
-     *             )
-     *         )
-     *     )
-     * )
-     */
+  
     public function detailValueDetails(Request $request, $id, $detailValueId)
     {
         try {
@@ -1332,31 +1023,7 @@ class ProductsController extends Controller
 
    
 
-    /**
-     * @OA\Get(
-     *     path="/api/categories",
-     *     summary="Get all product categories with hierarchical structure",
-     *     tags={"Products"},
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language ID (1=az, 2=en, 3=ru)",
-     *         required=false,
-     *         @OA\Schema(type="integer", default=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Categories retrieved successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Categories retrieved successfully"),
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="categories", type="array", @OA\Items(type="object"))
-     *             )
-     *         )
-     *     )
-     * )
-     */
+    
     public function categoriesOnly(Request $request)
     {
         try {
