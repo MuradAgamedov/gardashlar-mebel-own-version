@@ -7,6 +7,7 @@
     <meta name="description" content="Admin panel login">
     <meta name="keywords" content="admin, login">
     <meta name="author" content="Admin">
+    <meta name="robots" content="noindex, nofollow">
     <title>Admin Login</title>
     
     <!-- Favicon icon-->
