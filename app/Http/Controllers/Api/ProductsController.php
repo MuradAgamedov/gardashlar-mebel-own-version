@@ -274,7 +274,7 @@ class ProductsController extends Controller
                     break;
                 default: 
                     // İlk dəfə çağırıldıqda ən yenilər birinci, ən köhnələr sonda olsun
-                    $productsQuery->orderBy('created_at', 'desc'); 
+                    $productsQuery->orderBy('created_at', 'asc'); 
                     break;
             }
             
