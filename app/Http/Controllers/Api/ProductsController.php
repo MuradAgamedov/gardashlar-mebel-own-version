@@ -128,10 +128,10 @@ class ProductsController extends Controller
     
             // Sort options
             $sortOptions = [
-                ['value' => 'price_asc', 'label' => 'price_asc'],
-                ['value' => 'price_desc', 'label' => 'price_desc'],
                 ['value' => 'newest', 'label' => 'newest'],
                 ['value' => 'oldest', 'label' => 'oldest'],
+                ['value' => 'price_asc', 'label' => 'price_asc'],
+                ['value' => 'price_desc', 'label' => 'price_desc'],
                 ['value' => 'view_count', 'label' => 'view_count']
             ];
     
