@@ -96,7 +96,7 @@
                                                                                                          <a href="{{ route('admin.phone-types.phones.create', $phoneType->id) }}" class="btn btn-sm btn-success">
                                                          <i class="material-icons-outlined">add</i> 
                                                      </a>
-                                                     @if($phoneType->id != 3)
+                                                     @if($phoneType->id != 3 || $phoneType->id != 15)
                                                          <button type="button" class="btn btn-sm btn-danger delete-btn" 
                                                                  data-title="{{ $firstTranslation ? $firstTranslation->title : 'Phone Type #' . $phoneType->id }}"
                                                                  data-url="{{ route('admin.phone-types.destroy', $phoneType) }}">
