@@ -48,35 +48,38 @@ class PhoneController extends Controller
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
             $cacheKey = "api_phones_{$languageId}";
-            
+    
+            // 🔹 Cache təmizlə (test zamanı köhnə nəticə qalmasın)
+            Cache::forget($cacheKey);
+    
             $phoneTypes = Cache::rememberForever($cacheKey, function () use ($languageId) {
                 return \App\Models\PhoneType::with([
-                    'translates' => function($query) use ($languageId) {
+                    'translates' => function ($query) use ($languageId) {
                         $query->where('language_id', $languageId);
                     },
-                    'phones' => function($query) {
+                    'phones' => function ($query) {
                         $query->where('status', true)
-                              ->where('id', '!=', 15) // 👈 15 id-li phone-u çıxartdıq
-                              ->orderBy('order');
+                            ->where('id', '!=', 15) // 🔹 15 id-li phone çıxarılır
+                            ->orderBy('order');
                     }
                 ])
-                ->where('id', '!=', 3)
-                ->where('status', true)
-                ->orderBy('order')
-                ->get()
-                ->map(function ($phoneType) {
-                    $translation = $phoneType->translates->first();
-                    return [
-                        'id' => $phoneType->id,
-                        'type' => $translation ? $translation->title : '',
-                        'phones' => $phoneType->phones->map(function ($phone) {
-                            return [
-                                'id' => $phone->id,
-                                'phone' => $phone->phone
-                            ];
-                        })
-                    ];
-                });
+                    ->where('status', true)
+                    ->whereNotIn('id', [3, 15]) // 🔹 3 və 15 id-li PhoneType çıxarılır
+                    ->orderBy('order')
+                    ->get()
+                    ->map(function ($phoneType) {
+                        $translation = $phoneType->translates->first();
+                        return [
+                            'id' => $phoneType->id,
+                            'type' => $translation ? $translation->title : '',
+                            'phones' => $phoneType->phones->map(function ($phone) {
+                                return [
+                                    'id' => $phone->id,
+                                    'phone' => $phone->phone,
+                                ];
+                            })->values(), // 🔹 indexləri sıfırla (frontend üçün daha təmiz)
+                        ];
+                    });
             });
     
             return response()->json([
@@ -92,6 +95,7 @@ class PhoneController extends Controller
             ], 500);
         }
     }
+    
 
     public function specialPhone(Request $request): JsonResponse
 {
