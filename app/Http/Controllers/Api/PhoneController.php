@@ -98,30 +98,48 @@ class PhoneController extends Controller
     
 
     public function specialPhone(Request $request): JsonResponse
-{
-    try {
-        $cacheKey = 'api_special_phone_15';
-
-        $phone = Cache::rememberForever($cacheKey, function () {
-            return Phone::select(['id', 'phone'])
-                ->where('id', 15)
+    {
+        try {
+            $cacheKey = 'api_special_phone_type_15';
+    
+            $phone = Cache::rememberForever($cacheKey, function () {
+                $phoneType = \App\Models\PhoneType::with(['phones' => function ($query) {
+                    $query->where('status', true)
+                          ->orderBy('order');
+                }])
+                ->where('id', 15) // 🔹 PhoneType id = 15
                 ->where('status', true)
-                ->first(); // yalnız birini qaytarır
-        });
-
-        return response()->json([
-            'success' => true,
-            'data' => $phone
-        ], 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Error retrieving special phone: ' . $e->getMessage(),
-            'data' => null
-        ], 500);
+                ->first();
+    
+                if (!$phoneType || $phoneType->phones->isEmpty()) {
+                    return null; // Əgər 15-ci PhoneType və ya aktiv nömrə yoxdursa
+                }
+    
+                // 🔹 Yalnız ilk nömrəni götürürük
+                $firstPhone = $phoneType->phones->first();
+    
+                return [
+                    'phone_type_id' => $phoneType->id,
+                    'phone_type_title' => optional($phoneType->translates->first())->title ?? 'Type #15',
+                    'id' => $firstPhone->id,
+                    'phone' => $firstPhone->phone,
+                ];
+            });
+    
+            return response()->json([
+                'success' => true,
+                'data' => $phone
+            ], 200);
+    
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving special phone: ' . $e->getMessage(),
+                'data' => null
+            ], 500);
+        }
     }
-}
+    
 
     
 } 
