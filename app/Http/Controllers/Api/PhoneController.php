@@ -70,8 +70,7 @@ class PhoneController extends Controller
                     ->map(function ($phoneType) {
                         $translation = $phoneType->translates->first();
                         return [
-                            'id' => $phoneType->id,
-                            'type' => $translation ? $translation->title : '',
+            
                             'phones' => $phoneType->phones->map(function ($phone) {
                                 return [
                                     'id' => $phone->id,
@@ -115,15 +114,8 @@ class PhoneController extends Controller
                     return null; // Əgər 15-ci PhoneType və ya aktiv nömrə yoxdursa
                 }
     
-                // 🔹 Yalnız ilk nömrəni götürürük
-                $firstPhone = $phoneType->phones->first();
-    
-                return [
-                    'phone_type_id' => $phoneType->id,
-                    'phone_type_title' => optional($phoneType->translates->first())->title ?? 'Type #15',
-                    'id' => $firstPhone->id,
-                    'phone' => $firstPhone->phone,
-                ];
+                // 🔹 Yalnız birinci nömrəni götür və sadəcə nömrəni qaytar
+                return $phoneType->phones->first()->phone;
             });
     
             return response()->json([
@@ -139,6 +131,7 @@ class PhoneController extends Controller
             ], 500);
         }
     }
+    
     
 
     
