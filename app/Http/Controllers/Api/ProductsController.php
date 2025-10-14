@@ -260,13 +260,25 @@ class ProductsController extends Controller
     
             // === Sort əməliyyatları ===
             switch ($sort) {
-                case 'price_asc': $productsQuery->orderBy('price', 'asc'); break;
-                case 'price_desc': $productsQuery->orderBy('price', 'desc'); break;
-                case 'newest': $productsQuery->orderBy('created_at', 'desc'); break;
-                case 'oldest': $productsQuery->orderBy('created_at', 'asc'); break;
-                case 'view_count':
-                default: $productsQuery->orderBy('view_count', 'desc'); break;
+                case 'price_asc': 
+                    $productsQuery->orderBy('price', 'asc'); 
+                    break;
+                case 'price_desc': 
+                    $productsQuery->orderBy('price', 'desc'); 
+                    break;
+                case 'newest': 
+                    $productsQuery->orderBy('created_at', 'desc'); 
+                    break;
+                case 'oldest': 
+                    $productsQuery->orderBy('created_at', 'asc'); 
+                    break;
+                default: 
+                    // İlk dəfə çağırıldıqda ən yenilər birinci, ən köhnələr sonda olsun
+                    $productsQuery->orderBy('created_at', 'desc'); 
+                    break;
             }
+            
+            
     
             // === Pagination ===
             $products = $productsQuery->paginate($perPage, ['*'], 'page', $page);
