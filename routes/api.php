@@ -154,6 +154,7 @@ Route::get('/blog-categories', [BlogCategoryController::class, 'index'])->name('
 // Phones API Routes
 Route::get('/general-phones', [PhoneController::class, 'generalPhones'])->name('api.general-phones');
 Route::get('/phones', [PhoneController::class, 'phones'])->name('api.phones');
+Route::get('/wp-phone', [PhoneController::class, 'specialPhone'])->name('api.special-phone');
 
 // Emails API Routes
 Route::get('/emails', [EmailController::class, 'index'])->name('api.emails.index');
