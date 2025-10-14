@@ -21,6 +21,7 @@ class PhoneController extends Controller
     {
         $phones = $this->repository->getPhones();
         $phoneTypes = $this->repository->getPhoneTypes();
+        dd($phoneTypes);
         
         return view('admin.phones.index', compact('phones', 'phoneTypes'));
     }

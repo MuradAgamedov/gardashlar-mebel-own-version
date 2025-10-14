@@ -24,7 +24,6 @@ class PhoneTypeController extends Controller
     public function index()
     {
         $phoneTypes = $this->repository->getPhoneTypes();
-        dd($phoneTypes);
         
         $languages = $this->languageRepository->getAllLanguages();
         
