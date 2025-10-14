@@ -20,7 +20,6 @@ class PhoneController extends Controller
     public function index()
     {
         $phones = $this->repository->getPhones();
-        dd($phones);
         $phoneTypes = $this->repository->getPhoneTypes();
         
         return view('admin.phones.index', compact('phones', 'phoneTypes'));

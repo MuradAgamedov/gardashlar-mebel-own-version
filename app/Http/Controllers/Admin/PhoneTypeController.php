@@ -24,6 +24,8 @@ class PhoneTypeController extends Controller
     public function index()
     {
         $phoneTypes = $this->repository->getPhoneTypes();
+        dd($phoneTypes);
+        
         $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.phone-types.index', compact('phoneTypes', 'languages'));
