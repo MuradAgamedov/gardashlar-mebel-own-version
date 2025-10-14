@@ -346,7 +346,7 @@ $products = $productsPaginated->map(function($product) use ($languageId) {
             ->where('product_id', $product->id)
             ->exists();
 
-        $inCompare = \App\Models\Compare::where('user_id', $user->id)
+        $inCompare = \App\Models\ProductCompare::where('user_id', $user->id)
             ->where('product_id', $product->id)
             ->exists();
     }

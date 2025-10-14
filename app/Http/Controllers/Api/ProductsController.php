@@ -306,7 +306,7 @@ class ProductsController extends Controller
                 $user = auth('sanctum')->user();
                 $inCart = $user ? \App\Models\Cart::where('user_id', $user->id)->where('product_id', $product->id)->exists() : false;
                 $inFavorite = $user ? \App\Models\Favorite::where('user_id', $user->id)->where('product_id', $product->id)->exists() : false;
-                $inCompare = $user ? \App\Models\Compare::where('user_id', $user->id)->where('product_id', $product->id)->exists() : false;
+                $inCompare = $user ? \App\Models\ProductCompare::where('user_id', $user->id)->where('product_id', $product->id)->exists() : false;
     
                 return [
                     'id' => $product->id,
@@ -513,7 +513,7 @@ class ProductsController extends Controller
             // --- Compare data
             $inCompare = false;
             if ($user) {
-                $inCompare = \App\Models\Compare::where('user_id', $user->id)
+                $inCompare = \App\Models\ProductCompare::where('user_id', $user->id)
                     ->where('product_id', $product->id)
                     ->exists();
             }
@@ -690,7 +690,7 @@ class ProductsController extends Controller
     
                 $inCompare = false;
                 if ($user) {
-                    $inCompare = \App\Models\Compare::where('user_id', $user->id)
+                    $inCompare = \App\Models\ProductCompare::where('user_id', $user->id)
                         ->where('product_id', $item->id)
                         ->exists();
                 }
@@ -814,7 +814,7 @@ class ProductsController extends Controller
             // ✳️ inCompare
             $inCompare = false;
             if ($user) {
-                $inCompare = \App\Models\Compare::where('user_id', $user->id)
+                $inCompare = \App\Models\ProductCompare::where('user_id', $user->id)
                     ->where('product_id', $product->id)
                     ->exists();
             }
@@ -882,7 +882,7 @@ class ProductsController extends Controller
                 // --- inCompare
                 $inCompare = false;
                 if ($user) {
-                    $inCompare = \App\Models\Compare::where('user_id', $user->id)
+                    $inCompare = \App\Models\ProductCompare::where('user_id', $user->id)
                         ->where('product_id', $product->id)
                         ->exists();
                 }
