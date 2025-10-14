@@ -69,7 +69,7 @@ use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\CompareController;
 use App\Http\Controllers\Api\RoluteeteActionController;
 use App\Http\Controllers\Api\Payment\PaymentController;
-
+use App\Http\Controllers\Api\GetAllCountController;
 
 
 // Language API Routes
@@ -297,6 +297,8 @@ Route::post('/products/cart/dont-registered', [CartController::class, 'checkCard
 
 // Product Favorites API Routes (Requires Authentication)
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/get-all-count', [GetAllCountController::class, 'index'])->name('api.get-all-count');
+
     Route::post('/add-favorite', [FavoriteController::class, 'addFavorite'])->name('api.addFavorite');
     Route::get('/get-favorites', [FavoriteController::class, 'getFavorites'])->name('api.getFavorites');
     Route::delete('/remove-favorite', [FavoriteController::class, 'removeFavorite'])->name('api.removeFavorite');
