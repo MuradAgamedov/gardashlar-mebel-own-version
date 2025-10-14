@@ -37,6 +37,7 @@ class RoluteeteActionController extends Controller
         $request->validate([
             'percent' => 'nullable|numeric|min:1|max:100',
             'image' => 'nullable|image|max:5120',
+            "percent_value" => "nullable"
         ]);
 
         $imagePath = null;
@@ -88,6 +89,7 @@ class RoluteeteActionController extends Controller
         $action->update([
             'percent' => $request->input('percent'),
             'image' => $imagePath,
+            "percent_value" => "nullable"
         ]);
 
         // Tərcümələri update et
