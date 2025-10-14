@@ -16,6 +16,6 @@ class RoluteeteAction extends Model
 
     public function translates()
     {
-        return $this->hasMany(RoluteeteActionTranslate::class);
+        return $this->hasMany(RoluteeteActionTranslate::class, 'roluteete_action_id', 'id');
     }
 }
