@@ -31,9 +31,7 @@ class PaymentLoginHelper
                 'password' => '2&nOl0J9^O-#',
             ]);
             
-            dd($response->status(), $response->body());
-            
-            dd($response);
+          
             Log::info('UnitedPayment Login raw response:', [
                 'status' => $response->status(),
                 'body'   => $response->body(),
