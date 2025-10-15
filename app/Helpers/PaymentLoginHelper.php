@@ -28,7 +28,7 @@ class PaymentLoginHelper
                 'Content-Type' => 'application/json; charset=utf-8',
             ])->post($baseUrl . '/auth/', [
                 'email' => $email,
-                'password' => '2&nOl0J9^O-#',
+                'password' => $password,
             ]);
             
           
