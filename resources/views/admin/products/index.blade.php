@@ -262,21 +262,20 @@
                                                        title="Edit">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
-                                                    <form action="{{ route('admin.products.duplicate', $product) }}" method="POST" class="d-inline">
+                                                    <form action="{{ route('admin.products.duplicate', $product) }}" method="POST" class="d-inline-flex align-items-center gap-2">
                                                         @csrf
-                                                        <div class="d-flex align-items-center gap-1">
-                                                            <select name="category_id" class="form-select form-select-sm category-select" 
-                                                                    id="categorySelect{{ $product->id }}" 
-                                                                    style="width:100px;" 
+                                                        <div class="d-flex align-items-center gap-2 bg-light border rounded px-2 py-1" style="min-width: 150px;">
+                                                            <select name="category_id" id="categorySelect{{ $product->id }}"
+                                                                    class="form-select form-select-sm category-select border-0 bg-transparent flex-grow-1"
                                                                     required>
-                                                                <option value="">Select category</option>
+                                                                <option value="">Category</option>
                                                                 @foreach($categories as $cat)
-                                                                    <option value="{{ $cat->id }}">{{ $cat->translate()->title ?? 'No title' }}</option>
+                                                                    <option value="{{ $cat->id }}">{{ Str::limit($cat->translate()->title ?? 'No title', 20) }}</option>
                                                                 @endforeach
                                                             </select>
-                                                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Duplicate Product" 
-                                                                    onclick="return validateDuplicate({{ $product->id }})">
-                                                                <i class="material-icons-outlined">content_copy</i>
+                                                            <button type="submit" class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center"
+                                                                    title="Duplicate Product" onclick="return validateDuplicate({{ $product->id }})">
+                                                                <i class="material-icons-outlined" style="font-size: 16px;">content_copy</i>
                                                             </button>
                                                         </div>
                                                     </form>
@@ -397,6 +396,22 @@
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
+
+.category-select {
+    width: 120px !important;
+    font-size: 12px !important;
+    padding: 2px 4px !important;
+    border-radius: 6px !important;
+}
+
+.category-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.2);
+}
+
+.btn-outline-secondary {
+    padding: 3px 6px !important;
+    border-radius: 6px !important;
+}
 </style>
 @endpush
 
@@ -422,20 +437,17 @@ document.addEventListener('DOMContentLoaded', function() {
         $('.category-select').select2({
             placeholder: 'Category',
             allowClear: false,
-            width: '100px',
+            width: '120px',
             dropdownAutoWidth: false,
             minimumResultsForSearch: 8, // Show search box if more than 8 options
+            dropdownParent: $('body'), // Prevent z-index issues
             templateResult: function(option) {
                 if (!option.id) return option.text;
-                // Truncate long text
-                var text = option.text.length > 15 ? option.text.substring(0, 15) + '...' : option.text;
-                return $('<span title="' + option.text + '">' + text + '</span>');
+                return $('<span title="' + option.text + '">' + option.text + '</span>');
             },
             templateSelection: function(option) {
                 if (!option.id) return option.text;
-                // Truncate selected text
-                var text = option.text.length > 12 ? option.text.substring(0, 12) + '...' : option.text;
-                return $('<span title="' + option.text + '">' + text + '</span>');
+                return $('<span title="' + option.text + '">' + option.text + '</span>');
             }
         });
     });
