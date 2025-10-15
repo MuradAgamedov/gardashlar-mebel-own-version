@@ -86,7 +86,6 @@ class PaymentController extends Controller
         ]);
 
         $response = PaymentLoginHelper::withAuth()->post($baseUrl.'/transactions/checkout', $payload);
-dd($response);
         if ($response->successful()) {
             $body = $response->json();
             $redirectUrl = $body['url'] ?? null;
