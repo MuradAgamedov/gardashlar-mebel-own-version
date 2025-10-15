@@ -18,10 +18,7 @@ class PaymentLoginHelper
             $email    = env("UNITED_PAYMENT_API_EMAIL", "office@gardashlar.com");
             $password = env("UNITED_PAYMENT_API_PASSWORD", "2&nOl0J9^O-#");
     
-            // Cache yoxlaması (isteğe bağlı)
-            if (Cache::has('united_payment_token')) {
-                return Cache::get('united_payment_token');
-            }
+            
     
             $response = Http::withOptions([
                 'verify' => false, // ✅ SSL yoxlamasını söndür
