@@ -85,7 +85,7 @@ class PaymentController extends Controller
             'status' => 'processing',
         ]);
 
-        $response = PaymentLoginHelper::withAuth()->post($baseUrl.'/transactions/pay', $payload);
+        $response = PaymentLoginHelper::withAuth()->post($baseUrl.'/transactions/checkout', $payload);
 dd($response);
         if ($response->successful()) {
             $body = $response->json();
