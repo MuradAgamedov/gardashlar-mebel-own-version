@@ -171,75 +171,119 @@ class ProductController extends Controller
             'product_tags' => 'nullable|string',
             'status' => 'boolean'
         ]);
-
+    
         try {
+            // Əsas məhsul məlumatlarını yenilə
             $product->update([
                 'price' => $request->input('price'),
                 'discount_price' => $request->input('discount_price', 0),
                 'status' => $request->boolean('status', true)
             ]);
-
-            // Update translations
+    
+            // === TRANSLATIONS (bütün eyni slug-larda yenilə) ===
             foreach ($request->input('translations') as $translation) {
+                $languageId = $translation['language_id'];
+                $newSlug = $translation['slug'];
+    
+                // Əvvəlki slug-u götür
+                $existing = ProductTranslate::where('product_id', $product->id)
+                    ->where('language_id', $languageId)
+                    ->first();
+    
+                $oldSlug = $existing ? $existing->slug : $newSlug;
+    
+                // Bu məhsulun tərcüməsini yenilə və ya yarat
                 ProductTranslate::updateOrCreate(
                     [
                         'product_id' => $product->id,
-                        'language_id' => $translation['language_id']
+                        'language_id' => $languageId
                     ],
                     [
                         'title' => $translation['title'],
                         'description' => $translation['description'] ?? null,
-                        'slug' => $translation['slug'],
+                        'slug' => $newSlug,
                         'seo_title' => $translation['seo_title'] ?? null,
                         'seo_keywords' => $translation['seo_keywords'] ?? null,
                         'seo_description' => $translation['seo_description'] ?? null,
                     ]
                 );
-            }
-
-            // Sync categories
-            if ($request->has('product_categories') && !empty($request->input('product_categories'))) {
-                $categories = json_decode($request->input('product_categories'), true);
-                if (is_array($categories)) {
-                    $product->categories()->sync($categories);
-                } else {
-                    $product->categories()->detach();
+    
+                // === Eyni slug-a malik digər məhsulların tərcümələrini də yenilə ===
+                $sameSlugProducts = ProductTranslate::where('language_id', $languageId)
+                    ->where('slug', $oldSlug)
+                    ->where('product_id', '!=', $product->id)
+                    ->get();
+    
+                foreach ($sameSlugProducts as $sameTr) {
+                    $sameTr->update([
+                        'title' => $translation['title'],
+                        'description' => $translation['description'] ?? null,
+                        'slug' => $newSlug,
+                        'seo_title' => $translation['seo_title'] ?? null,
+                        'seo_keywords' => $translation['seo_keywords'] ?? null,
+                        'seo_description' => $translation['seo_description'] ?? null,
+                    ]);
                 }
-            } else {
-                $product->categories()->detach();
             }
-
-            // Sync types
-            if ($request->has('product_types') && !empty($request->input('product_types'))) {
+    
+            // === Kateqoriya — Yalnız bu məhsulda dəyişsin ===
+            if ($request->filled('product_categories')) {
+                $categories = json_decode($request->input('product_categories'), true);
+                $product->categories()->sync(is_array($categories) ? $categories : []);
+            }
+    
+            // === Tiplər — bütün eyni slug-lar üçün dəyişsin ===
+            if ($request->filled('product_types')) {
                 $types = json_decode($request->input('product_types'), true);
                 if (is_array($types)) {
+                    // Bu məhsulda dəyiş
                     $product->types()->sync($types);
-                } else {
-                    $product->types()->detach();
+    
+                    // Eyni slug-lu məhsullarda da dəyiş
+                    $slugs = $product->translates->pluck('slug')->toArray();
+                    $sameProducts = Product::whereHas('translates', function ($q) use ($slugs) {
+                        $q->whereIn('slug', $slugs);
+                    })->where('id', '!=', $product->id)->get();
+    
+                    foreach ($sameProducts as $sameProd) {
+                        $sameProd->types()->sync($types);
+                    }
                 }
             } else {
                 $product->types()->detach();
             }
-
-            // Sync tags
-            if ($request->has('product_tags') && !empty($request->input('product_tags'))) {
+    
+            // === Tag-lar — bütün eyni slug-lar üçün dəyişsin ===
+            if ($request->filled('product_tags')) {
                 $tags = json_decode($request->input('product_tags'), true);
                 if (is_array($tags)) {
+                    // Bu məhsulda dəyiş
                     $product->tags()->sync($tags);
-                } else {
-                    $product->tags()->detach();
+    
+                    // Eyni slug-lu məhsullarda da dəyiş
+                    $slugs = $product->translates->pluck('slug')->toArray();
+                    $sameProducts = Product::whereHas('translates', function ($q) use ($slugs) {
+                        $q->whereIn('slug', $slugs);
+                    })->where('id', '!=', $product->id)->get();
+    
+                    foreach ($sameProducts as $sameProd) {
+                        $sameProd->tags()->sync($tags);
+                    }
                 }
             } else {
                 $product->tags()->detach();
             }
-
-            return redirect()->route('admin.products.index', ['page' => $request->input('current_page', 1)])
-                ->with('success', 'Product updated successfully.');
-
+    
+            return redirect()
+                ->route('admin.products.index', ['page' => $request->input('current_page', 1)])
+                ->with('success', 'Product updated successfully. Same slug items synced, category only updated for current product.');
+    
         } catch (\Exception $e) {
             return back()->with('error', 'Error occurred: ' . $e->getMessage());
         }
     }
+    
+    
 
     /**
      * Remove the specified resource from storage.
