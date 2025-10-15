@@ -265,13 +265,31 @@
                                                     <form action="{{ route('admin.products.duplicate', $product) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         <div class="d-flex align-items-center gap-1">
-                                                            <select name="category_id" class="form-select form-select-sm" style="width:120px;">
-                                                                <option value="">Select category</option>
-                                                                @foreach($categories as $cat)
-                                                                    <option value="{{ $cat->id }}">{{ $cat->translate()->title ?? 'No title' }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Duplicate Product">
+                                                            <div class="dropdown" style="width:120px;">
+                                                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" 
+                                                                        data-bs-toggle="dropdown" aria-expanded="false" 
+                                                                        id="categoryDropdown{{ $product->id }}">
+                                                                    Select category
+                                                                </button>
+                                                                <div class="dropdown-menu p-2" style="width: 250px;">
+                                                                    <input type="text" class="form-control form-control-sm mb-2" 
+                                                                           placeholder="Search categories..." 
+                                                                           id="categorySearch{{ $product->id }}"
+                                                                           onkeyup="filterCategories({{ $product->id }})">
+                                                                    <div class="category-options" id="categoryOptions{{ $product->id }}" style="max-height: 200px; overflow-y: auto;">
+                                                                        @foreach($categories as $cat)
+                                                                            <div class="category-option" data-value="{{ $cat->id }}" data-text="{{ $cat->translate()->title ?? 'No title' }}">
+                                                                                <a class="dropdown-item" href="#" onclick="selectCategory({{ $product->id }}, {{ $cat->id }}, '{{ $cat->translate()->title ?? 'No title' }}')">
+                                                                                    {{ $cat->translate()->title ?? 'No title' }}
+                                                                                </a>
+                                                                            </div>
+                                                                        @endforeach
+                                                                    </div>
+                                                                </div>
+                                                                <input type="hidden" name="category_id" id="selectedCategory{{ $product->id }}" value="">
+                                                            </div>
+                                                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Duplicate Product" 
+                                                                    onclick="return validateDuplicate({{ $product->id }})">
                                                                 <i class="material-icons-outlined">content_copy</i>
                                                             </button>
                                                         </div>
@@ -325,6 +343,30 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+.category-option .dropdown-item {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.category-option .dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-menu {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border: 1px solid #dee2e6;
+}
+
+.category-options {
+    border-top: 1px solid #dee2e6;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+}
+</style>
+@endpush
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -426,5 +468,50 @@ deleteBtn.addEventListener('click', function() {
         else alert(data.message);
     });
 });
+
+// Category search and selection functions
+function filterCategories(productId) {
+    const searchInput = document.getElementById('categorySearch' + productId);
+    const searchTerm = searchInput.value.toLowerCase();
+    const categoryOptions = document.getElementById('categoryOptions' + productId);
+    const options = categoryOptions.querySelectorAll('.category-option');
+    
+    options.forEach(option => {
+        const text = option.getAttribute('data-text').toLowerCase();
+        if (text.includes(searchTerm)) {
+            option.style.display = 'block';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+}
+
+function selectCategory(productId, categoryId, categoryTitle) {
+    // Update dropdown button text
+    const dropdownButton = document.getElementById('categoryDropdown' + productId);
+    dropdownButton.textContent = categoryTitle;
+    dropdownButton.classList.add('text-primary');
+    
+    // Set hidden input value
+    const hiddenInput = document.getElementById('selectedCategory' + productId);
+    hiddenInput.value = categoryId;
+    
+    // Close dropdown
+    const dropdown = new bootstrap.Dropdown(dropdownButton);
+    dropdown.hide();
+    
+    // Prevent default link behavior
+    event.preventDefault();
+    return false;
+}
+
+function validateDuplicate(productId) {
+    const selectedCategory = document.getElementById('selectedCategory' + productId).value;
+    if (!selectedCategory) {
+        alert('Please select a category for duplication');
+        return false;
+    }
+    return true;
+}
 </script>
 @endpush
