@@ -298,4 +298,73 @@ class ProductController extends Controller
             return response()->json(['success' => false, 'error' => $e->getMessage()]);
         }
     }
+
+
+    public function duplicate(Request $request, Product $product)
+{
+    $request->validate([
+        'category_id' => 'required|exists:product_categories,id'
+    ]);
+
+    try {
+        // Yeni product yaradılır (əsas məlumatlar)
+        $newProduct = $product->replicate(['view_count', 'order']); 
+        $newProduct->status = false; // Yeni məhsul default olaraq deaktiv olsun
+        $newProduct->save();
+
+        // Yeni məhsul üçün translations kopyalanır
+        foreach ($product->translates as $translate) {
+            $newTranslate = $translate->replicate();
+            $newTranslate->product_id = $newProduct->id;
+            $newTranslate->slug = $translate->slug . '-copy-' . $newProduct->id;
+            $newTranslate->save();
+        }
+
+        // Kateqoriyalar — seçilmiş yeni kateqoriya əlavə edilir
+        $newProduct->categories()->attach($request->category_id);
+
+        // Tiplər
+        if ($product->types->count()) {
+            $newProduct->types()->attach($product->types->pluck('id')->toArray());
+        }
+
+        // Tag-lar
+        if ($product->tags->count()) {
+            $newProduct->tags()->attach($product->tags->pluck('id')->toArray());
+        }
+
+        // Accordion-lar
+        foreach ($product->accordions as $accordion) {
+            $newAcc = $accordion->replicate();
+            $newAcc->product_id = $newProduct->id;
+            $newAcc->save();
+        }
+
+        // Detallar və detail values
+        foreach ($product->details as $detail) {
+            $newDetail = $detail->replicate();
+            $newDetail->product_id = $newProduct->id;
+            $newDetail->save();
+        }
+        foreach ($product->detailValues as $dv) {
+            $newDV = $dv->replicate();
+            $newDV->product_id = $newProduct->id;
+            $newDV->save();
+        }
+
+        // Şəkillər
+        foreach ($product->images as $image) {
+            $newImg = $image->replicate();
+            $newImg->product_id = $newProduct->id;
+            $newImg->save();
+        }
+
+        return redirect()->route('admin.products.index')
+            ->with('success', 'Product duplicated successfully.');
+
+    } catch (\Exception $e) {
+        return back()->with('error', 'Error duplicating product: ' . $e->getMessage());
+    }
+}
+
 }

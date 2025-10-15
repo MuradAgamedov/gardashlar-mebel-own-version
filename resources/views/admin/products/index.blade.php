@@ -262,6 +262,21 @@
                                                        title="Edit">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
+                                                    <form action="{{ route('admin.products.duplicate', $product) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        <div class="d-flex align-items-center gap-1">
+                                                            <select name="category_id" class="form-select form-select-sm" style="width:120px;">
+                                                                <option value="">Select category</option>
+                                                                @foreach($categories as $cat)
+                                                                    <option value="{{ $cat->id }}">{{ $cat->translate()->title ?? 'No title' }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="Duplicate Product">
+                                                                <i class="material-icons-outlined">content_copy</i>
+                                                            </button>
+                                                        </div>
+                                                    </form>
+
                                                     <form action="{{ route('admin.products.destroy', $product) }}"
                                                           method="POST"
                                                           class="d-inline"

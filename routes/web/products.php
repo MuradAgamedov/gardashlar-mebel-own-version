@@ -16,7 +16,12 @@ use App\Http\Controllers\Admin\ProductDetailValueController;
 use App\Http\Controllers\Admin\ProductDetailsValuesDetailController;
 use App\Http\Controllers\Admin\CommentController;
 use App\Http\Controllers\Admin\ImageController;
-      
+
+
+Route::post('/products/{product}/duplicate', [ProductController::class, 'duplicate'])
+    ->name('admin.products.duplicate');
+
+
 Route::resource('product-categories', ProductCategoryController::class);
 Route::post('product-categories/reorder', [ProductCategoryController::class, 'reorder'])->name('product-categories.reorder');
 Route::post('product-categories/delete-selected', [ProductCategoryController::class, 'deleteSelected'])->name('product-categories.delete-selected');
@@ -101,3 +106,4 @@ Route::post('admin/comments/{comment}/answers', [CommentController::class, 'stor
 
 // Cavabı silmək
 Route::delete('admin/comments/answers/{answer}', [CommentController::class, 'destroyAnswer'])->name('comments.answers.destroy');
+
