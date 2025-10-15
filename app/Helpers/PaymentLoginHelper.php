@@ -27,7 +27,7 @@ class PaymentLoginHelper
                 'User-Agent' => 'curl/7.88.1',
                 'Content-Type' => 'application/json; charset=utf-8',
             ])->post($baseUrl . '/auth/', [
-                'email' => 'office@gardashlar.com',
+                'email' => $email,
                 'password' => '2&nOl0J9^O-#',
             ]);
             
