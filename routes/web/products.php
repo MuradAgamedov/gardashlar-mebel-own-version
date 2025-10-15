@@ -19,7 +19,7 @@ use App\Http\Controllers\Admin\ImageController;
 
 
 Route::post('/products/{product}/duplicate', [ProductController::class, 'duplicate'])
-    ->name('admin.products.duplicate');
+    ->name('products.duplicate');
 
 
 Route::resource('product-categories', ProductCategoryController::class);
