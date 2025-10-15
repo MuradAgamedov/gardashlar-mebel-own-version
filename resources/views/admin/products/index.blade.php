@@ -355,6 +355,7 @@
 .category-option .dropdown-item {
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
+    cursor: pointer;
 }
 
 .category-option .dropdown-item:hover {
@@ -364,12 +365,21 @@
 .dropdown-menu {
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     border: 1px solid #dee2e6;
+    z-index: 1050;
 }
 
 .category-options {
     border-top: 1px solid #dee2e6;
     margin-top: 0.5rem;
     padding-top: 0.5rem;
+}
+
+.dropdown-menu li {
+    list-style: none;
+}
+
+.dropdown-toggle::after {
+    margin-left: auto;
 }
 </style>
 @endpush
@@ -388,6 +398,21 @@ document.addEventListener('DOMContentLoaded', function() {
             typeSelect.dispatchEvent(new Event('change'));
         }
     }
+    
+    // Debug dropdown functionality
+    document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(dropdownToggle) {
+        dropdownToggle.addEventListener('click', function(e) {
+            console.log('Dropdown clicked:', this.id);
+        });
+        
+        dropdownToggle.addEventListener('shown.bs.dropdown', function() {
+            console.log('Dropdown shown:', this.id);
+        });
+        
+        dropdownToggle.addEventListener('hidden.bs.dropdown', function() {
+            console.log('Dropdown hidden:', this.id);
+        });
+    });
     const sortableList = document.getElementById('sortable-products');
 
     if (sortableList) {
