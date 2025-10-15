@@ -3,51 +3,65 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class PaymentLoginHelper
 {
     /**
      * Sistemə login olub Bearer token qaytarır
-     *
-     * @return string|null
      */
     public static function getToken()
     {
         try {
-            $baseUrl  = env("UNITED_PAYMENT_API_URL", "https://test-vpos.unitedpayment.az/api");
-            $email    = env("UNITED_PAYMENT_API_EMAIL", "support@unitedpayment.com");
-            $password = env("UNITED_PAYMENT_API_PASSWORD", "Testmerchant12!");
+            // .env-dən gələn parametrlər
+            $baseUrl  = env("UNITED_PAYMENT_API_URL", "https://vpos.unitedpayment.az/api");
+            $email    = env("UNITED_PAYMENT_API_EMAIL", "office@gardashlar.com");
+            $password = env("UNITED_PAYMENT_API_PASSWORD", "2&nOl0J9^O-#");
 
-            $response = Http::post($baseUrl . "/auth/", [
-                "email"    => $email,
-                "password" => $password,
+            // Cache-də varsa, 55 dəqiqəlik istifadə et
+            if (Cache::has('united_payment_token')) {
+                return Cache::get('united_payment_token');
+            }
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json; charset=utf-8'
+            ])->post($baseUrl . '/auth/', [
+                'email'    => $email,
+                'password' => $password,
             ]);
 
             if ($response->successful()) {
-                $data  = $response->json();
-                return $data["token"] ?? null;
+                $data = $response->json();
+                $token = $data['token'] ?? null;
+
+                if ($token) {
+                    Cache::put('united_payment_token', $token, now()->addMinutes(55));
+                    Log::info('✅ UnitedPayment token yeniləndi.');
+                    return $token;
+                }
             }
 
-            Log::error("UnitedPayment Login Error: " . $response->body());
+            Log::error('❌ UnitedPayment login xətası: ' . $response->status() . ' | ' . $response->body());
             return null;
 
         } catch (\Exception $e) {
-            Log::error("UnitedPayment Exception: " . $e->getMessage());
+            Log::error('UnitedPayment Exception: ' . $e->getMessage());
             return null;
         }
     }
 
     /**
-     * Avtomatik olaraq token ilə sorğu göndərmək üçün
+     * Token ilə sorğu göndərmək üçün wrapper
      */
     public static function withAuth()
     {
         $token   = self::getToken();
-        $baseUrl = env("UNITED_PAYMENT_API_URL", "https://test-vpos.unitedpayment.az/api");
+        $baseUrl = env("UNITED_PAYMENT_API_URL", "https://vpos.unitedpayment.az/api");
 
         return Http::withHeaders([
-            "x-auth-token" => $token,
+            'x-auth-token'  => $token,
+            'Content-Type'  => 'application/json; charset=utf-8'
         ])->baseUrl($baseUrl);
     }
 }
