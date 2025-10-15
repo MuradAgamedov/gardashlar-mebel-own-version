@@ -24,16 +24,19 @@ class PaymentLoginHelper
         }
 
         $response = Http::withOptions([
-            'verify' => false,  // SSL yoxlamasını söndür
+            'verify' => false,
             'timeout' => 30,
-            'version' => 1.1,   // 👈 HTTP/1.1 məcburi
+            'curl' => [
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            ],
         ])->withHeaders([
-            'User-Agent'   => 'curl/7.88.1', // 👈 CURL kimi davranır
+            'User-Agent'   => 'curl/7.88.1',
             'Content-Type' => 'application/json; charset=utf-8',
         ])->post($baseUrl . '/auth/', [
             'email'    => $email,
             'password' => $password,
         ]);
+        
         dd($response);
         if ($response->successful()) {
             $data = $response->json();
