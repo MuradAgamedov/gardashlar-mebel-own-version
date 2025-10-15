@@ -49,22 +49,52 @@ class ProductDetailController extends Controller
             'translates.*.value' => 'required|string',
         ]);
 
-        // Create product detail
-        $order = $this->repository->getNextOrder($product->id);
-        $productDetail = $this->repository->createDetail($product->id, $order);
+        try {
+            // === Create product detail for current product ===
+            $order = $this->repository->getNextOrder($product->id);
+            $productDetail = $this->repository->createDetail($product->id, $order);
 
-        // Create translations
-        foreach ($request->translates as $translate) {
-            ProductDetailTranslate::create([
-                'product_detail_id' => $productDetail->id,
-                'language_id' => $translate['language_id'],
-                'keyword' => $translate['keyword'],
-                'value' => $translate['value'],
-            ]);
+            // Create translations for current product detail
+            foreach ($request->translates as $translate) {
+                ProductDetailTranslate::create([
+                    'product_detail_id' => $productDetail->id,
+                    'language_id' => $translate['language_id'],
+                    'keyword' => $translate['keyword'],
+                    'value' => $translate['value'],
+                ]);
+            }
+
+            // === Synchronize same slug products ===
+            // Get current product's slugs
+            $currentProductSlugs = $product->translates->pluck('slug')->toArray();
+
+            // Find all products with same slugs (excluding current product)
+            $sameSlugProducts = Product::whereHas('translates', function ($q) use ($currentProductSlugs) {
+                $q->whereIn('slug', $currentProductSlugs);
+            })->where('id', '!=', $product->id)->get();
+
+            foreach ($sameSlugProducts as $sameProduct) {
+                // Create corresponding product detail with same order
+                $correspondingOrder = $this->repository->getNextOrder($sameProduct->id);
+                $correspondingDetail = $this->repository->createDetail($sameProduct->id, $correspondingOrder);
+
+                // Create translations with same data
+                foreach ($request->translates as $translate) {
+                    ProductDetailTranslate::create([
+                        'product_detail_id' => $correspondingDetail->id,
+                        'language_id' => $translate['language_id'],
+                        'keyword' => $translate['keyword'],
+                        'value' => $translate['value'],
+                    ]);
+                }
+            }
+
+            return redirect()->route('admin.products.details.index', $product)
+                ->with('success', 'Product detail created successfully. Same slug products synchronized.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error occurred: ' . $e->getMessage());
         }
-
-        return redirect()->route('admin.products.details.index', $product)
-            ->with('success', 'Product detail created successfully.');
     }
 
     /**
@@ -98,21 +128,56 @@ class ProductDetailController extends Controller
             'translates.*.value' => 'required|string',
         ]);
 
-        // Delete existing translations
-        $detail->translates()->delete();
+        try {
+            // === Update current product detail translations ===
+            $detail->translates()->delete();
 
-        // Create new translations
-        foreach ($request->translates as $translate) {
-            ProductDetailTranslate::create([
-                'product_detail_id' => $detail->id,
-                'language_id' => $translate['language_id'],
-                'keyword' => $translate['keyword'],
-                'value' => $translate['value'],
-            ]);
+            foreach ($request->translates as $translate) {
+                ProductDetailTranslate::create([
+                    'product_detail_id' => $detail->id,
+                    'language_id' => $translate['language_id'],
+                    'keyword' => $translate['keyword'],
+                    'value' => $translate['value'],
+                ]);
+            }
+
+            // === Synchronize same slug products ===
+            // Get current product's slugs
+            $currentProductSlugs = $product->translates->pluck('slug')->toArray();
+
+            // Find all products with same slugs (excluding current product)
+            $sameSlugProducts = Product::whereHas('translates', function ($q) use ($currentProductSlugs) {
+                $q->whereIn('slug', $currentProductSlugs);
+            })->where('id', '!=', $product->id)->get();
+
+            foreach ($sameSlugProducts as $sameProduct) {
+                // Find corresponding product detail by order
+                $correspondingDetail = $sameProduct->details()
+                    ->where('order', $detail->order)
+                    ->first();
+
+                if ($correspondingDetail) {
+                    // Delete existing translations for corresponding detail
+                    $correspondingDetail->translates()->delete();
+
+                    // Create new translations with same data
+                    foreach ($request->translates as $translate) {
+                        ProductDetailTranslate::create([
+                            'product_detail_id' => $correspondingDetail->id,
+                            'language_id' => $translate['language_id'],
+                            'keyword' => $translate['keyword'],
+                            'value' => $translate['value'],
+                        ]);
+                    }
+                }
+            }
+
+            return redirect()->route('admin.products.details.index', $product)
+                ->with('success', 'Product detail updated successfully. Same slug products synchronized.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error occurred: ' . $e->getMessage());
         }
-
-        return redirect()->route('admin.products.details.index', $product)
-            ->with('success', 'Product detail updated successfully.');
     }
 
     /**
@@ -120,11 +185,42 @@ class ProductDetailController extends Controller
      */
     public function destroy(Product $product, ProductDetail $detail)
     {
-        $detail->translates()->delete();
-        $detail->delete();
+        try {
+            // Store the order for synchronization
+            $detailOrder = $detail->order;
 
-        return redirect()->route('admin.products.details.index', $product)
-            ->with('success', 'Product detail deleted successfully.');
+            // === Delete current product detail ===
+            $detail->translates()->delete();
+            $detail->delete();
+
+            // === Synchronize same slug products ===
+            // Get current product's slugs
+            $currentProductSlugs = $product->translates->pluck('slug')->toArray();
+
+            // Find all products with same slugs (excluding current product)
+            $sameSlugProducts = Product::whereHas('translates', function ($q) use ($currentProductSlugs) {
+                $q->whereIn('slug', $currentProductSlugs);
+            })->where('id', '!=', $product->id)->get();
+
+            foreach ($sameSlugProducts as $sameProduct) {
+                // Find corresponding product detail by order
+                $correspondingDetail = $sameProduct->details()
+                    ->where('order', $detailOrder)
+                    ->first();
+
+                if ($correspondingDetail) {
+                    // Delete corresponding detail and its translations
+                    $correspondingDetail->translates()->delete();
+                    $correspondingDetail->delete();
+                }
+            }
+
+            return redirect()->route('admin.products.details.index', $product)
+                ->with('success', 'Product detail deleted successfully. Same slug products synchronized.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -154,13 +250,44 @@ class ProductDetailController extends Controller
             'ids.*' => 'exists:product_details,id'
         ]);
 
-        $details = $this->repository->getDetailsByIds($request->ids);
-        
-        foreach ($details as $detail) {
-            $detail->translates()->delete();
-            $detail->delete();
-        }
+        try {
+            $details = $this->repository->getDetailsByIds($request->ids);
+            
+            // Store orders for synchronization
+            $detailOrders = $details->pluck('order')->toArray();
 
-        return response()->json(['success' => true]);
+            // === Delete current product details ===
+            foreach ($details as $detail) {
+                $detail->translates()->delete();
+                $detail->delete();
+            }
+
+            // === Synchronize same slug products ===
+            // Get current product's slugs
+            $currentProductSlugs = $product->translates->pluck('slug')->toArray();
+
+            // Find all products with same slugs (excluding current product)
+            $sameSlugProducts = Product::whereHas('translates', function ($q) use ($currentProductSlugs) {
+                $q->whereIn('slug', $currentProductSlugs);
+            })->where('id', '!=', $product->id)->get();
+
+            foreach ($sameSlugProducts as $sameProduct) {
+                // Find corresponding product details by orders
+                $correspondingDetails = $sameProduct->details()
+                    ->whereIn('order', $detailOrders)
+                    ->get();
+
+                foreach ($correspondingDetails as $correspondingDetail) {
+                    // Delete corresponding detail and its translations
+                    $correspondingDetail->translates()->delete();
+                    $correspondingDetail->delete();
+                }
+            }
+
+            return response()->json(['success' => true, 'message' => 'Product details deleted successfully. Same slug products synchronized.']);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error occurred: ' . $e->getMessage()]);
+        }
     }
 }
