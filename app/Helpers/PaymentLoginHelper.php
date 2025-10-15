@@ -60,7 +60,7 @@ class PaymentLoginHelper
             }
     
             $data = json_decode($response, true);
-    
+                dd($data);
             if (isset($data['token'])) {
                 $token = $data['token'];
                 Cache::put('united_payment_token', $token, now()->addMinutes(55));
