@@ -26,7 +26,7 @@ class PaymentLoginHelper
             ])->withHeaders([
                 'User-Agent' => 'curl/7.88.1',
                 'Content-Type' => 'application/json; charset=utf-8',
-            ])->post('https://vpos.unitedpayment.az/api/auth/', [
+            ])->post($baseUrl . '/auth/', [
                 'email' => 'office@gardashlar.com',
                 'password' => '2&nOl0J9^O-#',
             ]);
