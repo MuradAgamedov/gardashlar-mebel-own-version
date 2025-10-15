@@ -75,19 +75,50 @@ class FavoriteController extends Controller
     
         // Geri plan üçün cart və compare məlumatlarını əvvəlcədən götür
         $cartItems = $user->cart()->get()->keyBy(fn($item) => $item->product_id . '-' . $item->color_id);
-        $compareIds = \App\Models\ProductCompare::whereIn('product_id', $favorites->pluck('product_id'))->pluck('product_id')->toArray();
+        $compareIds = \App\Models\ProductCompare::where('user_id', $user->id)
+            ->pluck('product_id')
+            ->toArray();
     
-        $favoriteData = $favorites->map(function ($fav) use ($languageId, $user, $cartItems, $compareIds) {
+        $favoriteData = $favorites->map(function ($fav) use ($languageId, $cartItems, $compareIds) {
             $product = $fav->product ? $fav->product->apiData($languageId) : null;
     
             // Cart və compare status
             $cartKey = $fav->product_id . '-' . $fav->color_id;
             $inCart = $cartItems[$cartKey] ?? null;
     
+            // === NEW: Kateqoriya məlumatları ===
+            $categorySlug = null;
+            $categoryTitle = null;
+            $parentSlug = null;
+            $parentTitle = null;
+    
+            if ($fav->product && $fav->product->categories->isNotEmpty()) {
+                $category = $fav->product->categories->first();
+                $categoryTrans = $category->translates->first();
+                $categorySlug = $categoryTrans?->slug;
+                $categoryTitle = $categoryTrans?->title;
+    
+                if ($category->parent_id) {
+                    $parentCategory = \App\Models\ProductCategory::find($category->parent_id);
+                    if ($parentCategory) {
+                        $parentTrans = $parentCategory->translates()->where('language_id', $languageId)->first();
+                        $parentSlug = $parentTrans?->slug;
+                        $parentTitle = $parentTrans?->title;
+                    }
+                }
+            }
+    
             return [
                 'favorite_id' => $fav->id,
                 'color_id'    => $fav->color_id,
                 'product'     => $product,
+    
+                // NEW: kateqoriya məlumatları
+                'category_slug'  => $categorySlug,
+                'category_title' => $categoryTitle,
+                'parent_slug'    => $parentSlug,
+                'parent_title'   => $parentTitle,
+    
                 'inFavorite' => [
                     'isActive' => true,
                     'color_id' => $fav->color_id,
@@ -103,10 +134,11 @@ class FavoriteController extends Controller
     
         return response()->json([
             'success' => true,
-            "data"    => $favoriteData,
-            "message" => "Favorites fetched successfully"
+            'data'    => $favoriteData,
+            'message' => 'Favorites fetched successfully'
         ]);
     }
+    
     
 
     /**

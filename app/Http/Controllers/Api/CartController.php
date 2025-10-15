@@ -50,41 +50,90 @@ class CartController extends Controller
         $languageId = $this->getLanguageIdFromHeader($request);
         $user = $request->user();
     
-        $carts = $user->cart()->with(['product.details.translates', 'product.images', 'product.types.translates', 'product.categories.translates', 'product.colors'])->get();
+        // 1️⃣ Bütün sepetləri və əlaqələri yüklə
+        $carts = $user->cart()->with([
+            'product.details.translates',
+            'product.images',
+            'product.types.translates',
+            'product.categories.parent.translates', // parent kateqoriyanı da çəkirik
+            'product.colors'
+        ])->get();
     
-        $cartData = $carts->map(function ($cart) use ($languageId, $user) {
+        // 2️⃣ Favorit və müqayisə məlumatlarını öncədən çək
+        $favoriteProducts = $user->favorites()->select('product_id', 'color_id')->get();
+        $favoritesMap = $favoriteProducts->groupBy(fn($item) => $item->product_id . '-' . $item->color_id);
+    
+        $compareProducts = \App\Models\ProductCompare::select('product_id')->pluck('product_id')->toArray();
+    
+        // 3️⃣ Cart məlumatlarını map et
+        $cartData = $carts->map(function ($cart) use ($languageId, $favoritesMap, $compareProducts) {
             $product = $cart->product;
     
-            $productData = $product ? [
+            if (!$product) return null;
+    
+            // Əsas kateqoriyanı al (bir məhsul bir neçə kateqoriyaya bağlı ola bilər, ilkini götürürük)
+            $category = $product->categories->first();
+            $parentCategory = $category?->parent;
+    
+            // Məhsul məlumatı
+            $productData = [
                 'id' => $product->id,
                 'title' => $product->translate($languageId)?->title ?? '',
                 'slug' => $product->translate($languageId)?->slug ?? '',
                 'price' => $product->price,
                 'discount_price' => $product->discount_price,
                 'view_count' => $product->view_count,
-                'images' => $product->images->map(fn($image) => [
-                    'id' => $image->id,
-                    'image_url' => $image->image ? asset('storage/' . $image->image) : asset('images/default_image.webp'),
-                    'is_main' => $image->is_main,
-                    'color_id' => $image->product_color_id
-                ])->sortBy('order')->values(),
+    
+                // 🟢 Yeni əlavə edilən hissə:
+                'category_title' => $category?->translates
+                    ->where('language_id', $languageId)
+                    ->first()?->title ?? '',
+                'category_slug' => $category?->translates
+                    ->where('language_id', $languageId)
+                    ->first()?->slug ?? '',
+                'parent_title' => $parentCategory?->translates
+                    ->where('language_id', $languageId)
+                    ->first()?->title ?? '',
+                'parent_slug' => $parentCategory?->translates
+                    ->where('language_id', $languageId)
+                    ->first()?->slug ?? '',
+    
+                'images' => $product->images
+                    ->sortBy('order')
+                    ->map(fn($image) => [
+                        'id' => $image->id,
+                        'image_url' => $image->image
+                            ? asset('storage/' . $image->image)
+                            : asset('images/default_image.webp'),
+                        'is_main' => $image->is_main,
+                        'color_id' => $image->product_color_id
+                    ])->values(),
+    
                 'available_colors' => $product->colors->map(fn($color) => [
                     'id' => $color->id,
                     'color_code' => $color->color_code
                 ]),
+    
                 'product_types' => $product->types->map(fn($type) => [
                     'id' => $type->id,
-                    'title' => $type->translates->first()?->title ?? ''
+                    'title' => $type->translates
+                        ->where('language_id', $languageId)
+                        ->first()?->title ?? ''
                 ]),
-                'product_details' => $product->details->map(function($detail) use ($languageId) {
-                    $translation = $detail->translates->first();
+    
+                'product_details' => $product->details->map(function ($detail) use ($languageId) {
+                    $translation = $detail->translates
+                        ->where('language_id', $languageId)
+                        ->first();
                     return [
                         'id' => $detail->id,
                         'keyword' => $translation?->keyword ?? '',
                         'value' => $translation?->value ?? '',
                     ];
                 }),
-            ] : null;
+            ];
+    
+            $key = $cart->product_id . '-' . $cart->color_id;
     
             return [
                 'cart_id' => $cart->id,
@@ -97,22 +146,21 @@ class CartController extends Controller
                     'count' => $cart->count,
                 ],
                 'inFavorite' => [
-                    'isActive' => $user->favorites()
-                                        ->where('product_id', $cart->product_id)
-                                        ->where('color_id', $cart->color_id)
-                                        ->exists(),
+                    'isActive' => isset($favoritesMap[$key]),
                     'color_id' => $cart->color_id,
                 ],
-                'inCompare' => \App\Models\ProductCompare::where('product_id', $cart->product_id)->exists(),
+                'inCompare' => in_array($cart->product_id, $compareProducts),
             ];
-        });
+        })->filter();
     
+        // 4️⃣ Cavabı qaytar
         return response()->json([
             'success' => true,
-            'data' => $cartData,
-            'message' => 'Cart fetched successfully'
+            'data' => $cartData->values(),
+            'message' => 'Cart fetched successfully',
         ]);
     }
+    
     
 
     public function removeCart(Request $request)
