@@ -13,7 +13,6 @@ class HomePageCategoryRepository extends BaseRepository
     {
     }
 
-    // Ana səhifə kateqoriyaları
     public function getHomePageCategories()
     {
         return $this->homePageCategory->with('productCategory.translates.language')
@@ -21,7 +20,6 @@ class HomePageCategoryRepository extends BaseRepository
             ->get();
     }
 
-    // Ana səhifədə olmayan kateqoriyalar
     public function getAvailableCategories($homePageCategories)
     {
         return ProductCategory::with('translates.language')
@@ -30,7 +28,6 @@ class HomePageCategoryRepository extends BaseRepository
             ->get();
     }
 
-    // Yeni üçün mövcud kateqoriyalar
     public function getCategoriesForCreate()
     {
         return ProductCategory::with('translates.language')
@@ -43,7 +40,6 @@ class HomePageCategoryRepository extends BaseRepository
             ->get();
     }
 
-    // Edit üçün kateqoriyalar
     public function getCategoriesForEdit($homePageCategory)
     {
         return ProductCategory::with('translates.language')
@@ -57,5 +53,29 @@ class HomePageCategoryRepository extends BaseRepository
             })
             ->ordered()
             ->get();
+    }
+
+    public function createHomePageCategory(array $data)
+    {
+        return $this->homePageCategory->create($data);
+    }
+
+    public function updateHomePageCategory(HomePageCategory $homePageCategory, array $data)
+    {
+        $homePageCategory->update($data);
+        return $homePageCategory;
+    }
+
+    public function deleteHomePageCategory(HomePageCategory $homePageCategory)
+    {
+        return $homePageCategory->delete();
+    }
+
+    public function reorderHomePageCategories(array $items)
+    {
+        foreach ($items as $index => $id) {
+            $this->homePageCategory->where('id', $id)->update(['order' => $index + 1]);
+        }
+        return true;
     }
 }

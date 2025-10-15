@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\HomePageCategory;
-use App\Models\ProductCategory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Repositories\HomePageCategoryRepository;
+use App\Http\Requests\Admin\HomePageCategory\StoreHomePageCategoryRequest;
+use App\Http\Requests\Admin\HomePageCategory\UpdateHomePageCategoryRequest;
 
 class HomePageCategoryController extends Controller
 {
@@ -15,39 +15,23 @@ class HomePageCategoryController extends Controller
     {
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $homePageCategories = $this->repository->getHomePageCategories();
         $allCategories = $this->repository->getAvailableCategories($homePageCategories);
-            
         return view('admin.home-page-categories.index', compact('homePageCategories', 'allCategories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $categories = $this->repository->getCategoriesForCreate();
-            
         return view('admin.home-page-categories.create', compact('categories'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreHomePageCategoryRequest $request)
     {
-        $request->validate([
-            'product_category_id' => 'required|exists:product_categories,id|unique:home_page_categories,product_category_id',
-            'status' => 'boolean'
-        ]);
-
         try {
-            HomePageCategory::create([
+            $this->repository->createHomePageCategory([
                 'product_category_id' => $request->input('product_category_id'),
                 'status' => $request->boolean('status', true)
             ]);
@@ -60,36 +44,21 @@ class HomePageCategoryController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(HomePageCategory $homePageCategory)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(HomePageCategory $homePageCategory)
     {
         $categories = $this->repository->getCategoriesForEdit($homePageCategory);
-            
         return view('admin.home-page-categories.edit', compact('homePageCategory', 'categories'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, HomePageCategory $homePageCategory)
+    public function update(UpdateHomePageCategoryRequest $request, HomePageCategory $homePageCategory)
     {
-        $request->validate([
-            'product_category_id' => 'required|exists:product_categories,id|unique:home_page_categories,product_category_id,' . $homePageCategory->id,
-            'status' => 'boolean'
-        ]);
-
         try {
-            $homePageCategory->update([
+            $this->repository->updateHomePageCategory($homePageCategory, [
                 'product_category_id' => $request->input('product_category_id'),
                 'status' => $request->boolean('status', true)
             ]);
@@ -102,14 +71,10 @@ class HomePageCategoryController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(HomePageCategory $homePageCategory)
     {
         try {
-            $homePageCategory->delete();
-
+            $this->repository->deleteHomePageCategory($homePageCategory);
             return redirect()->route('admin.home-page-categories.index')
                 ->with('success', 'Home page category deleted successfully.');
 
@@ -118,9 +83,6 @@ class HomePageCategoryController extends Controller
         }
     }
 
-    /**
-     * Reorder categories
-     */
     public function reorder(Request $request)
     {
         $request->validate([
@@ -129,10 +91,7 @@ class HomePageCategoryController extends Controller
         ]);
 
         try {
-            foreach ($request->input('items') as $index => $id) {
-                HomePageCategory::where('id', $id)->update(['order' => $index + 1]);
-            }
-
+            $this->repository->reorderHomePageCategories($request->input('items'));
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

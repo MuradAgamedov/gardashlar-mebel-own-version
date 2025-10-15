@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Repositories\LanguageRepository;
 use App\Repositories\CustomerRightsRepository;
+use App\Http\Requests\Admin\CustomerRights\UpdateCustomerRightsRequest;
 
 class CustomerRightsController extends Controller
 {
@@ -23,13 +23,8 @@ class CustomerRightsController extends Controller
         return view('admin.customer-rights.edit', compact('customerRights', 'languages'));
     }
 
-    public function update(Request $request)
+    public function update(UpdateCustomerRightsRequest $request)
     {
-        $request->validate([
-            'translations' => 'required|array',
-            'translations.*.content' => 'required|string|max:5000',
-        ]);
-
         try {
             $languages = $this->languageRepository->getAllLanguages();
             $this->repository->updateCustomerRights($request->input('translations'), $languages);

@@ -487,7 +487,28 @@ class PaymentController extends Controller
         }
     }
 
-     public function cancel(Request $request)
+   public function success(Request $request)
+    {
+        $orderId = $request->query('order_id');
+        $order = Order::find($orderId);
+
+        if ($order) {
+            $order->update([
+                'status' => 'completed',
+                'payment_status' => 'paid'
+            ]);
+        }
+
+        $data = $this->decodeUp($request->query('up'));
+        Log::info('Payment Success', ['order_id' => $orderId, 'data' => $data]);
+
+        return view('payment.success', compact('order', 'data'));
+    }
+
+    /**
+     * Cancel nəticəsi
+     */
+    public function cancel(Request $request)
     {
         $orderId = $request->query('order_id');
         $order = Order::find($orderId);
@@ -525,6 +546,8 @@ class PaymentController extends Controller
 
         return view('payment.decline', compact('order', 'data'));
     }
+
+
 
     private function decodeUp(?string $base64): array
     {

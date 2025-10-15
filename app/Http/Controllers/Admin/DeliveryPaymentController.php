@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Repositories\LanguageRepository;
 use App\Repositories\DeliveryPaymentRepository;
+use App\Http\Requests\Admin\DeliveryPayment\UpdateDeliveryPaymentRequest;
 
 class DeliveryPaymentController extends Controller
 {
@@ -23,13 +23,8 @@ class DeliveryPaymentController extends Controller
         return view('admin.delivery-payment.edit', compact('deliveryPayment', 'languages'));
     }
 
-    public function update(Request $request)
+    public function update(UpdateDeliveryPaymentRequest $request)
     {
-        $request->validate([
-            'translations' => 'required|array',
-            'translations.*.content' => 'required|string|max:5000',
-        ]);
-
         try {
             $languages = $this->languageRepository->getAllLanguages();
             $this->repository->updateDeliveryPayment($request->input('translations'), $languages);

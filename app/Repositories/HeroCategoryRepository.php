@@ -13,7 +13,6 @@ class HeroCategoryRepository extends BaseRepository
     {
     }
 
-    // Hero kateqoriyaları gətir
     public function getHeroCategories()
     {
         return $this->heroCategory->with('productCategory.translates.language')
@@ -21,7 +20,6 @@ class HeroCategoryRepository extends BaseRepository
             ->get();
     }
 
-    // Hero-da olmayan kateqoriyalar
     public function getAvailableCategories($heroCategories)
     {
         return ProductCategory::with('translates.language')
@@ -30,7 +28,6 @@ class HeroCategoryRepository extends BaseRepository
             ->get();
     }
 
-    // Yeni hero üçün mövcud kateqoriyalar
     public function getCategoriesForCreate()
     {
         return ProductCategory::with('translates.language')
@@ -43,7 +40,6 @@ class HeroCategoryRepository extends BaseRepository
             ->get();
     }
 
-    // Edit üçün kateqoriyalar
     public function getCategoriesForEdit($heroCategory)
     {
         return ProductCategory::with('translates.language')
@@ -57,5 +53,29 @@ class HeroCategoryRepository extends BaseRepository
             })
             ->ordered()
             ->get();
+    }
+
+    public function createHeroCategory(array $data)
+    {
+        return $this->heroCategory->create($data);
+    }
+
+    public function updateHeroCategory(HeroCategory $heroCategory, array $data)
+    {
+        $heroCategory->update($data);
+        return $heroCategory;
+    }
+
+    public function deleteHeroCategory(HeroCategory $heroCategory)
+    {
+        return $heroCategory->delete();
+    }
+
+    public function reorderHeroCategories(array $items)
+    {
+        foreach ($items as $index => $id) {
+            $this->heroCategory->where('id', $id)->update(['order' => $index + 1]);
+        }
+        return true;
     }
 }

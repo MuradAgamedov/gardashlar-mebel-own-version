@@ -12,7 +12,6 @@ class HomePageProjectCategoryRepository extends BaseRepository
     {
     }
 
-    // Ana səhifə layihə kateqoriyaları
     public function getHomePageProjectCategories()
     {
         return $this->homePageProjectCategory->with('projectCategory.translates')
@@ -20,12 +19,42 @@ class HomePageProjectCategoryRepository extends BaseRepository
             ->get();
     }
 
-    // Aktiv layihə kateqoriyaları
     public function getActiveProjectCategories()
     {
         return ProjectCategory::with('translates')
             ->active()
             ->ordered()
             ->get();
+    }
+
+    public function findWithCategory($id)
+    {
+        return $this->homePageProjectCategory->with('projectCategory.translates')->findOrFail($id);
+    }
+
+    public function createHomePageProjectCategory(array $data)
+    {
+        return $this->homePageProjectCategory->create($data);
+    }
+
+    public function updateHomePageProjectCategory($id, array $data)
+    {
+        $homePageProjectCategory = $this->homePageProjectCategory->findOrFail($id);
+        $homePageProjectCategory->update($data);
+        return $homePageProjectCategory;
+    }
+
+    public function deleteHomePageProjectCategory($id)
+    {
+        $homePageProjectCategory = $this->homePageProjectCategory->findOrFail($id);
+        return $homePageProjectCategory->delete();
+    }
+
+    public function reorderHomePageProjectCategories(array $items)
+    {
+        foreach ($items as $item) {
+            $this->homePageProjectCategory->where('id', $item['id'])->update(['order' => $item['order']]);
+        }
+        return true;
     }
 }

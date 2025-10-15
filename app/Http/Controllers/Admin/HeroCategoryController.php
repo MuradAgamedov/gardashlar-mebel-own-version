@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\HeroCategory;
-use App\Models\ProductCategory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Repositories\HeroCategoryRepository;
+use App\Http\Requests\Admin\HeroCategory\StoreHeroCategoryRequest;
+use App\Http\Requests\Admin\HeroCategory\UpdateHeroCategoryRequest;
 
 class HeroCategoryController extends Controller
 {
@@ -15,39 +15,23 @@ class HeroCategoryController extends Controller
     {
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $heroCategories = $this->repository->getHeroCategories();
         $allCategories = $this->repository->getAvailableCategories($heroCategories);
-            
         return view('admin.hero-categories.index', compact('heroCategories', 'allCategories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $categories = $this->repository->getCategoriesForCreate();
-            
         return view('admin.hero-categories.create', compact('categories'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreHeroCategoryRequest $request)
     {
-        $request->validate([
-            'product_category_id' => 'required|exists:product_categories,id|unique:hero_categories,product_category_id',
-            'status' => 'boolean'
-        ]);
-
         try {
-            HeroCategory::create([
+            $this->repository->createHeroCategory([
                 'product_category_id' => $request->input('product_category_id'),
                 'status' => $request->boolean('status', true)
             ]);
@@ -60,36 +44,21 @@ class HeroCategoryController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(HeroCategory $heroCategory)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(HeroCategory $heroCategory)
     {
         $categories = $this->repository->getCategoriesForEdit($heroCategory);
-            
         return view('admin.hero-categories.edit', compact('heroCategory', 'categories'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, HeroCategory $heroCategory)
+    public function update(UpdateHeroCategoryRequest $request, HeroCategory $heroCategory)
     {
-        $request->validate([
-            'product_category_id' => 'required|exists:product_categories,id|unique:hero_categories,product_category_id,' . $heroCategory->id,
-            'status' => 'boolean'
-        ]);
-
         try {
-            $heroCategory->update([
+            $this->repository->updateHeroCategory($heroCategory, [
                 'product_category_id' => $request->input('product_category_id'),
                 'status' => $request->boolean('status', true)
             ]);
@@ -102,14 +71,10 @@ class HeroCategoryController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(HeroCategory $heroCategory)
     {
         try {
-            $heroCategory->delete();
-
+            $this->repository->deleteHeroCategory($heroCategory);
             return redirect()->route('admin.hero-categories.index')
                 ->with('success', 'Hero category deleted successfully.');
 
@@ -118,9 +83,6 @@ class HeroCategoryController extends Controller
         }
     }
 
-    /**
-     * Reorder categories
-     */
     public function reorder(Request $request)
     {
         $request->validate([
@@ -129,10 +91,7 @@ class HeroCategoryController extends Controller
         ]);
 
         try {
-            foreach ($request->input('items') as $index => $id) {
-                HeroCategory::where('id', $id)->update(['order' => $index + 1]);
-            }
-
+            $this->repository->reorderHeroCategories($request->input('items'));
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

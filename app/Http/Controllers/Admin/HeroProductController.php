@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\HeroProduct;
-use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Repositories\HeroProductRepository;
+use App\Http\Requests\Admin\HeroProduct\StoreHeroProductRequest;
+use App\Http\Requests\Admin\HeroProduct\UpdateHeroProductRequest;
 
 class HeroProductController extends Controller
 {
@@ -15,36 +15,21 @@ class HeroProductController extends Controller
     {
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $heroProducts = $this->repository->getHeroProducts();
-            
         return view('admin.hero-products.index', compact('heroProducts'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('admin.hero-products.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreHeroProductRequest $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id|unique:hero_products,product_id',
-            'status' => 'boolean'
-        ]);
-
         try {
-            HeroProduct::create([
+            $this->repository->createHeroProduct([
                 'product_id' => $request->input('product_id'),
                 'status' => $request->boolean('status', true)
             ]);
@@ -57,34 +42,20 @@ class HeroProductController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(HeroProduct $heroProduct)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(HeroProduct $heroProduct)
     {
         return view('admin.hero-products.edit', compact('heroProduct'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, HeroProduct $heroProduct)
+    public function update(UpdateHeroProductRequest $request, HeroProduct $heroProduct)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id|unique:hero_products,product_id,' . $heroProduct->id,
-            'status' => 'boolean'
-        ]);
-
         try {
-            $heroProduct->update([
+            $this->repository->updateHeroProduct($heroProduct, [
                 'product_id' => $request->input('product_id'),
                 'status' => $request->boolean('status', true)
             ]);
@@ -97,14 +68,10 @@ class HeroProductController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(HeroProduct $heroProduct)
     {
         try {
-            $heroProduct->delete();
-
+            $this->repository->deleteHeroProduct($heroProduct);
             return redirect()->route('admin.hero-products.index')
                 ->with('success', 'Hero product deleted successfully.');
 
@@ -113,9 +80,6 @@ class HeroProductController extends Controller
         }
     }
 
-    /**
-     * Reorder products
-     */
     public function reorder(Request $request)
     {
         $request->validate([
@@ -124,41 +88,19 @@ class HeroProductController extends Controller
         ]);
 
         try {
-            foreach ($request->input('items') as $index => $id) {
-                HeroProduct::where('id', $id)->update(['order' => $index + 1]);
-            }
-
+            $this->repository->reorderHeroProducts($request->input('items'));
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
-    /**
-     * Search products for AJAX request
-     */
     public function searchProducts(Request $request)
     {
         $search = $request->input('search');
         $excludeIds = $request->input('exclude_ids', []);
-
         $products = $this->repository->searchProducts($search, $excludeIds);
-
-        $results = [];
-        foreach ($products as $product) {
-            $firstTranslation = $product->translates->first();
-            $firstCategory = $product->categories->first();
-            $categoryTranslation = $firstCategory ? $firstCategory->translates->first() : null;
-            
-            $results[] = [
-                'id' => $product->id,
-                'title' => $firstTranslation ? $firstTranslation->title : 'No title',
-                'category' => $categoryTranslation ? $categoryTranslation->title : 'No category',
-                'text' => ($firstTranslation ? $firstTranslation->title : 'No title') . 
-                         ' - ' . ($categoryTranslation ? $categoryTranslation->title : 'No category')
-            ];
-        }
-
+        $results = $this->repository->formatSearchResults($products);
         return response()->json($results);
     }
 } 

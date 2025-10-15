@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Http\Requests\Admin\HomePageCategory;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreHomePageCategoryRequest extends FormRequest
+{
+    public function authorize()
+    {
+        return true;
+    }
+
+    public function rules()
+    {
+        return [
+            'product_category_id' => 'required|exists:product_categories,id|unique:home_page_categories,product_category_id',
+            'status' => 'boolean'
+        ];
+    }
+}

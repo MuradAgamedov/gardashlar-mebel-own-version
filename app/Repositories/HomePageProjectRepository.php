@@ -13,7 +13,6 @@ class HomePageProjectRepository extends BaseRepository
     {
     }
 
-    // Ana səhifə layihələri
     public function getHomePageProjects()
     {
         return $this->homePageProject->with(['project.translates.language', 'projectCategory.translates.language'])
@@ -21,7 +20,6 @@ class HomePageProjectRepository extends BaseRepository
             ->get();
     }
 
-    // Layihələri əsas dildə gətir
     public function getProjectsWithMainLanguage($mainLanguage)
     {
         return Project::with(['translates' => function($query) use ($mainLanguage) {
@@ -29,7 +27,6 @@ class HomePageProjectRepository extends BaseRepository
         }])->get();
     }
 
-    // Kateqoriyaları əsas dildə gətir
     public function getCategoriesWithMainLanguage($mainLanguage)
     {
         return ProjectCategory::with(['translates' => function($query) use ($mainLanguage) {
@@ -37,7 +34,6 @@ class HomePageProjectRepository extends BaseRepository
         }])->get();
     }
 
-    // Kateqoriyaya görə layihələr
     public function getProjectsByCategory($categoryId, $mainLanguage)
     {
         return Project::with(['translates' => function($query) use ($mainLanguage) {
@@ -45,5 +41,36 @@ class HomePageProjectRepository extends BaseRepository
         }])
         ->where('project_category_id', $categoryId)
         ->get();
+    }
+
+    public function createHomePageProject(array $data)
+    {
+        $maxOrder = $this->homePageProject->max('order') ?? 0;
+        
+        return $this->homePageProject->create([
+            'project_id' => $data['project_id'],
+            'project_category_id' => $data['project_category_id'],
+            'order' => $maxOrder + 1,
+            'status' => $data['status'] ?? true,
+        ]);
+    }
+
+    public function updateHomePageProject(HomePageProject $homePageProject, array $data)
+    {
+        $homePageProject->update($data);
+        return $homePageProject;
+    }
+
+    public function deleteHomePageProject(HomePageProject $homePageProject)
+    {
+        return $homePageProject->delete();
+    }
+
+    public function reorderHomePageProjects(array $items)
+    {
+        foreach ($items as $index => $itemId) {
+            $this->homePageProject->where('id', $itemId)->update(['order' => $index + 1]);
+        }
+        return true;
     }
 }
