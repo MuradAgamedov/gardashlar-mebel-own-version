@@ -67,7 +67,6 @@ class PaymentLoginHelper
     public static function withAuth()
 {
     $token   = self::getToken();
-    dd($token);
     $baseUrl = env("UNITED_PAYMENT_API_URL", "https://vpos.unitedpayment.az/api");
 
     // Bearer sözü varsa, onu təmizləyək (dəfələrlə Bearer yazılmasın)
