@@ -268,24 +268,30 @@
                                                             <div class="dropdown" style="width:120px;">
                                                                 <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" 
                                                                         data-bs-toggle="dropdown" aria-expanded="false" 
-                                                                        id="categoryDropdown{{ $product->id }}">
+                                                                        id="categoryDropdown{{ $product->id }}"
+                                                                        data-bs-auto-close="outside">
                                                                     Select category
                                                                 </button>
-                                                                <div class="dropdown-menu p-2" style="width: 250px;">
-                                                                    <input type="text" class="form-control form-control-sm mb-2" 
-                                                                           placeholder="Search categories..." 
-                                                                           id="categorySearch{{ $product->id }}"
-                                                                           onkeyup="filterCategories({{ $product->id }})">
-                                                                    <div class="category-options" id="categoryOptions{{ $product->id }}" style="max-height: 200px; overflow-y: auto;">
-                                                                        @foreach($categories as $cat)
-                                                                            <div class="category-option" data-value="{{ $cat->id }}" data-text="{{ $cat->translate()->title ?? 'No title' }}">
-                                                                                <a class="dropdown-item" href="#" onclick="selectCategory({{ $product->id }}, {{ $cat->id }}, '{{ $cat->translate()->title ?? 'No title' }}')">
-                                                                                    {{ $cat->translate()->title ?? 'No title' }}
-                                                                                </a>
-                                                                            </div>
-                                                                        @endforeach
-                                                                    </div>
-                                                                </div>
+                                                                <ul class="dropdown-menu p-2" style="width: 250px;">
+                                                                    <li>
+                                                                        <input type="text" class="form-control form-control-sm mb-2" 
+                                                                               placeholder="Search categories..." 
+                                                                               id="categorySearch{{ $product->id }}"
+                                                                               onkeyup="filterCategories({{ $product->id }})"
+                                                                               onclick="event.stopPropagation()">
+                                                                    </li>
+                                                                    <li>
+                                                                        <div class="category-options" id="categoryOptions{{ $product->id }}" style="max-height: 200px; overflow-y: auto;">
+                                                                            @foreach($categories as $cat)
+                                                                                <div class="category-option" data-value="{{ $cat->id }}" data-text="{{ $cat->translate()->title ?? 'No title' }}">
+                                                                                    <a class="dropdown-item" href="#" onclick="selectCategory({{ $product->id }}, {{ $cat->id }}, '{{ addslashes($cat->translate()->title ?? 'No title') }}'); return false;">
+                                                                                        {{ $cat->translate()->title ?? 'No title' }}
+                                                                                    </a>
+                                                                                </div>
+                                                                            @endforeach
+                                                                        </div>
+                                                                    </li>
+                                                                </ul>
                                                                 <input type="hidden" name="category_id" id="selectedCategory{{ $product->id }}" value="">
                                                             </div>
                                                             <button type="submit" class="btn btn-sm btn-outline-secondary" title="Duplicate Product" 
@@ -497,11 +503,10 @@ function selectCategory(productId, categoryId, categoryTitle) {
     hiddenInput.value = categoryId;
     
     // Close dropdown
-    const dropdown = new bootstrap.Dropdown(dropdownButton);
+    const dropdownElement = dropdownButton.closest('.dropdown');
+    const dropdown = bootstrap.Dropdown.getInstance(dropdownButton) || new bootstrap.Dropdown(dropdownButton);
     dropdown.hide();
     
-    // Prevent default link behavior
-    event.preventDefault();
     return false;
 }
 
