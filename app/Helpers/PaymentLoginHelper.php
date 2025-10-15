@@ -55,13 +55,17 @@ class PaymentLoginHelper
      * Token ilə sorğu göndərmək üçün wrapper
      */
     public static function withAuth()
-    {
-        $token   = self::getToken();
-        $baseUrl = env("UNITED_PAYMENT_API_URL", "https://vpos.unitedpayment.az/api");
+{
+    $token   = self::getToken();
+    $baseUrl = env("UNITED_PAYMENT_API_URL", "https://vpos.unitedpayment.az/api");
 
-        return Http::withHeaders([
-            'x-auth-token'  => $token,
-            'Content-Type'  => 'application/json; charset=utf-8'
-        ])->baseUrl($baseUrl);
-    }
+    // Bearer sözü varsa, onu təmizləyək (dəfələrlə Bearer yazılmasın)
+    $token = str_replace('Bearer ', '', $token);
+
+    return Http::withHeaders([
+        'Authorization' => 'Bearer ' . $token, // 👈 Dəyişiklik budur
+        'Content-Type'  => 'application/json; charset=utf-8'
+    ])->baseUrl($baseUrl);
+}
+
 }
