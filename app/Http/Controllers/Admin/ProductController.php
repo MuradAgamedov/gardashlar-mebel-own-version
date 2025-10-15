@@ -382,6 +382,13 @@ class ProductController extends Controller
                 $newAcc = $accordion->replicate();
                 $newAcc->product_id = $newProduct->id;
                 $newAcc->save();
+                
+                // Accordion translations-larını da kopyala
+                foreach ($accordion->translates as $translate) {
+                    $newTranslate = $translate->replicate();
+                    $newTranslate->product_accordion_id = $newAcc->id;
+                    $newTranslate->save();
+                }
             }
     
             // Detallar
@@ -389,6 +396,13 @@ class ProductController extends Controller
                 $newDetail = $detail->replicate();
                 $newDetail->product_id = $newProduct->id;
                 $newDetail->save();
+                
+                // Detail translations-larını da kopyala
+                foreach ($detail->translates as $translate) {
+                    $newTranslate = $translate->replicate();
+                    $newTranslate->product_detail_id = $newDetail->id;
+                    $newTranslate->save();
+                }
             }
     
             // Detail values
