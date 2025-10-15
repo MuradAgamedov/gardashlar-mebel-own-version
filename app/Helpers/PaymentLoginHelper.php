@@ -34,7 +34,7 @@ class PaymentLoginHelper
             'email'    => $email,
             'password' => $password,
         ]);
-
+        dd($response);
         if ($response->successful()) {
             $data = $response->json();
             $token = $data['token'] ?? null;
