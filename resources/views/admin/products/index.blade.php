@@ -265,35 +265,15 @@
                                                     <form action="{{ route('admin.products.duplicate', $product) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         <div class="d-flex align-items-center gap-1">
-                                                            <div class="dropdown" style="width:120px;">
-                                                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle w-100 text-start" 
-                                                                        data-bs-toggle="dropdown" aria-expanded="false" 
-                                                                        id="categoryDropdown{{ $product->id }}"
-                                                                        data-bs-auto-close="outside">
-                                                                    Select category
-                                                                </button>
-                                                                <ul class="dropdown-menu p-2" style="width: 250px;">
-                                                                    <li>
-                                                                        <input type="text" class="form-control form-control-sm mb-2" 
-                                                                               placeholder="Search categories..." 
-                                                                               id="categorySearch{{ $product->id }}"
-                                                                               onkeyup="filterCategories({{ $product->id }})"
-                                                                               onclick="event.stopPropagation()">
-                                                                    </li>
-                                                                    <li>
-                                                                        <div class="category-options" id="categoryOptions{{ $product->id }}" style="max-height: 200px; overflow-y: auto;">
-                                                                            @foreach($categories as $cat)
-                                                                                <div class="category-option" data-value="{{ $cat->id }}" data-text="{{ $cat->translate()->title ?? 'No title' }}">
-                                                                                    <a class="dropdown-item" href="#" onclick="selectCategory({{ $product->id }}, {{ $cat->id }}, '{{ addslashes($cat->translate()->title ?? 'No title') }}'); return false;">
-                                                                                        {{ $cat->translate()->title ?? 'No title' }}
-                                                                                    </a>
-                                                                                </div>
-                                                                            @endforeach
-                                                                        </div>
-                                                                    </li>
-                                                                </ul>
-                                                                <input type="hidden" name="category_id" id="selectedCategory{{ $product->id }}" value="">
-                                                            </div>
+                                                            <select name="category_id" class="form-select form-select-sm category-select" 
+                                                                    id="categorySelect{{ $product->id }}" 
+                                                                    style="width:120px;" 
+                                                                    required>
+                                                                <option value="">Select category</option>
+                                                                @foreach($categories as $cat)
+                                                                    <option value="{{ $cat->id }}">{{ $cat->translate()->title ?? 'No title' }}</option>
+                                                                @endforeach
+                                                            </select>
                                                             <button type="submit" class="btn btn-sm btn-outline-secondary" title="Duplicate Product" 
                                                                     onclick="return validateDuplicate({{ $product->id }})">
                                                                 <i class="material-icons-outlined">content_copy</i>
@@ -351,41 +331,49 @@
 @endsection
 
 @push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
-.category-option .dropdown-item {
-    padding: 0.25rem 0.5rem;
+.select2-container {
+    width: 120px !important;
+}
+
+.select2-container--default .select2-selection--single {
+    height: 31px;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
     font-size: 0.875rem;
-    cursor: pointer;
 }
 
-.category-option .dropdown-item:hover {
-    background-color: #f8f9fa;
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 29px;
+    padding-left: 8px;
+    padding-right: 20px;
 }
 
-.dropdown-menu {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    border: 1px solid #dee2e6;
-    z-index: 1050;
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 29px;
+    right: 3px;
 }
 
-.category-options {
-    border-top: 1px solid #dee2e6;
-    margin-top: 0.5rem;
-    padding-top: 0.5rem;
+.select2-dropdown {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
 }
 
-.dropdown-menu li {
-    list-style: none;
-}
-
-.dropdown-toggle::after {
-    margin-left: auto;
+.select2-search--dropdown .select2-search__field {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    padding: 4px 8px;
+    font-size: 0.875rem;
 }
 </style>
 @endpush
 
 @push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-select first type if no type is selected
@@ -399,18 +387,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Debug dropdown functionality
-    document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(dropdownToggle) {
-        dropdownToggle.addEventListener('click', function(e) {
-            console.log('Dropdown clicked:', this.id);
-        });
-        
-        dropdownToggle.addEventListener('shown.bs.dropdown', function() {
-            console.log('Dropdown shown:', this.id);
-        });
-        
-        dropdownToggle.addEventListener('hidden.bs.dropdown', function() {
-            console.log('Dropdown hidden:', this.id);
+    // Initialize Select2 for category selects
+    $(document).ready(function() {
+        $('.category-select').select2({
+            placeholder: 'Select category',
+            allowClear: true,
+            width: '120px',
+            dropdownAutoWidth: true,
+            minimumResultsForSearch: 5 // Show search box if more than 5 options
         });
     });
     const sortableList = document.getElementById('sortable-products');
@@ -500,43 +484,8 @@ deleteBtn.addEventListener('click', function() {
     });
 });
 
-// Category search and selection functions
-function filterCategories(productId) {
-    const searchInput = document.getElementById('categorySearch' + productId);
-    const searchTerm = searchInput.value.toLowerCase();
-    const categoryOptions = document.getElementById('categoryOptions' + productId);
-    const options = categoryOptions.querySelectorAll('.category-option');
-    
-    options.forEach(option => {
-        const text = option.getAttribute('data-text').toLowerCase();
-        if (text.includes(searchTerm)) {
-            option.style.display = 'block';
-        } else {
-            option.style.display = 'none';
-        }
-    });
-}
-
-function selectCategory(productId, categoryId, categoryTitle) {
-    // Update dropdown button text
-    const dropdownButton = document.getElementById('categoryDropdown' + productId);
-    dropdownButton.textContent = categoryTitle;
-    dropdownButton.classList.add('text-primary');
-    
-    // Set hidden input value
-    const hiddenInput = document.getElementById('selectedCategory' + productId);
-    hiddenInput.value = categoryId;
-    
-    // Close dropdown
-    const dropdownElement = dropdownButton.closest('.dropdown');
-    const dropdown = bootstrap.Dropdown.getInstance(dropdownButton) || new bootstrap.Dropdown(dropdownButton);
-    dropdown.hide();
-    
-    return false;
-}
-
 function validateDuplicate(productId) {
-    const selectedCategory = document.getElementById('selectedCategory' + productId).value;
+    const selectedCategory = document.getElementById('categorySelect' + productId).value;
     if (!selectedCategory) {
         alert('Please select a category for duplication');
         return false;
