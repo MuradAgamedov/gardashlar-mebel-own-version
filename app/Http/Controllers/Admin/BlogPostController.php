@@ -4,278 +4,103 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
-use App\Models\BlogPostTranslate;
-use App\Models\BlogCategory;
-use App\Models\Language;
-use App\Services\ImageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use App\Repositories\BlogPostRepository;
 use App\Repositories\BlogCategoryRepository;
 use App\Repositories\LanguageRepository;
+use App\Http\Requests\Admin\BlogPost\StoreBlogPostRequest;
+use App\Http\Requests\Admin\BlogPost\UpdateBlogPostRequest;
 
 class BlogPostController extends Controller
 {
-    protected $imageService;
-
     public function __construct(
-        ImageService $imageService,
         public BlogPostRepository $repository,
         public BlogCategoryRepository $categoryRepository,
         public LanguageRepository $languageRepository
     )
     {
-        $this->imageService = $imageService;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $blogPosts = $this->repository->getPosts($request);
         $categories = $this->categoryRepository->getCategories();
-
         return view('admin.blog-posts.index', compact('blogPosts', 'categories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $categories = $this->categoryRepository->getCategories();
         $languages = $this->languageRepository->getActiveLanguages();
-
         return view('admin.blog-posts.create', compact('categories', 'languages'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreBlogPostRequest $request)
     {
-        $validated = $request->validate([
-            'blog_category_id' => 'required|exists:blog_categories,id',
-            'status' => 'boolean',
-            'published_at' => 'nullable|date',
-            'card_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'inner_banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.title' => 'required|string|max:255',
-            'translations.*.slug' => 'required|string|max:255|unique:blog_post_translates,slug',
-            'translations.*.description' => 'required|string',
-            'translations.*.card_image_alt_text' => 'nullable|string|max:255',
-            'translations.*.card_description' => 'nullable|string',
-            'translations.*.inner_banner_alt_text' => 'nullable|string|max:255',
-            'translations.*.seo_title' => 'nullable|string|max:255',
-            'translations.*.seo_keywords' => 'nullable|string',
-            'translations.*.seo_description' => 'nullable|string',
-        ], [
-            'blog_category_id.required' => 'Category is required.',
-            'blog_category_id.exists' => 'Selected category does not exist.',
-            'translations.required' => 'At least one translation is required.',
-            'translations.*.title.required' => 'Title is required for all languages.',
-            'translations.*.title.max' => 'Title cannot exceed 255 characters.',
-            'translations.*.slug.required' => 'Slug is required for all languages.',
-            'translations.*.slug.max' => 'Slug cannot exceed 255 characters.',
-            'translations.*.slug.unique' => 'Slug must be unique.',
-            'translations.*.description.required' => 'Description is required for all languages.',
-            'card_image.image' => 'Card image must be a valid image file.',
-            'card_image.mimes' => 'Card image must be a JPEG, PNG, JPG, GIF, or WEBP file.',
-            'card_image.max' => 'Card image size cannot exceed 2MB.',
-            'inner_banner_image.image' => 'Inner banner image must be a valid image file.',
-            'inner_banner_image.mimes' => 'Inner banner image must be a JPEG, PNG, JPG, GIF, or WEBP file.',
-            'inner_banner_image.max' => 'Inner banner image size cannot exceed 2MB.',
-        ]);
-
         try {
-            $data = [
-                'blog_category_id' => $request->blog_category_id,
-                'status' => $request->has('status'),
-                'published_at' => $request->published_at,
-            ];
-
-            // Handle card image upload
-            if ($request->hasFile('card_image')) {
-                $data['card_image'] = $this->imageService->upload($request->file('card_image'), 'blog-posts');
-            }
-
-            // Handle inner banner image upload
-            if ($request->hasFile('inner_banner_image')) {
-                $data['inner_banner_image'] = $this->imageService->upload($request->file('inner_banner_image'), 'blog-posts');
-            }
-
-            $blogPost = BlogPost::create($data);
-
-            // Create translations
-            foreach ($request->translations as $languageId => $translation) {
-                if (!empty($translation['title'])) {
-                    BlogPostTranslate::create([
-                        'blog_post_id' => $blogPost->id,
-                        'language_id' => $languageId,
-                        'title' => $translation['title'],
-                        'slug' => $translation['slug'],
-                        'description' => $translation['description'],
-                        'card_image_alt_text' => $translation['card_image_alt_text'] ?? null,
-                        'card_description' => $translation['card_description'] ?? null,
-                        'inner_banner_alt_text' => $translation['inner_banner_alt_text'] ?? null,
-                        'seo_title' => $translation['seo_title'] ?? null,
-                        'seo_keywords' => $translation['seo_keywords'] ?? null,
-                        'seo_description' => $translation['seo_description'] ?? null,
-                    ]);
-                }
-            }
+            $this->repository->createPost(
+                [
+                    'blog_category_id' => $request->blog_category_id,
+                    'status' => $request->has('status'),
+                    'published_at' => $request->published_at,
+                ],
+                $request->translations,
+                $request->file('card_image'),
+                $request->file('inner_banner_image')
+            );
 
             return redirect()->route('admin.blog-posts.index')
                 ->with('success', 'Blog post created successfully.');
 
         } catch (\Exception $e) {
-            Log::error('Error creating blog post: ' . $e->getMessage());
-            
             return back()->withInput()
-                ->with('error', 'Error creating blog post. Please try again.'.$e->getMessage());
+                ->with('error', 'Error creating blog post. Please try again.');
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(BlogPost $blogPost)
     {
         $blogPost->load(['category.translates', 'translates.language']);
         $categories = $this->categoryRepository->getCategories();
         $languages = $this->languageRepository->getActiveLanguages();
-
         return view('admin.blog-posts.edit', compact('blogPost', 'categories', 'languages'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, BlogPost $blogPost)
+    public function update(UpdateBlogPostRequest $request, BlogPost $blogPost)
     {
-        $validated = $request->validate([
-            'blog_category_id' => 'required|exists:blog_categories,id',
-            'status' => 'boolean',
-            'published_at' => 'nullable|date',
-            'card_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'inner_banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.title' => 'required|string|max:255',
-            'translations.*.slug' => 'required|string|max:255|unique:blog_post_translates,slug,' . $blogPost->id . ',blog_post_id',
-            'translations.*.description' => 'required|string',
-            'translations.*.card_image_alt_text' => 'nullable|string|max:255',
-            'translations.*.card_description' => 'nullable|string',
-            'translations.*.inner_banner_alt_text' => 'nullable|string|max:255',
-            'translations.*.seo_title' => 'nullable|string|max:255',
-            'translations.*.seo_keywords' => 'nullable|string',
-            'translations.*.seo_description' => 'nullable|string',
-        ], [
-            'blog_category_id.required' => 'Category is required.',
-            'blog_category_id.exists' => 'Selected category does not exist.',
-            'translations.required' => 'At least one translation is required.',
-            'translations.*.title.required' => 'Title is required for all languages.',
-            'translations.*.title.max' => 'Title cannot exceed 255 characters.',
-            'translations.*.slug.required' => 'Slug is required for all languages.',
-            'translations.*.slug.max' => 'Slug cannot exceed 255 characters.',
-            'translations.*.slug.unique' => 'Slug must be unique.',
-            'translations.*.description.required' => 'Description is required for all languages.',
-            'card_image.image' => 'Card image must be a valid image file.',
-            'card_image.mimes' => 'Card image must be a JPEG, PNG, JPG, GIF, or WEBP file.',
-            'card_image.max' => 'Card image size cannot exceed 2MB.',
-            'inner_banner_image.image' => 'Inner banner image must be a valid image file.',
-            'inner_banner_image.mimes' => 'Inner banner image must be a JPEG, PNG, JPG, GIF, or WEBP file.',
-            'inner_banner_image.max' => 'Inner banner image size cannot exceed 2MB.',
-        ]);
-
         try {
-            $data = [
-                'blog_category_id' => $request->blog_category_id,
-                'status' => $request->has('status'),
-                'published_at' => $request->published_at,
-            ];
-
-            // Handle card image upload
-            if ($request->hasFile('card_image')) {
-                if ($blogPost->card_image) {
-                    $this->imageService->delete($blogPost->card_image);
-                }
-                $data['card_image'] = $this->imageService->upload($request->file('card_image'), 'blog-posts');
-            }
-
-            // Handle inner banner image upload
-            if ($request->hasFile('inner_banner_image')) {
-                if ($blogPost->inner_banner_image) {
-                    $this->imageService->delete($blogPost->inner_banner_image);
-                }
-                $data['inner_banner_image'] = $this->imageService->upload($request->file('inner_banner_image'), 'blog-posts');
-            }
-
-            $blogPost->update($data);
-
-            // Update or create translations
-            foreach ($request->translations as $languageId => $translation) {
-                if (!empty($translation['title'])) {
-                    BlogPostTranslate::updateOrCreate(
-                        [
-                            'blog_post_id' => $blogPost->id,
-                            'language_id' => $languageId,
-                        ],
-                        [
-                            'title' => $translation['title'],
-                            'slug' => $translation['slug'],
-                            'description' => $translation['description'],
-                            'card_image_alt_text' => $translation['card_image_alt_text'] ?? null,
-                            'card_description' => $translation['card_description'] ?? null,
-                            'inner_banner_alt_text' => $translation['inner_banner_alt_text'] ?? null,
-                            'seo_title' => $translation['seo_title'] ?? null,
-                            'seo_keywords' => $translation['seo_keywords'] ?? null,
-                            'seo_description' => $translation['seo_description'] ?? null,
-                        ]
-                    );
-                }
-            }
+            $this->repository->updatePost(
+                $blogPost,
+                [
+                    'blog_category_id' => $request->blog_category_id,
+                    'status' => $request->has('status'),
+                    'published_at' => $request->published_at,
+                ],
+                $request->translations,
+                $request->file('card_image'),
+                $request->file('inner_banner_image')
+            );
 
             return redirect()->route('admin.blog-posts.index')
                 ->with('success', 'Blog post updated successfully.');
 
         } catch (\Exception $e) {
-            Log::error('Error updating blog post: ' . $e->getMessage());
-            
             return back()->withInput()
                 ->with('error', 'Error updating blog post. Please try again.');
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(BlogPost $blogPost)
     {
         try {
-            // Delete images
-            if ($blogPost->card_image) {
-                $this->imageService->delete($blogPost->card_image);
-            }
-            if ($blogPost->inner_banner_image) {
-                $this->imageService->delete($blogPost->inner_banner_image);
-            }
-
-            $blogPost->delete();
+            $this->repository->deletePost($blogPost);
             return redirect()->route('admin.blog-posts.index')
                 ->with('success', 'Blog post deleted successfully.');
         } catch (\Exception $e) {
-            Log::error('Error deleting blog post: ' . $e->getMessage());
             return back()->with('error', 'Error deleting blog post. Please try again.');
         }
     }
 
-    /**
-     * Bulk delete blog posts
-     */
     public function bulkDelete(Request $request)
     {
         $request->validate([
@@ -284,19 +109,7 @@ class BlogPostController extends Controller
         ]);
 
         try {
-            $blogPosts = BlogPost::whereIn('id', $request->ids)->get();
-            
-            foreach ($blogPosts as $blogPost) {
-                if ($blogPost->card_image) {
-                    $this->imageService->delete($blogPost->card_image);
-                }
-                if ($blogPost->inner_banner_image) {
-                    $this->imageService->delete($blogPost->inner_banner_image);
-                }
-            }
-
-            $deletedCount = BlogPost::whereIn('id', $request->ids)->delete();
-            
+            $deletedCount = $this->repository->bulkDelete($request->ids);
             return redirect()->route('admin.blog-posts.index')
                 ->with('success', "{$deletedCount} blog post(s) deleted successfully!");
         } catch (\Exception $e) {

@@ -3,20 +3,18 @@ namespace App\Repositories;
 
 use App\Models\BecomeAInvestorForm;
 use App\Repositories\Global\BaseRepository;
+use Illuminate\Support\Facades\DB;
 
 class BecomeAInvestorFormRepository extends BaseRepository
 {
-
     public function __construct(public BecomeAInvestorForm $form)
     {
     }
 
-    // Formları filtrlə və paginate et
     public function getForms($request)
     {
         $query = $this->form->query();
 
-        // Search functionality
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -26,7 +24,6 @@ class BecomeAInvestorFormRepository extends BaseRepository
             });
         }
 
-        // Filter by read status
         if ($request->filled('status')) {
             if ($request->status === 'unread') {
                 $query->unread();
@@ -36,5 +33,20 @@ class BecomeAInvestorFormRepository extends BaseRepository
         }
 
         return $query->orderBy('created_at', 'desc')->paginate(20);
+    }
+
+    public function deleteForm(BecomeAInvestorForm $form)
+    {
+        return $form->delete();
+    }
+
+    public function markAsRead(BecomeAInvestorForm $form)
+    {
+        return $form->markAsRead();
+    }
+
+    public function deleteSelected(array $ids)
+    {
+        return $this->form->whereIn('id', $ids)->delete();
     }
 }

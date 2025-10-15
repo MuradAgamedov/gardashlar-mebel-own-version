@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Http\Requests\Admin\BecomeAInvestorAdvantage;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class UpdateBecomeAInvestorAdvantageRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            'icon' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,svg|max:2048',
+            'status' => 'boolean',
+            'translations' => 'required|array',
+            'translations.*.icon_alt_text' => 'required|string|max:255',
+            'translations.*.title' => 'required|string|max:255',
+            'translations.*.description' => 'required|string|max:1000',
+        ];
+    }
+}

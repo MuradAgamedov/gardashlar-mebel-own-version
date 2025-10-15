@@ -13,36 +13,24 @@ class BecomeAPartnerFormController extends Controller
     {
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $forms = $this->repository->getForms($request);
-        
         return view('admin.become-a-partner-forms.index', compact('forms'));
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(BecomeAPartnerForm $becomeAPartnerForm)
     {
-        // Mark as read when viewed
         if (!$becomeAPartnerForm->is_read) {
-            $becomeAPartnerForm->markAsRead();
+            $this->repository->markAsRead($becomeAPartnerForm);
         }
-        
         return view('admin.become-a-partner-forms.show', compact('becomeAPartnerForm'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(BecomeAPartnerForm $becomeAPartnerForm)
     {
         try {
-            $becomeAPartnerForm->delete();
+            $this->repository->deleteForm($becomeAPartnerForm);
             return redirect()->route('admin.become-a-partner-forms.index')
                 ->with('success', 'Form deleted successfully!');
         } catch (\Exception $e) {
@@ -51,24 +39,17 @@ class BecomeAPartnerFormController extends Controller
         }
     }
 
-    /**
-     * Mark form as read
-     */
     public function markAsRead($id)
     {
         try {
             $form = BecomeAPartnerForm::findOrFail($id);
-            $form->markAsRead();
-            
+            $this->repository->markAsRead($form);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
-    /**
-     * Delete selected forms
-     */
     public function deleteSelected(Request $request)
     {
         $request->validate([
@@ -77,8 +58,7 @@ class BecomeAPartnerFormController extends Controller
         ]);
 
         try {
-            BecomeAPartnerForm::whereIn('id', $request->ids)->delete();
-
+            $this->repository->deleteSelected($request->ids);
             return redirect()->route('admin.become-a-partner-forms.index')
                 ->with('success', count($request->ids) . ' form(s) deleted successfully.');
 

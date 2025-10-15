@@ -4,94 +4,50 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\About;
-use App\Models\AboutTranslate;
 use App\Models\Language;
-use App\Services\ImageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Repositories\AboutRepository;
+use App\Http\Requests\Admin\About\StoreAboutRequest;
+use App\Http\Requests\Admin\About\UpdateAboutRequest;
+
 class AboutController extends Controller
 {
-
-    public function __construct(public ImageService $imageService, public AboutRepository $repository)
+    public function __construct(public AboutRepository $repository)
     {
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $abouts = $this->repository->getAbout();
-
         return view('admin.abouts.index', compact('abouts'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $languages = Language::getActiveLanguages();
         return view('admin.abouts.create', compact('languages'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreAboutRequest $request)
     {
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'date' => 'nullable|string|max:255',
-            'translates' => 'required|array',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string|max:255',
-            'translates.*.description' => 'required|string',
-            'translates.*.image_alt_text' => 'nullable|string|max:255',
-            'status' => 'boolean'
-        ]);
-
         try {
-            DB::beginTransaction();
-
-            // Upload image
-            $imagePath = $this->imageService->upload($request->file('image'), 'abouts');
-
-            // Create about
-            $about = About::create([
-                'image' => $imagePath,
-                'date' => $request->input('date'),
-                'status' => $request->input('status', true)
-            ]);
-
-            // Create translates
-            foreach ($request->input('translates') as $translate) {
-                AboutTranslate::create([
-                    'about_id' => $about->id,
-                    'language_id' => $translate['language_id'],
-                    'title' => $translate['title'],
-                    'description' => $translate['description'],
-                    'image_alt_text' => $translate['image_alt_text'] ?? null,
-                ]);
-            }
-
-            DB::commit();
+            $this->repository->createAbout(
+                [
+                    'date' => $request->input('date'),
+                    'status' => $request->input('status', true)
+                ],
+                $request->input('translates'),
+                $request->file('image')
+            );
 
             return redirect()->route('admin.abouts.index')
                 ->with('success', 'Haqqımızda məlumatı uğurla əlavə edildi.');
 
         } catch (\Exception $e) {
-            DB::rollback();
             return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
         }
     }
 
-
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(About $about)
     {
         $about->load('translates');
@@ -99,78 +55,31 @@ class AboutController extends Controller
         return view('admin.abouts.edit', compact('about', 'languages'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, About $about)
+    public function update(UpdateAboutRequest $request, About $about)
     {
-        $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'date' => 'nullable|string|max:255',
-            'translates' => 'required|array',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string|max:255',
-            'translates.*.description' => 'required|string',
-            'translates.*.image_alt_text' => 'nullable|string|max:255',
-            'status' => 'boolean'
-        ]);
-
         try {
-            DB::beginTransaction();
-
-            // Handle image upload
-            if ($request->hasFile('image')) {
-                // Delete old image
-                if ($about->image) {
-                    $this->imageService->delete($about->image);
-                }
-                // Upload new image
-                $imagePath = $this->imageService->upload($request->file('image'), 'abouts');
-                $about->image = $imagePath;
-            }
-
-            $about->date = $request->input('date');
-            $about->status = $request->input('status', true);
-            $about->save();
-
-            // Update translates
-            foreach ($request->input('translates') as $translate) {
-                AboutTranslate::updateOrCreate(
-                    [
-                        'about_id' => $about->id,
-                        'language_id' => $translate['language_id']
-                    ],
-                    [
-                        'title' => $translate['title'],
-                        'description' => $translate['description'],
-                        'image_alt_text' => $translate['image_alt_text'] ?? null,
-                    ]
-                );
-            }
-
-            DB::commit();
+            $this->repository->updateAbout(
+                $about,
+                [
+                    'date' => $request->input('date'),
+                    'status' => $request->input('status', true)
+                ],
+                $request->input('translates'),
+                $request->file('image')
+            );
 
             return redirect()->route('admin.abouts.index')
                 ->with('success', 'Haqqımızda məlumatı uğurla yeniləndi.');
 
         } catch (\Exception $e) {
-            DB::rollback();
             return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(About $about)
     {
         try {
-            // Delete image
-            if ($about->image) {
-                $this->imageService->delete($about->image);
-            }
-            
-            $about->delete();
+            $this->repository->deleteAbout($about);
             
             return redirect()->route('admin.abouts.index')
                 ->with('success', 'Haqqımızda məlumatı uğurla silindi.');
@@ -180,9 +89,6 @@ class AboutController extends Controller
         }
     }
 
-    /**
-     * Reorder about items
-     */
     public function reorder(Request $request)
     {
         $request->validate([
@@ -191,10 +97,7 @@ class AboutController extends Controller
         ]);
 
         try {
-            foreach ($request->input('order') as $index => $id) {
-                About::where('id', $id)->update(['order' => $index + 1]);
-            }
-
+            $this->repository->reorderAbouts($request->input('order'));
             return response()->json(['success' => true]);
 
         } catch (\Exception $e) {

@@ -4,116 +4,42 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BecomeAPartnerAdvantage;
-use App\Models\Language;
-use App\Services\ImageService;
 use Illuminate\Http\Request;
 use App\Repositories\BecomeAPartnerAdvantageRepository;
 use App\Repositories\LanguageRepository;
+use App\Http\Requests\Admin\BecomeAPartnerAdvantage\StoreBecomeAPartnerAdvantageRequest;
+use App\Http\Requests\Admin\BecomeAPartnerAdvantage\UpdateBecomeAPartnerAdvantageRequest;
 
 class BecomeAPartnerAdvantageController extends Controller
 {
-    protected $imageService;
-
     public function __construct(
-        ImageService $imageService,
         public BecomeAPartnerAdvantageRepository $repository,
         public LanguageRepository $languageRepository
     )
     {
-        $this->imageService = $imageService;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $advantages = $this->repository->getAdvantages();
         $languages = $this->languageRepository->getAllLanguages();
-        
         return view('admin.become-a-partner-advantages.index', compact('advantages', 'languages'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $languages = $this->languageRepository->getAllLanguages();
         return view('admin.become-a-partner-advantages.create', compact('languages'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreBecomeAPartnerAdvantageRequest $request)
     {
-        $languages = $this->languageRepository->getAllLanguages();
-        
-        // Base validation
-        $request->validate([
-            'icon' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,svg|max:2048',
-            'status' => 'boolean',
-        ], [
-            'icon.image' => 'Icon must be an image file.',
-            'icon.mimes' => 'Icon must be a file of type: jpg, jpeg, png, gif, webp, svg.',
-            'icon.max' => 'Icon may not be greater than 2MB.',
-            'status.boolean' => 'Status must be true or false.',
-        ]);
-
-        // Translation validation
-        foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.icon_alt_text" => 'required|string|max:255',
-                "translations.{$language->id}.title" => 'required|string|max:255',
-                "translations.{$language->id}.description" => 'required|string|max:1000',
-            ], [
-                "translations.{$language->id}.icon_alt_text.required" => "Icon alt text is required for {$language->lang_code}.",
-                "translations.{$language->id}.icon_alt_text.max" => "Icon alt text may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.description.required" => "Description is required for {$language->lang_code}.",
-                "translations.{$language->id}.description.max" => "Description may not be greater than 1000 characters for {$language->lang_code}.",
-            ]);
-        }
-
         try {
-            // Handle icon upload
-            $iconPath = null;
-            if ($request->hasFile('icon')) {
-                $iconPath = $this->imageService->upload(
-                    $request->file('icon'),
-                    'become-a-partner-advantages',
-                    [
-                        'max_size' => 2048,
-                        'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
-                    ]
-                );
-                
-                if (!$iconPath) {
-                    return redirect()->back()
-                        ->with('error', 'Failed to upload icon.')
-                        ->withInput();
-                }
-            }
-
-            // Create advantage
-            $advantage = BecomeAPartnerAdvantage::create([
-                'icon' => $iconPath,
-                'status' => $request->input('status'),
-            ]);
-
-            // Create translations
-            foreach ($languages as $language) {
-                $translationData = $request->input("translations.{$language->id}", []);
-                
-                $advantage->translates()->create([
-                    'language_id' => $language->id,
-                    'icon_alt_text' => trim($translationData['icon_alt_text'] ?? ''),
-                    'title' => trim($translationData['title'] ?? ''),
-                    'description' => trim($translationData['description'] ?? ''),
-                ]);
-            }
+            $this->repository->createAdvantage(
+                ['status' => $request->input('status', true)],
+                $request->input('translations'),
+                $request->file('icon')
+            );
 
             return redirect()->route('admin.become-a-partner.edit')
                 ->with('success', 'Advantage created successfully!');
@@ -125,92 +51,22 @@ class BecomeAPartnerAdvantageController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(BecomeAPartnerAdvantage $becomeAPartnerAdvantage)
     {
         $becomeAPartnerAdvantage->load('translates.language');
         $languages = $this->languageRepository->getAllLanguages();
-        
         return view('admin.become-a-partner-advantages.edit', compact('becomeAPartnerAdvantage', 'languages'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, BecomeAPartnerAdvantage $becomeAPartnerAdvantage)
+    public function update(UpdateBecomeAPartnerAdvantageRequest $request, BecomeAPartnerAdvantage $becomeAPartnerAdvantage)
     {
-        $languages = $this->languageRepository->getAllLanguages();
-        
-        // Base validation
-        $request->validate([
-            'icon' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,svg|max:2048',
-            'status' => 'boolean',
-        ], [
-            'icon.image' => 'Icon must be an image file.',
-            'icon.mimes' => 'Icon must be a file of type: jpg, jpeg, png, gif, webp, svg.',
-            'icon.max' => 'Icon may not be greater than 2MB.',
-            'status.boolean' => 'Status must be true or false.',
-        ]);
-
-        // Translation validation
-        foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.icon_alt_text" => 'required|string|max:255',
-                "translations.{$language->id}.title" => 'required|string|max:255',
-                "translations.{$language->id}.description" => 'required|string|max:1000',
-            ], [
-                "translations.{$language->id}.icon_alt_text.required" => "Icon alt text is required for {$language->lang_code}.",
-                "translations.{$language->id}.icon_alt_text.max" => "Icon alt text may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.description.required" => "Description is required for {$language->lang_code}.",
-                "translations.{$language->id}.description.max" => "Description may not be greater than 1000 characters for {$language->lang_code}.",
-            ]);
-        }
-
         try {
-            // Handle icon upload
-            $imageData = [];
-            if ($request->hasFile('icon')) {
-                $uploadedPath = $this->imageService->update(
-                    $request->file('icon'),
-                    $becomeAPartnerAdvantage->icon,
-                    'become-a-partner-advantages',
-                    [
-                        'max_size' => 2048,
-                        'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
-                    ]
-                );
-                
-                if ($uploadedPath) {
-                    $imageData['icon'] = $uploadedPath;
-                } else {
-                    return redirect()->back()
-                        ->with('error', 'Failed to upload icon.')
-                        ->withInput();
-                }
-            }
-
-            // Update advantage
-            $becomeAPartnerAdvantage->update(array_merge($imageData, [
-                'status' => $request->input('status'),
-            ]));
-
-            // Update translations
-            foreach ($languages as $language) {
-                $translationData = $request->input("translations.{$language->id}", []);
-                
-                $becomeAPartnerAdvantage->translates()->updateOrCreate(
-                    ['language_id' => $language->id],
-                    [
-                        'icon_alt_text' => trim($translationData['icon_alt_text'] ?? ''),
-                        'title' => trim($translationData['title'] ?? ''),
-                        'description' => trim($translationData['description'] ?? ''),
-                    ]
-                );
-            }
+            $this->repository->updateAdvantage(
+                $becomeAPartnerAdvantage,
+                ['status' => $request->input('status', true)],
+                $request->input('translations'),
+                $request->file('icon')
+            );
 
             return redirect()->route('admin.become-a-partner.edit')
                 ->with('success', 'Advantage updated successfully!');
@@ -222,13 +78,10 @@ class BecomeAPartnerAdvantageController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(BecomeAPartnerAdvantage $becomeAPartnerAdvantage)
     {
         try {
-            $becomeAPartnerAdvantage->delete();
+            $this->repository->deleteAdvantage($becomeAPartnerAdvantage);
             return redirect()->route('admin.become-a-partner.edit')
                 ->with('success', 'Advantage deleted successfully!');
         } catch (\Exception $e) {
@@ -237,9 +90,6 @@ class BecomeAPartnerAdvantageController extends Controller
         }
     }
 
-    /**
-     * Reorder advantages
-     */
     public function reorder(Request $request)
     {
         $request->validate([
@@ -248,19 +98,13 @@ class BecomeAPartnerAdvantageController extends Controller
         ]);
 
         try {
-            foreach ($request->advantages as $index => $advantageId) {
-                BecomeAPartnerAdvantage::where('id', $advantageId)->update(['order' => $index + 1]);
-            }
-
+            $this->repository->reorderAdvantages($request->advantages);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
-    /**
-     * Delete selected advantages
-     */
     public function deleteSelected(Request $request)
     {
         $request->validate([
@@ -269,12 +113,7 @@ class BecomeAPartnerAdvantageController extends Controller
         ]);
 
         try {
-            // Delete translations first
-            \App\Models\BecomeAPartnerAdvantageTranslate::whereIn('become_a_partner_advantage_id', $request->ids)->delete();
-            
-            // Delete advantages
-            BecomeAPartnerAdvantage::whereIn('id', $request->ids)->delete();
-
+            $this->repository->deleteSelected($request->ids);
             return redirect()->route('admin.become-a-partner.edit')
                 ->with('success', count($request->ids) . ' advantage(s) deleted successfully.');
 

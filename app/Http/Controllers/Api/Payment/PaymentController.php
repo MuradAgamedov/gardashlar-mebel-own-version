@@ -60,112 +60,116 @@ class PaymentController extends Controller
     /**
      * 🔹 Online ödəniş
      */
-    public function startOnline(Request $request)
-    {
-        $data = $request->validate([
-            'order_id' => 'required|exists:orders,order_id',
-        ]);
+   public function startOnline(Request $request)
+{
+    $data = $request->validate([
+        'order_id' => 'required|exists:orders,order_id',
+    ]);
 
-        $order = Order::where('order_id', $data['order_id'])->firstOrFail();
-        $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://vpos.unitedpayment.az/api');
+    $order = Order::where('order_id', $data['order_id'])->firstOrFail();
+    $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://vpos.unitedpayment.az/api');
 
-        // 🟢 Login olubsa user ID, yoxdursa random guest ID
-        $user = $request->user();
-        $memberId = $user ? (string) $user->id : 'guest_' . strtoupper(Str::random(8));
+    $user = $request->user();
+    $memberId = $user ? (string) $user->id : 'guest_' . strtoupper(Str::random(8));
 
-        $payload = [
-            'amount'     => (float) $order->amount,
-            'memberId'   => $memberId,
-            'language'   => strtoupper($order->language ?? 'EN'),
-            'successUrl' => route('payment.success', ['order_id' => $order->id], true),
-            'cancelUrl'  => route('payment.cancel', ['order_id' => $order->id], true),
-            'declineUrl' => route('payment.decline', ['order_id' => $order->id], true),
-        ];
+    $payload = [
+        'amount'     => (float) $order->amount,
+        'memberId'   => $memberId,
+        'language'   => strtoupper($order->language ?? 'EN'),
+        'successUrl' => route('payment.success', ['order_id' => $order->id], true),
+        'cancelUrl'  => route('payment.cancel', ['order_id' => $order->id], true),
+        'declineUrl' => route('payment.decline', ['order_id' => $order->id], true),
+    ];
 
-        $order->update([
-            'payment_method' => 'online',
-            'payment_status' => 'pending',
-            'status' => 'processing',
-            'member_id' => $memberId, // 💾 gələcək izləmə üçün saxlanır
-        ]);
+    $order->update([
+        'payment_method' => 'online',
+        'payment_status' => 'pending',
+        'status' => 'processing',
+        'member_id' => $memberId,
+    ]);
 
-        $response = PaymentLoginHelper::withAuth()->post($baseUrl . '/transactions/checkout', $payload);
+    $response = PaymentLoginHelper::withAuth()->post($baseUrl . '/transactions/checkout', $payload);
 
-        if ($response->successful()) {
-            $body = $response->json();
-            $redirectUrl = $body['url'] ?? null;
+    if ($response->successful()) {
+        $body = $response->json();
+        $redirectUrl = $body['url'] ?? null;
 
-            if ($redirectUrl) {
-                return response()->json([
-                    'success' => true,
+        if ($redirectUrl) {
+            return response()->json([
+                'success' => true,
+                'data' => [
                     'redirect_url' => $redirectUrl,
                     'order_id' => $order->id,
-                ]);
-            }
-
-            Log::error('Online Payment: URL not found', ['body' => $response->body()]);
-            return response()->json(['success' => false, 'message' => 'Ödəniş linki tapılmadı'], 422);
+                ],
+            ]);
         }
 
-        Log::error('Online Payment failed', ['body' => $response->body()]);
-        return response()->json(['success' => false, 'message' => $response->body()], 500);
+        Log::error('Online Payment: URL not found', ['body' => $response->body()]);
+        return response()->json(['success' => false, 'message' => 'Ödəniş linki tapılmadı'], 422);
     }
+
+    Log::error('Online Payment failed', ['body' => $response->body()]);
+    return response()->json(['success' => false, 'message' => $response->body()], 500);
+}
+
 
 
     /**
      * 🔹 Kredit (taksit) ödənişi
      */
-    public function startInstallment(Request $request)
-    {
-        $data = $request->validate([
-            'order_id' => 'required|exists:orders,order_id',
-        ]);
+ public function startInstallment(Request $request)
+{
+    $data = $request->validate([
+        'order_id' => 'required|exists:orders,order_id',
+    ]);
 
-        $order = Order::where('order_id', $data['order_id'])->firstOrFail();
-        $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://vpos.unitedpayment.az/api');
+    $order = Order::where('order_id', $data['order_id'])->firstOrFail();
+    $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://vpos.unitedpayment.az/api');
 
-        // 🟢 Login olubsa user ID, yoxdursa random guest ID
-        $user = $request->user();
-        $memberId = $user ? (string) $user->id : 'guest_' . strtoupper(Str::random(8));
+    $user = $request->user();
+    $memberId = $user ? (string) $user->id : 'guest_' . strtoupper(Str::random(8));
 
-        $payload = [
-            'amount'      => (float) $order->amount,
-            'memberId'    => $memberId,
-            'language'    => strtoupper($order->language ?? 'EN'),
-            'installment' => (int) $order->month,
-            'successUrl'  => route('payment.success', ['order_id' => $order->id], true),
-            'cancelUrl'   => route('payment.cancel', ['order_id' => $order->id], true),
-            'declineUrl'  => route('payment.decline', ['order_id' => $order->id], true),
-        ];
+    $payload = [
+        'amount'      => (float) $order->amount,
+        'memberId'    => $memberId,
+        'language'    => strtoupper($order->language ?? 'EN'),
+        'installment' => (int) $order->month,
+        'successUrl'  => route('payment.success', ['order_id' => $order->id], true),
+        'cancelUrl'   => route('payment.cancel', ['order_id' => $order->id], true),
+        'declineUrl'  => route('payment.decline', ['order_id' => $order->id], true),
+    ];
 
-        $order->update([
-            'payment_method' => 'installment',
-            'payment_status' => 'pending',
-            'status'         => 'processing',
-            'member_id'      => $memberId, // 💾 gələcək izləmə üçün saxlanır
-        ]);
+    $order->update([
+        'payment_method' => 'installment',
+        'payment_status' => 'pending',
+        'status'         => 'processing',
+        'member_id'      => $memberId,
+    ]);
 
-        $response = PaymentLoginHelper::withAuth()->post($baseUrl . '/transactions/taksit', $payload);
+    $response = PaymentLoginHelper::withAuth()->post($baseUrl . '/transactions/taksit', $payload);
 
-        if ($response->successful()) {
-            $body = $response->json();
-            $redirectUrl = $body['url'] ?? null;
+    if ($response->successful()) {
+        $body = $response->json();
+        $redirectUrl = $body['url'] ?? null;
 
-            if ($redirectUrl) {
-                return response()->json([
-                    'success' => true,
+        if ($redirectUrl) {
+            return response()->json([
+                'success' => true,
+                'data' => [
                     'redirect_url' => $redirectUrl,
                     'order_id' => $order->id,
-                ]);
-            }
-
-            Log::error('Installment: URL not found', ['body' => $response->body()]);
-            return response()->json(['success' => false, 'message' => 'Ödəniş linki tapılmadı'], 422);
+                ],
+            ]);
         }
 
-        Log::error('Installment failed', ['body' => $response->body()]);
-        return response()->json(['success' => false, 'message' => $response->body()], 500);
+        Log::error('Installment: URL not found', ['body' => $response->body()]);
+        return response()->json(['success' => false, 'message' => 'Ödəniş linki tapılmadı'], 422);
     }
+
+    Log::error('Installment failed', ['body' => $response->body()]);
+    return response()->json(['success' => false, 'message' => $response->body()], 500);
+}
+
 
 
     /**
@@ -177,27 +181,27 @@ class PaymentController extends Controller
             $data = $request->validate([
                 'order_id' => 'required|exists:orders,order_id',
             ]);
-    
+
             $order = Order::where('order_id', $data['order_id'])->first();
-    
+
             if (!$order) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Sifariş tapılmadı',
                 ], 404);
             }
-    
+
             $method = is_numeric($order->payment_method)
                 ? $this->paymentMethods[(int)$order->payment_method] ?? null
                 : $order->payment_method;
-    
+
             if (!$method) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Ödəniş metodu düzgün deyil',
                 ], 400);
             }
-    
+
             // Cavabı JSON olaraq qaytar
             return match ($method) {
                 'cash'        => $this->startCash($request),
@@ -208,7 +212,7 @@ class PaymentController extends Controller
                     'message' => 'Uyğun ödəniş metodu tapılmadı',
                 ], 400),
             };
-    
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -222,7 +226,7 @@ class PaymentController extends Controller
             ], 500);
         }
     }
-    
+
 
     /**
      * 🔹 Müvəqqəti sifariş yaradılması
@@ -247,23 +251,23 @@ class PaymentController extends Controller
                 'selected_card'   => 'nullable|integer|exists:credit_cards,id',
                 "text" => 'nullable|string',
             ]);
-    
+
             $deliveryMethodName = $this->deliveryMethods[$data['delivery_method']];
             $paymentMethodName  = $this->paymentMethods[$data['payment_method']];
-    
+
             // Kredit kartın adı (əgər varsa)
             $cardId = null;
             if (!empty($data['selected_card'])) {
                 $card = CreditCard::find($data['selected_card']);
                 $cardId = $card?->id;
             }
-    
+
             // Aylıq məbləğ hesablanır, əgər months gəlməyibsə null olacaq
             $monthValue = $data['months'] ?? null;
             $monthlyPrice = $monthValue ? ($data['amount'] / $monthValue) : null;
-    
+
             $userId = optional($request->user())->id;
-    
+
             if (!empty($data['order_id'])) {
                 $order = Order::where('order_id', $data['order_id'])->firstOrFail();
                 $order->update([
@@ -309,16 +313,16 @@ class PaymentController extends Controller
                 ]);
                 $message = 'Yeni müvəqqəti sifariş yaradıldı';
             }
-    
+
             return response()->json([
                 'success' => true,
                 'message' => $message,
                 'data' => [
                     'order_id' => $order->order_id,
-              
+
                 ]
             ], 201);
-    
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -336,10 +340,10 @@ class PaymentController extends Controller
             ], 500);
         }
     }
-    
 
 
-  
+
+
     public function getOrder(Request $request, $orderId)
     {
         try {
@@ -356,11 +360,11 @@ class PaymentController extends Controller
                     'selected_card',
                     'month',
                     'amount',
-                    'text'     
+                    'text'
                 ])
                 ->firstOrFail();
 
-           
+
 
             return response()->json([
                 'success' => true,
@@ -408,7 +412,7 @@ class PaymentController extends Controller
                     'categories.translates' => fn($q) => $q->where('language_id', $languageId),
                     'types.translates' => fn($q) => $q->where('language_id', $languageId),
                     'colors' => fn($q) => $q->select('product_colors.id', 'product_colors.color_code'),
-           
+
                 ])
                 ->get();
 
@@ -419,8 +423,8 @@ class PaymentController extends Controller
                 // Main image
                 $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
 
-           
-                
+
+
 
                 // Available colors
                 $availableColors = $product->colors->map(fn($color) => [
@@ -449,17 +453,17 @@ class PaymentController extends Controller
                     ]);
                 }
 
-              
+
                 return [
                     'id' => $product->id,
                     'title' => $translation?->title ?? '',
                     'available_colors' => $availableColors,
 
-        
+
                     'discount_price' => $product->discount_price,
                     'price' => $product->price,
                     'images' => $imagesWithColors,
-               
+
                 ];
             });
 

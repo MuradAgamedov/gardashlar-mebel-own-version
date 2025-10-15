@@ -16,24 +16,21 @@ class BecomeAInvestorFormController extends Controller
     public function index(Request $request)
     {
         $forms = $this->repository->getForms($request);
-
         return view('admin.become-a-investor-forms.index', compact('forms'));
     }
 
     public function show(BecomeAInvestorForm $becomeAInvestorForm)
     {
-        // Mark as read if not already read
         if (!$becomeAInvestorForm->is_read) {
-            $becomeAInvestorForm->markAsRead();
+            $this->repository->markAsRead($becomeAInvestorForm);
         }
-
         return view('admin.become-a-investor-forms.show', compact('becomeAInvestorForm'));
     }
 
     public function destroy(BecomeAInvestorForm $becomeAInvestorForm)
     {
         try {
-            $becomeAInvestorForm->delete();
+            $this->repository->deleteForm($becomeAInvestorForm);
             return redirect()->route('admin.become-a-investor-forms.index')
                 ->with('success', 'Form deleted successfully!');
         } catch (\Exception $e) {
@@ -45,7 +42,7 @@ class BecomeAInvestorFormController extends Controller
     {
         try {
             $form = BecomeAInvestorForm::findOrFail($id);
-            $form->markAsRead();
+            $this->repository->markAsRead($form);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
@@ -60,7 +57,7 @@ class BecomeAInvestorFormController extends Controller
         ]);
 
         try {
-            BecomeAInvestorForm::whereIn('id', $request->ids)->delete();
+            $this->repository->deleteSelected($request->ids);
             return redirect()->route('admin.become-a-investor-forms.index')
                 ->with('success', count($request->ids) . ' form(s) deleted successfully.');
         } catch (\Exception $e) {
