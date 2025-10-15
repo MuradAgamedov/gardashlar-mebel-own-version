@@ -19,10 +19,11 @@ class PaymentLoginHelper
             $email    = env("UNITED_PAYMENT_API_EMAIL", "support@unitedpayment.com");
             $password = env("UNITED_PAYMENT_API_PASSWORD", "Testmerchant12!");
 
-            $response = Http::post($baseUrl . "/auth/", [
+            $response = Http::post("https://vpos.unitedpayment.az/auth", [
                 "email"    => $email,
                 "password" => $password,
             ]);
+            
 
             if ($response->successful()) {
                 $data  = $response->json();
