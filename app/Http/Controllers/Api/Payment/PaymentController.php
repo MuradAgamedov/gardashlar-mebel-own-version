@@ -540,7 +540,7 @@ class PaymentController extends Controller
 
 
 
-public function getPaymentStatusByTransactionId(Request $request)
+public function getPaymentStatus(Request $request)
 {
     try {
         $data = $request->validate([
