@@ -55,7 +55,7 @@ class CartController extends Controller
             'product.details.translates',
             'product.images',
             'product.types.translates',
-            'product.categories.parent.translates', // parent kateqoriyanı da çəkirik
+            'product.categories.parent.translates',
             'product.colors'
         ])->get();
     
@@ -84,27 +84,17 @@ class CartController extends Controller
                 'discount_price' => $product->discount_price,
                 'view_count' => $product->view_count,
     
-                // 🟢 Yeni əlavə edilən hissə:
-                'category_title' => $category?->translates
-                    ->where('language_id', $languageId)
-                    ->first()?->title ?? '',
-                'category_slug' => $category?->translates
-                    ->where('language_id', $languageId)
-                    ->first()?->slug ?? '',
-                'parent_title' => $parentCategory?->translates
-                    ->where('language_id', $languageId)
-                    ->first()?->title ?? '',
-                'parent_slug' => $parentCategory?->translates
-                    ->where('language_id', $languageId)
-                    ->first()?->slug ?? '',
+                // 🔹 Category məlumatı product-un içində
+                'category_title' => $category?->translates->where('language_id', $languageId)->first()?->title ?? '',
+                'category_slug' => $category?->translates->where('language_id', $languageId)->first()?->slug ?? '',
+                'parent_title' => $parentCategory?->translates->where('language_id', $languageId)->first()?->title ?? '',
+                'parent_slug' => $parentCategory?->translates->where('language_id', $languageId)->first()?->slug ?? '',
     
                 'images' => $product->images
                     ->sortBy('order')
                     ->map(fn($image) => [
                         'id' => $image->id,
-                        'image_url' => $image->image
-                            ? asset('storage/' . $image->image)
-                            : asset('images/default_image.webp'),
+                        'image_url' => $image->image ? asset('storage/' . $image->image) : asset('images/default_image.webp'),
                         'is_main' => $image->is_main,
                         'color_id' => $image->product_color_id
                     ])->values(),
@@ -116,15 +106,11 @@ class CartController extends Controller
     
                 'product_types' => $product->types->map(fn($type) => [
                     'id' => $type->id,
-                    'title' => $type->translates
-                        ->where('language_id', $languageId)
-                        ->first()?->title ?? ''
+                    'title' => $type->translates->where('language_id', $languageId)->first()?->title ?? ''
                 ]),
     
                 'product_details' => $product->details->map(function ($detail) use ($languageId) {
-                    $translation = $detail->translates
-                        ->where('language_id', $languageId)
-                        ->first();
+                    $translation = $detail->translates->where('language_id', $languageId)->first();
                     return [
                         'id' => $detail->id,
                         'keyword' => $translation?->keyword ?? '',
@@ -160,6 +146,7 @@ class CartController extends Controller
             'message' => 'Cart fetched successfully',
         ]);
     }
+    
     
     
 

@@ -63,14 +63,14 @@ class FavoriteController extends Controller
             ], 401);
         }
     
-        // Eager load product with all necessary relations
+        // Eager load product with all necessary relations, including parent category
         $favorites = $user->favorites()->with([
             'product.translates' => fn($q) => $q->where('language_id', $languageId),
             'product.images',
             'product.colors',
             'product.details.translates' => fn($q) => $q->where('language_id', $languageId),
             'product.types.translates' => fn($q) => $q->where('language_id', $languageId),
-            'product.categories.translates' => fn($q) => $q->where('language_id', $languageId),
+            'product.categories.parent.translates', // parent kateqoriya
         ])->get();
     
         // Geri plan üçün cart və compare məlumatlarını əvvəlcədən götür
@@ -80,45 +80,59 @@ class FavoriteController extends Controller
             ->toArray();
     
         $favoriteData = $favorites->map(function ($fav) use ($languageId, $cartItems, $compareIds) {
-            $product = $fav->product ? $fav->product->apiData($languageId) : null;
+            $product = $fav->product;
     
-            // Cart və compare status
+            if (!$product) return null;
+    
+            // Əsas kateqoriyanı al (ilkini götürürük)
+            $category = $product->categories->first();
+            $parentCategory = $category?->parent;
+    
+            $productData = [
+                'id' => $product->id,
+                'title' => $product->translate($languageId)?->title ?? '',
+                'slug' => $product->translate($languageId)?->slug ?? '',
+                'price' => $product->price,
+                'discount_price' => $product->discount_price,
+                'view_count' => $product->view_count,
+    
+                // 🔹 Category məlumatı product-un içində
+                'category_title' => $category?->translates->where('language_id', $languageId)->first()?->title ?? '',
+                'category_slug'  => $category?->translates->where('language_id', $languageId)->first()?->slug ?? '',
+                'parent_title'   => $parentCategory?->translates->where('language_id', $languageId)->first()?->title ?? '',
+                'parent_slug'    => $parentCategory?->translates->where('language_id', $languageId)->first()?->slug ?? '',
+    
+                'images' => $product->images->sortBy('order')->map(fn($image) => [
+                    'id' => $image->id,
+                    'image_url' => $image->image ? asset('storage/' . $image->image) : asset('images/default_image.webp'),
+                    'is_main' => $image->is_main,
+                    'color_id' => $image->product_color_id
+                ])->values(),
+    
+                'available_colors' => $product->colors->map(fn($color) => [
+                    'id' => $color->id,
+                    'color_code' => $color->color_code
+                ]),
+    
+                'product_types' => $product->types->map(fn($type) => [
+                    'id' => $type->id,
+                    'title' => $type->translates->where('language_id', $languageId)->first()?->title ?? ''
+                ]),
+    
+                'product_details' => $product->details->map(fn($detail) => [
+                    'id' => $detail->id,
+                    'keyword' => $detail->translates->where('language_id', $languageId)->first()?->keyword ?? '',
+                    'value' => $detail->translates->where('language_id', $languageId)->first()?->value ?? '',
+                ]),
+            ];
+    
             $cartKey = $fav->product_id . '-' . $fav->color_id;
             $inCart = $cartItems[$cartKey] ?? null;
-    
-            // === NEW: Kateqoriya məlumatları ===
-            $categorySlug = null;
-            $categoryTitle = null;
-            $parentSlug = null;
-            $parentTitle = null;
-    
-            if ($fav->product && $fav->product->categories->isNotEmpty()) {
-                $category = $fav->product->categories->first();
-                $categoryTrans = $category->translates->first();
-                $categorySlug = $categoryTrans?->slug;
-                $categoryTitle = $categoryTrans?->title;
-    
-                if ($category->parent_id) {
-                    $parentCategory = \App\Models\ProductCategory::find($category->parent_id);
-                    if ($parentCategory) {
-                        $parentTrans = $parentCategory->translates()->where('language_id', $languageId)->first();
-                        $parentSlug = $parentTrans?->slug;
-                        $parentTitle = $parentTrans?->title;
-                    }
-                }
-            }
     
             return [
                 'favorite_id' => $fav->id,
                 'color_id'    => $fav->color_id,
-                'product'     => $product,
-    
-                // NEW: kateqoriya məlumatları
-                'category_slug'  => $categorySlug,
-                'category_title' => $categoryTitle,
-                'parent_slug'    => $parentSlug,
-                'parent_title'   => $parentTitle,
-    
+                'product'     => $productData,
                 'inFavorite' => [
                     'isActive' => true,
                     'color_id' => $fav->color_id,
@@ -130,14 +144,15 @@ class FavoriteController extends Controller
                 ],
                 'inCompare' => in_array($fav->product_id, $compareIds),
             ];
-        });
+        })->filter();
     
         return response()->json([
             'success' => true,
-            'data'    => $favoriteData,
+            'data'    => $favoriteData->values(),
             'message' => 'Favorites fetched successfully'
         ]);
     }
+    
     
     
 
