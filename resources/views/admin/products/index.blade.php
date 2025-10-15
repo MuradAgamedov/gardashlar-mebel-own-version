@@ -267,7 +267,7 @@
                                                         <div class="d-flex align-items-center gap-1">
                                                             <select name="category_id" class="form-select form-select-sm category-select" 
                                                                     id="categorySelect{{ $product->id }}" 
-                                                                    style="width:120px;" 
+                                                                    style="width:100px;" 
                                                                     required>
                                                                 <option value="">Select category</option>
                                                                 @foreach($categories as $cat)
@@ -334,38 +334,68 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
 .select2-container {
-    width: 120px !important;
+    width: 100px !important;
 }
 
 .select2-container--default .select2-selection--single {
-    height: 31px;
-    border: 1px solid #ced4da;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
+    height: 28px !important;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    background-color: #fff;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
-    line-height: 29px;
-    padding-left: 8px;
-    padding-right: 20px;
+    line-height: 26px;
+    padding-left: 6px;
+    padding-right: 16px;
+    color: #495057;
+    font-size: 0.75rem;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 29px;
-    right: 3px;
+    height: 26px;
+    right: 2px;
+    width: 14px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: #999 transparent transparent transparent;
+    border-style: solid;
+    border-width: 4px 3px 0 3px;
+    height: 0;
+    left: 50%;
+    margin-left: -3px;
+    margin-top: -2px;
+    position: absolute;
+    top: 50%;
+    width: 0;
 }
 
 .select2-dropdown {
-    border: 1px solid #ced4da;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.select2-results__option {
+    padding: 4px 8px;
+    font-size: 0.75rem;
 }
 
 .select2-search--dropdown .select2-search__field {
-    border: 1px solid #ced4da;
-    border-radius: 0.375rem;
-    padding: 4px 8px;
-    font-size: 0.875rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    height: 24px;
+}
+
+.select2-container--default .select2-selection--single:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 </style>
 @endpush
@@ -390,11 +420,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Select2 for category selects
     $(document).ready(function() {
         $('.category-select').select2({
-            placeholder: 'Select category',
-            allowClear: true,
-            width: '120px',
-            dropdownAutoWidth: true,
-            minimumResultsForSearch: 5 // Show search box if more than 5 options
+            placeholder: 'Category',
+            allowClear: false,
+            width: '100px',
+            dropdownAutoWidth: false,
+            minimumResultsForSearch: 8, // Show search box if more than 8 options
+            templateResult: function(option) {
+                if (!option.id) return option.text;
+                // Truncate long text
+                var text = option.text.length > 15 ? option.text.substring(0, 15) + '...' : option.text;
+                return $('<span title="' + option.text + '">' + text + '</span>');
+            },
+            templateSelection: function(option) {
+                if (!option.id) return option.text;
+                // Truncate selected text
+                var text = option.text.length > 12 ? option.text.substring(0, 12) + '...' : option.text;
+                return $('<span title="' + option.text + '">' + text + '</span>');
+            }
         });
     });
     const sortableList = document.getElementById('sortable-products');
