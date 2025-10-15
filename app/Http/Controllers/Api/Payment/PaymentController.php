@@ -486,4 +486,55 @@ class PaymentController extends Controller
             ], 500);
         }
     }
+
+     public function cancel(Request $request)
+    {
+        $orderId = $request->query('order_id');
+        $order = Order::find($orderId);
+
+        if ($order) {
+            $order->update([
+                'status' => 'cancelled',
+                'payment_status' => 'unpaid'
+            ]);
+        }
+
+        $data = $this->decodeUp($request->query('up'));
+        Log::info('Payment Cancel', ['order_id' => $orderId, 'data' => $data]);
+
+        return view('payment.cancel', compact('order', 'data'));
+    }
+
+    /**
+     * Decline nəticəsi
+     */
+    public function decline(Request $request)
+    {
+        $orderId = $request->query('order_id');
+        $order = Order::find($orderId);
+
+        if ($order) {
+            $order->update([
+                'status' => 'failed',
+                'payment_status' => 'failed'
+            ]);
+        }
+
+        $data = $this->decodeUp($request->query('up'));
+        Log::info('Payment Decline', ['order_id' => $orderId, 'data' => $data]);
+
+        return view('payment.decline', compact('order', 'data'));
+    }
+
+    private function decodeUp(?string $base64): array
+    {
+        if (!$base64) return [];
+        try {
+            $json = base64_decode($base64, true);
+            return json_decode($json, true) ?: [];
+        } catch (\Throwable $e) {
+            Log::error('UP decode error: '.$e->getMessage());
+            return [];
+        }
+    }
 }
