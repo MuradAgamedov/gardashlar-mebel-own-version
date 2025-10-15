@@ -449,7 +449,7 @@ class ProductsController extends Controller
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
             $colorId = $request->get('color_id');
-    
+            $categery_slug = $request->get('category_slug');
             if (!$languageId) {
                 return response()->json([
                     'success' => false,
@@ -457,7 +457,7 @@ class ProductsController extends Controller
                 ], 400);
             }
     
-            $product = Product::with([
+            $productQuery = Product::with([
                 'translates' => fn($q) => $q->where('language_id', $languageId),
                 'types.translates' => fn($q) => $q->where('language_id', $languageId),
                 'tags.translates' => fn($q) => $q->where('language_id', $languageId),
@@ -471,8 +471,17 @@ class ProductsController extends Controller
                 'categories.translates' => fn($q) => $q->where('language_id', $languageId),
                 'images' => fn($q) => $q->where('status', true)->orderBy('order'),
             ])
-            ->whereHas('translates', fn($q) => $q->where('slug', $slug))
-            ->first();
+            ->whereHas('translates', fn($q) => $q->where('slug', $slug));
+
+            // Category slug filtri əlavə et
+            if ($categery_slug) {
+                $productQuery->whereHas('categories.translates', function($q) use ($categery_slug, $languageId) {
+                    $q->where('slug', $categery_slug)
+                      ->where('language_id', $languageId);
+                });
+            }
+
+            $product = $productQuery->first();
                 
             if (!$product) {
                 return response()->json([
