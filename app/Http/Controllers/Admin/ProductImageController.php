@@ -60,11 +60,12 @@ class ProductImageController extends Controller
          
                 $imagePath = $this->imageService->upload($imageFile, 'products');
                 
-                $this->repository->createImage(
-                    $product->id,
-                    $request->input('product_color_id'),
-                    $imagePath
-                );
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'product_color_id' => $request->input('product_color_id'),
+                    'image' => $imagePath,
+                    'status' => true
+                ]);
             }
 
             return redirect()->route('admin.products.images.index', $product)
@@ -157,7 +158,7 @@ class ProductImageController extends Controller
 
         try {
             foreach ($request->input('items') as $index => $id) {
-                $this->repository->updateOrder($id, $index + 1);
+                ProductImage::where('id', $id)->update(['order' => $index + 1]);
             }
 
             return response()->json(['success' => true]);
@@ -173,7 +174,9 @@ class ProductImageController extends Controller
     {
         try {
             // Remove main flag from all other images of this product
-            $this->repository->removeMainFromOthers($product->id, $image->id);
+            ProductImage::where('product_id', $product->id)
+                ->where('id', '!=', $image->id)
+                ->update(['is_main' => false]);
 
             // Set this image as main
             $image->update(['is_main' => true]);

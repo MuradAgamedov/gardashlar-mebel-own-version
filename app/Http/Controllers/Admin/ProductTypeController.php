@@ -170,7 +170,7 @@ class ProductTypeController extends Controller
             $items = $request->input('items', []);
             
             foreach ($items as $index => $itemId) {
-                $this->repository->updateOrder($itemId, $index + 1);
+                ProductType::where('id', $itemId)->update(['order' => $index + 1]);
             }
 
             return response()->json(['success' => true]);

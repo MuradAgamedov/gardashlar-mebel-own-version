@@ -16,10 +16,4 @@ class ProductPriceFilterRepository extends BaseRepository
     {
         return $this->productPriceFilter->with('translates.language')->ordered()->get();
     }
-
-    // Order-i yenilə
-    public function updateOrder($id, $order)
-    {
-        return $this->productPriceFilter->where('id', $id)->update(['order' => $order]);
-    }
 }

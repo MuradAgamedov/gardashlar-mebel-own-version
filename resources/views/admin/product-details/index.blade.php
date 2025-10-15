@@ -59,7 +59,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="card-body">
                         @if($details->count() > 0)
                             <!-- Results Summary -->
@@ -68,10 +68,10 @@
                                     Total: {{ $details->count() }} details
                                 </div>
                                 <button id="delete-selected-details" class="btn btn-danger btn-sm" disabled>
-                                    <i class="material-icons-outlined">delete</i> Delete Selected
+                                    <i class="material-icons-outlined">delete</i>
                                 </button>
                             </div>
-                            
+
                             <div class="table-responsive">
                                 <table class="table table-hover">
                                     <thead>
@@ -126,19 +126,19 @@
                                                 </td>
                                                 <td>
                                                     <div class="d-flex gap-2">
-                                                        <a href="{{ route('admin.products.details.edit', [$product, $detail]) }}" 
-                                                           class="btn btn-sm btn-outline-primary" 
+                                                        <a href="{{ route('admin.products.details.edit', [$product, $detail]) }}"
+                                                           class="btn btn-sm btn-outline-primary"
                                                            title="Edit">
                                                             <i class="material-icons-outlined">edit</i>
                                                         </a>
-                                                        <form action="{{ route('admin.products.details.destroy', [$product, $detail]) }}" 
-                                                              method="POST" 
+                                                        <form action="{{ route('admin.products.details.destroy', [$product, $detail]) }}"
+                                                              method="POST"
                                                               class="d-inline"
                                                               onsubmit="return confirm('Are you sure you want to delete this detail?')">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" 
-                                                                    class="btn btn-sm btn-outline-danger" 
+                                                            <button type="submit"
+                                                                    class="btn btn-sm btn-outline-danger"
                                                                     title="Delete">
                                                                 <i class="material-icons-outlined">delete</i>
                                                             </button>
@@ -174,7 +174,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const sortableList = document.getElementById('sortable-details');
-    
+
     if (sortableList) {
         const sortable = new Sortable(sortableList, {
             handle: '.drag-handle',
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         `;
                         document.querySelector('.container-fluid').insertBefore(alert, document.querySelector('.row'));
-                        
+
                         // Auto remove after 3 seconds
                         setTimeout(() => {
                             alert.remove();
@@ -245,7 +245,7 @@ deleteBtn.addEventListener('click', function() {
     let ids = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
     if (ids.length === 0) return;
     if (!confirm('Are you sure you want to delete the selected details?')) return;
-    
+
     fetch("{{ route('admin.products.details.bulk-delete', $product) }}", {
         method: 'POST',
         headers: {

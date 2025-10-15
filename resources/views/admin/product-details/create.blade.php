@@ -43,7 +43,7 @@
                             </a>
                         </div>
                     </div>
-                    
+
                     <form action="{{ route('admin.products.details.store', $product) }}" method="POST">
                         @csrf
                         <div class="card-body">
@@ -54,11 +54,11 @@
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
                                         @foreach($languages as $index => $language)
                                         <li class="nav-item" role="presentation">
-                                            <button class="nav-link {{ $index === 0 ? 'active' : '' }}" 
-                                                    id="tab-{{ $language->id }}" 
-                                                    data-bs-toggle="tab" 
-                                                    data-bs-target="#content-{{ $language->id }}" 
-                                                    type="button" 
+                                            <button class="nav-link {{ $index === 0 ? 'active' : '' }}"
+                                                    id="tab-{{ $language->id }}"
+                                                    data-bs-toggle="tab"
+                                                    data-bs-target="#content-{{ $language->id }}"
+                                                    type="button"
                                                     role="tab">
                                                     {{ $language->name ?? $language->lang_name ?? $language->title }} ({{ $language->lang_code }})
                                             </button>
@@ -69,11 +69,11 @@
                                     <!-- Tab Content -->
                                     <div class="tab-content" id="languageTabContent">
                                         @foreach($languages as $index => $language)
-                                        <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" 
-                                             id="content-{{ $language->id }}" 
-                                             role="tabpanel" 
+                                        <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}"
+                                             id="content-{{ $language->id }}"
+                                             role="tabpanel"
                                              aria-labelledby="tab-{{ $language->id }}">
-                                            
+
                                             <div class="card mt-3">
                                                 <div class="card-header">
                                                     <h6 class="mb-0">{{ $language->name ?? $language->lang_name ?? $language->title }} Content</h6>
@@ -83,9 +83,9 @@
                                                         <div class="col-md-6">
                                                             <div class="mb-3">
                                                                 <label class="form-label">Keyword</label>
-                                                                <input type="text" 
-                                                                       class="form-control @error('translates.'.$index.'.keyword') is-invalid @enderror" 
-                                                                       name="translates[{{ $index }}][keyword]" 
+                                                                <input type="text"
+                                                                       class="form-control @error('translates.'.$index.'.keyword') is-invalid @enderror"
+                                                                       name="translates[{{ $index }}][keyword]"
                                                                        placeholder="Enter keyword (e.g., dimensions, material)"
                                                                        value="{{ old('translates.'.$index.'.keyword') }}"
                                                                        required>
@@ -97,9 +97,9 @@
                                                         <div class="col-md-6">
                                                             <div class="mb-3">
                                                                 <label class="form-label">Value</label>
-                                                                <input type="text" 
-                                                                       class="form-control @error('translates.'.$index.'.value') is-invalid @enderror" 
-                                                                       name="translates[{{ $index }}][value]" 
+                                                                <input type="text"
+                                                                       class="form-control @error('translates.'.$index.'.value') is-invalid @enderror"
+                                                                       name="translates[{{ $index }}][value]"
                                                                        placeholder="Enter value (e.g., 120x80x45, Wood)"
                                                                        value="{{ old('translates.'.$index.'.value') }}"
                                                                        required>
@@ -109,7 +109,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    
+
                                                     <!-- Hidden language_id field -->
                                                     <input type="hidden" name="translates[{{ $index }}][language_id]" value="{{ $language->id }}">
                                                 </div>
@@ -125,10 +125,10 @@
                                 <div class="col-md-12">
                                     <div class="d-flex gap-2">
                                         <button type="submit" class="btn btn-primary">
-                                            <i class="material-icons-outlined">save</i> Save Details
+                                            <i class="material-icons-outlined">save</i>
                                         </button>
                                         <a href="{{ route('admin.products.details.index', $product) }}" class="btn btn-outline-secondary">
-                                            <i class="material-icons-outlined">cancel</i> Cancel
+                                            <i class="material-icons-outlined">cancel</i>
                                         </a>
                                     </div>
                                 </div>

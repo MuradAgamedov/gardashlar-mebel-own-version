@@ -38,16 +38,4 @@ class ProjectRepository extends BaseRepository
     {
         return ProjectCategory::with('translates')->active()->ordered()->get();
     }
-
-    // Order-i yenilə
-    public function updateOrder($id, $order)
-    {
-        return $this->project->where('id', $id)->update(['order' => $order]);
-    }
-
-    // Çoxlu layihələri sil
-    public function bulkDelete($ids)
-    {
-        return $this->project->whereIn('id', $ids)->delete();
-    }
 }

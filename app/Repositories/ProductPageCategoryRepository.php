@@ -58,10 +58,4 @@ class ProductPageCategoryRepository extends BaseRepository
             ->ordered()
             ->get();
     }
-
-    // Order-i yenilə
-    public function updateOrder($id, $order)
-    {
-        return $this->productPageCategory->where('id', $id)->update(['order' => $order]);
-    }
 }

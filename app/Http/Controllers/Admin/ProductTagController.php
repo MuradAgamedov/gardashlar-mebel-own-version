@@ -172,7 +172,7 @@ class ProductTagController extends Controller
 
         try {
             foreach ($request->input('items') as $index => $id) {
-                $this->repository->updateOrder($id, $index + 1);
+                ProductTag::where('id', $id)->update(['order' => $index + 1]);
             }
 
             return response()->json(['success' => true]);

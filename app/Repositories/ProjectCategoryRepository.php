@@ -16,16 +16,4 @@ class ProjectCategoryRepository extends BaseRepository
     {
         return $this->projectCategory->with('translates.language')->ordered()->get();
     }
-
-    // Order-i yenilə
-    public function updateOrder($id, $order)
-    {
-        return $this->projectCategory->where('id', $id)->update(['order' => $order]);
-    }
-
-    // Çoxlu kateqoriyaları sil
-    public function bulkDelete($ids)
-    {
-        return $this->projectCategory->whereIn('id', $ids)->delete();
-    }
 }

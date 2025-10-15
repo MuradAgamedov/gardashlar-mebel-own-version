@@ -7,12 +7,18 @@ use App\Models\WhyChooseUs;
 use App\Models\Language;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use App\Repositories\WhyChooseUsRepository;
+use App\Repositories\LanguageRepository;
 
 class WhyChooseUsController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(
+        ImageService $imageService,
+        public WhyChooseUsRepository $repository,
+        public LanguageRepository $languageRepository
+    )
     {
         $this->imageService = $imageService;
     }
@@ -22,9 +28,8 @@ class WhyChooseUsController extends Controller
      */
     public function edit()
     {
-        $whyChooseUs = WhyChooseUs::getFirstOrCreate();
-        $whyChooseUs->load(['translates.language']);
-        $languages = Language::active()->orderBy('order')->get();
+        $whyChooseUs = $this->repository->getFirstOrCreate();
+        $languages = $this->languageRepository->getActiveLanguages();
         
         return view('admin.why-choose-us.edit', compact('whyChooseUs', 'languages'));
     }
@@ -34,7 +39,7 @@ class WhyChooseUsController extends Controller
      */
     public function update(Request $request)
     {
-        $whyChooseUs = WhyChooseUs::getFirstOrCreate();
+        $whyChooseUs = $this->repository->getFirstOrCreate();
 
         $request->validate([
             'first_icon' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',

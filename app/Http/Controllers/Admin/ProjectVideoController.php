@@ -46,7 +46,8 @@ class ProjectVideoController extends Controller
         ]);
 
         try {
-            $this->repository->createVideo($project->id, [
+            ProjectVideo::create([
+                'project_id' => $project->id,
                 'video_link' => $request->video_link,
                 'status' => $request->input('status', false),
             ]);
@@ -81,7 +82,7 @@ class ProjectVideoController extends Controller
         ]);
 
         try {
-            $this->repository->updateVideo($video, [
+            $video->update([
                 'video_link' => $request->video_link,
                 'status' => $request->input('status', false),
             ]);
@@ -103,7 +104,7 @@ class ProjectVideoController extends Controller
     public function destroy(Project $project, ProjectVideo $video)
     {
         try {
-            $this->repository->deleteVideo($video);
+            $video->delete();
             return redirect()->route('admin.projects.videos.index', $project)
                 ->with('success', 'Video deleted successfully.');
         } catch (\Exception $e) {
@@ -123,7 +124,9 @@ class ProjectVideoController extends Controller
         ]);
 
         try {
-            $this->repository->reorderVideos($request->items);
+            foreach ($request->items as $index => $id) {
+                ProjectVideo::where('id', $id)->update(['order' => $index + 1]);
+            }
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             Log::error('Error reordering project videos: ' . $e->getMessage());

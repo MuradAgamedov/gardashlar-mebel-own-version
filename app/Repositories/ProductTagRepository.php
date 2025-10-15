@@ -16,10 +16,4 @@ class ProductTagRepository extends BaseRepository
     {
         return $this->productTag->with('translates.language')->ordered()->get();
     }
-
-    // Order-i yenilə
-    public function updateOrder($id, $order)
-    {
-        return $this->productTag->where('id', $id)->update(['order' => $order]);
-    }
 }

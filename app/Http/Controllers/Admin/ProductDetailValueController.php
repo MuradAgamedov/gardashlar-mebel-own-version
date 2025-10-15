@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductDetailValue;
+use App\Models\ProductDetailValueTranslate;
 use App\Models\Language;
 use App\Repositories\ProductDetailValueRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductDetailValueController extends Controller
 {
@@ -29,7 +31,20 @@ class ProductDetailValueController extends Controller
             'translates.*.keyword' => 'required|string|max:255',
         ]);
 
-        $this->repository->createValue($request->all(), $product->id);
+        DB::transaction(function () use ($request, $product) {
+            $detailValue = ProductDetailValue::create([
+                'product_id' => $product->id,
+                'order' => ProductDetailValue::where('product_id', $product->id)->max('order') + 1
+            ]);
+
+            foreach ($request->translates as $translation) {
+                ProductDetailValueTranslate::create([
+                    'product_detail_value_id' => $detailValue->id,
+                    'language_id' => $translation['language_id'],
+                    'keyword' => $translation['keyword'],
+                ]);
+            }
+        });
 
         return redirect()->route('admin.products.detail-values.index', $product)
             ->with('success', 'Product detail value created successfully.');
@@ -46,7 +61,17 @@ class ProductDetailValueController extends Controller
             'translates.*.keyword' => 'required|string|max:255',
         ]);
 
-        $this->repository->updateValue($detailValue, $request->all());
+        DB::transaction(function () use ($request, $detailValue) {
+            $detailValue->translates()->delete();
+            
+            foreach ($request->translates as $translation) {
+                ProductDetailValueTranslate::create([
+                    'product_detail_value_id' => $detailValue->id,
+                    'language_id' => $translation['language_id'],
+                    'keyword' => $translation['keyword'],
+                ]);
+            }
+        });
 
         return redirect()->route('admin.products.detail-values.index', $product)
             ->with('success', 'Product detail value updated successfully.');
@@ -57,7 +82,10 @@ class ProductDetailValueController extends Controller
      */
     public function destroy(Product $product, ProductDetailValue $detailValue)
     {
-        $this->repository->deleteValue($detailValue);
+        DB::transaction(function () use ($detailValue) {
+            $detailValue->translates()->delete();
+            $detailValue->delete();
+        });
 
         return redirect()->route('admin.products.detail-values.index', $product)
             ->with('success', 'Product detail value deleted successfully.');
@@ -73,7 +101,11 @@ class ProductDetailValueController extends Controller
             'items.*' => 'exists:product_detail_values,id'
         ]);
 
-        $this->repository->reorder($request->items);
+        DB::transaction(function () use ($request) {
+            foreach ($request->items as $index => $id) {
+                ProductDetailValue::where('id', $id)->update(['order' => $index + 1]);
+            }
+        });
 
         return response()->json(['success' => true]);
     }
@@ -89,7 +121,14 @@ class ProductDetailValueController extends Controller
                 'ids.*' => 'exists:product_detail_values,id'
             ]);
 
-            $this->repository->bulkDelete($request->ids);
+            DB::transaction(function () use ($request) {
+                $detailValues = ProductDetailValue::whereIn('id', $request->ids)->get();
+                
+                foreach ($detailValues as $detailValue) {
+                    $detailValue->translates()->delete();
+                    $detailValue->delete();
+                }
+            });
 
             return response()->json([
                 'success' => true, 

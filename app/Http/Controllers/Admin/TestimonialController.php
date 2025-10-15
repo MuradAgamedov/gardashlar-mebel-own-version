@@ -7,12 +7,18 @@ use App\Models\Language;
 use App\Models\Testimonial;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use App\Repositories\TestimonialRepository;
+use App\Repositories\LanguageRepository;
 
 class TestimonialController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(
+        ImageService $imageService,
+        public TestimonialRepository $repository,
+        public LanguageRepository $languageRepository
+    )
     {
         $this->imageService = $imageService;
     }
@@ -22,8 +28,8 @@ class TestimonialController extends Controller
      */
     public function index()
     {
-        $testimonials = Testimonial::with('translates.language')->orderBy('order')->get();
-        $languages = Language::all();
+        $testimonials = $this->repository->getTestimonials();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.testimonials.index', compact('testimonials', 'languages'));
     }
@@ -33,7 +39,7 @@ class TestimonialController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         return view('admin.testimonials.create', compact('languages'));
     }
 
@@ -42,7 +48,7 @@ class TestimonialController extends Controller
      */
     public function store(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Base validation
         $request->validate([
@@ -151,7 +157,7 @@ class TestimonialController extends Controller
     public function edit(Testimonial $testimonial)
     {
         $testimonial->load('translates.language');
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.testimonials.edit', compact('testimonial', 'languages'));
     }
@@ -161,7 +167,7 @@ class TestimonialController extends Controller
      */
     public function update(Request $request, Testimonial $testimonial)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Base validation
         $request->validate([

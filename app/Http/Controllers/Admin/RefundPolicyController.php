@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Repositories\RefundPolicyRepository;
+use App\Models\RefundPolicy;
+use App\Models\Language;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class RefundPolicyController extends Controller
 {
@@ -44,7 +48,28 @@ class RefundPolicyController extends Controller
         }
 
         try {
-            $this->repository->updateRefundPolicy($request->input('translations', []));
+            DB::transaction(function () use ($request) {
+                $refundPolicy = RefundPolicy::firstOrCreate(
+                    [],
+                    ['status' => true]
+                );
+
+                // Update translations
+                foreach ($request->input('translations', []) as $languageId => $translation) {
+                    if (!empty($translation['content'])) {
+                        $refundPolicy->translates()->updateOrCreate(
+                            ['language_id' => $languageId],
+                            ['content' => trim($translation['content'])]
+                        );
+                    }
+                }
+
+                // Clear cache for all languages
+                $languages = Language::getActiveLanguages();
+                foreach ($languages as $language) {
+                    Cache::forget("refund_policy_{$language->id}");
+                }
+            });
             
             return redirect()->back()
                 ->with('success', 'Refund Policy updated successfully!');

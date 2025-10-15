@@ -69,13 +69,4 @@ class ProductTypeProductRepository extends BaseRepository
             ->where('product_id', $productId)
             ->first();
     }
-
-    // Ana səhifəyə məhsul əlavə et
-    public function addToHomePage($productTypeId, $productId)
-    {
-        return HomePageTypeProduct::create([
-            'product_type_id' => $productTypeId,
-            'product_id' => $productId,
-        ]);
-    }
 }

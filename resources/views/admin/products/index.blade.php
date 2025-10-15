@@ -50,13 +50,13 @@
                             </a>
                         </div>
                     </div>
-                    
+
                     <!-- Search and Filter Section -->
                     <div class="card-body border-bottom">
                         <form method="GET" action="{{ route('admin.products.index') }}" class="row g-3">
                             <div class="col-md-4">
                                 <label for="search" class="form-label">Search</label>
-                                <input type="text" class="form-control" id="search" name="search" 
+                                <input type="text" class="form-control" id="search" name="search"
                                        value="{{ request('search') }}" placeholder="Search by title or description...">
                             </div>
                             <div class="col-md-2">
@@ -106,7 +106,7 @@
                             </div>
                         </form>
                     </div>
-                    
+
                     <div class="card-body">
                         <!-- Results Summary -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -117,10 +117,10 @@
                                 Page {{ $products->currentPage() }} of {{ $products->lastPage() }}
                             </div>
                             <button id="delete-selected-products" class="btn btn-danger btn-sm ms-3" disabled>
-                                <i class="material-icons-outlined">delete</i> 
+                                <i class="material-icons-outlined">delete</i>
                             </button>
                         </div>
-                        
+
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
@@ -238,42 +238,38 @@
                                                     <span class="badge badge-light-danger">Inactive</span>
                                                 @endif
                                             </td>
-                                          
+
                                             <td>
                                                 <div class="d-flex gap-2">
-                                                    <a href="{{ route('admin.products.details.index', $product) }}" 
-                                                       class="btn btn-sm btn-outline-warning" 
+                                                    <a href="{{ route('admin.products.details.index', $product) }}"
+                                                       class="btn btn-sm btn-outline-warning"
                                                        title="Product Details">
                                                         <i class="material-icons-outlined">info</i>
                                                     </a>
-                                                    <a href="{{ route('admin.products.detail-values.index', $product) }}" 
-                                                       class="btn btn-sm btn-outline-secondary" 
-                                                       title="Detail Values">
-                                                        <i class="material-icons-outlined">list</i>
-                                                    </a>
-                                                    <a href="{{ route('admin.products.accordions.index', $product) }}" 
-                                                       class="btn btn-sm btn-outline-info" 
+
+                                                    <a href="{{ route('admin.products.accordions.index', $product) }}"
+                                                       class="btn btn-sm btn-outline-info"
                                                        title="Accordions">
                                                         <i class="material-icons-outlined">expand_more</i>
                                                     </a>
-                                                    <a href="{{ route('admin.products.images.index', $product) }}" 
-                                                       class="btn btn-sm btn-outline-success" 
+                                                    <a href="{{ route('admin.products.images.index', $product) }}"
+                                                       class="btn btn-sm btn-outline-success"
                                                        title="Images">
                                                         <i class="material-icons-outlined">image</i>
                                                     </a>
-                                                    <a href="{{ route('admin.products.edit', $product) }}?page={{ request('page', 1) }}" 
-                                                       class="btn btn-sm btn-outline-primary" 
+                                                    <a href="{{ route('admin.products.edit', $product) }}?page={{ request('page', 1) }}"
+                                                       class="btn btn-sm btn-outline-primary"
                                                        title="Edit">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
-                                                    <form action="{{ route('admin.products.destroy', $product) }}" 
-                                                          method="POST" 
+                                                    <form action="{{ route('admin.products.destroy', $product) }}"
+                                                          method="POST"
                                                           class="d-inline"
                                                           onsubmit="return confirm('Are you sure you want to delete this product?')">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" 
-                                                                class="btn btn-sm btn-outline-danger" 
+                                                        <button type="submit"
+                                                                class="btn btn-sm btn-outline-danger"
                                                                 title="Delete">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
@@ -300,7 +296,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        
+
                         <!-- Bootstrap Pagination -->
                         @if($products->hasPages())
                             <div class="d-flex justify-content-center mt-4">
@@ -330,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     const sortableList = document.getElementById('sortable-products');
-    
+
     if (sortableList) {
         const sortable = new Sortable(sortableList, {
             handle: '.drag-handle',
@@ -360,7 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         `;
                         document.querySelector('.container-fluid').insertBefore(alert, document.querySelector('.row'));
-                        
+
                         // Auto remove after 3 seconds
                         setTimeout(() => {
                             alert.remove();
@@ -416,4 +412,4 @@ deleteBtn.addEventListener('click', function() {
     });
 });
 </script>
-@endpush 
+@endpush

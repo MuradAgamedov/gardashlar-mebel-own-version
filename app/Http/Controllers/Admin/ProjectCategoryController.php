@@ -223,7 +223,7 @@ class ProjectCategoryController extends Controller
 
         try {
             foreach ($request->items as $index => $id) {
-                $this->repository->updateOrder($id, $index + 1);
+                ProjectCategory::where('id', $id)->update(['order' => $index + 1]);
             }
 
             // Clear cache after reordering
@@ -247,7 +247,7 @@ class ProjectCategoryController extends Controller
         ]);
 
         try {
-            $deletedCount = $this->repository->bulkDelete($request->ids);
+            $deletedCount = ProjectCategory::whereIn('id', $request->ids)->delete();
             
             // Clear cache after bulk deleting
             $this->clearProjectCategoriesCache();

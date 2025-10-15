@@ -10,12 +10,18 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use App\Services\ImageService;
+use App\Repositories\SimpleImageRepository;
+use App\Repositories\LanguageRepository;
 
 class SimpleImageController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(
+        ImageService $imageService,
+        public SimpleImageRepository $repository,
+        public LanguageRepository $languageRepository
+    )
     {
         $this->imageService = $imageService;
     }
@@ -25,7 +31,7 @@ class SimpleImageController extends Controller
      */
     public function index(): View
     {
-        $images = SimpleImage::with('translates.language')->get();
+        $images = $this->repository->getImages();
         return view('admin.simple-images.index', compact('images'));
     }
 
@@ -34,7 +40,7 @@ class SimpleImageController extends Controller
      */
     public function create(): View
     {
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageRepository->getActiveLanguages();
         return view('admin.simple-images.create', compact('languages'));
     }
 
@@ -131,7 +137,7 @@ class SimpleImageController extends Controller
      */
     public function edit(SimpleImage $simpleImage): View
     {
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageRepository->getActiveLanguages();
         $translations = $simpleImage->translates->keyBy('language_id');
         return view('admin.simple-images.edit', compact('simpleImage', 'languages', 'translations'));
     }

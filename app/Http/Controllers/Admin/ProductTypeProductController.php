@@ -42,7 +42,10 @@ class ProductTypeProductController extends Controller
                 $isOnHomepage = false;
             } else {
                 // Add to homepage
-                $this->repository->addToHomePage($productTypeId, $productId);
+                HomePageTypeProduct::create([
+                    'product_type_id' => $productTypeId,
+                    'product_id' => $productId,
+                ]);
                 $message = 'Product added to homepage';
                 $isOnHomepage = true;
             }

@@ -221,7 +221,7 @@ class ProjectController extends Controller
 
         try {
             foreach ($request->items as $index => $id) {
-                $this->repository->updateOrder($id, $index + 1);
+                Project::where('id', $id)->update(['order' => $index + 1]);
             }
 
             return response()->json(['success' => true]);
@@ -242,7 +242,7 @@ class ProjectController extends Controller
         ]);
 
         try {
-            $deletedCount = $this->repository->bulkDelete($request->ids);
+            $deletedCount = Project::whereIn('id', $request->ids)->delete();
             
             return redirect()->route('admin.projects.index')
                 ->with('success', "{$deletedCount} project(s) deleted successfully!");

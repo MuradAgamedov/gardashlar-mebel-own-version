@@ -26,10 +26,4 @@ class ProductTypeRepository extends BaseRepository
         
         return $query->ordered()->get();
     }
-
-    // Order-i yenilə
-    public function updateOrder($id, $order)
-    {
-        return $this->productType->where('id', $id)->update(['order' => $order]);
-    }
 }

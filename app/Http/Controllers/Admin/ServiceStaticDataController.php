@@ -7,12 +7,18 @@ use App\Models\ServiceStaticData;
 use App\Models\Language;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use App\Repositories\ServiceStaticDataRepository;
+use App\Repositories\LanguageRepository;
 
 class ServiceStaticDataController extends Controller
 {
     protected $imageService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(
+        ImageService $imageService,
+        public ServiceStaticDataRepository $repository,
+        public LanguageRepository $languageRepository
+    )
     {
         $this->imageService = $imageService;
     }
@@ -22,9 +28,8 @@ class ServiceStaticDataController extends Controller
      */
     public function edit()
     {
-        $serviceStaticData = ServiceStaticData::getFirstOrCreate();
-        $serviceStaticData->load('translates.language');
-        $languages = Language::all();
+        $serviceStaticData = $this->repository->getFirstOrCreate();
+        $languages = $this->languageRepository->getAllLanguages();
         
         return view('admin.service-static-data.edit', compact('serviceStaticData', 'languages'));
     }
@@ -34,7 +39,7 @@ class ServiceStaticDataController extends Controller
      */
     public function update(Request $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageRepository->getAllLanguages();
         
         // Debug: Check what data is being sent
         \Log::info('ServiceStaticData Update Request:', $request->all());
@@ -80,7 +85,7 @@ class ServiceStaticDataController extends Controller
         }
 
         try {
-            $serviceStaticData = ServiceStaticData::getFirstOrCreate();
+            $serviceStaticData = $this->repository->getFirstOrCreate();
 
             // Handle image uploads
             $imageData = [];
