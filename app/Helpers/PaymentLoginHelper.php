@@ -29,7 +29,7 @@ class PaymentLoginHelper
                 'email' => $email,
                 'password' => $password,
             ]);
-    
+            dd($response);
             Log::info('UnitedPayment Login raw response:', [
                 'status' => $response->status(),
                 'body'   => $response->body(),
