@@ -21,14 +21,18 @@ class PaymentLoginHelper
             
     
             $response = Http::withOptions([
-                'verify' => false, // ✅ SSL yoxlamasını söndür
-                'timeout' => 30,
+                'verify' => false,
+                'version' => 1.1,
             ])->withHeaders([
+                'User-Agent' => 'curl/7.88.1',
                 'Content-Type' => 'application/json; charset=utf-8',
-            ])->post($baseUrl . '/auth/', [
-                'email' => $email,
-                'password' => $password,
+            ])->post('https://vpos.unitedpayment.az/api/auth/', [
+                'email' => 'office@gardashlar.com',
+                'password' => '2&nOl0J9^O-#',
             ]);
+            
+            dd($response->status(), $response->body());
+            
             dd($response);
             Log::info('UnitedPayment Login raw response:', [
                 'status' => $response->status(),
