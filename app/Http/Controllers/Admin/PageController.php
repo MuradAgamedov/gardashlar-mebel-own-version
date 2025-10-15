@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Page;
-use App\Models\Language;
 use Illuminate\Http\Request;
 use App\Repositories\PageRepository;
 use App\Repositories\LanguageRepository;
+use App\Http\Requests\Admin\Page\StorePageRequest;
+use App\Http\Requests\Admin\Page\UpdatePageRequest;
 
 class PageController extends Controller
 {
@@ -18,70 +18,25 @@ class PageController extends Controller
     {
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $pages = $this->repository->getPages();
         return view('admin.pages.index', compact('pages'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $languages = $this->languageRepository->getActiveLanguages();
         return view('admin.pages.create', compact('languages'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StorePageRequest $request)
     {
-        // Validate the request
-        $request->validate([
-            'status' => 'nullable',
-            'keyword' => 'nullable|string|max:255',
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string|max:255',
-            'translates.*.slug' => 'required|string|max:255|unique:page_translates,slug',
-            'translates.*.seo_title' => 'nullable|string|max:255',
-            'translates.*.seo_keywords' => 'nullable|string',
-            'translates.*.seo_description' => 'nullable|string',
-        ], [
-            'translates.required' => 'At least one language translation is required.',
-            'translates.*.language_id.required' => 'Language is required.',
-            'translates.*.language_id.exists' => 'Selected language is invalid.',
-            'translates.*.title.required' => 'Title is required for all languages.',
-            'translates.*.title.max' => 'Title cannot exceed 255 characters.',
-            'translates.*.slug.required' => 'Slug is required for all languages.',
-            'translates.*.slug.max' => 'Slug cannot exceed 255 characters.',
-            'translates.*.slug.unique' => 'This slug is already in use.',
-            'keyword.max' => 'Keyword cannot exceed 255 characters.',
-        ]);
-
         try {
-            // Create the page
-            $page = Page::create([
+            $this->repository->createPage([
                 'status' => $request->has('status') ? true : false,
                 'keyword' => trim($request->input('keyword', ''))
-            ]);
-
-            // Create translations for each language
-            foreach ($request->translates as $translate) {
-                $page->translates()->create([
-                    'language_id' => $translate['language_id'],
-                    'title' => trim($translate['title']),
-                    'slug' => trim($translate['slug']),
-                    'seo_title' => trim($translate['seo_title'] ?? ''),
-                    'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
-                    'seo_description' => trim($translate['seo_description'] ?? ''),
-                ]);
-            }
+            ], $request->translates);
 
             return redirect()->route('admin.pages.index')
                 ->with('success', 'Page created successfully!');
@@ -93,76 +48,26 @@ class PageController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        $page = Page::with(['translates.language'])->findOrFail($id);
+        $page = $this->repository->findPage($id);
         return view('admin.pages.show', compact('page'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        $page = Page::with(['translates.language'])->findOrFail($id);
+        $page = $this->repository->findPage($id);
         $languages = $this->languageRepository->getActiveLanguages();
         return view('admin.pages.edit', compact('page', 'languages'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(UpdatePageRequest $request, string $id)
     {
-        $page = Page::findOrFail($id);
-
-        // Validate the request
-        $request->validate([
-            'status' => 'nullable',
-            'keyword' => 'nullable|string|max:255',
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string|max:255',
-            'translates.*.slug' => 'required|string|max:255|unique:page_translates,slug,' . $id . ',page_id',
-            'translates.*.seo_title' => 'nullable|string|max:255',
-            'translates.*.seo_keywords' => 'nullable|string',
-            'translates.*.seo_description' => 'nullable|string',
-        ], [
-            'translates.required' => 'At least one language translation is required.',
-            'translates.*.language_id.required' => 'Language is required.',
-            'translates.*.language_id.exists' => 'Selected language is invalid.',
-            'translates.*.title.required' => 'Title is required for all languages.',
-            'translates.*.title.max' => 'Title cannot exceed 255 characters.',
-            'translates.*.slug.required' => 'Slug is required for all languages.',
-            'translates.*.slug.max' => 'Slug cannot exceed 255 characters.',
-            'translates.*.slug.unique' => 'This slug is already in use.',
-            'keyword.max' => 'Keyword cannot exceed 255 characters.',
-        ]);
-
         try {
-            // Update the page
-            $page->update([
+            $this->repository->updatePage($id, [
                 'status' => $request->has('status') ? true : false,
                 'keyword' => trim($request->input('keyword', ''))
-            ]);
-
-            // Delete existing translations and create new ones
-            $page->translates()->delete();
-
-            // Create new translations
-            foreach ($request->translates as $translate) {
-                $page->translates()->create([
-                    'language_id' => $translate['language_id'],
-                    'title' => trim($translate['title']),
-                    'slug' => trim($translate['slug']),
-                    'seo_title' => trim($translate['seo_title'] ?? ''),
-                    'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
-                    'seo_description' => trim($translate['seo_description'] ?? ''),
-                ]);
-            }
+            ], $request->translates);
 
             return redirect()->route('admin.pages.index')
                 ->with('success', 'Page updated successfully!');
@@ -174,23 +79,10 @@ class PageController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         try {
-            $page = Page::findOrFail($id);
-            
-            // Check if this is the only active page
-            $activePagesCount = Page::where('status', true)->count();
-            if ($activePagesCount <= 1 && $page->status) {
-                return redirect()->back()
-                    ->with('error', 'Cannot delete the only active page. Please activate another page first.');
-            }
-            
-            $page->delete();
-
+            $this->repository->deletePage($id);
             return redirect()->route('admin.pages.index')
                 ->with('success', 'Page deleted successfully!');
 
@@ -200,11 +92,6 @@ class PageController extends Controller
         }
     }
 
-
-
-    /**
-     * Generate slug from title
-     */
     public function generateSlug(Request $request)
     {
         try {
@@ -214,17 +101,7 @@ class PageController extends Controller
                 'page_id' => 'nullable|exists:pages,id',
             ]);
 
-            $title = $request->input('title');
-            $languageId = $request->input('language_id');
-            $pageId = $request->input('page_id');
-            
-            // Return empty slug - let frontend handle slug generation
-            $slug = '';
-
-            return response()->json([
-                'success' => true,
-                'slug' => $slug
-            ]);
+            return response()->json(['success' => true, 'slug' => '']);
 
         } catch (\Exception $e) {
             return response()->json([

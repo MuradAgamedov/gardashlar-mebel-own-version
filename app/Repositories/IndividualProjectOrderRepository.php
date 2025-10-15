@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 
 class IndividualProjectOrderRepository extends BaseRepository
 {
-
     public function __construct(public IndividualProjectOrder $individualProjectOrder)
     {
     }

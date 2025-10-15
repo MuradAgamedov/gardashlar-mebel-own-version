@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kiv;
-use App\Models\KivCategory;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use App\Repositories\KivRepository;
+use App\Http\Requests\Admin\Kiv\StoreKivRequest;
+use App\Http\Requests\Admin\Kiv\UpdateKivRequest;
 
 class KivController extends Controller
 {
@@ -18,150 +19,66 @@ class KivController extends Controller
         $this->imageService = $imageService;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $kivs = $this->repository->getKivs($request);
         $categories = $this->repository->getCategories();
-        
         return view('admin.kivs.index', compact('kivs', 'categories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $categories = $this->repository->getCategories();
         return view('admin.kivs.create', compact('categories'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreKivRequest $request)
     {
-        // Base validation
-        $request->validate([
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'video_link' => 'nullable|string|max:500',
-            'kiv_category_id' => 'required|exists:kiv_categories,id',
-            'status' => 'boolean',
-        ], [
-            'image.image' => 'Image must be an image file.',
-            'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
-            'image.max' => 'Image may not be greater than 2MB.',
-            'video_link.max' => 'Video link may not be greater than 500 characters.',
-            'kiv_category_id.required' => 'Category is required.',
-            'kiv_category_id.exists' => 'Selected category does not exist.',
-            'status.boolean' => 'Status must be true or false.',
-        ]);
+        try {
+            $this->repository->createKiv([
+                'video_link' => $request->input('video_link'),
+                'kiv_category_id' => $request->input('kiv_category_id'),
+                'status' => $request->input('status'),
+            ], $request->file('image'), $this->imageService);
 
-        // Handle image upload
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $this->imageService->upload(
-                $request->file('image'),
-                'kivs',
-                [
-                    'max_size' => 2048,
-                    'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                ]
-            );
-            
-            if (!$imagePath) {
-                return redirect()->back()
-                    ->with('error', 'Failed to upload image.')
-                    ->withInput();
-            }
+            return redirect()->route('admin.kivs.index')
+                ->with('success', 'KIV created successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', $e->getMessage())
+                ->withInput();
         }
-
-        // Create KIV
-        $kiv = Kiv::create([
-            'image' => $imagePath,
-            'video_link' => $request->input('video_link'),
-            'kiv_category_id' => $request->input('kiv_category_id'),
-            'status' => $request->input('status'),
-        ]);
-
-        return redirect()->route('admin.kivs.index')
-            ->with('success', 'KIV created successfully!');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Kiv $kiv)
     {
         $kiv->load('category.translates');
         $categories = $this->repository->getCategories();
-        
         return view('admin.kivs.edit', compact('kiv', 'categories'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Kiv $kiv)
+    public function update(UpdateKivRequest $request, Kiv $kiv)
     {
-        // Base validation
-        $request->validate([
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'video_link' => 'nullable|string|max:500',
-            'kiv_category_id' => 'required|exists:kiv_categories,id',
-            'status' => 'boolean',
-        ], [
-            'image.image' => 'Image must be an image file.',
-            'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
-            'image.max' => 'Image may not be greater than 2MB.',
-            'video_link.max' => 'Video link may not be greater than 500 characters.',
-            'kiv_category_id.required' => 'Category is required.',
-            'kiv_category_id.exists' => 'Selected category does not exist.',
-            'status.boolean' => 'Status must be true or false.',
-        ]);
+        try {
+            $this->repository->updateKiv($kiv, [
+                'video_link' => $request->input('video_link'),
+                'kiv_category_id' => $request->input('kiv_category_id'),
+                'status' => $request->input('status'),
+            ], $request->file('image'), $this->imageService);
 
-        // Handle image upload
-        $imageData = [];
-        if ($request->hasFile('image')) {
-            $uploadedPath = $this->imageService->update(
-                $request->file('image'),
-                $kiv->image,
-                'kivs',
-                [
-                    'max_size' => 2048,
-                    'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                ]
-            );
-            
-            if ($uploadedPath) {
-                $imageData['image'] = $uploadedPath;
-            } else {
-                return redirect()->back()
-                    ->with('error', 'Failed to upload image.')
-                    ->withInput();
-            }
+            return redirect()->route('admin.kivs.index')
+                ->with('success', 'KIV updated successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', $e->getMessage())
+                ->withInput();
         }
-
-        // Update KIV
-        $kiv->update(array_merge($imageData, [
-            'video_link' => $request->input('video_link'),
-            'kiv_category_id' => $request->input('kiv_category_id'),
-            'status' => $request->input('status'),
-        ]));
-
-        return redirect()->route('admin.kivs.index')
-            ->with('success', 'KIV updated successfully!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Kiv $kiv)
     {
         try {
-            $kiv->delete();
+            $this->repository->deleteKiv($kiv);
             return redirect()->route('admin.kivs.index')
                 ->with('success', 'KIV deleted successfully!');
         } catch (\Exception $e) {
@@ -170,9 +87,6 @@ class KivController extends Controller
         }
     }
 
-    /**
-     * Reorder KIVs
-     */
     public function reorder(Request $request)
     {
         $request->validate([
@@ -181,10 +95,7 @@ class KivController extends Controller
         ]);
 
         try {
-            foreach ($request->kivs as $index => $kivId) {
-                Kiv::where('id', $kivId)->update(['order' => $index + 1]);
-            }
-
+            $this->repository->reorderKivs($request->kivs);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

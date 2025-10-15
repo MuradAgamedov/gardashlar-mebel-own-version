@@ -4,65 +4,41 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductAccordion;
-use App\Models\ProductAccordionTranslate;
 use App\Models\Product;
-use App\Models\Language;
 use Illuminate\Http\Request;
 use App\Repositories\LanguageRepository;
+use App\Repositories\ProductAccordionRepository;
+use App\Http\Requests\Admin\ProductAccordion\StoreProductAccordionRequest;
+use App\Http\Requests\Admin\ProductAccordion\UpdateProductAccordionRequest;
 
 class ProductAccordionController extends Controller
 {
-    public function __construct(public LanguageRepository $languageRepository)
+    public function __construct(
+        public LanguageRepository $languageRepository,
+        public ProductAccordionRepository $repository
+    )
     {
     }
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Product $product)
     {
-        $accordions = $product->accordions()->with(['translates.language'])->ordered()->get();
-        
+        $accordions = $this->repository->getProductAccordions($product);
         return view('admin.product-accordions.index', compact('product', 'accordions'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(Product $product)
     {
         $languages = $this->languageRepository->getAllLanguages();
-        
         return view('admin.product-accordions.create', compact('product', 'languages'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request, Product $product)
+    public function store(StoreProductAccordionRequest $request, Product $product)
     {
-        $request->validate([
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.title' => 'required|string|max:255',
-            'translations.*.description' => 'nullable|string',
-            'status' => 'boolean'
-        ]);
-
         try {
-            $accordion = ProductAccordion::create([
-                'product_id' => $product->id,
-                'status' => $request->boolean('status', true)
-            ]);
-
-            // Create translations
-            foreach ($request->input('translations') as $translation) {
-                ProductAccordionTranslate::create([
-                    'product_accordion_id' => $accordion->id,
-                    'language_id' => $translation['language_id'],
-                    'title' => $translation['title'],
-                    'description' => $translation['description'] ?? null
-                ]);
-            }
+            $this->repository->createProductAccordion(
+                $product,
+                ['status' => $request->boolean('status', true)],
+                $request->input('translations')
+            );
 
             return redirect()->route('admin.products.accordions.index', $product)
                 ->with('success', 'Accordion added successfully.');
@@ -72,56 +48,21 @@ class ProductAccordionController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Product $product, ProductAccordion $accordion)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Product $product, ProductAccordion $accordion)
     {
         $accordion->load(['translates.language']);
         $languages = $this->languageRepository->getAllLanguages();
-        
         return view('admin.product-accordions.edit', compact('product', 'accordion', 'languages'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Product $product, ProductAccordion $accordion)
+    public function update(UpdateProductAccordionRequest $request, Product $product, ProductAccordion $accordion)
     {
-        $request->validate([
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.title' => 'required|string|max:255',
-            'translations.*.description' => 'nullable|string',
-            'status' => 'boolean'
-        ]);
-
         try {
-            $accordion->update([
-                'status' => $request->boolean('status', true)
-            ]);
-
-            // Update translations
-            foreach ($request->input('translations') as $translation) {
-                ProductAccordionTranslate::updateOrCreate(
-                    [
-                        'product_accordion_id' => $accordion->id,
-                        'language_id' => $translation['language_id']
-                    ],
-                    [
-                        'title' => $translation['title'],
-                        'description' => $translation['description'] ?? null
-                    ]
-                );
-            }
+            $this->repository->updateProductAccordion(
+                $accordion,
+                ['status' => $request->boolean('status', true)],
+                $request->input('translations')
+            );
 
             return redirect()->route('admin.products.accordions.index', $product)
                 ->with('success', 'Accordion updated successfully.');
@@ -131,13 +72,10 @@ class ProductAccordionController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Product $product, ProductAccordion $accordion)
     {
         try {
-            $accordion->delete();
+            $this->repository->deleteProductAccordion($accordion);
             return redirect()->route('admin.products.accordions.index', $product)
                 ->with('success', 'Accordion deleted successfully.');
         } catch (\Exception $e) {
@@ -145,9 +83,6 @@ class ProductAccordionController extends Controller
         }
     }
 
-    /**
-     * Reorder accordions
-     */
     public function reorder(Request $request, Product $product)
     {
         $request->validate([
@@ -156,10 +91,7 @@ class ProductAccordionController extends Controller
         ]);
 
         try {
-            foreach ($request->input('items') as $index => $id) {
-                ProductAccordion::where('id', $id)->update(['order' => $index + 1]);
-            }
-
+            $this->repository->reorderProductAccordions($request->input('items'));
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()]);
