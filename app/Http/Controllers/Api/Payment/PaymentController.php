@@ -69,6 +69,7 @@ class PaymentController extends Controller
         $order = Order::where('order_id', $data['order_id'])->first();
 
         $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
+        dd($baseUrl);
         $payload = [
             'amount'     => (float) $order->amount,
             'memberId'   => $order->selected_card,
@@ -328,9 +329,7 @@ class PaymentController extends Controller
     
 
 
-    /**
-     * 🔹 Get order details by order_id
-     */
+  
     public function getOrder(Request $request, $orderId)
     {
         try {
