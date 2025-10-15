@@ -12,55 +12,53 @@ class PaymentLoginHelper
      * Sistemə login olub Bearer token qaytarır
      */
     public static function getToken()
-    {
-        try {
-            $baseUrl  = env("UNITED_PAYMENT_API_URL", "https://vpos.unitedpayment.az/api");
-            $email    = env("UNITED_PAYMENT_API_EMAIL", "office@gardashlar.com");
-            $password = env("UNITED_PAYMENT_API_PASSWORD", "2&nOl0J9^O-#");
-    
-            
-    
-            $response = Http::withOptions([
-                'verify' => false,
-                'version' => 1.1,
-            ])->withHeaders([
-                'User-Agent' => 'curl/7.88.1',
-                'Content-Type' => 'application/json; charset=utf-8',
-            ])->post('https://vpos.unitedpayment.az/api/auth/', [
-                'email' => 'office@gardashlar.com',
-                'password' => '2&nOl0J9^O-#',
-            ]);
-            
-            dd($response->status(), $response->body());
-            
-            dd($response);
-            Log::info('UnitedPayment Login raw response:', [
-                'status' => $response->status(),
-                'body'   => $response->body(),
-            ]);
-    
-            if ($response->successful()) {
-                $data = $response->json();
-                $token = $data['token'] ?? null;
-    
-                if ($token) {
-                    Cache::put('united_payment_token', $token, now()->addMinutes(55));
-                    Log::info('✅ UnitedPayment token alındı.');
-                    return $token;
-                }
-            }
-    
-            Log::error('❌ UnitedPayment login uğursuz', [
-                'status' => $response->status(),
-                'body'   => $response->body(),
-            ]);
-            return null;
-    
-        } catch (\Exception $e) {
-            Log::error('UnitedPayment Exception: ' . $e->getMessage());
-            return null;
+{
+    try {
+        $baseUrl  = env("UNITED_PAYMENT_API_URL", "https://vpos.unitedpayment.az/api");
+        $email    = env("UNITED_PAYMENT_API_EMAIL", "office@gardashlar.com");
+        $password = env("UNITED_PAYMENT_API_PASSWORD", "2&nOl0J9^O-#");
+
+        // Cache-də varsa, təzədən login etməyə ehtiyac yoxdur
+        if (Cache::has('united_payment_token')) {
+            return Cache::get('united_payment_token');
         }
+
+        $response = Http::withOptions([
+            'verify' => false,  // SSL yoxlamasını söndür
+            'timeout' => 30,
+            'version' => 1.1,   // 👈 HTTP/1.1 məcburi
+        ])->withHeaders([
+            'User-Agent'   => 'curl/7.88.1', // 👈 CURL kimi davranır
+            'Content-Type' => 'application/json; charset=utf-8',
+        ])->post($baseUrl . '/auth/', [
+            'email'    => $email,
+            'password' => $password,
+        ]);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            $token = $data['token'] ?? null;
+
+            if ($token) {
+                Cache::put('united_payment_token', $token, now()->addMinutes(55));
+                Log::info('✅ UnitedPayment token uğurla alındı');
+                return $token;
+            }
+        }
+
+        Log::error('❌ UnitedPayment login uğursuz', [
+            'status' => $response->status(),
+            'body'   => $response->body(),
+        ]);
+
+        return null;
+
+    } catch (\Exception $e) {
+        Log::error('UnitedPayment Exception: ' . $e->getMessage());
+        return null;
     }
+}
+
     
 
     /**
