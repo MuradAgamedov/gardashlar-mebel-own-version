@@ -337,7 +337,6 @@
 }
 
 .select2-container--default .select2-selection--single {
-    height: 28px !important;
     border: 1px solid #dee2e6;
     border-radius: 0.25rem;
     font-size: 0.75rem;
