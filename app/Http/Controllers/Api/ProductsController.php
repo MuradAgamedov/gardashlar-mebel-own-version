@@ -682,6 +682,23 @@ class ProductsController extends Controller
                 $translation = $item->translates()->where('language_id', $languageId)->first();
                 $mainImage = $item->images()->where('status', true)->orderBy('order')->first();
     
+                // Category slug və parent slug
+                $categorySlug = null;
+                $parentSlug = null;
+                if ($item->categories->isNotEmpty()) {
+                    $category = $item->categories->first();
+                    $categoryTranslation = $category->translates()->where('language_id', $languageId)->first();
+                    $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
+                    
+                    if ($category->parent_id) {
+                        $parentCategory = ProductCategory::find($category->parent_id);
+                        if ($parentCategory) {
+                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
+                            $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
+                        }
+                    }
+                }
+    
                 // same structure
                 $inCart = [
                     'isActive' => false,
@@ -725,6 +742,8 @@ class ProductsController extends Controller
                     'card_image' => $mainImage && $mainImage->image
                         ? asset('storage/' . $mainImage->image)
                         : asset('images/default_image.webp'),
+                    'category_slug' => $categorySlug,
+                    'parentSlug' => $parentSlug,
                     'inCart' => $inCart,
                     'inFavorite' => $inFavorite,
                     'inCompare' => $inCompare,
@@ -868,6 +887,23 @@ class ProductsController extends Controller
                 $translation = $product->translates->first();
                 $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
     
+                // Category slug və parent slug
+                $categorySlug = null;
+                $parentSlug = null;
+                if ($product->categories->isNotEmpty()) {
+                    $category = $product->categories->first();
+                    $categoryTranslation = $category->translates->first();
+                    $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
+                    
+                    if ($category->parent_id) {
+                        $parentCategory = ProductCategory::find($category->parent_id);
+                        if ($parentCategory) {
+                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
+                            $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
+                        }
+                    }
+                }
+    
                 // --- inCart
                 $inCart = [
                     'isActive' => false,
@@ -918,6 +954,8 @@ class ProductsController extends Controller
                         ? asset('storage/' . $mainImage->image)
                         : asset('images/default_image.webp'),
                     'discount_price' => $product->discount_price,
+                    'category_slug' => $categorySlug,
+                    'parentSlug' => $parentSlug,
                     'inCart' => $inCart,
                     'inFavorite' => $inFavorite,
                     'inCompare' => $inCompare,
