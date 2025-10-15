@@ -66,14 +66,17 @@ class PaymentController extends Controller
             'order_id' => 'required|exists:orders,order_id',
         ]);
 
-        $order = Order::where('order_id', $data['order_id'])->first();
+        $order = Order::where('order_id', $data['order_id'])->firstOrFail();
+        $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://vpos.unitedpayment.az/api');
 
-        $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
+        // 🟢 Login olubsa user ID, yoxdursa random guest ID
+        $user = $request->user();
+        $memberId = $user ? (string) $user->id : 'guest_' . strtoupper(Str::random(8));
 
         $payload = [
             'amount'     => (float) $order->amount,
-            'memberId'   => $order->selected_card,
-            'language'   => $order->language ?? 'EN',
+            'memberId'   => $memberId,
+            'language'   => strtoupper($order->language ?? 'EN'),
             'successUrl' => route('payment.success', ['order_id' => $order->id], true),
             'cancelUrl'  => route('payment.cancel', ['order_id' => $order->id], true),
             'declineUrl' => route('payment.decline', ['order_id' => $order->id], true),
@@ -83,9 +86,11 @@ class PaymentController extends Controller
             'payment_method' => 'online',
             'payment_status' => 'pending',
             'status' => 'processing',
+            'member_id' => $memberId, // 💾 gələcək izləmə üçün saxlanır
         ]);
 
-        $response = PaymentLoginHelper::withAuth()->post($baseUrl.'/transactions/checkout', $payload);
+        $response = PaymentLoginHelper::withAuth()->post($baseUrl . '/transactions/checkout', $payload);
+
         if ($response->successful()) {
             $body = $response->json();
             $redirectUrl = $body['url'] ?? null;
@@ -106,6 +111,7 @@ class PaymentController extends Controller
         return response()->json(['success' => false, 'message' => $response->body()], 500);
     }
 
+
     /**
      * 🔹 Kredit (taksit) ödənişi
      */
@@ -115,14 +121,17 @@ class PaymentController extends Controller
             'order_id' => 'required|exists:orders,order_id',
         ]);
 
-        $order = Order::where('order_id', $data['order_id'])->first();
+        $order = Order::where('order_id', $data['order_id'])->firstOrFail();
+        $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://vpos.unitedpayment.az/api');
 
-        $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://test-vpos.unitedpayment.az/api');
+        // 🟢 Login olubsa user ID, yoxdursa random guest ID
+        $user = $request->user();
+        $memberId = $user ? (string) $user->id : 'guest_' . strtoupper(Str::random(8));
 
         $payload = [
             'amount'      => (float) $order->amount,
-            'memberId'    => $order->selected_card,
-            'language'    => $order->language ?? 'EN',
+            'memberId'    => $memberId,
+            'language'    => strtoupper($order->language ?? 'EN'),
             'installment' => (int) $order->month,
             'successUrl'  => route('payment.success', ['order_id' => $order->id], true),
             'cancelUrl'   => route('payment.cancel', ['order_id' => $order->id], true),
@@ -133,9 +142,10 @@ class PaymentController extends Controller
             'payment_method' => 'installment',
             'payment_status' => 'pending',
             'status'         => 'processing',
+            'member_id'      => $memberId, // 💾 gələcək izləmə üçün saxlanır
         ]);
 
-        $response = PaymentLoginHelper::withAuth()->post($baseUrl.'/transactions/taksit', $payload);
+        $response = PaymentLoginHelper::withAuth()->post($baseUrl . '/transactions/taksit', $payload);
 
         if ($response->successful()) {
             $body = $response->json();
@@ -156,6 +166,7 @@ class PaymentController extends Controller
         Log::error('Installment failed', ['body' => $response->body()]);
         return response()->json(['success' => false, 'message' => $response->body()], 500);
     }
+
 
     /**
      * 🔹 payment_method-ə görə yönləndirmə
