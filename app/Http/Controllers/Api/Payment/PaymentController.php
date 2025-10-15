@@ -539,29 +539,28 @@ class PaymentController extends Controller
     }
 
 
-    /**
- * 🔹 Ödənişin vəziyyətini almaq (United Payment API)
- */
-public function getPaymentStatus(Request $request)
+
+public function getPaymentStatusByTransactionId(Request $request)
 {
     try {
         $data = $request->validate([
-            'order_id' => 'required|exists:orders,order_id',
+            'transaction_id' => 'required|numeric',
         ]);
 
-        $order = Order::where('order_id', $data['order_id'])->firstOrFail();
+        $transactionId = (int) $data['transaction_id'];
         $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://vpos.unitedpayment.az/api');
 
-        // API token ilə müraciət
+        // API sorğusu üçün body
         $payload = [
-            'clientOrderId' => (string) $order->order_id
+            'transactionId' => $transactionId
         ];
 
-        $response = PaymentLoginHelper::withAuth()->post($baseUrl . '/transactions/transaction-status-by-order-id-detailed', $payload);
+        $response = PaymentLoginHelper::withAuth()
+            ->post($baseUrl . '/transactions/transaction-status-by-trx-id-detailed', $payload);
 
         if (!$response->successful()) {
-            Log::error('Payment Status API Error', [
-                'order_id' => $order->order_id,
+            Log::error('Payment Status API Error (by transactionId)', [
+                'transaction_id' => $transactionId,
                 'response' => $response->body(),
             ]);
 
@@ -574,17 +573,19 @@ public function getPaymentStatus(Request $request)
 
         $data = $response->json();
 
-        // Log
-        Log::info('Payment Status', [
-            'order_id' => $order->order_id,
+        Log::info('Payment Status (by transactionId)', [
+            'transaction_id' => $transactionId,
             'status_data' => $data,
         ]);
 
-        // Sifariş statusunu da yeniləyək (əgər istəyirsənsə)
-        if (!empty($data['status'])) {
-            $order->update([
-                'payment_status' => strtolower($data['status']),
-            ]);
+        // Əgər sifariş bu transaction ilə bağlıdırsa — statusu lokal bazada da yenilə
+        if (!empty($data['clientOrderId'])) {
+            $order = Order::where('order_id', $data['clientOrderId'])->first();
+            if ($order) {
+                $order->update([
+                    'payment_status' => strtolower($data['status'] ?? 'unknown'),
+                ]);
+            }
         }
 
         return response()->json([
@@ -600,7 +601,7 @@ public function getPaymentStatus(Request $request)
             'errors'  => $e->errors(),
         ], 422);
     } catch (\Exception $e) {
-        Log::error('Get Payment Status failed', [
+        Log::error('Get Payment Status (by transactionId) failed', [
             'error' => $e->getMessage(),
             'trace' => $e->getTraceAsString(),
         ]);
@@ -611,5 +612,6 @@ public function getPaymentStatus(Request $request)
         ], 500);
     }
 }
+
 
 }
