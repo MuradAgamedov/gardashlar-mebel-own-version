@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use App\Repositories\CurrencyRepository;
+use App\Http\Requests\Admin\Currency\StoreCurrencyRequest;
+use App\Http\Requests\Admin\Currency\UpdateCurrencyRequest;
 
 class CurrencyController extends Controller
 {
@@ -15,41 +17,23 @@ class CurrencyController extends Controller
     {
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(): View
     {
         $currencies = $this->repository->getCurrencies();
         return view('admin.currencies.index', compact('currencies'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(): View
     {
         return view('admin.currencies.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreCurrencyRequest $request): RedirectResponse
     {
-        $request->validate([
-            'code' => 'required|string|max:3|unique:currencies,code',
-            'course' => 'required|numeric|min:0.0001|max:999999.9999',
-        ]);
-
         try {
-            // Get the highest order and add 1 for new item
-            $maxOrder = Currency::max('order') ?? 0;
-            
-            Currency::create([
-                'code' => strtoupper($request->code),
+            $this->repository->createCurrency([
+                'code' => $request->code,
                 'course' => $request->course,
-                'order' => $maxOrder + 1,
                 'status' => $request->has('status')
             ]);
 
@@ -62,27 +46,16 @@ class CurrencyController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Currency $currency): View
     {
         return view('admin.currencies.edit', compact('currency'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Currency $currency): RedirectResponse
+    public function update(UpdateCurrencyRequest $request, Currency $currency): RedirectResponse
     {
-        $request->validate([
-            'code' => 'required|string|max:3|unique:currencies,code,' . $currency->id,
-            'course' => 'required|numeric|min:0.0001|max:999999.9999',
-        ]);
-
         try {
-            $currency->update([
-                'code' => strtoupper($request->code),
+            $this->repository->updateCurrency($currency, [
+                'code' => $request->code,
                 'course' => $request->course,
                 'status' => $request->has('status')
             ]);
@@ -96,13 +69,10 @@ class CurrencyController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Currency $currency): RedirectResponse
     {
         try {
-            $currency->delete();
+            $this->repository->deleteCurrency($currency);
             return redirect()->route('admin.currencies.index')
                 ->with('success', 'Currency deleted successfully.');
         } catch (\Exception $e) {
@@ -110,9 +80,6 @@ class CurrencyController extends Controller
         }
     }
 
-    /**
-     * Reorder currencies
-     */
     public function reorder(Request $request): RedirectResponse
     {
         $request->validate([
@@ -121,10 +88,7 @@ class CurrencyController extends Controller
         ]);
 
         try {
-            foreach ($request->orders as $order => $id) {
-                Currency::where('id', $id)->update(['order' => $order]);
-            }
-
+            $this->repository->reorderCurrencies($request->orders);
             return redirect()->route('admin.currencies.index')
                 ->with('success', 'Currencies reordered successfully.');
 
@@ -133,15 +97,11 @@ class CurrencyController extends Controller
         }
     }
 
-    /**
-     * Toggle status
-     */
     public function toggleStatus(Currency $currency): RedirectResponse
     {
         try {
-            $currency->update(['status' => !$currency->status]);
-            
-            $status = $currency->status ? 'enabled' : 'disabled';
+            $this->repository->toggleStatus($currency);
+            $status = $currency->fresh()->status ? 'enabled' : 'disabled';
             return redirect()->route('admin.currencies.index')
                 ->with('success', "Currency {$status} successfully.");
 
@@ -150,9 +110,6 @@ class CurrencyController extends Controller
         }
     }
 
-    /**
-     * Bulk delete currencies
-     */
     public function bulkDelete(Request $request): RedirectResponse
     {
         $request->validate([
@@ -161,8 +118,7 @@ class CurrencyController extends Controller
         ]);
 
         try {
-            $deletedCount = Currency::whereIn('id', $request->ids)->delete();
-            
+            $deletedCount = $this->repository->bulkDelete($request->ids);
             return redirect()->route('admin.currencies.index')
                 ->with('success', "{$deletedCount} currency(ies) deleted successfully.");
 
@@ -171,9 +127,6 @@ class CurrencyController extends Controller
         }
     }
 
-    /**
-     * Bulk toggle status currencies
-     */
     public function bulkToggleStatus(Request $request): RedirectResponse
     {
         $request->validate([
@@ -182,14 +135,7 @@ class CurrencyController extends Controller
         ]);
 
         try {
-            $currencies = Currency::whereIn('id', $request->ids)->get();
-            $updatedCount = 0;
-
-            foreach ($currencies as $currency) {
-                $currency->update(['status' => !$currency->status]);
-                $updatedCount++;
-            }
-            
+            $updatedCount = $this->repository->bulkToggleStatus($request->ids);
             return redirect()->route('admin.currencies.index')
                 ->with('success', "{$updatedCount} currency(ies) status toggled successfully.");
 

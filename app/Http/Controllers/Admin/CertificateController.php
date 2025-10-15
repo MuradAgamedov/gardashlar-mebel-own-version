@@ -4,116 +4,45 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Certificate;
-use App\Models\Language;
-use App\Services\ImageService;
 use Illuminate\Http\Request;
 use App\Repositories\CertificateRepository;
 use App\Repositories\LanguageRepository;
+use App\Http\Requests\Admin\Certificate\StoreCertificateRequest;
+use App\Http\Requests\Admin\Certificate\UpdateCertificateRequest;
 
 class CertificateController extends Controller
 {
-    protected $imageService;
-
     public function __construct(
-        ImageService $imageService,
         public CertificateRepository $repository,
         public LanguageRepository $languageRepository
     )
     {
-        $this->imageService = $imageService;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $certificates = $this->repository->getCertificates();
         $languages = $this->languageRepository->getAllLanguages();
-        
         return view('admin.certificates.index', compact('certificates', 'languages'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $languages = $this->languageRepository->getAllLanguages();
         return view('admin.certificates.create', compact('languages'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreCertificateRequest $request)
     {
-        $languages = $this->languageRepository->getAllLanguages();
-        
-        // Base validation
-        $request->validate([
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'date' => 'required|string|max:255',
-            'status' => 'boolean',
-        ], [
-            'image.image' => 'Image must be an image file.',
-            'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
-            'image.max' => 'Image may not be greater than 2MB.',
-            'date.required' => 'Date is required.',
-            'date.max' => 'Date may not be greater than 255 characters.',
-            'status.boolean' => 'Status must be true or false.',
-        ]);
-
-        // Translation validation
-        foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.image_alt_text" => 'required|string|max:255',
-                "translations.{$language->id}.title" => 'required|string|max:255',
-            ], [
-                "translations.{$language->id}.image_alt_text.required" => "Image alt text is required for {$language->lang_code}.",
-                "translations.{$language->id}.image_alt_text.max" => "Image alt text may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-            ]);
-        }
-
         try {
-            // Handle image upload
-            $imagePath = null;
-            if ($request->hasFile('image')) {
-                $imagePath = $this->imageService->upload(
-                    $request->file('image'),
-                    'certificates',
-                    [
-                        'max_size' => 2048,
-                        'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                    ]
-                );
-                
-                if (!$imagePath) {
-                    return redirect()->back()
-                        ->with('error', 'Failed to upload image.')
-                        ->withInput();
-                }
-            }
-
-            // Create certificate
-            $certificate = Certificate::create([
-                'image' => $imagePath,
-                'date' => $request->input('date'),
-                'status' => $request->input('status'),
-            ]);
-
-            // Create translations
-            foreach ($languages as $language) {
-                $translationData = $request->input("translations.{$language->id}", []);
-                
-                $certificate->translates()->create([
-                    'language_id' => $language->id,
-                    'image_alt_text' => trim($translationData['image_alt_text'] ?? ''),
-                    'title' => trim($translationData['title'] ?? ''),
-                ]);
-            }
+            $this->repository->createCertificate(
+                [
+                    'date' => $request->input('date'),
+                    'status' => $request->input('status', true),
+                ],
+                $request->input('translations'),
+                $request->file('image')
+            );
 
             return redirect()->route('admin.certificates.index')
                 ->with('success', 'Certificate created successfully!');
@@ -125,92 +54,25 @@ class CertificateController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Certificate $certificate)
     {
         $certificate->load('translates.language');
         $languages = $this->languageRepository->getAllLanguages();
-        
         return view('admin.certificates.edit', compact('certificate', 'languages'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Certificate $certificate)
+    public function update(UpdateCertificateRequest $request, Certificate $certificate)
     {
-        $languages = $this->languageRepository->getAllLanguages();
-        
-        // Base validation
-        $request->validate([
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'date' => 'required|string|max:255',
-            'status' => 'boolean',
-        ], [
-            'image.image' => 'Image must be an image file.',
-            'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
-            'image.max' => 'Image may not be greater than 2MB.',
-            'date.required' => 'Date is required.',
-            'date.max' => 'Date may not be greater than 255 characters.',
-            'status.boolean' => 'Status must be true or false.',
-        ]);
-
-        // Translation validation
-        foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.image_alt_text" => 'required|string|max:255',
-                "translations.{$language->id}.title" => 'required|string|max:255',
-            ], [
-                "translations.{$language->id}.image_alt_text.required" => "Image alt text is required for {$language->lang_code}.",
-                "translations.{$language->id}.image_alt_text.max" => "Image alt text may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-            ]);
-        }
-
         try {
-            // Handle image upload
-            $imageData = [];
-            if ($request->hasFile('image')) {
-                $uploadedPath = $this->imageService->update(
-                    $request->file('image'),
-                    $certificate->image,
-                    'certificates',
-                    [
-                        'max_size' => 2048,
-                        'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                    ]
-                );
-                
-                if ($uploadedPath) {
-                    $imageData['image'] = $uploadedPath;
-                } else {
-                    return redirect()->back()
-                        ->with('error', 'Failed to upload image.')
-                        ->withInput();
-                }
-            }
-
-            // Update certificate
-            $certificate->update(array_merge($imageData, [
-                'date' => $request->input('date'),
-                'status' => $request->input('status'),
-            ]));
-
-            // Update translations
-            foreach ($languages as $language) {
-                $translationData = $request->input("translations.{$language->id}", []);
-                
-                $certificate->translates()->updateOrCreate(
-                    ['language_id' => $language->id],
-                    [
-                        'image_alt_text' => trim($translationData['image_alt_text'] ?? ''),
-                        'title' => trim($translationData['title'] ?? ''),
-                    ]
-                );
-            }
+            $this->repository->updateCertificate(
+                $certificate,
+                [
+                    'date' => $request->input('date'),
+                    'status' => $request->input('status', true),
+                ],
+                $request->input('translations'),
+                $request->file('image')
+            );
 
             return redirect()->route('admin.certificates.index')
                 ->with('success', 'Certificate updated successfully!');
@@ -222,13 +84,10 @@ class CertificateController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Certificate $certificate)
     {
         try {
-            $certificate->delete();
+            $this->repository->deleteCertificate($certificate);
             return redirect()->route('admin.certificates.index')
                 ->with('success', 'Certificate deleted successfully!');
         } catch (\Exception $e) {
@@ -237,9 +96,6 @@ class CertificateController extends Controller
         }
     }
 
-    /**
-     * Reorder certificates
-     */
     public function reorder(Request $request)
     {
         $request->validate([
@@ -248,13 +104,10 @@ class CertificateController extends Controller
         ]);
 
         try {
-            foreach ($request->certificates as $index => $certificateId) {
-                Certificate::where('id', $certificateId)->update(['order' => $index + 1]);
-            }
-
+            $this->repository->reorderCertificates($request->certificates);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
-} 
+}

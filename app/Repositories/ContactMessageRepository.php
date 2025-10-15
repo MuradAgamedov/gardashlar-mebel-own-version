@@ -11,12 +11,10 @@ class ContactMessageRepository extends BaseRepository
     {
     }
 
-    // Mesajları filtrlə və paginate et
     public function getMessages($request)
     {
         $query = $this->contactMessage->query();
 
-        // Search functionality
         if ($request->has('search') && $request->search) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -26,7 +24,6 @@ class ContactMessageRepository extends BaseRepository
             });
         }
 
-        // Filter by read status
         if ($request->has('status') && $request->status !== '') {
             if ($request->status === 'unread') {
                 $query->unread();
@@ -36,5 +33,28 @@ class ContactMessageRepository extends BaseRepository
         }
 
         return $query->orderBy('created_at', 'desc')->paginate(20);
+    }
+
+    public function findMessage(string $id)
+    {
+        return $this->contactMessage->findOrFail($id);
+    }
+
+    public function markAsRead(ContactMessage $message)
+    {
+        if (!$message->is_read) {
+            $message->markAsRead();
+        }
+        return $message;
+    }
+
+    public function deleteMessage(ContactMessage $message)
+    {
+        return $message->delete();
+    }
+
+    public function deleteSelected(array $ids)
+    {
+        return $this->contactMessage->whereIn('id', $ids)->delete();
     }
 }

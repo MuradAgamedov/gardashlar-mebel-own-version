@@ -3,72 +3,31 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\CompanyManagement;
-use App\Models\Language;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use App\Services\ImageService;
 use App\Repositories\LanguageRepository;
+use App\Repositories\CompanyManagementRepository;
 
 class CompanyManagementController extends Controller
 {
-    protected $imageService;
-    
-    public function __construct(ImageService $imageService, public LanguageRepository $languageRepository)
+    public function __construct(
+        public LanguageRepository $languageRepository,
+        public CompanyManagementRepository $repository
+    )
     {
-        $this->imageService = $imageService;
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function edit()
     {
-        $companyManagement = CompanyManagement::with(['translates.language'])->first();
-        
-        if (!$companyManagement) {
-            $companyManagement = CompanyManagement::create();
-        }
-        
+        $companyManagement = $this->repository->getFirstOrCreate();
         $languages = $this->languageRepository->getAllLanguages();
-        
         return view('admin.company-management.edit', compact('companyManagement', 'languages'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request)
     {
-        $languages = $this->languageRepository->getAllLanguages();
-
         try {
-            $companyManagement = CompanyManagement::first();
-            
-            if (!$companyManagement) {
-                $companyManagement = CompanyManagement::create();
-            }
-
-            // Update or create translations - only for languages that have data
-            foreach ($languages as $index => $language) {
-                $translationData = $request->input("translations.{$index}", []);
-                
-                // Only update if content is provided
-                if (!empty($translationData['content'])) {
-                    $companyManagement->translates()->updateOrCreate(
-                        ['language_id' => $language->id],
-                        [
-                            'content' => trim($translationData['content'] ?? ''),
-                        ]
-                    );
-                }
-            }
-
-            // Clear cache for all languages
-            $languages = Language::getActiveLanguages();
-            foreach ($languages as $language) {
-                Cache::forget("company_management_{$language->id}");
-            }
+            $languages = $this->languageRepository->getAllLanguages();
+            $this->repository->updateCompanyManagement($request->input('translations'), $languages);
 
             return redirect()->back()
                 ->with('success', 'Company Management updated successfully!');
@@ -80,9 +39,6 @@ class CompanyManagementController extends Controller
         }
     }
 
-    /**
-     * Upload image for CKEditor 5
-     */
     public function uploadImage(Request $request)
     {
         try {
@@ -90,17 +46,12 @@ class CompanyManagementController extends Controller
                 'upload' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
             ]);
 
-            $imagePath = $this->imageService->upload($request->file('upload'), 'ckeditor5');
-            $url = asset($imagePath);
+            $url = $this->repository->uploadImage($request->file('upload'));
 
-            return response()->json([
-                'url' => $url
-            ]);
+            return response()->json(['url' => $url]);
         } catch (\Exception $e) {
             return response()->json([
-                'error' => [
-                    'message' => $e->getMessage()
-                ]
+                'error' => ['message' => $e->getMessage()]
             ], 400);
         }
     }

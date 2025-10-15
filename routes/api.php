@@ -322,7 +322,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-    
+
     Route::post('/add-comment', [CommentController::class, 'addComment'])->name('api.addComment');
 
 
@@ -349,7 +349,7 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('
 // Protected routes (require authentication)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.auth.logout');
-    
+
     // Profile API Routes
     Route::get('/user/profile', [AuthController::class, 'getUserProfile'])->name('api.user.profile');
     Route::post('/profile/update', [AuthController::class, 'updateProfile'])->name('api.profile.update');
@@ -403,3 +403,4 @@ Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('a
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
 Route::get('/payment/decline', [PaymentController::class, 'decline'])->name('payment.decline');
+Route::post('/payment/status', [PaymentController::class, 'getPaymentStatus'])->name('api.payment.status');

@@ -27,58 +27,45 @@ class CommentController extends Controller
 
     public function destroy(Comment $comment)
     {
-        $comment->delete();
+        $this->repository->deleteComment($comment);
         return redirect()->route('admin.comments.index')->with('success', 'Şərh silindi');
     }
     public function markAsRead($id)
     {
         $comment = Comment::find($id);
-     
-        $comment->update([
-            'is_read' => $comment->is_read === 'active' ? 'passive' : 'active'
-        ]);
-    
+        $this->repository->toggleReadStatus($comment);
         return redirect()->back()->with('success', 'Şərh statusu yeniləndi');
     }
     
     
     public function toggleApprove(Comment $comment)
-{
-    $comment->update([
-        'status' => $comment->status === 'approved' ? 'pending' : 'approved'
-    ]);
-
-    return redirect()->back()->with('success', 'Şərhin təsdiq statusu dəyişdirildi');
-}
+    {
+        $this->repository->toggleApprove($comment);
+        return redirect()->back()->with('success', 'Şərhin təsdiq statusu dəyişdirildi');
+    }
 
     
-// Cavabların siyahısı
-public function answers(Comment $comment)
-{
-    $answers = $comment->answers()->latest()->get();
-    return view('admin.comments.answers', compact('comment', 'answers'));
-}
+    public function answers(Comment $comment)
+    {
+        $answers = $this->repository->getAnswers($comment);
+        return view('admin.comments.answers', compact('comment', 'answers'));
+    }
 
-// Cavab əlavə etmək
-public function storeAnswer(Request $request, Comment $comment)
-{
-    $request->validate([
-        'text' => 'required|string|max:1000',
-    ]);
+    public function storeAnswer(Request $request, Comment $comment)
+    {
+        $request->validate([
+            'text' => 'required|string|max:1000',
+        ]);
 
-    $comment->answers()->create([
-        'text' => $request->text,
-    ]);
+        $this->repository->storeAnswer($comment, ['text' => $request->text]);
+        return redirect()->back()->with('success', 'Cavab əlavə olundu');
+    }
 
-    return redirect()->back()->with('success', 'Cavab əlavə olundu');
-}
-
-// Cavabı silmək
-public function destroyAnswer(CommentAnswer $answer)
-{
-    $answer->delete();
-    return redirect()->back()->with('success', 'Cavab silindi');
-}
+    public function destroyAnswer(CommentAnswer $answer)
+    {
+        $this->repository->deleteAnswer($answer);
+        return redirect()->back()->with('success', 'Cavab silindi');
+    }
 
         
 }

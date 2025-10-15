@@ -4,70 +4,38 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CreditCard;
-use App\Services\ImageService;
 use Illuminate\Http\Request;
 use App\Repositories\CreditCardRepository;
+use App\Http\Requests\Admin\CreditCard\StoreCreditCardRequest;
+use App\Http\Requests\Admin\CreditCard\UpdateCreditCardRequest;
 
 class CreditCardController extends Controller
 {
-    protected $imageService;
-
-    public function __construct(ImageService $imageService, public CreditCardRepository $repository)
+    public function __construct(public CreditCardRepository $repository)
     {
-        $this->imageService = $imageService;
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $creditCards = $this->repository->getCreditCards();
         return view('admin.CreditCard.index', compact('creditCards'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('admin.CreditCard.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreCreditCardRequest $request)
     {
-
-        $request->validate([
-            'title'  => 'required|string|max:255',
-            'months' => 'nullable|string|max:255',
-            'image'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
-        ]);
-       
         try {
-            $imagePath = null;
-            if ($request->hasFile('image')) {
-                $imagePath = $this->imageService->upload(
-                    $request->file('image'),
-                    'credit-cards',
-                    [
-                        'max_size' => 2048,
-                        'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                    ]
-                );
-            }
-
-            // Yeni kart əlavə ediləndə order ən sonda getsin
-            $lastOrder = CreditCard::max('order') ?? 0;
-
-            CreditCard::create([
-                'title'  => $request->input('title'),
-                'months' => $request->input('months'),
-                'order'  => $lastOrder + 1,
-                'image'  => $imagePath,
-            ]);
+            $this->repository->createCreditCard(
+                [
+                    'title' => $request->input('title'),
+                    'months' => $request->input('months'),
+                ],
+                $request->file('image')
+            );
 
             return redirect()->route('admin.credit-cards.index')
                 ->with('success', 'Credit Card created successfully!');
@@ -79,59 +47,37 @@ class CreditCardController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(CreditCard $creditCard)
     {
         return view('admin.CreditCard.edit', compact('creditCard'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, CreditCard $creditCard)
+    public function update(UpdateCreditCardRequest $request, CreditCard $creditCard)
     {
-        $request->validate([
-            'title'  => 'required|string|max:255',
-            'months' => 'nullable|string|max:255',
-            'image'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp',
-        ]);
-    
-        $updateData = [
-            'title'  => $request->input('title'),
-            'months' => $request->input('months'),
-        ];
-    
-        if ($request->hasFile('image')) {
-            $uploadedPath = $this->imageService->update(
-                $request->file('image'),
-                $creditCard->image,
-                'credit-cards',
+        try {
+            $this->repository->updateCreditCard(
+                $creditCard,
                 [
-                    'allowed_types' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-                ]
+                    'title' => $request->input('title'),
+                    'months' => $request->input('months'),
+                ],
+                $request->file('image')
             );
-    
-            if ($uploadedPath) {
-                $updateData['image'] = $uploadedPath;
-            }
-        }
-    
-        $creditCard->update($updateData);
-    
-        return redirect()->route('admin.credit-cards.index')
-            ->with('success', 'Credit Card updated successfully!');
-    }
-    
 
-    /**
-     * Remove the specified resource from storage.
-     */
+            return redirect()->route('admin.credit-cards.index')
+                ->with('success', 'Credit Card updated successfully!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error updating credit card: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
     public function destroy(CreditCard $creditCard)
     {
         try {
-            $creditCard->delete();
+            $this->repository->deleteCreditCard($creditCard);
             return redirect()->route('admin.credit-cards.index')
                 ->with('success', 'Credit Card deleted successfully!');
         } catch (\Exception $e) {
@@ -140,9 +86,6 @@ class CreditCardController extends Controller
         }
     }
 
-    /**
-     * Reorder credit cards (drag & drop)
-     */
     public function reorder(Request $request)
     {
         $request->validate([
@@ -151,10 +94,7 @@ class CreditCardController extends Controller
         ]);
 
         try {
-            foreach ($request->credit_cards as $index => $cardId) {
-                CreditCard::where('id', $cardId)->update(['order' => $index + 1]);
-            }
-
+            $this->repository->reorderCreditCards($request->credit_cards);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

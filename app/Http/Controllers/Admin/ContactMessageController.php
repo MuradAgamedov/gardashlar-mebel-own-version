@@ -13,71 +13,46 @@ class ContactMessageController extends Controller
     {
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $messages = $this->repository->getMessages($request);
-
         return view('admin.contact-messages.index', compact('messages'));
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        $message = ContactMessage::findOrFail($id);
-        
-        // Mark as read if not already read
-        if (!$message->is_read) {
-            $message->markAsRead();
-        }
-
+        $message = $this->repository->findMessage($id);
+        $this->repository->markAsRead($message);
         return view('admin.contact-messages.show', compact('message'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        $message = ContactMessage::findOrFail($id);
-        $message->delete();
-
+        $message = $this->repository->findMessage($id);
+        $this->repository->deleteMessage($message);
         return redirect()->route('admin.contact-messages.index')
             ->with('success', 'Message deleted successfully');
     }
 
-    /**
-     * Mark message as read
-     */
     public function markAsRead(string $id)
     {
-        $message = ContactMessage::findOrFail($id);
-        $message->markAsRead();
-
+        $message = $this->repository->findMessage($id);
+        $this->repository->markAsRead($message);
         return redirect()->back()->with('success', 'Message marked as read');
     }
 
-    /**
-     * Delete multiple messages
-     */
     public function deleteSelected(Request $request)
     {
         $ids = $request->input('ids');
         
-        // If ids is already an array, use it directly
         if (is_array($ids)) {
             $idsArray = $ids;
         } else {
-            // If it's a JSON string, decode it
             $idsArray = json_decode($ids, true);
         }
         
         if ($idsArray && is_array($idsArray) && !empty($idsArray)) {
-            ContactMessage::whereIn('id', $idsArray)->delete();
+            $this->repository->deleteSelected($idsArray);
             return response()->json(['success' => true, 'message' => 'Selected messages deleted successfully']);
         }
 

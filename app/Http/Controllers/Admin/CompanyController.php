@@ -4,28 +4,20 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Models\CompanyProduct;
-use App\Models\CompanyTranslate;
-use App\Models\Language;
 use App\Models\Product;
-use App\Services\ImageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Str;
 use App\Repositories\CompanyRepository;
 use App\Repositories\LanguageRepository;
+use App\Http\Requests\Admin\Company\StoreCompanyRequest;
+use App\Http\Requests\Admin\Company\UpdateCompanyRequest;
+
 class CompanyController extends Controller
 {
-    protected $imageService;
-
     public function __construct(
-        ImageService $imageService, 
         public CompanyRepository $repository,
         public LanguageRepository $languageRepository
     )
     {
-        $this->imageService = $imageService;
     }
 
     public function index()
@@ -40,54 +32,19 @@ class CompanyController extends Controller
         return view('admin.companies.create', compact('languages'));
     }
 
-    public function store(Request $request)
+    public function store(StoreCompanyRequest $request)
     {
-        $request->validate([
-            'translates' => 'required|array',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string|max:255',
-            'translates.*.slug' => 'nullable|string|max:255|unique:company_translates,slug',
-            'translates.*.card_image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'translates.*.card_image_alt_text' => 'nullable|string|max:255',
-            'translates.*.inner_image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'translates.*.inner_image_alt_text' => 'nullable|string|max:255',
-            'translates.*.description' => 'required|string',
-            'status' => 'boolean'
-        ]);
-
         try {
-            DB::beginTransaction();
-
-            $company = Company::create([
-                'status' => $request->input('status', true)
-            ]);
-
-            foreach ($request->input('translates') as $translate) {
-                $cardImagePath = $this->imageService->upload($request->file("translates.{$translate['language_id']}.card_image"), 'companies/card');
-                $innerImagePath = $this->imageService->upload($request->file("translates.{$translate['language_id']}.inner_image"), 'companies/inner');
-
-                CompanyTranslate::create([
-                    'company_id' => $company->id,
-                    'language_id' => $translate['language_id'],
-                    'title' => $translate['title'],
-                    'slug' => !empty($translate['slug']) 
-                        ? Str::slug($translate['slug']) 
-                        : Str::slug($translate['title']),
-                    'card_image' => $cardImagePath,
-                    'card_image_alt_text' => $translate['card_image_alt_text'] ?? null,
-                    'inner_image' => $innerImagePath,
-                    'inner_image_alt_text' => $translate['inner_image_alt_text'] ?? null,
-                    'description' => $translate['description'],
-                ]);
-            }
-
-            DB::commit();
+            $this->repository->createCompany(
+                ['status' => $request->input('status', true)],
+                $request->input('translates'),
+                $request
+            );
 
             return redirect()->route('admin.companies.index')
                 ->with('success', 'Kompaniya uğurla əlavə edildi.');
 
         } catch (\Exception $e) {
-            DB::rollback();
             return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
         }
     }
@@ -99,78 +56,20 @@ class CompanyController extends Controller
         return view('admin.companies.edit', compact('company', 'languages'));
     }
 
-    public function update(Request $request, Company $company)
+    public function update(UpdateCompanyRequest $request, Company $company)
     {
-        $request->validate([
-            'translates' => 'required|array',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string|max:255',
-            'translates.*.slug' => [
-                'nullable',
-                'string',
-                'max:255',
-                Rule::unique('company_translates', 'slug')
-                    ->ignore($company->id, 'company_id')
-            ],
-            'translates.*.card_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'translates.*.card_image_alt_text' => 'nullable|string|max:255',
-            'translates.*.inner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'translates.*.inner_image_alt_text' => 'nullable|string|max:255',
-            'translates.*.description' => 'required|string',
-            'status' => 'boolean'
-        ]);
-
         try {
-            DB::beginTransaction();
-
-            $company->status = $request->input('status', true);
-            $company->save();
-
-            foreach ($request->input('translates') as $translate) {
-                $translateData = [
-                    'title' => $translate['title'],
-                    'slug' => !empty($translate['slug']) 
-                        ? Str::slug($translate['slug']) 
-                        : Str::slug($translate['title']),
-                    'card_image_alt_text' => $translate['card_image_alt_text'] ?? null,
-                    'inner_image_alt_text' => $translate['inner_image_alt_text'] ?? null,
-                    'description' => $translate['description'],
-                ];
-
-                // Handle card image
-                if ($request->hasFile("translates.{$translate['language_id']}.card_image")) {
-                    $existingTranslate = $company->translates->where('language_id', $translate['language_id'])->first();
-                    if ($existingTranslate && $existingTranslate->card_image) {
-                        $this->imageService->delete($existingTranslate->card_image);
-                    }
-                    $translateData['card_image'] = $this->imageService->upload($request->file("translates.{$translate['language_id']}.card_image"), 'companies/card');
-                }
-
-                // Handle inner image
-                if ($request->hasFile("translates.{$translate['language_id']}.inner_image")) {
-                    $existingTranslate = $company->translates->where('language_id', $translate['language_id'])->first();
-                    if ($existingTranslate && $existingTranslate->inner_image) {
-                        $this->imageService->delete($existingTranslate->inner_image);
-                    }
-                    $translateData['inner_image'] = $this->imageService->upload($request->file("translates.{$translate['language_id']}.inner_image"), 'companies/inner');
-                }
-
-                CompanyTranslate::updateOrCreate(
-                    [
-                        'company_id' => $company->id,
-                        'language_id' => $translate['language_id']
-                    ],
-                    $translateData
-                );
-            }
-
-            DB::commit();
+            $this->repository->updateCompany(
+                $company,
+                ['status' => $request->input('status', true)],
+                $request->input('translates'),
+                $request
+            );
 
             return redirect()->route('admin.companies.index')
                 ->with('success', 'Kompaniya uğurla yeniləndi.');
 
         } catch (\Exception $e) {
-            DB::rollback();
             return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
         }
     }
@@ -178,18 +77,7 @@ class CompanyController extends Controller
     public function destroy(Company $company)
     {
         try {
-            // Delete all images
-            foreach ($company->translates as $translate) {
-                if ($translate->card_image) {
-                    $this->imageService->delete($translate->card_image);
-                }
-                if ($translate->inner_image) {
-                    $this->imageService->delete($translate->inner_image);
-                }
-            }
-
-            $company->delete();
-
+            $this->repository->deleteCompany($company);
             return redirect()->route('admin.companies.index')
                 ->with('success', 'Kompaniya uğurla silindi.');
 
@@ -206,10 +94,7 @@ class CompanyController extends Controller
         ]);
 
         try {
-            foreach ($request->input('order') as $index => $id) {
-                Company::where('id', $id)->update(['order' => $index + 1]);
-            }
-
+            $this->repository->reorderCompanies($request->input('order'));
             return response()->json(['success' => true]);
 
         } catch (\Exception $e) {
@@ -217,9 +102,6 @@ class CompanyController extends Controller
         }
     }
 
-    /**
-     * Company product management
-     */
     public function actions(Company $company, Request $request)
     {
         $company->load(['translates.language']);
@@ -237,7 +119,6 @@ class CompanyController extends Controller
         }
 
         $products = $query->paginate(20);
-
         return view('admin.companies.actions', compact('company', 'products'));
     }
 
@@ -248,23 +129,14 @@ class CompanyController extends Controller
         ]);
 
         try {
-            $existing = CompanyProduct::where('company_id', $company->id)
-                ->where('product_id', $request->product_id)
-                ->first();
+            $result = $this->repository->addProductToCompany($company, $request->product_id);
 
-            if ($existing) {
+            if (!$result) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Product is already added to this company'
                 ], 400);
             }
-
-            CompanyProduct::create([
-                'company_id' => $company->id,
-                'product_id' => $request->product_id,
-                'action_id' => null,
-                'is_action_product' => false,
-            ]);
 
             return response()->json([
                 'success' => true,
@@ -286,9 +158,7 @@ class CompanyController extends Controller
         ]);
 
         try {
-            CompanyProduct::where('company_id', $company->id)
-                ->where('product_id', $request->product_id)
-                ->delete();
+            $this->repository->removeProductFromCompany($company, $request->product_id);
 
             return response()->json([
                 'success' => true,

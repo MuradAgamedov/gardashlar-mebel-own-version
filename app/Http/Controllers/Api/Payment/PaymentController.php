@@ -537,4 +537,79 @@ class PaymentController extends Controller
             return [];
         }
     }
+
+
+    /**
+ * 🔹 Ödənişin vəziyyətini almaq (United Payment API)
+ */
+public function getPaymentStatus(Request $request)
+{
+    try {
+        $data = $request->validate([
+            'order_id' => 'required|exists:orders,order_id',
+        ]);
+
+        $order = Order::where('order_id', $data['order_id'])->firstOrFail();
+        $baseUrl = env('UNITED_PAYMENT_API_URL', 'https://vpos.unitedpayment.az/api');
+
+        // API token ilə müraciət
+        $payload = [
+            'clientOrderId' => (string) $order->order_id
+        ];
+
+        $response = PaymentLoginHelper::withAuth()->post($baseUrl . '/transactions/transaction-status-by-order-id-detailed', $payload);
+
+        if (!$response->successful()) {
+            Log::error('Payment Status API Error', [
+                'order_id' => $order->order_id,
+                'response' => $response->body(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'API sorğusu uğursuz oldu',
+                'data' => json_decode($response->body(), true),
+            ], $response->status());
+        }
+
+        $data = $response->json();
+
+        // Log
+        Log::info('Payment Status', [
+            'order_id' => $order->order_id,
+            'status_data' => $data,
+        ]);
+
+        // Sifariş statusunu da yeniləyək (əgər istəyirsənsə)
+        if (!empty($data['status'])) {
+            $order->update([
+                'payment_status' => strtolower($data['status']),
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ödəniş statusu uğurla alındı',
+            'data' => $data,
+        ]);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation error',
+            'errors'  => $e->errors(),
+        ], 422);
+    } catch (\Exception $e) {
+        Log::error('Get Payment Status failed', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+}
+
 }
