@@ -13,6 +13,6 @@ class SimpleImageRepository extends BaseRepository
 
     public function getImages()
     {
-        return $this->GetData($this->simpleImage, ['translates.language'])->get();
+        return $this->simpleImage::with(['translates.language'])->get();
     }
 }

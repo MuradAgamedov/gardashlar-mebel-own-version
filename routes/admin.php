@@ -72,6 +72,7 @@ Route::prefix('')->name('admin.')->group(function () {
         require __DIR__.'/web/social-networks.php';
         require __DIR__.'/web/currencies.php';
         require __DIR__.'/web/actions.php';
+        require __DIR__.'/web/all-seo-pages.php';
 
        
     });
