@@ -40,8 +40,7 @@
                             <h1>Hello, Admin <img src="{{ asset('admin/assets/images/dashboard-1/hand.png') }}" alt=""/></h1>
                         </div>
                         <p>Welcome back! Here's your system overview for today.</p>
-                        <div class="d-flex align-center justify-content-between">
-                            <a class="btn btn-pill btn-primary" href="#">Dashboard</a>
+                        <div class="d-flex align-center justify-content-end">
                             <span>
                                 <svg class="stroke-icon">
                                     <use href="{{ asset('admin/assets/svg/icon-sprite.svg#watch') }}"></use>
