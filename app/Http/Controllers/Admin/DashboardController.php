@@ -95,7 +95,7 @@ class DashboardController extends Controller
         $topProducts = Product::select('products.*')
             ->selectSub(function ($query) {
                 $query->from('orders')
-                    ->whereJsonContains('product_ids', \DB::raw('products.id'))
+                    ->whereRaw('JSON_CONTAINS(product_ids, CAST(products.id AS JSON))')
                     ->whereMonth('created_at', Carbon::now()->month)
                     ->selectRaw('count(*)');
             }, 'orders_count')
