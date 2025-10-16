@@ -30,10 +30,11 @@ class ProductPageCategoryRepository extends BaseRepository
             ->get();
     }
 
-    // Səhifə kateqoriyasında olmayan kateqoriyaları gətir
+    // Səhifə kateqoriyasında olmayan kateqoriyaları gətir (sadəcə parent kategoriyalar)
     public function getCategoriesNotInProductPage()
     {
         return ProductCategory::with('translates.language')
+            ->whereNull('parent_id') // Sadəcə parent kategoriyalar
             ->whereNotExists(function ($query) {
                 $query->select(DB::raw(1))
                       ->from('product_page_categories')
@@ -43,10 +44,11 @@ class ProductPageCategoryRepository extends BaseRepository
             ->get();
     }
 
-    // Edit üçün kateqoriyaları gətir (cari və istifadə olunmayanlar)
+    // Edit üçün kateqoriyaları gətir (cari və istifadə olunmayanlar, sadəcə parent kategoriyalar)
     public function getCategoriesForEdit($currentCategoryId)
     {
         return ProductCategory::with('translates.language')
+            ->whereNull('parent_id') // Sadəcə parent kategoriyalar
             ->where(function ($query) use ($currentCategoryId) {
                 $query->where('id', $currentCategoryId)
                       ->orWhereNotExists(function ($subQuery) {

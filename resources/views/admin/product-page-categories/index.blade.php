@@ -47,7 +47,6 @@
                             <h5>Categories to Display on Product Page</h5>
                             <a href="{{ route('admin.product-page-categories.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Category
                             </a>
                         </div>
                     </div>
