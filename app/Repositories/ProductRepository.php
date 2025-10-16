@@ -14,17 +14,34 @@ class ProductRepository extends BaseRepository
     {
     }
 
-    // Məhsulları filtrlə və gətir
+    // Məhsulları filtrlə və gətir - Optimized
     public function getProducts($request)
     {
-        $query = $this->product->with(['categories', 'types', 'translates.language', 'tags']);
+        // Sadəcə lazım olan əlaqələri yüklə
+        $query = $this->product->select(['id', 'price', 'discount_price', 'status', 'view_count', 'created_at'])
+            ->with([
+                'translates' => function($q) {
+                    $q->select(['product_id', 'language_id', 'title', 'slug'])
+                      ->where('language_id', 1); // Sadəcə default dil
+                },
+                'categories' => function($q) {
+                    $q->select(['id'])->with(['translates' => function($tq) {
+                        $tq->select(['product_category_id', 'title'])->where('language_id', 1);
+                    }]);
+                },
+                'types' => function($q) {
+                    $q->select(['id'])->with(['translates' => function($tq) {
+                        $tq->select(['product_type_id', 'title'])->where('language_id', 1);
+                    }]);
+                }
+            ]);
         
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->whereHas('translates', function($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                  ->where('language_id', 1); // Default dildə axtarış
             });
         }
         
@@ -47,7 +64,7 @@ class ProductRepository extends BaseRepository
             $query->where('status', $request->input('status'));
         }
         
-        return $query->orderBy('id', 'desc')->paginate(30);
+        return $query->orderBy('id', 'desc')->paginate(15); // Pagination azaldıldı
     }
 
     // Aktiv alt kateqoriyaları gətir

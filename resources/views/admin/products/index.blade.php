@@ -162,34 +162,23 @@
                                                             $firstTranslation = $product->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
-                                                        @if($product->tags->count() > 0)
-                                                            <div class="mt-1">
-                                                                @foreach($product->tags->take(3) as $tag)
-                                                                    <span class="badge text-dark me-1" style="font-size: 10px; ">
-                                                                        {{ $tag->translate()->title ?? 'No title' }}
-                                                                    </span>
-                                                                @endforeach
-                                                                @if($product->tags->count() > 3)
-                                                                    <span class="badge bg-secondary" style="font-size: 10px; ">
-                                                                        +{{ $product->tags->count() - 3 }}
-                                                                    </span>
-                                                                @endif
-                                                            </div>
-                                                        @endif
+                                                        <div class="mt-1">
+                                                            <small class="text-muted">ID: {{ $product->id }}</small>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
                                                 @if($product->categories->count() > 0)
                                                     <div class="d-flex flex-wrap gap-1">
-                                                        @foreach($product->categories->take(3) as $category)
+                                                        @foreach($product->categories->take(2) as $category)
                                                             <span class="badge badge-light-primary">
-                                                                {{ $category->translate()->title ?? 'No title' }}
+                                                                {{ $category->translates->first()->title ?? 'No title' }}
                                                             </span>
                                                         @endforeach
-                                                        @if($product->categories->count() > 3)
+                                                        @if($product->categories->count() > 2)
                                                             <span class="badge badge-light-secondary">
-                                                                +{{ $product->categories->count() - 3 }}
+                                                                +{{ $product->categories->count() - 2 }}
                                                             </span>
                                                         @endif
                                                     </div>
@@ -200,14 +189,14 @@
                                             <td>
                                                 @if($product->types->count() > 0)
                                                     <div class="d-flex flex-wrap gap-1">
-                                                        @foreach($product->types->take(3) as $type)
+                                                        @foreach($product->types->take(2) as $type)
                                                             <span class="badge badge-light-info">
-                                                                {{ $type->translate()->title ?? 'No title' }}
+                                                                {{ $type->translates->first()->title ?? 'No title' }}
                                                             </span>
                                                         @endforeach
-                                                        @if($product->types->count() > 3)
+                                                        @if($product->types->count() > 2)
                                                             <span class="badge badge-light-secondary">
-                                                                +{{ $product->types->count() - 3 }}
+                                                                +{{ $product->types->count() - 2 }}
                                                             </span>
                                                         @endif
                                                     </div>
