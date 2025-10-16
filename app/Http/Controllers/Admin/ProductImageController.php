@@ -90,7 +90,7 @@ class ProductImageController extends Controller
             // Find all products with same slugs (excluding current product)
             $sameSlugProducts = Product::whereHas('translates', function ($q) use ($currentProductSlugs) {
                 $q->whereIn('slug', $currentProductSlugs);
-            })->where('id', '!=', $product->id)->get();
+            })->where('id', '!=', $product->id)->with('translates')->get();
 
             foreach ($sameSlugProducts as $sameProduct) {
                 // Create corresponding images for same slug products
