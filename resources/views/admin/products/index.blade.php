@@ -73,15 +73,16 @@
                             <div class="col-md-2">
     <label for="type" class="form-label">Type</label>
     <select class="form-select" id="type" name="type">
+        <option value="" {{ !request()->has('type') || request('type') == '' ? 'selected' : '' }}>
+            All Types
+        </option>
         @if($types->count() > 0)
-            @foreach($types as $index => $type)
+            @foreach($types as $type)
                 <option value="{{ $type->id }}"
-                    {{ (request()->has('type') ? request('type') == $type->id : $index == 0) ? 'selected' : '' }}>
+                    {{ request()->has('type') && request('type') == $type->id ? 'selected' : '' }}>
                     {{ $type->translate()->title ?? 'No title' }}
                 </option>
             @endforeach
-        @else
-            <option value="">No Types Available</option>
         @endif
     </select>
 </div>
