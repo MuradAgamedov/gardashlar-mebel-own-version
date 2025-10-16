@@ -8,11 +8,12 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductCompare;
 use App\Models\ProductColor;
-
 use App\Models\Language;
+use App\Traits\LocaleFromHeader;
 
 class CompareController extends Controller
 {
+    use LocaleFromHeader;
     /**
      * Add a product to the user's compare list
      */
@@ -68,7 +69,7 @@ class CompareController extends Controller
             ], 401);
         }
     
-        $languageId = $request->header('language_id') ?? Language::getMainLanguage()->id;
+        $languageId = $this->getLanguageIdFromHeader($request);
     
         // 🔹 Compare product IDs
         $compareProductIds = ProductCompare::where('user_id', $user->id)->pluck('product_id');
@@ -80,14 +81,23 @@ class CompareController extends Controller
             })
             ->active()
             ->ordered()
+            ->with([
+                'translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                },
+                'parent.translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                }
+            ])
             ->get()
             ->map(function ($category) use ($languageId) {
-                $translate = $category->translate($languageId);
+                $translate = $category->translates->first();
+                $parentTranslate = $category->parent ? $category->parent->translates->first() : null;
                 return [
                     'id' => $category->id,
                     'title' => $translate ? $translate->title : null,
                     'slug' => $translate ? $translate->slug : null,
-                    'parent_slug' => $category->parent ? $category->parent->translate($languageId)->slug ?? null : null,
+                    'parent_slug' => $parentTranslate ? $parentTranslate->slug : null,
                 ];
             });
     
@@ -123,12 +133,38 @@ class CompareController extends Controller
             })
             ->active()
             ->ordered()
+            ->with([
+                'translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                },
+                'images' => function($q) {
+                    $q->where('status', true)->orderBy('order');
+                },
+                'details.translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                },
+                'detailValues.translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                },
+                'detailValues.details.translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                },
+                'types.translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                },
+                'categories.translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                },
+                'categories.parent.translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                }
+            ])
             ->get()
             ->map(function ($product) use ($languageId, $user) {
-                $translation = $product->translate($languageId);
+                $translation = $product->translates->first();
     
-                $mainImage = $product->images()->where('status', true)->where('is_main', true)->first()
-                    ?? $product->images()->where('status', true)->first();
+                $mainImage = $product->images->where('is_main', true)->first()
+                    ?? $product->images->first();
     
                 $cardImage = $mainImage && $mainImage->image
                     ? asset('storage/' . $mainImage->image)
@@ -139,8 +175,8 @@ class CompareController extends Controller
        
     
                 // 🔹 Məhsul detalları
-                $details = $product->details()->ordered()->get()->map(function ($detail) use ($languageId) {
-                    $tr = $detail->translate($languageId);
+                $details = $product->details->sortBy('order')->map(function ($detail) use ($languageId) {
+                    $tr = $detail->translates->first();
                     return [
                         'id' => $detail->id,
                         'keyword' => $tr ? $tr->keyword : null,
@@ -148,11 +184,11 @@ class CompareController extends Controller
                     ];
                 });
     
-                $detailValues = $product->detailValues()->ordered()->get()->map(function ($value) use ($languageId) {
-                    $tr = $value->translate($languageId);
+                $detailValues = $product->detailValues->sortBy('order')->map(function ($value) use ($languageId) {
+                    $tr = $value->translates->first();
     
-                    $nestedDetails = $value->details()->ordered()->get()->map(function ($d) use ($languageId) {
-                        $dTr = $d->translate($languageId);
+                    $nestedDetails = $value->details->sortBy('order')->map(function ($d) use ($languageId) {
+                        $dTr = $d->translates->first();
                         return [
                             'id' => $d->id,
                             'keyword' => $dTr ? $dTr->keyword : null,
@@ -169,7 +205,7 @@ class CompareController extends Controller
     
                 // 🔹 Məhsul tipləri
                 $productTypes = $product->types->map(function ($type) use ($languageId) {
-                    $tr = $type->translates()->where('language_id', $languageId)->first();
+                    $tr = $type->translates->first();
                     return [
                         'id' => $type->id,
                         'title' => $tr ? $tr->title : '',
@@ -178,7 +214,7 @@ class CompareController extends Controller
                 });
     
                 // 🔹 Mövcud rənglər
-                $availableColors = $product->images()
+                $availableColors = $product->images
                     ->whereNotNull('product_color_id')
                     ->pluck('product_color_id')
                     ->unique()
@@ -247,7 +283,7 @@ class CompareController extends Controller
     public function checkCompareProducts(Request $request)
 {
     try {
-        $languageId = $request->header('language_id') ?? Language::getMainLanguage()->id;
+        $languageId = $this->getLanguageIdFromHeader($request);
 
         // 🔹 Compare product IDs (auth olmadan)
         $compareProductIds = $request->product_ids;
@@ -268,14 +304,23 @@ class CompareController extends Controller
             ->whereHas('products', fn($q) => $q->whereIn('products.id', $compareProductIds)->active())
             ->active()
             ->ordered()
+            ->with([
+                'translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                },
+                'parent.translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                }
+            ])
             ->get()
             ->map(function ($category) use ($languageId) {
-                $translate = $category->translate($languageId);
+                $translate = $category->translates->first();
+                $parentTranslate = $category->parent ? $category->parent->translates->first() : null;
                 return [
                     'id' => $category->id,
                     'title' => $translate ? $translate->title : null,
                     'slug' => $translate ? $translate->slug : null,
-                    'parent_slug' => $category->parent ? $category->parent->translate($languageId)->slug ?? null : null,
+                    'parent_slug' => $parentTranslate ? $parentTranslate->slug : null,
                 ];
             });
 
