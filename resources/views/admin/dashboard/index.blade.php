@@ -32,7 +32,7 @@
                 <div class="card welcome-banner">
                     <div class="card-header p-0 card-no-border">
                         <div class="welcome-card">
-                            <img class="w-100 img-fluid" src="{{ asset('admin/assets/images/dashboard_image.avif') }}" alt=""/>
+                            <img class="w-100 h-100" src="{{ asset('admin/assets/images/dashboard_image.avif') }}" alt=""/>
                         </div>
                     </div>
                     <div class="card-body">
