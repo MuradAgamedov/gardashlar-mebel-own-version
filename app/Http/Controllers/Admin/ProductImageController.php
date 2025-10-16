@@ -57,6 +57,8 @@ class ProductImageController extends Controller
             'product_color_id' => 'nullable|exists:product_colors,id'
         ]);
         
+        // Load product translations
+        $product->load('translates');
 
         try {
             $uploadedImages = [];
@@ -72,7 +74,13 @@ class ProductImageController extends Controller
                     'status' => true
                 ]);
 
-                $uploadedImages[] = $imagePath;
+                // Create alt text translations from product title
+                $this->createAltTextFromProductTitle($productImage, $product);
+
+                $uploadedImages[] = [
+                    'path' => $imagePath,
+                    'image_id' => $productImage->id
+                ];
             }
 
             // === Synchronize same slug products ===
@@ -86,13 +94,16 @@ class ProductImageController extends Controller
 
             foreach ($sameSlugProducts as $sameProduct) {
                 // Create corresponding images for same slug products
-                foreach ($uploadedImages as $imagePath) {
-                    ProductImage::create([
+                foreach ($uploadedImages as $imageData) {
+                    $sameProductImage = ProductImage::create([
                         'product_id' => $sameProduct->id,
                         'product_color_id' => $request->input('product_color_id'),
-                        'image' => $imagePath,
+                        'image' => $imageData['path'],
                         'status' => true
                     ]);
+
+                    // Create alt text translations from same product's title
+                    $this->createAltTextFromProductTitle($sameProductImage, $sameProduct);
                 }
             }
 
@@ -399,6 +410,24 @@ class ProductImageController extends Controller
                 'success' => false,
                 'error' => $e->getMessage()
             ]);
+        }
+    }
+
+    /**
+     * Create alt text translations from product title
+     */
+    private function createAltTextFromProductTitle(ProductImage $productImage, Product $product)
+    {
+        // Get all product translations
+        $productTranslations = $product->translates;
+        
+        foreach ($productTranslations as $productTranslate) {
+            if (!empty($productTranslate->title)) {
+                $productImage->translates()->create([
+                    'language_id' => $productTranslate->language_id,
+                    'alt_text' => $productTranslate->title
+                ]);
+            }
         }
     }
 }
