@@ -131,6 +131,44 @@ class PageController extends Controller
         }
     }
 
+    /**
+     * Delete OpenGraph image
+     */
+    public function deleteOpenGraphImage(string $id)
+    {
+        try {
+            $page = $this->repository->findPage($id);
+            
+            if ($page->opengraph_image) {
+                // Delete the image file
+                $this->imageService->delete($page->opengraph_image);
+                
+                // Update database
+                $page->update([
+                    'opengraph_image' => null,
+                    'opengraph_image_width' => null,
+                    'opengraph_image_height' => null
+                ]);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'OpenGraph image deleted successfully!'
+                ]);
+            }
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'No OpenGraph image found to delete.'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error deleting OpenGraph image: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function generateSlug(Request $request)
     {
         try {

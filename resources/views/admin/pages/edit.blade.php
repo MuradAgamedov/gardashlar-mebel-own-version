@@ -86,10 +86,16 @@
                                                          alt="OpenGraph Image" 
                                                          class="img-fluid rounded"
                                                          style="max-height: 150px;">
-                                                    <div class="mt-2">
+                                                    <div class="mt-2 d-flex justify-content-between align-items-center">
                                                         <small class="text-muted">
                                                             Size: {{ $page->opengraph_image_width ?? 'N/A' }}x{{ $page->opengraph_image_height ?? 'N/A' }}px
                                                         </small>
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-outline-danger"
+                                                                onclick="deleteOpenGraphImage({{ $page->id }})"
+                                                                title="Delete OpenGraph Image">
+                                                            <i class="material-icons-outlined">delete</i>
+                                                        </button>
                                                     </div>
                                                 @else
                                                     <div class="text-center text-muted py-4">
@@ -456,6 +462,63 @@ function previewOpenGraphImage(input) {
         
         reader.readAsDataURL(input.files[0]);
     }
+}
+
+// Delete OpenGraph image function
+function deleteOpenGraphImage(pageId) {
+    if (!confirm('Are you sure you want to delete the OpenGraph image?')) {
+        return;
+    }
+    
+    fetch(`{{ route('admin.pages.delete-opengraph-image', ':pageId') }}`.replace(':pageId', pageId), {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update preview area
+            document.getElementById('opengraph-preview').innerHTML = `
+                <div class="text-center text-muted py-4">
+                    <i class="material-icons-outlined" style="font-size: 48px;">image</i>
+                    <p class="mb-0">No OpenGraph image uploaded</p>
+                </div>
+            `;
+            
+            // Show success message
+            showAlert('success', data.message);
+        } else {
+            showAlert('danger', data.message || 'Error deleting image');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('danger', 'Error deleting OpenGraph image');
+    });
+}
+
+// Show alert function
+function showAlert(type, message) {
+    const alertHtml = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+    
+    const container = document.querySelector('.container-fluid');
+    container.insertAdjacentHTML('afterbegin', alertHtml);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        const alert = document.querySelector('.alert');
+        if (alert) {
+            alert.remove();
+        }
+    }, 5000);
 }
 </script>
 
