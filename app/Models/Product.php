@@ -114,11 +114,11 @@ class Product extends Model
 
     /**
      * Get orders that contain this product
-     * Since orders now use product_ids (JSON), we need to use whereJsonContains
+     * Since orders now use product_ids (JSON), we need a custom relationship
      */
     public function orders()
     {
-        return $this->hasMany(Order::class)->whereJsonContains('product_ids', $this->id);
+        return Order::whereJsonContains('product_ids', $this->id);
     }
 
     // Scopes
