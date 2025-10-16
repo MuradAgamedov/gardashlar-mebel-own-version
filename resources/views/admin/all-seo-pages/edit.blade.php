@@ -58,7 +58,7 @@
                                 <div class="col-md-6">
                                     <div class="card border">
                                         <div class="card-header bg-light">
-                                            <h5 class="mb-0">SEO Settings</h5>
+                                            <h5 style="color: black" class="mb-0">SEO Settings</h5>
                                         </div>
                                         <div class="card-body">
                                             <!-- Is Indexed -->
@@ -96,7 +96,7 @@
                                 <div class="col-md-6">
                                     <div class="card border">
                                         <div class="card-header bg-light">
-                                            <h5 class="mb-0">Page Header Code</h5>
+                                            <h5 style="color: black" class="mb-0">Page Header Code</h5>
                                         </div>
                                         <div class="card-body">
                                             <div class="form-group">
@@ -123,7 +123,7 @@
                                 <div class="col-12">
                                     <div class="card border">
                                         <div class="card-header bg-light">
-                                            <h5 class="mb-0">Page Footer Code</h5>
+                                            <h5 style="color: black" class="mb-0">Page Footer Code</h5>
                                         </div>
                                         <div class="card-body">
                                             <div class="form-group">
@@ -145,7 +145,7 @@
                                 </div>
                             </div>
 
-                            <!-- Submit Button -->
+                            <!-- mb-0 Button -->
                             <div class="row mt-4">
                                 <div class="col-12">
                                     <div class="text-end">
