@@ -32591,7 +32591,7 @@ footer p .footer-icon {
   background-color: var(--theme-default);
   border-radius: 24px 24px 0 0;
   overflow: hidden;
-  height: 230px;
+  height: 180px;
   display: flex;
   align-items: center;
   position: relative;
