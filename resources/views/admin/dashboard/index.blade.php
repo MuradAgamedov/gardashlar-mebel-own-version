@@ -244,52 +244,64 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-2 col-sm-4 mb-3">
-                                <div class="text-center">
-                                    <div class="badge bg-danger rounded-pill mb-2" style="font-size: 1.2em;">
-                                        {{ $notifications['unread_messages'] }}
+                                <a href="{{ route('admin.contact-messages.index') }}" class="text-decoration-none">
+                                    <div class="text-center">
+                                        <div class="badge bg-danger rounded-pill mb-2" style="font-size: 1.2em;">
+                                            {{ $notifications['unread_messages'] }}
+                                        </div>
+                                        <p class="mb-0 small text-dark">Unread Messages</p>
                                     </div>
-                                    <p class="mb-0 small">Unread Messages</p>
-                                </div>
+                                </a>
                             </div>
                             <div class="col-md-2 col-sm-4 mb-3">
-                                <div class="text-center">
-                                    <div class="badge bg-warning rounded-pill mb-2" style="font-size: 1.2em;">
-                                        {{ $notifications['unread_partner_forms'] }}
+                                <a href="{{ route('admin.become-a-partner-forms.index') }}" class="text-decoration-none">
+                                    <div class="text-center">
+                                        <div class="badge bg-warning rounded-pill mb-2" style="font-size: 1.2em;">
+                                            {{ $notifications['unread_partner_forms'] }}
+                                        </div>
+                                        <p class="mb-0 small text-dark">Partner Forms</p>
                                     </div>
-                                    <p class="mb-0 small">Partner Forms</p>
-                                </div>
+                                </a>
                             </div>
                             <div class="col-md-2 col-sm-4 mb-3">
-                                <div class="text-center">
-                                    <div class="badge bg-info rounded-pill mb-2" style="font-size: 1.2em;">
-                                        {{ $notifications['unread_investor_forms'] }}
+                                <a href="{{ route('admin.become-a-investor-forms.index') }}" class="text-decoration-none">
+                                    <div class="text-center">
+                                        <div class="badge bg-info rounded-pill mb-2" style="font-size: 1.2em;">
+                                            {{ $notifications['unread_investor_forms'] }}
+                                        </div>
+                                        <p class="mb-0 small text-dark">Investor Forms</p>
                                     </div>
-                                    <p class="mb-0 small">Investor Forms</p>
-                                </div>
+                                </a>
                             </div>
                             <div class="col-md-2 col-sm-4 mb-3">
-                                <div class="text-center">
-                                    <div class="badge bg-success rounded-pill mb-2" style="font-size: 1.2em;">
-                                        {{ $notifications['unread_suggestions'] }}
+                                <a href="{{ route('admin.suggestions-complaints-forms.index') }}" class="text-decoration-none">
+                                    <div class="text-center">
+                                        <div class="badge bg-success rounded-pill mb-2" style="font-size: 1.2em;">
+                                            {{ $notifications['unread_suggestions'] }}
+                                        </div>
+                                        <p class="mb-0 small text-dark">Suggestions</p>
                                     </div>
-                                    <p class="mb-0 small">Suggestions</p>
-                                </div>
+                                </a>
                             </div>
                             <div class="col-md-2 col-sm-4 mb-3">
-                                <div class="text-center">
-                                    <div class="badge bg-primary rounded-pill mb-2" style="font-size: 1.2em;">
-                                        {{ $notifications['unread_vacancy_forms'] }}
+                                <a href="{{ route('admin.vacancy-forms.index') }}" class="text-decoration-none">
+                                    <div class="text-center">
+                                        <div class="badge bg-primary rounded-pill mb-2" style="font-size: 1.2em;">
+                                            {{ $notifications['unread_vacancy_forms'] }}
+                                        </div>
+                                        <p class="mb-0 small text-dark">Vacancy Forms</p>
                                     </div>
-                                    <p class="mb-0 small">Vacancy Forms</p>
-                                </div>
+                                </a>
                             </div>
                             <div class="col-md-2 col-sm-4 mb-3">
-                                <div class="text-center">
-                                    <div class="badge bg-secondary rounded-pill mb-2" style="font-size: 1.2em;">
-                                        {{ $monthlyStats['orders_this_month'] }}
+                                <a href="{{ route('admin.orders.index') }}" class="text-decoration-none">
+                                    <div class="text-center">
+                                        <div class="badge bg-secondary rounded-pill mb-2" style="font-size: 1.2em;">
+                                            {{ $monthlyStats['orders_this_month'] }}
+                                        </div>
+                                        <p class="mb-0 small text-dark">Orders This Month</p>
                                     </div>
-                                    <p class="mb-0 small">Orders This Month</p>
-                                </div>
+                                </a>
                             </div>
                         </div>
                     </div>
