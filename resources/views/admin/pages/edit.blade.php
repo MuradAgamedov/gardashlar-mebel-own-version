@@ -51,7 +51,8 @@
                                            class="form-control @error('keyword') is-invalid @enderror" 
                                            name="keyword" 
                                            value="{{ old('keyword', $page->keyword) }}" 
-                                           placeholder="Enter page keyword">
+                                           placeholder="Enter page keyword"
+                                           disabled>
                                     @error('keyword')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
