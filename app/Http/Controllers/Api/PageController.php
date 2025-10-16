@@ -14,48 +14,7 @@ class PageController extends Controller
 {
     use LocaleFromHeader;
 
-    /**
-     * @OA\Get(
-     *     path="/api/pages",
-     *     operationId="getAllPages",
-     *     tags={"Pages"},
-     *     summary="Get all pages",
-     *     description="Returns all translated pages based on language ID sent via 'locale' header",
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language_id from languages api",
-     *         required=false,
-     *         @OA\Schema(
-     *             type="integer",
-     *             example=1
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful response",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="keyword", type="string", example="about-us"),
-     *                     @OA\Property(property="title", type="string", example="Haqqımızda"),
-     *                     @OA\Property(property="slug", type="string", example="haqqimizda"),
-     *                     @OA\Property(property="seo_title", type="string", example="Haqqımızda"),
-     *                     @OA\Property(property="seo_keywords", type="string", example="Haqqımızda, Bizim haqqımızda"),
-     *                     @OA\Property(property="seo_description", type="string", example="Şirkət haqqında ümumi məlumat")
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(response=500, description="Internal server error")
-     * )
-     */
+   
     public function index(Request $request): JsonResponse
     {
         try {
@@ -76,6 +35,12 @@ class PageController extends Controller
                             'seo_title'       => $translate->seo_title ?? null,
                             'seo_keywords'    => $translate->seo_keywords ?? null,
                             'seo_description' => $translate->seo_description ?? null,
+                            'opengraph_title' => $translate->opengraph_title ?? null,
+                            'opengraph_description' => $translate->opengraph_description ?? null,
+                            'opengraph_image' => $page->opengraph_image ? asset('storage/' . $page->opengraph_image) : null,
+                            'opengraph_image_width' => $page->opengraph_image_width ?? null,
+                            'opengraph_image_height' => $page->opengraph_image_height ?? null,
+                            'opengraph_image_alt_text' => $translate->opengraph_image_alt_text ?? null,
                         ];
                     });
             });
@@ -95,53 +60,6 @@ class PageController extends Controller
         }
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/pages/{keyword}",
-     *     operationId="getPageByKeyword",
-     *     tags={"Pages"},
-     *     summary="Get a page by keyword",
-     *     description="Returns a translated page by keyword and language ID from 'locale' header",
-     *     @OA\Parameter(
-     *         name="keyword",
-     *         in="path",
-     *         description="The keyword of the page",
-     *         required=true,
-     *         @OA\Schema(type="string", example="about-us")
-     *     ),
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language_id from languages api",
-     *         required=false,
-     *         @OA\Schema(
-     *             type="integer",
-     *             example=1
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful response",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=2),
-     *                 @OA\Property(property="title", type="string", example="Haqqımızda"),
-     *                 @OA\Property(property="slug", type="string", example="haqqimizda"),
-     *                 @OA\Property(property="seo_title", type="string", example="Haqqımızda"),
-     *                 @OA\Property(property="seo_keywords", type="string", example="Haqqımızda, Bizim haqqımızda"),
-     *                 @OA\Property(property="seo_description", type="string", example="Şirkət haqqında ümumi məlumat")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(response=400, description="Keyword parameter is required"),
-     *     @OA\Response(response=404, description="Page not found"),
-     *     @OA\Response(response=500, description="Internal server error")
-     * )
-     */
     public function findByKeyword(Request $request, $keyword): JsonResponse
     {
         if (empty($keyword)) {
@@ -175,6 +93,12 @@ class PageController extends Controller
                     'seo_title'       => $translate->seo_title ?? null,
                     'seo_keywords'    => $translate->seo_keywords ?? null,
                     'seo_description' => $translate->seo_description ?? null,
+                    'opengraph_title' => $translate->opengraph_title ?? null,
+                    'opengraph_description' => $translate->opengraph_description ?? null,
+                    'opengraph_image' => $page->opengraph_image ? asset('storage/' . $page->opengraph_image) : null,
+                    'opengraph_image_width' => $page->opengraph_image_width ?? null,
+                    'opengraph_image_height' => $page->opengraph_image_height ?? null,
+                    'opengraph_image_alt_text' => $translate->opengraph_image_alt_text ?? null,
                 ];
             });
 
