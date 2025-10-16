@@ -18,19 +18,19 @@ class ProductRepository extends BaseRepository
     public function getProducts($request)
     {
         // Sadəcə lazım olan əlaqələri yüklə
-        $query = $this->product->select(['id', 'price', 'discount_price', 'status', 'view_count', 'created_at'])
+        $query = $this->product->select(['products.id', 'products.price', 'products.discount_price', 'products.status', 'products.view_count', 'products.created_at'])
             ->with([
                 'translates' => function($q) {
                     $q->select(['product_id', 'language_id', 'title', 'slug'])
                       ->where('language_id', 1); // Sadəcə default dil
                 },
                 'categories' => function($q) {
-                    $q->select(['id'])->with(['translates' => function($tq) {
+                    $q->select(['product_categories.id'])->with(['translates' => function($tq) {
                         $tq->select(['product_category_id', 'title'])->where('language_id', 1);
                     }]);
                 },
                 'types' => function($q) {
-                    $q->select(['id'])->with(['translates' => function($tq) {
+                    $q->select(['product_types.id'])->with(['translates' => function($tq) {
                         $tq->select(['product_type_id', 'title'])->where('language_id', 1);
                     }]);
                 }
@@ -61,10 +61,10 @@ class ProductRepository extends BaseRepository
         
         // Status filter
         if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
+            $query->where('products.status', $request->input('status'));
         }
         
-        return $query->orderBy('id', 'desc')->paginate(15); // Pagination azaldıldı
+        return $query->orderBy('products.id', 'desc')->paginate(15); // Pagination azaldıldı
     }
 
     // Aktiv alt kateqoriyaları gətir
