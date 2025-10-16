@@ -420,7 +420,7 @@ class ProductImageController extends Controller
     {
         // Get all product translations
         $productTranslations = $product->translates;
-        
+        dd($productTranslations);
         foreach ($productTranslations as $productTranslate) {
             if (!empty($productTranslate->title)) {
                 $productImage->translates()->create([
