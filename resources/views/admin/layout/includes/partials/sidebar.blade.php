@@ -384,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cacheClearBtn.addEventListener('click', async function() {
       // Disable button and show loading state
       const originalText = this.innerHTML;
-      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i><h6>Clearing...</h6>';
+      this.innerHTML = '<i class="fas fa-sync-alt"></i><h6>Clearing...</h6>';
       this.disabled = true;
       
       try {
