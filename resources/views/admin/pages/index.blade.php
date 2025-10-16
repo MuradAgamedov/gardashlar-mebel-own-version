@@ -44,9 +44,9 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Pages List</h5>
-                            <a href="{{ route('admin.pages.create') }}" class="btn btn-primary">
+                            {{-- <a href="{{ route('admin.pages.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                            </a>
+                            </a> --}}
                         </div>
                     </div>
                     <div class="card-body">
