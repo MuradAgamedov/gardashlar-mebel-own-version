@@ -18,32 +18,7 @@ class AllSeoPagesController extends Controller
         $this->allSeoPagesRepository = $allSeoPagesRepository;
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/all-seo-pages",
-     *     operationId="getAllSeoPages",
-     *     tags={"SEO"},
-     *     summary="Get global SEO settings",
-     *     description="Returns global SEO settings for all pages including indexing, following, header and footer code",
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful response",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="is_indexed", type="boolean", example=true),
-     *                 @OA\Property(property="is_followed", type="boolean", example=true),
-     *                 @OA\Property(property="page_header", type="string", example="<meta name=\"google-site-verification\" content=\"...\" />"),
-     *                 @OA\Property(property="page_footer", type="string", example="<script>console.log('Footer script');</script>")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(response=500, description="Internal server error")
-     * )
-     */
+    
     public function index(): JsonResponse
     {
         try {
