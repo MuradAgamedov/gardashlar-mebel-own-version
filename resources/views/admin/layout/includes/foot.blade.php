@@ -50,8 +50,6 @@
 <!-- alternate page_datatable (if needed) -->
 <script src="{{ asset('admin/assets/js/datatable/datatables/datatable.custom.js') }}"></script>
 
-<!-- theme_customizer -->
-<script src="{{ asset('admin/assets/js/theme-customizer/customizer.js') }}"></script>
 
 <!-- tilt animation -->
 <script src="{{ asset('admin/assets/js/animation/tilt/tilt.jquery.js') }}"></script>
