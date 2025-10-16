@@ -41,12 +41,12 @@ class ProductTypeProductController extends Controller
                     $q->where('product_types.id', $productTypeId);
                 })->where('status', true);
                     
-                if ($homepageOnly) {
-                    $query->whereHas('homePageTypeProducts', function($q) use ($productTypeId) {
-                        $q->where('product_type_id', $productTypeId)
-                          ->where('status', true);
-                    });
-                }
+                // if ($homepageOnly) {
+                //     $query->whereHas('homePageTypeProducts', function($q) use ($productTypeId) {
+                //         $q->where('product_type_id', $productTypeId)
+                //           ->where('status', true);
+                //     });
+                // }
                     
                 return $query->with([
                     'translates' => function($q) use ($languageId) {
