@@ -170,6 +170,13 @@
                                                         </button>
                                                     @endif
                                                     
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-outline-info alt-text-btn"
+                                                            data-id="{{ $image->id }}"
+                                                            title="Edit Alt Text">
+                                                        <i class="material-icons-outlined">text_fields</i>
+                                                    </button>
+                                                    
                                                     <a href="{{ route('admin.products.images.edit', [$product, $image]) }}" 
                                                        class="btn btn-sm btn-outline-warning"
                                                        title="Edit">
@@ -212,6 +219,57 @@
         </div>
     </div>
 </div>
+
+<!-- Alt Text Modal -->
+<div class="modal fade" id="altTextModal" tabindex="-1" aria-labelledby="altTextModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="altTextModalLabel">Edit Alt Text</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="altTextForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <img id="modalImage" src="" alt="Product Image" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-3">Alt Text Translations</h6>
+                            <div id="languageInputs">
+                                @foreach($languages as $index => $language)
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <span class="badge badge-light-primary me-2">{{ $language->lang_code }}</span>
+                                            {{ $language->title }}
+                                        </label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               name="translates[{{ $index }}][alt_text]" 
+                                               placeholder="Enter alt text for {{ $language->title }}"
+                                               data-lang-id="{{ $language->id }}">
+                                        <input type="hidden" name="translates[{{ $index }}][language_id]" value="{{ $language->id }}">
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="material-icons-outlined">cancel</i>
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="material-icons-outlined">save</i>
+                        Save Alt Text
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('styles')
@@ -411,6 +469,118 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+    // Alt Text Modal functionality
+    document.querySelectorAll('.alt-text-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const imageId = this.dataset.id;
+            const imageCard = this.closest('.card');
+            const imageSrc = imageCard.querySelector('img').src;
+            
+            // Set modal image
+            document.getElementById('modalImage').src = imageSrc;
+            
+            // Load existing alt texts
+            loadAltTexts(imageId);
+            
+            // Store image ID for form submission
+            document.getElementById('altTextForm').dataset.imageId = imageId;
+            
+            // Show modal
+            new bootstrap.Modal(document.getElementById('altTextModal')).show();
+        });
+    });
+
+    // Load existing alt texts
+    function loadAltTexts(imageId) {
+        fetch(`/admin/products/{{ $product->id }}/images/${imageId}/alt-texts`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Clear all inputs first
+                    document.querySelectorAll('#languageInputs input[type="text"]').forEach(input => {
+                        input.value = '';
+                    });
+                    
+                    // Fill existing translations
+                    data.translations.forEach(translation => {
+                        const input = document.querySelector(`input[data-lang-id="${translation.language_id}"]`);
+                        if (input) {
+                            input.value = translation.alt_text || '';
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error loading alt texts:', error);
+            });
+    }
+
+    // Handle form submission
+    document.getElementById('altTextForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const imageId = this.dataset.imageId;
+        const formData = new FormData(this);
+        
+        // Convert FormData to JSON
+        const translates = [];
+        const inputs = this.querySelectorAll('input[name*="[alt_text]"]');
+        const hiddenInputs = this.querySelectorAll('input[name*="[language_id]"]');
+        
+        inputs.forEach((input, index) => {
+            translates.push({
+                language_id: hiddenInputs[index].value,
+                alt_text: input.value
+            });
+        });
+
+        fetch(`{{ route('admin.products.images.update-alt-text', ['product' => $product, 'image' => ':imageId']) }}`.replace(':imageId', imageId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ translates: translates })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Hide modal
+                bootstrap.Modal.getInstance(document.getElementById('altTextModal')).hide();
+                
+                // Show success message
+                showAlert('success', data.message);
+            } else {
+                showAlert('danger', data.error || 'An error occurred');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating alt text:', error);
+            showAlert('danger', 'An error occurred while updating alt text');
+        });
+    });
+
+    // Show alert function
+    function showAlert(type, message) {
+        const alertHtml = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        
+        const container = document.querySelector('.container-fluid .row');
+        container.insertAdjacentHTML('beforebegin', alertHtml);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            const alert = document.querySelector('.alert');
+            if (alert) {
+                alert.remove();
+            }
+        }, 5000);
+    }
 });
 </script>
 @endpush 

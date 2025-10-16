@@ -15,7 +15,7 @@ class ProductImageRepository extends BaseRepository
     // Məhsul üçün şəkilləri filtrlə və gətir
     public function getProductImages($product, $request)
     {
-        $query = $product->images()->with('color');
+        $query = $product->images()->with(['color', 'translates.language']);
         
         // Filter by color
         if ($request->has('color_id') && $request->color_id !== '') {

@@ -9,6 +9,7 @@ use App\Models\ProductColor;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 use App\Repositories\ProductImageRepository;
+use App\Repositories\LanguageRepository;
 
 class ProductImageController extends Controller
 {
@@ -16,7 +17,8 @@ class ProductImageController extends Controller
 
     public function __construct(
         ImageService $imageService,
-        public ProductImageRepository $repository
+        public ProductImageRepository $repository,
+        public LanguageRepository $languageRepository
     )
     {
         $this->imageService = $imageService;
@@ -29,9 +31,10 @@ class ProductImageController extends Controller
     {
         $images = $this->repository->getProductImages($product, $request);
         $colors = $this->repository->getAllColors();
+        $languages = $this->languageRepository->getActiveLanguages();
         $currentPage = $request->get('page', 1);
         
-        return view('admin.product-images.index', compact('product', 'images', 'colors', 'currentPage'));
+        return view('admin.product-images.index', compact('product', 'images', 'colors', 'languages', 'currentPage'));
     }
 
     /**
@@ -327,6 +330,75 @@ class ProductImageController extends Controller
             return response()->json(['success' => true, 'message' => 'Main image set successfully. Same slug products synchronized.']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Update alt text for product image
+     */
+    public function updateAltText(Request $request, Product $product, ProductImage $image)
+    {
+        $request->validate([
+            'translates' => 'required|array',
+            'translates.*.language_id' => 'required|exists:languages,id',
+            'translates.*.alt_text' => 'nullable|string|max:255'
+        ]);
+
+        try {
+            // Delete existing translations
+            $image->translates()->delete();
+
+            // Create new translations
+            foreach ($request->translates as $translate) {
+                if (!empty($translate['alt_text'])) {
+                    $image->translates()->create([
+                        'language_id' => $translate['language_id'],
+                        'alt_text' => trim($translate['alt_text'])
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'success' => true, 
+                'message' => 'Alt text updated successfully!'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false, 
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Get alt texts for product image
+     */
+    public function getAltTexts(Product $product, ProductImage $image)
+    {
+        try {
+            $translations = $image->translates()->with('language')->get();
+            
+            return response()->json([
+                'success' => true,
+                'translations' => $translations->map(function($translate) {
+                    return [
+                        'language_id' => $translate->language_id,
+                        'alt_text' => $translate->alt_text,
+                        'language' => [
+                            'id' => $translate->language->id,
+                            'title' => $translate->language->title,
+                            'lang_code' => $translate->language->lang_code
+                        ]
+                    ];
+                })
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 }

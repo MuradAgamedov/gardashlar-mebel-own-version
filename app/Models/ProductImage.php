@@ -6,6 +6,7 @@ use App\Services\ImageService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductImage extends Model
 {
@@ -89,6 +90,26 @@ class ProductImage extends Model
     public function color(): BelongsTo
     {
         return $this->belongsTo(ProductColor::class, 'product_color_id');
+    }
+
+    /**
+     * Translations relationship
+     */
+    public function translates(): HasMany
+    {
+        return $this->hasMany(ProductImageTranslate::class);
+    }
+
+    /**
+     * Get translation for specific language
+     */
+    public function translate($languageId = null)
+    {
+        if (!$languageId) {
+            $languageId = Language::getMainLanguage()->id;
+        }
+        
+        return $this->translates()->where('language_id', $languageId)->first();
     }
 
     /**

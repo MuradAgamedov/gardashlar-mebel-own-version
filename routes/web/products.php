@@ -69,6 +69,8 @@ Route::post('products/{product}/accordions/reorder', [ProductAccordionController
 
 Route::resource('products.images', ProductImageController::class);
 Route::post('products/{product}/images/reorder', [ProductImageController::class, 'reorder'])->name('products.images.reorder');
+Route::post('products/{product}/images/{image}/alt-text', [ProductImageController::class, 'updateAltText'])->name('products.images.update-alt-text');
+Route::get('products/{product}/images/{image}/alt-texts', [ProductImageController::class, 'getAltTexts'])->name('products.images.get-alt-texts');
 
 Route::resource('products.details', ProductDetailController::class);
 Route::post('products/{product}/details/reorder', [ProductDetailController::class, 'reorder'])->name('products.details.reorder');
