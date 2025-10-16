@@ -136,7 +136,7 @@
                                     <tr>
                                         <td>#{{ $order->id }}</td>
                                         <td>{{ $order->user->name ?? 'Guest User' }}</td>
-                                        <td>${{ number_format($order->total_amount ?? 0, 2) }}</td>
+                                        <td>${{ number_format($order->amount ?? 0, 2) }}</td>
                                         <td>{{ $order->created_at->format('M d, Y') }}</td>
                                         <td>
                                             @if($order->status == 'completed')
