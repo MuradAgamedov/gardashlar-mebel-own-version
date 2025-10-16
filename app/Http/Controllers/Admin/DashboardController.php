@@ -91,10 +91,14 @@ class DashboardController extends Controller
             ];
         }
         
-        // Top products by orders (if you have order_items table)
-        $topProducts = Product::withCount(['orders' => function($query) {
-                $query->whereMonth('created_at', Carbon::now()->month);
-            }])
+        // Top products by orders - using custom method since orders use JSON
+        $topProducts = Product::select('products.*')
+            ->selectSub(function ($query) {
+                $query->from('orders')
+                    ->whereJsonContains('product_ids', \DB::raw('products.id'))
+                    ->whereMonth('created_at', Carbon::now()->month)
+                    ->selectRaw('count(*)');
+            }, 'orders_count')
             ->orderBy('orders_count', 'desc')
             ->limit(5)
             ->get();
