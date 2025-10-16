@@ -159,6 +159,30 @@
                                                         </div>
                                                     </div>
                                                 @endif
+
+                                                @if($image->translates->count() > 0)
+                                                    <div class="mb-2">
+                                                        <small class="text-muted">Alt Text:</small>
+                                                        <div class="mt-1">
+                                                            @foreach($image->translates->take(2) as $translate)
+                                                                <div class="d-flex align-items-center mb-1">
+                                                                    <span class="badge badge-light-primary me-2" style="font-size: 10px;">{{ $translate->language->lang_code ?? 'N/A' }}</span>
+                                                                    <small class="text-truncate" style="max-width: 120px;" title="{{ $translate->alt_text }}">{{ $translate->alt_text }}</small>
+                                                                </div>
+                                                            @endforeach
+                                                            @if($image->translates->count() > 2)
+                                                                <small class="text-muted">+{{ $image->translates->count() - 2 }} more...</small>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                @else
+                                                    <div class="mb-2">
+                                                        <small class="text-muted">Alt Text:</small>
+                                                        <div class="mt-1">
+                                                            <small class="text-warning">No alt text</small>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                                 
                                                 <div class="d-flex gap-1 mt-2">
                                                     @if(!$image->is_main)
