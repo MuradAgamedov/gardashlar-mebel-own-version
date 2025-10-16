@@ -259,11 +259,9 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="material-icons-outlined">cancel</i>
-                        Cancel
                     </button>
                     <button type="submit" class="btn btn-primary">
                         <i class="material-icons-outlined">save</i>
-                        Save Alt Text
                     </button>
                 </div>
             </form>
