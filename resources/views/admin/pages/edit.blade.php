@@ -32,7 +32,7 @@
                         <h5>Edit Page</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.pages.update', $page) }}" method="POST">
+                        <form action="{{ route('admin.pages.update', $page) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             
@@ -59,7 +59,51 @@
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <!-- OpenGraph Image Section -->
+                            <div class="row mt-4">
+                                <div class="col-md-12">
+                                    <h6 class="mb-3 text-primary">OpenGraph Image</h6>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label class="form-label">OpenGraph Image</label>
+                                            <input type="file" 
+                                                   class="form-control @error('opengraph_image') is-invalid @enderror" 
+                                                   name="opengraph_image" 
+                                                   accept="image/*"
+                                                   onchange="previewOpenGraphImage(this)">
+                                            <small class="text-muted">Recommended size: 1200x630px</small>
+                                            @error('opengraph_image')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <label class="form-label">Current Image</label>
+                                            <div id="opengraph-preview" class="border rounded p-3" style="min-height: 150px;">
+                                                @if($page->opengraph_image)
+                                                    <img src="{{ asset('storage/' . $page->opengraph_image) }}" 
+                                                         alt="OpenGraph Image" 
+                                                         class="img-fluid rounded"
+                                                         style="max-height: 150px;">
+                                                    <div class="mt-2">
+                                                        <small class="text-muted">
+                                                            Size: {{ $page->opengraph_image_width ?? 'N/A' }}x{{ $page->opengraph_image_height ?? 'N/A' }}px
+                                                        </small>
+                                                    </div>
+                                                @else
+                                                    <div class="text-center text-muted py-4">
+                                                        <i class="material-icons-outlined" style="font-size: 48px;">image</i>
+                                                        <p class="mb-0">No OpenGraph image uploaded</p>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
                                 <div class="col-md-12">
                                     <h6 class="mb-3">Page Translations</h6>
                                     
@@ -190,6 +234,44 @@
                                                                       rows="3" 
                                                                       placeholder="Enter SEO description">{{ old('translates.'.$index.'.seo_description', $translate->seo_description ?? '') }}</textarea>
                                                             @error('translates.'.$index.'.seo_description')
+                                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+
+                                                        <hr class="my-4">
+                                                        <h6 class="mb-3 text-primary">OpenGraph Settings</h6>
+                                                        
+                                                        <div class="col-md-12 mb-3">
+                                                            <label class="form-label">OpenGraph Title</label>
+                                                            <input type="text" 
+                                                                   class="form-control @error('translates.'.$index.'.opengraph_title') is-invalid @enderror" 
+                                                                   name="translates[{{ $index }}][opengraph_title]" 
+                                                                   value="{{ old('translates.'.$index.'.opengraph_title', $translate->opengraph_title ?? '') }}"
+                                                                   placeholder="Enter OpenGraph title">
+                                                            @error('translates.'.$index.'.opengraph_title')
+                                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                        
+                                                        <div class="col-md-12 mb-3">
+                                                            <label class="form-label">OpenGraph Description</label>
+                                                            <textarea class="form-control @error('translates.'.$index.'.opengraph_description') is-invalid @enderror" 
+                                                                      name="translates[{{ $index }}][opengraph_description]" 
+                                                                      rows="3" 
+                                                                      placeholder="Enter OpenGraph description">{{ old('translates.'.$index.'.opengraph_description', $translate->opengraph_description ?? '') }}</textarea>
+                                                            @error('translates.'.$index.'.opengraph_description')
+                                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                        
+                                                        <div class="col-md-12 mb-3">
+                                                            <label class="form-label">OpenGraph Image Alt Text</label>
+                                                            <input type="text" 
+                                                                   class="form-control @error('translates.'.$index.'.opengraph_image_alt_text') is-invalid @enderror" 
+                                                                   name="translates[{{ $index }}][opengraph_image_alt_text]" 
+                                                                   value="{{ old('translates.'.$index.'.opengraph_image_alt_text', $translate->opengraph_image_alt_text ?? '') }}"
+                                                                   placeholder="Enter OpenGraph image alt text">
+                                                            @error('translates.'.$index.'.opengraph_image_alt_text')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
                                                         </div>
@@ -352,6 +434,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     @endif
 });
+
+// OpenGraph image preview function
+function previewOpenGraphImage(input) {
+    const preview = document.getElementById('opengraph-preview');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.innerHTML = `
+                <img src="${e.target.result}" 
+                     alt="OpenGraph Image Preview" 
+                     class="img-fluid rounded"
+                     style="max-height: 150px;">
+                <div class="mt-2">
+                    <small class="text-success">New image selected</small>
+                </div>
+            `;
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
 </script>
 
 <style>

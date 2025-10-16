@@ -14,7 +14,10 @@ class PageTranslate extends Model
         'slug',
         'seo_title',
         'seo_keywords',
-        'seo_description'
+        'seo_description',
+        'opengraph_title',
+        'opengraph_description',
+        'opengraph_image_alt_text'
     ];
 
     protected $casts = [

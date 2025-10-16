@@ -8,12 +8,14 @@ use App\Repositories\PageRepository;
 use App\Repositories\LanguageRepository;
 use App\Http\Requests\Admin\Page\StorePageRequest;
 use App\Http\Requests\Admin\Page\UpdatePageRequest;
+use App\Services\ImageService;
 
 class PageController extends Controller
 {
     public function __construct(
         public PageRepository $repository,
-        public LanguageRepository $languageRepository
+        public LanguageRepository $languageRepository,
+        public ImageService $imageService
     )
     {
     }
@@ -33,10 +35,25 @@ class PageController extends Controller
     public function store(StorePageRequest $request)
     {
         try {
-            $this->repository->createPage([
+            $data = [
                 'status' => $request->has('status') ? true : false,
                 'keyword' => trim($request->input('keyword', ''))
-            ], $request->translates);
+            ];
+
+            // Handle OpenGraph image upload
+            if ($request->hasFile('opengraph_image')) {
+                $imagePath = $this->imageService->upload($request->file('opengraph_image'), 'pages/opengraph');
+                $data['opengraph_image'] = $imagePath;
+                
+                // Get image dimensions
+                $imageInfo = getimagesize($request->file('opengraph_image')->getPathname());
+                if ($imageInfo) {
+                    $data['opengraph_image_width'] = $imageInfo[0];
+                    $data['opengraph_image_height'] = $imageInfo[1];
+                }
+            }
+
+            $this->repository->createPage($data, $request->translates);
 
             return redirect()->route('admin.pages.index')
                 ->with('success', 'Page created successfully!');
@@ -64,10 +81,32 @@ class PageController extends Controller
     public function update(UpdatePageRequest $request, string $id)
     {
         try {
-            $this->repository->updatePage($id, [
+            $page = $this->repository->findPage($id);
+            
+            $data = [
                 'status' => $request->has('status') ? true : false,
                 'keyword' => trim($request->input('keyword', ''))
-            ], $request->translates);
+            ];
+
+            // Handle OpenGraph image upload
+            if ($request->hasFile('opengraph_image')) {
+                // Delete old image if exists
+                if ($page->opengraph_image) {
+                    $this->imageService->delete($page->opengraph_image);
+                }
+                
+                $imagePath = $this->imageService->upload($request->file('opengraph_image'), 'pages/opengraph');
+                $data['opengraph_image'] = $imagePath;
+                
+                // Get image dimensions
+                $imageInfo = getimagesize($request->file('opengraph_image')->getPathname());
+                if ($imageInfo) {
+                    $data['opengraph_image_width'] = $imageInfo[0];
+                    $data['opengraph_image_height'] = $imageInfo[1];
+                }
+            }
+
+            $this->repository->updatePage($id, $data, $request->translates);
 
             return redirect()->route('admin.pages.index')
                 ->with('success', 'Page updated successfully!');

@@ -10,7 +10,10 @@ class Page extends Model
     protected $fillable = [
         'status',
         'order',
-        'keyword'
+        'keyword',
+        'opengraph_image',
+        'opengraph_image_width',
+        'opengraph_image_height'
     ];
 
     protected $casts = [

@@ -32,6 +32,9 @@ class PageRepository extends BaseRepository
                 'seo_title' => trim($translate['seo_title'] ?? ''),
                 'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
                 'seo_description' => trim($translate['seo_description'] ?? ''),
+                'opengraph_title' => trim($translate['opengraph_title'] ?? ''),
+                'opengraph_description' => trim($translate['opengraph_description'] ?? ''),
+                'opengraph_image_alt_text' => trim($translate['opengraph_image_alt_text'] ?? ''),
             ]);
         }
 
@@ -52,6 +55,9 @@ class PageRepository extends BaseRepository
                 'seo_title' => trim($translate['seo_title'] ?? ''),
                 'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
                 'seo_description' => trim($translate['seo_description'] ?? ''),
+                'opengraph_title' => trim($translate['opengraph_title'] ?? ''),
+                'opengraph_description' => trim($translate['opengraph_description'] ?? ''),
+                'opengraph_image_alt_text' => trim($translate['opengraph_image_alt_text'] ?? ''),
             ]);
         }
 
