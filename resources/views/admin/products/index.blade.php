@@ -241,18 +241,17 @@
 
                                             <td>
                                                 <div class="d-flex gap-2">
-                                                    <a href="{{ route('admin.products.details.index', $product) }}"
+                                                    <a href="{{ route('admin.products.details.index', $product) }}?page={{ request('page', 1) }}"
                                                        class="btn btn-sm btn-outline-warning"
                                                        title="Product Details">
                                                         <i class="material-icons-outlined">info</i>
                                                     </a>
-
-                                                    <a href="{{ route('admin.products.accordions.index', $product) }}"
+                                                    <a href="{{ route('admin.products.accordions.index', $product) }}?page={{ request('page', 1) }}"
                                                        class="btn btn-sm btn-outline-info"
                                                        title="Accordions">
                                                         <i class="material-icons-outlined">expand_more</i>
                                                     </a>
-                                                    <a href="{{ route('admin.products.images.index', $product) }}"
+                                                    <a href="{{ route('admin.products.images.index', $product) }}?page={{ request('page', 1) }}"
                                                        class="btn btn-sm btn-outline-success"
                                                        title="Images">
                                                         <i class="material-icons-outlined">image</i>

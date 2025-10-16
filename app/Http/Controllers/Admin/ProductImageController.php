@@ -29,8 +29,9 @@ class ProductImageController extends Controller
     {
         $images = $this->repository->getProductImages($product, $request);
         $colors = $this->repository->getAllColors();
+        $currentPage = $request->get('page', 1);
         
-        return view('admin.product-images.index', compact('product', 'images', 'colors'));
+        return view('admin.product-images.index', compact('product', 'images', 'colors', 'currentPage'));
     }
 
     /**

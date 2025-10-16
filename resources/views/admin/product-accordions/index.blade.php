@@ -49,10 +49,16 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Accordions for: {{ $product->translate()->title ?? 'No title' }}</h5>
-                            <a href="{{ route('admin.products.accordions.create', $product) }}" class="btn btn-primary">
-                                <i class="material-icons-outlined">add</i>
-                                Add Accordion
-                            </a>
+                            <div class="d-flex align-items-center gap-2">
+                                <a href="{{ route('admin.products.accordions.create', $product) }}" class="btn btn-primary">
+                                    <i class="material-icons-outlined">add</i>
+                                    Add Accordion
+                                </a>
+                                <a href="{{ route('admin.products.index', ['page' => $currentPage ?? 1]) }}" class="btn btn-secondary">
+                                    <i class="material-icons-outlined">arrow_back</i>
+                                    Back to List
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">

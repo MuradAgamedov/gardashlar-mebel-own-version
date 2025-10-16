@@ -19,10 +19,11 @@ class ProductAccordionController extends Controller
     )
     {
     }
-    public function index(Product $product)
+    public function index(Product $product, Request $request)
     {
         $accordions = $this->repository->getProductAccordions($product);
-        return view('admin.product-accordions.index', compact('product', 'accordions'));
+        $currentPage = $request->get('page', 1);
+        return view('admin.product-accordions.index', compact('product', 'accordions', 'currentPage'));
     }
 
     public function create(Product $product)

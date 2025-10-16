@@ -22,10 +22,11 @@ class ProductDetailController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Product $product)
+    public function index(Product $product, Request $request)
     {
         $details = $this->repository->getProductDetails($product);
-        return view('admin.product-details.index', compact('product', 'details'));
+        $currentPage = $request->get('page', 1);
+        return view('admin.product-details.index', compact('product', 'details', 'currentPage'));
     }
 
     /**

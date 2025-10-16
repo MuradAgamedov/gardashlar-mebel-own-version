@@ -53,7 +53,7 @@
                                 <a href="{{ route('admin.products.details.create', $product) }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
                                 </a>
-                                <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
+                                <a href="{{ route('admin.products.index', ['page' => $currentPage ?? 1]) }}" class="btn btn-outline-secondary">
                                     <i class="material-icons-outlined">arrow_back</i>
                                 </a>
                             </div>
