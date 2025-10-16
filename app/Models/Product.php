@@ -118,7 +118,7 @@ class Product extends Model
      */
     public function orders()
     {
-        return Order::whereJsonContains('product_ids', $this->id);
+        return Order::whereRaw('JSON_CONTAINS(product_ids, ?)', [json_encode($this->id)]);
     }
 
     // Scopes
