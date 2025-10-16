@@ -517,7 +517,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load existing alt texts
     function loadAltTexts(imageId) {
-        fetch(`/admin/products/{{ $product->id }}/images/${imageId}/alt-texts`)
+        fetch(`{{ route('admin.products.images.get-alt-texts', ['product' => $product, 'image' => ':imageId']) }}`.replace(':imageId', imageId))
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
