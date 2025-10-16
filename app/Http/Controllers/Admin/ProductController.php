@@ -353,7 +353,7 @@ class ProductController extends Controller
         try {
             // Yeni product yaradılır (əsas məlumatlar)
             $newProduct = $product->replicate(['view_count', 'order']);
-            $newProduct->status = false; // Yeni məhsul default olaraq deaktiv olsun
+            // status orijinal məhsuldan kopyalanır
             $newProduct->save();
     
             // Translations (slug eynilə saxlanılır)
