@@ -79,9 +79,6 @@ Route::get('/roulette-actions', [RoluteeteActionController::class, 'index'])->na
 
 // All SEO Pages API Routes
 Route::get('/all-seo-pages', [AllSeoPagesController::class, 'index'])->name('api.all-seo-pages.index');
-Route::get('/all-seo-pages/meta-tags', [AllSeoPagesController::class, 'getMetaTags'])->name('api.all-seo-pages.meta-tags');
-Route::get('/all-seo-pages/header-code', [AllSeoPagesController::class, 'getHeaderCode'])->name('api.all-seo-pages.header-code');
-Route::get('/all-seo-pages/footer-code', [AllSeoPagesController::class, 'getFooterCode'])->name('api.all-seo-pages.footer-code');
 
 // Dictionary API Routes
 Route::get('/dictionaries', [DictionaryController::class, 'index'])->name('api.dictionaries.index');
