@@ -261,6 +261,35 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('input.slug-input').forEach(function(input) {
         input.readOnly = true;
         input.classList.add('disabled-input-class');
+        
+        // Disable all keyboard input when readonly
+        input.addEventListener('keydown', function(e) {
+            if (this.readOnly) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        input.addEventListener('keypress', function(e) {
+            if (this.readOnly) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        input.addEventListener('input', function(e) {
+            if (this.readOnly) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        input.addEventListener('paste', function(e) {
+            if (this.readOnly) {
+                e.preventDefault();
+                return false;
+            }
+        });
     });
 
     // Add visual feedback for active tab
@@ -384,7 +413,11 @@ document.addEventListener('DOMContentLoaded', function() {
     background-color: #e9ecef !important;
     color: #6c757d !important;
     cursor: not-allowed !important;
-    pointer-events: none;
+    pointer-events: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
 }
 </style>
 @endpush
