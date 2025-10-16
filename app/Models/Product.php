@@ -112,6 +112,15 @@ class Product extends Model
         return $this->hasMany(ProductCompare::class);
     }
 
+    /**
+     * Get orders that contain this product
+     * Since orders now use product_ids (JSON), we need to use whereJsonContains
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class)->whereJsonContains('product_ids', $this->id);
+    }
+
     // Scopes
     public function scopeActive($query)
     {
