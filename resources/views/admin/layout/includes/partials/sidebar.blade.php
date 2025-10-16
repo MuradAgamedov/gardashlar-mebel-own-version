@@ -30,6 +30,12 @@
           <h6>Pages</h6>
         </a>
       </li>
+      <li class="sidebar-list">
+        <a class="sidebar-link" href="{{ route('admin.all-seo-pages.edit') }}">
+          <i class="fas fa-search-plus"></i>
+          <h6>All SEO Pages</h6>
+        </a>
+      </li>
 
       <li class="sidebar-list">
         <a class="sidebar-link" href="{{ route('admin.roulette-actions.index') }}">
@@ -318,15 +324,6 @@
           <li><a href="{{ route('admin.faqs.index') }}">FAQs</a></li>
           <li><a href="{{ route('admin.vacancies.index') }}">Vacancies</a></li>
         </ul>
-      </li>
-
-      <!-- SEO MANAGEMENT -->
-      <li class="sidebar-main-title"><div><h5 class="sidebar-title">SEO Management</h5></div></li>
-      <li class="sidebar-list">
-        <a class="sidebar-link" href="{{ route('admin.all-seo-pages.edit') }}">
-          <i class="fas fa-search-plus"></i>
-          <h6>All SEO Pages</h6>
-        </a>
       </li>
 
       <li class="sidebar-list">

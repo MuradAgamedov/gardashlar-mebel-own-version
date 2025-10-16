@@ -151,7 +151,6 @@
                                     <div class="text-end">
                                         <button type="submit" class="btn btn-primary btn-lg">
                                             <i class="fas fa-save me-2"></i>
-                                            Update SEO Settings
                                         </button>
                                     </div>
                                 </div>
