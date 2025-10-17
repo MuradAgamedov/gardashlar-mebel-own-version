@@ -19,7 +19,10 @@ class CompanyTranslate extends Model
         'inner_image',
         'inner_image_alt_text',
         'description',
-        "slug"
+        'slug',
+        'seo_title',
+        'seo_description',
+        'seo_keywords'
     ];
 
     public function company(): BelongsTo

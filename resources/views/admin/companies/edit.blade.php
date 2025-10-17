@@ -175,6 +175,18 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="mb-3">
+                                                    <label class="form-label">Card Image Alt Text</label>
+                                                    <input type="text" class="form-control @error("translates.{$language->id}.card_image_alt_text") is-invalid @enderror" 
+                                                           name="translates[{{ $language->id }}][card_image_alt_text]" 
+                                                           value="{{ old("translates.{$language->id}.card_image_alt_text", $translate?->card_image_alt_text) }}"
+                                                           placeholder="Enter card image alt text">
+                                                    @error("translates.{$language->id}.card_image_alt_text")
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
                                                     <label class="form-label">Inner Image Alt Text</label>
                                                     <input type="text" class="form-control @error("translates.{$language->id}.inner_image_alt_text") is-invalid @enderror" 
                                                            name="translates[{{ $language->id }}][inner_image_alt_text]" 
@@ -185,6 +197,9 @@
                                                     @enderror
                                                 </div>
                                             </div>
+                                        </div>
+
+                                        <div class="row">
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label class="form-label">Inner Image</label>
@@ -197,6 +212,9 @@
                                                     @enderror
                                                     <div class="form-text">Maximum size: 2MB. Formats: JPEG, PNG, JPG, GIF, WEBP</div>
                                                 </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <!-- Empty column for layout -->
                                             </div>
                                         </div>
 
@@ -239,6 +257,65 @@
                                             @error("translates.{$language->id}.description")
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
+                                        </div>
+
+                                        <!-- SEO Fields Section -->
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <h6 class="mb-3">
+                                                    <i class="material-icons-outlined me-2">search</i>
+                                                    SEO Settings
+                                                </h6>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label">SEO Title</label>
+                                                    <input type="text" 
+                                                           class="form-control @error("translates.{$language->id}.seo_title") is-invalid @enderror" 
+                                                           name="translates[{{ $language->id }}][seo_title]" 
+                                                           value="{{ old("translates.{$language->id}.seo_title", $translate?->seo_title) }}"
+                                                           placeholder="Enter SEO title">
+                                                    @error("translates.{$language->id}.seo_title")
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                    <div class="form-text">Recommended length: 50-60 characters</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label">SEO Description</label>
+                                                    <textarea class="form-control @error("translates.{$language->id}.seo_description") is-invalid @enderror" 
+                                                              name="translates[{{ $language->id }}][seo_description]" 
+                                                              rows="3"
+                                                              placeholder="Enter SEO description">{{ old("translates.{$language->id}.seo_description", $translate?->seo_description) }}</textarea>
+                                                    @error("translates.{$language->id}.seo_description")
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                    <div class="form-text">Recommended length: 150-160 characters</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label class="form-label">SEO Keywords</label>
+                                                    <textarea class="form-control @error("translates.{$language->id}.seo_keywords") is-invalid @enderror" 
+                                                              name="translates[{{ $language->id }}][seo_keywords]" 
+                                                              rows="2"
+                                                              placeholder="Enter SEO keywords (comma separated)">{{ old("translates.{$language->id}.seo_keywords", $translate?->seo_keywords) }}</textarea>
+                                                    @error("translates.{$language->id}.seo_keywords")
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                    <div class="form-text">Separate keywords with commas</div>
+                                                </div>
+                                            </div>
                                         </div>
                                         
                                         <input type="hidden" name="translates[{{ $language->id }}][language_id]" value="{{ $language->id }}">
