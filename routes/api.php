@@ -158,6 +158,7 @@ Route::get('/blog-posts/{slug}', [BlogPostController::class, 'show'])->name('api
 
 // Blog Categories API Routes
 Route::get('/blog-categories', [BlogCategoryController::class, 'index'])->name('api.blog-categories.index');
+Route::get('/blog-categories/{slug}', [BlogCategoryController::class, 'show'])->name('api.blog-categories.show');
 
 // Phones API Routes
 Route::get('/general-phones', [PhoneController::class, 'generalPhones'])->name('api.general-phones');
