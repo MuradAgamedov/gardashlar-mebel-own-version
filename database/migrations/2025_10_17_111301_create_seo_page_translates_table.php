@@ -16,10 +16,10 @@ return new class extends Migration
             $table->foreignId('seo_page_id')->constrained('seo_pages')->onDelete('cascade');
             $table->foreignId('language_id')->constrained('languages')->onDelete('cascade');
             $table->string('slug')->unique();
-            $table->string('title');
+            $table->text('title');
             $table->longText('page_header')->nullable();
             $table->longText('page_footer')->nullable();
-            $table->string('meta_title')->nullable();
+            $table->text('meta_title')->nullable();
             $table->longText('meta_description')->nullable();
             $table->longText('meta_keywords')->nullable();
             $table->timestamps();
