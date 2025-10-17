@@ -192,7 +192,6 @@ class SeoPageController extends Controller
                 }
 
                 return [
-                    'id' => $seoPageTranslate->seoPage->id,
                     'title' => $seoPageTranslate->title,
                     'slug' => $seoPageTranslate->slug,
                     'page_footer' => $seoPageTranslate->page_footer,
