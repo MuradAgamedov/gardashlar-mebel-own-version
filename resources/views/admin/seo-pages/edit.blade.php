@@ -155,7 +155,8 @@
 
                                                 <div class="mb-3">
                                                     <label class="form-label">Page Footer</label>
-                                                    <textarea class="form-control @error('translates.'.$index.'.page_footer') is-invalid @enderror" 
+                                                    <textarea class="form-control ckeditor @error('translates.'.$index.'.page_footer') is-invalid @enderror" 
+                                                              id="page_footer_{{ $language->id }}"
                                                               name="translates[{{ $index }}][page_footer]" 
                                                               rows="5">{{ old('translates.'.$index.'.page_footer', $translate->page_footer ?? '') }}</textarea>
                                                     @error('translates.'.$index.'.page_footer')
@@ -187,4 +188,29 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize CKEditor for all page_footer textareas
+    document.querySelectorAll('.ckeditor').forEach(function(textarea) {
+        ClassicEditor
+            .create(textarea, {
+                toolbar: [
+                    'heading', '|',
+                    'bold', 'italic', 'link', '|',
+                    'bulletedList', 'numberedList', '|',
+                    'outdent', 'indent', '|',
+                    'blockQuote', 'insertTable', '|',
+                    'undo', 'redo'
+                ]
+            })
+            .catch(error => {
+                console.error('CKEditor initialization error:', error);
+            });
+    });
+});
+</script>
+@endpush
 @endsection
