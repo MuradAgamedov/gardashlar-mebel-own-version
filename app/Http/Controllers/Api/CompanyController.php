@@ -51,9 +51,12 @@ class CompanyController extends Controller
                 return [
                     'id' => $company->id,
                     'slug' => $translation ? $translation->slug : null,
-
+                    'title' => $translation ? $translation->title : null,
                     'card_image_url' => $translation && $translation->card_image ? asset('storage/' . $translation->card_image) : null,
                     'card_image_alt_text' => $translation ? $translation->card_image_alt_text : null,
+                    'seo_title' => $translation ? $translation->seo_title : null,
+                    'seo_description' => $translation ? $translation->seo_description : null,
+                    'seo_keywords' => $translation ? $translation->seo_keywords : null,
                 ];
             });
 
