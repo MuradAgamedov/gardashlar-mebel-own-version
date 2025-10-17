@@ -41,9 +41,6 @@ class BlogCategoryController extends Controller
                     'id' => $blogCategory->id,
                     'title' => $translate->title ?? null,
                     'slug' => $translate->slug ?? null,
-                    'seo_title' => $translate->seo_title ?? null,
-                    'seo_keywords' => $translate->seo_keywords ?? null,
-                    'seo_description' => $translate->seo_description ?? null,
                     'posts_count' => $blogCategory->blog_posts_count,
                 ];
             });
@@ -68,63 +65,6 @@ class BlogCategoryController extends Controller
         }
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/blog-categories/{slug}",
-     *     summary="Get blog category SEO data by slug",
-     *     tags={"Blog Categories"},
-     *     @OA\Parameter(
-     *         name="slug",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="string"),
-     *         description="Blog category slug"
-     *     ),
-     *     @OA\Parameter(
-     *         name="Accept-Language",
-     *         in="header",
-     *         required=false,
-     *         @OA\Schema(type="string", example="az"),
-     *         description="Language code (az, en, ru)"
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Blog category SEO data retrieved successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="title", type="string", example="Technology"),
-     *                 @OA\Property(property="slug", type="string", example="technology"),
-     *                 @OA\Property(property="seo_title", type="string", example="Technology Blog - Latest Tech News"),
-     *                 @OA\Property(property="seo_keywords", type="string", example="technology, tech news, innovation"),
-     *                 @OA\Property(property="seo_description", type="string", example="Stay updated with the latest technology news and innovations"),
-     *                 @OA\Property(property="posts_count", type="integer", example=15)
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Blog category not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Blog category not found"),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving blog category"),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     )
-     * )
-     */
     public function show(Request $request, string $slug): JsonResponse
     {
         try {
