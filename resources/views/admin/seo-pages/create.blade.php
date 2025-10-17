@@ -76,7 +76,7 @@
                                                         data-bs-target="#lang-{{ $language->id }}" 
                                                         type="button" 
                                                         role="tab">
-                                                    {{ $language->name }} ({{ $language->code }})
+                                                    {{ $language->name }} ({{ $language->lang_code }})
                                                 </button>
                                             </li>
                                         @endforeach

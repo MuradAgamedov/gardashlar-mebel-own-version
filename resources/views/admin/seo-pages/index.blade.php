@@ -99,7 +99,7 @@
                                             <td>
                                                 <div class="d-flex gap-1">
                                                     @foreach($seoPage->translates as $translate)
-                                                        <span class="badge bg-info">{{ $translate->language->code }}</span>
+                                                        <span class="badge bg-info">{{ $translate->language->lang_code }}</span>
                                                     @endforeach
                                                 </div>
                                             </td>
