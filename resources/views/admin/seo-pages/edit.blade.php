@@ -25,6 +25,19 @@
         </div>
     </div>
     <div class="container-fluid">
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="material-icons-outlined">error</i>
+                <strong>Validation Errors:</strong>
+                <ul class="mb-0 mt-2">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
@@ -188,6 +201,21 @@
         </div>
     </div>
 </div>
+
+@push('styles')
+<style>
+.alert-danger ul {
+    padding-left: 20px;
+}
+.alert-danger ul li {
+    margin-bottom: 5px;
+}
+.alert-danger i {
+    vertical-align: middle;
+    margin-right: 8px;
+}
+</style>
+@endpush
 
 @push('scripts')
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
