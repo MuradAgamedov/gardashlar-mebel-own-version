@@ -81,6 +81,11 @@ Route::get('/roulette-actions', [RoluteeteActionController::class, 'index'])->na
 // All SEO Pages API Routes
 Route::get('/all-seo-pages', [AllSeoPagesController::class, 'index'])->name('api.all-seo-pages.index');
 
+// SEO Pages API Routes
+Route::get('/seo-pages', [SeoPageController::class, 'index'])->name('api.seo-pages.index');
+Route::get('/seo-pages/locale/{locale}', [SeoPageController::class, 'getByLocale'])->name('api.seo-pages.by-locale');
+Route::get('/seo-pages/{slug}/{locale?}', [SeoPageController::class, 'show'])->name('api.seo-pages.show');
+
 // Dictionary API Routes
 Route::get('/dictionaries', [DictionaryController::class, 'index'])->name('api.dictionaries.index');
 Route::get('/dictionaries/{keyword}', [DictionaryController::class, 'show'])->name('api.dictionaries.show');
