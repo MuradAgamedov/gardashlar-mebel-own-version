@@ -45,7 +45,7 @@ class SeoPageController extends Controller
     {
         $request->validate([
             'category_id' => 'nullable|exists:product_categories,id',
-            'status' => 'boolean',
+            'status' => 'nullable|boolean',
             'translates' => 'required|array',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.title' => 'required|string',
@@ -99,7 +99,7 @@ class SeoPageController extends Controller
     {
         $request->validate([
             'category_id' => 'nullable|exists:product_categories,id',
-            'status' => 'boolean',
+            'status' => 'nullable|boolean',
             'translates' => 'required|array',
             'translates.*.language_id' => 'required|exists:languages,id',
             'translates.*.title' => 'required|string',
