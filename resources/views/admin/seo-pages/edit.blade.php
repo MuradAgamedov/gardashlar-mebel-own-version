@@ -181,11 +181,11 @@
                             <div class="row mt-4">
                                 <div class="col-12">
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="material-icons-outlined">save</i> Update SEO Page
+                                        <button type="submit" class="btn btn-primary" title="Update SEO Page">
+                                            <i class="material-icons-outlined">save</i>
                                         </button>
-                                        <a href="{{ route('admin.seo-pages.index') }}" class="btn btn-secondary">
-                                            <i class="material-icons-outlined">arrow_back</i> Back to List
+                                        <a href="{{ route('admin.seo-pages.index') }}" class="btn btn-secondary" title="Back to List">
+                                            <i class="material-icons-outlined">arrow_back</i>
                                         </a>
                                     </div>
                                 </div>

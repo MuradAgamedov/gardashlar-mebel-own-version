@@ -44,8 +44,8 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>SEO Pages List</h5>
-                            <a href="{{ route('admin.seo-pages.create') }}" class="btn btn-primary">
-                                <i class="material-icons-outlined">add</i> Add New SEO Page
+                            <a href="{{ route('admin.seo-pages.create') }}" class="btn btn-primary" title="Add New SEO Page">
+                                <i class="material-icons-outlined">add</i>
                             </a>
                         </div>
                     </div>
@@ -107,7 +107,7 @@
                                             <td>
                                                 <div class="btn-group" role="group">
                                                     <a href="{{ route('admin.seo-pages.edit', $seoPage->id) }}" 
-                                                       class="btn btn-sm btn-warning">
+                                                       class="btn btn-sm btn-warning" title="Edit">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <form action="{{ route('admin.seo-pages.destroy', $seoPage->id) }}" 
@@ -116,7 +116,7 @@
                                                           onsubmit="return confirm('Are you sure you want to delete this SEO page?')">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger">
+                                                        <button type="submit" class="btn btn-sm btn-danger" title="Delete">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
                                                     </form>
@@ -129,8 +129,8 @@
                                                 <div class="d-flex flex-column align-items-center">
                                                     <i class="material-icons-outlined mb-2" style="font-size: 48px; color: #ccc;">description</i>
                                                     <p class="text-muted mb-0">No SEO pages found</p>
-                                                    <a href="{{ route('admin.seo-pages.create') }}" class="btn btn-primary btn-sm mt-2">
-                                                        Create First SEO Page
+                                                    <a href="{{ route('admin.seo-pages.create') }}" class="btn btn-primary btn-sm mt-2" title="Create First SEO Page">
+                                                        <i class="material-icons-outlined">add</i>
                                                     </a>
                                                 </div>
                                             </td>
