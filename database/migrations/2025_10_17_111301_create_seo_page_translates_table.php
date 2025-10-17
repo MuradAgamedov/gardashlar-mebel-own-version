@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('language_id')->constrained('languages')->onDelete('cascade');
             $table->string('slug')->unique();
             $table->text('title');
-            $table->longText('page_header')->nullable();
             $table->longText('page_footer')->nullable();
             $table->text('meta_title')->nullable();
             $table->longText('meta_description')->nullable();

@@ -12,7 +12,6 @@ class SeoPageTranslate extends Model
         'language_id',
         'slug',
         'title',
-        'page_header',
         'page_footer',
         'meta_title',
         'meta_description',

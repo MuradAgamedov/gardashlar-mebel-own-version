@@ -148,16 +148,6 @@
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label class="form-label">Page Header</label>
-                                                    <textarea class="form-control @error('translates.'.$index.'.page_header') is-invalid @enderror" 
-                                                              name="translates[{{ $index }}][page_header]" 
-                                                              rows="5">{{ old('translates.'.$index.'.page_header') }}</textarea>
-                                                    @error('translates.'.$index.'.page_header')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-
-                                                <div class="mb-3">
                                                     <label class="form-label">Page Footer</label>
                                                     <textarea class="form-control @error('translates.'.$index.'.page_footer') is-invalid @enderror" 
                                                               name="translates[{{ $index }}][page_footer]" 
