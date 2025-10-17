@@ -6,98 +6,101 @@ use App\Http\Controllers\Controller;
 use App\Models\SeoPage;
 use App\Models\Language;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
+use App\Traits\LocaleFromHeader;
 
 class SeoPageController extends Controller
 {
+    use LocaleFromHeader;
+
     /**
      * Get all SEO pages with title and slug only
      */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
         try {
-            $seoPages = SeoPage::with(['translates' => function($query) {
-                $query->select('seo_page_id', 'language_id', 'title', 'slug');
-            }, 'translates.language:id,lang_code'])
-            ->where('status', true)
-            ->get(['id']);
-
-            $result = [];
-            foreach ($seoPages as $seoPage) {
-                $pageData = ['id' => $seoPage->id];
-                
-                foreach ($seoPage->translates as $translate) {
-                    $pageData['translations'][$translate->language->lang_code] = [
-                        'title' => $translate->title,
-                        'slug' => $translate->slug
+            // Get language ID from header using trait
+            $languageId = $this->getLanguageIdFromHeader($request);
+            
+            $cacheKey = "api_seo_pages_{$languageId}";
+            
+            $seoPages = Cache::rememberForever($cacheKey, function () use ($languageId) {
+                return SeoPage::with(['translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId)
+                          ->select('seo_page_id', 'language_id', 'title', 'slug');
+                }])
+                ->where('status', true)
+                ->get(['id'])
+                ->map(function ($seoPage) {
+                    $translation = $seoPage->translates->first();
+                    
+                    return [
+                        'id' => $seoPage->id,
+                        'title' => $translation ? $translation->title : '',
+                        'slug' => $translation ? $translation->slug : ''
                     ];
-                }
-                
-                $result[] = $pageData;
-            }
+                })
+                ->filter(function ($item) {
+                    return !empty($item['title']) && !empty($item['slug']);
+                })
+                ->values();
+            });
 
             return response()->json([
                 'success' => true,
-                'data' => $result
-            ]);
+                'data' => $seoPages
+            ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error fetching SEO pages',
-                'error' => $e->getMessage()
+                'message' => 'Error fetching SEO pages: ' . $e->getMessage(),
+                'data' => []
             ], 500);
         }
     }
 
     /**
-     * Get specific SEO page by slug and locale
+     * Get specific SEO page by slug
      */
-    public function show($slug, $locale = 'az')
+    public function show(Request $request, $slug): JsonResponse
     {
         try {
-            // Get language by locale
-            $language = Language::where('lang_code', $locale)->first();
+            // Get language ID from header using trait
+            $languageId = $this->getLanguageIdFromHeader($request);
             
-            if (!$language) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Language not found'
-                ], 404);
-            }
-
-            // Find SEO page by slug and language
-            $seoPageTranslate = \App\Models\SeoPageTranslate::with(['seoPage', 'language'])
-                ->where('slug', $slug)
-                ->where('language_id', $language->id)
-                ->first();
-
-            if (!$seoPageTranslate || !$seoPageTranslate->seoPage->status) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'SEO page not found'
-                ], 404);
-            }
-
-            // Get category info if exists
-            $categoryData = null;
-            if ($seoPageTranslate->seoPage->category) {
-                $categoryTranslate = $seoPageTranslate->seoPage->category
-                    ->translates()
-                    ->where('language_id', $language->id)
+            $cacheKey = "api_seo_page_{$slug}_{$languageId}";
+            
+            $seoPageData = Cache::rememberForever($cacheKey, function () use ($slug, $languageId) {
+                // Find SEO page by slug and language
+                $seoPageTranslate = \App\Models\SeoPageTranslate::with(['seoPage.category.translates', 'language'])
+                    ->where('slug', $slug)
+                    ->where('language_id', $languageId)
                     ->first();
-                
-                if ($categoryTranslate) {
-                    $categoryData = [
-                        'id' => $seoPageTranslate->seoPage->category->id,
-                        'title' => $categoryTranslate->title,
-                        'slug' => $categoryTranslate->slug ?? null
-                    ];
-                }
-            }
 
-            return response()->json([
-                'success' => true,
-                'data' => [
+                if (!$seoPageTranslate || !$seoPageTranslate->seoPage->status) {
+                    return null;
+                }
+
+                // Get category info if exists
+                $categoryData = null;
+                if ($seoPageTranslate->seoPage->category) {
+                    $categoryTranslate = $seoPageTranslate->seoPage->category
+                        ->translates()
+                        ->where('language_id', $languageId)
+                        ->first();
+                    
+                    if ($categoryTranslate) {
+                        $categoryData = [
+                            'id' => $seoPageTranslate->seoPage->category->id,
+                            'title' => $categoryTranslate->title,
+                            'slug' => $categoryTranslate->slug ?? null
+                        ];
+                    }
+                }
+
+                return [
                     'id' => $seoPageTranslate->seoPage->id,
                     'title' => $seoPageTranslate->title,
                     'slug' => $seoPageTranslate->slug,
@@ -107,68 +110,31 @@ class SeoPageController extends Controller
                     'meta_keywords' => $seoPageTranslate->meta_keywords,
                     'category' => $categoryData,
                     'language' => [
-                        'code' => $language->lang_code,
-                        'name' => $language->name
+                        'code' => $seoPageTranslate->language->lang_code,
+                        'name' => $seoPageTranslate->language->name
                     ]
-                ]
-            ]);
+                ];
+            });
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error fetching SEO page',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Get all SEO pages for specific locale
-     */
-    public function getByLocale($locale = 'az')
-    {
-        try {
-            // Get language by locale
-            $language = Language::where('lang_code', $locale)->first();
-            
-            if (!$language) {
+            if (!$seoPageData) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Language not found'
+                    'message' => 'SEO page not found'
                 ], 404);
-            }
-
-            $seoPages = SeoPage::with(['translates' => function($query) use ($language) {
-                $query->where('language_id', $language->id)
-                      ->select('seo_page_id', 'language_id', 'title', 'slug');
-            }])
-            ->where('status', true)
-            ->get(['id']);
-
-            $result = [];
-            foreach ($seoPages as $seoPage) {
-                if ($seoPage->translates->isNotEmpty()) {
-                    $translate = $seoPage->translates->first();
-                    $result[] = [
-                        'id' => $seoPage->id,
-                        'title' => $translate->title,
-                        'slug' => $translate->slug
-                    ];
-                }
             }
 
             return response()->json([
                 'success' => true,
-                'data' => $result,
-                'locale' => $locale
-            ]);
+                'data' => $seoPageData
+            ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error fetching SEO pages',
-                'error' => $e->getMessage()
+                'message' => 'Error fetching SEO page: ' . $e->getMessage(),
+                'data' => []
             ], 500);
         }
     }
+
 }
