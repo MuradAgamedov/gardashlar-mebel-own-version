@@ -19,47 +19,7 @@ class CompanyController extends Controller
 {
     use LocaleFromHeader;
 
-    /**
-     * @OA\Get(
-     *     path="/api/companies",
-     *     operationId="getCompanies",
-     *     tags={"Companies"},
-     *     summary="Get all companies",
-     *     description="Returns a list of all active companies with translations based on locale header",
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language ID (e.g., 1 for Azerbaijani, 2 for English, 3 for Russian)",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Companies retrieved successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Companies retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="card_image_url", type="string", example="https://example.com/storage/companies/card_image.jpg", nullable=true),
-     *                     @OA\Property(property="card_image_alt_text", type="string", example="Card Image", nullable=true)
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving companies")
-     *         )
-     *     )
-     * )
-     */
+  
     public function index(Request $request)
     {
         try {
@@ -111,83 +71,7 @@ class CompanyController extends Controller
         }
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/companies/{id}",
-     *     operationId="getCompany",
-     *     tags={"Companies"},
-     *     summary="Get company details with products",
-     *     description="Returns company details including inner image, title and associated products",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="Company ID",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language ID (e.g., 1 for Azerbaijani, 2 for English, 3 for Russian)",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Company retrieved successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Company retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="title", type="string", example="Company Title"),
-     *                 @OA\Property(property="inner_image", type="string", example="https://example.com/storage/companies/inner_image.jpg", nullable=true),
-     *                 @OA\Property(property="inner_image_alt_text", type="string", example="Inner Image", nullable=true),
-     *                 @OA\Property(
-     *                     property="products",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="title", type="string", example="Product Title"),
-     *                         @OA\Property(property="slug", type="string", example="product-slug"),
-     *                         @OA\Property(property="price", type="number", format="float", example=99.99),
-     *                         @OA\Property(property="view_count", type="integer", example=150),
-     *                         @OA\Property(property="card_image", type="string", example="https://example.com/storage/products/image.jpg"),
-     *                         @OA\Property(property="discount_percent", type="number", format="float", example=10.5),
-     *                         @OA\Property(property="category_slug", type="string", example="category-slug", nullable=true),
-     *                         @OA\Property(property="parentSlug", type="string", example="parent-category-slug", nullable=true),
-     *                         @OA\Property(
-     *                             property="product_types",
-     *                             type="array",
-     *                             @OA\Items(
-     *                                 @OA\Property(property="id", type="integer", example=1),
-     *                                 @OA\Property(property="title", type="string", example="Product Type")
-     *                             )
-     *                         )
-     *                     )
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Company not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Company not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving company")
-     *         )
-     *     )
-     * )
-     */
+ 
     public function show(Request $request, $slug)
     {
         try {
@@ -385,6 +269,9 @@ $products = $productsPaginated->map(function($product) use ($languageId) {
                 'description' => $translation ? $translation->description : null,
                 'inner_image' => $translation && $translation->inner_image ? asset('storage/' . $translation->inner_image) : null,
                 'inner_image_alt_text' => $translation ? $translation->inner_image_alt_text : null,
+                'seo_title' => $translation ? $translation->seo_title : null,
+                'seo_description' => $translation ? $translation->seo_description : null,
+                'seo_keywords' => $translation ? $translation->seo_keywords : null,
                 'products' => $products,
                 'sort_options' => $sortOptions,
                 'sort_translations' => $sortTranslations,
