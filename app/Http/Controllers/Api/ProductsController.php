@@ -1159,15 +1159,98 @@ public function categoryBySlug(Request $request, $slug)
 
         return response()->json([
             'success' => true,
-            'message' => 'Category retrieved successfully',
             'data' => $data
         ]);
 
     } catch (\Exception $e) {
-        return response()->json([
+        return response([
             'success' => false,
             'message' => 'Error retrieving category: ' . $e->getMessage()
         ], 500);
     }
 }
+
+    /**
+     * Get product details by slug with category information and SEO data
+     */
+    public function productBySlug(Request $request, $slug)
+    {
+        try {
+            $languageId = $this->getLanguageIdFromHeader($request);
+            
+            if (!$languageId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid language'
+                ], 400);
+            }
+
+            // Get product with translations and relationships
+            $product = Product::with([
+                'translates' => function($query) use ($languageId, $slug) {
+                    $query->where('language_id', $languageId);
+                },
+                'categories.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                },
+                'images' => function($query) {
+                    $query->where('is_main', true)->where('status', true);
+                }
+            ])
+            ->whereHas('translates', function($query) use ($languageId, $slug) {
+                $query->where('language_id', $languageId)
+                      ->where('slug', $slug);
+            })
+            ->firstOrFail();
+
+            $translation = $product->translates->first();
+            $mainImage = $product->images->first();
+            
+            // Get category information
+            $categoryData = null;
+            if ($product->categories->isNotEmpty()) {
+                $category = $product->categories->first();
+                $categoryTranslation = $category->translates->first();
+                
+                if ($categoryTranslation) {
+                    $categoryData = [
+                        'id' => $category->id,
+                        'title' => $categoryTranslation->title,
+                        'slug' => $categoryTranslation->slug,
+                        'seo_title' => $categoryTranslation->seo_title ?? '',
+                        'seo_description' => $categoryTranslation->seo_description ?? '',
+                        'seo_keywords' => $categoryTranslation->seo_keywords ?? ''
+                    ];
+                }
+            }
+
+            // Prepare response data
+            $data = [
+                'id' => $product->id,
+                'title' => $translation->title ?? '',
+                'slug' => $translation->slug ?? '',
+                'description' => $translation->description ?? '',
+                'price' => $product->price,
+                'discount_price' => $product->discount_price,
+                'main_image' => $mainImage ? asset('storage/' . $mainImage->image) : null,
+                'image_alt_text' => $mainImage ? $mainImage->alt_text : '',
+                'seo_title' => $translation->seo_title ?? '',
+                'seo_description' => $translation->seo_description ?? '',
+                'seo_keywords' => $translation->seo_keywords ?? '',
+                'category' => $categoryData
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product retrieved successfully',
+                'data' => $data
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving product: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
