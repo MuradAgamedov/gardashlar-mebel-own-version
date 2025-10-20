@@ -82,7 +82,7 @@
                         <div class="row mb-3">
                             <div class="col-md-12">
                                 <label class="form-label fw-bold">Message:</label>
-                                <div class="border rounded p-3 bg-light">
+                                <div style="color: black !important" class="border rounded p-3 bg-light">
                                     {!! nl2br(e($form->message)) !!}
                                 </div>
                             </div>

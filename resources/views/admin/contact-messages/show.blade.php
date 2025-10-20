@@ -75,7 +75,7 @@
                                 <!-- Message Content -->
                                 <div class="mb-4">
                                     <h6 class="text-muted mb-2">Message:</h6>
-                                    <div class="border rounded p-3 bg-light">
+                                    <div style="color: black !important" class="border rounded p-3 bg-light">
                                         <p style="color: black" class="mb-0">{{ $message->message }}</p>
                                     </div>
                                 </div>
@@ -85,7 +85,7 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label class="form-label text-muted">Name:</label>
-                                            <p class="form-control-plaintext">{{ $message->name }}</p>
+                                            <p style="color: black !important" class="form-control-plaintext">{{ $message->name }}</p>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
