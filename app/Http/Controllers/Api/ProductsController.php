@@ -947,18 +947,10 @@ class ProductsController extends Controller
                 return [
                     'id' => $product->id,
                     'title' => $translation ? $translation->title : '',
-                    'slug' => $translation ? $translation->slug : '',
-                    'price' => $product->price,
-                    'view_count' => $product->view_count,
                     'card_image' => $mainImage && $mainImage->image
                         ? asset('storage/' . $mainImage->image)
                         : asset('images/default_image.webp'),
-                    'discount_price' => $product->discount_price,
-                    'category_slug' => $categorySlug,
-                    'parentSlug' => $parentSlug,
-                    'inCart' => $inCart,
-                    'inFavorite' => $inFavorite,
-                    'inCompare' => $inCompare,
+                   
                 ];
             });
     
