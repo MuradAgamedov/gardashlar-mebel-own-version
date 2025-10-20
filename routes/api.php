@@ -295,7 +295,7 @@ Route::post('/products/favorites/dont-registered', [FavoriteController::class, '
 
 Route::post('/products/compare/dont-registered', [CompareController::class, 'checkCompareProducts'])->name('api.products.compare-check');
 
-Route::get('/products/category/{slug}', [ProductsController::class, 'categoryBySlug'])->name('api.products.category-by-slug');
+Route::get('/categories/{slug}', [ProductsController::class, 'categoryBySlug'])->name('api.categories.category-by-slug');
 
 
 // Product Card Check API Route (No Authentication Required)
