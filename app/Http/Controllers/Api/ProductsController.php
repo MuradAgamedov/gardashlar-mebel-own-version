@@ -1180,6 +1180,56 @@ public function categoryBySlug(Request $request, $slug)
             // Get product with translations and relationships
             $product = Product::with([
                 'translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                },
+                'categories.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                },
+                'images' => function($query) use ($languageId) {
+                    $query->where('is_main', true)
+                          ->where('status', true)
+                          ->with(['translates' => function($q) use ($languageId) {
+                              $q->where('language_id', $languageId);
+                          }]);
+                }
+            ])
+            ->whereHas('translates', function($query) use ($languageId, $slug) {
+                $query->where('language_id', $languageId)
+                      ->where('slug', $slug);
+            })
+            ->firstOrFail();
+
+            $translation = $product->translates->first();
+            $mainImage = $product->images->first();
+            
+            // Get category title
+            $categoryTitle = '';
+            if ($product->categories->isNotEmpty()) {
+                $category = $product->categories->first();
+                $categoryTranslation = $category->translates->first();
+                $categoryTitle = $categoryTranslation ? $categoryTranslation->title : '';
+            }
+
+            // Get image alt text from translation
+            $imageAltText = '';
+            if ($mainImage && $mainImage->translates->isNotEmpty()) {
+                $imageAltText = $mainImage->translates->first()->alt_text ?? '';
+            }
+
+            // Prepare response data with only required fields
+            $data = [
+                'title' => $translation->title ?? '',
+                'seo_title' => $translation->seo_title ?? '',
+                'seo_description' => $translation->seo_description ?? '',
+                'seo_keywords' => $translation->seo_keywords ?? '',
+                'image' => $mainImage ? asset('storage/' . $mainImage->image) : null,
+                'image_alt_text' => $imageAltText,
+                'category_title' => $categoryTitle
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product details retrieved successfully',
                 'data' => $data
             ]);
 
