@@ -1163,7 +1163,7 @@ public function categoryBySlug(Request $request, $slug)
 }
 
     /**
-     * Get product details by slug with category information and SEO data
+     * Get product details by slug with minimal required fields
      */
     public function productBySlug(Request $request, $slug)
     {
@@ -1179,7 +1179,7 @@ public function categoryBySlug(Request $request, $slug)
 
             // Get product with translations and relationships
             $product = Product::with([
-                'translates' => function($query) use ($languageId, $slug) {
+                'translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
                 },
                 'categories.translates' => function($query) use ($languageId) {
@@ -1198,43 +1198,28 @@ public function categoryBySlug(Request $request, $slug)
             $translation = $product->translates->first();
             $mainImage = $product->images->first();
             
-            // Get category information
-            $categoryData = null;
+            // Get category title
+            $categoryTitle = '';
             if ($product->categories->isNotEmpty()) {
                 $category = $product->categories->first();
                 $categoryTranslation = $category->translates->first();
-                
-                if ($categoryTranslation) {
-                    $categoryData = [
-                        'id' => $category->id,
-                        'title' => $categoryTranslation->title,
-                        'slug' => $categoryTranslation->slug,
-                        'seo_title' => $categoryTranslation->seo_title ?? '',
-                        'seo_description' => $categoryTranslation->seo_description ?? '',
-                        'seo_keywords' => $categoryTranslation->seo_keywords ?? ''
-                    ];
-                }
+                $categoryTitle = $categoryTranslation ? $categoryTranslation->title : '';
             }
 
-            // Prepare response data
+            // Prepare response data with only required fields
             $data = [
-                'id' => $product->id,
                 'title' => $translation->title ?? '',
-                'slug' => $translation->slug ?? '',
-                'description' => $translation->description ?? '',
-                'price' => $product->price,
-                'discount_price' => $product->discount_price,
-                'main_image' => $mainImage ? asset('storage/' . $mainImage->image) : null,
-                'image_alt_text' => $mainImage ? $mainImage->alt_text : '',
                 'seo_title' => $translation->seo_title ?? '',
                 'seo_description' => $translation->seo_description ?? '',
                 'seo_keywords' => $translation->seo_keywords ?? '',
-                'category' => $categoryData
+                'image' => $mainImage ? asset('storage/' . $mainImage->image) : null,
+                'image_alt_text' => $mainImage ? $mainImage->alt_text : '',
+                'category_title' => $categoryTitle
             ];
 
             return response()->json([
                 'success' => true,
-                'message' => 'Product retrieved successfully',
+                'message' => 'Product details retrieved successfully',
                 'data' => $data
             ]);
 
