@@ -166,6 +166,9 @@ class VacancyController extends Controller
      *                 @OA\Property(property="email", type="string", example="hr@company.com"),
      *                 @OA\Property(property="address", type="string", example="Bakı şəhəri"),
      *                 @OA\Property(property="last_apply_date", type="string", format="date", example="2024-12-31"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2024-10-20T15:30:00Z"),
+     *                 @OA\Property(property="seo_title", type="string", example="Mühasib vəzifəsi - Şirkət adı"),
+     *                 @OA\Property(property="seo_description", type="string", example="Mühasib vəzifəsi üçün müraciət edin. 3-5 il təcrübə tələb olunur."),
      *                 @OA\Property(property="requirements", type="array", @OA\Items(type="object"))
      *             )
      *         )
@@ -246,6 +249,9 @@ class VacancyController extends Controller
                 'email' => $vacancy->email,
                 'address' => $vacancy->address,
                 'last_apply_date' => $vacancy->last_apply_date->format('Y-m-d'),
+                'created_at' => $vacancy->created_at->toISOString(),
+                'seo_title' => $translation ? $translation->seo_title : '',
+                'seo_description' => $translation ? $translation->seo_description : '',
                 'requirements' => $requirements
             ];
 
