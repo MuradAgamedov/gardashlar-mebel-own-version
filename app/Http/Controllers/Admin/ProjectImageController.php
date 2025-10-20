@@ -19,6 +19,14 @@ class ProjectImageController extends Controller
     }
 
     /**
+     * Show the form for creating a new resource.
+     */
+    public function create(Project $project)
+    {
+        return view('admin.project-images.create', compact('project'));
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Project $project)
