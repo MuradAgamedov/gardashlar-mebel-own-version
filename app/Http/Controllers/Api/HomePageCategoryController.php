@@ -32,7 +32,7 @@ class HomePageCategoryController extends Controller
                         
                         return [
                             'id' => $productCategory->id,
-                            'image_url' => $productCategory->image,
+                            'image_url' => asset('storage/' . $productCategory->image),
                             'title' => $translate->title ?? null,
                             'slug' => $translate->slug ?? null,
                             'parentSlug' =>  $productCategory->parent_id == null ? null : $productCategory->parent->translate($languageId)->slug
