@@ -1146,7 +1146,7 @@ public function categoryBySlug(Request $request, $slug)
         ->firstOrFail();
 
         $translation = $category->translates->first();
-
+        dd($category);
         $data = [
             'id' => $category->id,
             'title' => $translation->title ?? '',
