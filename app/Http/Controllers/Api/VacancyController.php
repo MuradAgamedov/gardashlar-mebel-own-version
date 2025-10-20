@@ -252,6 +252,7 @@ class VacancyController extends Controller
                 'created_at' => $vacancy->created_at->toISOString(),
                 'seo_title' => $translation ? $translation->seo_title : '',
                 'seo_description' => $translation ? $translation->seo_description : '',
+                'seo_keywords' => $translation ? $translation->seo_keywords : '',
                 'requirements' => $requirements
             ];
 
