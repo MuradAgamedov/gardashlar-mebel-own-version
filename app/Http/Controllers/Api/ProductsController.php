@@ -1137,8 +1137,7 @@ public function categoryBySlug(Request $request, $slug)
             'translates' => function($query) use ($languageId, $slug) {
                 $query->where('language_id', $languageId)
                       ->where('slug', $slug);
-            },
-            'image'
+            }
         ])
         ->whereHas('translates', function($query) use ($languageId, $slug) {
             $query->where('language_id', $languageId)
