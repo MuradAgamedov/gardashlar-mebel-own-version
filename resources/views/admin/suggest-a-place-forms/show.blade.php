@@ -174,7 +174,7 @@
                             <div class="col-12">
                                 <div class="mb-3">
                                     <label class="form-label fw-bold">Ətraflı:</label>
-                                    <div class="border rounded p-3 bg-light">
+                                    <div style="color: black !important" class="">
                                         {!! nl2br(e($suggestAPlaceForm->details)) !!}
                                     </div>
                                 </div>

@@ -75,7 +75,7 @@
                                 <!-- Message Content -->
                                 <div class="mb-4">
                                     <h6 class="text-muted mb-2">Message:</h6>
-                                    <div style="color: black !important" class="border rounded p-3 bg-light">
+                                    <div style="color: black !important" class="">
                                         <p style="color: black" class="mb-0">{{ $message->message }}</p>
                                     </div>
                                 </div>
