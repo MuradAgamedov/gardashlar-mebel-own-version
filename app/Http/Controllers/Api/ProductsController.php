@@ -1224,7 +1224,9 @@ public function categoryBySlug(Request $request, $slug)
                 'seo_keywords' => $translation->seo_keywords ?? '',
                 'image' => $mainImage ? asset('storage/' . $mainImage->image) : null,
                 'image_alt_text' => $imageAltText,
-                'category_title' => $categoryTitle
+                'category_title' => $categoryTitle,
+                'price' => $product->price,
+                'discount_price' => $product->discount_price
             ];
 
             return response()->json([
