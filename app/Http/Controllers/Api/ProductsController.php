@@ -1116,4 +1116,61 @@ class ProductsController extends Controller
             ], 500);
         }
     }
+
+
+    /**
+ * Get category details by slug
+ */
+public function categoryBySlug(Request $request, $slug)
+{
+    try {
+        $languageId = $this->getLanguageIdFromHeader($request);
+        
+        if (!$languageId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid language'
+            ], 400);
+        }
+
+        $category = ProductCategory::with([
+            'translates' => function($query) use ($languageId, $slug) {
+                $query->where('language_id', $languageId)
+                      ->where('slug', $slug);
+            },
+            'image'
+        ])
+        ->whereHas('translates', function($query) use ($languageId, $slug) {
+            $query->where('language_id', $languageId)
+                  ->where('slug', $slug);
+        })
+        ->firstOrFail();
+
+        $translation = $category->translates->first();
+
+        $data = [
+            'id' => $category->id,
+            'title' => $translation->title ?? '',
+            'slug' => $translation->slug ?? '',
+            'seo_title' => $translation->seo_title ?? '',
+            'seo_description' => $translation->seo_description ?? '',
+            'seo_keywords' => $translation->seo_keywords ?? '',
+            'image' => $category->image ? asset('storage/' . $category->image->path) : null,
+            'image_alt_text' => $category->image ? ($category->image->alt_text ?? $translation->title ?? '') : '',
+          
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Category retrieved successfully',
+            'data' => $data
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error retrieving category: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }
