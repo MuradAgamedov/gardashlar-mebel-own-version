@@ -1146,7 +1146,6 @@ public function categoryBySlug(Request $request, $slug)
         ->firstOrFail();
 
         $translation = $category->translates->first();
-        dd($category);
         $data = [
             'id' => $category->id,
             'title' => $translation->title ?? '',
@@ -1154,7 +1153,7 @@ public function categoryBySlug(Request $request, $slug)
             'seo_title' => $translation->seo_title ?? '',
             'seo_description' => $translation->seo_description ?? '',
             'seo_keywords' => $translation->seo_keywords ?? '',
-            'image' => $category->image_url,
+            'image' => $category->image,
             'image_alt_text' => $translation->title ?? ''
         ];
 
