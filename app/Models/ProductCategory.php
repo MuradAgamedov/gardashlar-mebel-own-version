@@ -14,8 +14,16 @@ class ProductCategory extends Model
         'parent_id',
         'order',
         'status',
-        'image'
+        'image_id'
     ];
+
+    /**
+     * Get the image associated with the product category.
+     */
+    public function image()
+    {
+        return $this->belongsTo(Media::class, 'image_id');
+    }
 
     protected $casts = [
         'parent_id' => 'integer',
