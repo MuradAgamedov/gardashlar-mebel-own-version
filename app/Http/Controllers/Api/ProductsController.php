@@ -1155,9 +1155,8 @@ public function categoryBySlug(Request $request, $slug)
             'seo_title' => $translation->seo_title ?? '',
             'seo_description' => $translation->seo_description ?? '',
             'seo_keywords' => $translation->seo_keywords ?? '',
-            'image' => $category->image ? asset('storage/' . $category->image->path) : null,
-            'image_alt_text' => $category->image ? ($category->image->alt_text ?? $translation->title ?? '') : '',
-          
+            'image' => $category->image_url,
+            'image_alt_text' => $translation->title ?? ''
         ];
 
         return response()->json([
