@@ -14,16 +14,8 @@ class ProductCategory extends Model
         'parent_id',
         'order',
         'status',
-        'image_id'
+        'image'
     ];
-
-    /**
-     * Get the image associated with the product category.
-     */
-    public function image()
-    {
-        return $this->belongsTo(Media::class, 'image_id');
-    }
 
     protected $casts = [
         'parent_id' => 'integer',
@@ -138,7 +130,22 @@ class ProductCategory extends Model
      */
     public function getImageUrlAttribute()
     {
-        return $this->image ? env('APP_URL') . Storage::url($this->image) : null;
+        if (!$this->image) {
+            return null;
+        }
+        
+        // Check if it's already a full URL
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+        
+        // Check if it's a storage path
+        if (strpos($this->image, 'storage/') === 0) {
+            return asset($this->image);
+        }
+        
+        // Default: treat as storage path
+        return Storage::exists($this->image) ? Storage::url($this->image) : null;
     }
 
     /**
