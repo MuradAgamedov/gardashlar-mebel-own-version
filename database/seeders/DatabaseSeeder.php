@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             SuggestionSeeder::class,
             ProductSeeder::class,
             ProductColorSeeder::class,
+            DictionarySeeder::class,
             ProductPriceSeeder::class,
             BlogCategorySeeder::class,
             BlogPostSeeder::class, // Added this line
