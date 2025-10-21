@@ -7,6 +7,7 @@ use App\Models\SuggestionsComplaintsForm;
 use App\Services\FileService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Helpers\DictionaryHelper;
 use OpenApi\Annotations as OA;
 
 /**
@@ -21,54 +22,40 @@ class SuggestionsComplaintsFormController extends Controller
         $this->fileService = $fileService;
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/suggestions-complaints-form",
-     *     operationId="storeSuggestionsComplaintsForm",
-     *     tags={"Suggestions & Complaints Form"},
-     *     summary="Submit suggestions and complaints form",
-     *     description="Submit a new suggestions and complaints form with file upload",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="multipart/form-data",
-     *             @OA\Schema(
-     *                 type="object",
-     *                 @OA\Property(property="name", type="string", example="John Doe", description="Full name"),
-     *                 @OA\Property(property="mobile", type="string", example="+994501234567", description="Mobile number"),
-     *                 @OA\Property(property="email", type="string", format="email", example="john@example.com", description="Email address"),
-     *                 @OA\Property(property="file", type="string", format="binary", description="Uploaded file (optional)"),
-     *                 @OA\Property(property="message", type="string", example="I have a suggestion for improvement", description="Suggestion or complaint message")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(response=201, description="Form submitted successfully", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=true), @OA\Property(property="message", type="string", example="Form submitted successfully"), @OA\Property(property="data", type="object", @OA\Property(property="id", type="integer", example=1)))),
-     *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=false), @OA\Property(property="message", type="string", example="Validation failed"), @OA\Property(property="errors", type="object"))),
-     *     @OA\Response(response=500, description="Internal server error", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=false), @OA\Property(property="message", type="string", example="Error submitting form"), @OA\Property(property="data", type="object")))
-     * )
-     */
     public function store(Request $request): JsonResponse
     {
         try {
+            $lang = $request->get('lang', 'az');
+
             $request->validate([
                 'name' => 'required|string|max:255',
-                'mobile' => 'required|string|max:20',
+                'mobile' => [
+                    'required',
+                    'string',
+                    'max:20',
+                    'regex:/^(?:\+\d{1,3}[-\s]?)?(?:\(?\d{2,4}\)?[-\s]?){2,4}\d{2,4}$/'
+                ],
                 'email' => 'required|email|max:255',
                 'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,txt,jpg,jpeg,png|max:10240',
                 'message' => 'required|string|max:2000',
             ], [
-                'name.required' => 'Name is required.',
-                'name.max' => 'Name may not be greater than 255 characters.',
-                'mobile.required' => 'Mobile number is required.',
-                'mobile.max' => 'Mobile number may not be greater than 20 characters.',
-                'email.required' => 'Email is required.',
-                'email.email' => 'Email must be a valid email address.',
-                'email.max' => 'Email may not be greater than 255 characters.',
-                'file.file' => 'File must be a valid file.',
-                'file.mimes' => 'File must be a file of type: pdf, doc, docx, xls, xlsx, txt, jpg, jpeg, png.',
-                'file.max' => 'File may not be greater than 10MB.',
-                'message.required' => 'Message is required.',
-                'message.max' => 'Message may not be greater than 2000 characters.',
+                'name.required' => DictionaryHelper::trans('name_required', $lang),
+                'name.max' => DictionaryHelper::trans('name_max', $lang),
+
+                'mobile.required' => DictionaryHelper::trans('mobile_required', $lang),
+                'mobile.max' => DictionaryHelper::trans('mobile_max', $lang),
+                'mobile.regex' => DictionaryHelper::trans('mobile_invalid', $lang),
+
+                'email.required' => DictionaryHelper::trans('email_required', $lang),
+                'email.email' => DictionaryHelper::trans('email_email', $lang),
+                'email.max' => DictionaryHelper::trans('email_max', $lang),
+
+                'file.file' => DictionaryHelper::trans('file_invalid', $lang),
+                'file.mimes' => DictionaryHelper::trans('file_mimes', $lang),
+                'file.max' => DictionaryHelper::trans('file_max', $lang),
+
+                'message.required' => DictionaryHelper::trans('message_required', $lang),
+                'message.max' => DictionaryHelper::trans('message_max', $lang),
             ]);
 
             $filePath = null;
@@ -85,7 +72,7 @@ class SuggestionsComplaintsFormController extends Controller
                 if (!$filePath) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Failed to upload file.',
+                        'message' => DictionaryHelper::trans('file_upload_failed', $lang),
                         'data' => null
                     ], 500);
                 }
@@ -101,7 +88,7 @@ class SuggestionsComplaintsFormController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Form submitted successfully',
+                'message' => DictionaryHelper::trans('form_submitted_success', $lang),
                 'data' => [
                     'id' => $form->id
                 ]
@@ -110,15 +97,15 @@ class SuggestionsComplaintsFormController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
+                'message' => DictionaryHelper::trans('validation_failed', $request->get('lang', 'az')),
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error submitting form: ' . $e->getMessage(),
+                'message' => DictionaryHelper::trans('form_submit_error', $request->get('lang', 'az')) . ': ' . $e->getMessage(),
                 'data' => null
             ], 500);
         }
     }
-} 
+}

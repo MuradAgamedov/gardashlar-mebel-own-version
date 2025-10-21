@@ -16,64 +16,7 @@ class ActionController extends Controller
 {
     use LocaleFromHeader;
 
-    /**
-     * @OA\Get(
-     *     path="/api/actions",
-     *     operationId="getActions",
-     *     tags={"Actions"},
-     *     summary="Get all actions",
-     *     description="Returns a list of all active actions with translations based on locale header",
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language ID (e.g., 1 for Azerbaijani, 2 for English, 3 for Russian)",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Parameter(
-     *         name="company_id",
-     *         in="query",
-     *         description="Filter by company ID",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Actions retrieved successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Actions retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="company_id", type="integer", example=1),
-     *                     @OA\Property(property="icon", type="string", example="local_offer", nullable=true),
-     *                     @OA\Property(property="status", type="boolean", example=true),
-     *                     @OA\Property(property="order", type="integer", example=1),
-     *                     @OA\Property(property="start_date", type="string", format="date", nullable=true),
-     *                     @OA\Property(property="end_date", type="string", format="date", nullable=true),
-     *                     @OA\Property(property="title", type="string", example="Action Title"),
-     *                     @OA\Property(property="description", type="string", example="Action description", nullable=true),
-     *                     @OA\Property(property="image_url", type="string", example="https://example.com/storage/actions/image.jpg", nullable=true),
-     *                     @OA\Property(property="image_alt_text", type="string", example="Action Image", nullable=true),
-     *                     @OA\Property(property="created_at", type="string", format="datetime"),
-     *                     @OA\Property(property="updated_at", type="string", format="datetime")
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving actions")
-     *         )
-     *     )
-     * )
-     */
+ 
     public function index(Request $request)
     {
         try {
