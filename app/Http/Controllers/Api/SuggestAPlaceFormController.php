@@ -7,6 +7,7 @@ use App\Models\SuggestAPlaceForm;
 use App\Services\FileService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Helpers\DictionaryHelper;
 use OpenApi\Annotations as OA;
 
 /**
@@ -21,15 +22,21 @@ class SuggestAPlaceFormController extends Controller
         $this->fileService = $fileService;
     }
 
-   
     public function store(Request $request): JsonResponse
     {
         try {
+            $lang = $request->get('lang', 'az'); // İstəyə görə lang parametri ilə tərcümə dilini götürürük
+
             $request->validate([
                 'name_surname' => 'required|string|max:255',
                 'email' => 'required|email|max:255',
                 'area_sqm' => 'required|string|max:50',
-                'mobile' => 'required|string|max:20',
+                'mobile' => [
+                    'required',
+                    'string',
+                    'max:20',
+                    'regex:/^(?:\+\d{1,3}[-\s]?)?(?:\(?\d{2,4}\)?[-\s]?){2,4}\d{2,4}$/'
+                ],
                 'address' => 'required|string|max:500',
                 'floor_count' => 'required|string|max:50',
                 'is_repaired' => 'required|boolean',
@@ -38,30 +45,41 @@ class SuggestAPlaceFormController extends Controller
                 'details' => 'required|string|max:2000',
                 'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,txt,jpg,jpeg,png|max:10240',
             ], [
-                'name_surname.required' => 'Name and surname is required.',
-                'name_surname.max' => 'Name and surname may not be greater than 255 characters.',
-                'email.required' => 'Email is required.',
-                'email.email' => 'Email must be a valid email address.',
-                'email.max' => 'Email may not be greater than 255 characters.',
-                'area_sqm.required' => 'Area is required.',
-                'area_sqm.max' => 'Area may not be greater than 50 characters.',
-                'mobile.required' => 'Mobile number is required.',
-                'mobile.max' => 'Mobile number may not be greater than 20 characters.',
-                'address.required' => 'Address is required.',
-                'address.max' => 'Address may not be greater than 500 characters.',
-                'floor_count.required' => 'Floor count is required.',
-                'floor_count.max' => 'Floor count may not be greater than 50 characters.',
-                'is_repaired.required' => 'Repair status is required.',
-                'is_repaired.boolean' => 'Repair status must be true or false.',
-                'has_warehouse.required' => 'Warehouse status is required.',
-                'has_warehouse.boolean' => 'Warehouse status must be true or false.',
-                'has_parking.required' => 'Parking status is required.',
-                'has_parking.boolean' => 'Parking status must be true or false.',
-                'details.required' => 'Details are required.',
-                'details.max' => 'Details may not be greater than 2000 characters.',
-                'file.file' => 'File must be a valid file.',
-                'file.mimes' => 'File must be a file of type: pdf, doc, docx, xls, xlsx, txt, jpg, jpeg, png.',
-                'file.max' => 'File may not be greater than 10MB.',
+                'name_surname.required' => DictionaryHelper::trans('name_surname_required', $lang),
+                'name_surname.max' => DictionaryHelper::trans('name_surname_max', $lang),
+
+                'email.required' => DictionaryHelper::trans('email_required', $lang),
+                'email.email' => DictionaryHelper::trans('email_email', $lang),
+                'email.max' => DictionaryHelper::trans('email_max', $lang),
+
+                'area_sqm.required' => DictionaryHelper::trans('area_required', $lang),
+                'area_sqm.max' => DictionaryHelper::trans('area_max', $lang),
+
+                'mobile.required' => DictionaryHelper::trans('mobile_required', $lang),
+                'mobile.max' => DictionaryHelper::trans('mobile_max', $lang),
+                'mobile.regex' => DictionaryHelper::trans('mobile_invalid', $lang),
+
+                'address.required' => DictionaryHelper::trans('address_required', $lang),
+                'address.max' => DictionaryHelper::trans('address_max', $lang),
+
+                'floor_count.required' => DictionaryHelper::trans('floor_count_required', $lang),
+                'floor_count.max' => DictionaryHelper::trans('floor_count_max', $lang),
+
+                'is_repaired.required' => DictionaryHelper::trans('is_repaired_required', $lang),
+                'is_repaired.boolean' => DictionaryHelper::trans('is_repaired_boolean', $lang),
+
+                'has_warehouse.required' => DictionaryHelper::trans('has_warehouse_required', $lang),
+                'has_warehouse.boolean' => DictionaryHelper::trans('has_warehouse_boolean', $lang),
+
+                'has_parking.required' => DictionaryHelper::trans('has_parking_required', $lang),
+                'has_parking.boolean' => DictionaryHelper::trans('has_parking_boolean', $lang),
+
+                'details.required' => DictionaryHelper::trans('details_required', $lang),
+                'details.max' => DictionaryHelper::trans('details_max', $lang),
+
+                'file.file' => DictionaryHelper::trans('file_invalid', $lang),
+                'file.mimes' => DictionaryHelper::trans('file_mimes', $lang),
+                'file.max' => DictionaryHelper::trans('file_max', $lang),
             ]);
 
             $filePath = null;
@@ -78,7 +96,7 @@ class SuggestAPlaceFormController extends Controller
                 if (!$filePath) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Failed to upload file.',
+                        'message' => DictionaryHelper::trans('file_upload_failed', $lang),
                         'data' => null
                     ], 500);
                 }
@@ -100,7 +118,7 @@ class SuggestAPlaceFormController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Form submitted successfully',
+                'message' => DictionaryHelper::trans('form_submitted_success', $lang),
                 'data' => [
                     'id' => $form->id
                 ]
@@ -109,13 +127,13 @@ class SuggestAPlaceFormController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
+                'message' => DictionaryHelper::trans('validation_failed', $request->get('lang', 'az')),
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error submitting form: ' . $e->getMessage(),
+                'message' => DictionaryHelper::trans('form_submit_error', $request->get('lang', 'az')) . ': ' . $e->getMessage(),
                 'data' => null
             ], 500);
         }
