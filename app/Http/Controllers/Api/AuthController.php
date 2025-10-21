@@ -11,21 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-/**
- * Authentication Controller
- *
- * @OA\Server(
- *     url="http://127.0.0.1:8000/api",
- *     description="Local API Server"
- * )
- *
- * @OA\SecurityScheme(
- *     securityScheme="bearerAuth",
- *     type="http",
- *     scheme="bearer",
- *     bearerFormat="JWT"
- * )
- */
+
 
 class AuthController extends Controller
 {

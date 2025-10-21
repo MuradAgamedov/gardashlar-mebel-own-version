@@ -21,38 +21,7 @@ class SuggestAPlaceFormController extends Controller
         $this->fileService = $fileService;
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/suggest-a-place-form",
-     *     operationId="storeSuggestAPlaceForm",
-     *     tags={"Suggest A Place Form"},
-     *     summary="Submit suggest a place form",
-     *     description="Submit a new suggest a place form with file upload",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="multipart/form-data",
-     *             @OA\Schema(
-     *                 type="object",
-     *                 @OA\Property(property="name_surname", type="string", example="John Doe", description="Full name and surname"),
-     *                 @OA\Property(property="email", type="string", format="email", example="john@example.com", description="Email address"),
-     *                 @OA\Property(property="area_sqm", type="string", example="150", description="Area in square meters"),
-     *                 @OA\Property(property="mobile", type="string", example="+994501234567", description="Mobile number"),
-     *                 @OA\Property(property="address", type="string", example="Baku, Azerbaijan", description="Address"),
-     *                 @OA\Property(property="floor_count", type="string", example="3", description="Number of floors"),
-     *                 @OA\Property(property="is_repaired", type="boolean", example=true, description="Repair status (true=repaired, false=unrepaired)"),
-     *                 @OA\Property(property="has_warehouse", type="boolean", example=true, description="Has warehouse area (true=yes, false=no)"),
-     *                 @OA\Property(property="has_parking", type="boolean", example=false, description="Has parking (true=yes, false=no)"),
-     *                 @OA\Property(property="details", type="string", example="Detailed description of the place", description="Detailed information"),
-     *                 @OA\Property(property="file", type="string", format="binary", description="Uploaded file (optional)")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(response=201, description="Form submitted successfully", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=true), @OA\Property(property="message", type="string", example="Form submitted successfully"), @OA\Property(property="data", type="object", @OA\Property(property="id", type="integer", example=1)))),
-     *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=false), @OA\Property(property="message", type="string", example="Validation failed"), @OA\Property(property="errors", type="object"))),
-     *     @OA\Response(response=500, description="Internal server error", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=false), @OA\Property(property="message", type="string", example="Error submitting form"), @OA\Property(property="data", type="object")))
-     * )
-     */
+   
     public function store(Request $request): JsonResponse
     {
         try {
