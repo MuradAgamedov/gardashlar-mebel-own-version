@@ -42,9 +42,10 @@ class RegisterController extends Controller
             $errors['surname'] = __('Surname is required');
         }
 
-        if (!empty($phone) && !preg_match('/^(?:\+\d{1,3})?\d{1,4}\d{7,10}$/', $phone)) {
+        if (!empty($phone) && !preg_match('/^(?:\+\d{1,3}[-\s]?)?(?:\(?\d{2,4}\)?[-\s]?){2,4}\d{2,4}$/', $phone)) {
             $errors['phone'] = __('Invalid phone number format');
         }
+        
 
         if (empty($email)) {
             $errors['email'] = __('Email is required');
