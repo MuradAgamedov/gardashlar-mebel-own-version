@@ -12,7 +12,7 @@ class  UserFinProductContoller extends Controller
     {
         // 1️⃣ FIN kodunu request-dən al
         $fin = $request->input('fin');
-        if (! $fin) {
+        if (!$fin) {
             return response()->json(['error' => 'fin is required'], 422);
         }
 
