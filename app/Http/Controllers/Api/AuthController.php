@@ -38,6 +38,7 @@ class AuthController extends Controller
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
+            "fin" => "nullable",
             'password_confirmation' => 'required|string|min:6',
         ], [
             'full_name.required' => 'Ad və soyad məcburidir',
@@ -72,6 +73,7 @@ class AuthController extends Controller
                 'full_name' => $request->full_name,
                 'phone' => $request->phone,
                 'email' => $request->email,
+                "fin" => $request->fin,
                 'password' => Hash::make($request->password),
             ]);
 
@@ -313,6 +315,7 @@ class AuthController extends Controller
                         'surname' => $user->surname,
                         'phone' => $user->phone,
                         'email' => $user->email,
+                        'fin' => $user->fin,
                         'email_verified' => !is_null($user->email_verified_at),
                         'email_verified_at' => $user->email_verified_at ? $user->email_verified_at->toDateTimeString() : null
                     ],
@@ -850,6 +853,7 @@ class AuthController extends Controller
                 'surname' => 'sometimes|required|string|max:255',
                 'phone' => 'sometimes|nullable|string|max:20',
                 'email' => 'sometimes|nullable|email|unique:users,email,' . $user->id,
+                'fin' => "nullable"
             ], [
                 'name.required' => 'Ad məcburidir',
                 'name.string' => 'Ad mətn formatında olmalıdır',
@@ -926,6 +930,7 @@ class AuthController extends Controller
                     'phone' => $user->phone,
                     'email' => $user->email,
                     'email_verified_at' => $user->email_verified_at,
+                    "fin" => $user->fin
                 ],
                 'otp_sent' => $otpSent
             ];
