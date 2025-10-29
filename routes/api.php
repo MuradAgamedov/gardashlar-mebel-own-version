@@ -71,9 +71,9 @@ use App\Http\Controllers\Api\RoluteeteActionController;
 use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\GetAllCountController;
 use App\Http\Controllers\Api\AllSeoPagesController;
+use App\Http\Controllers\Api\UserFinProductContoller;
+
 use App\Http\Controllers\Api\SeoPageController;
-
-
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
 Route::get('/roulette-actions', [RoluteeteActionController::class, 'index'])->name('api.roluteete-actions.index');
@@ -343,6 +343,9 @@ Route::post('/subscribers', [SubscriberController::class, 'store'])->name('api.s
 
 // Auth API Routes
 Route::post('/auth/register', [RegisterController::class, 'register'])->name('api.auth.register');
+
+Route::post('/auth/order-status', [RegisterController::class, 'register'])->name('api.auth.register');
+
 Route::post('/auth/verify-otp', [RegisterController::class, 'verifyOtp'])->name('api.auth.verify-otp');
 Route::post('/register', [AuthController::class, 'register'])->name('api.auth.register.old');
 Route::post('/send-otp', [AuthController::class, 'sendOTP'])->name('api.auth.send-otp');
