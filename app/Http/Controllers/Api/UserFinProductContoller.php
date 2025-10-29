@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
-class  UserFinProductContoller extends Controller
+class UserFinProductController extends Controller
 {
     public function index(Request $request)
     {
@@ -21,15 +21,15 @@ class  UserFinProductContoller extends Controller
         $email = env('FIN_API_EMAIL');
         $password = env('FIN_API_PASSWORD');
 
-        if (! $baseUrl || ! $email || ! $password) {
+        if (!$baseUrl || !$email || !$password) {
             return response()->json(['error' => 'API credentials missing in .env'], 500);
         }
 
         try {
-            // 3️⃣ Əvvəlcə login et və token al
-            $loginResponse = Http::withHeaders([
-                'Content-Type' => 'application/json',
-            ])->post("{$baseUrl}/login", [
+            // 3️⃣ Login üçün API-yə POST göndər
+            $loginUrl = "{$baseUrl}/login";
+
+            $loginResponse = Http::asJson()->post($loginUrl, [
                 'email' => $email,
                 'password' => $password,
                 'deviceToken' => '',
@@ -37,41 +37,46 @@ class  UserFinProductContoller extends Controller
 
             if ($loginResponse->failed()) {
                 return response()->json([
-                    'error' => 'Login failed',
+                    'error' => 'Login request failed',
+                    'login_url' => $loginUrl,
                     'details' => $loginResponse->json(),
                 ], $loginResponse->status());
             }
 
-            // Tokeni tap
+            // 4️⃣ Token tap
             $token = $loginResponse->json('data.token')
                 ?? $loginResponse->json('token')
                 ?? null;
 
-            if (! $token) {
-                return response()->json(['error' => 'Token not found in login response'], 500);
+            if (!$token) {
+                return response()->json([
+                    'error' => 'Token not found in login response',
+                    'response' => $loginResponse->json(),
+                ], 500);
             }
 
-            // 4️⃣ Tokenlə fin-ə əsasən məlumat al
-            $invoiceUrl = "{$baseUrl}/sales/invoice-products?fin={$fin}";
+            // 5️⃣ Token ilə fin sorğusu et
+            $invoiceUrl = "{$baseUrl}/sales/invoice-products?fin=" . urlencode($fin);
 
             $invoiceResponse = Http::withToken($token)
                 ->acceptJson()
                 ->get($invoiceUrl);
 
-            // 5️⃣ Əgər uğurludursa tam cavabı qaytar
+            // 6️⃣ Əgər uğurludursa tam cavabı qaytar
             if ($invoiceResponse->successful()) {
-                return response()->json($invoiceResponse->json());
+                return response()->json($invoiceResponse->json(), 200);
             }
 
-            // 6️⃣ Uğursuzdursa statusla birlikdə cavabı qaytar
+            // 7️⃣ Əks halda xətanı qaytar
             return response()->json([
                 'error' => 'Invoice API request failed',
+                'url' => $invoiceUrl,
                 'details' => $invoiceResponse->json(),
             ], $invoiceResponse->status());
 
         } catch (\Throwable $e) {
             return response()->json([
-                'error' => 'Unexpected error',
+                'error' => 'Unexpected error occurred',
                 'message' => $e->getMessage(),
             ], 500);
         }
