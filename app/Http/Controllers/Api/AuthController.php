@@ -1057,6 +1057,7 @@ class AuthController extends Controller
                         'surname' => $user->surname,
                         'phone' => $user->phone,
                         'email' => $user->email,
+                        'fin' => $user->fin,
                         'email_verified_at' => $user->email_verified_at,
                     ]
                 ]
