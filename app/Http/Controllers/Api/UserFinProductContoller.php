@@ -10,7 +10,6 @@ class  UserFinProductContoller extends Controller
 {
     public function index(Request $request)
     {
-        dd($request->all());
         // 1️⃣ FIN kodunu request-dən al
         $fin = $request->input('fin');
         if (!$fin) {
