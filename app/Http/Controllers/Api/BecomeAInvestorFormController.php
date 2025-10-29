@@ -24,66 +24,7 @@ class BecomeAInvestorFormController extends Controller
         $this->fileService = $fileService;
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/become-a-investor-forms",
-     *     summary="Submit become a investor form",
-     *     description="Submit a new become a investor form with file upload",
-     *     tags={"Become A Investor Forms"},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="multipart/form-data",
-     *             @OA\Schema(
-     *                 required={"name", "mobile", "email", "message"},
-     *                 @OA\Property(property="name", type="string", example="John Doe", description="Full name"),
-     *                 @OA\Property(property="mobile", type="string", example="+994501234567", description="Mobile number"),
-     *                 @OA\Property(property="email", type="string", format="email", example="john@example.com", description="Email address"),
-     *                 @OA\Property(property="message", type="string", example="I want to invest in your project", description="Application message"),
-     *                 @OA\Property(property="file", type="string", format="binary", description="Optional file upload (PDF, DOC, DOCX, max 10MB)")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=201,
-     *         description="Form submitted successfully",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Form submitted successfully"),
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *
-     *                 @OA\Property(property="name", type="string", example="John Doe"),
-     *                 @OA\Property(property="mobile", type="string", example="+994501234567"),
-     *                 @OA\Property(property="email", type="string", example="john@example.com"),
-     *                 @OA\Property(property="message", type="string", example="I want to invest in your project"),
-     *                 @OA\Property(property="file", type="string", example="become-a-investor-forms/file.pdf"),
-     *                 @OA\Property(property="created_at", type="string", format="date-time")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Validation failed"),
-     *             @OA\Property(property="errors", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error submitting form")
-     *         )
-     *     )
-     * )
-     */
+  
     public function store(Request $request)
     {
         try {
