@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
-class UserFinProductContoller extends Controller
+class UserFinProductController extends Controller
 {
     /**
      * Əsas endpoint: FIN koduna görə məhsul məlumatlarını alır.
@@ -77,8 +77,11 @@ class UserFinProductContoller extends Controller
             throw new \Exception('Login request failed: ' . json_encode($response->json()));
         }
 
-        return $response->json('data.token')
+        // ✅ Token artıq "data.accessToken" içindədir
+        return $response->json('data.accessToken')
+            ?? $response->json('accessToken')
             ?? $response->json('token')
+            ?? $response->json('data.token')
             ?? null;
     }
 }
