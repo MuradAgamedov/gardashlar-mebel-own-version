@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Http;
 
 class UserFinProductContoller extends Controller
 {
-    /**
-     * Əsas endpoint: FIN koduna görə məhsul məlumatlarını alır.
-     */
     public function index(Request $request)
     {
         $fin = $request->input('fin');
@@ -20,20 +17,20 @@ class UserFinProductContoller extends Controller
         }
 
         try {
-            // 1️⃣ Token al (login API vasitəsilə)
             $token = $this->getFinApiToken();
 
             if (!$token) {
                 return response()->json(['error' => 'Token could not be retrieved'], 500);
             }
 
-            // 2️⃣ FIN koduna əsasən məlumat al
             $baseUrl = rtrim(env('FIN_API_BASE_URL'), '/');
             $invoiceUrl = "{$baseUrl}/sales/invoice-products?fin=" . urlencode($fin);
 
-            $invoiceResponse = Http::withToken($token)
-                ->acceptJson()
-                ->get($invoiceUrl);
+            // ✅ Auth header düz formatda
+            $invoiceResponse = Http::withHeaders([
+                'Accept' => 'application/json',
+                'X-AUTH-TOKEN' => $token,
+            ])->get($invoiceUrl);
 
             if ($invoiceResponse->successful()) {
                 return response()->json($invoiceResponse->json(), 200);
@@ -52,9 +49,6 @@ class UserFinProductContoller extends Controller
         }
     }
 
-    /**
-     * Gizli login metodu — route yoxdur, yalnız daxildə istifadə olunur.
-     */
     private function getFinApiToken(): ?string
     {
         $baseUrl = rtrim(env('FIN_API_BASE_URL'), '/');
@@ -77,11 +71,9 @@ class UserFinProductContoller extends Controller
             throw new \Exception('Login request failed: ' . json_encode($response->json()));
         }
 
-        // ✅ Token artıq "data.accessToken" içindədir
+        // ✅ Token yeri: data.accessToken
         return $response->json('data.accessToken')
             ?? $response->json('accessToken')
-            ?? $response->json('token')
-            ?? $response->json('data.token')
             ?? null;
     }
 }
