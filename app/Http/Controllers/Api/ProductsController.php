@@ -195,6 +195,9 @@ class ProductsController extends Controller
                         $query->whereIn('product_color_id', $colorIds);
                     }
                 },
+                'images.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                },
                 'types.translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
                 },
@@ -291,6 +294,11 @@ class ProductsController extends Controller
             $productsData = $products->map(function ($product) use ($languageId) {
                 $translation = $product->translates->first();
                 $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
+                $mainImageAlt = '';
+                if ($mainImage) {
+                    $imgTr = $mainImage->translates->first();
+                    $mainImageAlt = $imgTr ? $imgTr->alt_text : '';
+                }
                 $categorySlug = null;
                 $parentSlug = null;
     
@@ -327,6 +335,7 @@ class ProductsController extends Controller
                     'price' => $product->price,
                     'view_count' => $product->view_count,
                     'card_image' => $mainImage && $mainImage->image ? asset('storage/' . $mainImage->image) : asset('images/default_image.webp'),
+                    'card_image_alt' => $mainImageAlt,
                     'discount_price' => $product->discount_price,
                     'category_slug' => $categorySlug,
                     'parentSlug' => $parentSlug,
@@ -470,6 +479,7 @@ class ProductsController extends Controller
                 'detailValues.details.translates' => fn($q) => $q->where('language_id', $languageId),
                 'categories.translates' => fn($q) => $q->where('language_id', $languageId),
                 'images' => fn($q) => $q->where('status', true)->orderBy('order'),
+                'images.translates' => fn($q) => $q->where('language_id', $languageId),
             ])
             ->whereHas('translates', fn($q) => $q->where('slug', $slug));
 
@@ -586,13 +596,15 @@ class ProductsController extends Controller
                 $images = $images->where('product_color_id', $colorId);
             }
     
-            $productImages = $images->map(function ($image) {
+            $productImages = $images->map(function ($image) use ($languageId) {
+                $imgTr = $image->translates->first();
                 return [
                     'id' => $image->id,
                     'image_url' => $image->image ? asset('storage/' . $image->image) : null,
                     'is_main' => $image->is_main,
                     'order' => $image->order,
                     'color_id' => $image->product_color_id,
+                    'alt_text' => $imgTr ? $imgTr->alt_text : '',
                 ];
             });
     
@@ -681,6 +693,11 @@ class ProductsController extends Controller
             $similarData = $similarProducts->map(function ($item) use ($languageId, $user) {
                 $translation = $item->translates()->where('language_id', $languageId)->first();
                 $mainImage = $item->images()->where('status', true)->orderBy('order')->first();
+                $mainImageAlt = '';
+                if ($mainImage) {
+                    $tr = $mainImage->translates()->where('language_id', $languageId)->first();
+                    $mainImageAlt = $tr ? $tr->alt_text : '';
+                }
     
                 // Category slug və parent slug
                 $categorySlug = null;
@@ -742,6 +759,7 @@ class ProductsController extends Controller
                     'card_image' => $mainImage && $mainImage->image
                         ? asset('storage/' . $mainImage->image)
                         : asset('images/default_image.webp'),
+                    'card_image_alt' => $mainImageAlt,
                     'category_slug' => $categorySlug,
                     'parentSlug' => $parentSlug,
                     'inCart' => $inCart,
@@ -788,6 +806,9 @@ class ProductsController extends Controller
                 },
                 'images' => function($q) {
                     $q->where('status', true)->orderBy('order');
+                },
+                'images.translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
                 },
                 'categories.translates' => function($q) use ($languageId) {
                     $q->where('language_id', $languageId);
@@ -866,6 +887,9 @@ class ProductsController extends Controller
                 },
                 'images' => function($query) {
                     $query->where('status', true)->orderBy('order');
+                },
+                'images.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
                 },
                 'types.translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
@@ -966,6 +990,16 @@ class ProductsController extends Controller
                         'view_count' => $product->view_count,
                         'discount_price' => $product->discount_price,
                         'images' => $product->images->map(fn($img) => asset('storage/' . $img->image)),
+                        'images_detailed' => $product->images->map(function ($img) use ($languageId) {
+                            $tr = $img->translates->first();
+                            return [
+                                'image_url' => $img->image ? asset('storage/' . $img->image) : null,
+                                'alt_text' => $tr ? $tr->alt_text : '',
+                                'is_main' => $img->is_main,
+                                'order' => $img->order,
+                                'color_id' => $img->product_color_id,
+                            ];
+                        }),
                         'details' => $detailsData,
                         'inCart' => $inCart,
                         'inFavorite' => $inFavorite,

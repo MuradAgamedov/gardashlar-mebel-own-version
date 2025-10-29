@@ -58,6 +58,9 @@ class ProductTypeProductController extends Controller
                     'images' => function($q) {
                         $q->active()->ordered();
                     },
+                    'images.translates' => function($q) use ($languageId) {
+                        $q->where('language_id', $languageId);
+                    },
                     'categories.translates' => function($q) use ($languageId) {
                         $q->where('language_id', $languageId);
                     }
@@ -92,6 +95,11 @@ class ProductTypeProductController extends Controller
             $products = $products->map(function ($product) use ($languageId, $cartIds, $favIds, $compareIds) {
                 $translation = $product->translates->first();
                 $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
+                $mainImageAlt = '';
+                if ($mainImage) {
+                    $imgTr = $mainImage->translates->first();
+                    $mainImageAlt = $imgTr ? $imgTr->alt_text : '';
+                }
     
                 $categorySlug = null;
                 $parentSlug = null;
@@ -117,6 +125,7 @@ class ProductTypeProductController extends Controller
                     'price' => $product->price,
                     'view_count' => $product->view_count ?? 0,
                     'card_image' => $mainImage && $mainImage->image ? asset('storage/' . $mainImage->image) : asset('images/default_image.webp'),
+                    'card_image_alt' => $mainImageAlt,
                     'discount_price' => $product->discount_price,
                     'category_slug' => $categorySlug,
                     'parentSlug' => $parentSlug,
