@@ -12,6 +12,7 @@
                 <tr>
                     <th>#</th>
                     <th>Full Name</th>
+                    <th>Ordere</th>
                     <th>Phone</th>
                     <th>Email</th>
                     <th>City</th>
@@ -32,6 +33,7 @@
                     <tr>
                         <td>{{ $order->id }}</td>
                         <td>{{ $order->full_name }}</td>
+                        <td>{{ $order->fin }}</td>
                         <td>{{ $order->phone }}</td>
                         <td>{{ $order->email }}</td>
                         <td>{{ $order->city }}</td>
