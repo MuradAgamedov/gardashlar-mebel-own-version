@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
-class UserFinProductController extends Controller
+class UserFinProductContoller extends Controller
 {
     /**
      * Əsas endpoint: FIN koduna görə məhsul məlumatlarını alır.
