@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Http;
 
 class UserFinProductContoller extends Controller
 {
+    /**
+     * FIN koduna görə məhsul məlumatlarını alır.
+     */
     public function index(Request $request)
     {
         $fin = $request->input('fin');
@@ -17,19 +20,21 @@ class UserFinProductContoller extends Controller
         }
 
         try {
-            $token = $this->getFinApiToken();
+            // 🔐 Token və Tenant məlumatı al
+            $auth = $this->getFinApiAuthData();
 
-            if (!$token) {
-                return response()->json(['error' => 'Token could not be retrieved'], 500);
+            if (empty($auth['token']) || empty($auth['tenant_id'])) {
+                return response()->json(['error' => 'Auth data missing (token or tenant_id)'], 500);
             }
 
             $baseUrl = rtrim(env('FIN_API_BASE_URL'), '/');
-            $invoiceUrl = "{$baseUrl}/sales/invoice-products?fin=" . urlencode($fin);
+            $invoiceUrl = "{$baseUrl}/sales/invoice-products?fin=" . urlencode($fin) . "&invoiceTypes[]=11";
 
-            // ✅ Auth header düz formatda
+            // ✅ Curl-dakı kimi düzgün header-larla
             $invoiceResponse = Http::withHeaders([
                 'Accept' => 'application/json',
-                'X-AUTH-TOKEN' => $token,
+                'X-AUTH-PROTOKEN' => $auth['token'],
+                'X-TENANT-ID' => $auth['tenant_id'],
             ])->get($invoiceUrl);
 
             if ($invoiceResponse->successful()) {
@@ -49,7 +54,10 @@ class UserFinProductContoller extends Controller
         }
     }
 
-    private function getFinApiToken(): ?string
+    /**
+     * Login edir və həm token, həm də tenant_id qaytarır.
+     */
+    private function getFinApiAuthData(): array
     {
         $baseUrl = rtrim(env('FIN_API_BASE_URL'), '/');
         $email = env('FIN_API_EMAIL');
@@ -71,9 +79,11 @@ class UserFinProductContoller extends Controller
             throw new \Exception('Login request failed: ' . json_encode($response->json()));
         }
 
-        // ✅ Token yeri: data.accessToken
-        return $response->json('data.accessToken')
-            ?? $response->json('accessToken')
-            ?? null;
+        $data = $response->json('data') ?? [];
+
+        return [
+            'token' => $data['accessToken'] ?? null,
+            'tenant_id' => $data['tenants'][0]['id'] ?? null,
+        ];
     }
 }
