@@ -24,6 +24,7 @@ class User extends Authenticatable
         'phone',
         'email',
         'password',
+        'fin',
         'pending_email',
         'pending_email_token',
         'pending_email_expires_at',

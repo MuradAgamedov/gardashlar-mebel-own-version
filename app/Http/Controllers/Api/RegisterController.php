@@ -27,6 +27,7 @@ class RegisterController extends Controller
         $surname = trim($request->input('surname'));
         $phone = trim($request->input('phone'));
         $email = trim($request->input('email'));
+        $fin = trim((string)$request->input('fin'));
         $password = $request->input('password');
         $passwordConfirmation = $request->input('password_confirmation');
 
@@ -44,6 +45,11 @@ class RegisterController extends Controller
 
         if (!empty($phone) && !preg_match('/^(?:\+\d{1,3}[-\s]?)?(?:\(?\d{2,4}\)?[-\s]?){2,4}\d{2,4}$/', $phone)) {
             $errors['phone'] = __('Invalid phone number format');
+        }
+        
+        // Optional FIN validation (alphanumeric and - _ . allowed, 2-50 chars)
+        if (!empty($fin) && !preg_match('/^[A-Za-z0-9._-]{2,50}$/', $fin)) {
+            $errors['fin'] = __('Invalid FIN format');
         }
         
 
@@ -104,6 +110,7 @@ class RegisterController extends Controller
                 'surname' => $surname,
                 'phone' => $phone,
                 'email' => $email,
+                'fin' => $fin ?: null,
                 'password' => Hash::make($password),
                 'email_verified_at' => null, // Not verified yet
             ]);
@@ -122,6 +129,7 @@ class RegisterController extends Controller
                             'surname' => $user->surname,
                             'phone' => $user->phone,
                             'email' => $user->email,
+                            'fin' => $user->fin,
                             'email_verified' => false
                         ],
                         'otp_sent' => true,
@@ -213,6 +221,7 @@ class RegisterController extends Controller
                         'surname' => $user->surname,
                         'phone' => $user->phone,
                         'email' => $user->email,
+                        'fin' => $user->fin,
                         'email_verified' => true,
                         'email_verified_at' => $user->email_verified_at->toDateTimeString()
                     ],
