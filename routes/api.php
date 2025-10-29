@@ -344,7 +344,7 @@ Route::post('/subscribers', [SubscriberController::class, 'store'])->name('api.s
 // Auth API Routes
 Route::post('/auth/register', [RegisterController::class, 'register'])->name('api.auth.register');
 
-Route::post('/auth/order-status', [UserFinProductContoller::class, 'index'])->name('api.auth.order_status');
+Route::get('/auth/order-status', [UserFinProductContoller::class, 'index'])->name('api.auth.order_status');
 
 Route::post('/auth/verify-otp', [RegisterController::class, 'verifyOtp'])->name('api.auth.verify-otp');
 Route::post('/register', [AuthController::class, 'register'])->name('api.auth.register.old');
