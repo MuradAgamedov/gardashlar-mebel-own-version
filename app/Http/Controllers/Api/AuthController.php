@@ -136,6 +136,7 @@ class AuthController extends Controller
                         'full_name' => $user->full_name,
                         'phone' => $user->phone,
                         'email' => $user->email,
+                        'fin' => $user->fin,
                     ],
                     'otp_sent' => true,
                     'contact_type' => $contactType,
