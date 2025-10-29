@@ -893,7 +893,9 @@ class AuthController extends Controller
             if ($request->has('phone')) {
                 $user->phone = $request->phone;
             }
-
+            if ($request->has('fin')) {
+                $user->fin = $request->fin;
+            }
             // Handle email change with pending verification
             if ($request->has('email')) {
                 if ($request->email !== $oldEmail) {
