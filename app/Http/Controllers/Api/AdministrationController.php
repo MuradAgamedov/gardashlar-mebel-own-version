@@ -14,51 +14,7 @@ class AdministrationController extends Controller
 {
     use LocaleFromHeader;
 
-    /**
-     * @OA\Get(
-     *     path="/api/administrations",
-     *     operationId="getAdministrations",
-     *     tags={"Administrations"},
-     *     summary="Get all administration members",
-     *     description="Returns a list of all active administration members, translated based on locale header",
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language ID (e.g., 1 for Azerbaijani, 2 for English)",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful response",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="image_url", type="string", example="https://example.com/storage/administrations/image.jpg", nullable=true),
-     *                     @OA\Property(property="title", type="string", example="John Doe"),
-     *                     @OA\Property(property="position", type="string", example="CEO"),
     
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving administration members")
-     *         )
-     *     )
-     * )
-     */
     public function index(Request $request): JsonResponse
     {
         try {

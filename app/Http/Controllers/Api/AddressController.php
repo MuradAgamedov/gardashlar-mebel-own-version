@@ -15,49 +15,7 @@ class AddressController extends Controller
 {
     use LocaleFromHeader;
 
-    /**
-     * @OA\Get(
-     *     path="/api/addresses",
-     *     operationId="getAddresses",
-     *     tags={"Addresses"},
-     *     summary="Get all addresses",
-     *     description="Returns a list of all active addresses with their types, translated based on locale header",
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language ID (e.g., 1 for Azerbaijani, 2 for English)",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful response",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="type", type="string", example="Baş ofis"),
-     *                     @OA\Property(property="address", type="string", example="Bakı şəhəri, Nərimanov rayonu, Atatürk prospekti 123")
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving addresses")
-     *         )
-     *     )
-     * )
-     */
+    
     public function index(Request $request): JsonResponse
     {
         try {
