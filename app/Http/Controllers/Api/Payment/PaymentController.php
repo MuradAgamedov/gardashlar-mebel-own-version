@@ -350,6 +350,7 @@ class PaymentController extends Controller
                 ->select([
                     'order_id',
                     'full_name',
+                    "fin",
                     'phone',
                     'email',
                     'fin',

@@ -12,7 +12,7 @@
                 <tr>
                     <th>#</th>
                     <th>Full Name</th>
-                    <th>Ordere</th>
+                    <th>Fin</th>
                     <th>Phone</th>
                     <th>Email</th>
                     <th>City</th>
