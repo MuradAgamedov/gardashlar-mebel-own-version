@@ -71,7 +71,7 @@ use App\Http\Controllers\Api\RoluteeteActionController;
 use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\GetAllCountController;
 use App\Http\Controllers\Api\AllSeoPagesController;
-use App\Http\Controllers\Api\UserFinProductController;
+use App\Http\Controllers\Api\UserFinProductContoller;
 
 use App\Http\Controllers\Api\SeoPageController;
 // Language API Routes
