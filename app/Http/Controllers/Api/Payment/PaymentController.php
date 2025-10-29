@@ -254,7 +254,27 @@ class PaymentController extends Controller
             ]);
 
             $deliveryMethodName = $this->deliveryMethods[$data['delivery_method']];
-            $paymentMethodName  = $this->paymentMethods[$data['payment_method']];
+            $paymentMethodName  =$data = $request->validate([
+                'order_id'        => "nullable|string",
+                'product_ids'     => 'required|array|min:1',
+                'product_ids.*'   => 'exists:products,id',
+                'full_name'       => 'required|string|max:255',
+                'phone'           => 'required|string|max:20',
+                'email'           => 'required|email|max:255',
+                'fin'             => 'nullable|regex:/^[A-NP-Z0-9]{7}$/',
+                'city'            => 'required|string|max:255',
+                'address'         => 'nullable|string',
+                'amount'          => 'nullable|numeric',
+                'months'          => 'nullable|in:2,3,6,9,12',
+                'language'        => 'nullable|in:az,en,ru',
+                'delivery_method' => 'required|integer|in:' . implode(',', array_keys($this->deliveryMethods)),
+                'payment_method'  => 'required|integer|in:' . implode(',', array_keys($this->paymentMethods)),
+                'selected_card'   => 'nullable|integer|exists:credit_cards,id',
+                'text'            => 'nullable|string',
+            ], [
+                'fin.regex' => 'FIN yalnız 7 simvoldan ibarət olmalı və yalnız A-N, P-Z və 0-9 simvollarına icazə verilir',
+            ]);
+             $this->paymentMethods[$data['payment_method']];
 
             // Kredit kartın adı (əgər varsa)
             $cardId = null;

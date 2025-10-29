@@ -38,8 +38,8 @@ class AuthController extends Controller
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
-            "fin" => "nullable",
             'password_confirmation' => 'required|string|min:6',
+            'fin' => ['nullable', 'regex:/^[A-NP-Z0-9]{7}$/'],
         ], [
             'full_name.required' => 'Ad və soyad məcburidir',
             'phone.nullable' => 'Telefon nömrəsi seçimlidir',
@@ -50,7 +50,9 @@ class AuthController extends Controller
             'password.min' => 'Şifrə ən azı 6 simvol olmalıdır',
             'password.confirmed' => 'Şifrə təkrarı düzgün deyil',
             'password_confirmation.required' => 'Şifrə təkrarı məcburidir',
+            'fin.regex' => 'FIN yalnız 7 simvoldan ibarət olmalı və A-N, P-Z və 0-9 aralığında olmalıdır',
         ]);
+        
 
         // Custom validation: either phone or email must be provided
         $validator->after(function ($validator) use ($request) {
