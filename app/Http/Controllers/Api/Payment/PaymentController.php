@@ -241,26 +241,6 @@ class PaymentController extends Controller
                 'full_name'       => 'required|string|max:255',
                 'phone'           => 'required|string|max:20',
                 'email'           => 'required|email|max:255',
-                'fin'             => 'nullable|regex:/^[A-Za-z0-9._-]{2,50}$/',
-                'city'            => 'required|string|max:255',
-                'address'         => 'nullable|string',
-                'amount'          => 'nullable|numeric',
-                'months'          => 'nullable|in:2,3,6,9,12',
-                'language'        => 'nullable|in:az,en,ru',
-                'delivery_method' => 'required|integer|in:' . implode(',', array_keys($this->deliveryMethods)),
-                'payment_method'  => 'required|integer|in:' . implode(',', array_keys($this->paymentMethods)),
-                'selected_card'   => 'nullable|integer|exists:credit_cards,id',
-                "text" => 'nullable|string',
-            ]);
-
-            $deliveryMethodName = $this->deliveryMethods[$data['delivery_method']];
-            $paymentMethodName  =$data = $request->validate([
-                'order_id'        => "nullable|string",
-                'product_ids'     => 'required|array|min:1',
-                'product_ids.*'   => 'exists:products,id',
-                'full_name'       => 'required|string|max:255',
-                'phone'           => 'required|string|max:20',
-                'email'           => 'required|email|max:255',
                 'fin'             => 'nullable|regex:/^[A-NP-Z0-9]{7}$/',
                 'city'            => 'required|string|max:255',
                 'address'         => 'nullable|string',
@@ -274,21 +254,19 @@ class PaymentController extends Controller
             ], [
                 'fin.regex' => 'FIN yalnız 7 simvoldan ibarət olmalı və yalnız A-N, P-Z və 0-9 simvollarına icazə verilir',
             ]);
-             $this->paymentMethods[$data['payment_method']];
-
+    
+            $deliveryMethodName = $this->deliveryMethods[$data['delivery_method']];
+            $paymentMethodName  = $this->paymentMethods[$data['payment_method']];
+    
             // Kredit kartın adı (əgər varsa)
-            $cardId = null;
-            if (!empty($data['selected_card'])) {
-                $card = CreditCard::find($data['selected_card']);
-                $cardId = $card?->id;
-            }
-
-            // Aylıq məbləğ hesablanır, əgər months gəlməyibsə null olacaq
+            $cardId = $data['selected_card'] ?? null;
+    
+            // Aylıq məbləğ hesablanır
             $monthValue = $data['months'] ?? null;
-            $monthlyPrice = $monthValue ? ($data['amount'] / $monthValue) : null;
-
+            $monthlyPrice = $monthValue && $data['amount'] ? ($data['amount'] / $monthValue) : null;
+    
             $userId = optional($request->user())->id;
-
+    
             if (!empty($data['order_id'])) {
                 $order = Order::where('order_id', $data['order_id'])->firstOrFail();
                 $order->update([
@@ -298,18 +276,17 @@ class PaymentController extends Controller
                     'email'           => $data['email'],
                     'fin'             => $data['fin'] ?? null,
                     'city'            => $data['city'],
-                    'text'            => $data['text'],
-
                     'address'         => $data['address'] ?? null,
                     'delivery_method' => $deliveryMethodName,
                     'payment_method'  => $paymentMethodName,
                     'selected_card'   => $cardId,
-                    'month'           => $monthValue,           // 👈 burda null da yaza bilər
+                    'month'           => $monthValue,
                     'monthly_price'   => $monthlyPrice,
-                    'amount'          => $data['amount'],
+                    'amount'          => $data['amount'] ?? null,
                     'language'        => $data['language'] ?? 'EN',
                     'status'          => 'temporary',
                     'payment_status'  => 'unpaid',
+                    'text'            => $data['text'] ?? null,
                 ]);
                 $message = 'Mövcud sifariş yeniləndi';
             } else {
@@ -326,26 +303,25 @@ class PaymentController extends Controller
                     'delivery_method' => $deliveryMethodName,
                     'payment_method'  => $paymentMethodName,
                     'selected_card'   => $cardId,
-                    'month'           => $monthValue,           // 👈 burada da null ola bilər
+                    'month'           => $monthValue,
                     'monthly_price'   => $monthlyPrice,
-                    'amount'          => $data['amount'],
+                    'amount'          => $data['amount'] ?? null,
                     'language'        => $data['language'] ?? 'EN',
                     'status'          => 'temporary',
                     'payment_status'  => 'unpaid',
-                    'text'            => $data['text'],
+                    'text'            => $data['text'] ?? null,
                 ]);
                 $message = 'Yeni müvəqqəti sifariş yaradıldı';
             }
-
+    
             return response()->json([
                 'success' => true,
                 'message' => $message,
                 'data' => [
                     'order_id' => $order->order_id,
-
                 ]
             ], 201);
-
+    
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -363,7 +339,7 @@ class PaymentController extends Controller
             ], 500);
         }
     }
-
+    
 
 
 
