@@ -29,7 +29,6 @@ class UserFinProductContoller extends Controller
 
             $baseUrl = rtrim(env('FIN_API_BASE_URL'), '/');
             $invoiceUrl = "{$baseUrl}/sales/invoice-products?fin=" . urlencode($fin) . "&invoiceTypes[]=11&withAttachmentUrl=1";
-            dd($invoiceUrl);
             // ✅ Curl-dakı kimi düzgün header-larla
             $invoiceResponse = Http::withHeaders([
                 'Accept' => 'application/json',
