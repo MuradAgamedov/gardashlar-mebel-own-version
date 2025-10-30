@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class UserFinProductContoller extends Controller
 {
@@ -20,8 +21,7 @@ class UserFinProductContoller extends Controller
         }
 
         try {
-            // 🔐 Token və Tenant məlumatı al
-            $auth = $this->getFinApiAuthData();
+            $auth = $this->getCachedFinApiAuthData();
 
             if (empty($auth['token']) || empty($auth['tenant_id'])) {
                 return response()->json(['error' => 'Auth data missing (token or tenant_id)'], 500);
@@ -30,12 +30,23 @@ class UserFinProductContoller extends Controller
             $baseUrl = rtrim(env('FIN_API_BASE_URL'), '/');
             $invoiceUrl = "{$baseUrl}/sales/invoice-products?fin=" . urlencode($fin) . "&invoiceTypes[]=11&withAttachmentUrl=1";
 
-            // ✅ Curl-dakı kimi düzgün header-larla
             $invoiceResponse = Http::withHeaders([
                 'Accept' => 'application/json',
                 'X-AUTH-PROTOKEN' => $auth['token'],
                 'X-TENANT-ID' => $auth['tenant_id'],
             ])->get($invoiceUrl);
+
+            // Əgər token vaxtı bitibsə (401), yenidən login et
+            if ($invoiceResponse->status() === 401) {
+                Cache::forget('fin_api_auth');
+                $auth = $this->getCachedFinApiAuthData();
+
+                $invoiceResponse = Http::withHeaders([
+                    'Accept' => 'application/json',
+                    'X-AUTH-PROTOKEN' => $auth['token'],
+                    'X-TENANT-ID' => $auth['tenant_id'],
+                ])->get($invoiceUrl);
+            }
 
             if ($invoiceResponse->successful()) {
                 return response()->json($invoiceResponse->json(), 200);
@@ -60,8 +71,7 @@ class UserFinProductContoller extends Controller
     public function getOrderStatuses()
     {
         try {
-            // 🔐 Login məlumatlarını al
-            $auth = $this->getFinApiAuthData();
+            $auth = $this->getCachedFinApiAuthData();
 
             if (empty($auth['token']) || empty($auth['tenant_id'])) {
                 return response()->json(['error' => 'Auth data missing (token or tenant_id)'], 500);
@@ -70,12 +80,23 @@ class UserFinProductContoller extends Controller
             $baseUrl = rtrim(env('FIN_API_BASE_URL'), '/');
             $statusUrl = "{$baseUrl}/sales/status";
 
-            // ✅ Curl-dakı kimi düzgün header-larla sorğu göndər
             $statusResponse = Http::withHeaders([
                 'Accept' => 'application/json',
                 'X-AUTH-PROTOKEN' => $auth['token'],
                 'X-TENANT-ID' => $auth['tenant_id'],
             ])->get($statusUrl);
+
+            // Token vaxtı bitibsə yenilə
+            if ($statusResponse->status() === 401) {
+                Cache::forget('fin_api_auth');
+                $auth = $this->getCachedFinApiAuthData();
+
+                $statusResponse = Http::withHeaders([
+                    'Accept' => 'application/json',
+                    'X-AUTH-PROTOKEN' => $auth['token'],
+                    'X-TENANT-ID' => $auth['tenant_id'],
+                ])->get($statusUrl);
+            }
 
             if ($statusResponse->successful()) {
                 return response()->json($statusResponse->json(), 200);
@@ -92,6 +113,16 @@ class UserFinProductContoller extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Token və tenant_id-ni cache-də saxlayır (10 dəq).
+     */
+    private function getCachedFinApiAuthData(): array
+    {
+        return Cache::remember('fin_api_auth', now()->addMinutes(10), function () {
+            return $this->getFinApiAuthData();
+        });
     }
 
     /**
