@@ -14,7 +14,8 @@ class UserFinProductContoller extends Controller
      */
     public function index(Request $request)
     {
-        $fin = $request->input('fin');
+        $fin = $request->user()->fin;
+
 
         if (!$fin) {
             return response()->json(['error' => 'fin is required'], 422);
