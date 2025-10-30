@@ -29,6 +29,7 @@ class UserFinProductContoller extends Controller
 
             $baseUrl = rtrim(env('FIN_API_BASE_URL'), '/');
             $invoiceUrl = "{$baseUrl}/sales/invoice-products?fin=" . urlencode($fin) . "&invoiceTypes[]=11&withAttachmentUrl=1";
+
             // ✅ Curl-dakı kimi düzgün header-larla
             $invoiceResponse = Http::withHeaders([
                 'Accept' => 'application/json',
@@ -44,6 +45,46 @@ class UserFinProductContoller extends Controller
                 'error' => 'Invoice API request failed',
                 'details' => $invoiceResponse->json(),
             ], $invoiceResponse->status());
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'Unexpected error occurred',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Satış statuslarını gətirir.
+     */
+    public function getOrderStatuses()
+    {
+        try {
+            // 🔐 Login məlumatlarını al
+            $auth = $this->getFinApiAuthData();
+
+            if (empty($auth['token']) || empty($auth['tenant_id'])) {
+                return response()->json(['error' => 'Auth data missing (token or tenant_id)'], 500);
+            }
+
+            $baseUrl = rtrim(env('FIN_API_BASE_URL'), '/');
+            $statusUrl = "{$baseUrl}/sales/status";
+
+            // ✅ Curl-dakı kimi düzgün header-larla sorğu göndər
+            $statusResponse = Http::withHeaders([
+                'Accept' => 'application/json',
+                'X-AUTH-PROTOKEN' => $auth['token'],
+                'X-TENANT-ID' => $auth['tenant_id'],
+            ])->get($statusUrl);
+
+            if ($statusResponse->successful()) {
+                return response()->json($statusResponse->json(), 200);
+            }
+
+            return response()->json([
+                'error' => 'Order status API request failed',
+                'details' => $statusResponse->json(),
+            ], $statusResponse->status());
 
         } catch (\Throwable $e) {
             return response()->json([
