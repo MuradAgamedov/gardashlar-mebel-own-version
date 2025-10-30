@@ -334,7 +334,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/add-comment', [CommentController::class, 'addComment'])->name('api.addComment');
     Route::post('/auth/user-orders', [UserFinProductContoller::class, 'index'])->name('api.auth.order_status');
-    Route::post('/auth/order-statuses', [UserFinProductContoller::class, 'getOrderStatuses'])->name('api.auth.getOrderStatuses');
+    Route::get('/auth/order-statuses', [UserFinProductContoller::class, 'getOrderStatuses'])->name('api.auth.getOrderStatuses');
 
 
 
