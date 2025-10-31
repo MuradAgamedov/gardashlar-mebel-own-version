@@ -67,7 +67,10 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">İstifadəçilər Siyahısı</h4>
-        <a href="#" class="btn btn-primary btn-sm">Yeni İstifadəçi Əlavə Et</a>
+        <a href="{{ route('admin.registered-users.export') }}" class="btn btn-success btn-sm">
+            Excel Export
+        </a>
+
     </div>
 
     @if (session('success'))

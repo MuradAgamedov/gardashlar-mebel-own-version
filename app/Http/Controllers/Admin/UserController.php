@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\UsersExport;
 class UserController extends Controller
 {
     public function index()
@@ -20,5 +21,10 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('admin.registered-users')->with('success', 'İstifadəçi silindi.');
+    }
+
+    public function export()
+    {
+        return Excel::download(new UsersExport, 'users.xlsx');
     }
 }
