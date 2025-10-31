@@ -85,6 +85,7 @@
                         <th>#</th>
                         <th>Ad</th>
                         <th>Soyad</th>
+                        <th>Fin</th>
                         <th>Email</th>
                         <th>Telefon</th>
                         <th>Yaradılma tarixi</th>
@@ -97,6 +98,7 @@
                             <td>{{ $users->firstItem() + $index }}</td>
                             <td>{{ $user->name ?: '-' }}</td>
                             <td>{{ $user->surname ?: '-' }}</td>
+                            <td>{{ $user->fin ?: '-' }}</td>
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->phone ?: '-' }}</td>
                             <td>{{ $user->created_at?->format('d.m.Y H:i') ?: '-' }}</td>
