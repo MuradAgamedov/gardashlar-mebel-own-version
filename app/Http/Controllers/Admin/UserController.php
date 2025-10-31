@@ -19,6 +19,6 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->route('registered-users')->with('success', 'İstifadəçi silindi.');
+        return redirect()->route('admin.registered-users.index')->with('success', 'İstifadəçi silindi.');
     }
 }
