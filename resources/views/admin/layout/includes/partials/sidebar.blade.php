@@ -346,7 +346,14 @@
 
 
 
-
+      <li class="sidebar-list">
+        <a class="sidebar-link" href="{{route('admin.registered-users')}}">
+          <i class="fas fa-blog"></i>
+          <h6>Users</h6>
+          <i class="fas fa-chevron-down float-end"></i>
+        </a>
+                
+      </li>
 
     </ul>
   </div>
