@@ -2,6 +2,9 @@
 
 @section('content')
 
+{{-- Bootstrap 5 CSS --}}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
 .trash-btn {
     background: none;
@@ -65,48 +68,59 @@
     <h4 class="mb-3">İstifadəçilər Siyahısı</h4>
 
     @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Bağla"></button>
+        </div>
     @endif
 
-    <table class="table table-bordered table-striped align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th>#</th>
-                <th>Ad</th>
-                <th>Soyad</th>
-                <th>Email</th>
-                <th>Telefon</th>
-                <th>Yaradılma tarixi</th>
-                <th class="text-center">Əməliyyatlar</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($users as $index => $user)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $user->name ?: '-' }}</td>
-                    <td>{{ $user->surname ?: '-' }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>{{ $user->phone ?: '-' }}</td>
-                    <td>{{ $user->created_at?->format('d.m.Y H:i') ?: '-' }}</td>
-                    <td class="text-center">
-                        <form action="{{ route('admin.registered-users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Bu istifadəçini silmək istədiyinizə əminsiniz?');" style="display:inline-block;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="trash-btn" title="Sil">
-                                <div class="trash-icon">
-                                    <span></span>
-                                </div>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="7" class="text-center text-muted">İstifadəçi tapılmadı</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-bordered table-striped align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Ad</th>
+                        <th>Soyad</th>
+                        <th>Email</th>
+                        <th>Telefon</th>
+                        <th>Yaradılma tarixi</th>
+                        <th class="text-center">Əməliyyatlar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($users as $index => $user)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $user->name ?: '-' }}</td>
+                            <td>{{ $user->surname ?: '-' }}</td>
+                            <td>{{ $user->email }}</td>
+                            <td>{{ $user->phone ?: '-' }}</td>
+                            <td>{{ $user->created_at?->format('d.m.Y H:i') ?: '-' }}</td>
+                            <td class="text-center">
+                                <form action="{{ route('admin.registered-users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Bu istifadəçini silmək istədiyinizə əminsiniz?');" style="display:inline-block;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="trash-btn" title="Sil">
+                                        <div class="trash-icon">
+                                            <span></span>
+                                        </div>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">İstifadəçi tapılmadı</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+{{-- Bootstrap 5 JS (Alert və s. üçün) --}}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 @endsection
