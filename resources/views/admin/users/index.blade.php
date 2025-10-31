@@ -30,7 +30,7 @@
                     <td>{{ $user->phone ?: '-' }}</td>
                     <td>{{ $user->created_at?->format('d.m.Y H:i') ?: '-' }}</td>
                     <td class="text-center">
-                        <form action="{{ route('registered-users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Bu istifadəçini silmək istədiyinizə əminsiniz?');" style="display:inline-block;">
+                        <form action="{{ route('admin.registered-users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Bu istifadəçini silmək istədiyinizə əminsiniz?');" style="display:inline-block;">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger" title="Sil">
