@@ -65,7 +65,10 @@
 </style>
 
 <div class="container mt-4">
-    <h4 class="mb-3">İstifadəçilər Siyahısı</h4>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">İstifadəçilər Siyahısı</h4>
+        <a href="#" class="btn btn-primary btn-sm">Yeni İstifadəçi Əlavə Et</a>
+    </div>
 
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -75,7 +78,7 @@
     @endif
 
     <div class="card shadow-sm">
-        <div class="card-body">
+        <div class="card-body p-0">
             <table class="table table-bordered table-striped align-middle mb-0">
                 <thead class="table-dark">
                     <tr>
@@ -91,7 +94,7 @@
                 <tbody>
                     @forelse ($users as $index => $user)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $users->firstItem() + $index }}</td>
                             <td>{{ $user->name ?: '-' }}</td>
                             <td>{{ $user->surname ?: '-' }}</td>
                             <td>{{ $user->email }}</td>
@@ -118,9 +121,14 @@
             </table>
         </div>
     </div>
+
+    {{-- Pagination --}}
+    <div class="d-flex justify-content-center mt-3">
+        {{ $users->links('pagination::bootstrap-5') }}
+    </div>
 </div>
 
-{{-- Bootstrap 5 JS (Alert və s. üçün) --}}
+{{-- Bootstrap 5 JS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 @endsection
