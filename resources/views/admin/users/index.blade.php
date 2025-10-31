@@ -1,5 +1,5 @@
 @extends('admin.layout.app')
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 @section('content')
 <div class="container mt-4">
     <h4 class="mb-3">İstifadəçilər Siyahısı</h4>
@@ -34,7 +34,7 @@
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger" title="Sil">
-                                <i class="material-icons-outlined"></i>
+                                <i class="fa fa-trash"></i>
                             </button>
                         </form>
                     </td>
