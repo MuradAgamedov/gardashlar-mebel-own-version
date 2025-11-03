@@ -15,13 +15,7 @@ class PageController extends Controller
     use LocaleFromHeader;
 
    
-  use App\Models\Page;
-use App\Models\PageTranslate;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-
-public function index(Request $request): JsonResponse
+   public function index(Request $request): JsonResponse
 {
     try {
         $languageId = $this->getLanguageIdFromHeader($request);
@@ -75,7 +69,6 @@ public function index(Request $request): JsonResponse
         ], 500);
     }
 }
-
 
     public function findByKeyword(Request $request, $keyword): JsonResponse
     {
