@@ -30,7 +30,7 @@ public function index(Request $request): JsonResponse
                     
                     // slug obyektini qururuq
                     $slugTranslations = $page->translates->mapWithKeys(function ($t) {
-                        return [$t->language->code => $t->slug];
+                        return [$t->language->lang_code => $t->slug];
                     });
 
                     return [
