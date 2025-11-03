@@ -15,7 +15,13 @@ class PageController extends Controller
     use LocaleFromHeader;
 
    
-   public function index(Request $request): JsonResponse
+  use App\Models\Page;
+use App\Models\PageTranslate;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+
+public function index(Request $request): JsonResponse
 {
     try {
         $languageId = $this->getLanguageIdFromHeader($request);
@@ -23,19 +29,15 @@ class PageController extends Controller
 
         $pages = Cache::rememberForever($cacheKey, function () use ($languageId) {
             return Page::where('status', true)
-                ->with([
-                    'translates' => fn($q) => $q->where('language_id', $languageId),
-                    // əlavə olaraq bütün dillərin slug-larını gətiririk
-                    'allTranslates.language:id,lang_code,languageable_id'
-                ])
+                ->with(['translates' => fn($q) => $q->where('language_id', $languageId)])
                 ->get()
-                ->map(function ($page) {
+                ->map(function ($page) use ($languageId) {
                     $translate = $page->translates->first();
 
-                    // bütün dillərin slug obyektini qururuq
-                    $slugTranslations = collect($page->allTranslates ?? [])->mapWithKeys(function ($t) {
-                        return [$t->language->lang_code => $t->slug];
-                    });
+                    // 🔹 Bütün dillərə aid slug-ları ayrıca çəkirik
+                    $slugTranslations = PageTranslate::where('page_id', $page->id)
+                        ->join('languages', 'languages.id', '=', 'page_translates.language_id')
+                        ->pluck('page_translates.slug', 'languages.lang_code');
 
                     return [
                         'id'              => $page->id,
@@ -52,7 +54,7 @@ class PageController extends Controller
                         'opengraph_image_height' => $page->opengraph_image_height ?? null,
                         'opengraph_image_alt_text' => $translate->opengraph_image_alt_text ?? null,
 
-                        // 🔥 Sadəcə bu yeni sahə əlavə olunub
+                        // 🔥 Yeni sahə (bütün dillərin slug-ları)
                         "translates" => [
                             "slug" => $slugTranslations
                         ]
@@ -64,7 +66,6 @@ class PageController extends Controller
             'success' => true,
             'data' => $pages
         ]);
-
     } catch (\Throwable $e) {
         report($e);
         return response()->json([
