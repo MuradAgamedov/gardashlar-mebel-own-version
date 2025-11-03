@@ -71,69 +71,79 @@ class PageController extends Controller
     }
 }
 
+public function findByKeyword(Request $request, $keyword): JsonResponse
+{
+    if (empty($keyword)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Keyword parameter is required',
+            'data' => null
+        ], 400);
+    }
 
-    public function findByKeyword(Request $request, $keyword): JsonResponse
-    {
-        if (empty($keyword)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Keyword parameter is required',
-                'data' => null
-            ], 400);
-        }
+    try {
+        $languageId = $this->getLanguageIdFromHeader($request);
+        $cacheKey = "api:page:keyword:{$keyword}:lang:{$languageId}";
 
-        try {
-            $languageId = $this->getLanguageIdFromHeader($request);
-            $cacheKey = "api:page:keyword:{$keyword}:lang:{$languageId}";
+        $responseData = Cache::rememberForever($cacheKey, function () use ($keyword, $languageId) {
+            $page = Page::where('status', true)
+                ->where('keyword', $keyword)
+                ->with(['translates.language']) // bütün dilləri və dil kodlarını gətir
+                ->first();
 
-            $responseData = Cache::rememberForever($cacheKey, function () use ($keyword, $languageId) {
-                $page = Page::where('status', true)
-                    ->where('keyword', $keyword)
-                    ->with(['translates' => fn($q) => $q->where('language_id', $languageId)])
-                    ->first();
-
-                if (!$page) {
-                    return null;
-                }
-
-                $translate = $page->translates->first();
-
-                return [
-                    'id'              => $page->id,
-                    'title'           => $translate->title ?? null,
-                    'slug'            => $translate->slug ?? null,
-                    'seo_title'       => $translate->seo_title ?? null,
-                    'seo_keywords'    => $translate->seo_keywords ?? null,
-                    'seo_description' => $translate->seo_description ?? null,
-                    'opengraph_title' => $translate->opengraph_title ?? null,
-                    'opengraph_description' => $translate->opengraph_description ?? null,
-                    'opengraph_image' => $page->opengraph_image ? asset('storage/' . $page->opengraph_image) : null,
-                    'opengraph_image_width' => $page->opengraph_image_width ?? null,
-                    'opengraph_image_height' => $page->opengraph_image_height ?? null,
-                    'opengraph_image_alt_text' => $translate->opengraph_image_alt_text ?? null,
-                ];
-            });
-
-            if (!$responseData) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Page not found with this keyword',
-                    'data' => null
-                ], 404);
+            if (!$page) {
+                return null;
             }
 
-            return response()->json([
-                'success' => true,
-                'data' => $responseData
-            ]);
+            $translate = $page->translates->firstWhere('language_id', $languageId);
 
-        } catch (\Throwable $e) {
-            report($e);
+            // bütün dillər üzrə slug-ları map edirik
+            $slugTranslations = $page->translates->mapWithKeys(function ($t) {
+                return [$t->language->lang_code => $t->slug];
+            });
+
+            return [
+                'id'              => $page->id,
+                'title'           => $translate->title ?? null,
+                'slug'            => $translate->slug ?? null,
+                'seo_title'       => $translate->seo_title ?? null,
+                'seo_keywords'    => $translate->seo_keywords ?? null,
+                'seo_description' => $translate->seo_description ?? null,
+                'opengraph_title' => $translate->opengraph_title ?? null,
+                'opengraph_description' => $translate->opengraph_description ?? null,
+                'opengraph_image' => $page->opengraph_image ? asset('storage/' . $page->opengraph_image) : null,
+                'opengraph_image_width' => $page->opengraph_image_width ?? null,
+                'opengraph_image_height' => $page->opengraph_image_height ?? null,
+                'opengraph_image_alt_text' => $translate->opengraph_image_alt_text ?? null,
+
+                // yeni əlavə olunan çoxdilli slug array
+                'translates' => [
+                    'slug' => $slugTranslations
+                ],
+            ];
+        });
+
+        if (!$responseData) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error retrieving page.',
+                'message' => 'Page not found with this keyword',
                 'data' => null
-            ], 500);
+            ], 404);
         }
+
+        return response()->json([
+            'success' => true,
+            'data' => $responseData
+        ]);
+
+    } catch (\Throwable $e) {
+        report($e);
+        return response()->json([
+            'success' => false,
+            'message' => 'Error retrieving page.',
+            'data' => null
+        ], 500);
     }
+}
+
 }
