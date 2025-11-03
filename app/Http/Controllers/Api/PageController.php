@@ -15,56 +15,66 @@ class PageController extends Controller
     use LocaleFromHeader;
 
    
-    public function index(Request $request): JsonResponse
-    {
-        try {
-            $languageId = $this->getLanguageIdFromHeader($request);
-            $cacheKey = "api:pages:all:lang:{$languageId}";
+   public function index(Request $request): JsonResponse
+{
+    try {
+        $languageId = $this->getLanguageIdFromHeader($request);
+        $cacheKey = "api:pages:all:lang:{$languageId}";
 
-            $pages = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                return Page::where('status', true)
-                    ->with(['translates' => fn($q) => $q->where('language_id', $languageId)])
-                    ->get()
-                    ->map(function ($page) {
-                        $translate = $page->translates->first();
-                         $slugTranslations = $page->translates->mapWithKeys(function ($t) {
-                            return [$t->language->lang_code => $t->slug];
-                        });
-                        return [
-                            'id'              => $page->id,
-                            'keyword'         => $page->keyword,
-                            'title'           => $translate->title ?? null,
-                            'slug'            => $translate->slug ?? null,
-                            'seo_title'       => $translate->seo_title ?? null,
-                            'seo_keywords'    => $translate->seo_keywords ?? null,
-                            'seo_description' => $translate->seo_description ?? null,
-                            'opengraph_title' => $translate->opengraph_title ?? null,
-                            'opengraph_description' => $translate->opengraph_description ?? null,
-                            'opengraph_image' => $page->opengraph_image ? asset('storage/' . $page->opengraph_image) : null,
-                            'opengraph_image_width' => $page->opengraph_image_width ?? null,
-                            'opengraph_image_height' => $page->opengraph_image_height ?? null,
-                            'opengraph_image_alt_text' => $translate->opengraph_image_alt_text ?? null,
-                              "translates" => [
+        $pages = Cache::rememberForever($cacheKey, function () use ($languageId) {
+            return Page::where('status', true)
+                ->with([
+                    'translates' => fn($q) => $q->where('language_id', $languageId),
+                    // əlavə olaraq bütün dillərin slug-larını gətiririk
+                    'allTranslates.language:id,lang_code,languageable_id'
+                ])
+                ->get()
+                ->map(function ($page) {
+                    $translate = $page->translates->first();
+
+                    // bütün dillərin slug obyektini qururuq
+                    $slugTranslations = collect($page->allTranslates ?? [])->mapWithKeys(function ($t) {
+                        return [$t->language->lang_code => $t->slug];
+                    });
+
+                    return [
+                        'id'              => $page->id,
+                        'keyword'         => $page->keyword,
+                        'title'           => $translate->title ?? null,
+                        'slug'            => $translate->slug ?? null,
+                        'seo_title'       => $translate->seo_title ?? null,
+                        'seo_keywords'    => $translate->seo_keywords ?? null,
+                        'seo_description' => $translate->seo_description ?? null,
+                        'opengraph_title' => $translate->opengraph_title ?? null,
+                        'opengraph_description' => $translate->opengraph_description ?? null,
+                        'opengraph_image' => $page->opengraph_image ? asset('storage/' . $page->opengraph_image) : null,
+                        'opengraph_image_width' => $page->opengraph_image_width ?? null,
+                        'opengraph_image_height' => $page->opengraph_image_height ?? null,
+                        'opengraph_image_alt_text' => $translate->opengraph_image_alt_text ?? null,
+
+                        // 🔥 Sadəcə bu yeni sahə əlavə olunub
+                        "translates" => [
                             "slug" => $slugTranslations
                         ]
-                        ];
-                    });
-            });
+                    ];
+                });
+        });
 
-            return response()->json([
-                'success' => true,
-                'data' => $pages
-            ]);
+        return response()->json([
+            'success' => true,
+            'data' => $pages
+        ]);
 
-        } catch (\Throwable $e) {
-            report($e);
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving pages.',
-                'data' => []
-            ], 500);
-        }
+    } catch (\Throwable $e) {
+        report($e);
+        return response()->json([
+            'success' => false,
+            'message' => 'Error retrieving pages.',
+            'data' => []
+        ], 500);
     }
+}
+
 
     public function findByKeyword(Request $request, $keyword): JsonResponse
     {
