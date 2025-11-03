@@ -27,6 +27,9 @@ class PageController extends Controller
                     ->get()
                     ->map(function ($page) {
                         $translate = $page->translates->first();
+                         $slugTranslations = $page->translates->mapWithKeys(function ($t) {
+                            return [$t->language->lang_code => $t->slug];
+                        });
                         return [
                             'id'              => $page->id,
                             'keyword'         => $page->keyword,
@@ -41,6 +44,9 @@ class PageController extends Controller
                             'opengraph_image_width' => $page->opengraph_image_width ?? null,
                             'opengraph_image_height' => $page->opengraph_image_height ?? null,
                             'opengraph_image_alt_text' => $translate->opengraph_image_alt_text ?? null,
+                              "translates" => [
+                            "slug" => $slugTranslations
+                        ]
                         ];
                     });
             });
