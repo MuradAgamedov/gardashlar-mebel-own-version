@@ -28,7 +28,7 @@ class BlogPostController extends Controller
             $sort = 'newest';
         }
 
-        $cacheKey = "api:blog-posts-v2:lang:{$languageId}:page:{$page}:per_page:{$perPage}:sort:{$sort}";
+        $cacheKey = "api:blog-posts-v3:lang:{$languageId}:page:{$page}:per_page:{$perPage}:sort:{$sort}";
         if ($categorySlug) {
             $cacheKey .= ":category:{$categorySlug}";
         }
@@ -50,7 +50,6 @@ class BlogPostController extends Controller
                 case 'oldest':
                     $query->orderBy('published_at', 'asc');
                     break;
-                case 'newest':
                 default:
                     $query->orderBy('published_at', 'desc');
                     break;
@@ -59,14 +58,10 @@ class BlogPostController extends Controller
             return $query->paginate($perPage);
         });
 
+        // Blog məlumatları (translates olmadan)
         $data = $blogPosts->getCollection()->map(function ($blogPost) use ($languageId) {
             $translate = $blogPost->translates->firstWhere('language_id', $languageId);
             $categoryTranslate = $blogPost->category?->translates?->firstWhere('language_id', $languageId);
-
-            // Kateqoriyanın bütün dillərdəki slug-ları
-            $categorySlugTranslations = $blogPost->category?->translates?->mapWithKeys(function ($t) {
-                return [$t->language->lang_code => $t->slug];
-            });
 
             return [
                 'id' => $blogPost->id,
@@ -76,17 +71,14 @@ class BlogPostController extends Controller
                 'card_image_url' => $blogPost->card_image_url,
                 'card_description' => $translate->card_description ?? null,
                 'category_slug' => $categoryTranslate->slug ?? null,
-                'translates' => [
-                    'category_slug' => $categorySlugTranslations ?? (object)[]
-                ]
             ];
         });
 
-        // Translates array (ümumi bütün kateqoriyaların slug-ları üçün)
-        $allCategoryTranslations = [];
-        foreach ($data as $item) {
-            if (!empty($item['translates']['category_slug'])) {
-                $allCategoryTranslations[] = $item['translates']['category_slug'];
+        // Ümumi bütün dillərdəki slug-lar (yalnız 1 dəfə gələcək)
+        $slugTranslations = [];
+        foreach ($blogPosts as $post) {
+            foreach ($post->translates as $t) {
+                $slugTranslations[$t->language->lang_code][$post->id] = $t->slug;
             }
         }
 
@@ -104,7 +96,9 @@ class BlogPostController extends Controller
                     ['value' => 'newest', 'label' => 'Ən yeni'],
                     ['value' => 'oldest', 'label' => 'Ən köhnə']
                 ],
-                'translates' => $allCategoryTranslations
+                'translates' => [
+                    'slug' => $slugTranslations
+                ]
             ]
         ], 200);
 
