@@ -14,7 +14,8 @@ class BlogPostController extends Controller
 {
     use LocaleFromHeader;
 
-   public function index(Request $request): JsonResponse
+ 
+  public function index(Request $request): JsonResponse
 {
     try {
         $languageId = $this->getLanguageIdFromHeader($request);
@@ -36,7 +37,7 @@ class BlogPostController extends Controller
         $blogPosts = Cache::remember($cacheKey, 3600, function () use ($languageId, $page, $perPage, $categorySlug, $sort) {
             $query = BlogPost::published()
                 ->with([
-                    'translates.language',
+                    'translates' => fn($q) => $q->where('language_id', $languageId),
                     'category.translates.language'
                 ]);
 
@@ -58,10 +59,10 @@ class BlogPostController extends Controller
             return $query->paginate($perPage);
         });
 
-        // Blog məlumatları (translates olmadan)
-        $data = $blogPosts->getCollection()->map(function ($blogPost) use ($languageId) {
-            $translate = $blogPost->translates->firstWhere('language_id', $languageId);
-            $categoryTranslate = $blogPost->category?->translates?->firstWhere('language_id', $languageId);
+        // Blog məlumatları (kateqoriya və tərcümə ilə)
+        $data = $blogPosts->getCollection()->map(function ($blogPost) {
+            $translate = $blogPost->translates->first();
+            $categoryTranslate = $blogPost->category?->translates?->first();
 
             return [
                 'id' => $blogPost->id,
@@ -74,11 +75,19 @@ class BlogPostController extends Controller
             ];
         });
 
-        // Ümumi bütün dillərdəki slug-lar (yalnız 1 dəfə gələcək)
-        $slugTranslations = [];
-        foreach ($blogPosts as $post) {
-            foreach ($post->translates as $t) {
-                $slugTranslations[$t->language->lang_code][$post->id] = $t->slug;
+        // Əgər category_slug seçilibsə, həmin kateqoriyanın bütün dillərdəki slug-larını alırıq
+        $categorySlugTranslations = null;
+        if ($categorySlug) {
+            $category = \App\Models\BlogCategory::whereHas('translates', function ($q) use ($categorySlug) {
+                $q->where('slug', $categorySlug);
+            })
+                ->with(['translates.language'])
+                ->first();
+
+            if ($category) {
+                $categorySlugTranslations = $category->translates->mapWithKeys(function ($t) {
+                    return [$t->language->lang_code => $t->slug];
+                });
             }
         }
 
@@ -97,7 +106,7 @@ class BlogPostController extends Controller
                     ['value' => 'oldest', 'label' => 'Ən köhnə']
                 ],
                 'translates' => [
-                    'slug' => $slugTranslations
+                    'slug' => $categorySlugTranslations ?? (object)[]
                 ]
             ]
         ], 200);
@@ -112,6 +121,102 @@ class BlogPostController extends Controller
 }
 
 
+    /**
+     * @OA\Get(
+     *     path="/api/blog-posts/{slug}",
+     *     operationId="getBlogPostBySlug",
+     *     tags={"BlogPosts"},
+     *     summary="Get a specific blog post by slug",
+     *     description="Returns a specific blog post with full details by slug",
+     *     @OA\Parameter(
+     *         name="locale",
+     *         in="header",
+     *         description="Language_id from languages api",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="integer",
+     *             example=1
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="slug",
+     *         in="path",
+     *         description="Blog post slug",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="string",
+     *             example="blog-post-slug"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="title", type="string", example="Blog Post Title"),
+     *                 @OA\Property(property="slug", type="string", example="blog-post-slug"),
+     *                 @OA\Property(property="description", type="string", example="Full blog post content"),
+     *                 @OA\Property(property="card_image_url", type="string", example="https://example.com/image.jpg"),
+     *                 @OA\Property(property="inner_banner_image_url", type="string", example="https://example.com/banner.jpg"),
+     *                 @OA\Property(property="published_at", type="string", example="2024-01-01T00:00:00.000000Z"),
+     *                 @OA\Property(
+     *                     property="category",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="title", type="string", example="Category Title"),
+     *                     @OA\Property(property="slug", type="string", example="category-slug")
+     *                 ),
+     *                 @OA\Property(property="category_slug", type="string", example="category-slug"),
+     *                 @OA\Property(
+     *                     property="images",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="image_url", type="string", example="https://example.com/storage/uploads/blogs/images/image1.jpg")
+     *                     )
+     *                 ),
+     *                 @OA\Property(
+     *                     property="similar_blogs",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=2),
+     *                         @OA\Property(property="title", type="string", example="Similar Blog Post"),
+     *                         @OA\Property(property="slug", type="string", example="similar-blog-post"),
+     *                         @OA\Property(property="card_image_url", type="string", example="https://example.com/similar-image.jpg"),
+     *                         @OA\Property(property="card_description", type="string", example="Similar blog description"),
+     *                         @OA\Property(property="category_slug", type="string", example="category-slug")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Blog post not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Blog post not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error retrieving blog post")
+     *         )
+     *     )
+     * )
+     */
     public function show(Request $request, string $slug): JsonResponse
     {
         try {
@@ -121,11 +226,11 @@ class BlogPostController extends Controller
             $blogPost = Cache::remember($cacheKey, 3600, function () use ($slug, $languageId) {
                 return BlogPost::published()
                     ->with([
-                        'translates.language',
-                        'category.translates.language',
+                        'translates' => fn($q) => $q->where('language_id', $languageId),
+                        'category.translates' => fn($q) => $q->where('language_id', $languageId),
                         'images'
                     ])
-                    ->whereHas('translates', function ($q) use ($slug) {
+                    ->whereHas('translates', function($q) use ($slug) {
                         $q->where('slug', $slug);
                     })
                     ->first();
@@ -139,14 +244,10 @@ class BlogPostController extends Controller
                 ], 404);
             }
 
-            $translate = $blogPost->translates->firstWhere('language_id', $languageId);
-            $categoryTranslate = $blogPost->category?->translates?->firstWhere('language_id', $languageId);
+            $translate = $blogPost->translates->first();
+            $categoryTranslate = $blogPost->category->translates->first();
 
-            // Blog post-un bütün dillərdəki slug-ları
-            $slugTranslations = $blogPost->translates->mapWithKeys(function ($t) {
-                return [$t->language->lang_code => $t->slug];
-            });
-
+            // Get similar blogs (same category, excluding current blog)
             $similarBlogs = BlogPost::published()
                 ->with([
                     'translates' => fn($q) => $q->where('language_id', $languageId),
@@ -182,7 +283,7 @@ class BlogPostController extends Controller
                 'seo_keywords' => $blogPost->seo_keywords ?? null,
                 'seo_description' => $blogPost->seo_description ?? null,
                 'category' => [
-                    'id' => $blogPost->category->id ?? null,
+                    'id' => $blogPost->category->id,
                     'title' => $categoryTranslate->title ?? null,
                     'slug' => $categoryTranslate->slug ?? null,
                 ],
@@ -193,10 +294,7 @@ class BlogPostController extends Controller
                         'image_url' => $image->image_url ? asset('storage/' . $image->image_url) : asset('images/default_image.webp')
                     ];
                 }),
-                'similar_blogs' => $similarBlogs,
-                'translates' => [
-                    'slug' => $slugTranslations
-                ]
+                'similar_blogs' => $similarBlogs
             ];
 
             return response()->json([
@@ -212,4 +310,4 @@ class BlogPostController extends Controller
             ], 500);
         }
     }
-}
+} 
