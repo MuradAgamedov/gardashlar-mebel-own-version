@@ -48,11 +48,12 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Keyword</label>
                                     <input type="text" 
-                                           class="form-control @error('keyword') is-invalid @enderror" 
-                                           name="keyword" 
-                                           value="{{ old('keyword', $page->keyword) }}" 
-                                           placeholder="Enter page keyword"
-                                           disabled>
+                                        class="form-control @error('keyword') is-invalid @enderror" 
+                                        name="keyword" 
+                                        value="{{ old('keyword', $page->keyword) }}" 
+                                        placeholder="Enter page keyword"
+                                        readonly>
+
                                     @error('keyword')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
