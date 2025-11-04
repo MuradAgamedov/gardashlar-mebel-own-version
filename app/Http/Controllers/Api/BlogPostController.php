@@ -14,99 +14,96 @@ class BlogPostController extends Controller
 {
     use LocaleFromHeader;
 
-    public function index(Request $request): JsonResponse
-    {
-        try {
-            $languageId = $this->getLanguageIdFromHeader($request);
-            $page = $request->get('page', 1);
-            $perPage = min($request->get('per_page', 10), 50);
-            $categorySlug = $request->get('category_slug');
-            $sort = $request->get('sort', 'newest');
+  public function index(Request $request): JsonResponse
+{
+    try {
+        $languageId = $this->getLanguageIdFromHeader($request);
+        $page = $request->get('page', 1);
+        $perPage = min($request->get('per_page', 10), 50);
+        $categorySlug = $request->get('category_slug');
+        $sort = $request->get('sort', 'newest');
 
-            $allowedSorts = ['newest', 'oldest'];
-            if (!in_array($sort, $allowedSorts)) {
-                $sort = 'newest';
-            }
-
-            $cacheKey = "api:blog-posts-v2:lang:{$languageId}:page:{$page}:per_page:{$perPage}:sort:{$sort}";
-            if ($categorySlug) {
-                $cacheKey .= ":category:{$categorySlug}";
-            }
-
-            $blogPosts = Cache::remember($cacheKey, 3600, function () use ($languageId, $page, $perPage, $categorySlug, $sort) {
-                $query = BlogPost::published()
-                    ->with([
-                        'translates.language',
-                        'category.translates.language'
-                    ]);
-
-                if ($categorySlug) {
-                    $query->whereHas('category.translates', function ($q) use ($categorySlug) {
-                        $q->where('slug', $categorySlug);
-                    });
-                }
-
-                switch ($sort) {
-                    case 'oldest':
-                        $query->orderBy('published_at', 'asc');
-                        break;
-                    case 'newest':
-                    default:
-                        $query->orderBy('published_at', 'desc');
-                        break;
-                }
-
-                return $query->paginate($perPage);
-            });
-
-            $data = $blogPosts->getCollection()->map(function ($blogPost) use ($languageId) {
-                $translate = $blogPost->translates->firstWhere('language_id', $languageId);
-                $categoryTranslate = $blogPost->category?->translates?->firstWhere('language_id', $languageId);
-
-                // Kateqoriyanın bütün dillərdəki slug-ları
-                $categorySlugTranslations = $blogPost->category?->translates?->mapWithKeys(function ($t) {
-                    return [$t->language->lang_code => $t->slug];
-                });
-
-                return [
-                    'id' => $blogPost->id,
-                    'title' => $translate->title ?? null,
-                    'slug' => $translate->slug ?? null,
-                    'card_image' => $blogPost->card_image,
-                    'card_image_url' => $blogPost->card_image_url,
-                    'card_description' => $translate->card_description ?? null,
-                    'category_slug' => $categoryTranslate->slug ?? null,
-                    'translates' => [
-                        'category_slug' => $categorySlugTranslations ?? (object)[]
-                    ]
-                ];
-            });
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'blogs' => $data,
-                    'pagination' => [
-                        'current_page' => $blogPosts->currentPage(),
-                        'last_page' => $blogPosts->lastPage(),
-                        'per_page' => $blogPosts->perPage(),
-                        'total' => $blogPosts->total(),
-                    ],
-                    'sort_options' => [
-                        ['value' => 'newest', 'label' => 'Ən yeni'],
-                        ['value' => 'oldest', 'label' => 'Ən köhnə']
-                    ]
-                ]
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving blog posts: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+        $allowedSorts = ['newest', 'oldest'];
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'newest';
         }
+
+        $cacheKey = "api:blog-posts-v2:lang:{$languageId}:page:{$page}:per_page:{$perPage}:sort:{$sort}";
+        if ($categorySlug) {
+            $cacheKey .= ":category:{$categorySlug}";
+        }
+
+        $blogPosts = Cache::remember($cacheKey, 3600, function () use ($languageId, $page, $perPage, $categorySlug, $sort) {
+            $query = BlogPost::published()
+                ->with([
+                    'translates.language',
+                    'category.translates.language'
+                ]);
+
+            if ($categorySlug) {
+                $query->whereHas('category.translates', function ($q) use ($categorySlug) {
+                    $q->where('slug', $categorySlug);
+                });
+            }
+
+            switch ($sort) {
+                case 'oldest':
+                    $query->orderBy('published_at', 'asc');
+                    break;
+                case 'newest':
+                default:
+                    $query->orderBy('published_at', 'desc');
+                    break;
+            }
+
+            return $query->paginate($perPage);
+        });
+
+        $data = $blogPosts->getCollection()->map(function ($blogPost) use ($languageId) {
+            $translate = $blogPost->translates->firstWhere('language_id', $languageId);
+            $categoryTranslate = $blogPost->category?->translates?->firstWhere('language_id', $languageId);
+
+            // Kateqoriyanın bütün dillərdəki slug-ları
+            $categorySlugTranslations = $blogPost->category?->translates?->mapWithKeys(function ($t) {
+                return [$t->language->lang_code => $t->slug];
+            });
+
+            return [
+                'id' => $blogPost->id,
+                'title' => $translate->title ?? null,
+                'slug' => $translate->slug ?? null,
+                'card_image' => $blogPost->card_image,
+                'card_image_url' => $blogPost->card_image_url,
+                'card_description' => $translate->card_description ?? null,
+                'category_slug' => $categoryTranslate->slug ?? null,
+                'translates' => [
+                    'category_slug' => $categorySlugTranslations ?? (object)[]
+                ]
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'blogs' => $data,
+                'pagination' => [
+                    'current_page' => $blogPosts->currentPage(),
+                    'last_page' => $blogPosts->lastPage(),
+                    'per_page' => $blogPosts->perPage(),
+                    'total' => $blogPosts->total(),
+                ]
+            ]
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error retrieving blog posts: ' . $e->getMessage(),
+            'data' => []
+        ], 500);
     }
+}
+
 
     public function show(Request $request, string $slug): JsonResponse
     {
