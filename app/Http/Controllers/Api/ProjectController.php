@@ -278,148 +278,140 @@ class ProjectController extends Controller
      *     )
      * )
      */
-    public function getByCategorySlug(Request $request, string $slug): JsonResponse
-    {
-        try {
-            $languageId = $this->getLanguageIdFromHeader($request);
-            $page = $request->get('page', 1);
-            $perPage = $request->get('per_page', 9);
-            $cacheKey = "api:projects:category:{$slug}:lang:{$languageId}:page:{$page}:per_page:{$perPage}";
-            
-            $data = Cache::rememberForever($cacheKey, function () use ($slug, $languageId, $page, $perPage) {
-                // Find the project category by slug
-                $category = ProjectCategory::with(['translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                }])
+public function getByCategorySlug(Request $request, string $slug): JsonResponse
+{
+    try {
+        $languageId = $this->getLanguageIdFromHeader($request);
+        $page = $request->get('page', 1);
+        $perPage = $request->get('per_page', 9);
+        $cacheKey = "api:projects:category:{$slug}:lang:{$languageId}:page:{$page}:per_page:{$perPage}";
+        
+        $data = Cache::rememberForever($cacheKey, function () use ($slug, $languageId, $page, $perPage) {
+            // 🔹 Kateqoriyanı tapırıq
+            $category = ProjectCategory::with(['translates.language'])
                 ->whereHas('translates', function($query) use ($slug) {
                     $query->where('slug', $slug);
                 })
                 ->active()
                 ->first();
 
-                if (!$category) {
-                    return null;
+            if (!$category) {
+                return null;
+            }
+
+            // 🔹 Kateqoriyanın bütün dillərdəki slug-ları
+            $categorySlugTranslations = $category->translates->mapWithKeys(function ($t) {
+                return [$t->language->lang_code => $t->slug];
+            });
+
+            // 🔹 Kateqoriyaya aid layihələri gətiririk
+            $projectsQuery = Project::with([
+                'translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                },
+                'images' => function($query) {
+                    $query->where('is_main_image', true)->where('status', true);
+                },
+                'category.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
                 }
+            ])
+            ->where('project_category_id', $category->id)
+            ->active()
+            ->ordered();
 
-                // Get projects for this category with pagination
-                $projectsQuery = Project::with([
-                    'translates' => function($query) use ($languageId) {
-                        $query->where('language_id', $languageId);
-                    },
-                    'images' => function($query) {
-                        $query->where('is_main_image', true)->where('status', true);
-                    }
-                ])
-                ->where('project_category_id', $category->id)
-                ->active()
-                ->ordered();
+            // 🔹 Pagination
+            $projects = $projectsQuery->paginate($perPage, ['*'], 'page', $page);
 
-                // Apply pagination
-                $projects = $projectsQuery->paginate($perPage, ['*'], 'page', $page);
-
-                // Transform the data
-                $transformedData = $projects->getCollection()->map(function ($project) use ($languageId) {
-                    // Get translation for the specified language
-                    $translation = $project->translates()
-                        ->where('language_id', $languageId)
-                        ->first();
-                    
-                    // If no translation found, get the first available translation
-                    if (!$translation) {
-                        $translation = $project->translates()->first();
-                    }
-
-                    // Get main image
-                    $mainImage = $project->images()->where('is_main_image', true)->where('status', true)->first();
-                        // Get category translation
-                        $categoryTranslation = $project->category->translates()
-                        ->where('language_id', $languageId)
-                        ->first();
-                        
-                        if (!$categoryTranslation) {
-                            $categoryTranslation = $project->category->translates()->first();
-                        }
-
-                    return [
-                        'id' => $project->id,
-                        'title' => $translation ? $translation->title : null,
-                        'slug' => $translation ? $translation->slug : null,
-                        'company_name' => $translation ? $translation->company_name : null,
-                        'category_slug' => $categoryTranslation ? $categoryTranslation->slug : null,
-                        'main_image' => $mainImage ? $mainImage->image_url : asset('images/default_image.webp')
-                    ];
-                })->filter(function ($item) {
-                    // Filter out items without title or slug
-                    return !empty($item['title']) && !empty($item['slug']);
-                })->values();
-
-                // Get similar projects (from the same category)
-                $similarProjects = Project::with([
-                    'translates' => fn($q) => $q->where('language_id', $languageId),
-                    'category.translates' => fn($q) => $q->where('language_id', $languageId),
-                    'images' => fn($q) => $q->where('is_main_image', true)->where('status', true)
-                ])
-                ->where('project_category_id', $category->id)
-                ->active()
-                ->ordered()
-                ->limit(4)
-                ->get()
-                ->map(function ($similarProject) use ($languageId) {
-                    $similarTranslation = $similarProject->translates->first();
-                    $similarCategoryTranslation = $similarProject->category->translates->first();
-                    $similarMainImage = $similarProject->images->first();
-                    
-                    return [
-                        'id' => $similarProject->id,
-                        'title' => $similarTranslation ? $similarTranslation->title : null,
-                        'slug' => $similarTranslation ? $similarTranslation->slug : null,
-                        'company_name' => $similarTranslation ? $similarTranslation->company_name : null,
-                        'category_slug' => $similarCategoryTranslation ? $similarCategoryTranslation->slug : null,
-                        'main_image' => $similarMainImage ? $similarMainImage->image_url : asset('images/default_image.webp')
-                    ];
-                });
-
-                // Create pagination info
-                $pagination = [
-                    'current_page' => $projects->currentPage(),
-                    'per_page' => $projects->perPage(),
-                    'total' => $projects->total(),
-                    'last_page' => $projects->lastPage(),
-                    'from' => $projects->firstItem(),
-                    'to' => $projects->lastItem()
-                ];
+            // 🔹 Layihə datalarının transformasiyası
+            $transformedData = $projects->getCollection()->map(function ($project) use ($languageId) {
+                $translation = $project->translates->first();
+                $mainImage = $project->images->first();
+                $categoryTranslation = $project->category?->translates?->first();
 
                 return [
-                    'data' => $transformedData,
-                    'pagination' => $pagination,
-                    'similar_projects' => $similarProjects
+                    'id' => $project->id,
+                    'title' => $translation?->title,
+                    'slug' => $translation?->slug,
+                    'company_name' => $translation?->company_name,
+                    'category_slug' => $categoryTranslation?->slug,
+                    'main_image' => $mainImage?->image_url ?? asset('images/default_image.webp')
+                ];
+            })->filter(fn($item) => !empty($item['title']) && !empty($item['slug']))->values();
+
+            // 🔹 Oxşar layihələr
+            $similarProjects = Project::with([
+                'translates' => fn($q) => $q->where('language_id', $languageId),
+                'category.translates' => fn($q) => $q->where('language_id', $languageId),
+                'images' => fn($q) => $q->where('is_main_image', true)->where('status', true)
+            ])
+            ->where('project_category_id', $category->id)
+            ->active()
+            ->ordered()
+            ->limit(4)
+            ->get()
+            ->map(function ($similarProject) {
+                $similarTranslation = $similarProject->translates->first();
+                $similarCategoryTranslation = $similarProject->category->translates->first();
+                $similarMainImage = $similarProject->images->first();
+                
+                return [
+                    'id' => $similarProject->id,
+                    'title' => $similarTranslation?->title,
+                    'slug' => $similarTranslation?->slug,
+                    'company_name' => $similarTranslation?->company_name,
+                    'category_slug' => $similarCategoryTranslation?->slug,
+                    'main_image' => $similarMainImage?->image_url ?? asset('images/default_image.webp')
                 ];
             });
 
-            if ($data === null) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Kateqoriya tapılmadı',
-                    'data' => [],
-                    'pagination' => null
-                ], 404);
-            }
+            // 🔹 Pagination məlumatları
+            $pagination = [
+                'current_page' => $projects->currentPage(),
+                'per_page' => $projects->perPage(),
+                'total' => $projects->total(),
+                'last_page' => $projects->lastPage(),
+                'from' => $projects->firstItem(),
+                'to' => $projects->lastItem()
+            ];
 
+            return [
+                'data' => $transformedData,
+                'pagination' => $pagination,
+                'similar_projects' => $similarProjects,
+                'translates' => [
+                    'category_slug' => $categorySlugTranslations
+                ]
+            ];
+        });
+
+        if ($data === null) {
             return response()->json([
-                'success' => true, 
-                'data' => $data['data'], 
-                'pagination' => $data['pagination'],
-                'similar_projects' => $data['similar_projects']
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false, 
-                'message' => 'Layihələr əldə edilərkən xəta baş verdi: ' . $e->getMessage(), 
+                'success' => false,
+                'message' => 'Kateqoriya tapılmadı',
                 'data' => [],
                 'pagination' => null
-            ], 500);
+            ], 404);
         }
+
+        return response()->json([
+            'success' => true, 
+            'data' => $data['data'], 
+            'pagination' => $data['pagination'],
+            'similar_projects' => $data['similar_projects'],
+            'translates' => $data['translates']
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false, 
+            'message' => 'Layihələr əldə edilərkən xəta baş verdi: ' . $e->getMessage(), 
+            'data' => [],
+            'pagination' => null
+        ], 500);
     }
+}
+
 
     /**
      * @OA\Get(
