@@ -122,7 +122,7 @@ class BlogPostController extends Controller
 
 
     
-  public function show(Request $request, string $slug): JsonResponse
+public function show(Request $request, string $slug): JsonResponse
 {
     try {
         $languageId = $this->getLanguageIdFromHeader($request);
@@ -132,7 +132,7 @@ class BlogPostController extends Controller
             return BlogPost::published()
                 ->with([
                     'translates.language',
-                    'category.translates' => fn($q) => $q->where('language_id', $languageId),
+                    'category.translates.language',
                     'images'
                 ])
                 ->whereHas('translates', function ($q) use ($slug) {
@@ -150,14 +150,19 @@ class BlogPostController extends Controller
         }
 
         $translate = $blogPost->translates->firstWhere('language_id', $languageId);
-        $categoryTranslate = $blogPost->category?->translates?->first();
+        $categoryTranslate = $blogPost->category?->translates?->firstWhere('language_id', $languageId);
 
-        // Blogun bütün dillərdəki slug-larını yığırıq
+        // 🔹 Bloqun bütün dillərdəki slug-ları
         $slugTranslations = $blogPost->translates->mapWithKeys(function ($t) {
             return [$t->language->lang_code => $t->slug];
         });
 
-        // Oxşar bloglar
+        // 🔹 Kateqoriyanın bütün dillərdəki slug-ları
+        $categorySlugTranslations = $blogPost->category?->translates?->mapWithKeys(function ($t) {
+            return [$t->language->lang_code => $t->slug];
+        }) ?? collect();
+
+        // 🔹 Oxşar bloglar
         $similarBlogs = BlogPost::published()
             ->with([
                 'translates' => fn($q) => $q->where('language_id', $languageId),
@@ -175,19 +180,26 @@ class BlogPostController extends Controller
                     'id' => $similarBlog->id,
                     'title' => $similarTranslate->title ?? null,
                     'slug' => $similarTranslate->slug ?? null,
-                    'card_image_url' => $similarBlog->card_image ? asset('storage/' . $similarBlog->card_image) : asset('images/default_image.webp'),
+                    'card_image_url' => $similarBlog->card_image
+                        ? asset('storage/' . $similarBlog->card_image)
+                        : asset('images/default_image.webp'),
                     'card_description' => $similarTranslate->card_description ?? null,
                     'category_slug' => $similarCategoryTranslate->slug ?? null
                 ];
             });
 
+        // 🔹 Məlumatlar
         $data = [
             'id' => $blogPost->id,
             'title' => $translate->title ?? null,
             'slug' => $translate->slug ?? null,
             'description' => $translate->description ?? null,
-            'card_image_url' => $blogPost->card_image ? asset('storage/' . $blogPost->card_image) : asset('images/default_image.webp'),
-            'inner_banner_image_url' => $blogPost->inner_banner_image ? asset('storage/' . $blogPost->inner_banner_image) : asset('images/default_image.webp'),
+            'card_image_url' => $blogPost->card_image
+                ? asset('storage/' . $blogPost->card_image)
+                : asset('images/default_image.webp'),
+            'inner_banner_image_url' => $blogPost->inner_banner_image
+                ? asset('storage/' . $blogPost->inner_banner_image)
+                : asset('images/default_image.webp'),
             'published_at' => $blogPost->published_at,
             'seo_title' => $blogPost->seo_title ?? null,
             'seo_keywords' => $blogPost->seo_keywords ?? null,
@@ -201,12 +213,15 @@ class BlogPostController extends Controller
             'images' => $blogPost->images->map(function ($image) {
                 return [
                     'id' => $image->id,
-                    'image_url' => $image->image_url ? asset('storage/' . $image->image_url) : asset('images/default_image.webp')
+                    'image_url' => $image->image_url
+                        ? asset('storage/' . $image->image_url)
+                        : asset('images/default_image.webp')
                 ];
             }),
             'similar_blogs' => $similarBlogs,
             'translates' => [
-                'slug' => $slugTranslations
+                'slug' => $slugTranslations,
+                'category_slug' => $categorySlugTranslations
             ]
         ];
 
