@@ -20,62 +20,7 @@ class VacancyController extends Controller
 {
     use LocaleFromHeader;
 
-    /**
-     * @OA\Get(
-     *     path="/api/vacancies",
-     *     summary="Get all active vacancies",
-     *     description="Returns list of active and non-expired vacancies with translated content based on header language",
-     *     tags={"Vacancies"},
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language ID (1=Az, 2=En, 3=Ru)",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Vacancies retrieved successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Vacancies retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="title", type="string", example="Mühasib vəzifəsi"),
-     *                     @OA\Property(property="slug", type="string", example="muhasib-vezifesi"),
-     *                     @OA\Property(property="position", type="string", example="Mühasib"),
-     *                     @OA\Property(property="last_apply_date", type="string", format="date", example="2024-12-31"),
-     *                     @OA\Property(property="email", type="string", example="hr@company.com"),
-     *                     @OA\Property(property="address", type="string", example="Bakı şəhəri"),
-     *                     @OA\Property(property="experience", type="string", example="3-5 il"),
-     *                     @OA\Property(property="work_schedule", type="string", example="9:00-18:00"),
-     *                     @OA\Property(property="is_expired", type="boolean", example=false)
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="No vacancies found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="No vacancies found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving vacancies")
-     *         )
-     *     )
-     * )
-     */
+   
     public function index(Request $request): JsonResponse
     {
         try {
@@ -127,146 +72,87 @@ class VacancyController extends Controller
         }
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/vacancies/{slug}",
-     *     summary="Get specific vacancy by slug",
-     *     description="Returns detailed information about a specific vacancy with translated content based on header language",
-     *     tags={"Vacancies"},
-     *     @OA\Parameter(
-     *         name="slug",
-     *         in="path",
-     *         description="Vacancy slug",
-     *         required=true,
-     *         @OA\Schema(type="string", example="muhasib-vezifesi")
-     *     ),
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language ID (1=Az, 2=En, 3=Ru)",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Vacancy retrieved successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Vacancy retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="title", type="string", example="Mühasib vəzifəsi"),
-     *                 @OA\Property(property="slug", type="string", example="muhasib-vezifesi"),
-     *                 @OA\Property(property="position", type="string", example="Mühasib"),
-     *                 @OA\Property(property="experience", type="string", example="3-5 il"),
-     *                 @OA\Property(property="work_schedule", type="string", example="9:00-18:00"),
-     *                 @OA\Property(property="salary", type="string", example="1000-1500 AZN"),
-     *                 @OA\Property(property="email", type="string", example="hr@company.com"),
-     *                 @OA\Property(property="address", type="string", example="Bakı şəhəri"),
-     *                 @OA\Property(property="last_apply_date", type="string", format="date", example="2024-12-31"),
-     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2024-10-20T15:30:00Z"),
-     *                 @OA\Property(property="seo_title", type="string", example="Mühasib vəzifəsi - Şirkət adı"),
-     *                 @OA\Property(property="seo_description", type="string", example="Mühasib vəzifəsi üçün müraciət edin. 3-5 il təcrübə tələb olunur."),
-     *                 @OA\Property(property="requirements", type="array", @OA\Items(type="object"))
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Vacancy not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Vacancy not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving vacancy")
-     *         )
-     *     )
-     * )
-     */
-    public function show(Request $request, string $slug): JsonResponse
-    {
-        try {
-            // Get language ID from header using trait
-            $languageId = $this->getLanguageIdFromHeader($request);
-            
-            $cacheKey = "api_vacancy_{$slug}_{$languageId}";
-            
-            $vacancy = Cache::rememberForever($cacheKey, function () use ($slug, $languageId) {
-                return Vacancy::with(['translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                }])
-                ->whereHas('translates', function($query) use ($slug, $languageId) {
-                    $query->where('slug', $slug)
-                          ->where('language_id', $languageId);
+   
+   public function show(Request $request, string $slug): JsonResponse
+{
+    try {
+        $languageId = $this->getLanguageIdFromHeader($request);
+        
+        $cacheKey = "api_vacancy_{$slug}_{$languageId}";
+        
+        $vacancy = Cache::rememberForever($cacheKey, function () use ($slug, $languageId) {
+            return Vacancy::with(['translates.language'])
+                ->whereHas('translates', function($query) use ($slug) {
+                    $query->where('slug', $slug);
                 })
                 ->active()
                 ->notExpired()
                 ->first();
-            });
+        });
 
-            if (!$vacancy) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Vacancy not found'
-                ], 404);
-            }
-
-            $translation = $vacancy->translates->first();
-
-            // Get requirements for this vacancy
-            $requirements = $vacancy->requirements()
-                ->with(['translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                }])
-                ->active()
-                ->ordered()
-                ->get()
-                ->map(function ($requirement) {
-                    $reqTranslation = $requirement->translates->first();
-                    return [
-                        'id' => $requirement->id,
-                        'title' => $reqTranslation ? $reqTranslation->title : '',
-                        'description' => $reqTranslation ? $reqTranslation->description : ''
-                    ];
-                });
-
-            $vacancyData = [
-                'id' => $vacancy->id,
-                'title' => $translation ? $translation->title : '',
-                'slug' => $translation ? $translation->slug : '',
-                'position' => $translation ? $translation->position : '',
-                'experience' => $translation ? $translation->experience : '',
-                'work_schedule' => $translation ? $translation->work_schedule : '',
-                'salary' => $translation ? $translation->salary : '',
-                'email' => $vacancy->email,
-                'address' => $vacancy->address,
-                'last_apply_date' => $vacancy->last_apply_date->format('Y-m-d'),
-                'created_at' => $vacancy->created_at->toISOString(),
-                'seo_title' => $translation ? $translation->seo_title : '',
-                'seo_description' => $translation ? $translation->seo_description : '',
-                'seo_keywords' => $translation ? $translation->seo_keywords : '',
-                'requirements' => $requirements
-            ];
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Vacancy retrieved successfully',
-                'data' => $vacancyData
-            ], 200);
-
-        } catch (\Exception $e) {
+        if (!$vacancy) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error retrieving vacancy: ' . $e->getMessage()
-            ], 500);
+                'message' => 'Vacancy not found'
+            ], 404);
         }
+
+        $translation = $vacancy->translates->firstWhere('language_id', $languageId);
+
+        // 🔹 Vakansiyanın bütün dillərdəki slug-ları
+        $slugTranslations = $vacancy->translates->mapWithKeys(function ($t) {
+            return [$t->language->lang_code => $t->slug];
+        });
+
+        // 🔹 Tələbləri gətiririk
+        $requirements = $vacancy->requirements()
+            ->with(['translates' => fn($q) => $q->where('language_id', $languageId)])
+            ->active()
+            ->ordered()
+            ->get()
+            ->map(function ($requirement) {
+                $reqTranslation = $requirement->translates->first();
+                return [
+                    'id' => $requirement->id,
+                    'title' => $reqTranslation?->title ?? '',
+                    'description' => $reqTranslation?->description ?? ''
+                ];
+            });
+
+        // 🔹 Əsas məlumatlar
+        $vacancyData = [
+            'id' => $vacancy->id,
+            'title' => $translation?->title ?? '',
+            'slug' => $translation?->slug ?? '',
+            'position' => $translation?->position ?? '',
+            'experience' => $translation?->experience ?? '',
+            'work_schedule' => $translation?->work_schedule ?? '',
+            'salary' => $translation?->salary ?? '',
+            'email' => $vacancy->email,
+            'address' => $vacancy->address,
+            'last_apply_date' => $vacancy->last_apply_date?->format('Y-m-d'),
+            'created_at' => $vacancy->created_at?->toISOString(),
+            'seo_title' => $translation?->seo_title ?? '',
+            'seo_description' => $translation?->seo_description ?? '',
+            'seo_keywords' => $translation?->seo_keywords ?? '',
+            'requirements' => $requirements,
+            'translates' => [
+                'slug' => $slugTranslations
+            ]
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Vacancy retrieved successfully',
+            'data' => $vacancyData
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error retrieving vacancy: ' . $e->getMessage()
+        ], 500);
     }
+}
+
 } 
