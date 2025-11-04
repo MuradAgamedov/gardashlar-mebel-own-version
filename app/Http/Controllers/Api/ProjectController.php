@@ -37,67 +37,7 @@ class ProjectController extends Controller
         }
     }
 
-    /**
-     * @OA\Get(
-     *     path="/projects",
-     *     operationId="getAllProjects",
-     *     tags={"Projects"},
-     *     summary="Get all projects",
-     *     description="Returns paginated active projects with title, slug, company name and main image",
-     *     @OA\Parameter(
-     *         name="page",
-     *         in="query",
-     *         description="Page number for pagination",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=1, default=1)
-     *     ),
-     *     @OA\Parameter(
-     *         name="per_page",
-     *         in="query",
-     *         description="Number of items per page",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=9, default=9)
-     *     ),
-     *     @OA\Parameter(
-     *         name="Accept-Language",
-     *         in="header",
-     *         description="Language code (az, en, ru)",
-     *         required=false,
-     *         @OA\Schema(type="string", example="az")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful response",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="array", @OA\Items(type="object", 
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="title", type="string", example="Modern Sofa Design"),
-     *                 @OA\Property(property="slug", type="string", example="modern-sofa-design"),
-     *                 @OA\Property(property="company_name", type="string", example="Gardashlar Furniture"),
-     *                 @OA\Property(property="main_image", type="string", example="https://example.com/storage/projects/image.jpg")
-     *             )),
-     *             @OA\Property(property="pagination", type="object",
-     *                 @OA\Property(property="current_page", type="integer", example=1),
-     *                 @OA\Property(property="per_page", type="integer", example=9),
-     *                 @OA\Property(property="total", type="integer", example=18),
-     *                 @OA\Property(property="last_page", type="integer", example=2),
-     *                 @OA\Property(property="from", type="integer", example=1),
-     *                 @OA\Property(property="to", type="integer", example=9)
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error occurred while getting projects"),
-     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
-     *         )
-     *     )
-     * )
-     */
+
     public function getAllProjects(Request $request): JsonResponse
     {
         try {
@@ -192,92 +132,7 @@ class ProjectController extends Controller
         }
     }
 
-    /**
-     * @OA\Get(
-     *     path="/projects/{slug}",
-     *     operationId="getProjectsByCategorySlug",
-     *     tags={"Projects"},
-     *     summary="Get projects by category slug",
-     *     description="Returns paginated active projects for a specific category with title, slug, company name and main image",
-     *     @OA\Parameter(
-     *         name="slug",
-     *         in="path",
-     *         description="Project category slug",
-     *         required=true,
-     *         @OA\Schema(type="string", example="yumaq-mebellr")
-     *     ),
-     *     @OA\Parameter(
-     *         name="page",
-     *         in="query",
-     *         description="Page number for pagination",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=1, default=1)
-     *     ),
-     *     @OA\Parameter(
-     *         name="per_page",
-     *         in="query",
-     *         description="Number of items per page",
-     *         required=false,
-     *         @OA\Schema(type="integer", example=9, default=9)
-     *     ),
-     *     @OA\Parameter(
-     *         name="Accept-Language",
-     *         in="header",
-     *         description="Language code (az, en, ru)",
-     *         required=false,
-     *         @OA\Schema(type="string", example="az")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful response",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="array", @OA\Items(type="object", 
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="title", type="string", example="Modern Sofa Design"),
-     *                 @OA\Property(property="slug", type="string", example="modern-sofa-design"),
-     *                 @OA\Property(property="company_name", type="string", example="Gardashlar Furniture"),
-     *                 @OA\Property(property="category_slug", type="string", example="yumshaq-mebeller"),
-     *                 @OA\Property(property="main_image", type="string", example="https://example.com/storage/projects/image.jpg")
-     *             )),
-     *             @OA\Property(property="pagination", type="object",
-     *                 @OA\Property(property="current_page", type="integer", example=1),
-     *                 @OA\Property(property="per_page", type="integer", example=9),
-     *                 @OA\Property(property="total", type="integer", example=18),
-     *                 @OA\Property(property="last_page", type="integer", example=2),
-     *                 @OA\Property(property="from", type="integer", example=1),
-     *                 @OA\Property(property="to", type="integer", example=9)
-     *             ),
-     *             @OA\Property(property="similar_projects", type="array", @OA\Items(type="object",
-     *                 @OA\Property(property="id", type="integer", example=2),
-     *                 @OA\Property(property="title", type="string", example="Similar Project"),
-     *                 @OA\Property(property="slug", type="string", example="similar-project"),
-     *                 @OA\Property(property="company_name", type="string", example="Similar Company"),
-     *                 @OA\Property(property="category_slug", type="string", example="category-slug"),
-     *                 @OA\Property(property="main_image", type="string", example="https://example.com/similar-image.jpg")
-     *             ))
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Category not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Category not found"),
-     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error occurred while getting projects"),
-     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
-     *         )
-     *     )
-     * )
-     */
+  
 public function getByCategorySlug(Request $request, string $slug): JsonResponse
 {
     try {
@@ -413,209 +268,122 @@ public function getByCategorySlug(Request $request, string $slug): JsonResponse
 }
 
 
-    /**
-     * @OA\Get(
-     *     path="/project/{slug}",
-     *     operationId="getProjectBySlug",
-     *     tags={"Projects"},
-     *     summary="Get project details by slug",
-     *     description="Returns detailed information about a specific project including images, videos, and translations",
-     *     @OA\Parameter(
-     *         name="slug",
-     *         in="path",
-     *         description="Project slug",
-     *         required=true,
-     *         @OA\Schema(type="string", example="modern-soft-furniture-design")
-     *     ),
-     *     @OA\Parameter(
-     *         name="Accept-Language",
-     *         in="header",
-     *         description="Language code (az, en, ru)",
-     *         required=false,
-     *         @OA\Schema(type="string", example="az")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful response",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="object", 
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="title", type="string", example="Modern Soft Furniture Design"),
-     *                 @OA\Property(property="slug", type="string", example="modern-soft-furniture-design"),
-     *                 @OA\Property(property="company_name", type="string", example="Gardashlar Furniture"),
-     *                 @OA\Property(property="description", type="string", example="Modern soft furniture design description"),
-     *                 @OA\Property(property="seo_title", type="string", example="Modern Soft Furniture Design - Gardashlar"),
-     *                 @OA\Property(property="seo_keywords", type="string", example="soft furniture, modern design, gardashlar"),
-     *                 @OA\Property(property="seo_description", type="string", example="High quality modern soft furniture design by Gardashlar"),
-     *                 @OA\Property(property="category_slug", type="string", example="yumshaq-mebeller"),
-     *                 @OA\Property(property="category_title", type="string", example="Yumşaq Mebellər"),
-     *                 @OA\Property(property="images", type="array", @OA\Items(type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="image_url", type="string", example="https://example.com/storage/projects/image.jpg"),
-     *                     @OA\Property(property="is_main_image", type="boolean", example=true),
-     *                     @OA\Property(property="order", type="integer", example=1)
-     *                 )),
-     *                 @OA\Property(property="videos", type="array", @OA\Items(type="object",
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="video_link", type="string", example="https://youtube.com/watch?v=example"),
-     *                     @OA\Property(property="order", type="integer", example=1)
-     *                 )),
-     *                 @OA\Property(property="similar_projects", type="array", @OA\Items(type="object",
-     *                     @OA\Property(property="id", type="integer", example=2),
-     *                     @OA\Property(property="title", type="string", example="Similar Project"),
-     *                     @OA\Property(property="slug", type="string", example="similar-project"),
-     *                     @OA\Property(property="company_name", type="string", example="Similar Company"),
-     *                     @OA\Property(property="category_slug", type="string", example="category-slug"),
-     *                     @OA\Property(property="main_image", type="string", example="https://example.com/similar-image.jpg")
-     *                 ))
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Project not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Project not found"),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error occurred while getting project"),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     )
-     * )
-     */
-    public function getBySlug(Request $request, string $slug): JsonResponse
-    {
-        try {
-            $languageId = $this->getLanguageIdFromHeader($request);
-            $cacheKey = "api:project:details:{$slug}:lang:{$languageId}";
-            
-            $data = Cache::rememberForever($cacheKey, function () use ($slug, $languageId) {
-                // Find the project by slug
-                $project = Project::with([
-                    'translates' => function($query) use ($languageId) {
-                        $query->where('language_id', $languageId);
-                    },
-                    'category.translates' => function($query) use ($languageId) {
-                        $query->where('language_id', $languageId);
-                    },
-                    'images' => function($query) {
-                        $query->where('status', true)->orderBy('order');
-                    },
-                    'videos' => function($query) {
-                        $query->where('status', true)->orderBy('order');
-                    }
-                ])
-                ->whereHas('translates', function($query) use ($slug) {
-                    $query->where('slug', $slug);
-                })
-                ->active()
-                ->first();
+   
+  public function getBySlug(Request $request, string $slug): JsonResponse
+{
+    try {
+        $languageId = $this->getLanguageIdFromHeader($request);
+        $cacheKey = "api:project:details:{$slug}:lang:{$languageId}";
+        
+        $data = Cache::rememberForever($cacheKey, function () use ($slug, $languageId) {
+            // 🔹 Layihəni tapırıq (bütün dilləri yükləyirik)
+            $project = Project::with([
+                'translates.language',
+                'category.translates.language',
+                'images' => fn($q) => $q->where('status', true)->orderBy('order'),
+                'videos' => fn($q) => $q->where('status', true)->orderBy('order')
+            ])
+            ->whereHas('translates', fn($q) => $q->where('slug', $slug))
+            ->active()
+            ->first();
 
-                if (!$project) {
-                    return null;
-                }
+            if (!$project) {
+                return null;
+            }
 
-                // Get translation for the specified language
-                $translation = $project->translates()
-                    ->where('language_id', $languageId)
-                    ->first();
-                
-                // If no translation found, get the first available translation
-                if (!$translation) {
-                    $translation = $project->translates()->first();
-                }
+            // 🔹 Mövcud dildə tərcümə
+            $translation = $project->translates->firstWhere('language_id', $languageId);
+            $categoryTranslation = $project->category?->translates?->firstWhere('language_id', $languageId);
 
-                // Get category translation
-                $categoryTranslation = $project->category->translates()
-                    ->where('language_id', $languageId)
-                    ->first();
-                
-                if (!$categoryTranslation) {
-                    $categoryTranslation = $project->category->translates()->first();
-                }
+            // 🔹 Layihənin bütün dillərdə slug-ları
+            $slugTranslations = $project->translates->mapWithKeys(function ($t) {
+                return [$t->language->lang_code => $t->slug];
+            });
 
-                // Get similar projects (same category, excluding current project)
-                $similarProjects = Project::with([
-                    'translates' => fn($q) => $q->where('language_id', $languageId),
-                    'category.translates' => fn($q) => $q->where('language_id', $languageId),
-                    'images' => fn($q) => $q->where('is_main_image', true)->where('status', true)
-                ])
-                ->where('project_category_id', $project->project_category_id)
-                ->where('id', '!=', $project->id)
-                ->active()
-                ->ordered()
-                ->limit(4)
-                ->get()
-                ->map(function ($similarProject) use ($languageId) {
-                    $similarTranslation = $similarProject->translates->first();
-                    $similarCategoryTranslation = $similarProject->category->translates->first();
-                    $similarMainImage = $similarProject->images->first();
-                    
-                    return [
-                        'id' => $similarProject->id,
-                        'title' => $similarTranslation ? $similarTranslation->title : null,
-                        'slug' => $similarTranslation ? $similarTranslation->slug : null,
-                        'company_name' => $similarTranslation ? $similarTranslation->company_name : null,
-                        'category_slug' => $similarCategoryTranslation ? $similarCategoryTranslation->slug : null,
-                        'category_title' => $similarCategoryTranslation ? $similarCategoryTranslation->title : null,
-                        'main_image' => $similarMainImage ? $similarMainImage->image_url : asset('images/default_image.webp')
-                    ];
-                });
+            // 🔹 Kateqoriyanın bütün dillərdə slug-ları
+            $categorySlugTranslations = $project->category?->translates?->mapWithKeys(function ($t) {
+                return [$t->language->lang_code => $t->slug];
+            }) ?? collect();
+
+            // 🔹 Oxşar layihələr
+            $similarProjects = Project::with([
+                'translates' => fn($q) => $q->where('language_id', $languageId),
+                'category.translates' => fn($q) => $q->where('language_id', $languageId),
+                'images' => fn($q) => $q->where('is_main_image', true)->where('status', true)
+            ])
+            ->where('project_category_id', $project->project_category_id)
+            ->where('id', '!=', $project->id)
+            ->active()
+            ->ordered()
+            ->limit(4)
+            ->get()
+            ->map(function ($similarProject) {
+                $similarTranslate = $similarProject->translates->first();
+                $similarCategoryTranslate = $similarProject->category?->translates?->first();
+                $similarMainImage = $similarProject->images->first();
 
                 return [
-                    'id' => $project->id,
-                    'title' => $translation ? $translation->title : null,
-                    'slug' => $translation ? $translation->slug : null,
-                    'company_name' => $translation ? $translation->company_name : null,
-                    'description' => $translation ? $translation->description : null,
-                    'seo_title' => $translation ? $translation->seo_title : null,
-                    'seo_keywords' => $translation ? $translation->seo_keywords : null,
-                    'seo_description' => $translation ? $translation->seo_description : null,
-                    'category_slug' => $categoryTranslation ? $categoryTranslation->slug : null,
-                    'category_title' => $categoryTranslation ? $categoryTranslation->title : null,
-                    'images' => $project->images->map(function ($image) {
-                        return [
-                            'id' => $image->id,
-                            'image_url' => $image->image_url,
-                            'is_main_image' => $image->is_main_image,
-                        ];
-                    }),
-                    'videos' => $project->videos->map(function ($video) {
-                        return [
-                            'id' => $video->id,
-                            'video_link' => $video->video_link,
-                            'video_id' => explode("?",$video->video_link)[1]
-                        ];
-                    }),
-                    'similar_projects' => $similarProjects
+                    'id' => $similarProject->id,
+                    'title' => $similarTranslate?->title,
+                    'slug' => $similarTranslate?->slug,
+                    'company_name' => $similarTranslate?->company_name,
+                    'category_slug' => $similarCategoryTranslate?->slug,
+                    'category_title' => $similarCategoryTranslate?->title,
+                    'main_image' => $similarMainImage?->image_url ?? asset('images/default_image.webp')
                 ];
             });
 
-            if ($data === null) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Layihə tapılmadı',
-                    'data' => null
-                ], 404);
-            }
+            // 🔹 Əsas məlumat
+            return [
+                'id' => $project->id,
+                'title' => $translation?->title,
+                'slug' => $translation?->slug,
+                'company_name' => $translation?->company_name,
+                'description' => $translation?->description,
+                'seo_title' => $translation?->seo_title,
+                'seo_keywords' => $translation?->seo_keywords,
+                'seo_description' => $translation?->seo_description,
+                'category_slug' => $categoryTranslation?->slug,
+                'category_title' => $categoryTranslation?->title,
+                'images' => $project->images->map(fn($image) => [
+                    'id' => $image->id,
+                    'image_url' => $image->image_url,
+                    'is_main_image' => $image->is_main_image,
+                ]),
+                'videos' => $project->videos->map(fn($video) => [
+                    'id' => $video->id,
+                    'video_link' => $video->video_link,
+                    'video_id' => explode("?", $video->video_link)[1] ?? null,
+                ]),
+                'similar_projects' => $similarProjects,
+                'translates' => [
+                    'slug' => $slugTranslations,
+                    'category_slug' => $categorySlugTranslations
+                ]
+            ];
+        });
 
-            return response()->json(['success' => true, 'data' => $data], 200);
-        } catch (\Exception $e) {
+        if ($data === null) {
             return response()->json([
-                'success' => false, 
-                'message' => 'Layihə əldə edilərkən xəta baş verdi: ' . $e->getMessage(), 
+                'success' => false,
+                'message' => 'Layihə tapılmadı',
                 'data' => null
-            ], 500);
+            ], 404);
         }
+
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false, 
+            'message' => 'Layihə əldə edilərkən xəta baş verdi: ' . $e->getMessage(), 
+            'data' => null
+        ], 500);
     }
+}
+
 
 }
