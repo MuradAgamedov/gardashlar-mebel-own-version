@@ -805,13 +805,27 @@ if ($categorySlug) {
                     'inCompare' => $inCompare,
                 ];
             });
-    
-            return response()->json([
+            $slugTranslations = [];
+            $languages = \App\Models\Language::all();
+
+            foreach ($languages as $lang) {
+                $translationForLang = $product->translates()
+                    ->where('language_id', $lang->id)
+                    ->first();
+
+                $slugTranslations[$lang->lang_code] = $translationForLang ? $translationForLang->slug : null;
+            }
+                $translatesData = [
+                    'slug' => $slugTranslations
+                ];
+                            return response()->json([
                 'success' => true,
                 'message' => 'Product retrieved successfully',
                 'data' => [
                     'product' => $productData,
                     'similar_products' => $similarData,
+                    'translates' => $translatesData,
+
                 ]
             ]);
     
