@@ -73,16 +73,16 @@ class VacancyController extends Controller
     }
 
    
-   public function show(Request $request, string $slug): JsonResponse
+public function show(Request $request, string $slug): JsonResponse
 {
     try {
         $languageId = $this->getLanguageIdFromHeader($request);
-        
+
         $cacheKey = "api_vacancy_{$slug}_{$languageId}";
-        
+
         $vacancy = Cache::rememberForever($cacheKey, function () use ($slug, $languageId) {
-            return Vacancy::with(['translates.language'])
-                ->whereHas('translates', function($query) use ($slug) {
+            return Vacancy::with(['translates.language', 'requirements.translates.language'])
+                ->whereHas('translates', function ($query) use ($slug) {
                     $query->where('slug', $slug);
                 })
                 ->active()
@@ -129,7 +129,7 @@ class VacancyController extends Controller
             'work_schedule' => $translation?->work_schedule ?? '',
             'salary' => $translation?->salary ?? '',
             'email' => $vacancy->email,
-            'address' => $vacancy->address,
+            'address' => $translation?->address ?? '', // ✅ düzəldildi
             'last_apply_date' => $vacancy->last_apply_date?->format('Y-m-d'),
             'created_at' => $vacancy->created_at?->toISOString(),
             'seo_title' => $translation?->seo_title ?? '',
@@ -154,5 +154,6 @@ class VacancyController extends Controller
         ], 500);
     }
 }
+
 
 } 
