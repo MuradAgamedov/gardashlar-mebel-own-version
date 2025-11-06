@@ -370,18 +370,21 @@ if ($categorySlug) {
         $parentSlugTranslations = [];
 
         foreach ($languages as $lang) {
-            $catTr = $selectedCategory->translates()->where('language_id', $lang->id)->first();
-            $slugTranslations[$lang->code] = $catTr ? $catTr->slug : null;
+            $langCode = $lang->lang_code; // YALNIZ BİR PROPERTY istifadə et
 
-            $parentSlugTranslations[$lang->lang_code] = null;
+            $catTr = $selectedCategory->translates()->where('language_id', $lang->id)->first();
+            $slugTranslations[$langCode] = $catTr ? $catTr->slug : null;
+
+            $parentSlugTranslations[$langCode] = null;
             if ($selectedCategory->parent_id) {
                 $parent = ProductCategory::find($selectedCategory->parent_id);
                 if ($parent) {
                     $parentTr = $parent->translates()->where('language_id', $lang->id)->first();
-                    $parentSlugTranslations[$lang->code] = $parentTr ? $parentTr->slug : null;
+                    $parentSlugTranslations[$langCode] = $parentTr ? $parentTr->slug : null;
                 }
             }
         }
+
 
         $translatesData = [
             'slug' => $slugTranslations,
