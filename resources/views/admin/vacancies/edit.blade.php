@@ -28,6 +28,7 @@
             </div>
         </div>
     </div>
+
     <div class="container-fluid">
         @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -68,7 +69,21 @@
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                        
+
+                                        <!-- ✅ Phone field added -->
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Phone</label>
+                                            <input type="text" 
+                                                   class="form-control @error('phone') is-invalid @enderror" 
+                                                   name="phone" 
+                                                   value="{{ old('phone', $vacancy->phone) }}"
+                                                   placeholder="Enter phone number">
+                                            @error('phone')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <!-- ✅ END Phone field -->
+
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Last Apply Date</label>
                                             <input type="date" 
@@ -84,190 +99,7 @@
                             </div>
 
                             <!-- Content Translations Section -->
-                            <div class="row mb-4">
-                                <div class="col-md-12">
-                                    <h6 class="mb-3">Content Translations</h6>
-                                    
-                                    <!-- Language Tabs -->
-                                    <ul class="nav nav-tabs" id="languageTabs" role="tablist">
-                                        @foreach($languages as $index => $language)
-                                            @php
-                                                $translation = $vacancy->translates->where('language_id', $language->id)->first();
-                                                $hasErrors = $errors->has("translations.{$language->id}.*");
-                                                $hasTranslation = $translation !== null;
-                                            @endphp
-                                            <li class="nav-item" role="presentation">
-                                                <button class="nav-link {{ $index === 0 ? 'active' : '' }}" 
-                                                        id="tab-{{ $language->id }}" 
-                                                        data-bs-toggle="tab" 
-                                                        data-bs-target="#content-{{ $language->id }}" 
-                                                        type="button" 
-                                                        role="tab" 
-                                                        aria-controls="content-{{ $language->id }}" 
-                                                        aria-selected="{{ $index === 0 ? 'true' : 'false' }}"
-                                                        style="{{ $hasErrors ? 'border-color: #dc3545;' : '' }}">
-                                                    {{ $language->lang_code }}
-                                                    @if($hasTranslation)
-                                                        <i class="fa fa-check text-success ms-1"></i>
-                                                    @elseif($hasErrors)
-                                                        <i class="fa fa-exclamation-triangle text-danger ms-1"></i>
-                                                    @else
-                                                        <i class="fa fa-exclamation-triangle text-warning ms-1"></i>
-                                                    @endif
-                                                </button>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-
-                                    <!-- Tab Content -->
-                                    <div class="tab-content" id="languageTabContent">
-                                        @foreach($languages as $index => $language)
-                                            @php
-                                                $translation = $vacancy->translates->where('language_id', $language->id)->first();
-                                            @endphp
-                                            <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" 
-                                                 id="content-{{ $language->id }}" 
-                                                 role="tabpanel" 
-                                                 aria-labelledby="tab-{{ $language->id }}">
-                                                
-                                                <div class="row mt-3">
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Title <span class="text-danger">*</span></label>
-                                                        <input type="text" 
-                                                               class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
-                                                               name="translations[{{ $language->id }}][title]" 
-                                                               value="{{ old("translations.{$language->id}.title", $translation->title ?? '') }}"
-                                                               placeholder="Enter title for {{ $language->lang_code }}">
-                                                        @error("translations.{$language->id}.title")
-                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                    
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Slug</label>
-                                                        <input type="text" 
-                                                               class="form-control @error("translations.{$language->id}.slug") is-invalid @enderror" 
-                                                               name="translations[{{ $language->id }}][slug]" 
-                                                               value="{{ old("translations.{$language->id}.slug", $translation->slug ?? '') }}"
-                                                               placeholder="Auto-generated slug for {{ $language->lang_code }}">
-                                                        @error("translations.{$language->id}.slug")
-                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="row mt-3">
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Position <span class="text-danger">*</span></label>
-                                                        <input type="text" 
-                                                               class="form-control @error("translations.{$language->id}.position") is-invalid @enderror" 
-                                                               name="translations[{{ $language->id }}][position]" 
-                                                               value="{{ old("translations.{$language->id}.position", $translation->position ?? '') }}"
-                                                               placeholder="Enter position for {{ $language->lang_code }}">
-                                                        @error("translations.{$language->id}.position")
-                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="row mt-3">
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Experience <span class="text-danger">*</span></label>
-                                                        <input type="text" 
-                                                               class="form-control @error("translations.{$language->id}.experience") is-invalid @enderror" 
-                                                               name="translations[{{ $language->id }}][experience]" 
-                                                               value="{{ old("translations.{$language->id}.experience", $translation->experience ?? '') }}"
-                                                               placeholder="Enter experience for {{ $language->lang_code }}">
-                                                        @error("translations.{$language->id}.experience")
-                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                    
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Work Schedule <span class="text-danger">*</span></label>
-                                                        <textarea class="form-control @error("translations.{$language->id}.work_schedule") is-invalid @enderror" 
-                                                                  name="translations[{{ $language->id }}][work_schedule]" 
-                                                                  rows="3"
-                                                                  placeholder="Enter work schedule for {{ $language->lang_code }}">{{ old("translations.{$language->id}.work_schedule", $translation->work_schedule ?? '') }}</textarea>
-                                                        @error("translations.{$language->id}.work_schedule")
-                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="row mt-3">
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Salary</label>
-                                                        <input type="text" 
-                                                               class="form-control @error("translations.{$language->id}.salary") is-invalid @enderror" 
-                                                               name="translations[{{ $language->id }}][salary]" 
-                                                               value="{{ old("translations.{$language->id}.salary", $translation->salary ?? '') }}"
-                                                               placeholder="Enter salary for {{ $language->lang_code }}">
-                                                        @error("translations.{$language->id}.salary")
-                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-
-                                                <!-- ✅ Address Field -->
-                                                <div class="row mt-3">
-                                                    <div class="col-md-12 mb-3">
-                                                        <label class="form-label">Address <span class="text-danger">*</span></label>
-                                                        <textarea class="form-control @error("translations.{$language->id}.address") is-invalid @enderror" 
-                                                                  name="translations[{{ $language->id }}][address]" 
-                                                                  rows="3"
-                                                                  placeholder="Enter address for {{ $language->lang_code }}">{{ old("translations.{$language->id}.address", $translation->address ?? '') }}</textarea>
-                                                        @error("translations.{$language->id}.address")
-                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                                <!-- ✅ END Address -->
-
-                                                <!-- SEO Section -->
-                                                <div class="row mt-3">
-                                                    <div class="col-md-12">
-                                                        <h6 class="mb-3">SEO Settings</h6>
-                                                    </div>
-                                                    <div class="col-md-12 mb-3">
-                                                        <label class="form-label">SEO Title</label>
-                                                        <input type="text" 
-                                                               class="form-control @error("translations.{$language->id}.seo_title") is-invalid @enderror" 
-                                                               name="translations[{{ $language->id }}][seo_title]" 
-                                                               value="{{ old("translations.{$language->id}.seo_title", $translation->seo_title ?? '') }}"
-                                                               placeholder="Enter SEO title for {{ $language->lang_code }}">
-                                                        @error("translations.{$language->id}.seo_title")
-                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                    
-                                                    <div class="col-md-12 mb-3">
-                                                        <label class="form-label">SEO Keywords</label>
-                                                        <textarea class="form-control @error("translations.{$language->id}.seo_keywords") is-invalid @enderror" 
-                                                                  name="translations[{{ $language->id }}][seo_keywords]" 
-                                                                  rows="3"
-                                                                  placeholder="Enter keywords separated by commas for {{ $language->lang_code }}">{{ old("translations.{$language->id}.seo_keywords", $translation->seo_keywords ?? '') }}</textarea>
-                                                        @error("translations.{$language->id}.seo_keywords")
-                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                    
-                                                    <div class="col-md-12 mb-3">
-                                                        <label class="form-label">SEO Description</label>
-                                                        <textarea class="form-control @error("translations.{$language->id}.seo_description") is-invalid @enderror" 
-                                                                  name="translations[{{ $language->id }}][seo_description]" 
-                                                                  rows="3"
-                                                                  placeholder="Enter SEO description for {{ $language->lang_code }}">{{ old("translations.{$language->id}.seo_description", $translation->seo_description ?? '') }}</textarea>
-                                                        @error("translations.{$language->id}.seo_description")
-                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
+                            @include('admin.vacancies.partials.translations-edit')
 
                             <!-- Status Section -->
                             <div class="row mb-4">

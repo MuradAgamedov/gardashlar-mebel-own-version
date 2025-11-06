@@ -136,6 +136,8 @@ public function show(Request $request, string $slug): JsonResponse
             'seo_description' => $translation?->seo_description ?? '',
             'seo_keywords' => $translation?->seo_keywords ?? '',
             'requirements' => $requirements,
+            'phone' => $vacancy->phone,
+
             'translates' => [
                 'slug' => $slugTranslations
             ]
