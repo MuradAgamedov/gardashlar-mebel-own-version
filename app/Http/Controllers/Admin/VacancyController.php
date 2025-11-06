@@ -33,23 +33,12 @@ class VacancyController extends Controller
     public function store(Request $request)
     {
         $languages = Language::all();
-        
+
         // Base validation
         $request->validate([
-            'last_apply_date' => 'required|date|after:today',
+            'last_apply_date' => 'nullable|date|after:today',
             'email' => 'required|email|max:255',
-            'address' => 'required|string|max:500',
             'status' => 'boolean',
-        ], [
-            'last_apply_date.required' => 'Last apply date is required.',
-            'last_apply_date.date' => 'Last apply date must be a valid date.',
-            'last_apply_date.after' => 'Last apply date must be after today.',
-            'email.required' => 'Email is required.',
-            'email.email' => 'Email must be a valid email address.',
-            'email.max' => 'Email may not be greater than 255 characters.',
-            'address.required' => 'Address is required.',
-            'address.max' => 'Address may not be greater than 500 characters.',
-            'status.boolean' => 'Status must be true or false.',
         ]);
 
         // Translation validation
@@ -60,35 +49,23 @@ class VacancyController extends Controller
                 "translations.{$language->id}.experience" => 'required|string|max:255',
                 "translations.{$language->id}.work_schedule" => 'required|string|max:1000',
                 "translations.{$language->id}.salary" => 'nullable|string|max:255',
+                "translations.{$language->id}.address" => 'required|string|max:500',
                 "translations.{$language->id}.seo_title" => 'nullable|string|max:255',
                 "translations.{$language->id}.seo_keywords" => 'nullable|string',
                 "translations.{$language->id}.seo_description" => 'nullable|string',
-            ], [
-                "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.position.required" => "Position is required for {$language->lang_code}.",
-                "translations.{$language->id}.position.max" => "Position may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.experience.required" => "Experience is required for {$language->lang_code}.",
-                "translations.{$language->id}.experience.max" => "Experience may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.work_schedule.required" => "Work schedule is required for {$language->lang_code}.",
-                "translations.{$language->id}.work_schedule.max" => "Work schedule may not be greater than 1000 characters for {$language->lang_code}.",
-                "translations.{$language->id}.salary.max" => "Salary may not be greater than 255 characters for {$language->lang_code}.",
             ]);
         }
 
         try {
-            // Create vacancy
             $vacancy = Vacancy::create([
                 'last_apply_date' => $request->last_apply_date,
                 'email' => trim($request->email),
-                'address' => trim($request->address),
                 'status' => $request->input('status'),
             ]);
 
-            // Create translations
             foreach ($languages as $language) {
                 $translationData = $request->input("translations.{$language->id}", []);
-                
+
                 $vacancy->translates()->create([
                     'language_id' => $language->id,
                     'title' => trim($translationData['title'] ?? ''),
@@ -97,6 +74,7 @@ class VacancyController extends Controller
                     'experience' => trim($translationData['experience'] ?? ''),
                     'work_schedule' => trim($translationData['work_schedule'] ?? ''),
                     'salary' => trim($translationData['salary'] ?? ''),
+                    'address' => trim($translationData['address'] ?? ''),
                     'seo_title' => trim($translationData['seo_title'] ?? ''),
                     'seo_keywords' => trim($translationData['seo_keywords'] ?? ''),
                     'seo_description' => trim($translationData['seo_description'] ?? ''),
@@ -113,6 +91,7 @@ class VacancyController extends Controller
         }
     }
 
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -127,25 +106,15 @@ class VacancyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Vacancy $vacancy)
+   public function update(Request $request, Vacancy $vacancy)
     {
         $languages = Language::all();
-        
+
         // Base validation
         $request->validate([
-            'last_apply_date' => 'required|date',
+            'last_apply_date' => 'nullable|date',
             'email' => 'required|email|max:255',
-            'address' => 'required|string|max:500',
             'status' => 'boolean',
-        ], [
-            'last_apply_date.required' => 'Last apply date is required.',
-            'last_apply_date.date' => 'Last apply date must be a valid date.',
-            'email.required' => 'Email is required.',
-            'email.email' => 'Email must be a valid email address.',
-            'email.max' => 'Email may not be greater than 255 characters.',
-            'address.required' => 'Address is required.',
-            'address.max' => 'Address may not be greater than 500 characters.',
-            'status.boolean' => 'Status must be true or false.',
         ]);
 
         // Translation validation
@@ -156,35 +125,23 @@ class VacancyController extends Controller
                 "translations.{$language->id}.experience" => 'required|string|max:255',
                 "translations.{$language->id}.work_schedule" => 'required|string|max:1000',
                 "translations.{$language->id}.salary" => 'nullable|string|max:255',
+                "translations.{$language->id}.address" => 'required|string|max:500',
                 "translations.{$language->id}.seo_title" => 'nullable|string|max:255',
                 "translations.{$language->id}.seo_keywords" => 'nullable|string',
                 "translations.{$language->id}.seo_description" => 'nullable|string',
-            ], [
-                "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.position.required" => "Position is required for {$language->lang_code}.",
-                "translations.{$language->id}.position.max" => "Position may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.experience.required" => "Experience is required for {$language->lang_code}.",
-                "translations.{$language->id}.experience.max" => "Experience may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.work_schedule.required" => "Work schedule is required for {$language->lang_code}.",
-                "translations.{$language->id}.work_schedule.max" => "Work schedule may not be greater than 1000 characters for {$language->lang_code}.",
-                "translations.{$language->id}.salary.max" => "Salary may not be greater than 255 characters for {$language->lang_code}.",
             ]);
         }
 
         try {
-            // Update vacancy
             $vacancy->update([
                 'last_apply_date' => $request->last_apply_date,
                 'email' => trim($request->email),
-                'address' => trim($request->address),
                 'status' => $request->input('status'),
             ]);
 
-            // Update translations
             foreach ($languages as $language) {
                 $translationData = $request->input("translations.{$language->id}", []);
-                
+
                 $vacancy->translates()->updateOrCreate(
                     ['language_id' => $language->id],
                     [
@@ -194,6 +151,7 @@ class VacancyController extends Controller
                         'experience' => trim($translationData['experience'] ?? ''),
                         'work_schedule' => trim($translationData['work_schedule'] ?? ''),
                         'salary' => trim($translationData['salary'] ?? ''),
+                        'address' => trim($translationData['address'] ?? ''),
                         'seo_title' => trim($translationData['seo_title'] ?? ''),
                         'seo_keywords' => trim($translationData['seo_keywords'] ?? ''),
                         'seo_description' => trim($translationData['seo_description'] ?? ''),
@@ -210,6 +168,7 @@ class VacancyController extends Controller
                 ->withInput();
         }
     }
+
 
     /**
      * Remove the specified resource from storage.

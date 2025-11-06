@@ -70,23 +70,12 @@
                                         </div>
                                         
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Last Apply Date <span class="text-danger">*</span></label>
+                                            <label class="form-label">Last Apply Date</label>
                                             <input type="date" 
                                                    class="form-control @error('last_apply_date') is-invalid @enderror" 
                                                    name="last_apply_date" 
-                                                   value="{{ old('last_apply_date', $vacancy->last_apply_date->format('Y-m-d')) }}">
+                                                   value="{{ old('last_apply_date', optional($vacancy->last_apply_date)->format('Y-m-d')) }}">
                                             @error('last_apply_date')
-                                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        
-                                        <div class="col-md-12 mb-3">
-                                            <label class="form-label">Address <span class="text-danger">*</span></label>
-                                            <textarea class="form-control @error('address') is-invalid @enderror" 
-                                                      name="address" 
-                                                      rows="3"
-                                                      placeholder="Enter vacancy address">{{ old('address', $vacancy->address) }}</textarea>
-                                            @error('address')
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -220,6 +209,21 @@
                                                     </div>
                                                 </div>
 
+                                                <!-- ✅ Address Field -->
+                                                <div class="row mt-3">
+                                                    <div class="col-md-12 mb-3">
+                                                        <label class="form-label">Address <span class="text-danger">*</span></label>
+                                                        <textarea class="form-control @error("translations.{$language->id}.address") is-invalid @enderror" 
+                                                                  name="translations[{{ $language->id }}][address]" 
+                                                                  rows="3"
+                                                                  placeholder="Enter address for {{ $language->lang_code }}">{{ old("translations.{$language->id}.address", $translation->address ?? '') }}</textarea>
+                                                        @error("translations.{$language->id}.address")
+                                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                                <!-- ✅ END Address -->
+
                                                 <!-- SEO Section -->
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
@@ -298,6 +302,7 @@
     </div>
 </div>
 @endsection
+
 
 @include('admin.partials.slug-generator')
 
