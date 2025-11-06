@@ -373,7 +373,7 @@ if ($categorySlug) {
             $catTr = $selectedCategory->translates()->where('language_id', $lang->id)->first();
             $slugTranslations[$lang->code] = $catTr ? $catTr->slug : null;
 
-            $parentSlugTranslations[$lang->code] = null;
+            $parentSlugTranslations[$lang->lang_code] = null;
             if ($selectedCategory->parent_id) {
                 $parent = ProductCategory::find($selectedCategory->parent_id);
                 if ($parent) {
