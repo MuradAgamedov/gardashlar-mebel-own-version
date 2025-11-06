@@ -805,26 +805,53 @@ if ($categorySlug) {
                     'inCompare' => $inCompare,
                 ];
             });
-            $slugTranslations = [];
             $languages = \App\Models\Language::all();
 
-            foreach ($languages as $lang) {
-                $translationForLang = $product->translates()
-                    ->where('language_id', $lang->id)
-                    ->first();
+                // === Məhsulun bütün dillərdəki slug-ları ===
+                $productSlugTranslations = [];
+                foreach ($languages as $lang) {
+                    $tr = $product->translates()->where('language_id', $lang->id)->first();
+                    $productSlugTranslations[$lang->lang_code] = $tr ? $tr->slug : null;
+                }
 
-                $slugTranslations[$lang->lang_code] = $translationForLang ? $translationForLang->slug : null;
-            }
+                // === Məhsulun əsas kateqoriyası və onun parent slug-ları ===
+                $categorySlugTranslations = [];
+                $parentCategorySlugTranslations = [];
+
+                if ($product->categories->isNotEmpty()) {
+                    $mainCategory = $product->categories->first();
+
+                    foreach ($languages as $lang) {
+                        // əsas kateqoriyanın slug-ları
+                        $catTr = $mainCategory->translates()->where('language_id', $lang->id)->first();
+                        $categorySlugTranslations[$lang->lang_code] = $catTr ? $catTr->slug : null;
+
+                        // parent kateqoriya slug-ları
+                        $parentCategorySlugTranslations[$lang->lang_code] = null;
+                        if ($mainCategory->parent_id) {
+                            $parent = \App\Models\ProductCategory::find($mainCategory->parent_id);
+                            if ($parent) {
+                                $parentTr = $parent->translates()->where('language_id', $lang->id)->first();
+                                $parentCategorySlugTranslations[$lang->lang_code] = $parentTr ? $parentTr->slug : null;
+                            }
+                        }
+                    }
+                }
+
+                // 🔹 Hamısını bir yerdə cəmlə
                 $translatesData = [
-                    'slug' => $slugTranslations
+                    'productSlug' => $productSlugTranslations,
+                    'categorySlug' => $categorySlugTranslations,
+                    'parentCategorySlug' => $parentCategorySlugTranslations
                 ];
-                            return response()->json([
+
+            return response()->json([
                 'success' => true,
                 'message' => 'Product retrieved successfully',
                 'data' => [
                     'product' => $productData,
                     'similar_products' => $similarData,
-                    'translates' => $translatesData,
+                    'translates' => $translatesData
 
                 ]
             ]);
