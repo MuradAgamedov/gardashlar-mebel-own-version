@@ -18,7 +18,13 @@ class Vacancy extends Model
         'phone'
     ];
         // App\Models\Vacancy.php
-    
+        public function scopeNotExpired($query)
+        {
+            return $query->where(function ($q) {
+                $q->whereNull('last_apply_date')
+                ->orWhere('last_apply_date', '>=', now());
+            });
+        }
 
     protected $casts = [
         'last_apply_date' => 'date',
@@ -89,10 +95,7 @@ class Vacancy extends Model
     /**
      * Scope for vacancies that haven't expired
      */
-    public function scopeNotExpired($query)
-    {
-        return $query->where('last_apply_date', '>=', now()->toDateString());
-    }
+  
 
     /**
      * Scope for ordered vacancies
