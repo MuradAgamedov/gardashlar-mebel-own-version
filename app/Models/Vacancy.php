@@ -15,6 +15,7 @@ class Vacancy extends Model
         'address',
         'order',
         'status',
+        'phone'
     ];
 
     protected $casts = [
