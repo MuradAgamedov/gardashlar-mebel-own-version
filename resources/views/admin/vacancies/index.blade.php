@@ -113,7 +113,8 @@
                                             <td>{{ $vacancy->address }}</td>
                                             <td>
                                                 <span class="{{ $vacancy->is_expired ? 'text-danger' : 'text-success' }}">
-                                                    {{ $vacancy->last_apply_date->format('M d, Y') }}
+                                                    {{ $vacancy->last_apply_date ? $vacancy->last_apply_date->format('M d, Y') : '—' }}
+
                                                 </span>
                                             </td>
                                             <td>{{ $vacancy->email }}</td>
