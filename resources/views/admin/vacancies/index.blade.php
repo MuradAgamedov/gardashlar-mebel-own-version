@@ -92,9 +92,11 @@
                                                         ?? $vacancy->translates->first();
                                                 @endphp
                                                 <strong>{{ $mainTranslation->title ?? 'N/A' }}</strong>
-                                                @if($vacancy->is_expired)
-                                                    <span class="badge bg-danger ms-2">Expired</span>
-                                                @endif
+                                                @if($vacancy->last_apply_date && now()->greaterThan($vacancy->last_apply_date))
+                                                        <span class="badge bg-danger ms-2">Expired</span>
+                                                    @endif
+
+
                                             </td>
                                             <td>
                                                 @php

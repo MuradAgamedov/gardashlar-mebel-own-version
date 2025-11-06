@@ -17,6 +17,14 @@ class Vacancy extends Model
         'status',
         'phone'
     ];
+        // App\Models\Vacancy.php
+        public function scopeNotExpired($query)
+        {
+            return $query->where(function ($q) {
+                $q->whereNull('last_apply_date')
+                ->orWhere('last_apply_date', '>=', now());
+            });
+        }
 
     protected $casts = [
         'last_apply_date' => 'date',
