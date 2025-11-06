@@ -105,40 +105,26 @@ class ProductsController extends Controller
                 ->get();
             });
     
-         $productPageCategoriesData = $productPageCategories->map(function ($pageCategory) {
-    $category = $pageCategory->productCategory;
-    if (!$category) return null;
-
-    $translation = $category->translates->first();
-
-    // 🔹 Hər dil üzrə slug-lar
-    $slugTranslates = $category->translates->mapWithKeys(function ($t) {
-        return [$t->language->lang_code => $t->slug];
-    });
-
-    // 🔹 Hər dil üzrə parentSlug-lar
-    $parentSlugTranslates = [];
-
-    if ($category->parent_id) {
-        $parentCategory = \App\Models\ProductCategory::with('translates.language')->find($category->parent_id);
-        if ($parentCategory) {
-            $parentSlugTranslates = $parentCategory->translates->mapWithKeys(function ($t) {
-                return [$t->language->lang_code => $t->slug];
+            $productPageCategoriesData = $productPageCategories->map(function ($pageCategory) use ($languageId) {
+                $category = $pageCategory->productCategory;
+                $translation = $category ? $category->translates->first() : null;
+                
+                $parentSlug = null;
+                if ($category && $category->parent_id) {
+                    $parentCategory = ProductCategory::find($category->parent_id);
+                    if ($parentCategory) {
+                        $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
+                        $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
+                    }
+                }
+                
+                return [
+                    'id' => $pageCategory->id,
+                    'title' => $translation ? $translation->title : '',
+                    'slug' => $translation ? $translation->slug : '',
+                    'parentSlug' => $parentSlug
+                ];
             });
-        }
-    }
-
-    return [
-        'id' => $pageCategory->id,
-        'title' => $translation ? $translation->title : '',
-        'slug' => $translation ? $translation->slug : '',
-        'translates' => [
-            'slug' => $slugTranslates,
-            'parentSlug' => $parentSlugTranslates
-        ]
-    ];
-});
-
     
             // Sort options
             $sortOptions = [
@@ -369,7 +355,41 @@ class ProductsController extends Controller
                 'to' => $products->lastItem(),
                 'has_more_pages' => $products->hasMorePages()
             ];
-    
+    $translatesData = null;
+
+if ($categorySlug) {
+    $selectedCategory = ProductCategory::whereHas('translates', function($query) use ($categorySlug) {
+        $query->where('slug', $categorySlug);
+    })->first();
+
+    if ($selectedCategory) {
+        // bütün dilləri çək
+        $languages = \App\Models\Language::all();
+
+        $slugTranslations = [];
+        $parentSlugTranslations = [];
+
+        foreach ($languages as $lang) {
+            $catTr = $selectedCategory->translates()->where('language_id', $lang->id)->first();
+            $slugTranslations[$lang->code] = $catTr ? $catTr->slug : null;
+
+            $parentSlugTranslations[$lang->code] = null;
+            if ($selectedCategory->parent_id) {
+                $parent = ProductCategory::find($selectedCategory->parent_id);
+                if ($parent) {
+                    $parentTr = $parent->translates()->where('language_id', $lang->id)->first();
+                    $parentSlugTranslations[$lang->code] = $parentTr ? $parentTr->slug : null;
+                }
+            }
+        }
+
+        $translatesData = [
+            'slug' => $slugTranslations,
+            'parentSlug' => $parentSlugTranslations
+        ];
+    }
+}
+
             return response()->json([
                 'success' => true,
                 'message' => 'Product categories retrieved successfully',
@@ -387,7 +407,8 @@ class ProductsController extends Controller
                         'min_price' => $actualMinPrice,
                         'max_price' => $actualMaxPrice
                     ],
-                    'seo_text' => $categorySeoText
+                    'seo_text' => $categorySeoText,
+                    'translates' => $translatesData
                 ]
             ]);
     
