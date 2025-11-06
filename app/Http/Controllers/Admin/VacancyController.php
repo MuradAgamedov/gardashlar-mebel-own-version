@@ -37,7 +37,7 @@ class VacancyController extends Controller
         // Base validation
         $request->validate([
             'last_apply_date' => 'nullable|date|after:today',
-            'email' => 'required|email|max:255',
+            'email' => 'nullable|email|max:255',
             'status' => 'boolean',
         ]);
 
@@ -113,7 +113,7 @@ class VacancyController extends Controller
         // Base validation
         $request->validate([
             'last_apply_date' => 'nullable|date',
-            'email' => 'required|email|max:255',
+            'email' => 'nullable|email|max:255',
             'status' => 'boolean',
         ]);
 
