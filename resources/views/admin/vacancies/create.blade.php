@@ -69,7 +69,7 @@
                                             @enderror
                                         </div>
 
-                                        <!-- ✅ Phone field added -->
+                                        <!-- ✅ Phone Field -->
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Phone</label>
                                             <input type="text" 
@@ -81,7 +81,7 @@
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                        <!-- ✅ END Phone field -->
+                                        <!-- ✅ END Phone Field -->
 
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Last Apply Date</label>
@@ -99,7 +99,141 @@
                             </div>
 
                             <!-- Content Translations Section -->
-                            @include('admin.vacancies.partials.translations')
+                            <div class="row mb-4">
+                                <div class="col-md-12">
+                                    <h6 class="mb-3">Content Translations</h6>
+                                    
+                                    <!-- Language Tabs -->
+                                    <ul class="nav nav-tabs" id="languageTabs" role="tablist">
+                                        @foreach($languages as $index => $language)
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link {{ $index === 0 ? 'active' : '' }}" 
+                                                        id="tab-{{ $language->id }}" 
+                                                        data-bs-toggle="tab" 
+                                                        data-bs-target="#content-{{ $language->id }}" 
+                                                        type="button" 
+                                                        role="tab" 
+                                                        aria-controls="content-{{ $language->id }}" 
+                                                        aria-selected="{{ $index === 0 ? 'true' : 'false' }}">
+                                                    {{ $language->lang_code }}
+                                                </button>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+
+                                    <!-- Tab Content -->
+                                    <div class="tab-content" id="languageTabContent">
+                                        @foreach($languages as $index => $language)
+                                            <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" 
+                                                 id="content-{{ $language->id }}" 
+                                                 role="tabpanel" 
+                                                 aria-labelledby="tab-{{ $language->id }}">
+                                                
+                                                <div class="row mt-3">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Title <span class="text-danger">*</span></label>
+                                                        <input type="text" 
+                                                               class="form-control" 
+                                                               name="translations[{{ $language->id }}][title]" 
+                                                               value="{{ old("translations.{$language->id}.title") }}"
+                                                               placeholder="Enter title for {{ $language->lang_code }}">
+                                                    </div>
+                                                    
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Slug</label>
+                                                        <input type="text" 
+                                                               class="form-control" 
+                                                               name="translations[{{ $language->id }}][slug]" 
+                                                               value="{{ old("translations.{$language->id}.slug") }}"
+                                                               placeholder="Auto-generated slug for {{ $language->lang_code }}">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mt-3">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Position</label>
+                                                        <input type="text" 
+                                                               class="form-control" 
+                                                               name="translations[{{ $language->id }}][position]" 
+                                                               value="{{ old("translations.{$language->id}.position") }}"
+                                                               placeholder="Enter position for {{ $language->lang_code }}">
+                                                    </div>
+
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Experience</label>
+                                                        <input type="text" 
+                                                               class="form-control" 
+                                                               name="translations[{{ $language->id }}][experience]" 
+                                                               value="{{ old("translations.{$language->id}.experience") }}"
+                                                               placeholder="Enter experience for {{ $language->lang_code }}">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mt-3">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Work Schedule</label>
+                                                        <textarea class="form-control" 
+                                                                  name="translations[{{ $language->id }}][work_schedule]" 
+                                                                  rows="3"
+                                                                  placeholder="Enter work schedule for {{ $language->lang_code }}">{{ old("translations.{$language->id}.work_schedule") }}</textarea>
+                                                    </div>
+
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Salary</label>
+                                                        <input type="text" 
+                                                               class="form-control" 
+                                                               name="translations[{{ $language->id }}][salary]" 
+                                                               value="{{ old("translations.{$language->id}.salary") }}"
+                                                               placeholder="Enter salary for {{ $language->lang_code }}">
+                                                    </div>
+                                                </div>
+
+                                                <!-- ✅ Address Field -->
+                                                <div class="row mt-3">
+                                                    <div class="col-md-12 mb-3">
+                                                        <label class="form-label">Address</label>
+                                                        <textarea class="form-control" 
+                                                                  name="translations[{{ $language->id }}][address]" 
+                                                                  rows="3"
+                                                                  placeholder="Enter address for {{ $language->lang_code }}">{{ old("translations.{$language->id}.address") }}</textarea>
+                                                    </div>
+                                                </div>
+                                                <!-- ✅ END Address -->
+
+                                                <!-- SEO Section -->
+                                                <div class="row mt-3">
+                                                    <div class="col-md-12">
+                                                        <h6 class="mb-3">SEO Settings</h6>
+                                                    </div>
+
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">SEO Title</label>
+                                                        <input type="text" 
+                                                               class="form-control" 
+                                                               name="translations[{{ $language->id }}][seo_title]" 
+                                                               value="{{ old("translations.{$language->id}.seo_title") }}">
+                                                    </div>
+
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">SEO Keywords</label>
+                                                        <textarea class="form-control" 
+                                                                  name="translations[{{ $language->id }}][seo_keywords]" 
+                                                                  rows="3">{{ old("translations.{$language->id}.seo_keywords") }}</textarea>
+                                                    </div>
+
+                                                    <div class="col-md-12 mb-3">
+                                                        <label class="form-label">SEO Description</label>
+                                                        <textarea class="form-control" 
+                                                                  name="translations[{{ $language->id }}][seo_description]" 
+                                                                  rows="3">{{ old("translations.{$language->id}.seo_description") }}</textarea>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
 
                             <!-- Status Section -->
                             <div class="row mb-4">
@@ -126,6 +260,7 @@
                                     </div>
                                 </div>
                             </div>
+
                         </form>
                     </div>
                 </div>
