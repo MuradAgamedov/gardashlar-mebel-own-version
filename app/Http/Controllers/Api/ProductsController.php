@@ -105,46 +105,37 @@ class ProductsController extends Controller
                 ->get();
             });
     
-         $productPageCategoriesData = $productPageCategories->map(function ($pageCategory) use ($languageId) {
+         $productPageCategoriesData = $productPageCategories->map(function ($pageCategory) {
     $category = $pageCategory->productCategory;
-    $translation = $category ? $category->translates->first() : null;
-    
-    $parentSlug = null;
-    $parentTranslates = [];
+    if (!$category) return null;
 
-    if ($category && $category->parent_id) {
-        $parentCategory = ProductCategory::find($category->parent_id);
+    $translation = $category->translates->first();
+
+    // 🔹 Hər dil üzrə slug-lar
+    $slugTranslates = $category->translates->mapWithKeys(function ($t) {
+        return [$t->language->lang_code => $t->slug];
+    });
+
+    // 🔹 Hər dil üzrə parentSlug-lar
+    $parentSlugTranslates = [];
+
+    if ($category->parent_id) {
+        $parentCategory = \App\Models\ProductCategory::with('translates.language')->find($category->parent_id);
         if ($parentCategory) {
-            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
-            $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
-
-            // 🔹 Yeni əlavə: parent slug-lar bütün dillər üçün
-            $parentTranslates = $parentCategory->translates->mapWithKeys(function ($t) {
+            $parentSlugTranslates = $parentCategory->translates->mapWithKeys(function ($t) {
                 return [$t->language->lang_code => $t->slug];
             });
         }
     }
 
-    // 🔹 Yeni əlavə: mövcud kateqoriyanın slug-ları bütün dillər üçün
-    $slugTranslates = $category
-        ? $category->translates->mapWithKeys(function ($t) {
-            return [$t->language->lang_code => $t->slug];
-        })
-        : [];
-
     return [
         'id' => $pageCategory->id,
         'title' => $translation ? $translation->title : '',
         'slug' => $translation ? $translation->slug : '',
-        'parentSlug' => $parentSlug,
-
-        // 🔹 Əlavə etdik:
         'translates' => [
-            'slug' => $slugTranslates
-        ],
-        'parentTranslates' => [
-            'slug' => $parentTranslates
-        ],
+            'slug' => $slugTranslates,
+            'parentSlug' => $parentSlugTranslates
+        ]
     ];
 });
 
