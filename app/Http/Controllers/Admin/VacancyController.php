@@ -30,66 +30,71 @@ class VacancyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $languages = Language::all();
+ public function store(Request $request)
+{
+    $languages = Language::all();
 
-        // Base validation
+    // ✅ Base validation
+    $request->validate([
+        'last_apply_date' => 'nullable|date|after:today',
+        'email' => 'nullable|email|max:255',
+        'phone' => 'nullable|string|max:50',
+        'status' => 'boolean',
+    ]);
+
+    // ✅ Translation validation
+    foreach ($languages as $language) {
         $request->validate([
-            'last_apply_date' => 'nullable|date|after:today',
-            'email' => 'nullable|email|max:255',
-            'status' => 'boolean',
+            "translations.{$language->id}.title" => 'required|string|max:255',
+            "translations.{$language->id}.position" => 'required|string|max:255',
+            "translations.{$language->id}.experience" => 'required|string|max:255',
+            "translations.{$language->id}.work_schedule" => 'required|string|max:1000',
+            "translations.{$language->id}.salary" => 'nullable|string|max:255',
+            "translations.{$language->id}.address" => 'required|string|max:500',
+            "translations.{$language->id}.seo_title" => 'nullable|string|max:255',
+            "translations.{$language->id}.seo_keywords" => 'nullable|string',
+            "translations.{$language->id}.seo_description" => 'nullable|string',
+        ]);
+    }
+
+    try {
+        // ✅ Create main vacancy
+        $vacancy = Vacancy::create([
+            'last_apply_date' => $request->last_apply_date,
+            'email' => trim($request->email),
+            'phone' => trim($request->phone),
+            'status' => $request->input('status'),
         ]);
 
-        // Translation validation
+        // ✅ Create translations
         foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.title" => 'required|string|max:255',
-                "translations.{$language->id}.position" => 'required|string|max:255',
-                "translations.{$language->id}.experience" => 'required|string|max:255',
-                "translations.{$language->id}.work_schedule" => 'required|string|max:1000',
-                "translations.{$language->id}.salary" => 'nullable|string|max:255',
-                "translations.{$language->id}.address" => 'required|string|max:500',
-                "translations.{$language->id}.seo_title" => 'nullable|string|max:255',
-                "translations.{$language->id}.seo_keywords" => 'nullable|string',
-                "translations.{$language->id}.seo_description" => 'nullable|string',
+            $translationData = $request->input("translations.{$language->id}", []);
+
+            $vacancy->translates()->create([
+                'language_id' => $language->id,
+                'title' => trim($translationData['title'] ?? ''),
+                'slug' => trim($translationData['slug'] ?? ''),
+                'position' => trim($translationData['position'] ?? ''),
+                'experience' => trim($translationData['experience'] ?? ''),
+                'work_schedule' => trim($translationData['work_schedule'] ?? ''),
+                'salary' => trim($translationData['salary'] ?? ''),
+                'address' => trim($translationData['address'] ?? ''),
+                'seo_title' => trim($translationData['seo_title'] ?? ''),
+                'seo_keywords' => trim($translationData['seo_keywords'] ?? ''),
+                'seo_description' => trim($translationData['seo_description'] ?? ''),
             ]);
         }
 
-        try {
-            $vacancy = Vacancy::create([
-                'last_apply_date' => $request->last_apply_date,
-                'email' => trim($request->email),
-                'status' => $request->input('status'),
-            ]);
+        return redirect()->route('admin.vacancies.index')
+            ->with('success', 'Vacancy created successfully!');
 
-            foreach ($languages as $language) {
-                $translationData = $request->input("translations.{$language->id}", []);
-
-                $vacancy->translates()->create([
-                    'language_id' => $language->id,
-                    'title' => trim($translationData['title'] ?? ''),
-                    'slug' => trim($translationData['slug'] ?? ''),
-                    'position' => trim($translationData['position'] ?? ''),
-                    'experience' => trim($translationData['experience'] ?? ''),
-                    'work_schedule' => trim($translationData['work_schedule'] ?? ''),
-                    'salary' => trim($translationData['salary'] ?? ''),
-                    'address' => trim($translationData['address'] ?? ''),
-                    'seo_title' => trim($translationData['seo_title'] ?? ''),
-                    'seo_keywords' => trim($translationData['seo_keywords'] ?? ''),
-                    'seo_description' => trim($translationData['seo_description'] ?? ''),
-                ]);
-            }
-
-            return redirect()->route('admin.vacancies.index')
-                ->with('success', 'Vacancy created successfully!');
-
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withErrors(['error' => 'Error creating vacancy: ' . $e->getMessage()])
-                ->withInput();
-        }
+    } catch (\Exception $e) {
+        return redirect()->back()
+            ->withErrors(['error' => 'Error creating vacancy: ' . $e->getMessage()])
+            ->withInput();
     }
+}
+
 
 
     /**
@@ -106,68 +111,73 @@ class VacancyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-   public function update(Request $request, Vacancy $vacancy)
-    {
-        $languages = Language::all();
+  public function update(Request $request, Vacancy $vacancy)
+{
+    $languages = Language::all();
 
-        // Base validation
+    // ✅ Base validation
+    $request->validate([
+        'last_apply_date' => 'nullable|date',
+        'email' => 'nullable|email|max:255',
+        'phone' => 'nullable|string|max:50',
+        'status' => 'boolean',
+    ]);
+
+    // ✅ Translation validation
+    foreach ($languages as $language) {
         $request->validate([
-            'last_apply_date' => 'nullable|date',
-            'email' => 'nullable|email|max:255',
-            'status' => 'boolean',
+            "translations.{$language->id}.title" => 'required|string|max:255',
+            "translations.{$language->id}.position" => 'required|string|max:255',
+            "translations.{$language->id}.experience" => 'required|string|max:255',
+            "translations.{$language->id}.work_schedule" => 'required|string|max:1000',
+            "translations.{$language->id}.salary" => 'nullable|string|max:255',
+            "translations.{$language->id}.address" => 'required|string|max:500',
+            "translations.{$language->id}.seo_title" => 'nullable|string|max:255',
+            "translations.{$language->id}.seo_keywords" => 'nullable|string',
+            "translations.{$language->id}.seo_description" => 'nullable|string',
+        ]);
+    }
+
+    try {
+        // ✅ Update main Vacancy
+        $vacancy->update([
+            'last_apply_date' => $request->last_apply_date,
+            'email' => trim($request->email),
+            'phone' => trim($request->phone),
+            'status' => $request->input('status'),
         ]);
 
-        // Translation validation
+        // ✅ Update translations
         foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.title" => 'required|string|max:255',
-                "translations.{$language->id}.position" => 'required|string|max:255',
-                "translations.{$language->id}.experience" => 'required|string|max:255',
-                "translations.{$language->id}.work_schedule" => 'required|string|max:1000',
-                "translations.{$language->id}.salary" => 'nullable|string|max:255',
-                "translations.{$language->id}.address" => 'required|string|max:500',
-                "translations.{$language->id}.seo_title" => 'nullable|string|max:255',
-                "translations.{$language->id}.seo_keywords" => 'nullable|string',
-                "translations.{$language->id}.seo_description" => 'nullable|string',
-            ]);
+            $translationData = $request->input("translations.{$language->id}", []);
+
+            $vacancy->translates()->updateOrCreate(
+                ['language_id' => $language->id],
+                [
+                    'title' => trim($translationData['title'] ?? ''),
+                    'slug' => trim($translationData['slug'] ?? ''),
+                    'position' => trim($translationData['position'] ?? ''),
+                    'experience' => trim($translationData['experience'] ?? ''),
+                    'work_schedule' => trim($translationData['work_schedule'] ?? ''),
+                    'salary' => trim($translationData['salary'] ?? ''),
+                    'address' => trim($translationData['address'] ?? ''),
+                    'seo_title' => trim($translationData['seo_title'] ?? ''),
+                    'seo_keywords' => trim($translationData['seo_keywords'] ?? ''),
+                    'seo_description' => trim($translationData['seo_description'] ?? ''),
+                ]
+            );
         }
 
-        try {
-            $vacancy->update([
-                'last_apply_date' => $request->last_apply_date,
-                'email' => trim($request->email),
-                'status' => $request->input('status'),
-            ]);
+        return redirect()->route('admin.vacancies.index')
+            ->with('success', 'Vacancy updated successfully!');
 
-            foreach ($languages as $language) {
-                $translationData = $request->input("translations.{$language->id}", []);
-
-                $vacancy->translates()->updateOrCreate(
-                    ['language_id' => $language->id],
-                    [
-                        'title' => trim($translationData['title'] ?? ''),
-                        'slug' => trim($translationData['slug'] ?? ''),
-                        'position' => trim($translationData['position'] ?? ''),
-                        'experience' => trim($translationData['experience'] ?? ''),
-                        'work_schedule' => trim($translationData['work_schedule'] ?? ''),
-                        'salary' => trim($translationData['salary'] ?? ''),
-                        'address' => trim($translationData['address'] ?? ''),
-                        'seo_title' => trim($translationData['seo_title'] ?? ''),
-                        'seo_keywords' => trim($translationData['seo_keywords'] ?? ''),
-                        'seo_description' => trim($translationData['seo_description'] ?? ''),
-                    ]
-                );
-            }
-
-            return redirect()->route('admin.vacancies.index')
-                ->with('success', 'Vacancy updated successfully!');
-
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withErrors(['error' => 'Error updating vacancy: ' . $e->getMessage()])
-                ->withInput();
-        }
+    } catch (\Exception $e) {
+        return redirect()->back()
+            ->withErrors(['error' => 'Error updating vacancy: ' . $e->getMessage()])
+            ->withInput();
     }
+}
+
 
 
     /**
