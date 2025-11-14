@@ -61,7 +61,6 @@ class PopupAdController extends Controller
 
     public function update(Request $request, PopupAd $popupAd)
     {
-        dd(1);
         try {
             $this->repository->updatePopupAd(
                 $popupAd,
@@ -76,6 +75,7 @@ class PopupAdController extends Controller
                 ->with('success', 'PopupAd updated successfully.');
 
         } catch (\Exception $e) {
+            dd( $e->getMessage());
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error updating popup ad: ' . $e->getMessage());
