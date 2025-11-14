@@ -94,14 +94,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- Order -->
-                                    <div class="mb-3">
-                                        <label class="form-label">Order</label>
-                                        <input type="number"
-                                               name="order"
-                                               value="{{ old('order', $popupAd->order) }}"
-                                               class="form-control">
-                                    </div>
+                                
 
                                 </div>
 
