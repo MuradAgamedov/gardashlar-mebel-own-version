@@ -6,21 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class PopupAdTranslate extends Model
 {
+    protected $table = 'popup_ad_translates';
+
     protected $fillable = [
         'popup_ad_id',
+        'language_id',
         'locale',
         'title',
         'description',
         'image_alt_text',
     ];
 
-    public function popupAd()
-    {
-        return $this->belongsTo(PopupAd::class);
-    }
-
     public function language()
     {
-        return $this->belongsTo(Language::class, 'locale', 'lang_code');
+        return $this->belongsTo(Language::class);
+    }
+
+    public function popup()
+    {
+        return $this->belongsTo(PopupAd::class, 'popup_ad_id');
     }
 }
