@@ -72,7 +72,7 @@ use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\GetAllCountController;
 use App\Http\Controllers\Api\AllSeoPagesController;
 use App\Http\Controllers\Api\UserFinProductContoller;
-
+use App\Http\Controllers\Api\PopupAdController;
 use App\Http\Controllers\Api\SeoPageController;
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
@@ -302,7 +302,7 @@ Route::get('/products/by-slug/{slug}', [ProductsController::class, 'productBySlu
 // Product Card Check API Route (No Authentication Required)
 Route::post('/products/cart/dont-registered', [CartController::class, 'checkCardProducts'])->name('api.products.card-check');
 
-
+Route::get('/popup-ads', [PopupAdController::class, 'index']);
 
 
 // Product Favorites API Routes (Requires Authentication)
