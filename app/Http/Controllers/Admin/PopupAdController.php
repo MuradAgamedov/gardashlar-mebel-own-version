@@ -31,11 +31,11 @@ class PopupAdController extends Controller
 
     public function store(StorePopupAdRequest $request)
     {
+        dd($request->all());    
         try {
             $this->repository->createPopupAd(
                 [
                     'image'  => $request->image,
-                    'order'  => $request->order ?? 0,
                     'status' => $request->boolean('status', true),
                 ],
                 $request->translations
