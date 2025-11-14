@@ -66,7 +66,6 @@ class PopupAdController extends Controller
                 $popupAd,
                 [
                     'image'  => $request->image,
-                    'order'  => $request->order ?? $popupAd->order,
                     'status' => $request->boolean('status', true),
                 ],
                 $request->translations
