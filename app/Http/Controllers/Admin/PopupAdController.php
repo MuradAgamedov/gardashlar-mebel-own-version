@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Language;
 use App\Models\PopupAd;
 use App\Repositories\PopupAdRepository;
-use Illuminate\Http\Request;
 use App\Http\Requests\Admin\PopupAd\StorePopupAdRequest;
 use App\Http\Requests\Admin\PopupAd\UpdatePopupAdRequest;
+use Illuminate\Http\Request;
 
 class PopupAdController extends Controller
 {
@@ -60,7 +60,7 @@ class PopupAdController extends Controller
         return view('admin.popup_ads.edit', compact('popupAd', 'languages'));
     }
 
-    public function update(Request $request, PopupAd $popupAd)
+    public function update(UpdatePopupAdRequest $request, PopupAd $popupAd)
     {
         try {
             $this->repository->updatePopupAd(
@@ -76,7 +76,7 @@ class PopupAdController extends Controller
                 ->with('success', 'PopupAd updated successfully.');
 
         } catch (\Exception $e) {
-            dd( $e->getMessage());
+            dd($e->getMessage());
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error updating popup ad: ' . $e->getMessage());

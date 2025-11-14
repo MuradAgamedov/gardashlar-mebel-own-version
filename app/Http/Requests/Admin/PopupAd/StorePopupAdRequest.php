@@ -14,12 +14,16 @@ class StorePopupAdRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
 
-            // CHECKBOX üçün ən düzgün validation
+            // Status checkbox
             'status' => 'required|in:1,0',
 
+            // Translations
             'translations' => 'required|array',
+
+            // LANGUAGE ID MÜTLƏQ OLMALIDIR!
+            'translations.*.language_id' => 'required|exists:languages,id',
 
             'translations.*.locale' => 'required|string|max:5',
             'translations.*.title' => 'required|string|max:255',

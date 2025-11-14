@@ -77,43 +77,38 @@
                                         <div class="form-text">Upload popup image (max 2MB)</div>
                                     </div>
 
-                                            <!-- Status -->
+                                    <!-- Status -->
                                     <div class="mb-3">
-                                            <div class="form-check form-switch">
+                                        <div class="form-check form-switch">
 
-                                                {{-- unchecked olsa belə POST-da "0" getsin deyə --}}
-                                                <input type="hidden" name="status" value="0">
+                                            <input type="hidden" name="status" value="0">
 
-                                                {{-- checkbox checked olanda "1" göndərsin --}}
-                                                <input class="form-check-input"
-                                                    type="checkbox"
-                                                    id="status"
-                                                    name="status"
-                                                    value="1"
-                                                    {{ old('status', isset($popupAd) ? $popupAd->status : true) ? 'checked' : '' }}>
+                                            <input class="form-check-input"
+                                                type="checkbox"
+                                                id="status"
+                                                name="status"
+                                                value="1"
+                                                {{ old('status', 1) ? 'checked' : '' }}>
 
-                                                <label class="form-check-label" for="status">Active</label>
-                                            </div>
+                                            <label class="form-check-label" for="status">Active</label>
                                         </div>
-
-
-                              
+                                    </div>
 
                                 </div>
 
-                                <!-- RIGHT: PREVIEW -->
+                                <!-- RIGHT: IMAGE PREVIEW -->
                                 <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Image Preview</label>
+                                    <label class="form-label">Image Preview</label>
 
-                                        <div id="image-preview" class="border rounded p-3 text-center" style="min-height: 200px; display:none;">
-                                            <img id="preview-img" src="" class="img-fluid" style="max-height: 180px;">
-                                        </div>
+                                    <div id="image-preview" class="border rounded p-3 text-center"
+                                         style="min-height: 200px; display:none;">
+                                        <img id="preview-img" src="" class="img-fluid" style="max-height: 180px;">
+                                    </div>
 
-                                        <div id="no-image" class="border rounded p-3 text-center text-muted" style="min-height:200px;">
-                                            <i class="material-icons-outlined" style="font-size:3rem;">image</i>
-                                            <p class="mt-2">No image selected</p>
-                                        </div>
+                                    <div id="no-image" class="border rounded p-3 text-center text-muted"
+                                         style="min-height:200px;">
+                                        <i class="material-icons-outlined" style="font-size:3rem;">image</i>
+                                        <p class="mt-2">No image selected</p>
                                     </div>
                                 </div>
                             </div>
@@ -125,11 +120,11 @@
                                 @foreach($languages as $index => $lang)
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link {{ $index === 0 ? 'active' : '' }}"
-                                                id="tab-{{ $lang->id }}"
-                                                data-bs-toggle="tab"
-                                                data-bs-target="#content-{{ $lang->id }}"
-                                                type="button"
-                                                role="tab">
+                                            id="tab-{{ $lang->id }}"
+                                            data-bs-toggle="tab"
+                                            data-bs-target="#content-{{ $lang->id }}"
+                                            type="button"
+                                            role="tab">
 
                                             {{ $lang->lang_code }}
 
@@ -141,7 +136,7 @@
                                 @endforeach
                             </ul>
 
-                            <!-- Tab Contents -->
+                            <!-- Language Content -->
                             <div class="tab-content mt-3">
                                 @foreach($languages as $index => $lang)
                                     <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}"
@@ -154,7 +149,6 @@
                                                    name="translations[{{ $lang->id }}][title]"
                                                    value="{{ old("translations.{$lang->id}.title") }}"
                                                    class="form-control @error("translations.{$lang->id}.title") is-invalid @enderror"
-                                                   placeholder="Enter title"
                                                    required>
 
                                             @error("translations.{$lang->id}.title")
@@ -168,7 +162,6 @@
                                             <textarea name="translations[{{ $lang->id }}][description]"
                                                       class="form-control @error("translations.{$lang->id}.description") is-invalid @enderror"
                                                       rows="4"
-                                                      placeholder="Enter description"
                                                       required>{{ old("translations.{$lang->id}.description") }}</textarea>
 
                                             @error("translations.{$lang->id}.description")
@@ -182,11 +175,12 @@
                                             <input type="text"
                                                    name="translations[{{ $lang->id }}][image_alt_text]"
                                                    class="form-control"
-                                                   placeholder="Alt text (optional)"
                                                    value="{{ old("translations.{$lang->id}.image_alt_text") }}">
                                         </div>
 
+                                        <!-- REQUIRED HIDDEN FIELDS -->
                                         <input type="hidden" name="translations[{{ $lang->id }}][locale]" value="{{ $lang->lang_code }}">
+                                        <input type="hidden" name="translations[{{ $lang->id }}][language_id]" value="{{ $lang->id }}">
                                     </div>
                                 @endforeach
                             </div>
