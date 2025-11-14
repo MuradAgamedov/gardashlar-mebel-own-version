@@ -19,7 +19,6 @@ class PopupAdController extends Controller
     public function index(Request $request)
     {
         $ads = $this->repository->getPopupAds($request);
-
         return view('admin.popup_ads.index', compact('ads'));
     }
 
@@ -45,8 +44,7 @@ class PopupAdController extends Controller
 
         } catch (\Exception $e) {
             dd($e->getMessage());
-            return redirect()->back()
-                ->withInput()
+            return redirect()->back()->withInput()
                 ->with('error', 'Error creating popup ad: ' . $e->getMessage());
         }
     }
@@ -76,8 +74,7 @@ class PopupAdController extends Controller
 
         } catch (\Exception $e) {
             dd($e->getMessage());
-            return redirect()->back()
-                ->withInput()
+            return redirect()->back()->withInput()
                 ->with('error', 'Error updating popup ad: ' . $e->getMessage());
         }
     }
