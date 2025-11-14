@@ -200,34 +200,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // DELETE CONFIRM
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const id = this.dataset.id;
-            const title = this.dataset.title;
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const id = this.dataset.id;
+        const title = this.dataset.title;
 
-            Swal.fire({
-                title: 'Are you sure?',
-                text: `Delete "${title}"?`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete!',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = `/admin/popup-ads/${id}`;
-                    form.innerHTML = `
-                        @csrf
-                        @method('DELETE')
-                    `;
-                    document.body.appendChild(form);
-                    form.submit();
-                }
-            });
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `Delete "${title}"?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete!',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `{{ url('admin/popup-ads') }}/${id}`;
+
+                form.innerHTML = `
+                    @csrf
+                    @method('DELETE')
+                `;
+
+                document.body.appendChild(form);
+                form.submit();
+            }
         });
     });
+});
+
 
 });
 </script>
