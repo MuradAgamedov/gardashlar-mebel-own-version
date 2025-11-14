@@ -4,7 +4,6 @@
 <div class="page-body">
     <div class="container-fluid">
 
-        <!-- Page Title -->
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
@@ -30,7 +29,6 @@
 
     <div class="container-fluid">
 
-        <!-- Validation Errors -->
         @if($errors->any())
             <div class="alert alert-danger alert-dismissible fade show">
                 <i class="material-icons-outlined">error</i>
@@ -57,10 +55,8 @@
                             @csrf
 
                             <div class="row">
-                                <!-- LEFT -->
                                 <div class="col-md-6">
 
-                                    <!-- Image Upload -->
                                     <div class="mb-3">
                                         <label for="image" class="form-label">Image *</label>
                                         <input type="file"
@@ -77,7 +73,6 @@
                                         <div class="form-text">Upload popup image (max 2MB)</div>
                                     </div>
 
-                                    <!-- Status -->
                                     <div class="mb-3">
                                         <div class="form-check form-switch">
 
@@ -96,7 +91,6 @@
 
                                 </div>
 
-                                <!-- RIGHT: IMAGE PREVIEW -->
                                 <div class="col-md-6">
                                     <label class="form-label">Image Preview</label>
 
@@ -115,77 +109,71 @@
 
                             <hr>
 
-                            <!-- Language Tabs -->
-                            <ul class="nav nav-tabs" id="languageTabs" role="tablist">
-                                @foreach($languages as $index => $lang)
+                            <!-- TABS -->
+                            <ul class="nav nav-tabs" role="tablist">
+                                @foreach($languages as $i => $lang)
                                     <li class="nav-item" role="presentation">
-                                        <button class="nav-link {{ $index === 0 ? 'active' : '' }}"
-                                            id="tab-{{ $lang->id }}"
+                                        <button class="nav-link {{ $i === 0 ? 'active' : '' }}"
                                             data-bs-toggle="tab"
-                                            data-bs-target="#content-{{ $lang->id }}"
+                                            data-bs-target="#lang-{{ $i }}"
                                             type="button"
                                             role="tab">
 
                                             {{ $lang->lang_code }}
-
-                                            @if($errors->has("translations.{$lang->id}.*"))
-                                                <i class="material-icons-outlined text-danger ms-1" style="font-size: 16px;">error</i>
-                                            @endif
                                         </button>
                                     </li>
                                 @endforeach
                             </ul>
 
-                            <!-- Language Content -->
+                            <!-- TAB CONTENT -->
                             <div class="tab-content mt-3">
-                                @foreach($languages as $index => $lang)
-                                    <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}"
-                                         id="content-{{ $lang->id }}" role="tabpanel">
 
-                                        <!-- Title -->
+                                @foreach($languages as $i => $lang)
+                                    <div class="tab-pane fade {{ $i === 0 ? 'show active' : '' }}"
+                                         id="lang-{{ $i }}" role="tabpanel">
+
                                         <div class="mb-3">
                                             <label class="form-label">Title *</label>
                                             <input type="text"
-                                                   name="translations[{{ $lang->id }}][title]"
-                                                   value="{{ old("translations.{$lang->id}.title") }}"
-                                                   class="form-control @error("translations.{$lang->id}.title") is-invalid @enderror"
+                                                   name="translations[{{ $i }}][title]"
+                                                   value="{{ old("translations.$i.title") }}"
+                                                   class="form-control @error("translations.$i.title") is-invalid @enderror"
                                                    required>
 
-                                            @error("translations.{$lang->id}.title")
+                                            @error("translations.$i.title")
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
 
-                                        <!-- Description -->
                                         <div class="mb-3">
                                             <label class="form-label">Description *</label>
-                                            <textarea name="translations[{{ $lang->id }}][description]"
-                                                      class="form-control @error("translations.{$lang->id}.description") is-invalid @enderror"
-                                                      rows="4"
-                                                      required>{{ old("translations.{$lang->id}.description") }}</textarea>
+                                            <textarea
+                                                   name="translations[{{ $i }}][description]"
+                                                   class="form-control @error("translations.$i.description") is-invalid @enderror"
+                                                   rows="4"
+                                                   required>{{ old("translations.$i.description") }}</textarea>
 
-                                            @error("translations.{$lang->id}.description")
+                                            @error("translations.$i.description")
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
 
-                                        <!-- Image Alt Text -->
                                         <div class="mb-3">
                                             <label class="form-label">Image Alt Text</label>
                                             <input type="text"
-                                                   name="translations[{{ $lang->id }}][image_alt_text]"
-                                                   class="form-control"
-                                                   value="{{ old("translations.{$lang->id}.image_alt_text") }}">
+                                                   name="translations[{{ $i }}][image_alt_text]"
+                                                   value="{{ old("translations.$i.image_alt_text") }}"
+                                                   class="form-control">
                                         </div>
 
                                         <!-- REQUIRED HIDDEN FIELDS -->
-                                        <input type="hidden" name="translations[{{ $lang->id }}][locale]" value="{{ $lang->lang_code }}">
-                                        <input type="hidden" name="translations[{{ $lang->id }}][language_id]" value="{{ $lang->id }}">
+                                        <input type="hidden" name="translations[{{ $i }}][locale]" value="{{ $lang->lang_code }}">
+                                        <input type="hidden" name="translations[{{ $i }}][language_id]" value="{{ $lang->id }}">
+
                                     </div>
                                 @endforeach
                             </div>
 
-                            <!-- Buttons -->
                             <div class="d-flex justify-content-end gap-2 mt-4">
                                 <a href="{{ route('admin.popup-ads.index') }}" class="btn btn-secondary">
                                     <i class="material-icons-outlined">arrow_back</i>
