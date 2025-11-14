@@ -44,6 +44,7 @@ class PopupAdController extends Controller
                             'title'         => $tr?->title ?? '',
                             'description'   => $tr?->description ?? '',
                             'image_alt_text'=> $tr?->image_alt_text ?? '',
+                            'link'          => $tr?->link ?? '',
                         ];
                     });
             });
