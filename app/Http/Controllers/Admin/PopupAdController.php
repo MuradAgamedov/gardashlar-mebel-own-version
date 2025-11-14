@@ -31,7 +31,7 @@ class PopupAdController extends Controller
 
     public function store(StorePopupAdRequest $request)
     {
-    
+        dd($request->all());    
         try {
             $this->repository->createPopupAd(
                 [
