@@ -20,21 +20,21 @@ class PopupAdSeeder extends Seeder
         // 2) Dillər üzrə tərcümələr
         $translations = [
             [
-                'language_id'   => 1,
+                'language_id'   => 1, // ENGLISH
                 'locale'        => 'en',
                 'title'         => 'Welcome Offer',
                 'description'   => 'Get special discounts on your first order!',
                 'image_alt_text'=> 'Popup image alt text EN',
             ],
             [
-                'language_id'   => 2,
+                'language_id'   => 3, // AZƏRBAYCAN
                 'locale'        => 'az',
                 'title'         => 'Xoş gəldin təklifi',
                 'description'   => 'İlk sifarişinizdə xüsusi endirim qazanın!',
                 'image_alt_text'=> 'Popup şəkil alt mətni AZ',
             ],
             [
-                'language_id'   => 3,
+                'language_id'   => 4, // RUS
                 'locale'        => 'ru',
                 'title'         => 'Приветственное предложение',
                 'description'   => 'Получите скидку на ваш первый заказ!',
