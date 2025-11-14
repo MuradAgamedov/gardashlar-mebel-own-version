@@ -59,7 +59,7 @@ class PopupAdController extends Controller
         return view('admin.popup_ads.edit', compact('popupAd', 'languages'));
     }
 
-    public function update(UpdatePopupAdRequest $request, PopupAd $popupAd)
+    public function update(Request $request, PopupAd $popupAd)
     {
         try {
             $this->repository->updatePopupAd(
