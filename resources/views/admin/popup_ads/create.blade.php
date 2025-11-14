@@ -41,7 +41,6 @@
             </div>
         @endif
 
-
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
@@ -57,6 +56,7 @@
                             <div class="row">
                                 <div class="col-md-6">
 
+                                    <!-- IMAGE -->
                                     <div class="mb-3">
                                         <label for="image" class="form-label">Image *</label>
                                         <input type="file"
@@ -73,9 +73,9 @@
                                         <div class="form-text">Upload popup image (max 2MB)</div>
                                     </div>
 
+                                    <!-- STATUS -->
                                     <div class="mb-3">
                                         <div class="form-check form-switch">
-
                                             <input type="hidden" name="status" value="0">
 
                                             <input class="form-check-input"
@@ -91,6 +91,7 @@
 
                                 </div>
 
+                                <!-- PREVIEW -->
                                 <div class="col-md-6">
                                     <label class="form-label">Image Preview</label>
 
@@ -132,6 +133,7 @@
                                     <div class="tab-pane fade {{ $i === 0 ? 'show active' : '' }}"
                                          id="lang-{{ $i }}" role="tabpanel">
 
+                                        <!-- TITLE -->
                                         <div class="mb-3">
                                             <label class="form-label">Title *</label>
                                             <input type="text"
@@ -145,6 +147,7 @@
                                             @enderror
                                         </div>
 
+                                        <!-- DESCRIPTION -->
                                         <div class="mb-3">
                                             <label class="form-label">Description *</label>
                                             <textarea
@@ -158,6 +161,16 @@
                                             @enderror
                                         </div>
 
+                                        <!-- LINK (YENİ SAHƏ) -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Link</label>
+                                            <input type="text"
+                                                   name="translations[{{ $i }}][link]"
+                                                   value="{{ old("translations.$i.link") }}"
+                                                   class="form-control">
+                                        </div>
+
+                                        <!-- IMAGE ALT -->
                                         <div class="mb-3">
                                             <label class="form-label">Image Alt Text</label>
                                             <input type="text"

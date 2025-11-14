@@ -183,6 +183,15 @@
                                             @enderror
                                         </div>
 
+                                        <!-- LINK (YENİ SAHƏ) -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Link</label>
+                                            <input type="text"
+                                                   name="translations[{{ $lang->id }}][link]"
+                                                   class="form-control"
+                                                   value="{{ old("translations.{$lang->id}.link", $translate?->link) }}">
+                                        </div>
+
                                         <!-- Image Alt Text -->
                                         <div class="mb-3">
                                             <label class="form-label">Image Alt Text</label>
