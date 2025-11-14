@@ -45,6 +45,7 @@ class PopupAdController extends Controller
                 ->with('success', 'PopupAd created successfully.');
 
         } catch (\Exception $e) {
+            dd($e->getMessage());
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error creating popup ad: ' . $e->getMessage());
