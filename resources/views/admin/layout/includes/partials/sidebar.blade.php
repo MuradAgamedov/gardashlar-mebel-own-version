@@ -36,6 +36,13 @@
           <h6>All SEO Pages</h6>
         </a>
       </li>
+        <li class="sidebar-list">
+    <a class="sidebar-link" href="{{ route('admin.popup-ads.index') }}">
+        <i class="fas fa-rectangle-ad"></i>
+        <h6>Popup Ads</h6>
+    </a>
+</li>
+
       <li class="sidebar-list">
         <a class="sidebar-link" href="{{ route('admin.seo-pages.index') }}">
           <i class="fas fa-file-alt"></i>
