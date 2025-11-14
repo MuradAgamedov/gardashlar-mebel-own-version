@@ -15,7 +15,6 @@ class UpdatePopupAdRequest extends FormRequest
     {
         return [
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'order' => 'nullable|integer|min:0',
 
             // Checkbox üçün ən stabil validation
             'status' => 'required|in:1,0',
