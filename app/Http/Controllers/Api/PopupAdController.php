@@ -26,10 +26,11 @@ class PopupAdController extends Controller
             $cacheKey = "api_popup_ads_{$languageId}";
 
             $popupAds = Cache::rememberForever($cacheKey, function () use ($languageId) {
+
                 return PopupAd::with(['translations' => function ($query) use ($languageId) {
                         $query->where('language_id', $languageId);
                     }])
-                    ->where('status', true)
+                    ->where('status', 1)   // <-- BURDA DÜZƏLDİLDİ
                     ->orderBy('order')
                     ->get()
                     ->map(function ($popup) {
@@ -37,9 +38,10 @@ class PopupAdController extends Controller
 
                         return [
                             'id'            => $popup->id,
-                            'image_url'     => $popup->image 
-                                                ? asset('storage/' . $popup->image)
-                                                : asset('images/default_image.webp'),
+
+                            'image_url'     => $popup->image
+                                ? asset('storage/' . $popup->image)
+                                : asset('images/default_image.webp'),
 
                             'title'         => $tr?->title ?? '',
                             'description'   => $tr?->description ?? '',
