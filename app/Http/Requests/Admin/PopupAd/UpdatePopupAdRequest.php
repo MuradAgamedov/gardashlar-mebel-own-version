@@ -8,7 +8,7 @@ class UpdatePopupAdRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // düzəldildi
+        return true;
     }
 
     public function rules(): array
@@ -16,10 +16,12 @@ class UpdatePopupAdRequest extends FormRequest
         return [
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp',
 
-            // Checkbox üçün ən stabil validation
             'status' => 'required|in:1,0',
 
             'translations' => 'required|array',
+
+            // MÜTLƏQ!!! ƏKS HALDA language_id requestdən atılır
+            'translations.*.language_id' => 'required|integer|exists:languages,id',
 
             'translations.*.locale' => 'required|string|max:5',
             'translations.*.title' => 'required|string|max:255',

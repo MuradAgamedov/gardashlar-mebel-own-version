@@ -133,10 +133,11 @@
                                     <li class="nav-item" role="presentation">
                                         <button class="nav-link {{ $index == 0 ? 'active' : '' }}"
                                                 data-bs-toggle="tab"
-                                                data-bs-target="#tab-{{ $lang->lang_code }}"
+                                                data-bs-target="#tab-{{ $lang->id }}"
                                                 type="button">
                                             {{ $lang->lang_code }}
-                                            @if($errors->has("translations.{$lang->lang_code}.*"))
+
+                                            @if($errors->has("translations.{$lang->id}.*"))
                                                 <i class="material-icons-outlined text-danger ms-1" style="font-size:16px;">error</i>
                                             @endif
                                         </button>
@@ -148,23 +149,23 @@
 
                                 @foreach($languages as $index => $lang)
                                     @php
-                                        $translate = $popupAd->translations->where('locale', $lang->lang_code)->first();
+                                        $translate = $popupAd->translations->where('language_id', $lang->id)->first();
                                     @endphp
 
                                     <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}"
-                                         id="tab-{{ $lang->lang_code }}"
+                                         id="tab-{{ $lang->id }}"
                                          role="tabpanel">
 
                                         <!-- Title -->
                                         <div class="mb-3">
                                             <label class="form-label">Title *</label>
                                             <input type="text"
-                                                   name="translations[{{ $lang->lang_code }}][title]"
-                                                   class="form-control @error("translations.{$lang->lang_code}.title") is-invalid @enderror"
-                                                   value="{{ old("translations.{$lang->lang_code}.title", $translate?->title) }}"
+                                                   name="translations[{{ $lang->id }}][title]"
+                                                   class="form-control @error("translations.{$lang->id}.title") is-invalid @enderror"
+                                                   value="{{ old("translations.{$lang->id}.title", $translate?->title) }}"
                                                    required>
 
-                                            @error("translations.{$lang->lang_code}.title")
+                                            @error("translations.{$lang->id}.title")
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -172,12 +173,12 @@
                                         <!-- Description -->
                                         <div class="mb-3">
                                             <label class="form-label">Description *</label>
-                                            <textarea name="translations[{{ $lang->lang_code }}][description]"
-                                                      class="form-control @error("translations.{$lang->lang_code}.description") is-invalid @enderror"
+                                            <textarea name="translations[{{ $lang->id }}][description]"
+                                                      class="form-control @error("translations.{$lang->id}.description") is-invalid @enderror"
                                                       rows="4"
-                                                      required>{{ old("translations.{$lang->lang_code}.description", $translate?->description) }}</textarea>
+                                                      required>{{ old("translations.{$lang->id}.description", $translate?->description) }}</textarea>
 
-                                            @error("translations.{$lang->lang_code}.description")
+                                            @error("translations.{$lang->id}.description")
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -186,14 +187,14 @@
                                         <div class="mb-3">
                                             <label class="form-label">Image Alt Text</label>
                                             <input type="text"
-                                                   name="translations[{{ $lang->lang_code }}][image_alt_text]"
+                                                   name="translations[{{ $lang->id }}][image_alt_text]"
                                                    class="form-control"
-                                                   value="{{ old("translations.{$lang->lang_code}.image_alt_text", $translate?->image_alt_text) }}">
+                                                   value="{{ old("translations.{$lang->id}.image_alt_text", $translate?->image_alt_text) }}">
                                         </div>
 
-                                        <input type="hidden"
-                                               name="translations[{{ $lang->lang_code }}][locale]"
-                                               value="{{ $lang->lang_code }}">
+                                        <!-- REQUIRED HIDDEN FIELDS -->
+                                        <input type="hidden" name="translations[{{ $lang->id }}][locale]" value="{{ $lang->lang_code }}">
+                                        <input type="hidden" name="translations[{{ $lang->id }}][language_id]" value="{{ $lang->id }}">
                                     </div>
 
                                 @endforeach
