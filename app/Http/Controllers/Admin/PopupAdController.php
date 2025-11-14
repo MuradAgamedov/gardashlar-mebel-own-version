@@ -75,7 +75,6 @@ class PopupAdController extends Controller
                 ->with('success', 'PopupAd updated successfully.');
 
         } catch (\Exception $e) {
-            dd( $e->getMessage());
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Error updating popup ad: ' . $e->getMessage());
