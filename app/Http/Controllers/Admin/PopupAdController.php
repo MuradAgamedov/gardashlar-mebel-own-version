@@ -61,6 +61,7 @@ class PopupAdController extends Controller
 
     public function update(Request $request, PopupAd $popupAd)
     {
+        dd(1);
         try {
             $this->repository->updatePopupAd(
                 $popupAd,
