@@ -81,7 +81,6 @@ class PopupAdController extends Controller
 
     public function destroy(PopupAd $popupAd)
     {
-        dd(1);
         try {
             $this->repository->deletePopupAd($popupAd);
 
