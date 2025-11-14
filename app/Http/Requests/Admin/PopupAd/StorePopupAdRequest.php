@@ -29,7 +29,11 @@ class StorePopupAdRequest extends FormRequest
             // text fields
             'translations.*.title' => 'required|string|max:255',
             'translations.*.description' => 'required|string',
+
             'translations.*.image_alt_text' => 'nullable|string|max:255',
+
+            // 🔥 yeni əlavə etdiyimiz sahə
+            'translations.*.link' => 'nullable|string|max:500',
         ];
     }
 }

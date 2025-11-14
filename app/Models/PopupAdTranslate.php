@@ -15,6 +15,7 @@ class PopupAdTranslate extends Model
         'title',
         'description',
         'image_alt_text',
+        'link',
     ];
 
     public function language()

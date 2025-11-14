@@ -46,6 +46,7 @@ class PopupAdRepository
                     'title'         => $trans['title'],
                     'description'   => $trans['description'],
                     'image_alt_text'=> $trans['image_alt_text'] ?? null,
+                    'link'          => $trans['link'] ?? null,
                 ]);
             }
 
@@ -76,6 +77,7 @@ class PopupAdRepository
                         'title'         => $trans['title'],
                         'description'   => $trans['description'],
                         'image_alt_text'=> $trans['image_alt_text'] ?? null,
+                        'link'          => $trans['link'] ?? null,
                     ]);
                 } else {
                     PopupAdTranslate::create([
@@ -85,6 +87,7 @@ class PopupAdRepository
                         'title'         => $trans['title'],
                         'description'   => $trans['description'],
                         'image_alt_text'=> $trans['image_alt_text'] ?? null,
+                        'link'          => $trans['link'] ?? null,
                     ]);
                 }
             }
@@ -96,9 +99,7 @@ class PopupAdRepository
     public function deletePopupAd(PopupAd $popup)
     {
         return DB::transaction(function () use ($popup) {
-
             $this->imageService->Delete($popup->image);
-
             return $popup->delete();
         });
     }
