@@ -29,7 +29,7 @@ class DashboardController extends Controller
         $currentDate = Carbon::now();
         $currentMonth = $currentDate->format('F Y');
         $currentDay = $currentDate->format('l j, M Y');
-        
+
         // Statistics
         $stats = [
             'total_products' => Product::count(),
@@ -41,7 +41,7 @@ class DashboardController extends Controller
             'total_testimonials' => Testimonial::count(),
             'total_subscribers' => Subscriber::count(),
         ];
-        
+
         // Unread notifications
         $notifications = [
             'unread_messages' => ContactMessage::where('is_read', false)->count(),
@@ -50,22 +50,22 @@ class DashboardController extends Controller
             'unread_suggestions' => SuggestionsComplaintsForm::where('is_read', false)->count(),
             'unread_vacancy_forms' => VacancyForm::where('is_read', false)->count(),
         ];
-        
+
         // Recent activities
         $recentOrders = Order::with(['user'])
             ->orderBy('created_at', 'desc')
             ->limit(6)
             ->get();
-            
+
         $recentMessages = ContactMessage::orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
-            
+
         $recentBlogPosts = BlogPost::with(['translates'])
             ->orderBy('created_at', 'desc')
             ->limit(3)
             ->get();
-        
+
         // Monthly statistics
         $monthlyStats = [
             'orders_this_month' => Order::whereMonth('created_at', $currentDate->month)
@@ -78,7 +78,7 @@ class DashboardController extends Controller
                 ->whereYear('created_at', $currentDate->year)
                 ->count(),
         ];
-        
+
         // Chart data for last 7 days
         $chartData = [];
         for ($i = 6; $i >= 0; $i--) {
@@ -90,7 +90,7 @@ class DashboardController extends Controller
                 'users' => User::whereDate('created_at', $date)->count(),
             ];
         }
-        
+
         // Top products by orders - using custom method since orders use JSON
         $topProducts = Product::select('products.*')
             ->selectSub(function ($query) {
@@ -102,10 +102,10 @@ class DashboardController extends Controller
             ->orderBy('orders_count', 'desc')
             ->limit(5)
             ->get();
-        
+
         return view('admin.dashboard.index', compact(
             'stats',
-            'notifications', 
+            'notifications',
             'recentOrders',
             'recentMessages',
             'recentBlogPosts',
@@ -120,15 +120,27 @@ class DashboardController extends Controller
     public function clearCache()
     {
         try {
-            // Clear optimize cache
+            // Clear backend caches
             Artisan::call('optimize:clear');
-            
-            // Clear application cache
             Artisan::call('cache:clear');
-            
+
+            // Get frontend cache URL from .env
+            $frontendCacheUrl = env('CLEAR_FRONTEND_CACHE');
+
+            if ($frontendCacheUrl) {
+                // Send request to frontend cache clear endpoint
+                $response = @file_get_contents($frontendCacheUrl);
+
+                // Optional: you can log response or show it in JSON
+                $frontendResponse = $response ?: 'No response received';
+            } else {
+                $frontendResponse = 'CLEAR_FRONTEND_CACHE not set in .env';
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Cache cleared successfully!'
+                'message' => 'Cache cleared successfully!',
+                'frontend_response' => $frontendResponse
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -137,4 +149,4 @@ class DashboardController extends Controller
             ], 500);
         }
     }
-} 
+}
