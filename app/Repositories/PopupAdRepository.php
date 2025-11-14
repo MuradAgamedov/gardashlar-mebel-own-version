@@ -4,11 +4,10 @@ namespace App\Repositories;
 
 use App\Models\PopupAd;
 use App\Models\PopupAdTranslate;
-use App\Repositories\Global\BaseRepository;
 use App\Services\ImageService;
 use Illuminate\Support\Facades\DB;
 
-class PopupAdRepository extends BaseRepository
+class PopupAdRepository
 {
     protected $imageService;
 
@@ -19,54 +18,51 @@ class PopupAdRepository extends BaseRepository
 
     public function getPopupAds($request = null)
     {
-        return $this->GetData($this->popupAd, ['translations.language'])
-                    ->orderBy('order')
-                    ->get();
+        return $this->popupAd
+            ->with('translations.language')
+            ->orderBy('order')
+            ->get();
     }
 
-   public function createPopupAd(array $data, array $translations)
-{
-    return DB::transaction(function () use ($data, $translations) {
+    public function createPopupAd(array $data, array $translations)
+    {
+        return DB::transaction(function () use ($data, $translations) {
 
-        $imagePath = $this->handleImageUpload($data['image'], 'popup_ads', $this->imageService);
+            // image
+            $imagePath = $this->imageService->Upload($data['image'], 'popup_ads');
 
-        $popup = $this->popupAd->create([
-            'image'  => $imagePath,
-            'order'  => $data['order'] ?? 0,
-            'status' => $data['status'] ?? true,
-        ]);
-
-        foreach ($translations as $trans) {
-
-            PopupAdTranslate::create([
-                'popup_ad_id'   => $popup->id,
-                'language_id'   => $trans['language_id'],
-                'locale'        => $trans['locale'],
-                'title'         => $trans['title'],
-                'description'   => $trans['description'],
-                'image_alt_text'=> $trans['image_alt_text'] ?? null,
+            $popup = $this->popupAd->create([
+                'image'  => $imagePath,
+                'order'  => $data['order'] ?? 0,
+                'status' => $data['status'] ?? 1,
             ]);
-        }
 
-        return $popup->load('translations.language');
-    });
-}
+            // translations
+            foreach ($translations as $trans) {
+                PopupAdTranslate::create([
+                    'popup_ad_id'   => $popup->id,
+                    'language_id'   => $trans['language_id'],
+                    'locale'        => $trans['locale'],
+                    'title'         => $trans['title'],
+                    'description'   => $trans['description'],
+                    'image_alt_text'=> $trans['image_alt_text'] ?? null,
+                ]);
+            }
 
+            return $popup->load('translations.language');
+        });
+    }
 
     public function updatePopupAd(PopupAd $popup, array $data, array $translations)
     {
         return DB::transaction(function () use ($popup, $data, $translations) {
 
+            // update image
             if (isset($data['image'])) {
-                $imagePath = $this->handleImageUpdate($popup, $data['image'], 'popup_ads', $this->imageService);
-
-                if ($imagePath) {
-                    $popup->image = $imagePath;
-                }
+                $popup->image = $this->imageService->Update($data['image'], $popup->image, 'popup_ads');
             }
 
-            $popup->order  = $data['order'] ?? $popup->order;
-            $popup->status = $data['status'] ?? $popup->status;
+            $popup->status = $data['status'];
             $popup->save();
 
             foreach ($translations as $trans) {
@@ -76,14 +72,12 @@ class PopupAdRepository extends BaseRepository
                     ->first();
 
                 if ($translate) {
-                    // UPDATE
                     $translate->update([
                         'title'         => $trans['title'],
                         'description'   => $trans['description'],
                         'image_alt_text'=> $trans['image_alt_text'] ?? null,
                     ]);
                 } else {
-                    // CREATE (əgər yox idisə)
                     PopupAdTranslate::create([
                         'popup_ad_id'   => $popup->id,
                         'language_id'   => $trans['language_id'],
@@ -103,7 +97,7 @@ class PopupAdRepository extends BaseRepository
     {
         return DB::transaction(function () use ($popup) {
 
-            $this->handleImageDelete($popup->image, $this->imageService);
+            $this->imageService->Delete($popup->image);
 
             return $popup->delete();
         });
@@ -111,6 +105,8 @@ class PopupAdRepository extends BaseRepository
 
     public function reorder(array $order)
     {
-        return $this->UpdateOrder($this->popupAd, $order);
+        foreach ($order as $id => $index) {
+            $this->popupAd->where('id', $id)->update(['order' => $index]);
+        }
     }
 }
