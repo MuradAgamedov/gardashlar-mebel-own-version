@@ -14,7 +14,7 @@ class StorePopupAdRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp',
 
             // CHECKBOX üçün ən düzgün validation
             'status' => 'required|in:1,0',

@@ -14,7 +14,7 @@ class UpdatePopupAdRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp',
 
             // Checkbox üçün ən stabil validation
             'status' => 'required|in:1,0',
