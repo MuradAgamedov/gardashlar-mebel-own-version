@@ -75,6 +75,8 @@ Route::prefix('')->name('admin.')->group(function () {
         require __DIR__.'/web/all-seo-pages.php';
         require __DIR__.'/web/seo-pages.php';
         require __DIR__.'/web/users.php';
+        require __DIR__.'/web/users.php';
+        require __DIR__.'/web/popupAd.php';
 
 
        
