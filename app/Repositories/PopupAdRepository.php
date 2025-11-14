@@ -24,32 +24,34 @@ class PopupAdRepository extends BaseRepository
                     ->get();
     }
 
-    public function createPopupAd(array $data, array $translations)
-    {
-        return DB::transaction(function () use ($data, $translations) {
+   public function createPopupAd(array $data, array $translations)
+{
+    return DB::transaction(function () use ($data, $translations) {
 
-            $imagePath = $this->handleImageUpload($data['image'], 'popup_ads', $this->imageService);
+        $imagePath = $this->handleImageUpload($data['image'], 'popup_ads', $this->imageService);
 
-            $popup = $this->popupAd->create([
-                'image'  => $imagePath,
-                'order'  => $data['order'] ?? 0,
-                'status' => $data['status'] ?? true,
+        $popup = $this->popupAd->create([
+            'image'  => $imagePath,
+            'order'  => $data['order'] ?? 0,
+            'status' => $data['status'] ?? true,
+        ]);
+
+        foreach ($translations as $trans) {
+
+            PopupAdTranslate::create([
+                'popup_ad_id'   => $popup->id,
+                'language_id'   => $trans['language_id'],
+                'locale'        => $trans['locale'],
+                'title'         => $trans['title'],
+                'description'   => $trans['description'],
+                'image_alt_text'=> $trans['image_alt_text'] ?? null,
             ]);
+        }
 
-            foreach ($translations as $trans) {
-                PopupAdTranslate::create([
-                    'popup_ad_id'   => $popup->id,
-                    'language_id'   => $trans['language_id'],
-                    'locale'        => $trans['locale'],
-                    'title'         => $trans['title'],
-                    'description'   => $trans['description'],
-                    'image_alt_text'=> $trans['image_alt_text'] ?? null,
-                ]);
-            }
+        return $popup->load('translations.language');
+    });
+}
 
-            return $popup->load('translations.language');
-        });
-    }
 
     public function updatePopupAd(PopupAd $popup, array $data, array $translations)
     {
