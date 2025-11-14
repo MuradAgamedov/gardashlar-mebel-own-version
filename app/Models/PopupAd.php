@@ -22,7 +22,10 @@ class PopupAd extends Model
     {
         return $this->hasMany(PopupAdTranslate::class);
     }
-
+    public function translates()
+    {
+        return $this->hasMany(PopupAdTranslate::class);
+    }
     /**
      * Aktiv dili avtomatik gətirmək üçün helper
      */
