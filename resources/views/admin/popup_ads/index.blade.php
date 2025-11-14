@@ -133,11 +133,21 @@
                                                             <i class="material-icons-outlined">edit</i>
                                                         </a>
 
-                                                        <button class="btn btn-sm btn-outline-danger delete-btn"
-                                                                data-id="{{ $ad->id }}"
-                                                                data-title="{{ $mainTranslate?->title ?? 'Popup Ad' }}">
-                                                            <i class="material-icons-outlined">delete</i>
-                                                        </button>
+                                                      <form action="{{ route('admin.popup-ads.destroy', $ad->id) }}"
+                                                                method="POST"
+                                                                style="display:inline-block;"
+                                                                onsubmit="return confirm('Are you sure you want to delete this item?');">
+
+                                                                @csrf
+                                                                @method('DELETE')
+
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                    <i class="material-icons-outlined">delete</i>
+                                                                </button>
+
+                                                            </form>
+
+
 
                                                     </div>
                                                 </td>
@@ -199,38 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // DELETE CONFIRM
-  document.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const id = this.dataset.id;
-        const title = this.dataset.title;
 
-        Swal.fire({
-            title: 'Are you sure?',
-            text: `Delete "${title}"?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete!',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `{{ url('admin/popup-ads') }}/${id}`;
-
-                form.innerHTML = `
-                    @csrf
-                    @method('DELETE')
-                `;
-
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    });
-});
 
 
 });
