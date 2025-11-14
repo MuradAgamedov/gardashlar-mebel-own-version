@@ -77,13 +77,25 @@
                                         <div class="form-text">Upload popup image (max 2MB)</div>
                                     </div>
 
-                                    <!-- Status -->
+                                            <!-- Status -->
                                     <div class="mb-3">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="status" name="status" checked>
-                                            <label class="form-check-label" for="status">Active</label>
+                                            <div class="form-check form-switch">
+
+                                                {{-- unchecked olsa belə POST-da "0" getsin deyə --}}
+                                                <input type="hidden" name="status" value="0">
+
+                                                {{-- checkbox checked olanda "1" göndərsin --}}
+                                                <input class="form-check-input"
+                                                    type="checkbox"
+                                                    id="status"
+                                                    name="status"
+                                                    value="1"
+                                                    {{ old('status', isset($popupAd) ? $popupAd->status : true) ? 'checked' : '' }}>
+
+                                                <label class="form-check-label" for="status">Active</label>
+                                            </div>
                                         </div>
-                                    </div>
+
 
                               
 

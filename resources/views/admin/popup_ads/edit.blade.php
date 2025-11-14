@@ -85,14 +85,21 @@
                                     <!-- Status -->
                                     <div class="mb-3">
                                         <div class="form-check form-switch">
+
+                                            {{-- Checkbox unchecked olanda belə 0 göndərmək üçün --}}
+                                            <input type="hidden" name="status" value="0">
+
                                             <input type="checkbox"
-                                                   class="form-check-input"
-                                                   id="status"
-                                                   name="status"
-                                                   {{ $popupAd->status ? 'checked' : '' }}>
+                                                class="form-check-input"
+                                                id="status"
+                                                name="status"
+                                                value="1"
+                                                {{ old('status', $popupAd->status) ? 'checked' : '' }}>
+
                                             <label class="form-check-label" for="status">Active</label>
                                         </div>
                                     </div>
+
 
                                 
 
