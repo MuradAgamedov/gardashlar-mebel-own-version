@@ -17,83 +17,96 @@ class PopupAdRepository extends BaseRepository
         $this->imageService = $imageService;
     }
 
-    /**
-     * Get all popup ads with translations
-     */
     public function getPopupAds($request = null)
     {
-        return $this->GetData($this->popupAd, ['translations'])->orderBy('order')->get();
+        return $this->GetData($this->popupAd, ['translations.language'])
+                    ->orderBy('order')
+                    ->get();
     }
 
-    /**
-     * Create new popup ad with translations
-     */
     public function createPopupAd(array $data, array $translations)
     {
         return DB::transaction(function () use ($data, $translations) {
 
-            // Upload image
             $imagePath = $this->handleImageUpload($data['image'], 'popup_ads', $this->imageService);
 
-            // Create popup ad
             $popup = $this->popupAd->create([
                 'image'  => $imagePath,
                 'order'  => $data['order'] ?? 0,
                 'status' => $data['status'] ?? true,
             ]);
 
-            // Create translations
-            $this->createTranslations($popup, $translations, PopupAdTranslate::class, 'popup_ad_id');
+            foreach ($translations as $trans) {
+                PopupAdTranslate::create([
+                    'popup_ad_id'   => $popup->id,
+                    'language_id'   => $trans['language_id'],
+                    'locale'        => $trans['locale'],
+                    'title'         => $trans['title'],
+                    'description'   => $trans['description'],
+                    'image_alt_text'=> $trans['image_alt_text'] ?? null,
+                ]);
+            }
 
-            return $popup->load('translations');
+            return $popup->load('translations.language');
         });
     }
 
-    /**
-     * Update popup ad and translations
-     */
     public function updatePopupAd(PopupAd $popup, array $data, array $translations)
     {
         return DB::transaction(function () use ($popup, $data, $translations) {
 
-            // Handle image update
             if (isset($data['image'])) {
                 $imagePath = $this->handleImageUpdate($popup, $data['image'], 'popup_ads', $this->imageService);
+
                 if ($imagePath) {
                     $popup->image = $imagePath;
                 }
             }
 
-            // Update base fields
             $popup->order  = $data['order'] ?? $popup->order;
             $popup->status = $data['status'] ?? $popup->status;
             $popup->save();
 
-            // Update translations
-            $this->updateTranslations($popup, $translations, 'popup_ad_id');
+            foreach ($translations as $trans) {
 
-            return $popup->load('translations');
+                $translate = PopupAdTranslate::where('popup_ad_id', $popup->id)
+                    ->where('language_id', $trans['language_id'])
+                    ->first();
+
+                if ($translate) {
+                    // UPDATE
+                    $translate->update([
+                        'title'         => $trans['title'],
+                        'description'   => $trans['description'],
+                        'image_alt_text'=> $trans['image_alt_text'] ?? null,
+                    ]);
+                } else {
+                    // CREATE (əgər yox idisə)
+                    PopupAdTranslate::create([
+                        'popup_ad_id'   => $popup->id,
+                        'language_id'   => $trans['language_id'],
+                        'locale'        => $trans['locale'],
+                        'title'         => $trans['title'],
+                        'description'   => $trans['description'],
+                        'image_alt_text'=> $trans['image_alt_text'] ?? null,
+                    ]);
+                }
+            }
+
+            return $popup->load('translations.language');
         });
     }
 
-    /**
-     * Delete popup ad
-     */
     public function deletePopupAd(PopupAd $popup)
     {
         return DB::transaction(function () use ($popup) {
 
-            // Delete image file
             $this->handleImageDelete($popup->image, $this->imageService);
 
-            // Delete popup ad
             return $popup->delete();
         });
     }
 
-    /**
-     * Reorder popup ads
-     */
     public function reorder(array $order)
     {
         return $this->UpdateOrder($this->popupAd, $order);
