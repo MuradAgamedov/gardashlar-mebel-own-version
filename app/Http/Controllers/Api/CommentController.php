@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Comment;
-
+use App\Helpers\DictionaryHelper;
 class CommentController extends Controller
 {
     public function addComment(Request $request)
@@ -20,7 +20,7 @@ class CommentController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Comment əlavə olundu',
+            'message' => DictionaryHelper::trans('comment_added', $lang),
             'data'    => $comment
         ], 201);
     }
