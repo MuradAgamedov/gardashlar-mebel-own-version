@@ -10,6 +10,7 @@ class CommentController extends Controller
 {
     public function addComment(Request $request)
     {
+        $lang = $request->get('locale', 'az');
         $data = $request->all();
         $comment = Comment::create([
             'user_id'    => $request->user()->id, // token-dən user id götürülür
