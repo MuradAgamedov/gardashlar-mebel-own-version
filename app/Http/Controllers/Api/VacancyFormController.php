@@ -26,7 +26,7 @@ class VacancyFormController extends Controller
     public function store(Request $request)
     {
         try {
-            $lang = $request->get('locale', 'az');
+            $lang = $request->header('locale', 'az');
 
             // Validation
             $validator = Validator::make($request->all(), [
