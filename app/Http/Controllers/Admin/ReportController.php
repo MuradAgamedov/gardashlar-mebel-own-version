@@ -46,10 +46,10 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         $languages = $this->repository->getActiveLanguages();
-        
+
         // Base validation
         $request->validate([
-            'pdf' => 'nullable|file|mimes:pdf', // 10MB max for PDF
+            'pdf' => 'nullable|file|mimes:pdf',
             'status' => 'boolean',
         ], [
             'pdf.mimes' => 'PDF must be a file of type: pdf.',
@@ -71,7 +71,7 @@ class ReportController extends Controller
         try {
             DB::transaction(function () use ($request) {
                 $data = ['status' => $request->input('status')];
-                
+
                 // Handle PDF upload
                 if ($request->hasFile('pdf')) {
                     $data['pdf'] = $this->fileService->upload($request->file('pdf'), 'reports');
@@ -83,10 +83,10 @@ class ReportController extends Controller
                 // Create translations
                 foreach ($request->input('translations', []) as $languageId => $translation) {
                     if (!empty($translation['title']) || !empty($translation['description'])) {
-                        $report->translations()->create([
+                        $report->translates()->create([
                             'language_id' => $languageId,
-                            'title' => trim($translation['title'] ?? ''),
-                            'description' => trim($translation['description'] ?? ''),
+                            'title' => trim($translation['title']),
+                            'description' => trim($translation['description']),
                         ]);
                     }
                 }
@@ -107,9 +107,9 @@ class ReportController extends Controller
      */
     public function edit(Report $report)
     {
-        $report->load('translations.language');
+        $report->load('translates.language');
         $languages = $this->repository->getActiveLanguages();
-        
+
         return view('admin.reports.edit', compact('report', 'languages'));
     }
 
@@ -119,7 +119,7 @@ class ReportController extends Controller
     public function update(Request $request, Report $report)
     {
         $languages = $this->repository->getActiveLanguages();
-        
+
         // Base validation
         $request->validate([
             'pdf' => 'nullable|file|mimes:pdf',
@@ -144,10 +144,9 @@ class ReportController extends Controller
         try {
             DB::transaction(function () use ($request, $report) {
                 $data = ['status' => $request->input('status')];
-                
+
                 // Handle PDF upload
                 if ($request->hasFile('pdf')) {
-                    // Delete old PDF
                     if ($report->pdf) {
                         $this->fileService->delete($report->pdf);
                     }
@@ -159,11 +158,11 @@ class ReportController extends Controller
 
                 // Update translations
                 foreach ($request->input('translations', []) as $languageId => $translation) {
-                    $report->translations()->updateOrCreate(
+                    $report->translates()->updateOrCreate(
                         ['language_id' => $languageId],
                         [
-                            'title' => trim($translation['title'] ?? ''),
-                            'description' => trim($translation['description'] ?? ''),
+                            'title' => trim($translation['title']),
+                            'description' => trim($translation['description']),
                         ]
                     );
                 }
@@ -186,20 +185,22 @@ class ReportController extends Controller
     {
         try {
             DB::transaction(function () use ($report) {
+
                 // Delete PDF file
                 if ($report->pdf) {
                     $this->fileService->delete($report->pdf);
                 }
 
                 // Delete translations
-                $report->translations()->delete();
+                $report->translates()->delete();
 
                 // Delete report
                 $report->delete();
             });
-            
+
             return redirect()->route('admin.reports.index')
                 ->with('success', 'Report deleted successfully!');
+
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Error deleting report: ' . $e->getMessage());
@@ -221,7 +222,9 @@ class ReportController extends Controller
                 Report::where('id', $reportId)->update(['order' => $index + 1]);
             }
             return response()->json(['success' => true]);
+
         } catch (\Exception $e) {
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error reordering reports: ' . $e->getMessage()
