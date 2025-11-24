@@ -189,7 +189,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-2">
-                                                    <a href="{{ route('admin.blog-posts.images.index', $blogPost) }}" class="btn btn-sm btn-info" title="Manage Images">
+                                                    <a href="{{ route('admin.blog-posts.images.index', $blogPost->id) }}" class="btn btn-sm btn-info" title="Manage Images">
                                                         <i class="material-icons-outlined">photo_library</i>
                                                     </a>
                                                     <a href="{{ route('admin.blog-posts.edit', $blogPost) }}" class="btn btn-sm btn-warning">
