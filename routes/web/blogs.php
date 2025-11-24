@@ -2,7 +2,7 @@
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\BlogImageController;
-Route::get('blog-images', [BlogImageController::class, 'index'])->name('blog-posts.images.index');
+Route::get('blog-images/{blogPost}', [BlogImageController::class, 'index'])->name('blog-posts.images.index');
 
 Route::resource('blog-categories', BlogCategoryController::class);
 Route::post('blog-categories/reorder', [BlogCategoryController::class, 'reorder'])->name('blog-categories.reorder');
