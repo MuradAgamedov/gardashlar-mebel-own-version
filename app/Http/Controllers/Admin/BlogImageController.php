@@ -17,7 +17,6 @@ class BlogImageController extends Controller
 
     public function index(BlogPost $blogPost)
     {
-        dd($blogPost);
         $images = $this->repository->getImagesByPost($blogPost);
         return view('admin.blog-images.index', compact('blogPost', 'images'));
     }
