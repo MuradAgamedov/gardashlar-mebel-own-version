@@ -95,13 +95,14 @@ class DashboardController extends Controller
         $topProducts = Product::select('products.*')
             ->selectSub(function ($query) {
                 $query->from('orders')
-                    ->whereRaw('JSON_CONTAINS(product_ids, CAST(products.id AS JSON))')
+                    ->whereRaw("FIND_IN_SET(products.id, REPLACE(REPLACE(product_ids, '[', ''), ']', ''))")
                     ->whereMonth('created_at', Carbon::now()->month)
-                    ->selectRaw('count(*)');
+                    ->selectRaw('COUNT(*)');
             }, 'orders_count')
             ->orderBy('orders_count', 'desc')
             ->limit(5)
             ->get();
+
 
         return view('admin.dashboard.index', compact(
             'stats',
