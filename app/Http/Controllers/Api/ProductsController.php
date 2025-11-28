@@ -25,14 +25,14 @@ class ProductsController extends Controller
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
-            
+
             if (!$languageId) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid language'
                 ], 400);
             }
-    
+
             $categories = Cache::rememberForever("product_categories_{$languageId}", function () use ($languageId) {
                 return ProductCategory::with(['translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
@@ -41,10 +41,10 @@ class ProductsController extends Controller
                 ->ordered()
                 ->get();
             });
-    
+
             // Build hierarchical structure
             $categoriesData = $this->buildHierarchy($categories);
-    
+
             // Get product price filters
             $priceFilters = Cache::rememberForever("product_price_filters_{$languageId}", function () use ($languageId) {
                 return ProductPriceFilter::with(['translates' => function($query) use ($languageId) {
@@ -54,7 +54,7 @@ class ProductsController extends Controller
                 ->ordered()
                 ->get();
             });
-    
+
             $priceFiltersData = $priceFilters->map(function ($filter) {
                 $translation = $filter->translates->first();
                 return [
@@ -64,19 +64,19 @@ class ProductsController extends Controller
                     'max_price' => $filter->max_price
                 ];
             });
-    
+
             // Get product colors
             $productColors = Cache::rememberForever("product_colors", function () {
                 return ProductColor::all();
             });
-    
+
             $productColorsData = $productColors->map(function ($color) {
                 return [
                     'id' => $color->id,
                     'color_code' => $color->color_code
                 ];
             });
-    
+
             // Get product types
             $productTypes = Cache::rememberForever("product_types_{$languageId}", function () use ($languageId) {
                 return ProductType::with(['translates' => function($query) use ($languageId) {
@@ -86,7 +86,7 @@ class ProductsController extends Controller
                 ->ordered()
                 ->get();
             });
-    
+
             $productTypesData = $productTypes->map(function ($type) {
                 $translation = $type->translates->first();
                 return [
@@ -94,7 +94,7 @@ class ProductsController extends Controller
                     'title' => $translation ? $translation->title : ''
                 ];
             });
-    
+
             // Get product page categories
             $productPageCategories = Cache::rememberForever("product_page_categories_{$languageId}", function () use ($languageId) {
                 return ProductPageCategory::with(['productCategory.translates' => function($query) use ($languageId) {
@@ -104,11 +104,11 @@ class ProductsController extends Controller
                 ->ordered()
                 ->get();
             });
-    
+
             $productPageCategoriesData = $productPageCategories->map(function ($pageCategory) use ($languageId) {
                 $category = $pageCategory->productCategory;
                 $translation = $category ? $category->translates->first() : null;
-                
+
                 $parentSlug = null;
                 if ($category && $category->parent_id) {
                     $parentCategory = ProductCategory::find($category->parent_id);
@@ -117,7 +117,7 @@ class ProductsController extends Controller
                         $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
                     }
                 }
-                
+
                 return [
                     'id' => $pageCategory->id,
                     'title' => $translation ? $translation->title : '',
@@ -125,7 +125,7 @@ class ProductsController extends Controller
                     'parentSlug' => $parentSlug
                 ];
             });
-    
+
             // Sort options
             $sortOptions = [
                 ['value' => 'oldest', 'label' => 'oldest'],
@@ -134,27 +134,27 @@ class ProductsController extends Controller
                 ['value' => 'price_desc', 'label' => 'price_desc'],
                 ['value' => 'view_count', 'label' => 'view_count']
             ];
-    
+
             $sortTranslations = Cache::rememberForever("sort_translations_{$languageId}", function () use ($languageId) {
                 $sortKeywords = [
                     'price_asc' => 'price_asc',
-                    'price_desc' => 'price_desc', 
+                    'price_desc' => 'price_desc',
                     'newest' => 'newest',
                     'oldest' => 'oldest',
                     'view_count' => 'view_count'
                 ];
-    
+
                 $sortData = [];
                 foreach ($sortKeywords as $key => $keyword) {
                     $sortData[$key] = Dictionary::getValue($keyword, $languageId);
                 }
-    
+
                 return $sortData;
             });
-    
+
             // === Yeni: search parametri ===
             $searchQuery = $request->get('search'); // məsələn: ?search=table
-    
+
             // Pagination və digər filterlər
             $perPage = $request->get('per_page', 12);
             $page = $request->get('page', 1);
@@ -165,25 +165,25 @@ class ProductsController extends Controller
             $sort = $request->get('sort', 'view_count');
             $minPrice = $request->get('min_price');
             $maxPrice = $request->get('max_price');
-    
+
             // SEO text
             $categorySeoText = null;
             if ($categorySlug) {
                 $selectedCategory = ProductCategory::whereHas('translates', function($query) use ($categorySlug, $languageId) {
                     $query->where('slug', $categorySlug)->where('language_id', $languageId);
                 })->first();
-                
+
                 if ($selectedCategory) {
                     $categoryTranslation = $selectedCategory->translates()->where('language_id', $languageId)->first();
                     $categorySeoText = $categoryTranslation ? $categoryTranslation->seo_text : null;
                 }
             }
-    
+
             // Convert filters to arrays
             if (!is_array($filterIds)) $filterIds = $filterIds ? [$filterIds] : [];
             if (!is_array($colorIds)) $colorIds = $colorIds ? [$colorIds] : [];
             if (!is_array($typeIds)) $typeIds = $typeIds ? [$typeIds] : [];
-    
+
             // === Məhsul query ===
             $productsQuery = Product::with([
                 'translates' => function($query) use ($languageId) {
@@ -206,7 +206,7 @@ class ProductsController extends Controller
                 }
             ])
             ->active();
-    
+
             // === Əgər search varsa, title-larda axtar ===
             if ($searchQuery) {
                 $productsQuery->whereHas('translates', function($query) use ($languageId, $searchQuery) {
@@ -214,13 +214,13 @@ class ProductsController extends Controller
                           ->where('title', 'like', '%' . $searchQuery . '%');
                 });
             }
-    
+
             // === Digər filterlər (category, type, color, price və s.) elə qalır ===
             if ($categorySlug) {
                 $category = ProductCategory::whereHas('translates', function($query) use ($categorySlug) {
                     $query->where('slug', $categorySlug);
                 })->first();
-                
+
                 if ($category) {
                     $children = ProductCategory::where('parent_id', $category->id)->pluck('id');
                     $categoryIds = $children->isNotEmpty() ? $children->push($category->id)->toArray() : [$category->id];
@@ -229,23 +229,23 @@ class ProductsController extends Controller
                     });
                 }
             }
-    
+
             if (!empty($typeIds)) {
                 $productsQuery->whereHas('types', function($query) use ($typeIds) {
                     $query->whereIn('product_types.id', $typeIds);
                 });
             }
-    
+
             if (!empty($colorIds)) {
                 $productsQuery->whereHas('images', function($query) use ($colorIds) {
                     $query->whereIn('product_color_id', $colorIds)->where('status', true);
                 });
             }
-    
+
             // === Qiymət filteri (min/max və ya predefined range-lər) ===
             $appliedMinPrice = null;
             $appliedMaxPrice = null;
-    
+
             if ($minPrice !== null || $maxPrice !== null) {
                 $appliedMinPrice = $minPrice;
                 $appliedMaxPrice = $maxPrice;
@@ -260,37 +260,37 @@ class ProductsController extends Controller
                     if ($appliedMaxPrice !== null) $productsQuery->where('price', '<=', $appliedMaxPrice);
                 }
             }
-    
+
             // === Sort əməliyyatları ===
             switch ($sort) {
-                case 'price_asc': 
-                    $productsQuery->orderBy('price', 'asc'); 
+                case 'price_asc':
+                    $productsQuery->orderBy('price', 'asc');
                     break;
-                case 'price_desc': 
-                    $productsQuery->orderBy('price', 'desc'); 
+                case 'price_desc':
+                    $productsQuery->orderBy('price', 'desc');
                     break;
-                case 'newest': 
-                    $productsQuery->orderBy('created_at', 'desc'); 
+                case 'newest':
+                    $productsQuery->orderBy('created_at', 'desc');
                     break;
-                case 'oldest': 
-                    $productsQuery->orderBy('created_at', 'asc'); 
+                case 'oldest':
+                    $productsQuery->orderBy('created_at', 'asc');
                     break;
-                default: 
+                default:
                     // İlk dəfə çağırıldıqda ən yenilər birinci, ən köhnələr sonda olsun
-                    $productsQuery->orderBy('created_at', 'asc'); 
+                    $productsQuery->orderBy('created_at', 'asc');
                     break;
             }
-            
-            
-    
+
+
+
             // === Pagination ===
             $products = $productsQuery->paginate($perPage, ['*'], 'page', $page);
-    
+
             // Min-max price (bütün məhsullardan)
             $allProducts = Product::active()->get();
             $actualMinPrice = $allProducts->isNotEmpty() ? $allProducts->min('price') : null;
             $actualMaxPrice = $allProducts->isNotEmpty() ? $allProducts->max('price') : null;
-    
+
             $productsData = $products->map(function ($product) use ($languageId) {
                 $translation = $product->translates->first();
                 $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
@@ -301,7 +301,7 @@ class ProductsController extends Controller
                 }
                 $categorySlug = null;
                 $parentSlug = null;
-    
+
                 if ($product->categories->isNotEmpty()) {
                     $category = $product->categories->first();
                     $categoryTranslation = $category->translates->first();
@@ -314,7 +314,7 @@ class ProductsController extends Controller
                         }
                     }
                 }
-    
+
                 $productTypes = $product->types->map(function ($type) {
                     $translation = $type->translates->first();
                     return [
@@ -322,12 +322,12 @@ class ProductsController extends Controller
                         'title' => $translation ? $translation->title : ''
                     ];
                 });
-    
+
                 $user = auth('sanctum')->user();
                 $inCart = $user ? \App\Models\Cart::where('user_id', $user->id)->where('product_id', $product->id)->exists() : false;
                 $inFavorite = $user ? \App\Models\Favorite::where('user_id', $user->id)->where('product_id', $product->id)->exists() : false;
                 $inCompare = $user ? \App\Models\ProductCompare::where('user_id', $user->id)->where('product_id', $product->id)->exists() : false;
-    
+
                 return [
                     'id' => $product->id,
                     'title' => $translation ? $translation->title : '',
@@ -345,7 +345,7 @@ class ProductsController extends Controller
                     'inCompare' => $inCompare,
                 ];
             });
-    
+
             $paginationData = [
                 'current_page' => $products->currentPage(),
                 'per_page' => $products->perPage(),
@@ -414,7 +414,7 @@ if ($categorySlug) {
                     'translates' => $translatesData
                 ]
             ]);
-    
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -422,7 +422,7 @@ if ($categorySlug) {
             ], 500);
         }
     }
-    
+
 
     /**
      * Build hierarchical structure for categories
@@ -435,7 +435,7 @@ if ($categorySlug) {
         // First pass: create category map
         foreach ($categories as $category) {
             $translation = $category->translates->first();
-            
+
             // Get parent slug if parent_id exists
             $parentSlug = null;
             if ($category->parent_id) {
@@ -445,7 +445,7 @@ if ($categorySlug) {
                     $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
                 }
             }
-            
+
             $categoryData = [
                 'id' => $category->id,
                 'title' => $translation ? $translation->title : '',
@@ -490,7 +490,7 @@ if ($categorySlug) {
         return $rootCategories;
     }
 
-   
+
     public function show(Request $request, $slug)
     {
         try {
@@ -503,7 +503,7 @@ if ($categorySlug) {
                     'message' => 'Invalid language'
                 ], 400);
             }
-    
+
             $productQuery = Product::with([
                 'translates' => fn($q) => $q->where('language_id', $languageId),
                 'types.translates' => fn($q) => $q->where('language_id', $languageId),
@@ -530,19 +530,19 @@ if ($categorySlug) {
             }
 
             $product = $productQuery->first();
-                
+
             if (!$product) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Product not found'
                 ], 404);
             }
-    
+
             $translation = $product->translates->first();
             $product->increment('view_count');
             // --- User Data
             $user = auth('sanctum')->user();
-    
+
             // --- Cart data
             $inCart = [
                 'isActive' => false,
@@ -561,7 +561,7 @@ if ($categorySlug) {
                     ];
                 }
             }
-    
+
             // --- Favorite data
             $inFavorite = [
                 'isActive' => false,
@@ -578,7 +578,7 @@ if ($categorySlug) {
                     ];
                 }
             }
-    
+
             // --- Compare data
             $inCompare = false;
             if ($user) {
@@ -586,30 +586,30 @@ if ($categorySlug) {
                     ->where('product_id', $product->id)
                     ->exists();
             }
-    
+
             // --- Relations
             $productTypes = $product->types->map(fn($t) => [
                 'id' => $t->id,
                 'title' => optional($t->translates->first())->title ?? '',
             ]);
-    
+
             $productTags = $product->tags->map(fn($t) => [
                 'id' => $t->id,
                 'title' => optional($t->translates->first())->title ?? '',
             ]);
-    
+
             $productAccordions = $product->accordions->map(fn($a) => [
                 'id' => $a->id,
                 'title' => optional($a->translates->first())->title ?? '',
                 'content' => optional($a->translates->first())->description ?? '',
             ]);
-    
+
             $productDetails = $product->details->map(fn($d) => [
                 'id' => $d->id,
                 'keyword' => optional($d->translates->first())->keyword ?? '',
                 'value' => optional($d->translates->first())->value ?? '',
             ])->filter(fn($d) => $d['keyword'] && $d['value'])->values();
-    
+
             $productDetailValues = $product->detailValues->map(function ($dv) use ($languageId) {
                 $translation = $dv->translates->first();
                 $details = $dv->details()
@@ -627,13 +627,13 @@ if ($categorySlug) {
                     'details' => $details,
                 ];
             });
-    
+
             // --- Images
             $images = $product->images;
             if ($colorId) {
                 $images = $images->where('product_color_id', $colorId);
             }
-    
+
             $productImages = $images->map(function ($image) use ($languageId) {
                 $imgTr = $image->translates->first();
                 return [
@@ -645,14 +645,14 @@ if ($categorySlug) {
                     'alt_text' => $imgTr ? $imgTr->alt_text : '',
                 ];
             });
-    
+
             // --- Available colors
             $availableColors = $product->images
                 ->whereNotNull('product_color_id')
                 ->pluck('product_color_id')
                 ->unique()
                 ->values();
-    
+
             $availableColorDetails = [];
             if ($availableColors->isNotEmpty()) {
                 $availableColorDetails = ProductColor::whereIn('id', $availableColors)
@@ -662,7 +662,7 @@ if ($categorySlug) {
                         'color_code' => $c->color_code,
                     ]);
             }
-    
+
             // --- Categories
             $productCategories = $product->categories->map(function ($cat) use ($languageId) {
                 $tr = $cat->translates->first();
@@ -684,10 +684,11 @@ if ($categorySlug) {
                     'parent_title' => $parentTitle,
                 ];
             });
-    
+
             // --- Comments
             $comments = $product->comments()
                 ->with('user', 'answers')
+                ->where('status', true)
                 ->get()
                 ->map(fn($c) => [
                     'id' => $c->id,
@@ -695,8 +696,8 @@ if ($categorySlug) {
                     'text' => $c->text,
                     'answers' => $c->answers->pluck('text'),
                 ]);
-    
-       
+
+
             // --- Product Data
             $productData = [
                 'id' => $product->id,
@@ -718,7 +719,7 @@ if ($categorySlug) {
                 'inFavorite' => $inFavorite,
                 'inCompare' => $inCompare,
             ];
-    
+
             // --- Similar products
             $similarProducts = Product::whereHas('categories', function($q) use ($product) {
                     $q->whereIn('product_categories.id', $product->categories->pluck('id'));
@@ -727,7 +728,7 @@ if ($categorySlug) {
                 ->active()
                 ->take(8)
                 ->get();
-    
+
             $similarData = $similarProducts->map(function ($item) use ($languageId, $user) {
                 $translation = $item->translates()->where('language_id', $languageId)->first();
                 $mainImage = $item->images()->where('status', true)->orderBy('order')->first();
@@ -736,7 +737,7 @@ if ($categorySlug) {
                     $tr = $mainImage->translates()->where('language_id', $languageId)->first();
                     $mainImageAlt = $tr ? $tr->alt_text : '';
                 }
-    
+
                 // Category slug və parent slug
                 $categorySlug = null;
                 $parentSlug = null;
@@ -744,7 +745,7 @@ if ($categorySlug) {
                     $category = $item->categories->first();
                     $categoryTranslation = $category->translates()->where('language_id', $languageId)->first();
                     $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
-                    
+
                     if ($category->parent_id) {
                         $parentCategory = ProductCategory::find($category->parent_id);
                         if ($parentCategory) {
@@ -753,7 +754,7 @@ if ($categorySlug) {
                         }
                     }
                 }
-    
+
                 // same structure
                 $inCart = [
                     'isActive' => false,
@@ -768,7 +769,7 @@ if ($categorySlug) {
                         $inCart['count'] = $cartItem->count ?? null;
                     }
                 }
-    
+
                 $inFavorite = [
                     'isActive' => false,
                     'color_id' => null,
@@ -780,14 +781,14 @@ if ($categorySlug) {
                         $inFavorite['color_id'] = $favItem->product_color_id ?? null;
                     }
                 }
-    
+
                 $inCompare = false;
                 if ($user) {
                     $inCompare = \App\Models\ProductCompare::where('user_id', $user->id)
                         ->where('product_id', $item->id)
                         ->exists();
                 }
-    
+
                 return [
                     'id' => $item->id,
                     'title' => $translation ? $translation->title : '',
@@ -855,7 +856,7 @@ if ($categorySlug) {
 
                 ]
             ]);
-    
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -863,21 +864,21 @@ if ($categorySlug) {
             ], 500);
         }
     }
-    
-    
+
+
 
     public function details(Request $request, $id)
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
-    
+
             if (!$languageId) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid language'
                 ], 400);
             }
-    
+
             // Product with translations and relations
             $product = Product::with([
                 'translates' => function($q) use ($languageId) {
@@ -899,9 +900,9 @@ if ($categorySlug) {
                     $q->where('language_id', $languageId);
                 }
             ])->findOrFail($id);
-    
+
             $translation = $product->translates->first();
-    
+
             // ✳️ Product details
             $detailsData = $product->details->map(function ($detail) {
                 $translation = $detail->translates->first();
@@ -911,46 +912,46 @@ if ($categorySlug) {
                     'value' => $translation ? $translation->value : ''
                 ];
             });
-    
+
             // ✳️ User
             $user = auth('sanctum')->user();
-    
+
             // ✳️ inCart
             $inCart = [
                 'isActive' => false,
                 'color_id' => null,
                 'count' => null,
             ];
-    
+
             if ($user) {
                 $cartItem = \App\Models\Cart::where('user_id', $user->id)
                     ->where('product_id', $product->id)
                     ->first();
-    
+
                 if ($cartItem) {
                     $inCart['isActive'] = true;
                     $inCart['color_id'] = $cartItem->product_color_id ?? null;
                     $inCart['count'] = $cartItem->count ?? null;
                 }
             }
-    
+
             // ✳️ inFavorite
             $inFavorite = [
                 'isActive' => false,
                 'color_id' => null,
             ];
-    
+
             if ($user) {
                 $favoriteItem = \App\Models\Favorite::where('user_id', $user->id)
                     ->where('product_id', $product->id)
                     ->first();
-    
+
                 if ($favoriteItem) {
                     $inFavorite['isActive'] = true;
                     $inFavorite['color_id'] = $favoriteItem->product_color_id ?? null;
                 }
             }
-    
+
             // ✳️ inCompare
             $inCompare = false;
             if ($user) {
@@ -958,7 +959,7 @@ if ($categorySlug) {
                     ->where('product_id', $product->id)
                     ->exists();
             }
-    
+
             // ✳️ Similar products
             $similarProductsQuery = Product::with([
                 'translates' => function($query) use ($languageId) {
@@ -983,13 +984,13 @@ if ($categorySlug) {
             })
             ->where('id', '!=', $product->id)
             ->limit(8);
-    
+
             $similarProducts = $similarProductsQuery->get();
-    
+
             $similarProductsData = $similarProducts->map(function ($product) use ($languageId, $user) {
                 $translation = $product->translates->first();
                 $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
-    
+
                 // Category slug və parent slug
                 $categorySlug = null;
                 $parentSlug = null;
@@ -997,7 +998,7 @@ if ($categorySlug) {
                     $category = $product->categories->first();
                     $categoryTranslation = $category->translates->first();
                     $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
-                    
+
                     if ($category->parent_id) {
                         $parentCategory = ProductCategory::find($category->parent_id);
                         if ($parentCategory) {
@@ -1006,7 +1007,7 @@ if ($categorySlug) {
                         }
                     }
                 }
-    
+
                 // --- inCart
                 $inCart = [
                     'isActive' => false,
@@ -1023,7 +1024,7 @@ if ($categorySlug) {
                         $inCart['count'] = $cartItem->count ?? null;
                     }
                 }
-    
+
                 // --- inFavorite
                 $inFavorite = [
                     'isActive' => false,
@@ -1038,7 +1039,7 @@ if ($categorySlug) {
                         $inFavorite['color_id'] = $favItem->product_color_id ?? null;
                     }
                 }
-    
+
                 // --- inCompare
                 $inCompare = false;
                 if ($user) {
@@ -1046,17 +1047,17 @@ if ($categorySlug) {
                         ->where('product_id', $product->id)
                         ->exists();
                 }
-    
+
                 return [
                     'id' => $product->id,
                     'title' => $translation ? $translation->title : '',
                     'card_image' => $mainImage && $mainImage->image
                         ? asset('storage/' . $mainImage->image)
                         : asset('images/default_image.webp'),
-                   
+
                 ];
             });
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'Product details retrieved successfully',
@@ -1087,7 +1088,7 @@ if ($categorySlug) {
                     'similar_products' => $similarProductsData
                 ]
             ]);
-    
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -1095,15 +1096,15 @@ if ($categorySlug) {
             ], 500);
         }
     }
-    
-    
 
-  
+
+
+
     public function detailValues(Request $request, $id)
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
-            
+
             if (!$languageId) {
                 return response()->json([
                     'success' => false,
@@ -1138,12 +1139,12 @@ if ($categorySlug) {
         }
     }
 
-  
+
     public function detailValueDetails(Request $request, $id, $detailValueId)
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
-            
+
             if (!$languageId) {
                 return response()->json([
                     'success' => false,
@@ -1153,7 +1154,7 @@ if ($categorySlug) {
 
             $product = Product::findOrFail($id);
             $detailValue = $product->detailValues()->findOrFail($detailValueId);
-            
+
             $details = $detailValue->details()->with(['translates' => function($query) use ($languageId) {
                 $query->where('language_id', $languageId);
             }])->get();
@@ -1181,13 +1182,13 @@ if ($categorySlug) {
         }
     }
 
- 
 
- 
 
-   
 
-    
+
+
+
+
     public function categoriesOnly(Request $request)
     {
         try {
@@ -1230,7 +1231,7 @@ public function categoryBySlug(Request $request, $slug)
 {
     try {
         $languageId = $this->getLanguageIdFromHeader($request);
-        
+
         if (!$languageId) {
             return response()->json([
                 'success' => false,
@@ -1282,7 +1283,7 @@ public function categoryBySlug(Request $request, $slug)
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
-            
+
             if (!$languageId) {
                 return response()->json([
                     'success' => false,
@@ -1314,7 +1315,7 @@ public function categoryBySlug(Request $request, $slug)
 
             $translation = $product->translates->first();
             $mainImage = $product->images->first();
-            
+
             // Get category title
             $categoryTitle = '';
             if ($product->categories->isNotEmpty()) {
