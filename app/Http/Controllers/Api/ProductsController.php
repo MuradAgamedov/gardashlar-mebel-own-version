@@ -688,7 +688,7 @@ if ($categorySlug) {
             // --- Comments
             $comments = $product->comments()
                 ->with('user', 'answers')
-                ->where('status', true)
+                ->where('status', 'approved')
                 ->get()
                 ->map(fn($c) => [
                     'id' => $c->id,
