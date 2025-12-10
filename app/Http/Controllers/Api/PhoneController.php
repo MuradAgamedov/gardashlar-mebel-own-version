@@ -14,12 +14,12 @@ class PhoneController extends Controller
 {
     use LocaleFromHeader;
 
-    
+
     public function generalPhones(Request $request): JsonResponse
     {
         try {
             $cacheKey = 'api_general_phones';
-            
+
             $phones = Cache::rememberForever($cacheKey, function () {
                 return Phone::select(['id', 'phone'])
                     ->where('phone_type_id', 3)
@@ -42,16 +42,16 @@ class PhoneController extends Controller
         }
     }
 
-   
+
     public function phones(Request $request): JsonResponse
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
             $cacheKey = "api_phones_{$languageId}";
-    
+
             // 🔹 Cache təmizlə (test zamanı köhnə nəticə qalmasın)
             Cache::forget($cacheKey);
-    
+
             $phoneTypes = Cache::rememberForever($cacheKey, function () use ($languageId) {
                 return \App\Models\PhoneType::with([
                     'translates' => function ($query) use ($languageId) {
@@ -70,7 +70,7 @@ class PhoneController extends Controller
                     ->map(function ($phoneType) {
                         $translation = $phoneType->translates->first();
                         return [
-            
+                            'type' => $translation ? $translation->title : '',
                             'phones' => $phoneType->phones->map(function ($phone) {
                                 return [
                                     'id' => $phone->id,
@@ -80,12 +80,12 @@ class PhoneController extends Controller
                         ];
                     });
             });
-    
+
             return response()->json([
                 'success' => true,
                 'data' => $phoneTypes
             ], 200);
-    
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -94,13 +94,13 @@ class PhoneController extends Controller
             ], 500);
         }
     }
-    
+
 
     public function specialPhone(Request $request): JsonResponse
     {
         try {
             $cacheKey = 'api_special_phone_type_15';
-    
+
             $phone = Cache::rememberForever($cacheKey, function () {
                 $phoneType = \App\Models\PhoneType::with(['phones' => function ($query) {
                     $query->where('status', true)
@@ -109,20 +109,20 @@ class PhoneController extends Controller
                 ->where('id', 15) // 🔹 PhoneType id = 15
                 ->where('status', true)
                 ->first();
-    
+
                 if (!$phoneType || $phoneType->phones->isEmpty()) {
                     return null; // Əgər 15-ci PhoneType və ya aktiv nömrə yoxdursa
                 }
-    
+
                 // 🔹 Yalnız birinci nömrəni götür və sadəcə nömrəni qaytar
                 return $phoneType->phones->first()->phone;
             });
-    
+
             return response()->json([
                 'success' => true,
                 'data' => $phone
             ], 200);
-    
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -131,8 +131,8 @@ class PhoneController extends Controller
             ], 500);
         }
     }
-    
-    
 
-    
-} 
+
+
+
+}
