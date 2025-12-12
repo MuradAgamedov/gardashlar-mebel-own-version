@@ -19,8 +19,7 @@ class BlogPostController extends Controller
 {
     try {
         $languageId = $this->getLanguageIdFromHeader($request);
-        dd($languageId);
-
+        
         $page = $request->get('page', 1);
         $perPage = min($request->get('per_page', 10), 50);
         $categorySlug = $request->get('category_slug');
