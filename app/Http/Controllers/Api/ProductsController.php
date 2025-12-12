@@ -23,6 +23,7 @@ class ProductsController extends Controller
 
     public function categories(Request $request)
     {
+        dd( __('newest') );
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
 
