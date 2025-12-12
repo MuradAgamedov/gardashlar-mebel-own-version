@@ -17,7 +17,7 @@ class BlogPostController extends Controller
  
   public function index(Request $request): JsonResponse
 {
-    dd(__('newest'));
+    dd(__('home_page'));
     try {
         $languageId = $this->getLanguageIdFromHeader($request);
         $page = $request->get('page', 1);
