@@ -23,7 +23,6 @@ class ProductsController extends Controller
 
     public function categories(Request $request)
     {
-        dd( __('newest') );
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
 
@@ -129,20 +128,20 @@ class ProductsController extends Controller
 
             // Sort options
             $sortOptions = [
-                ['value' => 'oldest', 'label' => __('oldest')],
-                ['value' => 'newest', 'label' => __('newest')],
-                ['value' => 'price_asc', 'label' => __('price_asc')],
-                ['value' => 'price_desc', 'label' => __('price_desc')],
-                ['value' => 'view_count', 'label' => __('view_count')]
+                ['value' => 'oldest', 'label' => __('messages.oldest')],
+                ['value' => 'newest', 'label' => __('messages.newest')],
+                ['value' => 'price_asc', 'label' => __('messages.price_asc')],
+                ['value' => 'price_desc', 'label' => __('messages.price_desc')],
+                ['value' => 'view_count', 'label' => __('messages.view_count')]
             ];
 
             $sortTranslations = Cache::rememberForever("sort_translations_{$languageId}", function () use ($languageId) {
                 $sortKeywords = [
-                    'price_asc' => __('price_asc'),
-                    'price_desc' => __('price_desc'),
-                    'newest' => __('newest'),
-                    'oldest' => __('oldest'),
-                    'view_count' => __('view_count')
+                    'price_asc' => 'price_asc',
+                    'price_desc' => 'price_desc',
+                    'newest' => 'newest',
+                    'oldest' => 'oldest',
+                    'view_count' => 'view_count'
                 ];
 
                 $sortData = [];
@@ -849,7 +848,7 @@ if ($categorySlug) {
 
             return response()->json([
                 'success' => true,
-                'message' => __('messages.product_retrieved_successfully'),
+                'message' => 'Product retrieved successfully',
                 'data' => [
                     'product' => $productData,
                     'similar_products' => $similarData,
@@ -861,7 +860,7 @@ if ($categorySlug) {
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => __('messages.error_retrieving_product') . ': ' . $e->getMessage()
+                'message' => 'Error retrieving product: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -876,7 +875,7 @@ if ($categorySlug) {
             if (!$languageId) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('messages.invalid_language')
+                    'message' => 'Invalid language'
                 ], 400);
             }
 
@@ -1061,7 +1060,7 @@ if ($categorySlug) {
 
             return response()->json([
                 'success' => true,
-                'message' => __('messages.product_details_retrieved_successfully'),
+                'message' => 'Product details retrieved successfully',
                 'data' => [
                     'product' => [
                         'id' => $product->id,
@@ -1093,7 +1092,7 @@ if ($categorySlug) {
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => __('messages.error_retrieving_product_details') . ': ' . $e->getMessage()
+                'message' => 'Error retrieving product details: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -1109,7 +1108,7 @@ if ($categorySlug) {
             if (!$languageId) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('messages.invalid_language')
+                    'message' => 'Invalid language'
                 ], 400);
             }
 
@@ -1128,14 +1127,14 @@ if ($categorySlug) {
 
             return response()->json([
                 'success' => true,
-                'message' => __('messages.product_detail_values_retrieved_successfully'),
+                'message' => 'Product detail values retrieved successfully',
                 'data' => $detailValuesData
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => __('messages.error_retrieving_product_detail_values') . ': ' . $e->getMessage()
+                'message' => 'Error retrieving product detail values: ' . $e->getMessage()
             ], 500);
         }
     }
