@@ -102,8 +102,8 @@ class BlogPostController extends Controller
                     'total' => $blogPosts->total(),
                 ],
                 'sort_options' => [
-                    ['value' => 'newest', 'label' => 'Ən yeni'],
-                    ['value' => 'oldest', 'label' => 'Ən köhnə']
+                    ['value' => 'newest', 'label' => __('newest')],
+                    ['value' => 'oldest', 'label' => __('oldest')],
                 ],
                 'translates' => [
                     'slug' => $categorySlugTranslations ?? (object)[]
