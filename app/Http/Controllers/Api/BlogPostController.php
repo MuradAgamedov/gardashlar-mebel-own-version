@@ -19,7 +19,6 @@ class BlogPostController extends Controller
 {
     try {
         $languageId = $this->getLanguageIdFromHeader($request);
-        
         $page = $request->get('page', 1);
         $perPage = min($request->get('per_page', 10), 50);
         $categorySlug = $request->get('category_slug');
@@ -103,8 +102,8 @@ class BlogPostController extends Controller
                     'total' => $blogPosts->total(),
                 ],
                 'sort_options' => [
-                    ['value' => 'newest', 'label' => __('newest')],
-                    ['value' => 'oldest', 'label' => __('oldest')],
+                    ['value' => 'newest', 'label' => 'Ən yeni'],
+                    ['value' => 'oldest', 'label' => 'Ən köhnə']
                 ],
                 'translates' => [
                     'slug' => $categorySlugTranslations ?? (object)[]
