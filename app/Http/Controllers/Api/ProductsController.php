@@ -29,7 +29,7 @@ class ProductsController extends Controller
             if (!$languageId) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid language'
+                    'message' => __('messages.invalid_language')
                 ], 400);
             }
 
@@ -128,20 +128,20 @@ class ProductsController extends Controller
 
             // Sort options
             $sortOptions = [
-                ['value' => 'oldest', 'label' => 'oldest'],
-                ['value' => 'newest', 'label' => 'newest'],
-                ['value' => 'price_asc', 'label' => 'price_asc'],
-                ['value' => 'price_desc', 'label' => 'price_desc'],
-                ['value' => 'view_count', 'label' => 'view_count']
+                ['value' => 'oldest', 'label' => __('oldest')],
+                ['value' => 'newest', 'label' => __('newest')],
+                ['value' => 'price_asc', 'label' => __('price_asc')],
+                ['value' => 'price_desc', 'label' => __('price_desc')],
+                ['value' => 'view_count', 'label' => __('view_count')]
             ];
 
             $sortTranslations = Cache::rememberForever("sort_translations_{$languageId}", function () use ($languageId) {
                 $sortKeywords = [
-                    'price_asc' => 'price_asc',
-                    'price_desc' => 'price_desc',
-                    'newest' => 'newest',
-                    'oldest' => 'oldest',
-                    'view_count' => 'view_count'
+                    'price_asc' => __('price_asc'),
+                    'price_desc' => __('price_desc'),
+                    'newest' => __('newest'),
+                    'oldest' => __('oldest'),
+                    'view_count' => __('view_count')
                 ];
 
                 $sortData = [];
@@ -395,7 +395,7 @@ if ($categorySlug) {
 
             return response()->json([
                 'success' => true,
-                'message' => 'Product categories retrieved successfully',
+                'message' => __('messages.product_categories_retrieved_successfully'),
                 'data' => [
                     'categories' => $categoriesData,
                     'product_price_filters' => $priceFiltersData,
@@ -418,7 +418,7 @@ if ($categorySlug) {
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error retrieving product categories: ' . $e->getMessage()
+                'message' => __('messages.error_retrieving_product_categories') . ': ' . $e->getMessage()
             ], 500);
         }
     }
@@ -534,7 +534,7 @@ if ($categorySlug) {
             if (!$product) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Product not found'
+                    'message' => __('messages.product_not_found')
                 ], 404);
             }
 
@@ -848,7 +848,7 @@ if ($categorySlug) {
 
             return response()->json([
                 'success' => true,
-                'message' => 'Product retrieved successfully',
+                'message' => __('messages.product_retrieved_successfully'),
                 'data' => [
                     'product' => $productData,
                     'similar_products' => $similarData,
@@ -860,7 +860,7 @@ if ($categorySlug) {
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error retrieving product: ' . $e->getMessage()
+                'message' => __('messages.error_retrieving_product') . ': ' . $e->getMessage()
             ], 500);
         }
     }
@@ -875,7 +875,7 @@ if ($categorySlug) {
             if (!$languageId) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid language'
+                    'message' => __('messages.invalid_language')
                 ], 400);
             }
 
@@ -1060,7 +1060,7 @@ if ($categorySlug) {
 
             return response()->json([
                 'success' => true,
-                'message' => 'Product details retrieved successfully',
+                'message' => __('messages.product_details_retrieved_successfully'),
                 'data' => [
                     'product' => [
                         'id' => $product->id,
@@ -1092,7 +1092,7 @@ if ($categorySlug) {
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error retrieving product details: ' . $e->getMessage()
+                'message' => __('messages.error_retrieving_product_details') . ': ' . $e->getMessage()
             ], 500);
         }
     }
@@ -1108,7 +1108,7 @@ if ($categorySlug) {
             if (!$languageId) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid language'
+                    'message' => __('messages.invalid_language')
                 ], 400);
             }
 
@@ -1127,14 +1127,14 @@ if ($categorySlug) {
 
             return response()->json([
                 'success' => true,
-                'message' => 'Product detail values retrieved successfully',
+                'message' => __('messages.product_detail_values_retrieved_successfully'),
                 'data' => $detailValuesData
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error retrieving product detail values: ' . $e->getMessage()
+                'message' => __('messages.error_retrieving_product_detail_values') . ': ' . $e->getMessage()
             ], 500);
         }
     }
