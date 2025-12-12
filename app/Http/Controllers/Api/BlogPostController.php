@@ -20,6 +20,7 @@ class BlogPostController extends Controller
     try {
         $languageId = $this->getLanguageIdFromHeader($request);
         $lang = $request->header('locale');
+        dd($lang);
         app()->setLocale($lang);
         $page = $request->get('page', 1);
         $perPage = min($request->get('per_page', 10), 50);
