@@ -153,6 +153,8 @@ public function show(Request $request, string $slug): JsonResponse
                         'salary' => $t?->salary ?? '',
                         'email' => $t?->email ?? '',
                         'phone' => $t?->phone ?? '',
+                        'last_apply_date' => $t?->last_apply_date ?? '',
+
                     ];
                 });
 
