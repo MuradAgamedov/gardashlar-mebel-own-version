@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-
+use App\Models\Dictionary;
 
 class AuthController extends Controller
 {
@@ -310,7 +310,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => __('Uğurla giriş edildi'),
+                'message' => Dictionary::getValue('success_login'),
                 'data' => [
                     'user' => [
                         'id' => $user->id,
