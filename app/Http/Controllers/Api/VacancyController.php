@@ -167,5 +167,70 @@ public function show(Request $request, string $slug): JsonResponse
     }
 }
 
+/**
+ * Get other active vacancies (excluding the current one)
+ * 
+ * @OA\Get(
+ *     path="/api/vacancies/other/{slug}",
+ *     tags={"Vacancies"},
+ *     summary="Get other active vacancies",
+ *     @OA\Parameter(
+ *         name="slug",
+ *         in="path",
+ *         required=true,
+ *         description="Slug of the current vacancy to exclude"
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="List of other vacancies"
+ *     )
+ * )
+ */
+public function otherVacancies(Request $request, string $slug): JsonResponse
+{
+    try {
+        $languageId = $this->getLanguageIdFromHeader($request);
+        $cacheKey = "api_other_vacancies_{$slug}_{$languageId}";
+
+        $otherVacancies = Cache::remember($cacheKey, now()->addHours(1), function () use ($slug, $languageId) {
+            return Vacancy::with(['translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }])
+                ->whereHas('translates', function($query) use ($slug) {
+                    $query->where('slug', '!=', $slug);
+                })
+                ->active()
+                ->notExpired()
+                ->ordered()
+                ->limit(3)
+                ->get()
+                ->map(function ($vacancy) {
+                    $translation = $vacancy->translates->first();
+
+                    return [
+                        'id' => $vacancy->id,
+                        'title' => $translation?->title ?? '',
+                        'slug' => $translation?->slug ?? '',
+                        'position' => $translation?->position ?? '',
+                        'experience' => $translation?->experience ?? '',
+                        'last_apply_date' => $vacancy->last_apply_date?->format('Y-m-d'),
+                    ];
+                });
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Other vacancies retrieved successfully',
+            'data' => $otherVacancies
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error retrieving other vacancies: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
 
 } 
