@@ -188,7 +188,7 @@ class AuthController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-
+        app()->setLocale('en');    
         try {
             if (!empty($request->email)) {
                 $sent = $this->emailService->sendOTP($request->email, 'verification');
@@ -236,16 +236,16 @@ class AuthController extends Controller
             'phone' => 'nullable|string|max:20',
             'password' => 'required|string',
         ], [
-            'email.nullable' => 'Email ünvanı seçimlidir',
-            'email.email' => 'Düzgün email ünvanı daxil edin',
-            'phone.nullable' => 'Telefon nömrəsi seçimlidir',
-            'password.required' => 'Şifrə məcburidir',
+            'email.nullable' => __('Email ünvanı seçimlidir'),
+            'email.email' => __('Düzgün email ünvanı daxil edin'),
+            'phone.nullable' => __('Telefon nömrəsi seçimlidir'),
+            'password.required' => __('Şifrə məcburidir'),
         ]);
 
         // Custom validation: either phone or email must be provided
         $validator->after(function ($validator) use ($request) {
             if (empty($request->phone) && empty($request->email)) {
-                $validator->errors()->add('contact_info', 'Telefon nömrəsi və ya email ünvanından ən azı biri məcburidir');
+                $validator->errors()->add('contact_info', __('Telefon nömrəsi və ya email ünvanından ən azı biri məcburidir'));
             }
         });
 
@@ -269,9 +269,9 @@ class AuthController extends Controller
             if (!$user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'İstifadəçi tapılmadı',
+                    'message' => __('İstifadəçi tapılmadı'),
                     'errors' => [
-                        'credentials' => ['Email və ya şifrə düzgün deyil']
+                        'credentials' => [__("Email və ya şifrə düzgün deyil")]
                     ]
                 ], 401);
             }
@@ -289,7 +289,7 @@ class AuthController extends Controller
                     'success' => false,
                     'message' => 'Hesabınız hələ təsdiqlənməyib',
                     'errors' => [
-                        'verification' => ['Zəhmət olmasa əvvəlcə hesabınızı təsdiqləyin']
+                        'verification' => [__('Zəhmət olmasa əvvəlcə hesabınızı təsdiqləyin')]
                     ]
                 ], 403);
             }
@@ -298,9 +298,9 @@ class AuthController extends Controller
             if (!Hash::check($request->password, $user->password)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Email və ya şifrə düzgün deyil',
+                    'message' => __('Email və ya şifrə düzgün deyil'),
                     'errors' => [
-                        'credentials' => ['Email və ya şifrə düzgün deyil']
+                        'credentials' => [__('Email və ya şifrə düzgün deyil')]
                     ]
                 ], 401);
             }
@@ -310,7 +310,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Uğurla giriş edildi',
+                'message' => __('Uğurla giriş edildi'),
                 'data' => [
                     'user' => [
                         'id' => $user->id,
