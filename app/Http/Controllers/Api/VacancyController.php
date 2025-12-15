@@ -90,81 +90,103 @@ public function show(Request $request, string $slug): JsonResponse
 
         $cacheKey = "api_vacancy_show_{$slug}_{$languageId}";
 
-        $vacancy = Cache::rememberForever($cacheKey, function () use ($slug, $languageId) {
+        $data = Cache::rememberForever($cacheKey, function () use ($slug, $languageId) {
 
-            return Vacancy::with([
+            $vacancy = Vacancy::with([
                     'translates.language',
                     'requirements.translates.language'
                 ])
-                ->whereHas('translates', function ($q) use ($slug) {
-                    $q->where('slug', $slug);
+                ->whereHas('translates', function ($query) use ($slug) {
+                    $query->where('slug', $slug);
                 })
                 ->active()
+                ->notExpired()
                 ->first();
+
+            if (!$vacancy) {
+                return null;
+            }
+
+            $translation = $vacancy->translates
+                ->firstWhere('language_id', $languageId);
+
+            // 🔹 Slug-lar (bütün dillər)
+            $slugTranslations = $vacancy->translates->mapWithKeys(function ($t) {
+                return [$t->language->lang_code => $t->slug];
+            });
+
+            // 🔹 Requirements
+            $requirements = $vacancy->requirements()
+                ->with(['translates' => fn ($q) => $q->where('language_id', $languageId)])
+                ->active()
+                ->ordered()
+                ->get()
+                ->map(function ($requirement) {
+                    $reqTranslation = $requirement->translates->first();
+                    return [
+                        'id' => $requirement->id,
+                        'title' => $reqTranslation?->title ?? '',
+                        'description' => $reqTranslation?->description ?? '',
+                    ];
+                });
+
+            // 🔹 Other vacancies (cari vakansiya çıxılır)
+            $otherVacancies = Vacancy::with([
+                    'translates' => fn ($q) => $q->where('language_id', $languageId)
+                ])
+                ->where('id', '!=', $vacancy->id)
+                ->active()
+                ->notExpired()
+                ->ordered()
+                ->limit(5)
+                ->get()
+                ->map(function ($item) {
+                    $t = $item->translates->first();
+
+                    return [
+                        'id' => $item->id,
+                        'title' => $t?->title ?? '',
+                        'slug' => $t?->slug ?? '',
+                        'position' => $t?->position ?? '',
+                        'last_apply_date' => $item->last_apply_date?->format('Y-m-d'),
+                    ];
+                });
+
+            return [
+                'id' => $vacancy->id,
+                'title' => $translation?->title ?? '',
+                'slug' => $translation?->slug ?? '',
+                'position' => $translation?->position ?? '',
+                'experience' => $translation?->experience ?? '',
+                'work_schedule' => $translation?->work_schedule ?? '',
+                'salary' => $translation?->salary ?? '',
+                'email' => $vacancy->email,
+                'phone' => $vacancy->phone,
+                'address' => $translation?->address ?? '',
+                'last_apply_date' => $vacancy->last_apply_date?->format('Y-m-d'),
+                'created_at' => $vacancy->created_at?->toISOString(),
+
+                'seo_title' => $translation?->seo_title ?? '',
+                'seo_description' => $translation?->seo_description ?? '',
+                'seo_keywords' => $translation?->seo_keywords ?? '',
+
+                'requirements' => $requirements,
+
+                'translates' => [
+                    'slug' => $slugTranslations
+                ],
+
+                // ✅ Əlavə edildi
+                'other_vacancies' => $otherVacancies
+            ];
         });
 
-        if (!$vacancy) {
+        if (!$data) {
             return response()->json([
                 'success' => false,
                 'message' => 'Vacancy not found'
             ], 404);
         }
-
-        $translation = $vacancy->translates
-            ->firstWhere('language_id', $languageId);
-
-        // 🔹 Expired hesablanması (index ilə eyni)
-        $isExpired = $vacancy->last_apply_date
-            ? now()->greaterThan($vacancy->last_apply_date)
-            : false;
-
-        // 🔹 Slug translations (index-dəki kimi)
-        $slugTranslations = $vacancy->translates->mapWithKeys(function ($t) {
-            return [$t->language->lang_code => $t->slug];
-        });
-
-        // 🔹 Requirements
-        $requirements = $vacancy->requirements()
-            ->with(['translates' => fn ($q) => $q->where('language_id', $languageId)])
-            ->active()
-            ->ordered()
-            ->get()
-            ->map(function ($req) {
-                $t = $req->translates->first();
-                return [
-                    'id' => $req->id,
-                    'title' => $t?->title ?? '',
-                    'description' => $t?->description ?? '',
-                ];
-            });
-
-        // 🔹 INDEX STRUCTURE ilə eyni obyekt
-        $data = [
-            'id' => $vacancy->id,
-            'title' => $translation?->title ?? '',
-            'slug' => $translation?->slug ?? '',
-            'position' => $translation?->position ?? '',
-            'experience' => $translation?->experience ?? '',
-            'work_schedule' => $translation?->work_schedule ?? '',
-            'salary' => $translation?->salary ?? '',
-            'email' => $vacancy->email,
-            'phone' => $vacancy->phone,
-            'address' => $translation?->address ?? '',
-            'last_apply_date' => $vacancy->last_apply_date?->format('Y-m-d'),
-            'is_expired' => $isExpired,
-
-            'requirements' => $requirements,
-
-            'created_at' => $vacancy->created_at?->toISOString(),
-
-            'seo_title' => $translation?->seo_title ?? '',
-            'seo_description' => $translation?->seo_description ?? '',
-            'seo_keywords' => $translation?->seo_keywords ?? '',
-
-            'translates' => [
-                'slug' => $slugTranslations
-            ]
-        ];
 
         return response()->json([
             'success' => true,
@@ -180,7 +202,6 @@ public function show(Request $request, string $slug): JsonResponse
         ], 500);
     }
 }
-
 
 
 } 
