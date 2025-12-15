@@ -148,7 +148,11 @@ public function show(Request $request, string $slug): JsonResponse
                         'title' => $t?->title ?? '',
                         'slug' => $t?->slug ?? '',
                         'position' => $t?->position ?? '',
-                        'last_apply_date' => $item->last_apply_date?->format('Y-m-d'),
+                        'experience' => $t?->experience ?? '',
+                        'work_schedule' => $t?->work_schedule ?? '',
+                        'salary' => $t?->salary ?? '',
+                        'email' => $t?->email ?? '',
+                        'phone' => $t?->phone ?? '',
                     ];
                 });
 
