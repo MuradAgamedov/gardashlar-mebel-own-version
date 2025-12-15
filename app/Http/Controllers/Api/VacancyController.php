@@ -96,8 +96,8 @@ public function show(Request $request, string $slug): JsonResponse
                     'translates.language',
                     'requirements.translates.language'
                 ])
-                ->whereHas('translates', function ($q) use ($slug) {
-                    $q->where('slug', $slug);
+                ->whereHas('translates', function ($query) use ($slug) {
+                    $query->where('slug', $slug);
                 })
                 ->active()
                 ->notExpired()
@@ -110,30 +110,29 @@ public function show(Request $request, string $slug): JsonResponse
             $translation = $vacancy->translates
                 ->firstWhere('language_id', $languageId);
 
-            // 🔹 Slug translations
+            // 🔹 Slug-lar (bütün dillər)
             $slugTranslations = $vacancy->translates->mapWithKeys(function ($t) {
                 return [$t->language->lang_code => $t->slug];
             });
 
-            // 🔹 Requirements (main vacancy)
+            // 🔹 Requirements
             $requirements = $vacancy->requirements()
                 ->with(['translates' => fn ($q) => $q->where('language_id', $languageId)])
                 ->active()
                 ->ordered()
                 ->get()
-                ->map(function ($req) {
-                    $t = $req->translates->first();
+                ->map(function ($requirement) {
+                    $reqTranslation = $requirement->translates->first();
                     return [
-                        'id' => $req->id,
-                        'title' => $t?->title ?? '',
-                        'description' => $t?->description ?? '',
+                        'id' => $requirement->id,
+                        'title' => $reqTranslation?->title ?? '',
+                        'description' => $reqTranslation?->description ?? '',
                     ];
                 });
 
-            // 🔹 Other vacancies (FULL STRUCTURE)
+            // 🔹 Other vacancies (cari vakansiya çıxılır)
             $otherVacancies = Vacancy::with([
-                    'translates.language',
-                    'requirements.translates.language'
+                    'translates' => fn ($q) => $q->where('language_id', $languageId)
                 ])
                 ->where('id', '!=', $vacancy->id)
                 ->active()
@@ -141,44 +140,18 @@ public function show(Request $request, string $slug): JsonResponse
                 ->ordered()
                 ->limit(5)
                 ->get()
-                ->map(function ($item) use ($languageId) {
-
-                    $t = $item->translates
-                        ->firstWhere('language_id', $languageId);
-
-                    $slugTranslations = $item->translates->mapWithKeys(function ($tr) {
-                        return [$tr->language->lang_code => $tr->slug];
-                    });
-
-                    $isExpired = $item->last_apply_date
-                        ? now()->greaterThan($item->last_apply_date)
-                        : false;
+                ->map(function ($item) {
+                    $t = $item->translates->first();
 
                     return [
                         'id' => $item->id,
                         'title' => $t?->title ?? '',
                         'slug' => $t?->slug ?? '',
                         'position' => $t?->position ?? '',
-                        'experience' => $t?->experience ?? '',
-                        'work_schedule' => $t?->work_schedule ?? '',
-                        'salary' => $t?->salary ?? '',
-                        'email' => $item->email,
-                        'phone' => $item->phone,
-                        'address' => $t?->address ?? '',
                         'last_apply_date' => $item->last_apply_date?->format('Y-m-d'),
-                        'is_expired' => $isExpired,
-                        'requirements' => [], // 👉 listdə adətən boş saxlanır
-                        'created_at' => $item->created_at?->toISOString(),
-                        'seo_title' => $t?->seo_title ?? '',
-                        'seo_description' => $t?->seo_description ?? '',
-                        'seo_keywords' => $t?->seo_keywords ?? '',
-                        'translates' => [
-                            'slug' => $slugTranslations
-                        ]
                     ];
                 });
 
-            // 🔹 MAIN vacancy (index ilə eyni)
             return [
                 'id' => $vacancy->id,
                 'title' => $translation?->title ?? '',
@@ -191,17 +164,19 @@ public function show(Request $request, string $slug): JsonResponse
                 'phone' => $vacancy->phone,
                 'address' => $translation?->address ?? '',
                 'last_apply_date' => $vacancy->last_apply_date?->format('Y-m-d'),
-                'is_expired' => false,
-                'requirements' => $requirements,
                 'created_at' => $vacancy->created_at?->toISOString(),
+
                 'seo_title' => $translation?->seo_title ?? '',
                 'seo_description' => $translation?->seo_description ?? '',
                 'seo_keywords' => $translation?->seo_keywords ?? '',
+
+                'requirements' => $requirements,
+
                 'translates' => [
                     'slug' => $slugTranslations
                 ],
 
-                // ✅ FULL IVacancy list
+                // ✅ Əlavə edildi
                 'other_vacancies' => $otherVacancies
             ];
         });
@@ -227,7 +202,6 @@ public function show(Request $request, string $slug): JsonResponse
         ], 500);
     }
 }
-
 
 
 } 
