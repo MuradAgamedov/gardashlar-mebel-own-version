@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+
 use App\Models\Dictionary;
 
 class AuthController extends Controller
@@ -40,30 +41,30 @@ class AuthController extends Controller
             'password_confirmation' => 'required|string|min:6',
             'fin' => ['nullable', 'regex:/^[A-NP-Z0-9]{7}$/'],
         ], [
-            'full_name.required' => Dictionary::getValue('full_name_required', $request->header('locale', 'az')),
-            'phone.nullable' => Dictionary::getValue('phone_nullable', $request->header('locale', 'az')),
-            'email.nullable' => Dictionary::getValue('email_nullable', $request->header('locale', 'az')),
-            'email.email' => Dictionary::getValue('email_email', $request->header('locale', 'az')),
-            'email.unique' => Dictionary::getValue('email_unique', $request->header('locale', 'az')),
-            'password.required' => Dictionary::getValue('password_required', $request->header('locale', 'az')),
-            'password.min' => Dictionary::getValue('password_min', $request->header('locale', 'az')),
-            'password.confirmed' => Dictionary::getValue('password_confirmed', $request->header('locale', 'az')),
-            'password_confirmation.required' => Dictionary::getValue('password_confirmation_required', $request->header('locale', 'az')),
-            'fin.regex' => Dictionary::getValue('fin_regex', $request->header('locale', 'az')),
+            'full_name.required' => 'Ad və soyad məcburidir',
+            'phone.nullable' => 'Telefon nömrəsi seçimlidir',
+            'email.nullable' => 'Email ünvanı seçimlidir',
+            'email.email' => 'Düzgün email ünvanı daxil edin',
+            'email.unique' => 'Bu email ünvanı artıq istifadə olunub',
+            'password.required' => 'Şifrə məcburidir',
+            'password.min' => 'Şifrə ən azı 6 simvol olmalıdır',
+            'password.confirmed' => 'Şifrə təkrarı düzgün deyil',
+            'password_confirmation.required' => 'Şifrə təkrarı məcburidir',
+            'fin.regex' => 'FIN yalnız 7 simvoldan ibarət olmalı və A-N, P-Z və 0-9 aralığında olmalıdır',
         ]);
         
 
         // Custom validation: either phone or email must be provided
         $validator->after(function ($validator) use ($request) {
             if (empty($request->phone) && empty($request->email)) {
-                $validator->errors()->add('contact_info', Dictionary::getValue('contact_info_required'));
+                $validator->errors()->add('contact_info', 'Telefon nömrəsi və ya email ünvanından ən azı biri məcburidir');
             }
         });
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => Dictionary::getValue('validation_failed'),
+                'message' => 'Validation failed',
                 'errors' => $validator->errors()
             ], 422);
         }
@@ -107,9 +108,9 @@ class AuthController extends Controller
             } elseif (!empty($request->phone)) {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('phone_registration_not_available'),
+                    'message' => 'Telefon nömrəsi ilə qeydiyyat hələ mövcud deyil',
                     'errors' => [
-                        'phone' => [Dictionary::getValue('phone_registration_not_available')]
+                        'phone' => ['Telefon nömrəsi ilə qeydiyyat hələ mövcud deyil']
                     ]
                 ], 422);
             }
@@ -119,16 +120,16 @@ class AuthController extends Controller
                 $user->delete(); // Delete the created user
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('otp_send_failed', $request->header('locale', 'az')),
+                    'message' => 'OTP kodu göndərilə bilmədi. Zəhmət olmasa yenidən cəhd edin.',
                     'errors' => [
-                        'otp' => [Dictionary::getValue('otp_send_failed')]
+                        'otp' => ['OTP kodu göndərilə bilmədi']
                     ]
                 ], 500);
             }
 
             $response = [
                 'success' => true,
-                'message' => Dictionary::getValue('registration_success_otp_sent'),
+                'message' => 'İstifadəçi uğurla qeydiyyatdan keçdi və OTP kodu göndərildi',
                 'data' => [
                     'user' => [
                         'id' => $user->id,
@@ -155,7 +156,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => Dictionary::getValue('registration_error', $request->header('locale', 'az')),
+                'message' => 'Qeydiyyat zamanı xəta baş verdi',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -168,22 +169,22 @@ class AuthController extends Controller
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email',
         ], [
-            'phone.nullable' => Dictionary::getValue('phone_nullable', $request->header('locale', 'az')),
-            'email.nullable' => Dictionary::getValue('email_nullable', $request->header('locale', 'az')),
-            'email.email' => Dictionary::getValue('email_email', $request->header('locale', 'az')),
+            'phone.nullable' => 'Telefon nömrəsi seçimlidir',
+            'email.nullable' => 'Email ünvanı seçimlidir',
+            'email.email' => 'Düzgün email ünvanı daxil edin',
         ]);
 
         // Custom validation: either phone or email must be provided
         $validator->after(function ($validator) use ($request) {
             if (empty($request->phone) && empty($request->email)) {
-                $validator->errors()->add('contact_info', Dictionary::getValue('contact_info_required', $request->header('locale', 'az')));
+                $validator->errors()->add('contact_info', 'Telefon nömrəsi və ya email ünvanından ən azı biri məcburidir');
             }
         });
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => Dictionary::getValue('validation_failed', $request->header('locale', 'az')),
+                'message' => 'Validation failed',
                 'errors' => $validator->errors()
             ], 422);
         }
@@ -195,7 +196,7 @@ class AuthController extends Controller
                 if ($sent) {
                     return response()->json([
                         'success' => true,
-                        'message' => Dictionary::getValue('otp_sent_to_email', $request->header('locale', 'az')),
+                        'message' => 'OTP kodu email ünvanına göndərildi',
                         'data' => [
                             'contact_type' => 'email',
                             'contact_info' => $request->email,
@@ -203,6 +204,409 @@ class AuthController extends Controller
                         ]
                     ]);
                 }
+            } elseif (!empty($request->phone)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Telefon nömrəsi ilə OTP göndərilməsi hələ mövcud deyil',
+                    'errors' => [
+                        'phone' => ['Telefon nömrəsi ilə OTP göndərilməsi hələ mövcud deyil']
+                    ]
+                ], 422);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP kodu göndərilə bilmədi'
+            ], 500);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP göndərilməsi zamanı xəta baş verdi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'nullable|email',
+            'phone' => 'nullable|string|max:20',
+            'password' => 'required|string',
+        ], [
+            'email.nullable' => Dictionary::getValue('email_nullable'),
+            'email.email' => Dictionary::getValue('email_email'),
+            'phone.nullable' => Dictionary::getValue('phone_nullable'),
+            'password.required' => Dictionary::getValue('password_required'),
+        ]);
+
+        // Custom validation: either phone or email must be provided
+        $validator->after(function ($validator) use ($request) {
+            if (empty($request->phone) && empty($request->email)) {
+                $validator->errors()->add('contact_info', __('Telefon nömrəsi və ya email ünvanından ən azı biri məcburidir'));
+            }
+        });
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Find user by email or phone
+            $user = null;
+            if (!empty($request->email)) {
+                $user = User::where('email', $request->email)->first();
+            } elseif (!empty($request->phone)) {
+                $user = User::where('phone', $request->phone)->first();
+            }
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => Dictionary::getValue('user_not_found'),
+                    'errors' => [
+                        'credentials' => [Dictionary::getValue('invalid_credentials'),]
+                    ]
+                ], 401);
+            }
+
+            // Check if user email is verified
+            \Log::info('Login verification check', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'email_verified_at' => $user->email_verified_at,
+                'is_null_check' => is_null($user->email_verified_at)
+            ]);
+
+            if (is_null($user->email_verified_at)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => Dictionary::getValue('account_not_verified'),
+                    'errors' => [
+                        'verification' => [Dictionary::getValue('verify_account')]
+                    ]
+                ], 403);
+            }
+
+            // Check password
+            if (!Hash::check($request->password, $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => Dictionary::getValue('invalid_credentials'),
+                    'errors' => [
+                        'credentials' => [Dictionary::getValue('invalid_credentials')]
+                    ]
+                ], 401);
+            }
+
+            // Generate token
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'success' => true,
+                'message' => Dictionary::getValue('success_login'),
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'surname' => $user->surname,
+                        'phone' => $user->phone,
+                        'email' => $user->email,
+                        'fin' => $user->fin,
+                        'email_verified' => !is_null($user->email_verified_at),
+                        'email_verified_at' => $user->email_verified_at ? $user->email_verified_at->toDateTimeString() : null
+                    ],
+                    'token' => $token,
+                    'token_type' => 'Bearer'
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Login error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => Dictionary::getValue('login_error', $request->header("locale")),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+   
+    public function logout(Request $request)
+    {
+        try {
+            $request->user()->currentAccessToken()->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => Dictionary::getValue('success_logout')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => Dictionary::getValue('logout_error'),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+   
+    public function resendOTP(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email',
+            'purpose' => 'nullable|string|in:registration,password_reset',
+        ], [
+            'phone.nullable' => Dictionary::getValue('phone_nullable'),
+            'email.nullable' => Dictionary::getValue('email_nullable'),
+            'email.email' => Dictionary::getValue('email_email'),
+            'purpose.in' => Dictionary::getValue('purpose_in'),
+        ]);
+
+        // Custom validation: either phone or email must be provided
+        $validator->after(function ($validator) use ($request) {
+            if (empty($request->phone) && empty($request->email)) {
+                $validator->errors()->add('contact_info', Dictionary::getValue('contact_info'));
+            }
+        });
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $contactInfo = !empty($request->email) ? $request->email : $request->phone;
+            $contactType = !empty($request->email) ? 'email' : 'phone';
+            $purpose = $request->purpose ?? 'registration';
+
+            // Rate limiting: Check if OTP was sent recently (within 1 minute)
+            $recentOtp = \App\Models\OtpCode::where('contact_info', $contactInfo)
+                ->where('contact_type', $contactType)
+                ->where('created_at', '>', \Carbon\Carbon::now()->subMinute())
+                ->first();
+
+            if ($recentOtp) {
+                return response()->json([
+                    'success' => false,
+                    'message' => Dictionary::getValue('rate_limit'),
+                    'errors' => [
+                        'rate_limit' => [Dictionary::getValue('rate_limit')]
+                    ]
+                ], 429);
+            }
+
+            $otpSent = false;
+
+            if (!empty($request->email)) {
+                $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+                try {
+                    // Store OTP in database
+                    \App\Models\OtpCode::create([
+                        'contact_info' => $request->email,
+                        'contact_type' => 'email',
+                        'otp_code' => $otp,
+                        'expires_at' => \Carbon\Carbon::now()->addMinutes(10),
+                        'is_used' => false,
+                        'purpose' => $purpose
+                    ]);
+
+                    // Send email with appropriate subject
+                    $subject = $purpose === 'password_reset' ? 'Şifrə Yeniləmə' : 'OTP Kodu';
+                    \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OTPMail($otp, $subject));
+                    $otpSent = true;
+
+                    \Log::info('OTP resent successfully', [
+                        'email' => $request->email,
+                        'otp' => $otp
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to resend OTP via email', [
+                        'email' => $request->email,
+                        'error' => $e->getMessage()
+                    ]);
+                    $otpSent = false;
+                }
+            } elseif (!empty($request->phone)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => Dictionary::getValue('otp_not_available'),
+                    'errors' => [
+                        'phone' => [Dictionary::getValue('otp_not_available')]
+                    ]
+                ], 422);
+            }
+
+            if ($otpSent) {
+                return response()->json([
+                    'success' => true,
+                    'message' => Dictionary::getValue('otp_sent'),
+                    'data' => [
+                        'contact_type' => $contactType,
+                        'contact_info' => $contactInfo,
+                        'otp_sent' => true,
+                        'expires_at' => now()->addMinutes(10)->toISOString()
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => Dictionary::getValue('otp_not_sent'),
+                ], 500);
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Resend OTP error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $request->all()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => Dictionary::getValue('otp_not_sent'),
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+  
+    public function verifyOTP(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email',
+            'otp_code' => 'required|string|size:6',
+        ], [
+            'phone.nullable' => Dictionary::getValue('phone_nullable'),
+            'email.nullable' => Dictionary::getValue('email_nullable'),
+            'email.email' => Dictionary::getValue('email_email'),
+            'otp_code.required' => Dictionary::getValue('otp_code_required'),
+            'otp_code.size' => Dictionary::getValue('otp_code_size'),
+        ]);
+
+        // Custom validation: either phone or email must be provided
+        $validator->after(function ($validator) use ($request) {
+            if (empty($request->phone) && empty($request->email)) {
+                $validator->errors()->add('contact_info', 'Telefon nömrəsi və ya email ünvanından ən azı biri məcburidir');
+            }
+        });
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $otpVerified = false;
+            $contactType = '';
+            $contactInfo = '';
+
+            if (!empty($request->email)) {
+                $otpVerified = $this->emailService->verifyOTP($request->email, $request->otp_code, 'registration');
+                $contactType = 'email';
+                $contactInfo = $request->email;
+            } elseif (!empty($request->phone)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Telefon nömrəsi ilə OTP təsdiqləməsi hələ mövcud deyil',
+                    'errors' => [
+                        'phone' => ['Telefon nömrəsi ilə OTP təsdiqləməsi hələ mövcud deyil']
+                    ]
+                ], 422);
+            }
+
+            if ($otpVerified) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'OTP kodu uğurla təsdiqləndi',
+                    'data' => [
+                        'contact_type' => $contactType,
+                        'contact_info' => $contactInfo,
+                        'verified' => true
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'OTP kodu düzgün deyil və ya vaxtı keçib',
+                    'errors' => [
+                        'otp_code' => ['OTP kodu düzgün deyil və ya vaxtı keçib']
+                    ]
+                ], 422);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP təsdiqləməsi zamanı xəta baş verdi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+   
+    public function forgotPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ], [
+            'email.required' => 'Email ünvanı məcburidir',
+            'email.email' => 'Düzgün email ünvanı daxil edin',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Check if user exists
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bu email ünvanı ilə istifadəçi tapılmadı',
+                    'errors' => [
+                        'email' => ['Bu email ünvanı ilə qeydiyyatdan keçmiş istifadəçi yoxdur']
+                    ]
+                ], 404);
+            }
+
+            // Rate limiting: Check if OTP was sent recently (within 1 minute)
+            $recentOtp = \App\Models\OtpCode::where('contact_info', $request->email)
+                ->where('contact_type', 'email')
+                ->where('created_at', '>', \Carbon\Carbon::now()->subMinute())
+                ->first();
+
+            if ($recentOtp) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Çox tez-tez cəhd etmisiniz. Zəhmət olmasa 1 dəqiqə gözləyin.',
+                    'errors' => [
+                        'rate_limit' => ['1 dəqiqə ərzində yalnız bir dəfə OTP göndərə bilərsiniz']
+                    ]
+                ], 429);
             }
 
             // Generate and send OTP
@@ -219,7 +623,7 @@ class AuthController extends Controller
             ]);
 
             // Send email
-            \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OTPMail($otp, Dictionary::getValue('password_reset_subject', $request->header('locale', 'az'))));
+            \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\OTPMail($otp, 'Şifrə Yeniləmə'));
 
             \Log::info('Password reset OTP sent', [
                 'email' => $request->email,
@@ -228,7 +632,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => Dictionary::getValue('password_reset_link_sent', $request->header('locale', 'az')),
+                'message' => 'Şifrə yeniləmə üçün OTP kodu göndərildi',
                 'data' => [
                     'email' => $request->email,
                     'otp_sent' => true,
@@ -245,40 +649,37 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => Dictionary::getValue('password_reset_error', $request->header('locale', 'az')),
+                'message' => 'OTP göndərilməsi zamanı xəta baş verdi',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
+   
     public function verifyResetOTP(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'contact_info' => 'required|string',
+            'email' => 'required|email',
             'otp_code' => 'required|string|size:6',
-            'contact_type' => 'required|in:email,phone',
-            'purpose' => 'nullable|string|in:registration,reset_password,email_change',
         ], [
-            'contact_info.required' => Dictionary::getValue('contact_info_required', $request->header('locale', 'az')),
-            'otp_code.required' => Dictionary::getValue('otp_code_required', $request->header('locale', 'az')),
-            'otp_code.size' => Dictionary::getValue('otp_code_size', $request->header('locale', 'az')),
-            'contact_type.required' => Dictionary::getValue('contact_type_required', $request->header('locale', 'az')),
-            'contact_type.in' => Dictionary::getValue('contact_type_invalid', $request->header('locale', 'az')),
-            'purpose.in' => Dictionary::getValue('purpose_invalid', $request->header('locale', 'az'))
+            'email.required' => 'Email ünvanı məcburidir',
+            'email.email' => 'Düzgün email ünvanı daxil edin',
+            'otp_code.required' => 'OTP kodu məcburidir',
+            'otp_code.size' => 'OTP kodu 6 simvol olmalıdır',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => Dictionary::getValue('validation_failed', $request->header('locale', 'az')),
+                'message' => 'Validation failed',
                 'errors' => $validator->errors()
             ], 422);
         }
 
         try {
             // Find the OTP record
-            $otpRecord = \App\Models\OtpCode::where('contact_info', $request->contact_info)
-                ->where('contact_type', $request->contact_type)
+            $otpRecord = \App\Models\OtpCode::where('contact_info', $request->email)
+                ->where('contact_type', 'email')
                 ->where('is_used', false)
                 ->where('expires_at', '>', \Carbon\Carbon::now())
                 ->latest()
@@ -287,9 +688,9 @@ class AuthController extends Controller
             if (!$otpRecord || $otpRecord->otp_code !== $request->otp_code) {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('invalid_otp', $request->header('locale', 'az')),
+                    'message' => 'OTP kodu düzgün deyil və ya vaxtı keçib',
                     'errors' => [
-                        'otp_code' => [Dictionary::getValue('invalid_otp', $request->header('locale', 'az'))]
+                        'otp_code' => ['OTP kodu düzgün deyil və ya vaxtı keçib']
                     ]
                 ], 422);
             }
@@ -301,18 +702,18 @@ class AuthController extends Controller
             $resetToken = bin2hex(random_bytes(32));
 
             // Store reset token in cache for 10 minutes
-            \Cache::put("password_reset_token_{$resetToken}", $request->contact_info, 600);
+            \Cache::put("password_reset_token_{$resetToken}", $request->email, 600);
 
             \Log::info('Password reset OTP verified', [
-                'contact_info' => $request->contact_info,
+                'email' => $request->email,
                 'reset_token' => $resetToken
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => Dictionary::getValue('password_reset_otp_verified', $request->header('locale', 'az')),
+                'message' => 'OTP təsdiqləndi. İndi yeni şifrə təyin edə bilərsiniz',
                 'data' => [
-                    'contact_info' => $request->contact_info,
+                    'email' => $request->email,
                     'verified' => true,
                     'reset_token' => $resetToken
                 ]
@@ -322,16 +723,128 @@ class AuthController extends Controller
             \Log::error('Verify reset OTP error', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
-                'contact_info' => $request->contact_info
+                'email' => $request->email
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => Dictionary::getValue('password_reset_error', $request->header('locale', 'az')),
+                'message' => 'OTP təsdiqləməsi zamanı xəta baş verdi',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
+
+   
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'reset_token' => 'required|string',
+            'password' => 'required|string|min:8|confirmed',
+            'password_confirmation' => 'required|string|min:8',
+        ], [
+            'reset_token.required' => 'Reset token məcburidir',
+            'password.required' => 'Şifrə məcburidir',
+            'password.min' => 'Şifrə ən azı 8 simvol olmalıdır',
+            'password.confirmed' => 'Şifrə təkrarı düzgün deyil',
+            'password_confirmation.required' => 'Şifrə təkrarı məcburidir',
+        ]);
+
+        // Additional password validation with regex (like RegisterController)
+        $validator->after(function ($validator) use ($request) {
+            $password = $request->password;
+            if (!empty($password)) {
+                if (!preg_match('/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/', $password)) {
+                    $validator->errors()->add('password', 'Şifrədə ən azı bir xüsusi simvol olmalıdır (!@#$%^&* və s.)');
+                }
+                if (!preg_match('/\d/', $password)) {
+                    $validator->errors()->add('password', 'Şifrədə ən azı bir rəqəm olmalıdır');
+                }
+                if (!preg_match('/[A-Z]/', $password)) {
+                    $validator->errors()->add('password', 'Şifrədə ən azı bir böyük hərf olmalıdır');
+                }
+            }
+        });
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Get email from cache using reset token
+            $email = \Cache::get("password_reset_token_{$request->reset_token}");
+
+            if (!$email) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Reset token düzgün deyil və ya vaxtı keçib',
+                    'errors' => [
+                        'reset_token' => ['Reset token düzgün deyil və ya vaxtı keçib']
+                    ]
+                ], 422);
+            }
+
+            // Find user
+            $user = User::where('email', $email)->first();
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'İstifadəçi tapılmadı',
+                    'errors' => [
+                        'email' => ['Bu email ünvanı ilə istifadəçi tapılmadı']
+                    ]
+                ], 404);
+            }
+
+            // Update password
+            $user->password = Hash::make($request->password);
+
+            // BONUS: If email not verified, verify it now
+            $emailVerified = false;
+            if (is_null($user->email_verified_at)) {
+                $user->email_verified_at = now();
+                $emailVerified = true;
+            }
+
+            $user->save();
+
+            // Remove reset token from cache
+            \Cache::forget("password_reset_token_{$request->reset_token}");
+
+            \Log::info('Password reset successfully', [
+                'email' => $email,
+                'email_verified' => $emailVerified
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Şifrə uğurla yeniləndi' . ($emailVerified ? ' və email təsdiqləndi' : ''),
+                'data' => [
+                    'email' => $email,
+                    'password_reset' => true,
+                    'email_verified' => !is_null($user->email_verified_at),
+                    'email_verified_now' => $emailVerified
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Reset password error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'reset_token' => $request->reset_token
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Şifrə yeniləməsi zamanı xəta baş verdi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
    
     public function updateProfile(Request $request)
     {
@@ -353,14 +866,14 @@ class AuthController extends Controller
                 'surname.max' => 'Soyad 255 simvoldan çox ola bilməz',
                 'phone.string' => 'Telefon nömrəsi mətn formatında olmalıdır',
                 'phone.max' => 'Telefon nömrəsi 20 simvoldan çox ola bilməz',
-                'email.email' => Dictionary::getValue('email_email', $request->header('locale', 'az')),
-                'email.unique' => Dictionary::getValue('email_unique', $request->header('locale', 'az')),
+                'email.email' => 'Düzgün email ünvanı daxil edin',
+                'email.unique' => 'Bu email ünvanı artıq istifadə olunub',
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('validation_failed', $request->header('locale', 'az')),
+                    'message' => 'Validation failed',
                     'errors' => $validator->errors()
                 ], 422);
             }
@@ -435,8 +948,8 @@ class AuthController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => $otpSent ?
-                    Dictionary::getValue('profile_updated_otp_sent', $request->header('locale', 'az')) :
-                    Dictionary::getValue('profile_updated', $request->header('locale', 'az')),
+                    'Profil yeniləndi. Yeni email ünvanınıza təsdiq kodu göndərildi' :
+                    'Profil uğurla yeniləndi',
                 'data' => $responseData
             ]);
 
@@ -449,7 +962,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => Dictionary::getValue('profile_update_error', $request->header('locale', 'az')),
+                'message' => 'Profil yeniləməsi zamanı xəta baş verdi',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -472,7 +985,7 @@ class AuthController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('validation_failed', $request->header('locale', 'az')),
+                    'message' => 'Validation failed',
                     'errors' => $validator->errors()
                 ], 422);
             }
@@ -481,9 +994,9 @@ class AuthController extends Controller
             if (!$user->pending_email) {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('email_change_request_not_found', $request->header('locale', 'az')),
+                    'message' => 'Email dəyişmə sorğusu tapılmadı',
                     'errors' => [
-                        'pending_email' => [Dictionary::getValue('no_active_email_change_request', $request->header('locale', 'az'))]
+                        'pending_email' => ['Aktiv email dəyişmə sorğusu yoxdur']
                     ]
                 ], 422);
             }
@@ -499,9 +1012,9 @@ class AuthController extends Controller
 
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('email_change_request_expired', $request->header('locale', 'az')),
+                    'message' => 'Email dəyişmə sorğusunun vaxtı keçib',
                     'errors' => [
-                        'expired' => [Dictionary::getValue('please_try_again', $request->header('locale', 'az'))]
+                        'expired' => ['Zəhmət olmasa yenidən cəhd edin']
                     ]
                 ], 422);
             }
@@ -512,9 +1025,9 @@ class AuthController extends Controller
             if (!$otpValid) {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('invalid_otp', $request->header('locale', 'az')),
+                    'message' => 'OTP kod düzgün deyil',
                     'errors' => [
-                        'otp_code' => [Dictionary::getValue('invalid_otp', $request->header('locale', 'az'))]
+                        'otp_code' => ['OTP kod düzgün deyil']
                     ]
                 ], 422);
             }
@@ -536,7 +1049,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => Dictionary::getValue('email_verified_and_changed', $request->header('locale', 'az')),
+                'message' => 'Email uğurla təsdiqləndi və dəyişdirildi',
                 'data' => [
                     'user' => [
                         'id' => $user->id,
@@ -559,7 +1072,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => Dictionary::getValue('email_verification_error', $request->header('locale', 'az')),
+                'message' => 'Email təsdiqi zamanı xəta baş verdi',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -575,9 +1088,9 @@ class AuthController extends Controller
             if (!$user->pending_email) {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('no_active_email_change_request', $request->header('locale', 'az')),
+                    'message' => 'Aktiv email dəyişmə sorğusu yoxdur',
                     'errors' => [
-                        'pending_email' => [Dictionary::getValue('email_change_request_not_found', $request->header('locale', 'az'))]
+                        'pending_email' => ['Email dəyişmə sorğusu tapılmadı']
                     ]
                 ], 422);
             }
@@ -597,7 +1110,7 @@ class AuthController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'message' => Dictionary::getValue('otp_resent', $request->header('locale', 'az')),
+                    'message' => 'OTP kodu yenidən göndərildi',
                     'data' => [
                         'otp_sent' => true,
                         'expires_at' => now()->addMinutes(10)->toISOString()
@@ -606,9 +1119,9 @@ class AuthController extends Controller
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('otp_send_failed', $request->header('locale', 'az')),
+                    'message' => 'OTP göndərilə bilmədi',
                     'errors' => [
-                        'otp' => [Dictionary::getValue('otp_send_error', $request->header('locale', 'az'))]
+                        'otp' => ['OTP göndərilməsi zamanı xəta baş verdi']
                     ]
                 ], 500);
             }
@@ -622,7 +1135,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => Dictionary::getValue('otp_resend_error', $request->header('locale', 'az')),
+                'message' => 'OTP yenidən göndərilməsi zamanı xəta baş verdi',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -637,7 +1150,7 @@ class AuthController extends Controller
             if (!$user) {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('user_not_found', $request->header('locale', 'az')),
+                    'message' => 'İstifadəçi tapılmadı'
                 ], 401);
             }
 
@@ -653,14 +1166,14 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => Dictionary::getValue('user_info_retrieved'),
+                'message' => 'İstifadəçi məlumatları uğurla alındı',
                 'data' => $userData
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => Dictionary::getValue('user_info_retrieval_error'),
+                'message' => 'İstifadəçi məlumatları alınarkən xəta baş verdi',
                 'error' => $e->getMessage()
             ], 500);
         }
