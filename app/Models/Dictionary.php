@@ -44,7 +44,7 @@ class Dictionary extends Model
 
         $dictionary = static::where('keyword', $keyword)->first();
         if (!$dictionary) {
-            return $keyword; // Return keyword if translation not found
+            return $keyword;
         }
 
         $translation = $dictionary->translates()->where('language_id', $languageId)->first();
