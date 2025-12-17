@@ -118,7 +118,7 @@
         </table>
 
         <div class="mt-3">
-            {{ $orders->links('bootstrap::pagination') }}
+            {{ $orders->links('bootstrap-5::pagination') }}
         </div>
     </div>
 </div>
