@@ -1,3 +1,29 @@
+
+<style>
+.pagination {
+    gap: 6px;
+}
+
+.page-item .page-link {
+    border-radius: 6px;
+    padding: 6px 12px;
+    color: #0d6efd;
+    border: 1px solid #dee2e6;
+}
+
+.page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
+}
+
+.page-item.disabled .page-link {
+    color: #adb5bd;
+    background-color: #f8f9fa;
+}
+
+
+</style>
 @if ($paginator->hasPages())
     <nav>
         <ul class="pagination">

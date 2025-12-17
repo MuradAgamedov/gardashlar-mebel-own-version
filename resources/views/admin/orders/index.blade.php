@@ -117,9 +117,10 @@
             </tbody>
         </table>
 
-        <div class="mt-3">
-            {{ $orders->links() }}
+        <div class="mt-4 d-flex justify-content-center">
+            {{ $orders->links('vendor.pagination.bootstrap-4') }}
         </div>
+
     </div>
 </div>
 
