@@ -10,9 +10,21 @@ class OrderRepository extends BaseRepository
     {
     }
 
-    public function getOrders()
+    public function getOrders($request = null)
     {
-        return $this->order->latest()->paginate(10);
+        $query = $this->order->latest();
+        
+        if ($request) {
+            if ($request->filled('delivery_method')) {
+                $query->where('delivery_method', $request->delivery_method);
+            }
+            
+            if ($request->filled('payment_method')) {
+                $query->where('payment_method', $request->payment_method);
+            }
+        }
+        
+        return $query->paginate(10);
     }
 
     public function findOrder($id)

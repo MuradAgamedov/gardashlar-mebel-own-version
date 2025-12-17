@@ -14,7 +14,7 @@ class PaymentController extends Controller
 
     public function index(Request $request)
     {
-        $orders = $this->repository->getOrders();
+        $orders = $this->repository->getOrders($request);
         return view("admin.orders.index", compact('orders'));
     }
 

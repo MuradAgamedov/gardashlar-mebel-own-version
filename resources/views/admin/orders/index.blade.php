@@ -7,6 +7,45 @@
     <div class="container-fluid">
         <h3 class="mb-4">Orders</h3>
 
+        <!-- Filter Section -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="GET" action="{{ route('admin.orders.index') }}" id="filter-form">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="delivery_method" class="form-label">Delivery Method</label>
+                            <select name="delivery_method" id="delivery_method" class="form-select">
+                                <option value="">All Delivery Methods</option>
+                                <option value="pickup" {{ request('delivery_method') == 'pickup' ? 'selected' : '' }}>Pickup</option>
+                                <option value="delivery" {{ request('delivery_method') == 'delivery' ? 'selected' : '' }}>Delivery</option>
+                                <option value="express" {{ request('delivery_method') == 'express' ? 'selected' : '' }}>Express</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="payment_method" class="form-label">Payment Method</label>
+                            <select name="payment_method" id="payment_method" class="form-select">
+                                <option value="">All Payment Methods</option>
+                                <option value="cash" {{ request('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
+                                <option value="card" {{ request('payment_method') == 'card' ? 'selected' : '' }}>Card</option>
+                                <option value="credit" {{ request('payment_method') == 'credit' ? 'selected' : '' }}>Credit</option>
+                                <option value="online" {{ request('payment_method') == 'online' ? 'selected' : '' }}>Online</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <div class="btn-group w-100">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                                <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Reset
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
@@ -103,6 +142,15 @@
 @push('scripts')
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    // Auto-submit filter form when dropdown values change
+    document.getElementById('delivery_method').addEventListener('change', function() {
+        document.getElementById('filter-form').submit();
+    });
+    
+    document.getElementById('payment_method').addEventListener('change', function() {
+        document.getElementById('filter-form').submit();
+    });
+
     document.querySelectorAll(".show-order").forEach(btn => {
         btn.addEventListener("click", function() {
             let html = `
