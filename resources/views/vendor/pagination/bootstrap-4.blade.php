@@ -18,10 +18,12 @@
     color: #ffffff;
 }
 
-.page-item.active .page-link {
-    background-color: #308e87;
-    border-color: #308e87;
-    color: #ffffff;
+/* 🔴 ƏSAS DÜZƏLİŞ BURDADIR */
+.page-item.active > .page-link,
+.page-item.active > span.page-link {
+    background-color: #308e87 !important;
+    border-color: #308e87 !important;
+    color: #ffffff !important;
 }
 
 .page-item.disabled .page-link {
@@ -30,6 +32,7 @@
     border-color: #dee2e6;
     cursor: not-allowed;
 }
+
 </style>
 
 @if ($paginator->hasPages())
