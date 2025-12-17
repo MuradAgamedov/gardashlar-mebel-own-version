@@ -34,10 +34,10 @@
                         <div class="col-md-4 d-flex align-items-end">
                             <div class="btn-group w-100">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-filter"></i> Filter
+                                    <i class="fas fa-filter"></i> 
                                 </button>
                                 <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">
-                                    <i class="fas fa-times"></i> Reset
+                                    <i class="fas fa-times"></i> 
                                 </a>
                             </div>
                         </div>
