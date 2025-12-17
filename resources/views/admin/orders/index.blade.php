@@ -33,11 +33,11 @@
                         </div>
                         <div class="col-md-4 d-flex align-items-end">
                             <div class="btn-group w-100">
-                                <button style="width: max-content" type="submit" class="btn btn-primary">
-                                    <i class="fas fa-filter"></i> Filter
+                                <button type="submit" class="btn btn-primary" title="Filter">
+                                    <i class="fas fa-filter"></i>
                                 </button>
-                                <a style="width: max-content" href="{{ route('admin.orders.index') }}" class="btn btn-secondary">
-                                    <i class="fas fa-times"></i> Clear
+                                <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary" title="Clear">
+                                    <i class="fas fa-times"></i>
                                 </a>
                             </div>
                         </div>
