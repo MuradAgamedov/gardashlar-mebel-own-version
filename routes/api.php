@@ -321,6 +321,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/add-cart', [CartController::class, 'addCart'])->name('api.addCart');
     Route::get('/get-cart', [CartController::class, 'getCart'])->name('api.getCart');
     Route::delete('/remove-cart', [CartController::class, 'removeCart'])->name('api.removeCart');
+    Route::post('/favorite-products-add-to-cart', [CartController::class, 'favoriteProductsAddToCart'])->name('api.favoriteProductsAddToCart');
     Route::delete('/remove-compare', [CompareController::class, 'removeCompare'])->name('api.removeCompare');
     Route::post('/reset-compare', [CompareController::class, 'resetCompare'])->name('api.resetCompare');
 

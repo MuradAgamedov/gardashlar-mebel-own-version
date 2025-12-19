@@ -8,6 +8,7 @@ use App\Models\Cart;
 use App\Traits\LocaleFromHeader;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use Illuminate\Support\Facades\Validator;
 
 class CartController extends Controller
 {
@@ -42,6 +43,63 @@ class CartController extends Controller
             'success' => true,
             'message' => 'Product added to cart successfully!',
             'data' => $cart
+        ]);
+    }
+
+    public function favoriteProductsAddToCart(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You must be logged in to complete this transaction!'
+            ], 401);
+        }
+
+        $items = $request->all();
+
+        if (!is_array($items) || empty($items)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Request payload must be a non-empty array of items.'
+            ], 422);
+        }
+
+        $validator = Validator::make($items, [
+            '*.product_id' => 'required|integer|exists:products,id',
+            '*.color_id' => 'nullable|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $addedItems = [];
+
+        foreach ($items as $item) {
+            $cart = Cart::updateOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'product_id' => $item['product_id'],
+                ],
+                [
+                    'color_id' => $item['color_id'] ?? null,
+                    'count' => 1,
+                ]
+            );
+
+            $addedItems[] = $cart;
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Favorite products added to cart successfully!',
+            'data' => $addedItems,
         ]);
     }
 
