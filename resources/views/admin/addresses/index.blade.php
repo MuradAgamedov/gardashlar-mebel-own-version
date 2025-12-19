@@ -125,20 +125,13 @@
                                                                     <div>
                                                                         <div class="d-flex align-items-center">
                                                                             <i class="material-icons-outlined text-muted me-1" style="font-size: 14px;">location_on</i>
-                                                                            @php
-                                                                                $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
-                                                                                $mainAddressTranslate = $address->translates->firstWhere('language_id', $mainLanguageId)
-                                                                                    ?? $address->translates->first();
-                                                                            @endphp
                                                                             <div class="small">
-                                                                                @if($mainAddressTranslate)
+                                                                                @foreach($address->translates as $translate)
                                                                                     <div class="d-flex align-items-center">
-                                                                                        <span class="badge bg-light text-dark me-1" style="font-size: 8px;">{{ $mainAddressTranslate->language->lang_code }}</span>
-                                                                                        <span class="text-truncate" style="max-width: 200px;">{{ $mainAddressTranslate->address }}</span>
+                                                                                        <span class="badge bg-light text-dark me-1" style="font-size: 8px;">{{ $translate->language->lang_code }}</span>
+                                                                                        <span class="text-truncate" style="max-width: 200px;">{{ $translate->address }}</span>
                                                                                     </div>
-                                                                                @else
-                                                                                    <span class="text-muted">No translation</span>
-                                                                                @endif
+                                                                                @endforeach
                                                                             </div>
                                                                         </div>
                                                                         <span class="badge bg-info mt-1" style="font-size: 10px;">Address</span>
