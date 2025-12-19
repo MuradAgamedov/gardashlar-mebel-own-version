@@ -102,8 +102,10 @@ class CartController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Favorite products added to cart successfully!',
-            'data' => $addedItems,
-            'cart_length' => $cartLength,
+            'data' => [
+                'cart' => $addedItems,
+                'length' => $cartLength,
+            ],
         ]);
     }
 
