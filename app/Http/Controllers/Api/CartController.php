@@ -96,10 +96,14 @@ class CartController extends Controller
             $addedItems[] = $cart;
         }
 
+        // Cari istifadəçinin cart-indakı item sayını hesabla
+        $cartLength = $user->cart()->count();
+
         return response()->json([
             'success' => true,
             'message' => 'Favorite products added to cart successfully!',
             'data' => $addedItems,
+            'cart_length' => $cartLength,
         ]);
     }
 
