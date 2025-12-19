@@ -39,7 +39,7 @@
                                         </tr>
                                         <tr>
                                             <td><strong>Company:</strong></td>
-                                            <td>{{ $action->company->translate()->first()->title ?? 'No Company' }}</td>
+                                            <td>{{ $action->company->translates->firstWhere('language_id', \App\Models\Language::getMainLanguage()->id)?->title ?? 'No Company' }}</td>
                                         </tr>
                                         <tr>
                                             <td><strong>Icon:</strong></td>

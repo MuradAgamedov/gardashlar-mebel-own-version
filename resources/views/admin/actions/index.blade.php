@@ -33,9 +33,13 @@
                                 <select name="company_id" class="form-select" onchange="this.form.submit()">
                                     <option value="">All Companies</option>
                                     @foreach($companies as $company)
+                                        @php
+                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                            $companyMainTranslate = $company->translates->firstWhere('language_id', $mainLanguageId);
+                                        @endphp
                                         <option value="{{ $company->id }}" 
                                                 {{ request('company_id') == $company->id ? 'selected' : '' }}>
-                                            {{ $company->translate()->first()->title ?? 'No Title' }}
+                                            {{ $companyMainTranslate?->title ?? 'No Title' }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -61,6 +65,11 @@
                             </thead>
                             <tbody>
                                 @forelse($actions as $action)
+                                    @php
+                                        $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                        $actionMainTranslate = $action->translates->firstWhere('language_id', $mainLanguageId);
+                                        $companyMainTranslate = $action->company?->translates->firstWhere('language_id', $mainLanguageId);
+                                    @endphp
                                     <tr>
                                         <td>{{ $action->id }}</td>
                                         <td>
@@ -71,13 +80,10 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @php
-                                                $mainTranslate = $action->translate()->first();
-                                            @endphp
-                                            {{ $mainTranslate->title ?? 'No Title' }}
+                                            {{ $actionMainTranslate?->title ?? 'No Title' }}
                                         </td>
                                         <td>
-                                            {{ $action->company->translate()->first()->title ?? 'No Company' }}
+                                            {{ $companyMainTranslate?->title ?? 'No Company' }}
                                         </td>
                                         <td>
                                             <span class="badge {{ $action->status ? 'bg-success' : 'bg-danger' }}">
