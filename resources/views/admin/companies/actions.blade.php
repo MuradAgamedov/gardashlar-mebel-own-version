@@ -11,8 +11,13 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h4 class="card-title mb-0">Products Management</h4>
+                            @php
+                                $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                $companyMainTranslate = $company->translates->firstWhere('language_id', $mainLanguageId)
+                                    ?? $company->translates->first();
+                            @endphp
                             <p class="text-muted mb-0">
-                                <strong>{{ $company->translate()->first()->title ?? 'No Company' }}</strong>
+                                <strong>{{ $companyMainTranslate?->title ?? 'No Company' }}</strong>
                             </p>
                         </div>
                         <div class="d-flex gap-2">
@@ -47,7 +52,9 @@
                             <div class="row">
                                 @forelse($products as $product)
                                     @php
-                                        $mainTranslate = $product->translate()->first();
+                                        $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                        $mainTranslate = $product->translates->firstWhere('language_id', $mainLanguageId)
+                                            ?? $product->translates->first();
                                         $isInAnyAction = $product->companyProducts->isNotEmpty();
                                     @endphp
                                     <div class="col-md-4 col-lg-3 mb-4">

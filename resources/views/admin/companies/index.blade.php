@@ -68,6 +68,11 @@
                                     </thead>
                                     <tbody id="sortable-list">
                                         @foreach($companies as $company)
+                                            @php
+                                                $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                $mainTranslate = $company->translates->firstWhere('language_id', $mainLanguageId)
+                                                    ?? $company->translates->first();
+                                            @endphp
                                             <tr data-id="{{ $company->id }}" class="sortable-item">
                                                 <td>
                                                     <div class="drag-handle">
@@ -80,9 +85,6 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    @php
-                                                        $mainTranslate = $company->translate()->first();
-                                                    @endphp
                                                     @if($mainTranslate && $mainTranslate->card_image)
                                                         <img src="{{ asset('storage/' . $mainTranslate->card_image) }}" 
                                                              alt="{{ $mainTranslate->card_image_alt_text ?? 'Card Image' }}" 
