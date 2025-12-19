@@ -65,6 +65,11 @@
                                     </thead>
                                     <tbody id="sortable-list">
                                         @foreach($administrations as $administration)
+                                            @php
+                                                $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                $mainTranslate = $administration->translates->firstWhere('language_id', $mainLanguageId)
+                                                    ?? $administration->translates->first();
+                                            @endphp
                                             <tr data-id="{{ $administration->id }}" class="sortable-item">
                                                 <td>
                                                     <div class="drag-handle">
@@ -91,9 +96,6 @@
                                                 </td>
                                                 <td>
                                                     <div>
-                                                        @php
-                                                            $mainTranslate = $administration->translate()->first();
-                                                        @endphp
                                                         <strong>{{ $mainTranslate?->title ?? 'No title' }}</strong>
                                                         @if($mainTranslate)
                                                             <span class="badge bg-info ms-1">{{ $mainTranslate->language->lang_code }}</span>
