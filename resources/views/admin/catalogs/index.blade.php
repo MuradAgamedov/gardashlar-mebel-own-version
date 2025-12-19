@@ -65,7 +65,9 @@
                                 <tbody id="sortable-catalogs">
                                     @forelse($catalogs as $catalog)
                                         @php
-                                            $firstTranslation = $catalog->translates->first();
+                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                            $firstTranslation = $catalog->translates->firstWhere('language_id', $mainLanguageId)
+                                                ?? $catalog->translates->first();
                                         @endphp
                                         <tr data-id="{{ $catalog->id }}">
                                             <td>

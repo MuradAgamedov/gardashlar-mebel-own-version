@@ -64,7 +64,9 @@
                                 <tbody id="sortable-certificates">
                                     @forelse($certificates as $certificate)
                                         @php
-                                            $firstTranslation = $certificate->translates->first();
+                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                            $firstTranslation = $certificate->translates->firstWhere('language_id', $mainLanguageId)
+                                                ?? $certificate->translates->first();
                                         @endphp
                                         <tr data-id="{{ $certificate->id }}">
                                             <td>

@@ -65,7 +65,9 @@
                                      <option value="">All Categories</option>
                                      @foreach($categories as $category)
                                          @php
-                                             $categoryTranslation = $category->translates->first();
+                                             $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                             $categoryTranslation = $category->translates->firstWhere('language_id', $mainLanguageId)
+                                                 ?? $category->translates->first();
                                          @endphp
                                          <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
                                              {{ $categoryTranslation ? $categoryTranslation->title : 'No title' }}
@@ -129,6 +131,13 @@
                                 </thead>
                                 <tbody>
                                     @forelse($blogPosts as $blogPost)
+                                        @php
+                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                            $firstTranslation = $blogPost->translates->firstWhere('language_id', $mainLanguageId)
+                                                ?? $blogPost->translates->first();
+                                            $categoryTranslation = $blogPost->category?->translates->firstWhere('language_id', $mainLanguageId)
+                                                ?? $blogPost->category?->translates->first();
+                                        @endphp
                                         <tr class="blog-post-row">
                                             <td>
                                                 <input type="checkbox" class="form-check-input blog-post-checkbox" value="{{ $blogPost->id }}">
@@ -150,9 +159,6 @@
                                                 <div class="d-flex align-items-center">
                                                     <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">article</i>
                                                     <div>
-                                                        @php
-                                                            $firstTranslation = $blogPost->translates->first();
-                                                        @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
                                                         @if($firstTranslation && $firstTranslation->card_description)
                                                             <br><small class="text-muted">{{ Str::limit($firstTranslation->card_description, 50) }}</small>
@@ -162,9 +168,6 @@
                                             </td>
                                             <td>
                                                 @if($blogPost->category)
-                                                    @php
-                                                        $categoryTranslation = $blogPost->category->translates->first();
-                                                    @endphp
                                                     <span class="badge bg-secondary">
                                                         {{ $categoryTranslation ? $categoryTranslation->title : 'No category' }}
                                                     </span>
