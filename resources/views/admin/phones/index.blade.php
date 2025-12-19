@@ -55,7 +55,9 @@
                         <div id="sortable-phone-types" class="sortable-container">
                             @forelse($phoneTypes as $phoneType)
                                 @php
-                                    $firstTranslation = $phoneType->translates->first();
+                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                    $firstTranslation = $phoneType->translates->firstWhere('language_id', $mainLanguageId)
+                                        ?? $phoneType->translates->first();
                                     $typePhones = $phones->where('phone_type_id', $phoneType->id);
                                 @endphp
                                 

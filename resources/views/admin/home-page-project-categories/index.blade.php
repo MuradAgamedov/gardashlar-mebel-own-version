@@ -80,7 +80,9 @@
                                                     <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">category</i>
                                                     <div>
                                                         @php
-                                                            $firstTranslation = $homePageProjectCategory->projectCategory->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $firstTranslation = $homePageProjectCategory->projectCategory->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $homePageProjectCategory->projectCategory->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
                                                         @if($firstTranslation && $firstTranslation->description)

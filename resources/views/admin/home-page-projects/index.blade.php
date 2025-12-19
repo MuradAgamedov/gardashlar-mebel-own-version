@@ -83,7 +83,9 @@
                                                     <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">work</i>
                                                     <div>
                                                         @php
-                                                            $firstProjectTranslation = $homePageProject->project->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $firstProjectTranslation = $homePageProject->project->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $homePageProject->project->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstProjectTranslation ? $firstProjectTranslation->title : 'No title' }}</strong>
                                                     </div>
@@ -92,7 +94,9 @@
                                             <td>
                                                 @if($homePageProject->projectCategory)
                                                     @php
-                                                        $firstCategoryTranslation = $homePageProject->projectCategory->translates->first();
+                                                        $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                        $firstCategoryTranslation = $homePageProject->projectCategory->translates->firstWhere('language_id', $mainLanguageId)
+                                                            ?? $homePageProject->projectCategory->translates->first();
                                                     @endphp
                                                     <span class="badge bg-secondary">
                                                         {{ $firstCategoryTranslation ? $firstCategoryTranslation->title : 'No category' }}

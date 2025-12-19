@@ -65,7 +65,9 @@
                                 <tbody id="sortable-reports">
                                     @forelse($reports as $report)
                                         @php
-                                            $firstTranslation = $report->translates->first();
+                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                            $firstTranslation = $report->translates->firstWhere('language_id', $mainLanguageId)
+                                                ?? $report->translates->first();
                                         @endphp
                                         <tr data-id="{{ $report->id }}">
                                             <td>

@@ -54,7 +54,8 @@
                                     <option value="">All Vacancies</option>
                                     @foreach($vacancies as $vacancy)
                                         @php
-                                            $vacancyTranslation = $vacancy->translates->where('language.is_default', true)->first() 
+                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                            $vacancyTranslation = $vacancy->translates->firstWhere('language_id', $mainLanguageId)
                                                 ?? $vacancy->translates->first();
                                         @endphp
                                         <option value="{{ $vacancy->id }}" {{ request('vacancy_id') == $vacancy->id ? 'selected' : '' }}>
@@ -105,14 +106,16 @@
                                             </td>
                                             <td>
                                                 @php
-                                                    $mainTranslation = $requirement->translates->where('language.is_default', true)->first() 
+                                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                    $mainTranslation = $requirement->translates->firstWhere('language_id', $mainLanguageId)
                                                         ?? $requirement->translates->first();
                                                 @endphp
                                                 <strong>{{ $mainTranslation->title ?? 'N/A' }}</strong>
                                             </td>
                                             <td>
                                                 @php
-                                                    $vacancyTranslation = $requirement->vacancy->translates->where('language.is_default', true)->first() 
+                                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                    $vacancyTranslation = $requirement->vacancy->translates->firstWhere('language_id', $mainLanguageId)
                                                         ?? $requirement->vacancy->translates->first();
                                                 @endphp
                                                 {{ $vacancyTranslation->title ?? 'N/A' }}

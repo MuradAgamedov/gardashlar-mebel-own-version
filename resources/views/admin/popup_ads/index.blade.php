@@ -73,7 +73,9 @@
 
                                         @foreach($ads as $ad)
                                             @php
-                                                $mainTranslate = $ad->translation();
+                                                $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                $mainTranslate = $ad->translates->firstWhere('language_id', $mainLanguageId)
+                                                    ?? $ad->translates->first();
                                             @endphp
 
                                             <tr data-id="{{ $ad->id }}" class="sortable-item">

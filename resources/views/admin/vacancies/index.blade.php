@@ -88,7 +88,8 @@
                                             </td>
                                             <td>
                                                 @php
-                                                    $mainTranslation = $vacancy->translates->where('language.is_default', true)->first() 
+                                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                    $mainTranslation = $vacancy->translates->firstWhere('language_id', $mainLanguageId)
                                                         ?? $vacancy->translates->first();
                                                 @endphp
                                                 <strong>{{ $mainTranslation->title ?? 'N/A' }}</strong>
@@ -100,14 +101,16 @@
                                             </td>
                                             <td>
                                                 @php
-                                                    $mainTranslation = $vacancy->translates->where('language.is_default', true)->first() 
+                                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                    $mainTranslation = $vacancy->translates->firstWhere('language_id', $mainLanguageId)
                                                         ?? $vacancy->translates->first();
                                                 @endphp
                                                 {{ $mainTranslation->position ?? 'N/A' }}
                                             </td>
                                             <td>
                                                 @php
-                                                    $mainTranslation = $vacancy->translates->where('language.is_default', true)->first() 
+                                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                    $mainTranslation = $vacancy->translates->firstWhere('language_id', $mainLanguageId)
                                                         ?? $vacancy->translates->first();
                                                 @endphp
                                                 {{ $mainTranslation->experience ?? 'N/A' }}

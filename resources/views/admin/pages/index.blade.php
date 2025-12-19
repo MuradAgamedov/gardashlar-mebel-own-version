@@ -73,14 +73,24 @@
                                             {{-- <th scope="row">{{ $page->id }}</th> --}}
                                             <td>
                                                 @if($page->translates->count() > 0)
-                                                    {{ $page->translates->first()->title }}
+                                                    @php
+                                                        $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                        $mainTranslation = $page->translates->firstWhere('language_id', $mainLanguageId)
+                                                            ?? $page->translates->first();
+                                                    @endphp
+                                                    {{ $mainTranslation->title }}
                                                 @else
                                                     <span class="text-muted">No title</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if($page->translates->count() > 0)
-                                                    <span class="badge badge-light-primary">{{ $page->translates->first()->slug }}</span>
+                                                    @php
+                                                        $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                        $mainTranslation = $page->translates->firstWhere('language_id', $mainLanguageId)
+                                                            ?? $page->translates->first();
+                                                    @endphp
+                                                    <span class="badge badge-light-primary">{{ $mainTranslation->slug }}</span>
                                                 @else
                                                     <span class="text-muted">No slug</span>
                                                 @endif

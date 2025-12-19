@@ -129,7 +129,9 @@
                                                 <td>
                                                     <div>
                                                         @php
-                                                            $mainTranslate = $order->translate()->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $mainTranslate = $order->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $order->translates->first();
                                                         @endphp
                                                         <strong>{{ $mainTranslate?->title ?? 'No title' }}</strong>
                                                         @if($mainTranslate)

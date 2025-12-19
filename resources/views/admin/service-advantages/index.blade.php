@@ -9,7 +9,7 @@
             <div class="row">
                 <div class="col-6">
                     <h3>Service Advantages</h3>
-                    <p class="text-muted">{{ $service->translate()->title ?? 'Service' }}</p>
+                    <p class="text-muted">{{ $service->translates->firstWhere('language_id', \App\Models\Language::getMainLanguage()->id)?->title ?? $service->translates->first()?->title ?? 'Service' }}</p>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -217,7 +217,9 @@
                                             </td>
                                             <td>
                                                 @php
-                                                    $mainTranslate = $advantage->translate();
+                                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                    $mainTranslate = $advantage->translates->firstWhere('language_id', $mainLanguageId)
+                                                        ?? $advantage->translates->first();
                                                 @endphp
                                                 {{ $mainTranslate ? $mainTranslate->title : 'No title' }}
                                             </td>

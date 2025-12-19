@@ -80,7 +80,9 @@
                                                     <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">flag</i>
                                                     <div>
                                                         @php
-                                                            $firstTranslation = $ourGoal->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $firstTranslation = $ourGoal->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $ourGoal->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
                                                     </div>

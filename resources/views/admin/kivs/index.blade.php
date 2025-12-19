@@ -57,7 +57,9 @@
                                         <option value="">All Categories</option>
                                         @foreach($categories as $category)
                                             @php
-                                                $categoryTranslation = $category->translates->first();
+                                                $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                $categoryTranslation = $category->translates->firstWhere('language_id', $mainLanguageId)
+                                                    ?? $category->translates->first();
                                             @endphp
                                             <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
                                                 {{ $categoryTranslation ? $categoryTranslation->title : 'Unknown Category' }}
@@ -91,7 +93,9 @@
                                 <tbody id="sortable-kivs">
                                     @forelse($kivs as $kiv)
                                         @php
-                                            $categoryTranslation = $kiv->category->translates->first();
+                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                            $categoryTranslation = $kiv->category->translates->firstWhere('language_id', $mainLanguageId)
+                                                ?? $kiv->category->translates->first();
                                         @endphp
                                         <tr data-id="{{ $kiv->id }}">
                                             <td>

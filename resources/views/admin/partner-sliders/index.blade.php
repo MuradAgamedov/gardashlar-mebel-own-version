@@ -64,7 +64,9 @@
                                 <tbody id="sortable-sliders">
                                     @forelse($sliders as $slider)
                                         @php
-                                            $firstTranslation = $slider->translates->first();
+                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                            $firstTranslation = $slider->translates->firstWhere('language_id', $mainLanguageId)
+                                                ?? $slider->translates->first();
                                         @endphp
                                         <tr data-id="{{ $slider->id }}">
                                             <td class="drag-handle text-center">

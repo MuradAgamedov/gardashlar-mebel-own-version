@@ -65,7 +65,9 @@
                                     <option value="">All Categories</option>
                                     @foreach($categories as $category)
                                         @php
-                                            $translation = $category->translates->first();
+                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                            $translation = $category->translates->firstWhere('language_id', $mainLanguageId)
+                                                ?? $category->translates->first();
                                         @endphp
                                         <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
                                             {{ $translation ? $translation->title : 'Category #' . $category->id }}
@@ -142,7 +144,9 @@
                                                     <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">work</i>
                                                     <div>
                                                         @php
-                                                            $firstTranslation = $project->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $firstTranslation = $project->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $project->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
                                                     </div>
@@ -165,7 +169,9 @@
                                             <td>
                                                 @if($project->category)
                                                     @php
-                                                        $categoryTranslation = $project->category->translates->first();
+                                                        $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                        $categoryTranslation = $project->category->translates->firstWhere('language_id', $mainLanguageId)
+                                                            ?? $project->category->translates->first();
                                                     @endphp
                                                     <span class="badge bg-secondary">
                                                         {{ $categoryTranslation ? $categoryTranslation->title : 'No category' }}

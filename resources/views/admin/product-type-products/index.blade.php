@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Products for ' . ($productType->translates->first() ? $productType->translates->first()->title : 'Product Type'))
+@section('title', 'Products for ' . ($productType->translates->firstWhere('language_id', \App\Models\Language::getMainLanguage()->id) ?? $productType->translates->first() ? ($productType->translates->firstWhere('language_id', \App\Models\Language::getMainLanguage()->id) ?? $productType->translates->first())->title : 'Product Type'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Products for {{ $productType->translates->first() ? $productType->translates->first()->title : 'Product Type' }}</h3>
+                    <h3>Products for {{ ($productType->translates->firstWhere('language_id', \App\Models\Language::getMainLanguage()->id) ?? $productType->translates->first())?->title ?? 'Product Type' }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -111,7 +111,9 @@
                                                     <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">inventory_2</i>
                                                     <div>
                                                         @php
-                                                            $firstTranslation = $product->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $firstTranslation = $product->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $product->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
                                                         @if($firstTranslation && $firstTranslation->description)
@@ -124,7 +126,9 @@
                                                 @if($product->categories->count() > 0)
                                                     @foreach($product->categories->take(3) as $category)
                                                         @php
-                                                            $categoryTranslation = $category->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $categoryTranslation = $category->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $category->translates->first();
                                                         @endphp
                                                         <span class="badge badge-light-primary me-1">
                                                             {{ $categoryTranslation ? $categoryTranslation->title : 'No title' }}
@@ -141,7 +145,9 @@
                                                 @if($product->types->count() > 0)
                                                     @foreach($product->types->take(3) as $type)
                                                         @php
-                                                            $typeTranslation = $type->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $typeTranslation = $type->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $type->translates->first();
                                                         @endphp
                                                         <span class="badge badge-light-info me-1">
                                                             {{ $typeTranslation ? $typeTranslation->title : 'No title' }}

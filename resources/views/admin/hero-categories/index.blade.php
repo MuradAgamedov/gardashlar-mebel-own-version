@@ -85,7 +85,9 @@
                                                     @endif
                                                     <div>
                                                         @php
-                                                            $firstTranslation = $heroCategory->productCategory->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $firstTranslation = $heroCategory->productCategory->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $heroCategory->productCategory->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
                                                     </div>
@@ -94,7 +96,9 @@
                                             <td>
                                                 @if($heroCategory->productCategory->parent)
                                                     @php
-                                                        $parentTranslation = $heroCategory->productCategory->parent->translates->first();
+                                                        $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                        $parentTranslation = $heroCategory->productCategory->parent->translates->firstWhere('language_id', $mainLanguageId)
+                                                            ?? $heroCategory->productCategory->parent->translates->first();
                                                     @endphp
                                                     <span class="badge bg-secondary">
                                                         <i class="material-icons-outlined" style="font-size: 12px;">subdirectory_arrow_right</i>

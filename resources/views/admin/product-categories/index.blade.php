@@ -86,7 +86,9 @@
 
                             @forelse($mainCategories as $mainCategory)
                                 @php
-                                    $firstTranslation = $mainCategory->translates->first();
+                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                    $firstTranslation = $mainCategory->translates->firstWhere('language_id', $mainLanguageId)
+                                        ?? $mainCategory->translates->first();
                                     $categorySubs = $subCategories->where('parent_id', $mainCategory->id);
                                 @endphp
                                 
@@ -167,7 +169,9 @@
                                                 <div class="subcategories-container" data-parent-id="{{ $mainCategory->id }}">
                                                     @foreach($categorySubs as $subCategory)
                                                         @php
-                                                            $subTranslation = $subCategory->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $subTranslation = $subCategory->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $subCategory->translates->first();
                                                         @endphp
                                                         <div class="subcategory-item" data-id="{{ $subCategory->id }}">
                                                             <div class="d-flex align-items-center justify-content-between p-2 border rounded mb-2 subcategory-indent">

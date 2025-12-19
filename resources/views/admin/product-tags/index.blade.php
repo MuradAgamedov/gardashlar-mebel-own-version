@@ -82,7 +82,9 @@
                                                     <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">local_offer</i>
                                                     <div>
                                                         @php
-                                                            $firstTranslation = $productTag->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $firstTranslation = $productTag->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $productTag->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
                                                     </div>

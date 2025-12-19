@@ -103,7 +103,12 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <strong>{{ $detail->translates->first()->keyword ?? 'No keyword' }}</strong>
+                                                    @php
+                                                        $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                        $mainTranslation = $detail->translates->firstWhere('language_id', $mainLanguageId)
+                                                            ?? $detail->translates->first();
+                                                    @endphp
+                                                    <strong>{{ $mainTranslation?->keyword ?? 'No keyword' }}</strong>
                                                 </td>
                                                 <td>
                                                     @foreach($detail->translates as $translate)

@@ -85,7 +85,9 @@
                                                     @endif
                                                     <div>
                                                         @php
-                                                            $firstTranslation = $homePageCategory->productCategory->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $firstTranslation = $homePageCategory->productCategory->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $homePageCategory->productCategory->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
                                                     </div>
@@ -94,7 +96,9 @@
                                             <td>
                                                 @if($homePageCategory->productCategory->parent)
                                                     @php
-                                                        $parentTranslation = $homePageCategory->productCategory->parent->translates->first();
+                                                        $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                        $parentTranslation = $homePageCategory->productCategory->parent->translates->firstWhere('language_id', $mainLanguageId)
+                                                            ?? $homePageCategory->productCategory->parent->translates->first();
                                                     @endphp
                                                     <span class="badge bg-secondary">
                                                         <i class="material-icons-outlined" style="font-size: 12px;">subdirectory_arrow_right</i>

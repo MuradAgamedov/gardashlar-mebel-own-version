@@ -102,7 +102,9 @@
                                                     <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">category</i>
                                                     <div>
                                                         @php
-                                                            $firstTranslation = $type->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $firstTranslation = $type->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $type->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
                                                     </div>

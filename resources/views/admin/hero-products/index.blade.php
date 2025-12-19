@@ -82,7 +82,9 @@
                                                     <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">inventory_2</i>
                                                     <div>
                                                         @php
-                                                            $firstTranslation = $heroProduct->product->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $firstTranslation = $heroProduct->product->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $heroProduct->product->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
                                                     </div>
@@ -94,7 +96,9 @@
                                                 @endphp
                                                 @if($firstCategory)
                                                     @php
-                                                        $categoryTranslation = $firstCategory->translates->first();
+                                                        $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                        $categoryTranslation = $firstCategory->translates->firstWhere('language_id', $mainLanguageId)
+                                                            ?? $firstCategory->translates->first();
                                                     @endphp
                                                     <div class="d-flex align-items-center">
                                                         <span class="badge bg-secondary me-2">

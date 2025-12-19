@@ -160,7 +160,9 @@
                                                     <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">inventory_2</i>
                                                     <div>
                                                         @php
-                                                            $firstTranslation = $product->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $firstTranslation = $product->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $product->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
                                                         <div class="mt-1">
@@ -174,7 +176,12 @@
                                                     <div class="d-flex flex-wrap gap-1">
                                                         @foreach($product->categories->take(2) as $category)
                                                             <span class="badge badge-light-primary">
-                                                                {{ $category->translates->first()->title ?? 'No title' }}
+                                                                @php
+                                                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                                    $categoryTranslation = $category->translates->firstWhere('language_id', $mainLanguageId)
+                                                                        ?? $category->translates->first();
+                                                                @endphp
+                                                                {{ $categoryTranslation ? $categoryTranslation->title : 'No title' }}
                                                             </span>
                                                         @endforeach
                                                         @if($product->categories->count() > 2)
@@ -192,7 +199,12 @@
                                                     <div class="d-flex flex-wrap gap-1">
                                                         @foreach($product->types->take(2) as $type)
                                                             <span class="badge badge-light-info">
-                                                                {{ $type->translates->first()->title ?? 'No title' }}
+                                                                @php
+                                                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                                    $typeTranslation = $type->translates->firstWhere('language_id', $mainLanguageId)
+                                                                        ?? $type->translates->first();
+                                                                @endphp
+                                                                {{ $typeTranslation ? $typeTranslation->title : 'No title' }}
                                                             </span>
                                                         @endforeach
                                                         @if($product->types->count() > 2)

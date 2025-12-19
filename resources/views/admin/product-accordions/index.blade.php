@@ -92,7 +92,9 @@
                                                     <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">expand_more</i>
                                                     <div>
                                                         @php
-                                                            $firstTranslation = $accordion->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $firstTranslation = $accordion->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $accordion->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
                                                     </div>

@@ -127,7 +127,9 @@
                                             </td>
                                             <td>
                                                 @php
-                                                    $mainTranslate = $service->translate();
+                                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                    $mainTranslate = $service->translates->firstWhere('language_id', $mainLanguageId)
+                                                        ?? $service->translates->first();
                                                 @endphp
                                                 {{ $mainTranslate ? $mainTranslate->title : 'No title' }}
                                             </td>

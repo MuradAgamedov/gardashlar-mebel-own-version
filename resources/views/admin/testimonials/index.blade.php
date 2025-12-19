@@ -97,7 +97,9 @@
                                             </td>
                                             <td>
                                                 @php
-                                                    $firstTranslation = $testimonial->translates->first();
+                                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                    $firstTranslation = $testimonial->translates->firstWhere('language_id', $mainLanguageId)
+                                                        ?? $testimonial->translates->first();
                                                 @endphp
                                                 {{ $firstTranslation ? $firstTranslation->full_name : 'No translation' }}
                                             </td>

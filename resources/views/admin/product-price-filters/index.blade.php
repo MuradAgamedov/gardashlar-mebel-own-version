@@ -81,7 +81,9 @@
                                                 <td>
                                                     <div>
                                                         @php
-                                                            $mainTranslate = $filter->translate()->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $mainTranslate = $filter->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $filter->translates->first();
                                                         @endphp
                                                         <strong>{{ $mainTranslate?->title ?? 'Başlıq yoxdur' }}</strong>
                                                         @if($mainTranslate)

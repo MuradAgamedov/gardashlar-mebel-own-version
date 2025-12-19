@@ -85,7 +85,9 @@
                                                     @endif
                                                     <div>
                                                         @php
-                                                            $firstTranslation = $productPageCategory->productCategory->translates->first();
+                                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                            $firstTranslation = $productPageCategory->productCategory->translates->firstWhere('language_id', $mainLanguageId)
+                                                                ?? $productPageCategory->productCategory->translates->first();
                                                         @endphp
                                                         <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
                                                     </div>
@@ -94,7 +96,9 @@
                                             <td>
                                                 @if($productPageCategory->productCategory->parent)
                                                     @php
-                                                        $parentTranslation = $productPageCategory->productCategory->parent->translates->first();
+                                                        $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                        $parentTranslation = $productPageCategory->productCategory->parent->translates->firstWhere('language_id', $mainLanguageId)
+                                                            ?? $productPageCategory->productCategory->parent->translates->first();
                                                     @endphp
                                                     <span class="badge bg-secondary">
                                                         <i class="material-icons-outlined" style="font-size: 12px;">subdirectory_arrow_right</i>

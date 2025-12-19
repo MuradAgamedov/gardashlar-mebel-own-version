@@ -72,7 +72,12 @@
                                             @endif
                                         </td>
                                         <td>
-                                            {{ optional($action->translates->first())->title ?? '---' }}
+                                            @php
+                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                            $mainTranslation = $action->translates->firstWhere('language_id', $mainLanguageId)
+                                                ?? $action->translates->first();
+                                        @endphp
+                                        {{ $mainTranslation?->title ?? '---' }}
                                         </td>
 
                                         {{-- 👁 Status --}}

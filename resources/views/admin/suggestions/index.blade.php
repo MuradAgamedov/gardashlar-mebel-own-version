@@ -141,7 +141,9 @@
                                             </td>
                                             <td>
                                                 @php
-                                                    $firstTranslation = $suggestion->translates->first();
+                                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                    $firstTranslation = $suggestion->translates->firstWhere('language_id', $mainLanguageId)
+                                                        ?? $suggestion->translates->first();
                                                 @endphp
                                                 {{ $firstTranslation ? $firstTranslation->title : 'Tərcümə yoxdur' }}
                                             </td>

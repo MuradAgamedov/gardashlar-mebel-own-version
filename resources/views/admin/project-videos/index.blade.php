@@ -50,7 +50,9 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Videos for Project: 
                                 @php
-                                    $firstTranslation = $project->translates->first();
+                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                    $firstTranslation = $project->translates->firstWhere('language_id', $mainLanguageId)
+                                        ?? $project->translates->first();
                                 @endphp
                                 <span class="text-primary">{{ $firstTranslation ? $firstTranslation->title : 'Project #' . $project->id }}</span>
                             </h5>
