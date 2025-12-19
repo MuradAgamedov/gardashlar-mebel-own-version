@@ -69,6 +69,11 @@
                                 </thead>
                                 <tbody id="sortable-address-types">
                                     @forelse($addressTypes as $addressType)
+                                        @php
+                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                            $firstTranslation = $addressType->translates->firstWhere('language_id', $mainLanguageId)
+                                                ?? $addressType->translates->first();
+                                        @endphp
                                         <tr data-id="{{ $addressType->id }}">
                                             <td>
                                                 <div class="drag-handle">
@@ -81,9 +86,6 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                @php
-                                                    $firstTranslation = $addressType->translates->first();
-                                                @endphp
                                                 <strong>{{ $firstTranslation ? $firstTranslation->title : 'No translation' }}</strong>
                                             </td>
                                             <td>
