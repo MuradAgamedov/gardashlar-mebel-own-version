@@ -82,16 +82,19 @@ class CartController extends Controller
         $addedItems = [];
 
         foreach ($items as $item) {
-            $cart = Cart::updateOrCreate(
-                [
+            // Əgər bu istifadəçi üçün bu məhsul artıq cart-dadırsa, onu dəyişmə, sadəcə keç
+            $cart = Cart::where('user_id', $user->id)
+                ->where('product_id', $item['product_id'])
+                ->first();
+
+            if (!$cart) {
+                $cart = Cart::create([
                     'user_id' => $user->id,
                     'product_id' => $item['product_id'],
-                ],
-                [
                     'color_id' => $item['color_id'] ?? null,
                     'count' => 1,
-                ]
-            );
+                ]);
+            }
 
             $addedItems[] = $cart;
         }
