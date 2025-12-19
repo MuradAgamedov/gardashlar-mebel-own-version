@@ -48,8 +48,9 @@ class SeoPageController extends Controller
             'status' => 'nullable|boolean',
             'translates' => 'required|array',
             'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string',
-            'translates.*.slug' => 'required|string|max:255|unique:seo_page_translates,slug',
+            // Hər dil üçün məcburi deyil
+            'translates.*.title' => 'nullable|string',
+            'translates.*.slug' => 'nullable|string|max:255|unique:seo_page_translates,slug',
             'translates.*.page_footer' => 'nullable|string',
             'translates.*.meta_title' => 'nullable|string',
             'translates.*.meta_description' => 'nullable|string',
@@ -63,15 +64,30 @@ class SeoPageController extends Controller
 
         $translates = [];
         foreach ($request->translates as $translate) {
+            // Boş olan dilləri keç (title və slug tam boşdursa saxlamırıq)
+            $title = $translate['title'] ?? null;
+            $slug  = $translate['slug'] ?? null;
+
+            if (empty($title) && empty($slug)) {
+                continue;
+            }
+
             $translates[] = [
                 'language_id' => $translate['language_id'],
-                'title' => $translate['title'],
-                'slug' => Str::slug($translate['slug']),
+                'title' => $title,
+                'slug' => Str::slug($slug),
                 'page_footer' => $translate['page_footer'] ?? '',
                 'meta_title' => $translate['meta_title'] ?? '',
                 'meta_description' => $translate['meta_description'] ?? '',
                 'meta_keywords' => $translate['meta_keywords'] ?? '',
             ];
+        }
+
+        // Ən azı bir dildə tərcümə olmalıdır
+        if (empty($translates)) {
+            return back()
+                ->withErrors(['translates' => 'Ən azı bir dil üçün Title və Slug doldurulmalıdır.'])
+                ->withInput();
         }
 
         $this->repository->createSeoPage($data, $translates);
@@ -102,8 +118,9 @@ class SeoPageController extends Controller
             'status' => 'nullable|boolean',
             'translates' => 'required|array',
             'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string',
-            'translates.*.slug' => 'required|string|max:255|unique:seo_page_translates,slug,' . $id . ',seo_page_id',
+            // Hər dil üçün məcburi deyil
+            'translates.*.title' => 'nullable|string',
+            'translates.*.slug' => 'nullable|string|max:255|unique:seo_page_translates,slug,' . $id . ',seo_page_id',
             'translates.*.page_footer' => 'nullable|string',
             'translates.*.meta_title' => 'nullable|string',
             'translates.*.meta_description' => 'nullable|string',

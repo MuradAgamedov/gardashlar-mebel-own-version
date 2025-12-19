@@ -111,23 +111,21 @@
                                                 
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Title <span class="text-danger">*</span></label>
+                                                        <label class="form-label">Title</label>
                                                         <input type="text" 
                                                                class="form-control @error('translates.'.$index.'.title') is-invalid @enderror" 
                                                                name="translates[{{ $index }}][title]" 
-                                                               value="{{ old('translates.'.$index.'.title', $translate->title ?? '') }}"
-                                                               required>
+                                                               value="{{ old('translates.'.$index.'.title', $translate->title ?? '') }}">
                                                         @error('translates.'.$index.'.title')
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Slug <span class="text-danger">*</span></label>
+                                                        <label class="form-label">Slug</label>
                                                         <input type="text" 
                                                                class="form-control @error('translates.'.$index.'.slug') is-invalid @enderror" 
                                                                name="translates[{{ $index }}][slug]" 
-                                                               value="{{ old('translates.'.$index.'.slug', $translate->slug ?? '') }}"
-                                                               required>
+                                                               value="{{ old('translates.'.$index.'.slug', $translate->slug ?? '') }}">
                                                         @error('translates.'.$index.'.slug')
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
