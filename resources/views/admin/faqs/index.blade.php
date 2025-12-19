@@ -91,7 +91,8 @@
                                     <tbody id="sortable-faqs">
                                         @foreach($faqs as $faq)
                                             @php
-                                                $mainTranslation = $faq->translates->where('language.is_default', true)->first() 
+                                                $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                $mainTranslation = $faq->translates->firstWhere('language_id', $mainLanguageId)
                                                     ?? $faq->translates->first();
                                             @endphp
                                             <tr data-id="{{ $faq->id }}">
