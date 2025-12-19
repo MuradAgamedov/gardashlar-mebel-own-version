@@ -55,7 +55,8 @@
                         <div id="sortable-address-types" class="sortable-container">
                             @forelse($addressTypes as $addressType)
                                 @php
-                                    $firstTranslation = $addressType->translates->first();
+                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                    $firstTranslation = $addressType->translates->firstWhere('language_id', $mainLanguageId) ?? $addressType->translates->first();
                                     $typeAddresses = $addressType->addresses;
                                 @endphp
                                 
