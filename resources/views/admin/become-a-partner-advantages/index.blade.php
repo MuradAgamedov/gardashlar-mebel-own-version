@@ -73,6 +73,11 @@
                                 </thead>
                                 <tbody>
                                     @forelse($advantages as $advantage)
+                                        @php
+                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                            $mainTranslate = $advantage->translates->firstWhere('language_id', $mainLanguageId)
+                                                ?? $advantage->translates->first();
+                                        @endphp
                                         <tr>
                                             <td>{{ $advantage->id }}</td>
                                             <td>
@@ -86,15 +91,15 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                @if($advantage->translates->isNotEmpty())
-                                                    <strong>{{ $advantage->translates->first()->title }}</strong>
+                                                @if($mainTranslate)
+                                                    <strong>{{ $mainTranslate->title }}</strong>
                                                 @else
                                                     <span class="text-muted">No title</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                @if($advantage->translates->isNotEmpty())
-                                                    {{ Str::limit($advantage->translates->first()->description, 100) }}
+                                                @if($mainTranslate)
+                                                    {{ Str::limit($mainTranslate->description, 100) }}
                                                 @else
                                                     <span class="text-muted">No description</span>
                                                 @endif
