@@ -36,14 +36,18 @@ class SeoPageController extends Controller
                 ->get(['id'])
                 ->map(function ($seoPage) {
                     $translation = $seoPage->translates->first();
+
+                    $title = $translation?->title;
+                    $slug  = $translation?->slug;
                     
                     return [
                         'id' => $seoPage->id,
-                        'title' => $translation ? $translation->title : '',
-                        'slug' => $translation ? $translation->slug : ''
+                        'title' => $title,
+                        'slug' => $slug,
                     ];
                 })
                 ->filter(function ($item) {
+                    // Yalnız title və slug həqiqətən boş olmayanlar
                     return !empty($item['title']) && !empty($item['slug']);
                 })
                 ->values();
@@ -212,6 +216,14 @@ class SeoPageController extends Controller
                     'success' => false,
                     'message' => 'SEO page not found'
                 ], 404);
+            }
+
+            // Əgər title və ya slug boşdursa, sadəcə boş array qaytar
+            if (empty($seoPageData['title']) || empty($seoPageData['slug'])) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [],
+                ], 200);
             }
 
             return response()->json([
