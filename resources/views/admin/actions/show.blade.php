@@ -142,7 +142,8 @@
                                             @foreach($action->companyProducts as $companyProduct)
                                                 @php
                                                     $product = $companyProduct->product;
-                                                    $mainTranslate = $product->translate()->first();
+                                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                    $mainTranslate = $product?->translates->firstWhere('language_id', $mainLanguageId);
                                                 @endphp
                                                 <div class="col-md-3 col-lg-2 mb-3">
                                                     <div class="card border-success">
