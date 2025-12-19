@@ -23,7 +23,7 @@ class SeoPageController extends Controller
      */
     public function index()
     {
-        app()->setlocale("az");
+        app()->setLocale("az");
         $seoPages = $this->repository->getSeoPages();
         return view('admin.seo-pages.index', compact('seoPages'));
     }
