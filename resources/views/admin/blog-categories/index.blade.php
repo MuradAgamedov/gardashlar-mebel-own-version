@@ -90,6 +90,11 @@
                                 </thead>
                                 <tbody id="sortable-categories">
                                     @forelse($categories as $category)
+                                        @php
+                                            $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                            $firstTranslation = $category->translates->firstWhere('language_id', $mainLanguageId)
+                                                ?? $category->translates->first();
+                                        @endphp
                                         <tr data-id="{{ $category->id }}" class="category-row">
                                             <td>
                                                 <input type="checkbox" class="form-check-input category-checkbox" value="{{ $category->id }}">
@@ -104,12 +109,9 @@
                                                     </svg>
                                                 </div>
                                             </td>
-                                                                                         <td>
-                                                 @php
-                                                     $firstTranslation = $category->translates->first();
-                                                 @endphp
-                                                 {{ $firstTranslation ? $firstTranslation->title : 'No translation' }}
-                                             </td>
+                                            <td>
+                                                {{ $firstTranslation ? $firstTranslation->title : 'No translation' }}
+                                            </td>
                                             <td>
                                                 @if($category->status)
                                                     <span class="badge bg-success">Active</span>
