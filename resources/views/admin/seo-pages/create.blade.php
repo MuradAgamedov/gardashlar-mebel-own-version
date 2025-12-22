@@ -65,9 +65,7 @@
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
                                                 @php
-                                                    $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
-                                                    $categoryTranslation = $category->translates->firstWhere('language_id', $mainLanguageId)
-                                                        ?? $category->translates->first();
+                                                    $categoryTranslation = $category->translate();
                                                 @endphp
                                                 @if($categoryTranslation)
                                                     {{ $categoryTranslation->title }}
