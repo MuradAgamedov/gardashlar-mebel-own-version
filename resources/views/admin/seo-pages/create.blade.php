@@ -65,9 +65,9 @@
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
                                                 @if($category->translates->isNotEmpty())
-                                                    {{ $category->translates->first()->title }}
+                                                    {{ $category->title }}
                                                 @else
-                                                    Category #{{ $category->id }}
+                                                    {{ app()->getLocale() === 'az' ? 'Kateqoriya #' : 'Category #' }}{{ $category->id }}
                                                 @endif
                                             </option>
                                         @endforeach

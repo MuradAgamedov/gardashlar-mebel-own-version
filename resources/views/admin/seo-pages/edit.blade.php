@@ -70,7 +70,7 @@
                                                 @if($category->translates->isNotEmpty())
                                                     {{ $category->translates->first()->title }}
                                                 @else
-                                                    Category #{{ $category->id }}
+                                                    {{ app()->getLocale() === 'az' ? 'Kateqoriya #' : 'Category #' }}{{ $category->id }}
                                                 @endif
                                             </option>
                                         @endforeach
