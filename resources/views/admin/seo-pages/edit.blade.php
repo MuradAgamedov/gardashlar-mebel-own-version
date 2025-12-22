@@ -68,7 +68,8 @@
                                             <option value="{{ $category->id }}" 
                                                     {{ old('category_id', $seoPage->category_id) == $category->id ? 'selected' : '' }}>
                                                 @php
-                                                    $currentLanguageId = app()->getLocale() === 'az' ? 1 : 2; // Assuming 1=AZ, 2=EN
+                                                    $mainLanguage = \App\Models\Language::getMainLanguage();
+                                                    $currentLanguageId = $mainLanguage ? $mainLanguage->id : 1;
                                                     $categoryTranslation = $category->translates->where('language_id', $currentLanguageId)->first();
                                                 @endphp
                                                 @if($categoryTranslation)
