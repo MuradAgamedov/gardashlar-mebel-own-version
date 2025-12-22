@@ -68,17 +68,22 @@
                                     @forelse($seoPages as $seoPage)
                                         @php
                                             $currentLocale = app()->getLocale();
+                                            $mainLanguage = \App\Models\Language::getMainLanguage();
 
-                                            // SEO page üçün cari locale-ə uyğun translate
+                                            // SEO page üçün cari locale-ə uyğun translate, əgər yoxdsa əsas dil
                                             $currentTranslate = $seoPage->translates
                                                 ->firstWhere('language.lang_code', $currentLocale)
+                                                ?? $seoPage->translates
+                                                    ->firstWhere('language_id', $mainLanguage ? $mainLanguage->id : null)
                                                 ?? $seoPage->translates->first();
 
-                                            // Kateqoriya üçün cari locale-ə uyğun translate
+                                            // Kateqoriya üçün cari locale-ə uyğun translate, əgər yoxdsa əsas dil
                                             $currentCategoryTranslate = null;
                                             if ($seoPage->category && $seoPage->category->translates->isNotEmpty()) {
                                                 $currentCategoryTranslate = $seoPage->category->translates
                                                     ->firstWhere('language.lang_code', $currentLocale)
+                                                    ?? $seoPage->category->translates
+                                                        ->firstWhere('language_id', $mainLanguage ? $mainLanguage->id : null)
                                                     ?? $seoPage->category->translates->first();
                                             }
                                         @endphp
