@@ -167,3 +167,51 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+.translation-list {
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.translation-item {
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.translation-item:last-child {
+    margin-bottom: 0;
+}
+
+.slug-list {
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.slug-item {
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.slug-item:last-child {
+    margin-bottom: 0;
+}
+
+.translation-item span:not(.badge),
+.slug-item span:not(.badge) {
+    font-size: 0.85em;
+}
+
+.translation-item .badge,
+.slug-item .badge {
+    min-width: 35px;
+    text-align: center;
+    font-size: 0.7em;
+}
+</style>
+@endpush
