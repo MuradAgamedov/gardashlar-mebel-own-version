@@ -64,8 +64,12 @@
                                         <option value="">{{ app()->getLocale() === 'az' ? 'Kateqoriya seçin (İsteğe bağlı)' : 'Select Category (Optional)' }}</option>
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                                @if($category->translates->isNotEmpty())
-                                                    {{ $category->title }}
+                                                @php
+                                                    $currentLanguageId = app()->getLocale() === 'az' ? 1 : 2; // Assuming 1=AZ, 2=EN
+                                                    $categoryTranslation = $category->translates->where('language_id', $currentLanguageId)->first();
+                                                @endphp
+                                                @if($categoryTranslation)
+                                                    {{ $categoryTranslation->title }}
                                                 @else
                                                     {{ app()->getLocale() === 'az' ? 'Kateqoriya #' : 'Category #' }}{{ $category->id }}
                                                 @endif
