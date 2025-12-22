@@ -61,7 +61,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Category</label>
                                     <select class="form-select @error('category_id') is-invalid @enderror" name="category_id">
-                                        <option value="">Select Category (Optional)</option>
+                                        <option value="">{{ app()->getLocale() === 'az' ? 'Kateqoriya seçin (İsteğe bağlı)' : 'Select Category (Optional)' }}</option>
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
                                                 @if($category->translates->isNotEmpty())
