@@ -66,47 +66,46 @@
                                 </thead>
                                 <tbody>
                                     @forelse($seoPages as $seoPage)
-                                        @php
-                                            $currentLocale = app()->getLocale();
-                                            $mainLanguage = \App\Models\Language::getMainLanguage();
-
-                                            // SEO page üçün cari locale-ə uyğun translate, əgər yoxdsa əsas dil
-                                            $currentTranslate = $seoPage->translates
-                                                ->firstWhere('language.lang_code', $currentLocale)
-                                                ?? $seoPage->translates
-                                                    ->firstWhere('language_id', $mainLanguage ? $mainLanguage->id : null)
-                                                ?? $seoPage->translates->first();
-
-                                            // Kateqoriya üçün cari locale-ə uyğun translate, əgər yoxdsa əsas dil
-                                            $currentCategoryTranslate = null;
-                                            if ($seoPage->category && $seoPage->category->translates->isNotEmpty()) {
-                                                $currentCategoryTranslate = $seoPage->category->translates
-                                                    ->firstWhere('language.lang_code', $currentLocale)
-                                                    ?? $seoPage->category->translates
-                                                        ->firstWhere('language_id', $mainLanguage ? $mainLanguage->id : null)
-                                                    ?? $seoPage->category->translates->first();
-                                            }
-                                        @endphp
-
                                         <tr>
                                             <td>{{ $seoPage->id }}</td>
                                             <td>
-                                                @if($currentTranslate)
-                                                    {{ $currentTranslate->title }}
+                                                @if($seoPage->translates->isNotEmpty())
+                                                    <div class="translation-list">
+                                                        @foreach($seoPage->translates as $translate)
+                                                            <div class="translation-item">
+                                                                <span class="badge bg-info me-1">{{ $translate->language->lang_code }}</span>
+                                                                <span>{{ $translate->title }}</span>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
                                                 @else
                                                     <span class="text-muted">No translation</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                @if($currentCategoryTranslate)
-                                                    {{ $currentCategoryTranslate->title }}
+                                                @if($seoPage->category && $seoPage->category->translates->isNotEmpty())
+                                                    <div class="translation-list">
+                                                        @foreach($seoPage->category->translates as $translate)
+                                                            <div class="translation-item">
+                                                                <span class="badge bg-secondary me-1">{{ $translate->language->lang_code }}</span>
+                                                                <span>{{ $translate->title }}</span>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
                                                 @else
                                                     <span class="text-muted">No category</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                @if($currentTranslate)
-                                                    <code>{{ $currentTranslate->slug }}</code>
+                                                @if($seoPage->translates->isNotEmpty())
+                                                    <div class="slug-list">
+                                                        @foreach($seoPage->translates as $translate)
+                                                            <div class="slug-item">
+                                                                <span class="badge bg-light text-dark me-1">{{ $translate->language->lang_code }}</span>
+                                                                <code>{{ $translate->slug }}</code>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
                                                 @else
                                                     <span class="text-muted">-</span>
                                                 @endif
