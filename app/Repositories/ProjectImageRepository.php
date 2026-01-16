@@ -52,7 +52,7 @@ class ProjectImageRepository extends BaseRepository
         foreach ($images as $image) {
             try {
                 $path = $this->imageService->upload($image, 'projects');
-                
+
                 $projectImage = $this->projectImage->create([
                     'project_id' => $projectId,
                     'image' => $path,
@@ -86,7 +86,7 @@ class ProjectImageRepository extends BaseRepository
             if (Storage::disk('public')->exists($image->image)) {
                 Storage::disk('public')->delete($image->image);
             }
-            
+
             // Upload new image
             $data['image'] = $this->imageService->upload($newImage, 'projects');
         }
@@ -106,7 +106,7 @@ class ProjectImageRepository extends BaseRepository
         if (Storage::disk('public')->exists($image->image)) {
             Storage::disk('public')->delete($image->image);
         }
-        
+
         return $image->delete();
     }
 
@@ -126,7 +126,7 @@ class ProjectImageRepository extends BaseRepository
         // Set the selected image as main
         $this->projectImage->where('id', $imageId)
             ->where('project_id', $projectId)
-            ->update(['is_main' => true]);
+            ->update(['is_main_image' => true]);
     }
 
     /**
@@ -149,14 +149,14 @@ class ProjectImageRepository extends BaseRepository
 
         $case = 'CASE id ';
         $ids = [];
-        
+
         foreach ($itemIds as $order => $id) {
             $case .= 'WHEN ' . $id . ' THEN ' . ($order + 1) . ' ';
             $ids[] = $id;
         }
-        
+
         $case .= 'ELSE `order` END';
-        
+
         return $this->projectImage->whereIn('id', $ids)
             ->update([
                 'order' => DB::raw($case)
