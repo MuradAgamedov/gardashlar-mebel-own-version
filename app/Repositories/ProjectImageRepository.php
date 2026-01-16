@@ -121,7 +121,7 @@ class ProjectImageRepository extends BaseRepository
     {
         // Reset all images to not main
         $this->projectImage->where('project_id', $projectId)
-            ->update(['is_main' => false]);
+            ->update(['is_main_image' => false]);
 
         // Set the selected image as main
         $this->projectImage->where('id', $imageId)
