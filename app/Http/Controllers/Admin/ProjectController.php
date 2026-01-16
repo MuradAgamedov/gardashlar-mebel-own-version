@@ -64,7 +64,7 @@ class ProjectController extends Controller
         try {
             $project = Project::create([
                 'project_category_id' => $request->project_category_id,
-                'status' => $request->boolean('status'),
+                'status' => $request->input('status', false),
             ]);
 
             // Create translations
@@ -80,6 +80,7 @@ class ProjectController extends Controller
                         'seo_title' => $translation['seo_title'] ?? null,
                         'seo_keywords' => $translation['seo_keywords'] ?? null,
                         'seo_description' => $translation['seo_description'] ?? null,
+                        'status' => $request->boolean('status'),
                     ]);
                 }
             }

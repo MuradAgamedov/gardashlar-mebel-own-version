@@ -67,7 +67,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Add New Images for Project: 
+                        <h5>Add New Images for Project:
                             @php
                                 $firstTranslation = $project->translates->first();
                             @endphp
@@ -77,16 +77,16 @@
                     <div class="card-body">
                         <form action="{{ route('admin.projects.images.store', $project) }}" method="POST" enctype="multipart/form-data">
                             @csrf
-                            
+
                             <!-- Multiple Image Upload -->
                             <div style="padding: 15px" class="row mb-3">
                                 <div class="col-md-12">
                                     <label class="form-label">
                                         Images <span class="text-danger">*</span>
                                     </label>
-                                    <input type="file" 
-                                           class="form-control @error('images') is-invalid @enderror" 
-                                           name="images[]" 
+                                    <input type="file"
+                                           class="form-control @error('images') is-invalid @enderror"
+                                           name="images[]"
                                            accept="image/*"
                                            id="imageInput"
                                            multiple
@@ -114,6 +114,7 @@
                             <div style="padding: 15px" class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Status</label>
+                                    <input type="hidden" name="status" value="0">
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" value="1" checked>
                                         <label class="form-check-label" for="status">Active</label>
@@ -148,11 +149,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     const imageInput = document.getElementById('imageInput');
     const selectedFiles = document.getElementById('selectedFiles');
-    
+
     imageInput.addEventListener('change', function() {
         if (this.files && this.files.length > 0) {
             selectedFiles.innerHTML = '';
-            
+
             // Optional: Add file count warning for very large selections
             if (this.files.length > 100) {
                 selectedFiles.innerHTML = `
@@ -162,12 +163,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 `;
             }
-            
+
             // Process each file
             Array.from(this.files).forEach((file, index) => {
                 const fileName = file.name;
                 const fileSize = (file.size / 1024 / 1024).toFixed(2); // Convert to MB
-                
+
                 // Create preview for each file
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -190,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
                 reader.readAsDataURL(file);
             });
-            
+
             // Add summary
             const summary = document.createElement('div');
             summary.className = 'alert alert-success alert-dismissible fade show';
@@ -199,11 +200,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             `;
             selectedFiles.appendChild(summary);
-            
+
         } else {
             selectedFiles.innerHTML = '';
         }
     });
 });
 </script>
-@endpush 
+@endpush

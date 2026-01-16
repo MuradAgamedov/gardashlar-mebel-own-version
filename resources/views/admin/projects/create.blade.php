@@ -91,7 +91,6 @@
                             <div style="padding: 15px" class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Status</label>
-                                    <input type="hidden" name="status" value="0">
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" value="1" checked>
                                         <label class="form-check-label" for="status">Active</label>

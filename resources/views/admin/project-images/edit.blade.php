@@ -55,7 +55,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Image for Project: 
+                        <h5>Edit Image for Project:
                             @php
                                 $firstTranslation = $project->translates->first();
                             @endphp
@@ -66,15 +66,15 @@
                         <form action="{{ route('admin.projects.images.update', [$project, $image]) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
-                            
+
                             <!-- Current Image Preview -->
                             <div style="padding: 15px" class="row mb-3">
                                 <div class="col-md-12">
                                     <label class="form-label">Current Image</label>
                                     <div class="text-center">
-                                        <img src="{{ $image->image_url }}" 
-                                             alt="Current Image" 
-                                             class="img-fluid rounded" 
+                                        <img src="{{ $image->image_url }}"
+                                             alt="Current Image"
+                                             class="img-fluid rounded"
                                              style="max-height: 300px; max-width: 100%;">
                                     </div>
                                 </div>
@@ -84,9 +84,9 @@
                             <div style="padding: 15px" class="row mb-3">
                                 <div class="col-md-12">
                                     <label class="form-label">New Image (Optional)</label>
-                                    <input type="file" 
-                                           class="form-control @error('image') is-invalid @enderror" 
-                                           name="image" 
+                                    <input type="file"
+                                           class="form-control @error('image') is-invalid @enderror"
+                                           name="image"
                                            accept="image/*"
                                            id="imageInput">
                                     @error('image')
@@ -107,12 +107,13 @@
                             <div style="padding: 15px" class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Status</label>
+                                    <input type="hidden" name="status" value="0">
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" 
-                                               type="checkbox" 
-                                               id="status" 
-                                               name="status" 
-                                               value="1" 
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               id="status"
+                                               name="status"
+                                               value="1"
                                                {{ old('status', $image->status) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">Active</label>
                                     </div>
@@ -146,13 +147,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     const imageInput = document.getElementById('imageInput');
     const selectedFileName = document.getElementById('selectedFileName');
-    
+
     imageInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
             const file = this.files[0];
             const fileName = file.name;
             const fileSize = (file.size / 1024 / 1024).toFixed(2); // Convert to MB
-            
+
             // Create preview
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -179,4 +180,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush 
+@endpush
