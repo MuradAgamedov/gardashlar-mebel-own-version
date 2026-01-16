@@ -183,18 +183,10 @@ class ImageService
         }
 
         // Keyfiyyətlə bağlı heç bir parametr yoxdur (default WebP)
-        ob_start();
-        $ok = imagewebp($image);
+        // $ok = imagewebp($image);
+        // WebP çevrilməsi müvəqqəti söndürülüb - orijinal formatda saxlanılacaq
         imagedestroy($image);
-
-        if (!$ok) {
-            ob_end_clean();
-            \Log::error('WebP encoding failed', ['mime' => $mime]);
-            return null;
-        }
-
-        $data = ob_get_clean();
-        return $data === false ? null : $data;
+        return null; // WebP çevrilməsi söndürülüb, null qaytarırıq
     }
 
     private function generateFilenameWithExtension(UploadedFile $file, string $forceExtension, bool $unique = true): string
