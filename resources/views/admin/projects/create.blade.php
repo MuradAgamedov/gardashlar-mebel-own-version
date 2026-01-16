@@ -57,23 +57,23 @@
                     <div class="card-body">
                         <form action="{{ route('admin.projects.store') }}" method="POST">
                             @csrf
-                            
 
-                                
+
+
                                 <!-- Project Category -->
                                 <div class="col-md-6">
                                     <label class="form-label">
                                         Project Category <span class="text-danger">*</span>
                                     </label>
-                                    <select class="form-select @error('project_category_id') is-invalid @enderror" 
-                                            name="project_category_id" 
+                                    <select class="form-select @error('project_category_id') is-invalid @enderror"
+                                            name="project_category_id"
                                             required>
                                         <option value="">Select a category</option>
                                         @foreach($categories as $category)
                                             @php
                                                 $categoryTranslation = $category->translates->first();
                                             @endphp
-                                            <option value="{{ $category->id }}" 
+                                            <option value="{{ $category->id }}"
                                                     {{ old('project_category_id') == $category->id ? 'selected' : '' }}>
                                                 {{ $categoryTranslation ? $categoryTranslation->title : 'Category #' . $category->id }}
                                             </option>
@@ -91,6 +91,7 @@
                             <div style="padding: 15px" class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Status</label>
+                                    <input type="hidden" name="status" value="0">
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" value="1" checked>
                                         <label class="form-check-label" for="status">Active</label>
@@ -105,11 +106,11 @@
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
                                         @foreach($languages as $index => $language)
                                             <li class="nav-item" role="presentation">
-                                                <button class="nav-link {{ $index === 0 ? 'active' : '' }}" 
-                                                        id="tab-{{ $language->id }}" 
-                                                        data-bs-toggle="tab" 
-                                                        data-bs-target="#content-{{ $language->id }}" 
-                                                        type="button" 
+                                                <button class="nav-link {{ $index === 0 ? 'active' : '' }}"
+                                                        id="tab-{{ $language->id }}"
+                                                        data-bs-toggle="tab"
+                                                        data-bs-target="#content-{{ $language->id }}"
+                                                        type="button"
                                                         role="tab">
                                                         {{ $language->lang_name }} ({{ $language->lang_code }})
                                                 </button>
@@ -119,20 +120,20 @@
 
                                     <div class="tab-content" id="languageTabContent">
                                         @foreach($languages as $index => $language)
-                                            <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" 
-                                                 id="content-{{ $language->id }}" 
+                                            <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}"
+                                                 id="content-{{ $language->id }}"
                                                  role="tabpanel">
-                                                
+
                                                 <div class="row mt-3" style="padding: 15px;">
                                                     <!-- Title -->
                                                     <div class="col-md-6 mb-3">
                                                         <label class="form-label">
                                                             Title <span class="text-danger">*</span>
                                                         </label>
-                                                        <input type="text" 
-                                                               class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
-                                                               name="translations[{{ $language->id }}][title]" 
-                                                               value="{{ old("translations.{$language->id}.title") }}" 
+                                                        <input type="text"
+                                                               class="form-control @error("translations.{$language->id}.title") is-invalid @enderror"
+                                                               name="translations[{{ $language->id }}][title]"
+                                                               value="{{ old("translations.{$language->id}.title") }}"
                                                                placeholder="Enter project title in {{ $language->lang_name }}"
                                                                required>
                                                         @error("translations.{$language->id}.title")
@@ -141,16 +142,16 @@
                                                             </div>
                                                         @enderror
                                                     </div>
-                                                    
+
                                                     <!-- Company Name -->
                                                     <div class="col-md-6 mb-3">
                                                         <label class="form-label">
                                                             Company Name <span class="text-danger">*</span>
                                                         </label>
-                                                        <input type="text" 
-                                                               class="form-control @error("translations.{$language->id}.company_name") is-invalid @enderror" 
-                                                               name="translations[{{ $language->id }}][company_name]" 
-                                                               value="{{ old("translations.{$language->id}.company_name") }}" 
+                                                        <input type="text"
+                                                               class="form-control @error("translations.{$language->id}.company_name") is-invalid @enderror"
+                                                               name="translations[{{ $language->id }}][company_name]"
+                                                               value="{{ old("translations.{$language->id}.company_name") }}"
                                                                placeholder="Enter company name in {{ $language->lang_name }}"
                                                                required>
                                                         @error("translations.{$language->id}.company_name")
@@ -159,16 +160,16 @@
                                                             </div>
                                                         @enderror
                                                     </div>
-                                                    
+
                                                     <!-- Slug -->
                                                     <div class="col-md-12 mb-3">
                                                         <label class="form-label">
                                                             Slug <span class="text-danger">*</span>
                                                         </label>
-                                                        <input type="text" 
-                                                               class="form-control @error("translations.{$language->id}.slug") is-invalid @enderror" 
-                                                               name="translations[{{ $language->id }}][slug]" 
-                                                               value="{{ old("translations.{$language->id}.slug") }}" 
+                                                        <input type="text"
+                                                               class="form-control @error("translations.{$language->id}.slug") is-invalid @enderror"
+                                                               name="translations[{{ $language->id }}][slug]"
+                                                               value="{{ old("translations.{$language->id}.slug") }}"
                                                                placeholder="Enter project slug in {{ $language->lang_name }}"
                                                                required>
                                                         @error("translations.{$language->id}.slug")
@@ -177,14 +178,14 @@
                                                             </div>
                                                         @enderror
                                                     </div>
-                                                    
+
                                                     <!-- Description -->
                                                     <div class="col-md-12 mb-3">
                                                         <label class="form-label">
                                                             Description <span class="text-danger">*</span>
                                                         </label>
-                                                        <textarea class="form-control ckeditor @error("translations.{$language->id}.description") is-invalid @enderror" 
-                                                                  name="translations[{{ $language->id }}][description]" 
+                                                        <textarea class="form-control ckeditor @error("translations.{$language->id}.description") is-invalid @enderror"
+                                                                  name="translations[{{ $language->id }}][description]"
                                                                   placeholder="Enter project description in {{ $language->lang_name }}"
                                                                   required>{{ old("translations.{$language->id}.description") }}</textarea>
                                                         @error("translations.{$language->id}.description")
@@ -193,7 +194,7 @@
                                                             </div>
                                                         @enderror
                                                     </div>
-                                                    
+
                                                     <!-- SEO Fields -->
                                                     <div class="col-12 mb-3">
                                                         <h6 class="mb-3 text-primary">
@@ -201,16 +202,16 @@
                                                             SEO Information
                                                         </h6>
                                                     </div>
-                                                    
+
                                                     <!-- SEO Title -->
                                                     <div class="col-md-12 mb-3">
                                                         <label class="form-label">
                                                             SEO Title
                                                         </label>
-                                                        <input type="text" 
-                                                               class="form-control @error("translations.{$language->id}.seo_title") is-invalid @enderror" 
-                                                               name="translations[{{ $language->id }}][seo_title]" 
-                                                               value="{{ old("translations.{$language->id}.seo_title") }}" 
+                                                        <input type="text"
+                                                               class="form-control @error("translations.{$language->id}.seo_title") is-invalid @enderror"
+                                                               name="translations[{{ $language->id }}][seo_title]"
+                                                               value="{{ old("translations.{$language->id}.seo_title") }}"
                                                                placeholder="Enter SEO optimized title for {{ $language->lang_name }}">
                                                         @error("translations.{$language->id}.seo_title")
                                                             <div class="invalid-feedback">
@@ -218,14 +219,14 @@
                                                             </div>
                                                         @enderror
                                                     </div>
-                                                    
+
                                                     <!-- SEO Keywords -->
                                                     <div class="col-md-12 mb-3">
                                                         <label class="form-label">
                                                             SEO Keywords
                                                         </label>
-                                                        <textarea class="form-control @error("translations.{$language->id}.seo_keywords") is-invalid @enderror" 
-                                                                  name="translations[{{ $language->id }}][seo_keywords]" 
+                                                        <textarea class="form-control @error("translations.{$language->id}.seo_keywords") is-invalid @enderror"
+                                                                  name="translations[{{ $language->id }}][seo_keywords]"
                                                                   rows="2"
                                                                   placeholder="Enter SEO keywords separated by commas for {{ $language->lang_name }}">{{ old("translations.{$language->id}.seo_keywords") }}</textarea>
                                                         @error("translations.{$language->id}.seo_keywords")
@@ -234,14 +235,14 @@
                                                             </div>
                                                         @enderror
                                                     </div>
-                                                    
+
                                                     <!-- SEO Description -->
                                                     <div class="col-md-12 mb-3">
                                                         <label class="form-label">
                                                             SEO Description
                                                         </label>
-                                                        <textarea class="form-control @error("translations.{$language->id}.seo_description") is-invalid @enderror" 
-                                                                  name="translations[{{ $language->id }}][seo_description]" 
+                                                        <textarea class="form-control @error("translations.{$language->id}.seo_description") is-invalid @enderror"
+                                                                  name="translations[{{ $language->id }}][seo_description]"
                                                                   rows="3"
                                                                   placeholder="Enter SEO meta description for {{ $language->lang_name }}">{{ old("translations.{$language->id}.seo_description") }}</textarea>
                                                         @error("translations.{$language->id}.seo_description")
@@ -251,7 +252,7 @@
                                                         @enderror
                                                     </div>
                                                 </div>
-                                                
+
                                                 <input type="hidden" name="translations[{{ $language->id }}][language_id]" value="{{ $language->id }}">
                                             </div>
                                         @endforeach
@@ -289,11 +290,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.ckeditor').forEach(textarea => {
         textarea.removeAttribute('required');
     });
-    
+
     // Initialize CKEditor for all textareas with ckeditor class
     const textareas = document.querySelectorAll('.ckeditor');
     const editors = {};
-    
+
     textareas.forEach((textarea, index) => {
         ClassicEditor
             .create(textarea, {
@@ -307,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('CKEditor error:', error);
             });
     });
-    
+
     // Update form data before submit using getData() method
     document.querySelector('form').addEventListener('submit', function() {
         Object.entries(editors).forEach(([name, editor]) => {
@@ -322,6 +323,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush 
+@endpush
 
-@include('admin.partials.slug-generator') 
+@include('admin.partials.slug-generator')

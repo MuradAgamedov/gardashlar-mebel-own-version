@@ -19,9 +19,7 @@ class ProjectController extends Controller
     public function __construct(
         public ProjectRepository $repository,
         public LanguageRepository $languageRepository
-    )
-    {
-    }
+    ) {}
     /**
      * Display a listing of the resource.
      */
@@ -30,7 +28,7 @@ class ProjectController extends Controller
         $mainLanguage = $this->languageRepository->getMainLanguage();
         $categories = $this->repository->getActiveCategoriesWithMainLanguage($mainLanguage->id);
         $projects = $this->repository->getProjects($request);
-        
+
         return view('admin.projects.index', compact('projects', 'categories'));
     }
 
@@ -66,7 +64,7 @@ class ProjectController extends Controller
         try {
             $project = Project::create([
                 'project_category_id' => $request->project_category_id,
-                'status' => $request->input('status', false),
+                'status' => $request->boolean('status'),
             ]);
 
             // Create translations
@@ -88,11 +86,10 @@ class ProjectController extends Controller
 
             return redirect()->route('admin.projects.index')
                 ->with('success', 'Project created successfully.');
-
         } catch (\Exception $e) {
             Log::error('Error creating project: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
-            
+
             return back()->withInput()
                 ->with('error', 'Error creating project: ' . $e->getMessage());
         }
@@ -132,13 +129,13 @@ class ProjectController extends Controller
         foreach ($request->translations as $languageId => $translation) {
             $existingTranslation = $project->translates()->where('language_id', $languageId)->first();
             $slugRule = 'required|string|max:255';
-            
+
             if ($existingTranslation) {
                 $slugRule .= '|unique:project_translates,slug,' . $existingTranslation->id;
             } else {
                 $slugRule .= '|unique:project_translates,slug';
             }
-            
+
             $customRules["translations.{$languageId}.slug"] = $slugRule;
         }
 
@@ -147,14 +144,14 @@ class ProjectController extends Controller
         try {
             $project->update([
                 'project_category_id' => $request->project_category_id,
-                'status' => $request->input('status', false),
+                'status' => $request->boolean('status'),
             ]);
 
             // Update or create translations
             foreach ($request->translations as $languageId => $translation) {
                 if (!empty($translation['title'])) {
                     $existingTranslation = $project->translates()->where('language_id', $languageId)->first();
-                    
+
                     if ($existingTranslation) {
                         // Update existing translation
                         $existingTranslation->update([
@@ -185,10 +182,9 @@ class ProjectController extends Controller
 
             return redirect()->route('admin.projects.index')
                 ->with('success', 'Project updated successfully.');
-
         } catch (\Exception $e) {
             Log::error('Error updating project: ' . $e->getMessage());
-            
+
             return back()->withInput()
                 ->with('error', 'Error updating project. Please try again.');
         }
@@ -243,7 +239,7 @@ class ProjectController extends Controller
 
         try {
             $deletedCount = Project::whereIn('id', $request->ids)->delete();
-            
+
             return redirect()->route('admin.projects.index')
                 ->with('success', "{$deletedCount} project(s) deleted successfully!");
         } catch (\Exception $e) {
