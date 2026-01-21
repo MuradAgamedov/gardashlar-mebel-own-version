@@ -20,6 +20,20 @@ use Illuminate\Support\Facades\Cache;
 class ProductsController extends Controller
 {
     use LocaleFromHeader;
+    function normalizeSearchQuery(string $text): string
+    {
+        $map = [
+            'ə' => 'e', 'Ə' => 'e',
+            'ı' => 'i', 'İ' => 'i',
+            'ö' => 'o', 'Ö' => 'o',
+            'ü' => 'u', 'Ü' => 'u',
+            'ş' => 's', 'Ş' => 's',
+            'ç' => 'c', 'Ç' => 'c',
+            'ğ' => 'g', 'Ğ' => 'g',
+        ];
+
+        return strtolower(strtr($text, $map));
+    }
 
     public function categories(Request $request)
     {
@@ -153,7 +167,7 @@ class ProductsController extends Controller
             });
 
             // === Yeni: search parametri ===
-            $searchQuery = $request->get('search'); // məsələn: ?search=table
+            $searchQuery = $this->normalizeSearchQuery($request->get('search')); // məsələn: ?search=table
 
             // Pagination və digər filterlər
             $perPage = $request->get('per_page', 12);
