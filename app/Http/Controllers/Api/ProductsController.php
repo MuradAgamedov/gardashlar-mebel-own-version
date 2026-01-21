@@ -238,8 +238,8 @@ class ProductsController extends Controller
                     // Maksimum oxşarlıq skorunu tap
                     $maxSimilarity = max($titleSimilarity, $descriptionSimilarity, $seoDescriptionSimilarity);
                     
-                    // Ən azı 30% oxşarlıq olan məhsulları əlavə et
-                    if ($maxSimilarity >= 30) {
+                    // Ən azı 70% oxşarlıq olan məhsulları əlavə et
+                    if ($maxSimilarity >= 70) {
                         $similarProducts[] = [
                             'product_id' => $translate->product_id,
                             'similarity_score' => $maxSimilarity
