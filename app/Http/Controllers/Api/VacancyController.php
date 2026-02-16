@@ -54,6 +54,10 @@ public function index(Request $request): JsonResponse
                         'slug' => $translation?->slug ?? '',
                         'position' => $translation?->position ?? '',
                         'experience' => $translation?->experience ?? '',
+                        'age' => $vacancy->age,
+                        'education' => $translation?->education ?? '',
+                        'related_person' => $translation?->related_person ?? '',
+                        'city' => $translation?->city ?? '',
                         'last_apply_date' => $lastApplyDate,
                         'is_expired' => $isExpired,
                     ];
