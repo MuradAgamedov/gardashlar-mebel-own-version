@@ -153,7 +153,7 @@ public function show(Request $request, string $slug): JsonResponse
                 ->ordered()
                 ->limit(5)
                 ->get()
-                ->map(function ($item) {
+                ->map(function ($item) use ($languageId) {
                     $t = $item->translates->first();
                     $requirement = $item->requirements()->with(['translates' => fn ($q) => $q->where('language_id', $languageId)])->active()->ordered()->first();
 
