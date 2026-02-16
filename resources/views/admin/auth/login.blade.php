@@ -20,19 +20,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,200;6..12,300;6..12,400;6..12,500;6..12,600;6..12,700;6..12,800;6..12,900;6..12,1000&display=swap" rel="stylesheet">
     
     <!-- Flag icon css -->
-    <link rel="stylesheet" href="{{ asset('admin/assets/css/vendors/flag-icon.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/assets/css/vendors/flag-icon.css?v=' . time()) }}">
     <!-- iconly-icon-->
-    <link rel="stylesheet" href="{{ asset('admin/assets/css/iconly-icon.css') }}">
-    <link rel="stylesheet" href="{{ asset('admin/assets/css/bulk-style.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/assets/css/iconly-icon.css?v=' . time()) }}">
+    <link rel="stylesheet" href="{{ asset('admin/assets/css/bulk-style.css?v=' . time()) }}">
     <!-- iconly-icon-->
-    <link rel="stylesheet" href="{{ asset('admin/assets/css/themify.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/assets/css/themify.css?v=' . time()) }}">
     <!--fontawesome-->
-    <link rel="stylesheet" href="{{ asset('admin/assets/css/fontawesome-min.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/assets/css/fontawesome-min.css?v=' . time()) }}">
     <!-- Whether Icon css-->
-    <link rel="stylesheet" type="text/css" href="{{ asset('admin/assets/css/vendors/weather-icons/weather-icons.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('admin/assets/css/vendors/weather-icons/weather-icons.min.css?v=' . time()) }}">
     <!-- App css -->
-    <link id="color" rel="stylesheet" href="{{ asset('admin/assets/css/color-1.css') }}" media="screen">
-    <link rel="stylesheet" href="{{ asset('admin/assets/css/style.css') }}">
+    <link id="color" rel="stylesheet" href="{{ asset('admin/assets/css/color-1.css?v=' . time()) }}" media="screen">
+    <link rel="stylesheet" href="{{ asset('admin/assets/css/style.css?v=' . time()) }}">
 </head>
 <body>
     <!-- tap on top starts-->
@@ -126,15 +126,15 @@
     </div>
     
     <!-- jquery-->
-    <script src="{{ asset('admin/assets/js/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('admin/assets/js/vendors/jquery/jquery.min.js?v=' . time()) }}"></script>
     <!-- bootstrap js-->
-    <script src="{{ asset('admin/assets/js/vendors/bootstrap/dist/js/bootstrap.bundle.min.js') }}" defer></script>
-    <script src="{{ asset('admin/assets/js/vendors/bootstrap/dist/js/popper.min.js') }}" defer></script>
+    <script src="{{ asset('admin/assets/js/vendors/bootstrap/dist/js/bootstrap.bundle.min.js?v=' . time()) }}" defer></script>
+    <script src="{{ asset('admin/assets/js/vendors/bootstrap/dist/js/popper.min.js?v=' . time()) }}" defer></script>
     <!--fontawesome-->
-    <script src="{{ asset('admin/assets/js/vendors/font-awesome/fontawesome-min.js') }}"></script>
+    <script src="{{ asset('admin/assets/js/vendors/font-awesome/fontawesome-min.js?v=' . time()) }}"></script>
     <!-- password_show-->
-    <script src="{{ asset('admin/assets/js/password.js') }}"></script>
+    <script src="{{ asset('admin/assets/js/password.js?v=' . time()) }}"></script>
     <!-- custom script -->
-    <script src="{{ asset('admin/assets/js/script.js') }}"></script>
+    <script src="{{ asset('admin/assets/js/script.js?v=' . time()) }}"></script>
 </body>
 </html> 
