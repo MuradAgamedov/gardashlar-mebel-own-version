@@ -151,37 +151,46 @@ public function show(Request $request, string $slug): JsonResponse
 
             // 🔹 Other vacancies (cari vakansiya çıxılır)
             $otherVacancies = Vacancy::with([
-                    'translates' => fn ($q) => $q->where('language_id', $languageId)
-                ])
-                ->where('id', '!=', $vacancy->id)
-                ->active()
-                ->notExpired()
-                ->ordered()
-                ->limit(5)
-                ->get()
-                ->map(function ($item) {
-                    $t = $item->translates->first();
+        'translates' => fn ($q) => $q->where('language_id', $languageId),
+        'requirements.translates' => fn ($q) => $q->where('language_id', $languageId)
+    ])
+    ->where('id', '!=', $vacancy->id)
+    ->active()
+    ->notExpired()
+    ->ordered()
+    ->limit(5)
+    ->get()
+    ->map(function ($item) {
+        $t = $item->translates->first();
 
-                    return [
-                        'id' => $item->id,
-                        'title' => $t?->title ?? '',
-                        'slug' => $t?->slug ?? '',
-                        'position' => $t?->position ?? '',
-                        'experience' => $t?->experience ?? '',
-                        'work_schedule' => $t?->work_schedule ?? '',
-                        'salary' => $t?->salary ?? '',
-                        'email' => $t?->email ?? '',
-                        'phone' => $t?->phone ?? '',
-                        'age' => $item->age,
-                        'education' => $t?->education ?? '',
-                        'related_person' => $t?->related_person ?? '',
-                        'city' => $t?->city ?? '',
-                        'last_apply_date' => $item->last_apply_date?->format('Y-m-d'),
-                        'email' => $item->email,
-                        'phone' => $item->phone,
+        $requirements = $item->requirements->map(function ($req) {
+            $reqTranslation = $req->translates->first();
+            return [
+                'id' => $req->id,
+                'title' => $reqTranslation?->title ?? '',
+                'description' => $reqTranslation?->description ?? '',
+            ];
+        });
 
-                    ];
-                });
+        return [
+            'id' => $item->id,
+            'title' => $t?->title ?? '',
+            'slug' => $t?->slug ?? '',
+            'position' => $t?->position ?? '',
+            'experience' => $t?->experience ?? '',
+            'work_schedule' => $t?->work_schedule ?? '',
+            'salary' => $t?->salary ?? '',
+            'email' => $item->email,
+            'phone' => $item->phone,
+            'age' => $item->age,
+            'education' => $t?->education ?? '',
+            'related_person' => $t?->related_person ?? '',
+            'city' => $t?->city ?? '',
+            'last_apply_date' => $item->last_apply_date?->format('Y-m-d'),
+            'requirements' => $requirements, // ✅ əlavə edildi
+        ];
+    });
+
 
             return [
                 'id' => $vacancy->id,
