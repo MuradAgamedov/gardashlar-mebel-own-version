@@ -67,7 +67,7 @@ public function index(Request $request): JsonResponse
                         'slug' => $translation?->slug ?? '',
                         'position' => $translation?->position ?? '',
                         'experience' => $translation?->experience ?? '',
-                        'salary' => $vacancy->salary,
+                        'salary' => $translation->salary,
                         
                         'age' => $vacancy->age,
                         'education' => $translation?->education ?? '',
