@@ -13,9 +13,6 @@ return new class extends Migration
     {
         Schema::table('vacancies', function (Blueprint $table) {
             $table->integer('age')->nullable();
-            $table->string('education')->nullable();
-            $table->string('related_person')->nullable();
-            $table->string('city')->nullable();
         });
     }
 
@@ -25,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('vacancies', function (Blueprint $table) {
-            $table->dropColumn(['age', 'education', 'related_person', 'city']);
+            $table->dropColumn('age');
         });
     }
 };

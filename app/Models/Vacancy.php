@@ -16,10 +16,7 @@ class Vacancy extends Model
         'order',
         'status',
         'phone',
-        'age',
-        'education',
-        'related_person',
-        'city'
+        'age'
     ];
         // App\Models\Vacancy.php
         public function scopeNotExpired($query)

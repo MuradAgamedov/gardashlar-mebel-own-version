@@ -84,6 +84,20 @@
                                         </div>
                                         <!-- ✅ End Phone -->
 
+                                        <!-- ✅ Age Field -->
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Age</label>
+                                            <input type="number" 
+                                                   class="form-control @error('age') is-invalid @enderror" 
+                                                   name="age" 
+                                                   value="{{ old('age', $vacancy->age) }}"
+                                                   placeholder="Enter age requirement">
+                                            @error('age')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <!-- ✅ END Age Field -->
+
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Last Apply Date</label>
                                             <input type="date" 
@@ -205,6 +219,37 @@
                                                     </div>
                                                 </div>
                                                 <!-- ✅ END Address -->
+
+                                                <!-- ✅ Additional Fields -->
+                                                <div class="row mt-3">
+                                                    <div class="col-md-4 mb-3">
+                                                        <label class="form-label">Education</label>
+                                                        <input type="text" 
+                                                               class="form-control" 
+                                                               name="translations[{{ $language->id }}][education]" 
+                                                               value="{{ old("translations.{$language->id}.education", $translation->education ?? '') }}"
+                                                               placeholder="Enter education requirement for {{ $language->lang_code }}">
+                                                    </div>
+
+                                                    <div class="col-md-4 mb-3">
+                                                        <label class="form-label">Related Person</label>
+                                                        <input type="text" 
+                                                               class="form-control" 
+                                                               name="translations[{{ $language->id }}][related_person]" 
+                                                               value="{{ old("translations.{$language->id}.related_person", $translation->related_person ?? '') }}"
+                                                               placeholder="Enter related person for {{ $language->lang_code }}">
+                                                    </div>
+
+                                                    <div class="col-md-4 mb-3">
+                                                        <label class="form-label">City</label>
+                                                        <input type="text" 
+                                                               class="form-control" 
+                                                               name="translations[{{ $language->id }}][city]" 
+                                                               value="{{ old("translations.{$language->id}.city", $translation->city ?? '') }}"
+                                                               placeholder="Enter city for {{ $language->lang_code }}">
+                                                    </div>
+                                                </div>
+                                                <!-- ✅ END Additional Fields -->
 
                                                 <!-- SEO Section -->
                                                 <div class="row mt-3">

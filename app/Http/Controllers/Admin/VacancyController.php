@@ -39,6 +39,7 @@ class VacancyController extends Controller
         'last_apply_date' => 'nullable|date|after:today',
         'email' => 'nullable|email|max:255',
         'phone' => 'nullable|string|max:50',
+        'age' => 'nullable|integer|min:1|max:150',
         'status' => 'boolean',
     ]);
 
@@ -51,6 +52,9 @@ class VacancyController extends Controller
             "translations.{$language->id}.work_schedule" => 'required|string|max:1000',
             "translations.{$language->id}.salary" => 'nullable|string|max:255',
             "translations.{$language->id}.address" => 'nullable|string|max:500',
+            "translations.{$language->id}.education" => 'nullable|string|max:255',
+            "translations.{$language->id}.related_person" => 'nullable|string|max:255',
+            "translations.{$language->id}.city" => 'nullable|string|max:255',
             "translations.{$language->id}.seo_title" => 'nullable|string|max:255',
             "translations.{$language->id}.seo_keywords" => 'nullable|string',
             "translations.{$language->id}.seo_description" => 'nullable|string',
@@ -63,6 +67,7 @@ class VacancyController extends Controller
             'last_apply_date' => $request->last_apply_date,
             'email' => trim($request->email),
             'phone' => trim($request->phone),
+            'age' => $request->age,
             'status' => $request->input('status'),
         ]);
 
@@ -79,6 +84,9 @@ class VacancyController extends Controller
                 'work_schedule' => trim($translationData['work_schedule'] ?? ''),
                 'salary' => trim($translationData['salary'] ?? ''),
                 'address' => trim($translationData['address'] ?? ''),
+                'education' => trim($translationData['education'] ?? ''),
+                'related_person' => trim($translationData['related_person'] ?? ''),
+                'city' => trim($translationData['city'] ?? ''),
                 'seo_title' => trim($translationData['seo_title'] ?? ''),
                 'seo_keywords' => trim($translationData['seo_keywords'] ?? ''),
                 'seo_description' => trim($translationData['seo_description'] ?? ''),
@@ -120,6 +128,7 @@ class VacancyController extends Controller
         'last_apply_date' => 'nullable|date',
         'email' => 'nullable|email|max:255',
         'phone' => 'nullable|string|max:50',
+        'age' => 'nullable|integer|min:1|max:150',
         'status' => 'boolean',
     ]);
 
@@ -132,6 +141,9 @@ class VacancyController extends Controller
             "translations.{$language->id}.work_schedule" => 'required|string|max:1000',
             "translations.{$language->id}.salary" => 'nullable|string|max:255',
             "translations.{$language->id}.address" => 'nullable|string|max:500',
+            "translations.{$language->id}.education" => 'nullable|string|max:255',
+            "translations.{$language->id}.related_person" => 'nullable|string|max:255',
+            "translations.{$language->id}.city" => 'nullable|string|max:255',
             "translations.{$language->id}.seo_title" => 'nullable|string|max:255',
             "translations.{$language->id}.seo_keywords" => 'nullable|string',
             "translations.{$language->id}.seo_description" => 'nullable|string',
@@ -144,6 +156,7 @@ class VacancyController extends Controller
             'last_apply_date' => $request->last_apply_date,
             'email' => trim($request->email),
             'phone' => trim($request->phone),
+            'age' => $request->age,
             'status' => $request->input('status'),
         ]);
 
@@ -161,6 +174,9 @@ class VacancyController extends Controller
                     'work_schedule' => trim($translationData['work_schedule'] ?? ''),
                     'salary' => trim($translationData['salary'] ?? ''),
                     'address' => trim($translationData['address'] ?? ''),
+                    'education' => trim($translationData['education'] ?? ''),
+                    'related_person' => trim($translationData['related_person'] ?? ''),
+                    'city' => trim($translationData['city'] ?? ''),
                     'seo_title' => trim($translationData['seo_title'] ?? ''),
                     'seo_keywords' => trim($translationData['seo_keywords'] ?? ''),
                     'seo_description' => trim($translationData['seo_description'] ?? ''),

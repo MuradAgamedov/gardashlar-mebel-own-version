@@ -22,6 +22,9 @@ class VacancyTranslate extends Model
         'seo_keywords',
         'seo_description',
         'address',
+        'education',
+        'related_person',
+        'city'
     ];
 
     /**
