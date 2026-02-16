@@ -29,16 +29,27 @@ public function index(Request $request): JsonResponse
         
         $cacheKey = "api_vacancies_{$languageId}";
         
-        $vacancies = Cache::rememberForever($cacheKey, function () use ($languageId) {
-            return Vacancy::with(['translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                }])
+      $vacancies = Cache::rememberForever($cacheKey, function () use ($languageId) {
+            return Vacancy::with([
+                    'translates' => fn ($q) => $q->where('language_id', $languageId),
+                    'requirements.translates' => fn ($q) => $q->where('language_id', $languageId)
+                ])
                 ->active()
                 ->notExpired()
                 ->ordered()
                 ->get()
                 ->map(function ($vacancy) {
                     $translation = $vacancy->translates->first();
+
+                    $requirements = $vacancy->requirements
+                        ->map(function ($requirement) {
+                            $reqTranslation = $requirement->translates->first();
+                            return [
+                                'id' => $requirement->id,
+                                'title' => $reqTranslation?->title ?? '',
+                                'description' => $reqTranslation?->description ?? '',
+                            ];
+                        });
 
                     $lastApplyDate = $vacancy->last_apply_date 
                         ? $vacancy->last_apply_date->format('Y-m-d')
@@ -62,9 +73,11 @@ public function index(Request $request): JsonResponse
                         'phone' => $vacancy->phone,
                         'last_apply_date' => $lastApplyDate,
                         'is_expired' => $isExpired,
+                        'requirements' => $requirements, // ✅ əlavə edildi
                     ];
                 });
         });
+
 
         if ($vacancies->isEmpty()) {
             return response()->json([
