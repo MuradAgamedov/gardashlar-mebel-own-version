@@ -46,10 +46,10 @@ class VacancyController extends Controller
     // ✅ Translation validation
     foreach ($languages as $language) {
         $request->validate([
-            "translations.{$language->id}.title" => 'required|string|max:255',
-            "translations.{$language->id}.position" => 'required|string|max:255',
-            "translations.{$language->id}.experience" => 'required|string|max:255',
-            "translations.{$language->id}.work_schedule" => 'required|string|max:1000',
+            "translations.{$language->id}.title" => 'string|max:255',
+            "translations.{$language->id}.position" => 'string|max:255',
+            "translations.{$language->id}.experience" => 'string|max:255',
+            "translations.{$language->id}.work_schedule" => 'string|max:1000',
             "translations.{$language->id}.salary" => 'nullable|string|max:255',
             "translations.{$language->id}.address" => 'nullable|string|max:500',
             "translations.{$language->id}.education" => 'nullable|string|max:255',
@@ -135,10 +135,10 @@ class VacancyController extends Controller
     // ✅ Translation validation
     foreach ($languages as $language) {
         $request->validate([
-            "translations.{$language->id}.title" => 'required|string|max:255',
-            "translations.{$language->id}.position" => 'required|string|max:255',
-            "translations.{$language->id}.experience" => 'required|string|max:255',
-            "translations.{$language->id}.work_schedule" => 'required|string|max:1000',
+            "translations.{$language->id}.title" => 'string|max:255',
+            "translations.{$language->id}.position" => 'string|max:255',
+            "translations.{$language->id}.experience" => 'string|max:255',
+            "translations.{$language->id}.work_schedule" => 'string|max:1000',
             "translations.{$language->id}.salary" => 'nullable|string|max:255',
             "translations.{$language->id}.address" => 'nullable|string|max:500',
             "translations.{$language->id}.education" => 'nullable|string|max:255',
@@ -217,8 +217,8 @@ class VacancyController extends Controller
     public function reorder(Request $request)
     {
         $request->validate([
-            'vacancies' => 'required|array',
-            'vacancies.*' => 'required|integer|exists:vacancies,id',
+            'vacancies' => 'array',
+            'vacancies.*' => 'integer|exists:vacancies,id',
         ]);
 
         try {
