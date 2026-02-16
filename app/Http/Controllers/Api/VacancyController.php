@@ -157,6 +157,10 @@ public function show(Request $request, string $slug): JsonResponse
                         'salary' => $t?->salary ?? '',
                         'email' => $t?->email ?? '',
                         'phone' => $t?->phone ?? '',
+                        'age' => $item->age,
+                        'education' => $t?->education ?? '',
+                        'related_person' => $t?->related_person ?? '',
+                        'city' => $t?->city ?? '',
                         'last_apply_date' => $item->last_apply_date?->format('Y-m-d'),
 
                     ];
@@ -173,6 +177,10 @@ public function show(Request $request, string $slug): JsonResponse
                 'email' => $vacancy->email,
                 'phone' => $vacancy->phone,
                 'address' => $translation?->address ?? '',
+                'age' => $vacancy->age,
+                'education' => $translation?->education ?? '',
+                'related_person' => $translation?->related_person ?? '',
+                'city' => $translation?->city ?? '',
                 'last_apply_date' => $vacancy->last_apply_date?->format('Y-m-d'),
                 'created_at' => $vacancy->created_at?->toISOString(),
 
