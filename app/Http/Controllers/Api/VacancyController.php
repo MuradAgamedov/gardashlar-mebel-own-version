@@ -75,7 +75,7 @@ public function index(Request $request): JsonResponse
                         'phone' => $vacancy->phone,
                         'last_apply_date' => $lastApplyDate,
                         'is_expired' => $isExpired,
-                        'requirements' => $requirements, // ✅ əlavə edildi
+                        'requirements' => $firstRequirement ?? [],
                     ];
                 });
         });
@@ -174,6 +174,8 @@ public function show(Request $request, string $slug): JsonResponse
             ];
         });
 
+        $firstRequirement = $requirements->first();
+
         return [
             'id' => $item->id,
             'title' => $t?->title ?? '',
@@ -189,7 +191,7 @@ public function show(Request $request, string $slug): JsonResponse
             'related_person' => $t?->related_person ?? '',
             'city' => $t?->city ?? '',
             'last_apply_date' => $item->last_apply_date?->format('Y-m-d'),
-            'requirements' => $requirements, // ✅ əlavə edildi
+            'requirements' => $firstRequirement ?? [],
         ];
     });
 
