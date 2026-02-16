@@ -51,6 +51,8 @@ public function index(Request $request): JsonResponse
                             ];
                         });
 
+                    $firstRequirement = $requirements->first();
+
                     $lastApplyDate = $vacancy->last_apply_date 
                         ? $vacancy->last_apply_date->format('Y-m-d')
                         : null;
