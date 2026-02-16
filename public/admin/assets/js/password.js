@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     var showHideElements = document.querySelectorAll(".show-hide");
-    var passwordInput = document.querySelector('input[name="login[password]"]');
+    var passwordInput = document.querySelector('input[name="password"]');
     var showHideSpan = document.querySelector(".show-hide span");
     var submitButton = document.querySelector('form button[type="submit"]');
   
