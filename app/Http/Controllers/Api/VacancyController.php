@@ -32,13 +32,14 @@ public function index(Request $request): JsonResponse
         $vacancies = Cache::rememberForever($cacheKey, function () use ($languageId) {
             return Vacancy::with(['translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
-                }])
+                }, 'requirements.translates.language'])
                 ->active()
                 ->notExpired()
                 ->ordered()
                 ->get()
                 ->map(function ($vacancy) {
                     $translation = $vacancy->translates->first();
+                    $requirement = $vacancy->requirements()->with(['translates' => fn ($q) => $q->where('language_id', $languageId)])->active()->ordered()->first();
 
                     $lastApplyDate = $vacancy->last_apply_date 
                         ? $vacancy->last_apply_date->format('Y-m-d')
@@ -58,6 +59,13 @@ public function index(Request $request): JsonResponse
                         'education' => $translation?->education ?? '',
                         'related_person' => $translation?->related_person ?? '',
                         'city' => $translation?->city ?? '',
+                        'email' => $vacancy->email,
+                        'phone' => $vacancy->phone,
+                        'requirement' => $requirement ? [
+                            'id' => $requirement->id,
+                            'title' => $requirement->translates->first()?->title ?? '',
+                            'description' => $requirement->translates->first()?->description ?? '',
+                        ] : null,
                         'last_apply_date' => $lastApplyDate,
                         'is_expired' => $isExpired,
                     ];
@@ -136,7 +144,8 @@ public function show(Request $request, string $slug): JsonResponse
 
             // 🔹 Other vacancies (cari vakansiya çıxılır)
             $otherVacancies = Vacancy::with([
-                    'translates' => fn ($q) => $q->where('language_id', $languageId)
+                    'translates' => fn ($q) => $q->where('language_id', $languageId),
+                    'requirements.translates.language'
                 ])
                 ->where('id', '!=', $vacancy->id)
                 ->active()
@@ -146,6 +155,7 @@ public function show(Request $request, string $slug): JsonResponse
                 ->get()
                 ->map(function ($item) {
                     $t = $item->translates->first();
+                    $requirement = $item->requirements()->with(['translates' => fn ($q) => $q->where('language_id', $languageId)])->active()->ordered()->first();
 
                     return [
                         'id' => $item->id,
@@ -162,6 +172,13 @@ public function show(Request $request, string $slug): JsonResponse
                         'related_person' => $t?->related_person ?? '',
                         'city' => $t?->city ?? '',
                         'last_apply_date' => $item->last_apply_date?->format('Y-m-d'),
+                        'email' => $item->email,
+                        'phone' => $item->phone,
+                        'requirement' => $requirement ? [
+                            'id' => $requirement->id,
+                            'title' => $requirement->translates->first()?->title ?? '',
+                            'description' => $requirement->translates->first()?->description ?? '',
+                        ] : null,
 
                     ];
                 });
