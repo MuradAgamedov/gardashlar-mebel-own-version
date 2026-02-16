@@ -155,7 +155,9 @@ public function show(Request $request, string $slug): JsonResponse
                 ->get()
                 ->map(function ($item) use ($languageId) {
                     $t = $item->translates->first();
-                    $requirement = $item->requirements()->with(['translates' => fn ($q) => $q->where('language_id', $languageId)])->active()->ordered()->first();
+                    $requirement = $item->requirements()->with(['translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                }])->active()->ordered()->first();
 
                     return [
                         'id' => $item->id,
