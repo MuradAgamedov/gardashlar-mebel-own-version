@@ -15,7 +15,11 @@ class Vacancy extends Model
         'address',
         'order',
         'status',
-        'phone'
+        'phone',
+        'age',
+        'education',
+        'related_person',
+        'city'
     ];
         // App\Models\Vacancy.php
         public function scopeNotExpired($query)
@@ -30,6 +34,7 @@ class Vacancy extends Model
         'last_apply_date' => 'date',
         'order' => 'integer',
         'status' => 'boolean',
+        'age' => 'integer',
     ];
 
     /**
