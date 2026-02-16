@@ -38,7 +38,7 @@ class VacancyController extends Controller
     $request->validate([
         'last_apply_date' => 'nullable|date|after:today',
         'email' => 'nullable|email|max:255',
-        'phone' => 'nullable|string|max:50',
+        'phone' => 'nullable|max:50',
         'age' => 'nullable|integer|min:1|max:150',
         'status' => 'boolean',
     ]);
@@ -46,16 +46,16 @@ class VacancyController extends Controller
     // ✅ Translation validation
     foreach ($languages as $language) {
         $request->validate([
-            "translations.{$language->id}.title" => 'string|max:255',
-            "translations.{$language->id}.position" => 'string|max:255',
-            "translations.{$language->id}.experience" => 'string|max:255',
-            "translations.{$language->id}.work_schedule" => 'string|max:1000',
-            "translations.{$language->id}.salary" => 'nullable|string|max:255',
-            "translations.{$language->id}.address" => 'nullable|string|max:500',
-            "translations.{$language->id}.education" => 'nullable|string|max:255',
-            "translations.{$language->id}.related_person" => 'nullable|string|max:255',
-            "translations.{$language->id}.city" => 'nullable|string|max:255',
-            "translations.{$language->id}.seo_title" => 'nullable|string|max:255',
+            "translations.{$language->id}.title" => 'max:255',
+            "translations.{$language->id}.position" => 'max:255',
+            "translations.{$language->id}.experience" => 'max:255',
+            "translations.{$language->id}.work_schedule" => 'max:1000',
+            "translations.{$language->id}.salary" => 'nullable|max:255',
+            "translations.{$language->id}.address" => 'nullable|max:500',
+            "translations.{$language->id}.education" => 'nullable|max:255',
+            "translations.{$language->id}.related_person" => 'nullable|max:255',
+            "translations.{$language->id}.city" => 'nullable|max:255',
+            "translations.{$language->id}.seo_title" => 'nullable|max:255',
             "translations.{$language->id}.seo_keywords" => 'nullable|string',
             "translations.{$language->id}.seo_description" => 'nullable|string',
         ]);
@@ -127,7 +127,7 @@ class VacancyController extends Controller
     $request->validate([
         'last_apply_date' => 'nullable|date',
         'email' => 'nullable|email|max:255',
-        'phone' => 'nullable|string|max:50',
+        'phone' => 'nullable|max:50',
         'age' => 'nullable|integer|min:1|max:150',
         'status' => 'boolean',
     ]);
@@ -135,16 +135,16 @@ class VacancyController extends Controller
     // ✅ Translation validation
     foreach ($languages as $language) {
         $request->validate([
-            "translations.{$language->id}.title" => 'string|max:255',
-            "translations.{$language->id}.position" => 'string|max:255',
-            "translations.{$language->id}.experience" => 'string|max:255',
-            "translations.{$language->id}.work_schedule" => 'string|max:1000',
-            "translations.{$language->id}.salary" => 'nullable|string|max:255',
-            "translations.{$language->id}.address" => 'nullable|string|max:500',
-            "translations.{$language->id}.education" => 'nullable|string|max:255',
-            "translations.{$language->id}.related_person" => 'nullable|string|max:255',
-            "translations.{$language->id}.city" => 'nullable|string|max:255',
-            "translations.{$language->id}.seo_title" => 'nullable|string|max:255',
+            "translations.{$language->id}.title" => 'max:255',
+            "translations.{$language->id}.position" => 'max:255',
+            "translations.{$language->id}.experience" => 'max:255',
+            "translations.{$language->id}.work_schedule" => 'max:1000',
+            "translations.{$language->id}.salary" => 'nullable|max:255',
+            "translations.{$language->id}.address" => 'nullable|max:500',
+            "translations.{$language->id}.education" => 'nullable|max:255',
+            "translations.{$language->id}.related_person" => 'nullable|max:255',
+            "translations.{$language->id}.city" => 'nullable|max:255',
+            "translations.{$language->id}.seo_title" => 'nullable|max:255',
             "translations.{$language->id}.seo_keywords" => 'nullable|string',
             "translations.{$language->id}.seo_description" => 'nullable|string',
         ]);
