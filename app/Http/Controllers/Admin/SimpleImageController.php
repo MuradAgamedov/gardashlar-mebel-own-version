@@ -240,17 +240,6 @@ class SimpleImageController extends Controller
         } catch (\Exception $e) {
             \Log::error('SimpleImage update error: ' . $e->getMessage());
             return back()->withInput()
-                ->with('error', 'Error updating image: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(SimpleImage $simpleImage): RedirectResponse
-    {
-        try {
-            // Delete image file
             if ($simpleImage->image_path) {
                 $this->imageService->delete($simpleImage->image_path);
             }
