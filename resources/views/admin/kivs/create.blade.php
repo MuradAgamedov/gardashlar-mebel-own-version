@@ -73,7 +73,7 @@
                                     @error('video_link')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="form-text text-muted">YouTube, Vimeo, or any video URL</small>
+                                    <small class="form-text text-muted">YouTube video URL</small>
                                 </div>
                             </div>
 
