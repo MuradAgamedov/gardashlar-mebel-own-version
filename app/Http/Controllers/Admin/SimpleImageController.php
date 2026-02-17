@@ -384,6 +384,7 @@ class SimpleImageController extends Controller
 
 public function downloadImage(string $keyword)
 {
+    dd($keyword);
     $simpleImage = SimpleImage::where('keyword', $keyword)->first();
 
     if (!$simpleImage || !$simpleImage->image_path) {
