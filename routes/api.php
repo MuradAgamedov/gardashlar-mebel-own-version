@@ -419,3 +419,6 @@ Route::get('/payment/success', [PaymentController::class, 'success'])->name('pay
 Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
 Route::get('/payment/decline', [PaymentController::class, 'decline'])->name('payment.decline');
 Route::post('/payment/status', [PaymentController::class, 'getPaymentStatus'])->name('api.payment.status');
+Route::get('api/download/simple-images', function () {
+    dd(1);
+})->name('simple-images.download');
