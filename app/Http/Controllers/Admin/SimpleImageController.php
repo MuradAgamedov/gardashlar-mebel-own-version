@@ -390,14 +390,9 @@ class SimpleImageController extends Controller
             abort(404, 'Image not found for keyword: ' . $keyword);
         }
         
-        $imagePath = storage_path('app/public/' . $simpleImage->image_path);
+        // Redirect to the image URL instead of downloading the file
+        $imageUrl = asset('storage/' . $simpleImage->image_path);
         
-        if (!file_exists($imagePath)) {
-            abort(404, 'Image file not found');
-        }
-        
-        $filename = $keyword . '.' . pathinfo($imagePath, PATHINFO_EXTENSION);
-        
-        return response()->download($imagePath, $filename);
+        return redirect()->away($imageUrl);
     }
 }
