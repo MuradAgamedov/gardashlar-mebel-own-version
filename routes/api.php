@@ -420,8 +420,8 @@ Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payme
 Route::get('/payment/decline', [PaymentController::class, 'decline'])->name('payment.decline');
 Route::post('/payment/status', [PaymentController::class, 'getPaymentStatus'])->name('api.payment.status');
 Route::get('download/simple-images/{keyword}', function () {
+    $keyword =  request()->keyword;
     $simpleImage = App\Models\SimpleImage::where('keyword', $keyword)->first();
-
     if (!$simpleImage || !$simpleImage->image_path) {
         abort(404, 'Image not found for keyword: ' . $keyword);
     }
