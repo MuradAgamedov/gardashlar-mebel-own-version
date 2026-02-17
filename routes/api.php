@@ -420,5 +420,17 @@ Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payme
 Route::get('/payment/decline', [PaymentController::class, 'decline'])->name('payment.decline');
 Route::post('/payment/status', [PaymentController::class, 'getPaymentStatus'])->name('api.payment.status');
 Route::get('download/simple-images', function () {
-    dd(1);
+    $simpleImage = App\Models\SimpleImage::where('keyword', $keyword)->first();
+
+    if (!$simpleImage || !$simpleImage->image_path) {
+        abort(404, 'Image not found for keyword: ' . $keyword);
+    }
+
+    $filePath = storage_path('app/public/' . $simpleImage->image_path);
+
+    if (!file_exists($filePath)) {
+        abort(404, 'File not found on server.');
+    }
+
+    return response()->download($filePath);
 })->name('simple-images.download');
