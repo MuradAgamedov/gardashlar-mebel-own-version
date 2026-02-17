@@ -382,17 +382,21 @@ class SimpleImageController extends Controller
         }
     }
 
-        public function downloadImage(string $keyword)
-    {
-        $simpleImage = SimpleImage::where('keyword', $keyword)->first();
-        
-        if (!$simpleImage || !$simpleImage->image_path) {
-            abort(404, 'Image not found for keyword: ' . $keyword);
-        }
-        
-        // Redirect to the image URL instead of downloading the file
-        $imageUrl = asset('storage/' . $simpleImage->image_path);
-        
-        return redirect()->away($imageUrl);
+public function downloadImage(string $keyword)
+{
+    $simpleImage = SimpleImage::where('keyword', $keyword)->first();
+
+    if (!$simpleImage || !$simpleImage->image_path) {
+        abort(404, 'Image not found for keyword: ' . $keyword);
     }
+
+    $filePath = storage_path('app/public/' . $simpleImage->image_path);
+
+    if (!file_exists($filePath)) {
+        abort(404, 'File not found on server.');
+    }
+
+    return response()->download($filePath);
+}
+
 }
