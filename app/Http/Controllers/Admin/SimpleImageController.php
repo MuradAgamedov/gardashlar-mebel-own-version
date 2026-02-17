@@ -240,6 +240,134 @@ class SimpleImageController extends Controller
         } catch (\Exception $e) {
             \Log::error('SimpleImage update error: ' . $e->getMessage());
             return back()->withInput()
+                ->with('error', 'Error updating image: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Quick upload image by keyword
+     */
+    public function quickUpload(Request $request, string $keyword): View
+    {
+        $simpleImage = SimpleImage::where('keyword', $keyword)->first();
+        $languages = $this->languageRepository->getActiveLanguages();
+        
+        if ($simpleImage) {
+            $translations = $simpleImage->translates->keyBy('language_id');
+        } else {
+            $translations = collect();
+        }
+        
+        return view('admin.simple-images.quick-upload', compact('keyword', 'simpleImage', 'languages', 'translations'));
+    }
+
+    /**
+     * Store quick uploaded image by keyword
+     */
+    public function quickUploadStore(Request $request, string $keyword): RedirectResponse
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
+            'translations' => 'required|array',
+            'translations.*.language_id' => 'required|exists:languages,id',
+            'translations.*.image_go_url' => 'nullable|string|max:255',
+            'translations.*.image_alt_text' => 'nullable|string|max:255',
+        ], [
+            'image.required' => 'Image is required.',
+            'image.image' => 'The file must be an image.',
+            'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
+        ]);
+
+        try {
+            $file = $request->file('image');
+            
+            if (!$file->isValid()) {
+                $errorMessages = [
+                    UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
+                    UPLOAD_ERR_FORM_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form.',
+                    UPLOAD_ERR_PARTIAL => 'The uploaded file was only partially uploaded.',
+                    UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
+                    UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder.',
+                    UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
+                    UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.',
+                ];
+                
+                $errorMessage = $errorMessages[$file->getError()] ?? 'Unknown upload error occurred.';
+                return back()->withInput()->with('error', 'File upload failed: ' . $errorMessage);
+            }
+
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!in_array($file->getMimeType(), $allowedTypes)) {
+                return back()->withInput()->with('error', 'Invalid file type. Please upload a JPG, PNG, GIF, or WebP image.');
+            }
+
+            try {
+                $imagePath = $this->imageService->upload($file, 'simple-images');
+                
+                if (!$imagePath) {
+                    return back()->withInput()
+                        ->with('error', 'Failed to upload image. Please check server storage permissions and try again.');
+                }
+            } catch (\Exception $uploadException) {
+                \Log::error('Image upload error in quick upload: ' . $uploadException->getMessage(), [
+                    'keyword' => $keyword,
+                    'file' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                    'mime_type' => $file->getMimeType(),
+                    'error' => $uploadException->getMessage()
+                ]);
+                
+                return back()->withInput()
+                    ->with('error', 'Image upload failed: ' . $uploadException->getMessage());
+            }
+
+            // Find existing or create new
+            $simpleImage = SimpleImage::where('keyword', $keyword)->first();
+            
+            if ($simpleImage) {
+                // Delete old image
+                if ($simpleImage->image_path) {
+                    $this->imageService->delete($simpleImage->image_path);
+                }
+                
+                $simpleImage->update(['image_path' => $imagePath]);
+                
+                // Delete old translations
+                $simpleImage->translates()->delete();
+            } else {
+                $simpleImage = SimpleImage::create([
+                    'keyword' => $keyword,
+                    'image_path' => $imagePath,
+                ]);
+            }
+
+            // Create translations
+            foreach ($request->translations as $languageId => $translation) {
+                SimpleImageTranslate::create([
+                    'simple_image_id' => $simpleImage->id,
+                    'language_id' => $languageId,
+                    'image_go_url' => $translation['image_go_url'] ?? null,
+                    'image_alt_text' => $translation['image_alt_text'] ?? null,
+                ]);
+            }
+
+            return redirect()->route('admin.simple-images.quick-upload', $keyword)
+                ->with('success', 'Image uploaded successfully for keyword: ' . $keyword);
+
+        } catch (\Exception $e) {
+            \Log::error('SimpleImage quick upload error: ' . $e->getMessage());
+            return back()->withInput()
+                ->with('error', 'Error uploading image: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(SimpleImage $simpleImage): RedirectResponse
+    {
+        try {
+            // Delete image file
             if ($simpleImage->image_path) {
                 $this->imageService->delete($simpleImage->image_path);
             }
