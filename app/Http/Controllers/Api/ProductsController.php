@@ -207,8 +207,11 @@ class ProductsController extends Controller
             ])
             ->active();
 
-            // === Əgər search varsa, similar_text ilə oxşar mətnlərdə axtar ===
+            // === Əgər search varsa, oxşar mətnlərdə axtar ===
             if ($searchQuery) {
+                // Debug: Log search query
+                \Log::info('Search query: ' . $searchQuery . ' for language: ' . $languageId);
+                
                 // Bütün aktiv məhsulların tərcümələrini al
                 $allProductTranslates = \App\Models\ProductTranslate::where('language_id', $languageId)
                     ->whereHas('product', function($query) {
@@ -216,34 +219,42 @@ class ProductsController extends Controller
                     })
                     ->get();
 
+                // Debug: Log total products found
+                \Log::info('Total products found: ' . $allProductTranslates->count());
+
                 // Oxşarlıq skorlarını saxlamaq üçün array
                 $similarProducts = [];
                 
                 foreach ($allProductTranslates as $translate) {
                     // Başlıqla oxşarlıq
-                    similar_text(strtolower($searchQuery), strtolower($translate->title), $titleSimilarity);
+                    similar_text(strtolower(trim($searchQuery)), strtolower(trim($translate->title)), $titleSimilarity);
                     
                     // Təsvirlə oxşarlıq (varsa)
                     $descriptionSimilarity = 0;
                     if ($translate->description) {
-                        similar_text(strtolower($searchQuery), strtolower($translate->description), $descriptionSimilarity);
+                        similar_text(strtolower(trim($searchQuery)), strtolower(trim($translate->description)), $descriptionSimilarity);
                     }
                     
                     // SEO mətnlərilə oxşarlıq (varsa)
                     $seoDescriptionSimilarity = 0;
                     if ($translate->seo_description) {
-                        similar_text(strtolower($searchQuery), strtolower($translate->seo_description), $seoDescriptionSimilarity);
+                        similar_text(strtolower(trim($searchQuery)), strtolower(trim($translate->seo_description)), $seoDescriptionSimilarity);
                     }
                     
                     // Maksimum oxşarlıq skorunu tap
                     $maxSimilarity = max($titleSimilarity, $descriptionSimilarity, $seoDescriptionSimilarity);
                     
-                    // Ən azı 70% oxşarlıq olan məhsulları əlavə et
-                    if ($maxSimilarity >= 70) {
+                    // Ən azı 60% oxşarlıq olan məhsulları əlavə et (threshold'u endirdik)
+                    if ($maxSimilarity >= 60) {
                         $similarProducts[] = [
                             'product_id' => $translate->product_id,
-                            'similarity_score' => $maxSimilarity
+                            'similarity_score' => $maxSimilarity,
+                            'matched_text' => $translate->title,
+                            'similarity_type' => $titleSimilarity >= $maxSimilarity ? 'title' : ($descriptionSimilarity >= $maxSimilarity ? 'description' : 'seo_description')
                         ];
+                        
+                        // Debug: Log matches
+                        \Log::info('Match found: ' . $translate->title . ' with similarity: ' . $maxSimilarity . '%');
                     }
                 }
                 
@@ -251,6 +262,9 @@ class ProductsController extends Controller
                 usort($similarProducts, function($a, $b) {
                     return $b['similarity_score'] <=> $a['similarity_score'];
                 });
+                
+                // Debug: Log final results
+                \Log::info('Total similar products: ' . count($similarProducts));
                 
                 // Yalnız product_id-ləri götür
                 $similarProductIds = array_column($similarProducts, 'product_id');
