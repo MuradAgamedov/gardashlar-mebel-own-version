@@ -207,75 +207,91 @@ class ProductsController extends Controller
             ])
             ->active();
 
-            // === Əgər search varsa, oxşar mətnlərdə axtar ===
+            // === Əgər search varsa, sadə LIKE axtarışı da yoxla ===
             if ($searchQuery) {
                 // Debug: Log search query
                 \Log::info('Search query: ' . $searchQuery . ' for language: ' . $languageId);
                 
-                // Bütün aktiv məhsulların tərcümələrini al
-                $allProductTranslates = \App\Models\ProductTranslate::where('language_id', $languageId)
-                    ->whereHas('product', function($query) {
-                        $query->active();
-                    })
-                    ->get();
-
-                // Debug: Log total products found
-                \Log::info('Total products found: ' . $allProductTranslates->count());
-
-                // Oxşarlıq skorlarını saxlamaq üçün array
-                $similarProducts = [];
+                // Sadə LIKE axtarışı - ən azı bir nəticə varsa yoxla
+                $simpleSearch = Product::whereHas('translates', function($q) use ($searchQuery, $languageId) {
+                    $q->where('language_id', $languageId)
+                      ->where('title', 'LIKE', '%' . $searchQuery . '%');
+                })
+                ->active()
+                ->pluck('id');
                 
-                foreach ($allProductTranslates as $translate) {
-                    // Başlıqla oxşarlıq
-                    similar_text(strtolower(trim($searchQuery)), strtolower(trim($translate->title)), $titleSimilarity);
-                    
-                    // Təsvirlə oxşarlıq (varsa)
-                    $descriptionSimilarity = 0;
-                    if ($translate->description) {
-                        similar_text(strtolower(trim($searchQuery)), strtolower(trim($translate->description)), $descriptionSimilarity);
-                    }
-                    
-                    // SEO mətnlərilə oxşarlıq (varsa)
-                    $seoDescriptionSimilarity = 0;
-                    if ($translate->seo_description) {
-                        similar_text(strtolower(trim($searchQuery)), strtolower(trim($translate->seo_description)), $seoDescriptionSimilarity);
-                    }
-                    
-                    // Maksimum oxşarlıq skorunu tap
-                    $maxSimilarity = max($titleSimilarity, $descriptionSimilarity, $seoDescriptionSimilarity);
-                    
-                    // Ən azı 60% oxşarlıq olan məhsulları əlavə et (threshold'u endirdik)
-                    if ($maxSimilarity >= 60) {
-                        $similarProducts[] = [
-                            'product_id' => $translate->product_id,
-                            'similarity_score' => $maxSimilarity,
-                            'matched_text' => $translate->title,
-                            'similarity_type' => $titleSimilarity >= $maxSimilarity ? 'title' : ($descriptionSimilarity >= $maxSimilarity ? 'description' : 'seo_description')
-                        ];
-                        
-                        // Debug: Log matches
-                        \Log::info('Match found: ' . $translate->title . ' with similarity: ' . $maxSimilarity . '%');
-                    }
-                }
+                \Log::info('Simple LIKE search found: ' . $simpleSearch->count() . ' products');
                 
-                // Oxşarlıq skoruna görə sırala
-                usort($similarProducts, function($a, $b) {
-                    return $b['similarity_score'] <=> $a['similarity_score'];
-                });
-                
-                // Debug: Log final results
-                \Log::info('Total similar products: ' . count($similarProducts));
-                
-                // Yalnız product_id-ləri götür
-                $similarProductIds = array_column($similarProducts, 'product_id');
-                
-                // Əgər oxşar məhsul varsa, filter tətbiq et
-                if (!empty($similarProductIds)) {
-                    $productsQuery->whereIn('id', $similarProductIds)
-                        ->orderByRaw('FIELD(id, ' . implode(',', $similarProductIds) . ')');
+                // Əgər sadə axtarış nəticə verirsə, ondan istifadə et
+                if ($simpleSearch->isNotEmpty()) {
+                    $productsQuery->whereIn('id', $simpleSearch);
                 } else {
-                    // Əgər heç bir oxşar məhsul tapılmadısa, boş nəticə qaytar
-                    $productsQuery->where('id', 0);
+                    // Əgər sadə axtarış nəticə vermirsə, similar_text ilə yoxla
+                    // Bütün aktiv məhsulların tərcümələrini al
+                    $allProductTranslates = \App\Models\ProductTranslate::where('language_id', $languageId)
+                        ->whereHas('product', function($query) {
+                            $query->active();
+                        })
+                        ->get();
+
+                    // Debug: Log total products found
+                    \Log::info('Total products found: ' . $allProductTranslates->count());
+
+                    // Oxşarlıq skorlarını saxlamaq üçün array
+                    $similarProducts = [];
+                    
+                    foreach ($allProductTranslates as $translate) {
+                        // Başlıqla oxşarlıq
+                        similar_text(strtolower(trim($searchQuery)), strtolower(trim($translate->title)), $titleSimilarity);
+                        
+                        // Təsvirlə oxşarlıq (varsa)
+                        $descriptionSimilarity = 0;
+                        if ($translate->description) {
+                            similar_text(strtolower(trim($searchQuery)), strtolower(trim($translate->description)), $descriptionSimilarity);
+                        }
+                        
+                        // SEO mətnlərilə oxşarlıq (varsa)
+                        $seoDescriptionSimilarity = 0;
+                        if ($translate->seo_description) {
+                            similar_text(strtolower(trim($searchQuery)), strtolower(trim($translate->seo_description)), $seoDescriptionSimilarity);
+                        }
+                        
+                        // Maksimum oxşarlıq skorunu tap
+                        $maxSimilarity = max($titleSimilarity, $descriptionSimilarity, $seoDescriptionSimilarity);
+                        
+                        // Ən azı 60% oxşarlıq olan məhsulları əlavə et (threshold'u endirdik)
+                        if ($maxSimilarity >= 60) {
+                            $similarProducts[] = [
+                                'product_id' => $translate->product_id,
+                                'similarity_score' => $maxSimilarity,
+                                'matched_text' => $translate->title,
+                                'similarity_type' => $titleSimilarity >= $maxSimilarity ? 'title' : ($descriptionSimilarity >= $maxSimilarity ? 'description' : 'seo_description')
+                            ];
+                            
+                            // Debug: Log matches
+                            \Log::info('Match found: ' . $translate->title . ' with similarity: ' . $maxSimilarity . '%');
+                        }
+                    }
+                    
+                    // Oxşarlıq skoruna görə sırala
+                    usort($similarProducts, function($a, $b) {
+                        return $b['similarity_score'] <=> $a['similarity_score'];
+                    });
+                    
+                    // Debug: Log final results
+                    \Log::info('Total similar products: ' . count($similarProducts));
+                    
+                    // Yalnız product_id-ləri götür
+                    $similarProductIds = array_column($similarProducts, 'product_id');
+                    
+                    // Əgər oxşar məhsul varsa, filter tətbiq et
+                    if (!empty($similarProductIds)) {
+                        $productsQuery->whereIn('id', $similarProductIds)
+                            ->orderByRaw('FIELD(id, ' . implode(',', $similarProductIds) . ')');
+                    } else {
+                        // Əgər heç bir oxşar məhsul tapılmadısa, boş nəticə qaytar
+                        $productsQuery->where('id', 0);
+                    }
                 }
             }
 
