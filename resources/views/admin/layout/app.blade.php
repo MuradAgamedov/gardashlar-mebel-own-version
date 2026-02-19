@@ -66,5 +66,6 @@
       </div>
     </div>
     @include('admin.layout.includes.foot')
+    @yield('scripts')
   </body>
 </html>
