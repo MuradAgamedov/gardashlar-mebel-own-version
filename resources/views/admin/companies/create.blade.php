@@ -58,10 +58,11 @@
                                     Company Information
                                 </h5>
                                 <div class="form-check form-switch">
+                                    <input type="hidden" name="status" value="0">
                                     <input class="form-check-input" type="checkbox" name="status" value="1" 
                                            id="status" {{ old('status', true) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="status">
-                                        <span class="status-indicator active">Active</span>
+                                        <span class="status-indicator" id="statusText">Active</span>
                                     </label>
                                 </div>
                             </div>
@@ -352,6 +353,39 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('companyForm');
     form.setAttribute('novalidate', 'novalidate');
     
+    // Status toggle functionality
+    const statusCheckbox = document.getElementById('status');
+    const statusText = document.getElementById('statusText');
+    const statusHidden = document.querySelector('input[type="hidden"][name="status"]');
+    
+    function updateStatusDisplay() {
+        if (statusCheckbox.checked) {
+            statusText.textContent = 'Active';
+            statusText.style.color = '#28a745';
+            statusHidden.disabled = true; // Disable hidden input when checkbox is checked
+        } else {
+            statusText.textContent = 'Inactive';
+            statusText.style.color = '#6c757d';
+            statusHidden.disabled = false; // Enable hidden input when checkbox is unchecked
+        }
+    }
+    
+    // Initialize status display
+    updateStatusDisplay();
+    
+    // Add event listener for status change
+    statusCheckbox.addEventListener('change', updateStatusDisplay);
+    
+    // Handle form submission to ensure proper status value
+    form.addEventListener('submit', function(e) {
+        if (statusCheckbox.checked) {
+            statusHidden.disabled = true;
+        } else {
+            statusHidden.disabled = false;
+            statusCheckbox.disabled = true; // Disable checkbox to ensure hidden value is sent
+        }
+    });
+    
     // Handle required attributes for tabs
     document.querySelectorAll('input[data-required="true"], textarea[data-required="true"]').forEach(function(input) {
         input.removeAttribute('required');
@@ -564,12 +598,9 @@ function removeImage(inputId) {
 }
 
 /* Status Toggle */
-.form-check-input:checked + .form-check-label .status-indicator {
-    color: #28a745;
-}
-
-.form-check-input:not(:checked) + .form-check-label .status-indicator {
-    color: #6c757d;
+.status-indicator {
+    font-weight: 600;
+    transition: color 0.3s ease;
 }
 
 /* Image Upload Cards */
