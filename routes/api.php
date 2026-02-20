@@ -264,7 +264,7 @@ Route::get('/refund-policy', [RefundPolicyController::class, 'index'])->name('ap
 // Company Management API Routes
 Route::get('/company-management', [CompanyManagementController::class, 'index'])->name('api.company-management.index');
 
-// Companies API Routes
+// Campaigns API Routes
 Route::get('/companies', [CompanyController::class, 'index'])->name('api.companies.index');
 Route::get('/companies/{slug}', [CompanyController::class, 'show'])->name('api.companies.show');
 

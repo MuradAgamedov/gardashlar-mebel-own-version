@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Companies</h3>
+                    <h3>Campaigns</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -15,7 +15,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Companies</li>
+                        <li class="breadcrumb-item active">Campaigns</li>
                     </ol>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Companies List</h5>
+                            <h5>Campaigns List</h5>
                             <a href="{{ route('admin.companies.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                                 Add New
