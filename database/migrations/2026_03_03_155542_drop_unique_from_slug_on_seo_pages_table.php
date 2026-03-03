@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('seo_pages', function (Blueprint $table) {
+        Schema::table('seo_page_translates', function (Blueprint $table) {
             $table->dropUnique(['slug']); 
         });
     }
