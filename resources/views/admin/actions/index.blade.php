@@ -31,7 +31,7 @@
                         <div class="col-md-6">
                             <form method="GET" action="{{ route('admin.actions.index') }}">
                                 <select name="company_id" class="form-select" onchange="this.form.submit()">
-                                    <option value="">All Companies</option>
+                                    <option value="">All Campaigns</option>
                                     @foreach($companies as $company)
                                         @php
                                             $mainLanguageId = \App\Models\Language::getMainLanguage()->id;

@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 /**
- * @OA\Tag(name="Companies", description="API Endpoints for Companies")
+ * @OA\Tag(name="Campaigns", description="API Endpoints for Campaigns")
  */
 class CompanyController extends Controller
 {
@@ -59,14 +59,14 @@ class CompanyController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Companies retrieved successfully',
+                'message' => 'Campaigns retrieved successfully',
                 'data' => $companiesData
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error retrieving companies: ' . $e->getMessage()
+                'message' => 'Error retrieving campaigns: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -104,7 +104,7 @@ class CompanyController extends Controller
         if (!$company) {
             return response()->json([
                 'success' => false,
-                'message' => 'Company not found'
+                'message' => 'Campaign not found'
             ], 404);
         }
 
@@ -278,7 +278,7 @@ class CompanyController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Company retrieved successfully',
+            'message' => 'Campaign retrieved successfully',
             'data' => $companyData
         ]);
 

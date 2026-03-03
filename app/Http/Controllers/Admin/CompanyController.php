@@ -42,7 +42,7 @@ class CompanyController extends Controller
             );
 
             return redirect()->route('admin.companies.index')
-                ->with('success', 'Kompaniya uğurla əlavə edildi.');
+                ->with('success', 'Kampaniya uğurla əlavə edildi.');
 
         } catch (\Exception $e) {
             return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
@@ -67,7 +67,7 @@ class CompanyController extends Controller
             );
 
             return redirect()->route('admin.companies.index')
-                ->with('success', 'Kompaniya uğurla yeniləndi.');
+                ->with('success', 'Kampaniya uğurla yeniləndi.');
 
         } catch (\Exception $e) {
             return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
@@ -79,7 +79,7 @@ class CompanyController extends Controller
         try {
             $this->repository->deleteCompany($company);
             return redirect()->route('admin.companies.index')
-                ->with('success', 'Kompaniya uğurla silindi.');
+                ->with('success', 'Kampaniya uğurla silindi.');
 
         } catch (\Exception $e) {
             return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());

@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Company</h3>
+                    <h3>Edit Campaign</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -16,7 +16,7 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.companies.index') }}">Companies</a>
+                            <a href="{{ route('admin.companies.index') }}">Campaigns</a>
                         </li>
                         <li class="breadcrumb-item active">Edit</li>
                     </ol>
@@ -41,7 +41,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Company</h5>
+                        <h5>Edit Campaign</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.companies.update', $company->id) }}" method="POST" enctype="multipart/form-data">

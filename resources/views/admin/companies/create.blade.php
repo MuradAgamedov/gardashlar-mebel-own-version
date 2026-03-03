@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Add New Company</h3>
+                    <h3>Add New Campaign</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -16,7 +16,7 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.companies.index') }}">Companies</a>
+                            <a href="{{ route('admin.companies.index') }}">Campaigns</a>
                         </li>
                         <li class="breadcrumb-item active">Add New</li>
                     </ol>
@@ -55,7 +55,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">
                                     <i class="material-icons-outlined me-2">business</i>
-                                    Company Information
+                                    Campaign Information
                                 </h5>
                                 <div class="form-check form-switch">
                                     <input type="hidden" name="status" value="0">
@@ -114,9 +114,9 @@
                                                             name="translates[{{ $language->id }}][title]" 
                                                             id="title-{{ $language->id }}"
                                                             value="{{ old("translates.{$language->id}.title") }}"
-                                                            placeholder="Enter company title"
+                                                            placeholder="Enter campaign title"
                                                             @if($index === 0) required @else data-required="true" @endif>
-                                                        <label for="title-{{ $language->id }}">Company Title *</label>
+                                                        <label for="title-{{ $language->id }}">Campaign Title *</label>
                                                         @error("translates.{$language->id}.title")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
@@ -133,7 +133,7 @@
                                                             name="translates[{{ $language->id }}][slug]" 
                                                             id="slug-{{ $language->id }}"
                                                             value="{{ old("translates.{$language->id}.slug") }}"
-                                                            placeholder="Enter company slug"
+                                                            placeholder="Enter campaign slug"
                                                             @if($index === 0) required @else data-required="true" @endif>
                                                         <label for="slug-{{ $language->id }}">Slug *</label>
                                                         @error("translates.{$language->id}.slug")
@@ -194,7 +194,7 @@
                                                     <div class="image-upload-card">
                                                         <div class="upload-header">
                                                             <label class="form-label">Inner Image *</label>
-                                                            <span class="upload-info">Detailed image for company page</span>
+                                                            <span class="upload-info">Detailed image for campaign page</span>
                                                         </div>
                                                         <input type="file" 
                                                                class="form-control @error("translates.{$language->id}.inner_image") is-invalid @enderror" 
@@ -329,7 +329,7 @@
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary btn-lg">
                                     <i class="material-icons-outlined me-2">save</i>
-                                    Create Company
+                                    Create Campaign
                                 </button>
                                 <a href="{{ route('admin.companies.index') }}" class="btn btn-outline-secondary">
                                     <i class="material-icons-outlined me-2">arrow_back</i>
