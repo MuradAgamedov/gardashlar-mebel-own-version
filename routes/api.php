@@ -74,6 +74,20 @@ use App\Http\Controllers\Api\AllSeoPagesController;
 use App\Http\Controllers\Api\UserFinProductContoller;
 use App\Http\Controllers\Api\PopupAdController;
 use App\Http\Controllers\Api\SeoPageController;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
+
+// Apply throttle middleware to all API routes
+Route::middleware('throttle:60,1')->group(function () {
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
 Route::get('/roulette-actions', [RoluteeteActionController::class, 'index'])->name('api.roluteete-actions.index');
@@ -434,3 +448,5 @@ Route::get('download/simple-images/{keyword}', function () {
 
     return response()->download($filePath);
 })->name('simple-images.download');
+
+}); // Close throttle middleware group
