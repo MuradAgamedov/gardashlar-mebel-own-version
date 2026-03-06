@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Apply throttle middleware to all web routes
-Route::middleware('throttle:60,1')->group(function () {
+Route::middleware('throttle:6000,1')->group(function () {
 
 Route::get('/', function () {
     return view('welcome');

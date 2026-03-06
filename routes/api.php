@@ -87,7 +87,7 @@ use App\Http\Controllers\Api\SeoPageController;
 */
 
 // Apply throttle middleware to all API routes
-Route::middleware('throttle:60,1')->group(function () {
+Route::middleware('throttle:6000,1')->group(function () {
 // Language API Routes
 Route::get('/languages', [LanguageController::class, 'index'])->name('api.languages.index');
 Route::get('/roulette-actions', [RoluteeteActionController::class, 'index'])->name('api.roluteete-actions.index');
