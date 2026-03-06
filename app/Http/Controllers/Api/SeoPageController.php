@@ -195,6 +195,19 @@ class SeoPageController extends Controller
                     });
                 }
 
+                // Get all translations for slug_translations
+                $slugTranslations = \App\Models\SeoPageTranslate::where('seo_page_id', $seoPageTranslate->seo_page_id)
+                    ->with('language')
+                    ->get()
+                    ->mapWithKeys(function ($translation) {
+                        return [
+                            $translation->language->lang_code => $translation->slug
+                        ];
+                    })
+                    ->filter(function ($slug) {
+                        return !empty($slug); // Remove empty slugs
+                    });
+
                 return [
                     'title' => $seoPageTranslate->title,
                     'slug' => $seoPageTranslate->slug,
@@ -204,6 +217,7 @@ class SeoPageController extends Controller
                     'meta_keywords' => $seoPageTranslate->meta_keywords,
                     'category' => $categoryData,
                     'products' => $products,
+                    'slug_translations' => $slugTranslations,
                     'language' => [
                         'code' => $seoPageTranslate->language->lang_code,
                         'name' => $seoPageTranslate->language->name
