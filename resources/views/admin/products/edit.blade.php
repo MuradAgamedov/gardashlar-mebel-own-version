@@ -311,13 +311,16 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Status</label>
                                     <div class="form-check form-switch">
+                                        <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" 
                                                type="checkbox" 
                                                id="status" 
                                                name="status" 
                                                value="1" 
                                                {{ old('status', $product->status) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="status">Active</label>
+                                        <label class="form-check-label" for="status">
+                                            <span class="status-indicator" id="statusText">Active</span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -476,12 +479,54 @@
     background: #e3f2fd;
     color: #1976d2;
 }
+
+/* Status Toggle */
+.status-indicator {
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
 </style>
 @endpush
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Status toggle functionality
+    const statusCheckbox = document.getElementById('status');
+    const statusText = document.getElementById('statusText');
+    const statusHidden = document.querySelector('input[type="hidden"][name="status"]');
+    
+    function updateStatusDisplay() {
+        if (statusCheckbox.checked) {
+            statusText.textContent = 'Active';
+            statusText.style.color = '#28a745';
+            statusHidden.disabled = true; // Disable hidden input when checkbox is checked
+        } else {
+            statusText.textContent = 'Inactive';
+            statusText.style.color = '#6c757d';
+            statusHidden.disabled = false; // Enable hidden input when checkbox is unchecked
+        }
+    }
+    
+    // Initialize status display
+    updateStatusDisplay();
+    
+    // Add event listener for status change
+    statusCheckbox.addEventListener('change', updateStatusDisplay);
+    
+    // Handle form submission to ensure proper status value
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (statusCheckbox.checked) {
+                statusHidden.disabled = true;
+            } else {
+                statusHidden.disabled = false;
+                statusCheckbox.disabled = true; // Disable checkbox to ensure hidden value is sent
+            }
+        });
+    }
+    
     // Custom Tags Functionality
     const tagsInput = document.getElementById('tagsInput');
     const tagsDropdown = document.getElementById('tagsDropdown');
