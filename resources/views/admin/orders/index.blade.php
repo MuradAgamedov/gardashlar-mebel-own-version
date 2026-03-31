@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     <div class="col-md-6">
                         <div class="card mb-3">
                             <div class="card-header bg-light">
-                                <h6 class="mb-0">Customer Information</h6>
+                                <h6 class="mb-0" style="color: black;">Customer Information</h6>
                             </div>
                             <div class="card-body">
                                 <p><strong>ID:</strong> ${this.dataset.id}</p>
@@ -174,7 +174,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     <div class="col-md-6">
                         <div class="card mb-3">
                             <div class="card-header bg-light">
-                                <h6 class="mb-0">Order Details</h6>
+                                <h6 class="mb-0" style="color: black;">Order Details</h6>
                             </div>
                             <div class="card-body">
                                 <p><strong>Status:</strong> <span class="badge bg-info">${this.dataset.status || '-'}</span></p>
@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 <div class="card mb-3">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0">Product Information</h6>
+                        <h6 class="mb-0" style="color: black;">Product Information</h6>
                     </div>
                     <div class="card-body">
                         <table class="table table-sm table-bordered">
