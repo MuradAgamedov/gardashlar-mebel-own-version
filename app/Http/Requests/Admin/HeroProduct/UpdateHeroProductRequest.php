@@ -13,8 +13,10 @@ class UpdateHeroProductRequest extends FormRequest
 
     public function rules()
     {
+        $heroProductId = $this->route('hero_product')->id;
+        
         return [
-            'product_id' => 'required|exists:products,id|unique:hero_products,product_id,' . $this->heroProduct->id,
+            'product_id' => 'required|exists:products,id|unique:hero_products,product_id,' . $heroProductId,
             'status' => 'boolean'
         ];
     }
