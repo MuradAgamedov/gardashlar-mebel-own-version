@@ -122,6 +122,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Status</label>
                                     <div class="form-check form-switch">
+                                        <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" 
                                                type="checkbox" 
                                                name="status" 
@@ -129,7 +130,7 @@
                                                value="1" 
                                                {{ old('status', $heroProduct->status) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Active
+                                            <span class="status-indicator" id="statusText">Active</span>
                                         </label>
                                     </div>
                                     <small class="form-text text-muted">Enable or disable this hero product</small>
@@ -161,8 +162,59 @@
 @endsection
 
 @push('scripts')
+<style>
+/* Status Toggle */
+.status-indicator {
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.search-result-item:hover {
+    background-color: #f8f9fa;
+}
+
+.search-result-item {
+    transition: background-color 0.2s ease;
+}
+</style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Status toggle functionality
+    const statusCheckbox = document.getElementById('status');
+    const statusText = document.getElementById('statusText');
+    const statusHidden = document.querySelector('input[type="hidden"][name="status"]');
+    
+    function updateStatusDisplay() {
+        if (statusCheckbox.checked) {
+            statusText.textContent = 'Active';
+            statusText.style.color = '#28a745';
+            statusHidden.disabled = true; // Disable hidden input when checkbox is checked
+        } else {
+            statusText.textContent = 'Inactive';
+            statusText.style.color = '#6c757d';
+            statusHidden.disabled = false; // Enable hidden input when checkbox is unchecked
+        }
+    }
+    
+    // Initialize status display
+    updateStatusDisplay();
+    
+    // Add event listener for status change
+    statusCheckbox.addEventListener('change', updateStatusDisplay);
+    
+    // Handle form submission to ensure proper status value
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (statusCheckbox.checked) {
+                statusHidden.disabled = true;
+            } else {
+                statusHidden.disabled = false;
+                statusCheckbox.disabled = true; // Disable checkbox to ensure hidden value is sent
+            }
+        });
+    }
+    
     const searchInput = document.getElementById('product_search');
     const searchResults = document.getElementById('search_results');
     const productIdInput = document.getElementById('product_id');
