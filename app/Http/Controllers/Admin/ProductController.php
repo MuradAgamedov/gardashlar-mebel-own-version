@@ -180,103 +180,49 @@ class ProductController extends Controller
                 'status' => $request->boolean('status', true)
             ]);
     
-            // === TRANSLATIONS (bütün eyni slug-larda yenilə) ===
+            // === TRANSLATIONS (yalniz bu mehsulda deyis) ===
             foreach ($request->input('translations') as $translation) {
-                $languageId = $translation['language_id'];
-                $newSlug = $translation['slug'];
-    
-                // Əvvəlki slug-u götür
-                $existing = ProductTranslate::where('product_id', $product->id)
-                    ->where('language_id', $languageId)
-                    ->first();
-    
-                $oldSlug = $existing ? $existing->slug : $newSlug;
-    
-                // Bu məhsulun tərcüməsini yenilə və ya yarat
                 ProductTranslate::updateOrCreate(
                     [
                         'product_id' => $product->id,
-                        'language_id' => $languageId
+                        'language_id' => $translation['language_id']
                     ],
                     [
                         'title' => $translation['title'],
                         'description' => $translation['description'] ?? null,
-                        'slug' => $newSlug,
+                        'slug' => $translation['slug'],
                         'seo_title' => $translation['seo_title'] ?? null,
                         'seo_keywords' => $translation['seo_keywords'] ?? null,
                         'seo_description' => $translation['seo_description'] ?? null,
                     ]
                 );
-    
-                // === Eyni slug-a malik digər məhsulların tərcümələrini də yenilə ===
-                $sameSlugProducts = ProductTranslate::where('language_id', $languageId)
-                    ->where('slug', $oldSlug)
-                    ->where('product_id', '!=', $product->id)
-                    ->get();
-    
-                foreach ($sameSlugProducts as $sameTr) {
-                    $sameTr->update([
-                        'title' => $translation['title'],
-                        'description' => $translation['description'] ?? null,
-                        'slug' => $newSlug,
-                        'seo_title' => $translation['seo_title'] ?? null,
-                        'seo_keywords' => $translation['seo_keywords'] ?? null,
-                        'seo_description' => $translation['seo_description'] ?? null,
-                    ]);
-                }
             }
     
-            // === Kateqoriya — Yalnız bu məhsulda dəyişsin ===
+            // === Kateqoriya (yalniz bu mehsulda deyis) ===
             if ($request->filled('product_categories')) {
                 $categories = json_decode($request->input('product_categories'), true);
                 $product->categories()->sync(is_array($categories) ? $categories : []);
             }
     
-            // === Tiplər — bütün eyni slug-lar üçün dəyişsin ===
+            // === Tipler (yalniz bu mehsulda deyis) ===
             if ($request->filled('product_types')) {
                 $types = json_decode($request->input('product_types'), true);
-                if (is_array($types)) {
-                    // Bu məhsulda dəyiş
-                    $product->types()->sync($types);
-    
-                    // Eyni slug-lu məhsullarda da dəyiş
-                    $slugs = $product->translates->pluck('slug')->toArray();
-                    $sameProducts = Product::whereHas('translates', function ($q) use ($slugs) {
-                        $q->whereIn('slug', $slugs);
-                    })->where('id', '!=', $product->id)->get();
-    
-                    foreach ($sameProducts as $sameProd) {
-                        $sameProd->types()->sync($types);
-                    }
-                }
+                $product->types()->sync(is_array($types) ? $types : []);
             } else {
                 $product->types()->detach();
             }
     
-            // === Tag-lar — bütün eyni slug-lar üçün dəyişsin ===
+            // === Tag-lar (yalniz bu mehsulda deyis) ===
             if ($request->filled('product_tags')) {
                 $tags = json_decode($request->input('product_tags'), true);
-                if (is_array($tags)) {
-                    // Bu məhsulda dəyiş
-                    $product->tags()->sync($tags);
-    
-                    // Eyni slug-lu məhsullarda da dəyiş
-                    $slugs = $product->translates->pluck('slug')->toArray();
-                    $sameProducts = Product::whereHas('translates', function ($q) use ($slugs) {
-                        $q->whereIn('slug', $slugs);
-                    })->where('id', '!=', $product->id)->get();
-    
-                    foreach ($sameProducts as $sameProd) {
-                        $sameProd->tags()->sync($tags);
-                    }
-                }
+                $product->tags()->sync(is_array($tags) ? $tags : []);
             } else {
                 $product->tags()->detach();
             }
     
             return redirect()
                 ->route('admin.products.index', ['page' => $request->input('current_page', 1)])
-                ->with('success', 'Product updated successfully. Same slug items synced, category only updated for current product.');
+                ->with('success', 'Product updated successfully.');
     
         } catch (\Exception $e) {
             return back()->with('error', 'Error occurred: ' . $e->getMessage());
