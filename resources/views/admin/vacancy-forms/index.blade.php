@@ -85,7 +85,7 @@
                                         </td>
                                         <td>
                                             @if($form->file)
-                                                <a href="{{ route('admin.vacancy-forms.download-file', $form->id) }}" 
+                                                <a href="{{ asset($form->file) }}" 
                                                    class="btn btn-sm btn-outline-primary">
                                                     <i class="fas fa-download"></i> Download
                                                 </a>
