@@ -94,7 +94,7 @@
                                     </tr>
                                     <tr>
                                         <td><strong>Last Apply Date:</strong></td>
-                                        <td>{{ $form->vacancy->last_apply_date->format('d.m.Y') }}</td>
+                                        <td>{{ $form->vacancy->last_apply_date ? $form->vacancy->last_apply_date->format('d.m.Y') : 'N/A' }}</td>
                                     </tr>
                                 @else
                                     <tr>
