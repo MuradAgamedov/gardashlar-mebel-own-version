@@ -99,19 +99,11 @@ class VacancyFormController extends Controller
             return redirect()->back()->with('error', 'File not found in storage');
         }
 
-        // Get file path
-        $filePath = Storage::path($form->file);
-        
-        // Check if file exists on disk
-        if (!file_exists($filePath)) {
-            return redirect()->back()->with('error', 'File does not exist on disk');
-        }
-
         // Get original filename
         $originalName = $form->file_name ?: basename($form->file);
         
-        // Return file download response
-        return response()->download($filePath, $originalName);
+        // Return file download response using Laravel's Storage::download
+        return Storage::download($form->file, $originalName);
     }
 
     /**
