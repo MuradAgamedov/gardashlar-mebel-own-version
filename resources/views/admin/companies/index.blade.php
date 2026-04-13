@@ -44,7 +44,7 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Campaigns List</h5>
-                            <a href="{{ route('admin.companies.create') }}" class="btn btn-primary">
+                            <a href="{{ route('admin.campaigns.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                                 Add New
                             </a>
@@ -136,12 +136,12 @@
                                                 <td>{{ $company->order }}</td>
                                                 <td>
                                                     <div class="btn-group" role="group">
-                                                        <a href="{{ route('admin.companies.actions', $company->id) }}" 
+                                                        <a href="{{ route('admin.campaigns.actions', $company->id) }}" 
                                                            class="btn btn-sm btn-outline-success" 
                                                            title="Məhsul Əlavə Et">
                                                             <i class="material-icons-outlined">inventory</i>
                                                         </a>
-                                                        <a href="{{ route('admin.companies.edit', $company->id) }}" 
+                                                        <a href="{{ route('admin.campaigns.edit', $company->id) }}" 
                                                            class="btn btn-sm btn-outline-primary">
                                                             <i class="material-icons-outlined">edit</i>
                                                         </a>
@@ -149,7 +149,7 @@
                                                                 class="btn btn-sm btn-outline-danger delete-btn" 
                                                                 data-id="{{ $company->id }}"
                                                                 data-title="{{ $mainTranslate?->title ?? 'This company' }}"
-                                                                data-url="{{ route('admin.companies.destroy', $company->id) }}">
+                                                                data-url="{{ route('admin.campaigns.destroy', $company->id) }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
                                                     </div>
@@ -164,7 +164,7 @@
                                 <i class="material-icons-outlined text-muted" style="font-size: 4rem;">business</i>
                                 <h5 class="mt-3 text-muted">No companies found</h5>
                                 <p class="text-muted">Click the button below to add the first company.</p>
-                                <a href="{{ route('admin.companies.create') }}" class="btn btn-primary">
+                                <a href="{{ route('admin.campaigns.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
                                     Add First Company
                                 </a>
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
             onEnd: function(evt) {
                 const items = Array.from(sortableList.querySelectorAll('.sortable-item')).map(item => item.dataset.id);
                 
-                fetch('{{ route("admin.companies.reorder") }}', {
+                fetch('{{ route("admin.campaigns.reorder") }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

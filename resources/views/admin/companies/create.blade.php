@@ -16,7 +16,7 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.companies.index') }}">Campaigns</a>
+                            <a href="{{ route('admin.campaigns.index') }}">Campaigns</a>
                         </li>
                         <li class="breadcrumb-item active">Add New</li>
                     </ol>
@@ -44,7 +44,7 @@
         </div>
         @endif
 
-        <form action="{{ route('admin.companies.store') }}" method="POST" enctype="multipart/form-data" id="companyForm" novalidate>
+        <form action="{{ route('admin.campaigns.store') }}" method="POST" enctype="multipart/form-data" id="companyForm" novalidate>
             @csrf
             
             <div class="row">
@@ -331,7 +331,7 @@
                                     <i class="material-icons-outlined me-2">save</i>
                                     Create Campaign
                                 </button>
-                                <a href="{{ route('admin.companies.index') }}" class="btn btn-outline-secondary">
+                                <a href="{{ route('admin.campaigns.index') }}" class="btn btn-outline-secondary">
                                     <i class="material-icons-outlined me-2">arrow_back</i>
                                     Back to List
                                 </a>

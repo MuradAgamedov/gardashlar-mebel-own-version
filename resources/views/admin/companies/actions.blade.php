@@ -21,7 +21,7 @@
                             </p>
                         </div>
                         <div class="d-flex gap-2">
-                            <a href="{{ route('admin.companies.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('admin.campaigns.index') }}" class="btn btn-secondary">
                                 <i class="material-icons-outlined">arrow_back</i>
                                 Geri
                             </a>
@@ -37,7 +37,7 @@
                             <!-- Search -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <form method="GET" action="{{ route('admin.companies.actions', $company) }}" class="d-flex">
+                                    <form method="GET" action="{{ route('admin.campaigns.actions', $company) }}" class="d-flex">
                                         <input type="text" name="search" class="form-control me-2" 
                                                placeholder="Məhsul axtar..." 
                                                value="{{ request('search') }}">
@@ -148,7 +148,7 @@ function addToCompany(productId) {
     const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
     loadingModal.show();
     
-    fetch('{{ route("admin.companies.add-product-to-action", $company) }}', {
+    fetch('{{ route("admin.campaigns.add-product-to-action", $company) }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -183,7 +183,7 @@ function removeFromCompany(productId) {
     const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
     loadingModal.show();
     
-    fetch('{{ route("admin.companies.remove-product-from-action", $company) }}', {
+    fetch('{{ route("admin.campaigns.remove-product-from-action", $company) }}', {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',

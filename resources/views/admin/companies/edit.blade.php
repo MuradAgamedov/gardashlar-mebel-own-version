@@ -16,7 +16,7 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.companies.index') }}">Campaigns</a>
+                            <a href="{{ route('admin.campaigns.index') }}">Campaigns</a>
                         </li>
                         <li class="breadcrumb-item active">Edit</li>
                     </ol>
@@ -44,7 +44,7 @@
                         <h5>Edit Campaign</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.companies.update', $company->id) }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('admin.campaigns.update', $company->id) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             
@@ -331,7 +331,7 @@
                                             <i class="material-icons-outlined">save</i>
                                             Save
                                         </button>
-                                        <a href="{{ route('admin.companies.index') }}" class="btn btn-secondary">
+                                        <a href="{{ route('admin.campaigns.index') }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">cancel</i>
                                             Cancel
                                         </a>
