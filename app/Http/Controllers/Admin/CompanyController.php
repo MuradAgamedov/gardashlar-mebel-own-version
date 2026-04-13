@@ -49,18 +49,18 @@ class CompanyController extends Controller
         }
     }
 
-    public function edit(Company $company)
+    public function edit(Company $campaign)
     {
-        $company->load('translates');
+        $campaign->load('translates');
         $languages = $this->languageRepository->getActiveLanguages();
-        return view('admin.companies.edit', compact('company', 'languages'));
+        return view('admin.companies.edit', ['company' => $campaign, 'languages' => $languages]);
     }
 
-    public function update(UpdateCompanyRequest $request, Company $company)
+    public function update(UpdateCompanyRequest $request, Company $campaign)
     {
         try {
             $this->repository->updateCompany(
-                $company,
+                $campaign,
                 ['status' => $request->input('status', true)],
                 $request->input('translates'),
                 $request
@@ -74,10 +74,10 @@ class CompanyController extends Controller
         }
     }
 
-    public function destroy(Company $company)
+    public function destroy(Company $campaign)
     {
         try {
-            $this->repository->deleteCompany($company);
+            $this->repository->deleteCompany($campaign);
             return redirect()->route('admin.companies.index')
                 ->with('success', 'Kampaniya uğurla silindi.');
 
@@ -102,12 +102,12 @@ class CompanyController extends Controller
         }
     }
 
-    public function actions(Company $company, Request $request)
+    public function actions(Company $campaign, Request $request)
     {
-        $company->load(['translates.language']);
+        $campaign->load(['translates.language']);
         
-        $query = Product::with(['translates.language', 'companyProducts' => function($q) use ($company) {
-            $q->where('company_id', $company->id);
+        $query = Product::with(['translates.language', 'companyProducts' => function($q) use ($campaign) {
+            $q->where('company_id', $campaign->id);
         }]);
 
         if ($request->filled('search')) {
@@ -119,17 +119,17 @@ class CompanyController extends Controller
         }
 
         $products = $query->paginate(20);
-        return view('admin.companies.actions', compact('company', 'products'));
+        return view('admin.companies.actions', ['company' => $campaign, 'products' => $products]);
     }
 
-    public function addProductToAction(Request $request, Company $company)
+    public function addProductToAction(Request $request, Company $campaign)
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
         ]);
 
         try {
-            $result = $this->repository->addProductToCompany($company, $request->product_id);
+            $result = $this->repository->addProductToCompany($campaign, $request->product_id);
 
             if (!$result) {
                 return response()->json([
@@ -151,14 +151,14 @@ class CompanyController extends Controller
         }
     }
 
-    public function removeProductFromAction(Request $request, Company $company)
+    public function removeProductFromAction(Request $request, Company $campaign)
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
         ]);
 
         try {
-            $this->repository->removeProductFromCompany($company, $request->product_id);
+            $this->repository->removeProductFromCompany($campaign, $request->product_id);
 
             return response()->json([
                 'success' => true,
