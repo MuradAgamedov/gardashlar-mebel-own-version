@@ -1,7 +1,7 @@
 <?php
 use App\Http\Controllers\Admin\CompanyController;
 
-Route::resource('companies', CompanyController::class);
+Route::resource('campaigns', CompanyController::class);
 Route::post('campaigns/reorder', [CompanyController::class, 'reorder'])->name('companies.reorder');
 Route::get('campaigns/{company}/actions', [CompanyController::class, 'actions'])->name('companies.actions');
 Route::post('campaigns/{company}/add-product-to-action', [CompanyController::class, 'addProductToAction'])->name('companies.add-product-to-action');
