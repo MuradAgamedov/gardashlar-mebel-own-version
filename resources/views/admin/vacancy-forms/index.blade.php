@@ -85,7 +85,7 @@
                                         </td>
                                         <td>
                                             @if($form->file)
-                                                <a href="{{ asset('storage/' . $form->file) }}" 
+                                                <a target="_blank" href="{{ asset('storage/' . $form->file) }}" 
                                                    class="btn btn-sm btn-outline-primary">
                                                     <i class="fas fa-download"></i> Download
                                                 </a>
