@@ -120,7 +120,7 @@
                                 <h5>Attached File</h5>
                                 <div class="border p-3 rounded bg-light">
                                     <p><strong>File:</strong> {{ $form->file_name }}</p>
-                                    <a href="{{ asset($form->file) }}" 
+                                    <a href="" 
                                        class="btn btn-primary">
                                         <i class="fas fa-download"></i> Download File
                                     </a>
