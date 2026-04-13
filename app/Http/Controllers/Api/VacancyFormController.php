@@ -86,11 +86,9 @@ class VacancyFormController extends Controller
 
             // File upload
             $filePath = null;
-            $fileName = null;
             if ($request->hasFile('file')) {
-                $file = $request->file('file');
                 $filePath = $this->fileService->upload(
-                    $file,
+                    $request->file('file'),
                     'vacancy-forms',
                     [
                         'generate_unique_name' => false,
@@ -105,9 +103,6 @@ class VacancyFormController extends Controller
                         'data' => null
                     ], 500);
                 }
-
-                // Store original filename
-                $fileName = $file->getClientOriginalName();
             }
 
             // Create record
@@ -118,7 +113,6 @@ class VacancyFormController extends Controller
                 'email' => trim($request->email),
                 'message' => trim($request->message),
                 'file' => $filePath,
-                'file_name' => $fileName,
                 'is_read' => false,
             ]);
 
