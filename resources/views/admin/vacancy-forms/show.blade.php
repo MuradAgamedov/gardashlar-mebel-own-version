@@ -108,7 +108,7 @@
                     <div class="row mt-4">
                         <div class="col-12">
                             <h5>Message</h5>
-                            <div style="color: black;" class="border p-3 rounded bg-light">
+                            <div style="color: black;" class="border p-3 rounded">
                                 {{ $form->message }}
                             </div>
                         </div>
