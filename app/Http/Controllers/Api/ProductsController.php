@@ -1371,20 +1371,14 @@ public function categoryBySlug(Request $request, $slug)
                 ], 400);
             }
 
-            // Get product with translations and relationships
+            // Get product with all translations and relationships
             $product = Product::with([
-                'translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                },
-                'categories.translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                },
-                'images' => function($query) use ($languageId) {
+                'translates',
+                'categories.translates',
+                'images' => function($query) {
                     $query->where('is_main', true)
                           ->where('status', true)
-                          ->with(['translates' => function($q) use ($languageId) {
-                              $q->where('language_id', $languageId);
-                          }]);
+                          ->with(['translates']);
                 }
             ])
             ->whereHas('translates', function($query) use ($languageId, $slug) {
@@ -1393,21 +1387,62 @@ public function categoryBySlug(Request $request, $slug)
             })
             ->firstOrFail();
 
-            $translation = $product->translates->first();
+            $translation = $product->translates->where('language_id', $languageId)->first();
             $mainImage = $product->images->first();
 
             // Get category title
             $categoryTitle = '';
             if ($product->categories->isNotEmpty()) {
                 $category = $product->categories->first();
-                $categoryTranslation = $category->translates->first();
+                $categoryTranslation = $category->translates->where('language_id', $languageId)->first();
                 $categoryTitle = $categoryTranslation ? $categoryTranslation->title : '';
             }
 
             // Get image alt text from translation
             $imageAltText = '';
             if ($mainImage && $mainImage->translates->isNotEmpty()) {
-                $imageAltText = $mainImage->translates->first()->alt_text ?? '';
+                $imageAltText = $mainImage->translates->where('language_id', $languageId)->first()->alt_text ?? '';
+            }
+
+            // Get all languages for translates structure
+            $languages = \App\Models\Language::all();
+            
+            // Build translates structure
+            $translatesData = [
+                'slug' => [],
+                'category_slug' => [],
+                'parent_slug' => []
+            ];
+
+            foreach ($languages as $lang) {
+                $langCode = $lang->lang_code;
+                
+                // Product slug
+                $productTr = $product->translates->where('language_id', $lang->id)->first();
+                $translatesData['slug'][$langCode] = $productTr ? $productTr->slug : null;
+                
+                // Category slug
+                $categorySlug = null;
+                if ($product->categories->isNotEmpty()) {
+                    $category = $product->categories->first();
+                    $categoryTr = $category->translates->where('language_id', $lang->id)->first();
+                    $categorySlug = $categoryTr ? $categoryTr->slug : null;
+                }
+                $translatesData['category_slug'][$langCode] = $categorySlug;
+                
+                // Parent slug (if category has parent)
+                $parentSlug = null;
+                if ($product->categories->isNotEmpty()) {
+                    $category = $product->categories->first();
+                    if ($category->parent_id) {
+                        $parentCategory = \App\Models\ProductCategory::find($category->parent_id);
+                        if ($parentCategory) {
+                            $parentTr = $parentCategory->translates->where('language_id', $lang->id)->first();
+                            $parentSlug = $parentTr ? $parentTr->slug : null;
+                        }
+                    }
+                }
+                $translatesData['parent_slug'][$langCode] = $parentSlug;
             }
 
             // Prepare response data with only required fields
@@ -1420,7 +1455,8 @@ public function categoryBySlug(Request $request, $slug)
                 'image_alt_text' => $imageAltText,
                 'category_title' => $categoryTitle,
                 'price' => $product->price,
-                'discount_price' => $product->discount_price
+                'discount_price' => $product->discount_price,
+                'translates' => $translatesData
             ];
 
             return response()->json([
