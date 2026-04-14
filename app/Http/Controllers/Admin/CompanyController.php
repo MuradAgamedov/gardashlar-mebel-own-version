@@ -29,7 +29,7 @@ class CompanyController extends Controller
     public function create()
     {
         $languages = $this->languageRepository->getActiveLanguages();
-        return view('admin.campaigns.create', compact('languages'));
+        return view('admin.companies.create', compact('languages'));
     }
 
     public function store(StoreCompanyRequest $request)
