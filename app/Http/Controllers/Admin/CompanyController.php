@@ -23,13 +23,13 @@ class CompanyController extends Controller
     public function index()
     {
         $companies = $this->repository->getCompanies();
-        return view('admin.companies.index', compact('companies'));
+        return view('admin.campaigns.index', compact('companies'));
     }
 
     public function create()
     {
         $languages = $this->languageRepository->getActiveLanguages();
-        return view('admin.companies.create', compact('languages'));
+        return view('admin.campaigns.create', compact('languages'));
     }
 
     public function store(StoreCompanyRequest $request)
@@ -41,7 +41,7 @@ class CompanyController extends Controller
                 $request
             );
 
-            return redirect()->route('admin.companies.index')
+            return redirect()->route('admin.campaigns.index')
                 ->with('success', 'Kampaniya uğurla əlavə edildi.');
 
         } catch (\Exception $e) {
@@ -66,7 +66,7 @@ class CompanyController extends Controller
                 $request
             );
 
-            return redirect()->route('admin.companies.index')
+            return redirect()->route('admin.campaigns.index')
                 ->with('success', 'Kampaniya uğurla yeniləndi.');
 
         } catch (\Exception $e) {
@@ -78,7 +78,7 @@ class CompanyController extends Controller
     {
         try {
             $this->repository->deleteCompany($campaign);
-            return redirect()->route('admin.companies.index')
+            return redirect()->route('admin.campaigns.index')
                 ->with('success', 'Kampaniya uğurla silindi.');
 
         } catch (\Exception $e) {
