@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
+use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -94,6 +95,15 @@ class BlogCategoryController extends Controller
 
             $translate = $blogCategory->translates->first();
             
+            $languages = Language::all();
+            $slugTranslations = [];
+            
+            foreach ($languages as $lang) {
+                $langCode = $lang->lang_code;
+                $tr = $blogCategory->translates()->where('language_id', $lang->id)->first();
+                $slugTranslations[$langCode] = $tr ? $tr->slug : null;
+            }
+
             $data = [
                 'id' => $blogCategory->id,
                 'title' => $translate->title ?? null,
@@ -102,6 +112,9 @@ class BlogCategoryController extends Controller
                 'seo_keywords' => $translate->seo_keywords ?? null,
                 'seo_description' => $translate->seo_description ?? null,
                 'posts_count' => $blogCategory->blog_posts_count,
+                'translates' => [
+                    'slug' => $slugTranslations
+                ]
             ];
 
             return response()->json([

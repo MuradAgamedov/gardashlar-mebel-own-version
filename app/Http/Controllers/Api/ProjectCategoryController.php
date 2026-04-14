@@ -66,36 +66,42 @@ class ProjectCategoryController extends Controller
             $cacheKey = "api:project-categories:all:lang:{$languageId}";
             
             $data = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                $projectCategories = ProjectCategory::with([
-                    'translates' => function($query) use ($languageId) {
-                        $query->where('language_id', $languageId);
-                    }
-                ])
+                $projectCategories = ProjectCategory::with(['translates'])
                 ->active()
                 ->ordered()
                 ->get();
 
-                return $projectCategories->map(function ($category) use ($languageId) {
+                $languages = \App\Models\Language::all();
+
+                return $projectCategories->map(function ($category) use ($languageId, $languages) {
                     // Get translation for the specified language
-                    $translation = $category->translates()
-                        ->where('language_id', $languageId)
-                        ->first();
+                    $translation = $category->translates->where('language_id', $languageId)->first();
                     
                     // If no translation found, get the first available translation
                     if (!$translation) {
-                        $translation = $category->translates()->first();
+                        $translation = $category->translates->first();
                     }
 
-        return [
-            'id' => $category->id,
-            'title' => $translation ? $translation->title : null,
-            'slug' => $translation ? $translation->slug : null,
-            'seo_title' => $translation ? $translation->seo_title : null,
-            'seo_keywords' => $translation ? $translation->seo_keywords : null,
-            'seo_description' => $translation ? $translation->seo_description : null,
-            'image_alt_text' => $translation ? $translation->image_alt_text : null,
-            'image_url' => $category->image_url
-        ];
+                    $slugTranslations = [];
+                    foreach ($languages as $lang) {
+                        $langCode = $lang->lang_code;
+                        $tr = $category->translates->where('language_id', $lang->id)->first();
+                        $slugTranslations[$langCode] = $tr ? $tr->slug : null;
+                    }
+
+                    return [
+                        'id' => $category->id,
+                        'title' => $translation ? $translation->title : null,
+                        'slug' => $translation ? $translation->slug : null,
+                        'seo_title' => $translation ? $translation->seo_title : null,
+                        'seo_keywords' => $translation ? $translation->seo_keywords : null,
+                        'seo_description' => $translation ? $translation->seo_description : null,
+                        'image_alt_text' => $translation ? $translation->image_alt_text : null,
+                        'image_url' => $category->image_url,
+                        'translates' => [
+                            'slug' => $slugTranslations
+                        ]
+                    ];
                 })->filter(function ($item) {
                     // Filter out items without title or slug
                     return !empty($item['title']) && !empty($item['slug']);
