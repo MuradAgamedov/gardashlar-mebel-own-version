@@ -23,7 +23,7 @@ class CompanyController extends Controller
     public function index()
     {
         $companies = $this->repository->getCompanies();
-        return view('admin.campaigns.index', compact('companies'));
+        return view('admin.companies.index', compact('companies'));
     }
 
     public function create()
