@@ -1320,10 +1320,7 @@ public function categoryBySlug(Request $request, $slug)
         }
 
         $category = ProductCategory::with([
-            'translates' => function($query) use ($languageId, $slug) {
-                $query->where('language_id', $languageId)
-                      ->where('slug', $slug);
-            }
+            'translates'
         ])
         ->whereHas('translates', function($query) use ($languageId, $slug) {
             $query->where('language_id', $languageId)
@@ -1331,7 +1328,36 @@ public function categoryBySlug(Request $request, $slug)
         })
         ->firstOrFail();
 
-        $translation = $category->translates->first();
+        $translation = $category->translates->where('language_id', $languageId)->first();
+
+        // Get all languages for translates structure
+        $languages = \App\Models\Language::all();
+        
+        // Build translates structure
+        $translatesData = [
+            'slug' => [],
+            'parent_slug' => []
+        ];
+
+        foreach ($languages as $lang) {
+            $langCode = $lang->lang_code;
+            
+            // Category slug
+            $categoryTr = $category->translates->where('language_id', $lang->id)->first();
+            $translatesData['slug'][$langCode] = $categoryTr ? $categoryTr->slug : null;
+            
+            // Parent slug (if category has parent)
+            $parentSlug = null;
+            if ($category->parent_id) {
+                $parentCategory = \App\Models\ProductCategory::find($category->parent_id);
+                if ($parentCategory) {
+                    $parentTr = $parentCategory->translates->where('language_id', $lang->id)->first();
+                    $parentSlug = $parentTr ? $parentTr->slug : null;
+                }
+            }
+            $translatesData['parent_slug'][$langCode] = $parentSlug;
+        }
+
         $data = [
             'id' => $category->id,
             'title' => $translation->title ?? '',
@@ -1340,7 +1366,8 @@ public function categoryBySlug(Request $request, $slug)
             'seo_description' => $translation->seo_description ?? '',
             'seo_keywords' => $translation->seo_keywords ?? '',
             'image' => asset('storage/' . $category->image),
-            'image_alt_text' => $translation->image_alt_text ?? ''
+            'image_alt_text' => $translation->image_alt_text ?? '',
+            'translates' => $translatesData
         ];
 
         return response()->json([
