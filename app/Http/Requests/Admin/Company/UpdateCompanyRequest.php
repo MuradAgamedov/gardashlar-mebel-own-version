@@ -14,7 +14,8 @@ class UpdateCompanyRequest extends FormRequest
 
     public function rules(): array
     {
-        $companyId = $this->route('company')->id ?? null;
+        $campaign = $this->route('campaign');
+        $companyId = is_object($campaign) ? $campaign->id : $campaign;
 
         return [
             'translates' => 'required|array',
