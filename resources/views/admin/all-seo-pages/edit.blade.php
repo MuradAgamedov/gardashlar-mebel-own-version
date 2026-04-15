@@ -1,31 +1,6 @@
-{{-- @extends("admin.layout.app") --}}
+@extends("admin.layout.app")
 
 @section("content")
-{{-- SEO Scripts and Head sections commented out for debugging --}}
-{{-- 
-@section('seo-meta')
-@if($seoPages)
-    @if($seoPages->is_indexed)
-        <meta name="robots" content="index, follow">
-    @else
-        <meta name="robots" content="noindex, nofollow">
-    @endif
-@endif
-@endsection
-
-@section('page-header')
-@if($seoPages && $seoPages->page_header)
-    {!! $seoPages->page_header !!}
-@endif
-@endsection
-
-@section('page-footer')
-@if($seoPages && $seoPages->page_footer)
-    {!! $seoPages->page_footer !!}
-@endif
-@endsection
---}}
-
 <div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
@@ -117,7 +92,9 @@
                                     </div>
                                 </div>
 
-                                <!-- Page Header -->
+                              {{--
+                                
+                                  <!-- Page Header -->
                                 <div class="col-md-6">
                                     <div class="card border">
                                         <div class="card-header bg-light">
@@ -141,9 +118,12 @@
                                         </div>
                                     </div>
                                 </div>
+                                --}}
                             </div>
 
-                            <div class="row mt-3">
+                            {{--
+                                
+                                <div class="row mt-3">
                                 <!-- Page Footer -->
                                 <div class="col-12">
                                     <div class="card border">
@@ -169,6 +149,7 @@
                                     </div>
                                 </div>
                             </div>
+                                --}}
 
                             <!-- mb-0 Button -->
                             <div class="row mt-4">
