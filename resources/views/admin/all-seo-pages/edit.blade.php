@@ -1,6 +1,31 @@
-@extends("admin.layout.app")
+{{-- @extends("admin.layout.app") --}}
 
 @section("content")
+{{-- SEO Scripts and Head sections commented out for debugging --}}
+{{-- 
+@section('seo-meta')
+@if($seoPages)
+    @if($seoPages->is_indexed)
+        <meta name="robots" content="index, follow">
+    @else
+        <meta name="robots" content="noindex, nofollow">
+    @endif
+@endif
+@endsection
+
+@section('page-header')
+@if($seoPages && $seoPages->page_header)
+    {!! $seoPages->page_header !!}
+@endif
+@endsection
+
+@section('page-footer')
+@if($seoPages && $seoPages->page_footer)
+    {!! $seoPages->page_footer !!}
+@endif
+@endsection
+--}}
+
 <div class="page-body">
     <div class="container-fluid">
         <div class="page-title">
