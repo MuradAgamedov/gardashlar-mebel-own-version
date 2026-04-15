@@ -189,6 +189,15 @@
 </div>
 
 <style>
+body {
+    background-color: #ffffff !important;
+    min-height: 100vh;
+}
+
+.page-body {
+    background-color: #ffffff !important;
+}
+
 .form-check-input:checked {
     background-color: #28a745;
     border-color: #28a745;
