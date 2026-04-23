@@ -320,6 +320,17 @@
         background-color: #fff;
         border-color: #dee2e6 #dee2e6 #fff;
     }
+    
+    /* CKEditor validation styles */
+    .ck-editor__editable.is-invalid {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    }
+    
+    .ck-editor__editable.is-invalid:focus {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    }
 </style>
 @endpush
 
@@ -376,6 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(e) {
             let isValid = true;
             let firstErrorTab = null;
+            let firstErrorField = null;
             
             // Validate CKEditor fields
             @foreach($languages as $language)
@@ -383,17 +395,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (editor{{ $language->id }}) {
                     const content = editor{{ $language->id }}.getData().trim();
                     const textarea = document.getElementById('description_{{ $language->id }}');
+                    const editorElement = editor{{ $language->id }}.ui.view.editable.element;
                     
                     if (!content) {
                         isValid = false;
                         textarea.classList.add('is-invalid');
+                        editorElement.classList.add('is-invalid');
                         
                         // Switch to the first tab with error
                         if (!firstErrorTab) {
                             firstErrorTab = 'tab-{{ $language->id }}';
+                            firstErrorField = editorElement;
                         }
                     } else {
                         textarea.classList.remove('is-invalid');
+                        editorElement.classList.remove('is-invalid');
                         // Update textarea value for form submission
                         textarea.value = content;
                     }
@@ -408,7 +424,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (titleInput{{ $language->id }} && !titleInput{{ $language->id }}.value.trim()) {
                     isValid = false;
                     titleInput{{ $language->id }}.classList.add('is-invalid');
-                    if (!firstErrorTab) firstErrorTab = 'tab-{{ $language->id }}';
+                    if (!firstErrorTab) {
+                        firstErrorTab = 'tab-{{ $language->id }}';
+                        firstErrorField = titleInput{{ $language->id }};
+                    }
                 } else if (titleInput{{ $language->id }}) {
                     titleInput{{ $language->id }}.classList.remove('is-invalid');
                 }
@@ -416,7 +435,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (slugInput{{ $language->id }} && !slugInput{{ $language->id }}.value.trim()) {
                     isValid = false;
                     slugInput{{ $language->id }}.classList.add('is-invalid');
-                    if (!firstErrorTab) firstErrorTab = 'tab-{{ $language->id }}';
+                    if (!firstErrorTab) {
+                        firstErrorTab = 'tab-{{ $language->id }}';
+                        firstErrorField = slugInput{{ $language->id }};
+                    }
                 } else if (slugInput{{ $language->id }}) {
                     slugInput{{ $language->id }}.classList.remove('is-invalid');
                 }
@@ -431,6 +453,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         const tab = new bootstrap.Tab(errorTab);
                         tab.show();
                     }
+                    
+                    // Focus on the first error field after tab switch
+                    setTimeout(() => {
+                        if (firstErrorField) {
+                            firstErrorField.focus();
+                        }
+                    }, 100);
                 }
                 alert('Please fill in all required fields marked with *');
             }
