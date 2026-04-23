@@ -19,7 +19,7 @@
                             <a href="{{ route('admin.news-posts.index') }}">News Posts</a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.news-posts.edit', $newsPost) }}">Edit</a>
+                            <a href="{{ route('admin.news-posts.edit', $news_post) }}">Edit</a>
                         </li>
                         <li class="breadcrumb-item active">Images</li>
                     </ol>
@@ -64,7 +64,7 @@
                                                         </button>
                                                         <button type="button" class="btn btn-sm btn-danger delete-btn" 
                                                                 data-id="{{ $image->id }}"
-                                                                data-url="{{ route('admin.news-posts.images.destroy', [$newsPost, $image]) }}">
+                                                                data-url="{{ route('admin.news-posts.images.destroy', [$news_post, $image]) }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
                                                     </div>
@@ -156,7 +156,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const postId = {{ $newsPost->id }};
+    const postId = {{ $news_post->id }};
 
     // Sortable functionality
     const sortableImages = document.getElementById('sortable-images');
