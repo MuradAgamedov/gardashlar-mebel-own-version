@@ -46,7 +46,7 @@ class NewsImageController extends Controller
 
                 $uploadedImages[] = [
                     'id' => $newsImage->id,
-                    'image_url' => $newsImage->image_url,
+                    'image_url' => $newsImage->getImageUrlAttribute(),
                     'order' => $newsImage->order,
                 ];
             }
@@ -86,7 +86,7 @@ class NewsImageController extends Controller
                 'message' => 'Image updated successfully',
                 'image' => [
                     'id' => $news_image->id,
-                    'image_url' => $news_image->image_url,
+                    'image_url' => $news_image->getImageUrlAttribute(),
                     'order' => $news_image->order,
                 ]
             ]);
