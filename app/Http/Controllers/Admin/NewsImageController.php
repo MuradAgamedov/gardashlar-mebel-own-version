@@ -25,7 +25,7 @@ class NewsImageController extends Controller
         return view('admin.news-images.index', compact('news_post'));
     }
 
-    public function store(Request $request, NewsPost $news_post): JsonResponse
+    public function store(Request $request, NewsPost $news_post)
     {
         $request->validate([
             'images' => 'required|array',
@@ -33,34 +33,23 @@ class NewsImageController extends Controller
         ]);
 
         try {
-            $uploadedImages = [];
+            $uploadedCount = 0;
             $maxOrder = $news_post->images()->max('order') ?? 0;
             
             foreach ($request->file('images') as $index => $image) {
                 $imagePath = $this->imageService->upload($image, 'news-images');
                 
-                $newsImage = $news_post->images()->create([
+                $news_post->images()->create([
                     'image_url' => $imagePath,
                     'order' => $maxOrder + $index + 1,
                 ]);
-
-                $uploadedImages[] = [
-                    'id' => $newsImage->id,
-                    'image_url' => $newsImage->getImageUrlAttribute(),
-                    'order' => $newsImage->order,
-                ];
+                
+                $uploadedCount++;
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => count($uploadedImages) . ' images uploaded successfully',
-                'images' => $uploadedImages
-            ]);
+            return redirect()->back()->with('success', $uploadedCount . ' images uploaded successfully');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error uploading images: ' . $e->getMessage()
-            ], 500);
+            return redirect()->back()->with('error', 'Error uploading images: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -98,7 +87,7 @@ class NewsImageController extends Controller
         }
     }
 
-    public function destroy(NewsPost $news_post, NewsImage $news_image): JsonResponse
+    public function destroy(NewsPost $news_post, NewsImage $news_image)
     {
         try {
             // Delete image file
@@ -109,15 +98,9 @@ class NewsImageController extends Controller
             // Delete database record
             $news_image->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Image deleted successfully'
-            ]);
+            return redirect()->back()->with('success', 'Image deleted successfully');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error deleting image: ' . $e->getMessage()
-            ], 500);
+            return redirect()->back()->with('error', 'Error deleting image: ' . $e->getMessage());
         }
     }
 
