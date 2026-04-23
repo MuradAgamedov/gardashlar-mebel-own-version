@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const imageId = document.getElementById('editImageId').value;
         const formData = new FormData(this);
         
-        fetch(`/admin/news-posts/${newsPostId}/images/${imageId}`, {
+        fetch(`api/admin/news-posts/${newsPostId}/images/${imageId}`, {
             method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
