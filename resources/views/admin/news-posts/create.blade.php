@@ -33,7 +33,7 @@
                         <h5>News Post Information</h5>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="{{ route('admin.news-posts.store') }}" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('admin.news-posts.store') }}" enctype="multipart/form-data" novalidate>
                             @csrf
                             
                             <!-- Basic Information -->
