@@ -37,7 +37,7 @@
                             @csrf
                             
                             <!-- Basic Information -->
-                            <div class="row mb-3">
+                            <div class="row mb-4">
                                 <div class="col-md-6">
                                     <label for="news_category_id" class="form-label">Category <span class="text-danger">*</span></label>
                                     <select class="form-select" id="news_category_id" name="news_category_id" required>
@@ -54,15 +54,19 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-6">
                                     <label for="published_at" class="form-label">Published At</label>
                                     <input type="datetime-local" 
                                            class="form-control" 
                                            id="published_at" 
                                            name="published_at">
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="form-check form-switch mt-4">
+                            </div>
+
+                            <!-- Status -->
+                            <div class="row mb-4">
+                                <div class="col-md-12">
+                                    <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" name="status" id="status" value="1" checked>
                                         <label class="form-check-label" for="status">
                                             Active Status
@@ -72,7 +76,7 @@
                             </div>
 
                             <!-- Images -->
-                            <div class="row mb-3">
+                            <div class="row mb-4">
                                 <div class="col-md-6">
                                     <label for="card_image" class="form-label">Card Image</label>
                                     <input type="file" 
@@ -80,7 +84,11 @@
                                            id="card_image" 
                                            name="card_image" 
                                            accept="image/*">
-                                    <small class="text-muted">Recommended size: 800x600px</small>
+                                    <small class="form-text text-muted">Recommended size: 400x300px, Max: 2MB</small>
+                                    <div class="mt-2">
+                                        <img id="card_image_preview" src="" alt="Card Image Preview" 
+                                             class="img-thumbnail" style="max-width: 200px; display: none;">
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="inner_banner_image" class="form-label">Inner Banner Image</label>
@@ -89,7 +97,11 @@
                                            id="inner_banner_image" 
                                            name="inner_banner_image" 
                                            accept="image/*">
-                                    <small class="text-muted">Recommended size: 1920x400px</small>
+                                    <small class="form-text text-muted">Recommended size: 1200x400px, Max: 2MB</small>
+                                    <div class="mt-2">
+                                        <img id="inner_banner_image_preview" src="" alt="Inner Banner Image Preview" 
+                                             class="img-thumbnail" style="max-width: 200px; display: none;">
+                                    </div>
                                 </div>
                             </div>
 
@@ -150,11 +162,39 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="card_description_{{ $language->id }}" class="form-label">Card Description</label>
-                                                    <textarea class="form-control" 
-                                                              id="card_description_{{ $language->id }}" 
-                                                              name="translations[{{ $language->id }}][card_description]" 
-                                                              rows="3"></textarea>
+                                                    <label for="description_{{ $language->id }}" class="form-label">
+                                                        Description <span class="text-danger">*</span>
+                                                    </label>
+                                                    <textarea class="form-control ckeditor" 
+                                                              id="description_{{ $language->id }}" 
+                                                              name="translations[{{ $language->id }}][description]" 
+                                                              rows="10" required></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="translations[{{ $language->id }}][card_image_alt_text]" class="form-label">
+                                                        Card Image Alt Text ({{ strtoupper($language->lang_code) }})
+                                                    </label>
+                                                    <input type="text" 
+                                                           class="form-control" 
+                                                           name="translations[{{ $language->id }}][card_image_alt_text]" 
+                                                           value="">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="translations[{{ $language->id }}][inner_banner_alt_text]" class="form-label">
+                                                        Inner Banner Alt Text ({{ strtoupper($language->lang_code) }})
+                                                    </label>
+                                                    <input type="text" 
+                                                           class="form-control" 
+                                                           name="translations[{{ $language->id }}][inner_banner_alt_text]" 
+                                                           value="">
                                                 </div>
                                             </div>
                                         </div>
@@ -162,12 +202,20 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="description_{{ $language->id }}" class="form-label">Description</label>
+                                                    <label for="translations[{{ $language->id }}][card_description]" class="form-label">
+                                                        Card Description ({{ strtoupper($language->lang_code) }})
+                                                    </label>
                                                     <textarea class="form-control" 
-                                                              id="description_{{ $language->id }}" 
-                                                              name="translations[{{ $language->id }}][description]" 
-                                                              rows="10"></textarea>
+                                                              name="translations[{{ $language->id }}][card_description]" 
+                                                              rows="3"></textarea>
                                                 </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- SEO Section -->
+                                        <div class="row mt-4">
+                                            <div class="col-12">
+                                                <h6 class="mb-3">SEO Settings ({{ strtoupper($language->lang_code) }})</h6>
                                             </div>
                                         </div>
 
@@ -235,8 +283,21 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.ckeditor.com/ckeditor5/27.1.0/classic/ckeditor.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize CKEditor for each description field
+    @foreach($languages as $language)
+        ClassicEditor
+            .create(document.querySelector('#description_{{ $language->id }}'), {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', 'undo', 'redo'],
+                language: '{{ $language->lang_code }}'
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    @endforeach
+
     // Auto-generate slug from title
     const titleInputs = document.querySelectorAll('input[name*="[title]"]');
     const slugInputs = document.querySelectorAll('input[name*="[slug]"]');
@@ -254,6 +315,46 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Image preview functionality
+    function setupImagePreview(inputId, previewId) {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        
+        if (input && preview) {
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.style.display = 'none';
+                }
+            });
+        }
+    }
+
+    // Setup image previews
+    setupImagePreview('card_image', 'card_image_preview');
+    setupImagePreview('inner_banner_image', 'inner_banner_image_preview');
 });
 </script>
+
+<style>
+    .nav-tabs .nav-link {
+        color: #6c757d;
+    }
+    .nav-tabs .nav-link.active {
+        color: #495057;
+        background-color: #fff;
+        border-color: #dee2e6 #dee2e6 #fff;
+    }
+    .img-thumbnail {
+        border-radius: 4px;
+    }
+</style>
 @endpush

@@ -16,6 +16,8 @@ class NewsPostTranslate extends Model
         'slug',
         'card_description',
         'description',
+        'card_image_alt_text',
+        'inner_banner_alt_text',
         'seo_title',
         'seo_keywords',
         'seo_description',
