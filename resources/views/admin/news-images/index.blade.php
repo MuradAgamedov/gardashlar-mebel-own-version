@@ -99,20 +99,23 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Upload Image</h5>
+                <h5 class="modal-title">Upload Images</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="uploadForm" enctype="multipart/form-data">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="image" class="form-label">Select Image</label>
-                        <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
-                        <small class="text-muted">Supported formats: JPEG, PNG, JPG, GIF, WebP (Max: 2MB)</small>
+                        <label for="images" class="form-label">Select Multiple Images</label>
+                        <input type="file" class="form-control" id="images" name="images[]" accept="image/*" multiple required>
+                        <small class="text-muted">Supported formats: JPEG, PNG, JPG, GIF, WebP (Max: 2MB each)</small>
+                    </div>
+                    <div class="mb-3">
+                        <div id="imagePreview" class="row g-2"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Upload</button>
+                    <button type="submit" class="btn btn-primary">Upload Images</button>
                 </div>
             </form>
         </div>
@@ -158,6 +161,35 @@
 document.addEventListener('DOMContentLoaded', function() {
     const newsPostId = {{ $news_post->id }};
 
+    // Image preview functionality
+    const imageInput = document.getElementById('images');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    imageInput.addEventListener('change', function(e) {
+        imagePreview.innerHTML = '';
+        const files = Array.from(e.target.files);
+        
+        files.forEach((file, index) => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-4';
+                    col.innerHTML = `
+                        <div class="card">
+                            <img src="${e.target.result}" class="img-fluid rounded" style="height: 100px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <small class="text-muted">${file.name}</small>
+                            </div>
+                        </div>
+                    `;
+                    imagePreview.appendChild(col);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+
     // Sortable functionality
     const sortableImages = document.getElementById('sortable-images');
     if (sortableImages) {
@@ -167,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
             onEnd: function(evt) {
                 const imageIds = Array.from(sortableImages.children).map(row => row.getAttribute('data-id'));
                 
-                fetch(`/api/admin/news-posts/${newsPostId}/images/reorder`, {
+                fetch(`/admin/news-posts/${newsPostId}/images/reorder`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -211,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const formData = new FormData(this);
         
-        fetch(`/api/admin/news-posts/${newsPostId}/images`, {
+        fetch(`/admin/news-posts/${newsPostId}/images`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')

@@ -28,32 +28,38 @@ class NewsImageController extends Controller
     public function store(Request $request, NewsPost $news_post): JsonResponse
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'images' => 'required|array',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         try {
-            $imagePath = $this->imageService->upload($request->file('image'), 'news-images');
-            
+            $uploadedImages = [];
             $maxOrder = $news_post->images()->max('order') ?? 0;
             
-            $newsImage = $news_post->images()->create([
-                'image_url' => $imagePath,
-                'order' => $maxOrder + 1,
-            ]);
+            foreach ($request->file('images') as $index => $image) {
+                $imagePath = $this->imageService->upload($image, 'news-images');
+                
+                $newsImage = $news_post->images()->create([
+                    'image_url' => $imagePath,
+                    'order' => $maxOrder + $index + 1,
+                ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Image uploaded successfully',
-                'image' => [
+                $uploadedImages[] = [
                     'id' => $newsImage->id,
                     'image_url' => $newsImage->image_url,
                     'order' => $newsImage->order,
-                ]
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => count($uploadedImages) . ' images uploaded successfully',
+                'images' => $uploadedImages
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error uploading image: ' . $e->getMessage()
+                'message' => 'Error uploading images: ' . $e->getMessage()
             ], 500);
         }
     }
