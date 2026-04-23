@@ -14,6 +14,8 @@ class BlogCategoryTranslate extends Model
         'language_id',
         'title',
         'slug',
+        'card_image_alt_text',
+        'inner_banner_alt_text',
         'seo_title',
         'seo_keywords',
         'seo_description',
