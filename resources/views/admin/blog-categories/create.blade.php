@@ -61,98 +61,134 @@
                                 </div>
                             </div>
 
-                            <!-- Translations -->
-                            <div class="row mb-3">
-                                <div class="col-12">
-                                    <label class="form-label">Translations</label>
-                                    <div class="card border">
-                                        <div class="card-body">
-                                            @foreach($languages as $language)
-                                                <div class="row mb-4">
-                                                    <div class="col-md-12">
-                                                        <h6 class="mb-3">
-                                                            <span class="badge bg-primary">{{ strtoupper($language->lang_code) }}</span>
-                                                            {{ $language->title }}
-                                                        </h6>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label class="form-label">
-                                                            Title <span class="text-danger">*</span>
-                                                        </label>
-                                                        <input type="text" 
-                                                               class="form-control @error('translations.' . $language->id . '.title') is-invalid @enderror" 
-                                                               name="translations[{{ $language->id }}][title]" 
-                                                               id="title_{{ $language->id }}"
-                                                               value="{{ old('translations.' . $language->id . '.title') }}" 
-                                                               placeholder="Enter title for {{ $language->title }}"
-                                                               required>
-                                                        @error('translations.' . $language->id . '.title')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label class="form-label">Slug</label>
-                                                        <input type="text" 
-                                                               class="form-control @error('translations.' . $language->id . '.slug') is-invalid @enderror" 
-                                                               name="translations[{{ $language->id }}][slug]" 
-                                                               id="slug_{{ $language->id }}"
-                                                               value="{{ old('translations.' . $language->id . '.slug') }}" 
-                                                               placeholder="Auto-generated from title">
-                                                        @error('translations.' . $language->id . '.slug')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <label class="form-label">SEO Title</label>
-                                                        <input type="text" 
-                                                               class="form-control @error('translations.' . $language->id . '.seo_title') is-invalid @enderror" 
-                                                               name="translations[{{ $language->id }}][seo_title]" 
-                                                               value="{{ old('translations.' . $language->id . '.seo_title') }}" 
-                                                               placeholder="Enter SEO title for {{ $language->title }}">
-                                                        @error('translations.' . $language->id . '.seo_title')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-12 mt-3">
-                                                        <label class="form-label">SEO Keywords</label>
-                                                        <textarea class="form-control @error('translations.' . $language->id . '.seo_keywords') is-invalid @enderror" 
-                                                                  name="translations[{{ $language->id }}][seo_keywords]" 
-                                                                  rows="2"
-                                                                  placeholder="Enter SEO keywords for {{ $language->title }}">{{ old('translations.' . $language->id . '.seo_keywords') }}</textarea>
-                                                        @error('translations.' . $language->id . '.seo_keywords')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-12 mt-3">
-                                                        <label class="form-label">SEO Description</label>
-                                                        <textarea class="form-control @error('translations.' . $language->id . '.seo_description') is-invalid @enderror" 
-                                                                  name="translations[{{ $language->id }}][seo_description]" 
-                                                                  rows="3"
-                                                                  placeholder="Enter SEO description for {{ $language->title }}">{{ old('translations.' . $language->id . '.seo_description') }}</textarea>
-                                                        @error('translations.' . $language->id . '.seo_description')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
+                            <!-- Language Tabs -->
+                            <ul class="nav nav-tabs mb-3" id="languageTabs" role="tablist">
+                                @foreach($languages as $index => $language)
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link {{ $index === 0 ? 'active' : '' }}" 
+                                                id="lang-{{ $language->id }}-tab" 
+                                                data-bs-toggle="tab" 
+                                                data-bs-target="#lang-{{ $language->id }}" 
+                                                type="button" 
+                                                role="tab">
+                                            {{ $language->title }}
+                                                <span class="badge bg-secondary ms-1">{{ strtoupper($language->lang_code) }}</span>
+                                            @if($language->is_default)
+                                                <span class="badge bg-primary ms-1">Default</span>
+                                            @endif
+                                        </button>
+                                    </li>
+                                @endforeach
+                            </ul>
+
+                            <!-- Tab Content -->
+                            <div class="tab-content" id="languageTabContent">
+                                @foreach($languages as $index => $language)
+                                    <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" 
+                                         id="lang-{{ $language->id }}" 
+                                         role="tabpanel">
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="title_{{ $language->id }}" class="form-label">
+                                                        Title <span class="text-danger">*</span>
+                                                    </label>
+                                                    <input type="text" 
+                                                           class="form-control @error('translations.' . $language->id . '.title') is-invalid @enderror" 
+                                                           id="title_{{ $language->id }}" 
+                                                           name="translations[{{ $language->id }}][title]" 
+                                                           value="{{ old('translations.' . $language->id . '.title') }}" 
+                                                           placeholder="Enter title for {{ $language->title }}"
+                                                           required>
+                                                    @error('translations.' . $language->id . '.title')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
-                                                @if(!$loop->last)
-                                                    <hr>
-                                                @endif
-                                            @endforeach
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="slug_{{ $language->id }}" class="form-label">
+                                                        Slug <span class="text-danger">*</span>
+                                                    </label>
+                                                    <input type="text" 
+                                                           class="form-control @error('translations.' . $language->id . '.slug') is-invalid @enderror" 
+                                                           id="slug_{{ $language->id }}" 
+                                                           name="translations[{{ $language->id }}][slug]" 
+                                                           value="{{ old('translations.' . $language->id . '.slug') }}" 
+                                                           placeholder="Auto-generated from title"
+                                                           required>
+                                                    @error('translations.' . $language->id . '.slug')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label for="seo_title_{{ $language->id }}" class="form-label">SEO Title</label>
+                                                    <input type="text" 
+                                                           class="form-control @error('translations.' . $language->id . '.seo_title') is-invalid @enderror" 
+                                                           id="seo_title_{{ $language->id }}" 
+                                                           name="translations[{{ $language->id }}][seo_title]" 
+                                                           value="{{ old('translations.' . $language->id . '.seo_title') }}" 
+                                                           placeholder="Enter SEO title for {{ $language->title }}">
+                                                    @error('translations.' . $language->id . '.seo_title')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label for="seo_keywords_{{ $language->id }}" class="form-label">SEO Keywords</label>
+                                                    <textarea class="form-control @error('translations.' . $language->id . '.seo_keywords') is-invalid @enderror" 
+                                                              id="seo_keywords_{{ $language->id }}" 
+                                                              name="translations[{{ $language->id }}][seo_keywords]" 
+                                                              rows="3"
+                                                              placeholder="Enter SEO keywords for {{ $language->title }}">{{ old('translations.' . $language->id . '.seo_keywords') }}</textarea>
+                                                    @error('translations.' . $language->id . '.seo_keywords')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-3">
+                                                    <label for="seo_description_{{ $language->id }}" class="form-label">SEO Description</label>
+                                                    <textarea class="form-control @error('translations.' . $language->id . '.seo_description') is-invalid @enderror" 
+                                                              id="seo_description_{{ $language->id }}" 
+                                                              name="translations[{{ $language->id }}][seo_description]" 
+                                                              rows="4"
+                                                              placeholder="Enter SEO description for {{ $language->title }}">{{ old('translations.' . $language->id . '.seo_description') }}</textarea>
+                                                    @error('translations.' . $language->id . '.seo_description')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                @endforeach
                             </div>
 
-                            <!-- Action Buttons -->
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <a href="{{ route('admin.blog-categories.index') }}" class="btn btn-secondary">
-                                            <i class="material-icons-outlined">arrow_back</i>
-                                        </a>
+                            <!-- Submit Buttons -->
+                            <div class="row mt-4">
+                                <div class="col-md-12">
+                                    <div class="d-flex gap-2">
                                         <button type="submit" class="btn btn-primary">
-                                            <i class="material-icons-outlined">add</i>
+                                            <i class="material-icons-outlined">save</i>
+                                            Create Category
                                         </button>
+                                        <a href="{{ route('admin.blog-categories.index') }}" class="btn btn-secondary">
+                                            <i class="material-icons-outlined">cancel</i>
+                                            Cancel
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -165,33 +201,26 @@
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Slug generation function
-    function generateSlug(text) {
-        return text
-            .toLowerCase()
-            .trim()
-            .replace(/[^\w\s-]/g, '') // Remove special characters
-            .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
-            .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
-    }
-
-    // Get all title inputs
-    const titleInputs = document.querySelectorAll('input[id^="title_"]');
+    // Auto-generate slug from title
+    const titleInputs = document.querySelectorAll('input[name*="[title]"]');
+    const slugInputs = document.querySelectorAll('input[name*="[slug]"]');
     
-    titleInputs.forEach(function(titleInput) {
+    titleInputs.forEach((titleInput, index) => {
         titleInput.addEventListener('input', function() {
-            const languageId = this.id.split('_')[1];
-            const slugInput = document.getElementById('slug_' + languageId);
+            const slug = this.value.toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .trim('-');
             
-            if (slugInput && this.value.trim()) {
-                slugInput.value = generateSlug(this.value);
+            if (slugInputs[index]) {
+                slugInputs[index].value = slug;
             }
         });
     });
 });
 </script>
-@endsection 
-@include('admin.partials.slug-generator') 
+@endpush 
