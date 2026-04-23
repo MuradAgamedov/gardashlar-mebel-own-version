@@ -351,7 +351,17 @@
               </ul>
       </li>
 
-
+      <li class="sidebar-list">
+        <a class="sidebar-link" href="javascript:void(0)">
+          <i class="fas fa-newspaper"></i>
+          <h6>News</h6>
+          <i class="fas fa-chevron-down float-end"></i>
+        </a>
+                      <ul class="sidebar-submenu">
+                <li><a href="{{ route('admin.news-categories.index') }}">News Categories</a></li>
+                <li><a href="{{ route('admin.news-posts.index') }}">News Posts</a></li>
+              </ul>
+      </li>
 
       <li class="sidebar-list">
         <a class="sidebar-link" href="{{route('admin.registered-users')}}">

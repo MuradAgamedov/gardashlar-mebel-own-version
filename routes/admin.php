@@ -69,6 +69,7 @@ Route::prefix('')->name('admin.')->group(function () {
         require __DIR__.'/web/become-a-partner-forms.php';
         require __DIR__.'/web/become-a-investor-forms.php';
         require __DIR__.'/web/blogs.php';
+        require __DIR__.'/web/news.php';
         require __DIR__.'/web/social-networks.php';
         require __DIR__.'/web/currencies.php';
         require __DIR__.'/web/actions.php';

@@ -22,6 +22,8 @@ use App\Http\Controllers\Api\SubscriberController;
 use App\Http\Controllers\Api\TestimonialController;
 use App\Http\Controllers\Api\BlogPostController;
 use App\Http\Controllers\Api\BlogCategoryController;
+use App\Http\Controllers\Api\NewsPostController;
+use App\Http\Controllers\Api\NewsCategoryController;
 use App\Http\Controllers\Api\PhoneController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\AddressController;
@@ -173,6 +175,14 @@ Route::get('/blog-posts/{slug}', [BlogPostController::class, 'show'])->name('api
 // Blog Categories API Routes
 Route::get('/blog-categories', [BlogCategoryController::class, 'index'])->name('api.blog-categories.index');
 Route::get('/blog-categories/{slug}', [BlogCategoryController::class, 'show'])->name('api.blog-categories.show');
+
+// News Posts API Routes
+Route::get('/news-posts', [NewsPostController::class, 'index'])->name('api.news-posts.index');
+Route::get('/news-posts/{slug}', [NewsPostController::class, 'show'])->name('api.news-posts.show');
+
+// News Categories API Routes
+Route::get('/news-categories', [NewsCategoryController::class, 'index'])->name('api.news-categories.index');
+Route::get('/news-categories/{slug}', [NewsCategoryController::class, 'show'])->name('api.news-categories.show');
 
 // Phones API Routes
 Route::get('/general-phones', [PhoneController::class, 'generalPhones'])->name('api.general-phones');
