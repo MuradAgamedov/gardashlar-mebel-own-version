@@ -34,13 +34,13 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Images for: {{ $newsPost->title ?? 'News Post #' . $newsPost->id }}</h5>
+                            <h5>Images for: {{ $news_post->title ?? 'News Post #' . $news_post->id }}</h5>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
                                     <i class="material-icons-outlined">add</i>
                                     Add Image
                                 </button>
-                                <a href="{{ route('admin.news-posts.edit', $newsPost) }}" class="btn btn-secondary">
+                                <a href="{{ route('admin.news-posts.edit', $news_post) }}" class="btn btn-secondary">
                                     <i class="material-icons-outlined">arrow_back</i>
                                     Back to Post
                                 </a>
@@ -48,9 +48,9 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        @if($newsPost->images->count() > 0)
+                        @if($news_post->images->count() > 0)
                             <div class="row" id="sortable-images">
-                                @foreach($newsPost->images as $image)
+                                @foreach($news_post->images as $image)
                                     <div class="col-md-3 mb-3" data-id="{{ $image->id }}">
                                         <div class="card image-card">
                                             <div class="card-body p-2">

@@ -19,13 +19,13 @@ class NewsImageController extends Controller
     {
     }
 
-    public function index(NewsPost $newsPost)
+    public function index(NewsPost $news_post)
     {
-        $newsPost->load(['images' => fn($q) => $q->ordered()]);
-        return view('admin.news-images.index', compact('newsPost'));
+        $news_post->load(['images' => fn($q) => $q->ordered()]);
+        return view('admin.news-images.index', compact('news_post'));
     }
 
-    public function store(Request $request, NewsPost $newsPost): JsonResponse
+    public function store(Request $request, NewsPost $news_post): JsonResponse
     {
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -34,9 +34,9 @@ class NewsImageController extends Controller
         try {
             $imagePath = $this->imageService->upload($request->file('image'), 'news-images');
             
-            $maxOrder = $newsPost->images()->max('order') ?? 0;
+            $maxOrder = $news_post->images()->max('order') ?? 0;
             
-            $newsImage = $newsPost->images()->create([
+            $newsImage = $news_post->images()->create([
                 'image_url' => $imagePath,
                 'order' => $maxOrder + 1,
             ]);
@@ -58,7 +58,7 @@ class NewsImageController extends Controller
         }
     }
 
-    public function update(Request $request, NewsPost $newsPost, NewsImage $newsImage): JsonResponse
+    public function update(Request $request, NewsPost $news_post, NewsImage $news_image): JsonResponse
     {
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -66,22 +66,22 @@ class NewsImageController extends Controller
 
         try {
             // Delete old image
-            if ($newsImage->image_url) {
-                $this->imageService->delete($newsImage->image_url);
+            if ($news_image->image_url) {
+                $this->imageService->delete($news_image->image_url);
             }
 
             // Upload new image
             $imagePath = $this->imageService->upload($request->file('image'), 'news-images');
             
-            $newsImage->update(['image_url' => $imagePath]);
+            $news_image->update(['image_url' => $imagePath]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Image updated successfully',
                 'image' => [
-                    'id' => $newsImage->id,
-                    'image_url' => $newsImage->image_url,
-                    'order' => $newsImage->order,
+                    'id' => $news_image->id,
+                    'image_url' => $news_image->image_url,
+                    'order' => $news_image->order,
                 ]
             ]);
         } catch (\Exception $e) {
@@ -92,16 +92,16 @@ class NewsImageController extends Controller
         }
     }
 
-    public function destroy(NewsPost $newsPost, NewsImage $newsImage): JsonResponse
+    public function destroy(NewsPost $news_post, NewsImage $news_image): JsonResponse
     {
         try {
             // Delete image file
-            if ($newsImage->image_url) {
-                $this->imageService->delete($newsImage->image_url);
+            if ($news_image->image_url) {
+                $this->imageService->delete($news_image->image_url);
             }
 
             // Delete database record
-            $newsImage->delete();
+            $news_image->delete();
 
             return response()->json([
                 'success' => true,
@@ -115,7 +115,7 @@ class NewsImageController extends Controller
         }
     }
 
-    public function reorder(Request $request, NewsPost $newsPost): JsonResponse
+    public function reorder(Request $request, NewsPost $news_post): JsonResponse
     {
         $request->validate([
             'images' => 'required|array',
@@ -125,7 +125,7 @@ class NewsImageController extends Controller
         try {
             foreach ($request->images as $index => $imageId) {
                 NewsImage::where('id', $imageId)
-                    ->where('news_post_id', $newsPost->id)
+                    ->where('news_post_id', $news_post->id)
                     ->update(['order' => $index + 1]);
             }
 
