@@ -26,7 +26,6 @@
             </div>
         </div>
     </div>
-@idf
     <div class="container-fluid">
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -60,14 +59,14 @@
                             {{-- Title --}}
                             <div class="mb-3">
                                 <label class="form-label">Title <span class="text-danger">*</span></label>
-                                <input type="text" name="title" class="form-control" 
+                                <input type="text" name="title" class="form-control"
                                        value="{{ old('title') }}" required>
                             </div>
 
                             {{-- Months --}}
                             <div class="mb-3">
                                 <label class="form-label">Months (e.g. 3, 6, 9, 12)</label>
-                                <input type="text" name="months" class="form-control" 
+                                <input type="text" name="months" class="form-control"
                                        placeholder="Enter installment months (comma separated)"
                                        value="{{ old('months') }}">
                                 <small class="form-text text-muted">
@@ -85,7 +84,7 @@
 
                                 {{-- Preview --}}
                                 <div class="mt-3">
-                                    <img id="imagePreview" src="#" alt="Preview" 
+                                    <img id="imagePreview" src="#" alt="Preview"
                                          style="display: none; max-height: 200px; border:1px solid #ddd; padding:4px; border-radius:6px;">
                                 </div>
                             </div>
@@ -93,10 +92,10 @@
                             {{-- Submit --}}
                             <div class="d-flex justify-content-end gap-2">
                                 <a href="{{ route('admin.credit-cards.index') }}" class="btn btn-secondary">
-                                    <i class="material-icons-outlined">arrow_back</i> 
+                                    <i class="material-icons-outlined">arrow_back</i>
                                 </a>
                                 <button type="submit" class="btn btn-success">
-                                    <i class="material-icons-outlined">save</i> 
+                                    <i class="material-icons-outlined">save</i>
                                 </button>
                             </div>
                         </form>
