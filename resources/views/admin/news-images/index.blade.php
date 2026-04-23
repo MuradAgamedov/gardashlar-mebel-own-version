@@ -156,7 +156,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const postId = {{ $news_post->id }};
+    const newsPostId = {{ $news_post->id }};
 
     // Sortable functionality
     const sortableImages = document.getElementById('sortable-images');
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
             onEnd: function(evt) {
                 const imageIds = Array.from(sortableImages.children).map(row => row.getAttribute('data-id'));
                 
-                fetch(`/admin/news-posts/${postId}/images/reorder`, {
+                fetch(`/admin/news-posts/${newsPostId}/images/reorder`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const formData = new FormData(this);
         
-        fetch(`/admin/news-posts/${postId}/images`, {
+        fetch(`/admin/news-posts/${newsPostId}/images`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const imageId = document.getElementById('editImageId').value;
         const formData = new FormData(this);
         
-        fetch(`/admin/news-posts/${postId}/images/${imageId}`, {
+        fetch(`/admin/news-posts/${newsPostId}/images/${imageId}`, {
             method: 'PUT',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
