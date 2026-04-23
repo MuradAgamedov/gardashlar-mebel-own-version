@@ -129,32 +129,6 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="card_image_alt_text_{{ $language->id }}" class="form-label">Card Image Alt Text</label>
-                                                    <input type="text" 
-                                                           class="form-control" 
-                                                           id="card_image_alt_text_{{ $language->id }}" 
-                                                           name="translations[{{ $language->id }}][card_image_alt_text]" 
-                                                           placeholder="Enter alt text for card image">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
-                                                    <label for="inner_banner_alt_text_{{ $language->id }}" class="form-label">Inner Banner Alt Text</label>
-                                                    <input type="text" 
-                                                           class="form-control" 
-                                                           id="inner_banner_alt_text_{{ $language->id }}" 
-                                                           name="translations[{{ $language->id }}][inner_banner_alt_text]" 
-                                                           placeholder="Enter alt text for inner banner image">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="mb-3">
                                                     <label for="seo_description_{{ $language->id }}" class="form-label">SEO Description</label>
                                                     <textarea class="form-control" 
                                                               id="seo_description_{{ $language->id }}" 
