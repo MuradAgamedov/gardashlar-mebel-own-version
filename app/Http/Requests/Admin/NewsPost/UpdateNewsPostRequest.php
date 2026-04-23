@@ -39,7 +39,7 @@ class UpdateNewsPostRequest extends FormRequest
                 'max:255',
                 Rule::unique('news_post_translates', 'slug')
                     ->where('language_id', $languageId)
-                    ->ignore($this->newsPost->id, 'news_post_id')
+                    ->ignore($this->route('news_post')->id, 'news_post_id')
             ];
             $rules["translations.{$languageId}.card_description"] = 'nullable|string|max:500';
             $rules["translations.{$languageId}.description"] = 'nullable|string';

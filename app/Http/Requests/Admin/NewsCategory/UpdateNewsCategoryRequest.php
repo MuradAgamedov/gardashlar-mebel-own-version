@@ -35,7 +35,7 @@ class UpdateNewsCategoryRequest extends FormRequest
                 'max:255',
                 Rule::unique('news_category_translates', 'slug')
                     ->where('language_id', $languageId)
-                    ->ignore($this->newsCategory->id, 'news_category_id')
+                    ->ignore($this->route('news_category')->id, 'news_category_id')
             ];
             $rules["translations.{$languageId}.seo_title"] = 'nullable|string|max:255';
             $rules["translations.{$languageId}.seo_keywords"] = 'nullable|string|max:500';
