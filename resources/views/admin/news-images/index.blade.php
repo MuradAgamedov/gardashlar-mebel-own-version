@@ -109,11 +109,7 @@
                                 <div class="image-container">
                                     <img src="{{ $image->image_url }}" alt="News Image" class="img-fluid rounded">
                                     <div class="image-actions">
-                                        <button type="button" class="btn btn-sm btn-warning edit-btn" 
-                                                data-id="{{ $image->id }}"
-                                                data-url="{{ $image->image_url }}">
-                                            <i class="material-icons-outlined">edit</i>
-                                        </button>
+                                        <!-- Delete button - top right -->
                                         <form method="POST" action="{{ route('admin.news-posts.images.destroy', [$news_post, $image]) }}" style="display: inline;">
                                             @csrf
                                             @method('DELETE')
@@ -123,8 +119,13 @@
                                             </button>
                                         </form>
                                     </div>
-                                    <div class="drag-handle">
-                                        <i class="material-icons-outlined">drag_indicator</i>
+                                    <div class="edit-actions">
+                                        <!-- Edit button - bottom left -->
+                                        <button type="button" class="btn btn-sm btn-warning edit-btn" 
+                                                data-id="{{ $image->id }}"
+                                                data-url="{{ $image->image_url }}">
+                                            <i class="material-icons-outlined">edit</i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -184,4 +185,47 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+<style>
+.image-card {
+    transition: transform 0.2s;
+}
+
+.image-card:hover {
+    transform: translateY(-2px);
+}
+
+.image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.image-container img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.image-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.edit-actions {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.image-container:hover .image-actions,
+.image-container:hover .edit-actions {
+    opacity: 1;
+}
+</style>
 @endpush
