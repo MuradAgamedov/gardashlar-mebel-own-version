@@ -60,6 +60,7 @@
                                                 type="button" 
                                                 role="tab">
                                             {{ $language->name }}
+                                                <span class="badge bg-secondary ms-1">{{ strtoupper($language->lang_code) }}</span>
                                             @if($language->is_default)
                                                 <span class="badge bg-primary ms-1">Default</span>
                                             @endif
