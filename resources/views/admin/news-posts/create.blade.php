@@ -286,12 +286,17 @@
 <script src="https://cdn.ckeditor.com/ckeditor5/27.1.0/classic/ckeditor.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    let editors = {};
+    
     // Initialize CKEditor for each description field
     @foreach($languages as $language)
         ClassicEditor
             .create(document.querySelector('#description_{{ $language->id }}'), {
                 toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', 'undo', 'redo'],
                 language: '{{ $language->lang_code }}'
+            })
+            .then(editor => {
+                editors['{{ $language->id }}'] = editor;
             })
             .catch(error => {
                 console.error(error);
@@ -341,6 +346,91 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup image previews
     setupImagePreview('card_image', 'card_image_preview');
     setupImagePreview('inner_banner_image', 'inner_banner_image_preview');
+
+    // Form validation before submission
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            let firstErrorTab = null;
+            let firstErrorField = null;
+            
+            // Validate CKEditor fields
+            @foreach($languages as $language)
+                const editor{{ $language->id }} = editors['{{ $language->id }}'];
+                if (editor{{ $language->id }}) {
+                    const content = editor{{ $language->id }}.getData().trim();
+                    const textarea = document.getElementById('description_{{ $language->id }}');
+                    const editorElement = editor{{ $language->id }}.ui.view.editable.element;
+                    
+                    if (!content) {
+                        isValid = false;
+                        textarea.classList.add('is-invalid');
+                        editorElement.classList.add('is-invalid');
+                        
+                        // Switch to the first tab with error
+                        if (!firstErrorTab) {
+                            firstErrorTab = 'lang-{{ $language->id }}-tab';
+                            firstErrorField = editorElement;
+                        }
+                    } else {
+                        textarea.classList.remove('is-invalid');
+                        editorElement.classList.remove('is-invalid');
+                        // Update textarea value for form submission
+                        textarea.value = content;
+                    }
+                }
+            @endforeach
+            
+            // Validate required title and slug fields
+            @foreach($languages as $language)
+                const titleInput{{ $language->id }} = document.getElementById('title_{{ $language->id }}');
+                const slugInput{{ $language->id }} = document.getElementById('slug_{{ $language->id }}');
+                
+                if (titleInput{{ $language->id }} && !titleInput{{ $language->id }}.value.trim()) {
+                    isValid = false;
+                    titleInput{{ $language->id }}.classList.add('is-invalid');
+                    if (!firstErrorTab) {
+                        firstErrorTab = 'lang-{{ $language->id }}-tab';
+                        firstErrorField = titleInput{{ $language->id }};
+                    }
+                } else if (titleInput{{ $language->id }}) {
+                    titleInput{{ $language->id }}.classList.remove('is-invalid');
+                }
+                
+                if (slugInput{{ $language->id }} && !slugInput{{ $language->id }}.value.trim()) {
+                    isValid = false;
+                    slugInput{{ $language->id }}.classList.add('is-invalid');
+                    if (!firstErrorTab) {
+                        firstErrorTab = 'lang-{{ $language->id }}-tab';
+                        firstErrorField = slugInput{{ $language->id }};
+                    }
+                } else if (slugInput{{ $language->id }}) {
+                    slugInput{{ $language->id }}.classList.remove('is-invalid');
+                }
+            @endforeach
+            
+            // Switch to first tab with error and prevent submission if invalid
+            if (!isValid) {
+                e.preventDefault();
+                if (firstErrorTab) {
+                    const errorTab = document.getElementById(firstErrorTab);
+                    if (errorTab) {
+                        const tab = new bootstrap.Tab(errorTab);
+                        tab.show();
+                    }
+                    
+                    // Focus on the first error field after tab switch
+                    setTimeout(() => {
+                        if (firstErrorField) {
+                            firstErrorField.focus();
+                        }
+                    }, 100);
+                }
+                alert('Please fill in all required fields marked with *');
+            }
+        });
+    }
 });
 </script>
 
@@ -355,6 +445,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     .img-thumbnail {
         border-radius: 4px;
+    }
+    
+    /* CKEditor validation styles */
+    .ck-editor__editable.is-invalid {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    }
+    
+    .ck-editor__editable.is-invalid:focus {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
     }
 </style>
 @endpush
