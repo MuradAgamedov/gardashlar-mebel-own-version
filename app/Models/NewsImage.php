@@ -40,6 +40,6 @@ class NewsImage extends Model
      */
     public function getImageUrlAttribute()
     {
-        return $this->image_url ? asset('storage/' . $this->image_url) : null;
+        return $this->attributes['image_url'] ? asset('storage/' . $this->attributes['image_url']) : null;
     }
 }
