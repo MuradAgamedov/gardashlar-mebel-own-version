@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const formData = new FormData(this);
         
-        fetch(`/admin/news-posts/${newsPostId}/images`, {
+        fetch(`api/admin/news-posts/${newsPostId}/images`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
