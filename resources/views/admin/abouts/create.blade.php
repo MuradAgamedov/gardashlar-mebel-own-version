@@ -71,8 +71,9 @@
                                     
                                     <div class="mb-3">
                                         <div class="form-check">
+                                            <input type="hidden" name="status" value="0">
                                             <input class="form-check-input" type="checkbox" name="status" value="1" 
-                                                   id="status" {{ old('status', true) ? 'checked' : '' }}>
+                                                   id="status" {{ old('status', '1') ? 'checked' : '' }}>
                                             <label class="form-check-label" for="status">
                                                 Active
                                             </label>
