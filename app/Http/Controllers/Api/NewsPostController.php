@@ -51,9 +51,17 @@ class NewsPostController extends Controller
                 ]);
 
             if ($categorySlug) {
-                $query->whereHas('category.translates', function ($q) use ($categorySlug) {
+                // Find the category by slug first, then filter by category ID
+                $category = \App\Models\NewsCategory::whereHas('translates', function ($q) use ($categorySlug) {
                     $q->where('slug', $categorySlug);
-                });
+                })->first();
+                
+                if ($category) {
+                    $query->where('news_category_id', $category->id);
+                } else {
+                    // If category not found, return empty result
+                    return new \Illuminate\Pagination\LengthAwarePaginator([], 0, $perPage);
+                }
             }
 
             switch ($sort) {
