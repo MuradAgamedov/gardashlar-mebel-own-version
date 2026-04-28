@@ -20,46 +20,20 @@ class NewsPostController extends Controller
     try {
         $languageId = $this->getLanguageIdFromHeader($request);
         $lang = $request->header('locale');
-        
-        // Debug: Check what language we're actually getting
-        $mainLanguage = \App\Models\Language::where('is_main_language', true)->first();
-        $requestedLanguage = \App\Models\Language::find($languageId);
-        
         app()->setLocale($lang);
         $page = $request->get('page', 1);
         $perPage = min($request->get('per_page', 10), 50);
         $categorySlug = $request->get('category_slug');
         $sort = $request->get('sort', 'newest');
 
-        
-        // Temporary debug response
-        return response()->json([
-            'debug' => [
-                'header_locale' => $lang,
-                'detected_language_id' => $languageId,
-                'main_language' => $mainLanguage ? [
-                    'id' => $mainLanguage->id,
-                    'lang_code' => $mainLanguage->lang_code,
-                    'name' => $mainLanguage->name
-                ] : null,
-                'requested_language' => $requestedLanguage ? [
-                    'id' => $requestedLanguage->id,
-                    'lang_code' => $requestedLanguage->lang_code,
-                    'name' => $requestedLanguage->name
-                ] : null
-            ]
-        ]);
-
         $allowedSorts = ['newest', 'oldest'];
         if (!in_array($sort, $allowedSorts)) {
             $sort = 'newest';
         }
 
-        // When filtering by category_slug, don't include language in cache key to show all languages
+        $cacheKey = "api:news-posts-v3:lang:{$languageId}:page:{$page}:per_page:{$perPage}:sort:{$sort}";
         if ($categorySlug) {
-            $cacheKey = "api:news-posts-v3:category:{$categorySlug}:page:{$page}:per_page:{$perPage}:sort:{$sort}";
-        } else {
-            $cacheKey = "api:news-posts-v3:lang:{$languageId}:page:{$page}:per_page:{$perPage}:sort:{$sort}";
+            $cacheKey .= ":category:{$categorySlug}";
         }
 
         $newsPosts = Cache::remember($cacheKey, 3600, function () use ($languageId, $page, $perPage, $categorySlug, $sort) {
@@ -75,18 +49,9 @@ class NewsPostController extends Controller
                 ]);
 
             if ($categorySlug) {
-                // Find the category by slug first, then filter by category ID
-                $category = \App\Models\NewsCategory::whereHas('translates', function ($q) use ($categorySlug) {
+                $query->whereHas('category.translates', function ($q) use ($categorySlug) {
                     $q->where('slug', $categorySlug);
-                })->first();
-                
-                                
-                if ($category) {
-                    $query->where('news_category_id', $category->id);
-                } else {
-                    // If category not found, return empty result
-                    return new \Illuminate\Pagination\LengthAwarePaginator([], 0, $perPage);
-                }
+                });
             }
 
             switch ($sort) {
@@ -114,9 +79,6 @@ class NewsPostController extends Controller
                 $categoryTranslate = $newsPost->category?->translates?->first();
             }
 
-            // When filtering by category_slug, return the filtered slug instead of the translated one
-            $responseCategorySlug = $categorySlug ?? ($categoryTranslate->slug ?? null);
-
             return [
                 'id' => $newsPost->id,
                 'title' => $translate->title ?? null,
@@ -124,7 +86,7 @@ class NewsPostController extends Controller
                 'card_image' => $newsPost->card_image,
                 'card_image_url' => $newsPost->card_image_url,
                 'card_description' => $translate->card_description ?? null,
-                'category_slug' => $responseCategorySlug,
+                'category_slug' => $categoryTranslate->slug ?? null,
                 'language_code' => $translate->language->lang_code ?? null,
             ];
         });
