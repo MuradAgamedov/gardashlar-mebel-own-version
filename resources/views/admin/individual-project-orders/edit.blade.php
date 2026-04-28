@@ -52,8 +52,9 @@
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <div class="form-check">
+                                            <input type="hidden" name="status" value="0">
                                             <input class="form-check-input" type="checkbox" name="status" value="1" 
-                                                   id="status" {{ old('status', $individualProjectOrder->status) ? 'checked' : '' }}>
+                                                   id="status" {{ old('status', $individualProjectOrder->status ? '1' : '0') ? 'checked' : '' }}>
                                             <label class="form-check-label" for="status">
                                                 Active
                                             </label>
