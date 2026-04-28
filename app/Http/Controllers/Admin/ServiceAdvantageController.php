@@ -166,7 +166,7 @@ class ServiceAdvantageController extends Controller
             // Update advantage
             $advantage->update([
                 'icon' => $iconPath,
-                'status' => $request->has('status') ? true : false
+                'status' => $request->status == '1'
             ]);
 
             // Delete existing translations and create new ones

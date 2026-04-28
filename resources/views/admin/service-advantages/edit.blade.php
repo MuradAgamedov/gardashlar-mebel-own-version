@@ -67,8 +67,9 @@
                                 
                                 <div class="col-md-6 mb-3">
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="status" name="status" 
-                                               {{ $advantage->status ? 'checked' : '' }}>
+                                        <input type="hidden" name="status" value="0">
+                                        <input class="form-check-input" type="checkbox" id="status" name="status" value="1"
+                                               {{ old('status', $advantage->status ? '1' : '0') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
                                             Active
                                         </label>

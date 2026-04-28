@@ -209,11 +209,11 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <div class="form-check form-switch">
-                                                    <input class="form-check-input status-toggle" type="checkbox" 
-                                                           data-advantage-id="{{ $advantage->id }}"
-                                                           {{ $advantage->status ? 'checked' : '' }}>
-                                                </div>
+                                                @if($advantage->status)
+                                                    <span class="badge bg-success">Active</span>
+                                                @else
+                                                    <span class="badge bg-secondary">Inactive</span>
+                                                @endif
                                             </td>
                                             <td>
                                                 @php
@@ -398,37 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Status toggle functionality
-    document.querySelectorAll('.status-toggle').forEach(function(toggle) {
-        toggle.addEventListener('change', function() {
-            const advantageId = this.getAttribute('data-advantage-id');
-            const status = this.checked;
-            
-            fetch(`/admin/services/{{ $service->id }}/advantages/${advantageId}/toggle-status`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ status: status })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    // Revert the toggle if failed
-                    this.checked = !status;
-                    alert('Error updating status: ' + data.message);
-                }
-            })
-            .catch(error => {
-                // Revert the toggle if failed
-                this.checked = !status;
-                console.error('Error updating status:', error);
-                alert('Error updating status');
-            });
-        });
     });
-});
 </script>
 @endpush
 @endsection 
