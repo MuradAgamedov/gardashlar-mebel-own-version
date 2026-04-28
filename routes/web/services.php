@@ -7,7 +7,7 @@ use App\Http\Controllers\Admin\ServiceFormController;
 Route::resource('services', ServiceController::class);
 Route::post('services/reorder', [ServiceController::class, 'updateOrder'])->name('services.reorder');
 Route::post('services/delete-selected', [ServiceController::class, 'deleteSelected'])->name('services.delete-selected');
-Route::post('services/{id}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('services.toggle-status');
+Route::post('services/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])->name('services.toggle-status');
 
 Route::get('services/{serviceId}/advantages', [ServiceAdvantageController::class, 'index'])->name('service-advantages.index');
 Route::get('services/{serviceId}/advantages/create', [ServiceAdvantageController::class, 'create'])->name('service-advantages.create');

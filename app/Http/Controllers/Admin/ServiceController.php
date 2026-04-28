@@ -226,10 +226,9 @@ class ServiceController extends Controller
     /**
      * Toggle service status
      */
-    public function toggleStatus(Request $request, string $id)
+    public function toggleStatus(Request $request, Service $service)
     {
         try {
-            $service = Service::findOrFail($id);
             $status = $request->boolean('status');
             $service->update(['status' => $status ? 1 : 0]);
 
