@@ -71,7 +71,7 @@ class ServiceController extends Controller
         try {
             // Create the service
             $service = Service::create([
-                'status' => $request->has('status') ? true : false
+                'status' => $request->status == '1'
             ]);
 
             // Create translations for each language
@@ -150,7 +150,7 @@ class ServiceController extends Controller
         try {
             // Update the service
             $service->update([
-                'status' => $request->has('status') ? true : false
+                'status' => $request->status == '1'
             ]);
 
             // Update or create translations
