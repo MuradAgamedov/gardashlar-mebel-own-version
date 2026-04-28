@@ -202,25 +202,10 @@
 @endsection
 
 @push('scripts')
+<script src="{{ asset('js/slug-generator.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-generate slug from title
-    const titleInputs = document.querySelectorAll('input[name*="[title]"]');
-    const slugInputs = document.querySelectorAll('input[name*="[slug]"]');
-    
-    titleInputs.forEach((titleInput, index) => {
-        titleInput.addEventListener('input', function() {
-            const slug = this.value.toLowerCase()
-                .replace(/[^a-z0-9\s-]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-')
-                .trim('-');
-            
-            if (slugInputs[index]) {
-                slugInputs[index].value = slug;
-            }
-        });
-    });
+    // Slug generation is now handled by slug-generator.js
 });
 </script>
 @endpush 
