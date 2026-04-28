@@ -91,11 +91,13 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Status</label>
                                     <div class="form-check form-switch">
+                                        <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" 
                                                type="checkbox" 
                                                id="status" 
                                                name="status" 
-                                               {{ $homePageProjectCategory->status ? 'checked' : '' }}>
+                                               value="1"
+                                               {{ old('status', $homePageProjectCategory->status ? '1' : '0') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
                                             Active
                                         </label>
