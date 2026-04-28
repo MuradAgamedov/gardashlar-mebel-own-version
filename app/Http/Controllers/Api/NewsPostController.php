@@ -76,7 +76,8 @@ class NewsPostController extends Controller
                     ?? $newsPost->category?->translates->first();
             } else {
                 $translate = $newsPost->translates->first();
-                $categoryTranslate = $newsPost->category?->translates?->first();
+                $categoryTranslate = $newsPost->category?->translates?->where('language_id', $languageId)->first()
+                    ?? $newsPost->category?->translates?->first();
             }
 
             return [
