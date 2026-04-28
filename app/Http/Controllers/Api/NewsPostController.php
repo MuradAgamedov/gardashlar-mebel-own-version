@@ -26,6 +26,14 @@ class NewsPostController extends Controller
         $categorySlug = $request->get('category_slug');
         $sort = $request->get('sort', 'newest');
 
+        // Debug: Log the request details
+        \Log::info('NewsPosts API Request', [
+            'languageId' => $languageId,
+            'lang' => $lang,
+            'categorySlug' => $categorySlug,
+            'headers' => $request->headers->all()
+        ]);
+
         $allowedSorts = ['newest', 'oldest'];
         if (!in_array($sort, $allowedSorts)) {
             $sort = 'newest';
@@ -56,6 +64,12 @@ class NewsPostController extends Controller
                     $q->where('slug', $categorySlug);
                 })->first();
                 
+                \Log::info('Category lookup', [
+                    'categorySlug' => $categorySlug,
+                    'foundCategory' => $category ? $category->toArray() : null,
+                    'categoryId' => $category ? $category->id : null
+                ]);
+                
                 if ($category) {
                     $query->where('news_category_id', $category->id);
                 } else {
@@ -78,6 +92,14 @@ class NewsPostController extends Controller
 
         // News məlumatları (kateqoriya və tərcümə ilə)
         $data = $newsPosts->getCollection()->map(function ($newsPost) use ($languageId, $categorySlug) {
+            // Debug: Log all available translations for this post
+            \Log::info('Post translations', [
+                'postId' => $newsPost->id,
+                'allTranslates' => $newsPost->translates->toArray(),
+                'requestedLanguageId' => $languageId,
+                'categoryTranslates' => $newsPost->category?->translates?->toArray() ?? []
+            ]);
+            
             // When filtering by category_slug, try to get translate in requested language first, then any language
             if ($categorySlug) {
                 $translate = $newsPost->translates->where('language_id', $languageId)->first() 
@@ -88,6 +110,13 @@ class NewsPostController extends Controller
                 $translate = $newsPost->translates->first();
                 $categoryTranslate = $newsPost->category?->translates?->first();
             }
+
+            // Debug: Log which translation was selected
+            \Log::info('Selected translation', [
+                'postId' => $newsPost->id,
+                'selectedTranslate' => $translate ? $translate->toArray() : null,
+                'selectedLanguageCode' => $translate->language->lang_code ?? null
+            ]);
 
             // When filtering by category_slug, return the filtered slug instead of the translated one
             $responseCategorySlug = $categorySlug ?? ($categoryTranslate->slug ?? null);
