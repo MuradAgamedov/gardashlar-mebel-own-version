@@ -101,8 +101,9 @@
                                                id="status" 
                                                name="status" 
                                                value="1" 
-                                               {{ old('status', $productPageCategory->status) ? 'checked' : '' }}>
+                                               {{ old('status', $productPageCategory->status ? '1' : '0') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">Active</label>
+                                        <input type="hidden" name="status" value="0">
                                     </div>
                                 </div>
                             </div>
