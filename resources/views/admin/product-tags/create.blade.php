@@ -55,7 +55,7 @@
                         <h5>New Product Tag</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.product-tags.store') }}" method="POST">
+                        <form action="{{ route('admin.product-tags.store') }}" novalidate method="POST">
                             @csrf
                             
                             <!-- Language Tabs -->

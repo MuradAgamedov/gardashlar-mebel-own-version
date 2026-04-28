@@ -55,7 +55,7 @@
                         <h5>Edit Product Tag</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.product-tags.update', $productTag) }}" method="POST">
+                        <form action="{{ route('admin.product-tags.update', $productTag) }}" novalidate method="POST">
                             @csrf
                             @method('PUT')
                             
