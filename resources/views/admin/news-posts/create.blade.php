@@ -288,6 +288,7 @@
 
 @push('scripts')
 <script src="https://cdn.ckeditor.com/ckeditor5/27.1.0/classic/ckeditor.js"></script>
+<script src="{{ asset('js/slug-generator.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let editors = {};
@@ -307,24 +308,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error(error);
             });
     @endforeach
-
-    // Auto-generate slug from title
-    const titleInputs = document.querySelectorAll('input[name*="[title]"]');
-    const slugInputs = document.querySelectorAll('input[name*="[slug]"]');
-    
-    titleInputs.forEach((titleInput, index) => {
-        titleInput.addEventListener('input', function() {
-            const slug = this.value.toLowerCase()
-                .replace(/[^a-z0-9\s-]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-')
-                .trim('-');
-            
-            if (slugInputs[index]) {
-                slugInputs[index].value = slug;
-            }
-        });
-    });
 
     // Image preview functionality
     function setupImagePreview(inputId, previewId) {

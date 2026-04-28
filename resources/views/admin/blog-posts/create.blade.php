@@ -336,6 +336,7 @@
 
 @push('scripts')
 <script src="https://cdn.ckeditor.com/ckeditor5/27.1.0/classic/ckeditor.js"></script>
+<script src="{{ asset('js/slug-generator.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let editors = {};
@@ -345,7 +346,8 @@ document.addEventListener('DOMContentLoaded', function() {
         ClassicEditor
             .create(document.querySelector('#description_{{ $language->id }}'), {
                 toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', 'undo', 'redo'],
-                language: '{{ $language->lang_code }}'
+                language: '{{ $language->lang_code }}',
+                initialData: @js(old("translations.{$language->id}.description"))
             })
             .then(editor => {
                 editors['{{ $language->id }}'] = editor;
