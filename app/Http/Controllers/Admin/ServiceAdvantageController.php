@@ -84,7 +84,7 @@ class ServiceAdvantageController extends Controller
             $advantage = ServiceAdvantage::create([
                 'service_id' => $request->service_id,
                 'icon' => $iconPath,
-                'status' => $request->has('status') ? true : false
+                'status' => $request->status == '1'
             ]);
 
             \Log::info('ServiceAdvantage created', ['advantage_id' => $advantage->id]);

@@ -106,11 +106,13 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <div class="form-check">
+                                        <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" 
                                                type="checkbox" 
                                                name="status" 
                                                id="status" 
-                                               {{ old('status', $currency->status) ? 'checked' : '' }}>
+                                               value="1"
+                                               {{ old('status', $currency->status ? '1' : '0') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
                                             Active
                                         </label>

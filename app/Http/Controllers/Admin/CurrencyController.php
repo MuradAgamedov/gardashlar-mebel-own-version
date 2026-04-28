@@ -57,7 +57,7 @@ class CurrencyController extends Controller
             $this->repository->updateCurrency($currency, [
                 'code' => $request->code,
                 'course' => $request->course,
-                'status' => $request->has('status')
+                'status' => $request->status == '1'
             ]);
 
             return redirect()->route('admin.currencies.index')
