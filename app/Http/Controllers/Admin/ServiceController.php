@@ -230,7 +230,8 @@ class ServiceController extends Controller
     {
         try {
             $service = Service::findOrFail($id);
-            $service->update(['status' => $request->status]);
+            $status = $request->boolean('status');
+            $service->update(['status' => $status ? 1 : 0]);
 
             return response()->json(['success' => true]);
 
