@@ -137,6 +137,15 @@
                                                        class="btn btn-sm btn-warning">
                                                         Edit
                                                     </a>
+                                                    <form action="{{ route('admin.services.destroy', $service->id) }}" 
+                                                          method="POST" class="d-inline" 
+                                                          onsubmit="return confirm('Are you sure you want to delete this service?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger">
+                                                            Delete
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </td>
                                         </tr>
