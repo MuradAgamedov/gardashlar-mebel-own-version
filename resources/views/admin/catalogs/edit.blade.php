@@ -56,8 +56,9 @@
                                 <div class="col-md-6">
                                     <label class="form-label">Status</label>
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="status" name="status" value="1" {{ $catalog->status ? 'checked' : '' }}>
+                                        <input class="form-check-input" type="checkbox" id="status" name="status" value="1" {{ old('status', $catalog->status ? '1' : '0') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">Active</label>
+                                        <input type="hidden" name="status" value="0">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
