@@ -37,9 +37,14 @@ class NewsPostController extends Controller
         }
 
         $newsPosts = Cache::remember($cacheKey, 3600, function () use ($languageId, $page, $perPage, $categorySlug, $sort) {
+            // When filtering by category_slug, load all translates to show content in any language
+            $translatesRelation = $categorySlug 
+                ? 'translates.language' 
+                : fn($q) => $q->where('language_id', $languageId);
+                
             $query = NewsPost::published()
                 ->with([
-                    'translates' => fn($q) => $q->where('language_id', $languageId),
+                    'translates' => $translatesRelation,
                     'category.translates.language'
                 ]);
 
@@ -62,9 +67,17 @@ class NewsPostController extends Controller
         });
 
         // News məlumatları (kateqoriya və tərcümə ilə)
-        $data = $newsPosts->getCollection()->map(function ($newsPost) {
-            $translate = $newsPost->translates->first();
-            $categoryTranslate = $newsPost->category?->translates?->first();
+        $data = $newsPosts->getCollection()->map(function ($newsPost) use ($languageId, $categorySlug) {
+            // When filtering by category_slug, try to get translate in requested language first, then any language
+            if ($categorySlug) {
+                $translate = $newsPost->translates->where('language_id', $languageId)->first() 
+                    ?? $newsPost->translates->first();
+                $categoryTranslate = $newsPost->category?->translates->where('language_id', $languageId)->first()
+                    ?? $newsPost->category?->translates->first();
+            } else {
+                $translate = $newsPost->translates->first();
+                $categoryTranslate = $newsPost->category?->translates?->first();
+            }
 
             return [
                 'id' => $newsPost->id,
@@ -74,6 +87,7 @@ class NewsPostController extends Controller
                 'card_image_url' => $newsPost->card_image_url,
                 'card_description' => $translate->card_description ?? null,
                 'category_slug' => $categoryTranslate->slug ?? null,
+                'language_code' => $translate->language->lang_code ?? null,
             ];
         });
 
