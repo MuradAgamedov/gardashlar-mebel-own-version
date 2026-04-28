@@ -81,6 +81,9 @@ class NewsPostController extends Controller
                 $categoryTranslate = $newsPost->category?->translates?->first();
             }
 
+            // When filtering by category_slug, return the filtered slug instead of the translated one
+            $responseCategorySlug = $categorySlug ?? ($categoryTranslate->slug ?? null);
+
             return [
                 'id' => $newsPost->id,
                 'title' => $translate->title ?? null,
@@ -88,7 +91,7 @@ class NewsPostController extends Controller
                 'card_image' => $newsPost->card_image,
                 'card_image_url' => $newsPost->card_image_url,
                 'card_description' => $translate->card_description ?? null,
-                'category_slug' => $categoryTranslate->slug ?? null,
+                'category_slug' => $responseCategorySlug,
                 'language_code' => $translate->language->lang_code ?? null,
             ];
         });
