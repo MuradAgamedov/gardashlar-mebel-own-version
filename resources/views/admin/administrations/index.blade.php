@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = `/admin/administrations/${id}`;
+                    form.action = `{{ route('admin.administrations.destroy', ':id') }}`.replace(':id', id);
                     
                     // Add CSRF token
                     const csrfInput = document.createElement('input');
