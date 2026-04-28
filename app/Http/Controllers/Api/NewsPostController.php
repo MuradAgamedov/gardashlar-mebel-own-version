@@ -31,9 +31,11 @@ class NewsPostController extends Controller
             $sort = 'newest';
         }
 
-        $cacheKey = "api:news-posts-v3:lang:{$languageId}:page:{$page}:per_page:{$perPage}:sort:{$sort}";
+        // When filtering by category_slug, don't include language in cache key to show all languages
         if ($categorySlug) {
-            $cacheKey .= ":category:{$categorySlug}";
+            $cacheKey = "api:news-posts-v3:category:{$categorySlug}:page:{$page}:per_page:{$perPage}:sort:{$sort}";
+        } else {
+            $cacheKey = "api:news-posts-v3:lang:{$languageId}:page:{$page}:per_page:{$perPage}:sort:{$sort}";
         }
 
         $newsPosts = Cache::remember($cacheKey, 3600, function () use ($languageId, $page, $perPage, $categorySlug, $sort) {
