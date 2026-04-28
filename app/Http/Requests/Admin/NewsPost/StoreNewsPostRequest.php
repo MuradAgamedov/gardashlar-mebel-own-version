@@ -25,8 +25,8 @@ class StoreNewsPostRequest extends FormRequest
             'news_category_id' => 'required|exists:news_categories,id',
             'status' => 'sometimes|boolean',
             'published_at' => 'nullable|date',
-            'card_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'inner_banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'card_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
+            'inner_banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
         ];
 
         // Add translation rules for each language

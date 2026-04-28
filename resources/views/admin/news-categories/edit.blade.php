@@ -41,7 +41,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ $newsCategory->status ? 'checked' : '' }}>
+                                        <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ old('status', $newsCategory->status ? '1' : '') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
                                             Active Status
                                         </label>
@@ -90,7 +90,7 @@
                                                            class="form-control" 
                                                            id="title_{{ $language->id }}" 
                                                            name="translations[{{ $language->id }}][title]" 
-                                                           value="{{ $translation?->title ?? '' }}"
+                                                           value="{{ old("translations.{$language->id}.title", $translation?->title ?? '') }}"
                                                            required>
                                                 </div>
                                             </div>
@@ -103,7 +103,7 @@
                                                            class="form-control" 
                                                            id="slug_{{ $language->id }}" 
                                                            name="translations[{{ $language->id }}][slug]" 
-                                                           value="{{ $translation?->slug ?? '' }}"
+                                                           value="{{ old("translations.{$language->id}.slug", $translation?->slug ?? '') }}"
                                                            required>
                                                 </div>
                                             </div>
@@ -117,7 +117,7 @@
                                                            class="form-control" 
                                                            id="seo_title_{{ $language->id }}" 
                                                            name="translations[{{ $language->id }}][seo_title]" 
-                                                           value="{{ $translation?->seo_title ?? '' }}">
+                                                           value="{{ old("translations.{$language->id}.seo_title", $translation?->seo_title ?? '') }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -129,7 +129,7 @@
                                                     <textarea class="form-control" 
                                                               id="seo_keywords_{{ $language->id }}" 
                                                               name="translations[{{ $language->id }}][seo_keywords]" 
-                                                              rows="3">{{ $translation?->seo_keywords ?? '' }}</textarea>
+                                                              rows="3">{{ old("translations.{$language->id}.seo_keywords", $translation?->seo_keywords ?? '') }}</textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -141,7 +141,7 @@
                                                     <textarea class="form-control" 
                                                               id="seo_description_{{ $language->id }}" 
                                                               name="translations[{{ $language->id }}][seo_description]" 
-                                                              rows="4">{{ $translation?->seo_description ?? '' }}</textarea>
+                                                              rows="4">{{ old("translations.{$language->id}.seo_description", $translation?->seo_description ?? '') }}</textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -193,6 +193,64 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Form validation before submission
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            let firstErrorTab = null;
+            let firstErrorField = null;
+            
+            // Validate required title and slug fields
+            @foreach($languages as $language)
+                const titleInput{{ $language->id }} = document.getElementById('title_{{ $language->id }}');
+                const slugInput{{ $language->id }} = document.getElementById('slug_{{ $language->id }}');
+                
+                if (titleInput{{ $language->id }} && !titleInput{{ $language->id }}.value.trim()) {
+                    isValid = false;
+                    titleInput{{ $language->id }}.classList.add('is-invalid');
+                    if (!firstErrorTab) {
+                        firstErrorTab = 'lang-{{ $language->id }}-tab';
+                        firstErrorField = titleInput{{ $language->id }};
+                    }
+                } else if (titleInput{{ $language->id }}) {
+                    titleInput{{ $language->id }}.classList.remove('is-invalid');
+                }
+                
+                if (slugInput{{ $language->id }} && !slugInput{{ $language->id }}.value.trim()) {
+                    isValid = false;
+                    slugInput{{ $language->id }}.classList.add('is-invalid');
+                    if (!firstErrorTab) {
+                        firstErrorTab = 'lang-{{ $language->id }}-tab';
+                        firstErrorField = slugInput{{ $language->id }};
+                    }
+                } else if (slugInput{{ $language->id }}) {
+                    slugInput{{ $language->id }}.classList.remove('is-invalid');
+                }
+            @endforeach
+            
+            // Switch to first tab with error and prevent submission if invalid
+            if (!isValid) {
+                e.preventDefault();
+                if (firstErrorTab) {
+                    const errorTab = document.getElementById(firstErrorTab);
+                    if (errorTab) {
+                        const tab = new bootstrap.Tab(errorTab);
+                        tab.show();
+                    }
+                    
+                    // Focus on the first error field after tab switch
+                    setTimeout(() => {
+                        if (firstErrorField) {
+                            firstErrorField.focus();
+                        }
+                    }, 100);
+                }
+                alert('Please fill in all required fields marked with *');
+            }
+        });
+    }
 });
 </script>
 @endpush

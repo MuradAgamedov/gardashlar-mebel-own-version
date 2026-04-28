@@ -48,7 +48,7 @@
                                                 $categoryTranslation = $category->translates->firstWhere('language_id', $mainLanguageId)
                                                     ?? $category->translates->first();
                                             @endphp
-                                            <option value="{{ $category->id }}">
+                                            <option value="{{ $category->id }}" {{ old('news_category_id') == $category->id ? 'selected' : '' }}>
                                                 {{ $categoryTranslation ? $categoryTranslation->title : 'No title' }}
                                             </option>
                                         @endforeach
@@ -59,7 +59,8 @@
                                     <input type="datetime-local" 
                                            class="form-control" 
                                            id="published_at" 
-                                           name="published_at">
+                                           name="published_at"
+                                           value="{{ old('published_at') }}">
                                 </div>
                             </div>
 
@@ -67,7 +68,7 @@
                             <div class="row mb-4">
                                 <div class="col-md-12">
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="status" id="status" value="1" checked>
+                                        <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ old('status', '1') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
                                             Active Status
                                         </label>
@@ -142,6 +143,7 @@
                                                            class="form-control" 
                                                            id="title_{{ $language->id }}" 
                                                            name="translations[{{ $language->id }}][title]" 
+                                                           value="{{ old("translations.{$language->id}.title") }}" 
                                                            required>
                                                 </div>
                                             </div>
@@ -154,6 +156,7 @@
                                                            class="form-control" 
                                                            id="slug_{{ $language->id }}" 
                                                            name="translations[{{ $language->id }}][slug]" 
+                                                           value="{{ old("translations.{$language->id}.slug") }}" 
                                                            required>
                                                 </div>
                                             </div>
@@ -168,7 +171,7 @@
                                                     <textarea class="form-control ckeditor" 
                                                               id="description_{{ $language->id }}" 
                                                               name="translations[{{ $language->id }}][description]" 
-                                                              rows="10" required></textarea>
+                                                              rows="10" required>{{ old("translations.{$language->id}.description") }}</textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -182,7 +185,7 @@
                                                     <input type="text" 
                                                            class="form-control" 
                                                            name="translations[{{ $language->id }}][card_image_alt_text]" 
-                                                           value="">
+                                                           value="{{ old("translations.{$language->id}.card_image_alt_text") }}">
                                                 </div>
                                             </div>
                                             
@@ -194,7 +197,7 @@
                                                     <input type="text" 
                                                            class="form-control" 
                                                            name="translations[{{ $language->id }}][inner_banner_alt_text]" 
-                                                           value="">
+                                                           value="{{ old("translations.{$language->id}.inner_banner_alt_text") }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -207,7 +210,7 @@
                                                     </label>
                                                     <textarea class="form-control" 
                                                               name="translations[{{ $language->id }}][card_description]" 
-                                                              rows="3"></textarea>
+                                                              rows="3">{{ old("translations.{$language->id}.card_description") }}</textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -226,7 +229,8 @@
                                                     <input type="text" 
                                                            class="form-control" 
                                                            id="seo_title_{{ $language->id }}" 
-                                                           name="translations[{{ $language->id }}][seo_title]">
+                                                           name="translations[{{ $language->id }}][seo_title]" 
+                                                           value="{{ old("translations.{$language->id}.seo_title") }}">
                                                 </div>
                                             </div>
                                         </div>
@@ -238,7 +242,7 @@
                                                     <textarea class="form-control" 
                                                               id="seo_keywords_{{ $language->id }}" 
                                                               name="translations[{{ $language->id }}][seo_keywords]" 
-                                                              rows="3"></textarea>
+                                                              rows="3">{{ old("translations.{$language->id}.seo_keywords") }}</textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -250,7 +254,7 @@
                                                     <textarea class="form-control" 
                                                               id="seo_description_{{ $language->id }}" 
                                                               name="translations[{{ $language->id }}][seo_description]" 
-                                                              rows="4"></textarea>
+                                                              rows="4">{{ old("translations.{$language->id}.seo_description") }}</textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -293,7 +297,8 @@ document.addEventListener('DOMContentLoaded', function() {
         ClassicEditor
             .create(document.querySelector('#description_{{ $language->id }}'), {
                 toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', 'undo', 'redo'],
-                language: '{{ $language->lang_code }}'
+                language: '{{ $language->lang_code }}',
+                initialData: @js(old("translations.{$language->id}.description"))
             })
             .then(editor => {
                 editors['{{ $language->id }}'] = editor;
