@@ -32,7 +32,7 @@ class HomePageProjectCategoryController extends Controller
     {
         $this->repository->createHomePageProjectCategory([
             'project_category_id' => $request->project_category_id,
-            'status' => true,
+            'status' => $request->status == '1',
         ]);
 
         return redirect()->route('admin.home-page-project-categories.index')
@@ -55,7 +55,7 @@ class HomePageProjectCategoryController extends Controller
     {
         $this->repository->updateHomePageProjectCategory($id, [
             'project_category_id' => $request->project_category_id,
-            'status' => $request->has('status'),
+            'status' => $request->status == '1',
         ]);
 
         return redirect()->route('admin.home-page-project-categories.index')
