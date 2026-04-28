@@ -51,7 +51,8 @@
                             <div class="row mb-4">
                                 <div class="col-md-12">
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="status" name="status" value="1" checked>
+                                        <input type="hidden" name="status" value="0">
+                                        <input class="form-check-input" type="checkbox" id="status" name="status" value="1" {{ old('status', '1') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
                                             Active
                                         </label>
