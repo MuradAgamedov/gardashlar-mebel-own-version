@@ -38,15 +38,19 @@ class NewsPostController extends Controller
 
         $newsPosts = Cache::remember($cacheKey, 3600, function () use ($languageId, $page, $perPage, $categorySlug, $sort) {
             // When filtering by category_slug, load all translates to show content in any language
-            $translatesRelation = $categorySlug 
-                ? 'translates.language' 
-                : fn($q) => $q->where('language_id', $languageId);
-                
-            $query = NewsPost::published()
-                ->with([
-                    'translates' => $translatesRelation,
-                    'category.translates.language'
-                ]);
+            if ($categorySlug) {
+                $query = NewsPost::published()
+                    ->with([
+                        'translates.language',
+                        'category.translates.language'
+                    ]);
+            } else {
+                $query = NewsPost::published()
+                    ->with([
+                        'translates' => fn($q) => $q->where('language_id', $languageId),
+                        'category.translates.language'
+                    ]);
+            }
 
             if ($categorySlug) {
                 $query->whereHas('category.translates', function ($q) use ($categorySlug) {
