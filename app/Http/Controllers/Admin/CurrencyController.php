@@ -38,11 +38,11 @@ class CurrencyController extends Controller
             ]);
 
             return redirect()->route('admin.currencies.index')
-                ->with('success', 'Currency created successfully.');
+                ->with('success', __('Currency created successfully.'));
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error creating currency: ' . $e->getMessage());
+                ->with('error', __('Error creating currency: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -61,11 +61,11 @@ class CurrencyController extends Controller
             ]);
 
             return redirect()->route('admin.currencies.index')
-                ->with('success', 'Currency updated successfully.');
+                ->with('success', __('Currency updated successfully.'));
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error updating currency: ' . $e->getMessage());
+                ->with('error', __('Error updating currency: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -74,9 +74,9 @@ class CurrencyController extends Controller
         try {
             $this->repository->deleteCurrency($currency);
             return redirect()->route('admin.currencies.index')
-                ->with('success', 'Currency deleted successfully.');
+                ->with('success', __('Currency deleted successfully.'));
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting currency: ' . $e->getMessage());
+            return back()->with('error', __('Error deleting currency: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -90,10 +90,10 @@ class CurrencyController extends Controller
         try {
             $this->repository->reorderCurrencies($request->orders);
             return redirect()->route('admin.currencies.index')
-                ->with('success', 'Currencies reordered successfully.');
+                ->with('success', __('Currencies reordered successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error reordering currencies: ' . $e->getMessage());
+            return back()->with('error', __('Error reordering currencies: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -103,10 +103,10 @@ class CurrencyController extends Controller
             $this->repository->toggleStatus($currency);
             $status = $currency->fresh()->status ? 'enabled' : 'disabled';
             return redirect()->route('admin.currencies.index')
-                ->with('success', "Currency {$status} successfully.");
+                ->with('success', __('Currency :status successfully.', ['status' => $status]));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error updating currency status: ' . $e->getMessage());
+            return back()->with('error', __('Error updating currency status: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -120,10 +120,10 @@ class CurrencyController extends Controller
         try {
             $deletedCount = $this->repository->bulkDelete($request->ids);
             return redirect()->route('admin.currencies.index')
-                ->with('success', "{$deletedCount} currency(ies) deleted successfully.");
+                ->with('success', __(':count currency(ies) deleted successfully.', ['count' => $deletedCount]));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting currencies: ' . $e->getMessage());
+            return back()->with('error', __('Error deleting currencies: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -137,10 +137,10 @@ class CurrencyController extends Controller
         try {
             $updatedCount = $this->repository->bulkToggleStatus($request->ids);
             return redirect()->route('admin.currencies.index')
-                ->with('success', "{$updatedCount} currency(ies) status toggled successfully.");
+                ->with('success', __(':count currency(ies) status toggled successfully.', ['count' => $updatedCount]));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error toggling currency status: ' . $e->getMessage());
+            return back()->with('error', __('Error toggling currency status: :error', ['error' => $e->getMessage()]));
         }
     }
 }

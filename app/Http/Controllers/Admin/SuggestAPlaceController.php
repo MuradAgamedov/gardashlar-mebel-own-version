@@ -56,11 +56,11 @@ class SuggestAPlaceController extends Controller
             }
 
             return redirect()->route('admin.suggest-a-place.edit')
-                ->with('success', 'Suggest A Place section updated successfully!');
+                ->with('success', __('Suggest A Place section updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating Suggest A Place section: ' . $e->getMessage())
+                ->with('error', __('Error updating Suggest A Place section: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }

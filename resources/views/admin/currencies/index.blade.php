@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Currencies')
+@section('title', __('Currencies'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Currencies</h3>
+                    <h3>{{ __('Currencies') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Currencies</li>
+                        <li class="breadcrumb-item active">{{ __('Currencies') }}</li>
                     </ol>
                 </div>
             </div>
@@ -44,11 +44,11 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Currencies</h5>
+                            <h5>{{ __('Currencies') }}</h5>
                             <div class="d-flex gap-2">
                                 <button type="button" id="toggleStatusBtn" class="btn btn-warning" style="display: none;">
                                     <i class="material-icons-outlined">swap_horiz</i>
-                                    Toggle Status
+                                    {{ __('Toggle Status') }}
                                 </button>
                                 <button type="button" id="deleteSelectedBtn" class="btn btn-danger" style="display: none;">
                                     <i class="material-icons-outlined">delete</i>
@@ -70,17 +70,17 @@
                                     <input type="text" 
                                            id="searchInput" 
                                            class="form-control" 
-                                           placeholder="Search by currency code...">
+                                           placeholder="{{ __('Search by currency code...') }}">
                                 </div>
                             </div>
                             <div class="col-md-6 text-end">
                                 <button type="button" id="selectAllBtn" class="btn btn-outline-secondary btn-sm">
                                     <i class="material-icons-outlined">select_all</i>
-                                    Select All
+                                    {{ __('Select All') }}
                                 </button>
                                 <button type="button" id="deselectAllBtn" class="btn btn-outline-secondary btn-sm" style="display: none;">
                                     <i class="material-icons-outlined">deselect</i>
-                                    Deselect All
+                                    {{ __('Deselect All') }}
                                 </button>
                             </div>
                         </div>
@@ -92,11 +92,11 @@
                                         <th style="width: 5%;">
                                             <input type="checkbox" id="selectAllCheckbox" class="form-check-input">
                                         </th>
-                                        <th style="width: 5%;">Order</th>
-                                        <th style="width: 20%;">Code</th>
-                                        <th style="width: 25%;">Course</th>
-                                        <th style="width: 15%;">Status</th>
-                                        <th style="width: 20%;">Actions</th>
+                                        <th style="width: 5%;">{{ __('Order') }}</th>
+                                        <th style="width: 20%;">{{ __('Code') }}</th>
+                                        <th style="width: 25%;">{{ __('Course') }}</th>
+                                        <th style="width: 15%;">{{ __('Status') }}</th>
+                                        <th style="width: 20%;">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable">
@@ -120,7 +120,7 @@
                                             <td>
                                                 <strong class="text-success">{{ number_format($currency->course, 4) }}</strong>
                                                 <br>
-                                                <small class="text-muted">Exchange Rate</small>
+                                                <small class="text-muted">{{ __('Exchange Rate') }}</small>
                                             </td>
                                             <td>
                                                 <form action="{{ route('admin.currencies.toggle-status', $currency->id) }}" 
@@ -129,8 +129,8 @@
                                                     @csrf
                                                     <button type="submit" 
                                                             class="btn btn-sm {{ $currency->status ? 'btn-success' : 'btn-secondary' }}"
-                                                            title="{{ $currency->status ? 'Active' : 'Inactive' }}"
-                                                            onclick="return confirm('Are you sure you want to {{ $currency->status ? 'deactivate' : 'activate' }} this currency?')">
+                                                            title="{{ $currency->status ? __('Active') : __('Inactive') }}"
+                                                            onclick="return confirm('{{ __('Are you sure you want to :action this currency?', ['action' => $currency->status ? 'deactivate' : 'activate']) }}')">
                                                         <i class="material-icons-outlined">{{ $currency->status ? 'check_circle' : 'cancel' }}</i>
                                      
                                                     </button>
@@ -140,18 +140,18 @@
                                                 <div class="d-flex gap-1">
                                                     <a href="{{ route('admin.currencies.edit', $currency->id) }}" 
                                                        class="btn btn-sm btn-outline-primary" 
-                                                       title="Edit">
+                                                       title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <form action="{{ route('admin.currencies.destroy', $currency->id) }}" 
                                                           method="POST" 
-                                                          onsubmit="return confirm('Are you sure you want to delete this currency?')"
+                                                          onsubmit="return confirm('{{ __('Are you sure you want to delete this currency?') }}')"
                                                           style="display: inline;">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" 
                                                                 class="btn btn-sm btn-outline-danger" 
-                                                                title="Delete">
+                                                                title="{{ __('Delete') }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
                                                     </form>
@@ -162,8 +162,8 @@
                                         <tr>
                                             <td colspan="6" class="text-center py-5">
                                                 <i class="material-icons-outlined" style="font-size: 48px; color: #6c757d;">attach_money</i>
-                                                <h5 class="text-muted mt-3">No Currencies</h5>
-                                                <p class="text-muted">Start by adding currencies.</p>
+                                                <h5 class="text-muted mt-3">{{ __('No Currencies') }}</h5>
+                                                <p class="text-muted">{{ __('Start by adding currencies.') }}</p>
                                                 <a href="{{ route('admin.currencies.create') }}" class="btn btn-primary">
                                                     <i class="material-icons-outlined">add</i>
                                                 </a>

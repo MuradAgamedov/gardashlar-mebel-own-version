@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Administration Member</h3>
+                    <h3>{{ __('Edit Administration Member') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -16,9 +16,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.administrations.index') }}">Administrations</a>
+                            <a href="{{ route('admin.administrations.index') }}">{{ __('Administrations') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>
@@ -41,7 +41,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Administration Member</h5>
+                        <h5>{{ __('Edit Administration Member') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.administrations.update', $administration->id) }}" method="POST" enctype="multipart/form-data">
@@ -51,13 +51,13 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="image" class="form-label">Image</label>
+                                        <label for="image" class="form-label">{{ __('Image') }}</label>
                                         <input type="file" class="form-control @error('image') is-invalid @enderror" 
                                                id="image" name="image" accept="image/*">
                                         @error('image')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
-                                        <div class="form-text">Upload a new image to replace the current one (max 2MB)</div>
+                                        <div class="form-text">{{ __('Upload a new image to replace the current one (max 2MB)') }}</div>
                                     </div>
 
                                     <div class="mb-3">
@@ -66,7 +66,7 @@
                                             <input class="form-check-input" type="checkbox" id="status" name="status" value="1" 
                                                    {{ old('status', $administration->status ? '1' : '0') ? 'checked' : '' }}>
                                             <label class="form-check-label" for="status">
-                                                Active
+                                                {{ __('Active') }}
                                             </label>
                                         </div>
                                     </div>
@@ -74,29 +74,29 @@
 
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label">Current Image</label>
+                                        <label class="form-label">{{ __('Current Image') }}</label>
                                         @if($administration->image)
                                             <div class="border rounded p-3 text-center">
                                                 <img src="{{ asset('storage/' . $administration->image) }}" 
-                                                     alt="Current Image" class="img-fluid" style="max-height: 180px;">
+                                                     alt="{{ __('Current Image') }}" class="img-fluid" style="max-height: 180px;">
                                                 <p class="mt-2 text-muted small">{{ $administration->image }}</p>
                                             </div>
                                         @else
                                             <div class="border rounded p-3 text-center text-muted">
                                                 <i class="material-icons-outlined" style="font-size: 3rem;">image</i>
-                                                <p class="mt-2">No image uploaded</p>
+                                                <p class="mt-2">{{ __('No image uploaded') }}</p>
                                             </div>
                                         @endif
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label">New Image Preview</label>
+                                        <label class="form-label">{{ __('New Image Preview') }}</label>
                                         <div id="image-preview" class="border rounded p-3 text-center" style="min-height: 200px; display: none;">
-                                            <img id="preview-img" src="" alt="Preview" class="img-fluid" style="max-height: 180px;">
+                                            <img id="preview-img" src="" alt="{{ __('Preview') }}" class="img-fluid" style="max-height: 180px;">
                                         </div>
                                         <div id="no-image" class="border rounded p-3 text-center text-muted" style="min-height: 200px;">
                                             <i class="material-icons-outlined" style="font-size: 3rem;">image</i>
-                                            <p class="mt-2">No new image selected</p>
+                                            <p class="mt-2">{{ __('No new image selected') }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -143,11 +143,11 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Title *</label>
+                                                    <label class="form-label">{{ __('Title') }} *</label>
                                                     <input type="text" class="form-control @error("translates.{$language->id}.title") is-invalid @enderror" 
                                                            name="translates[{{ $language->id }}][title]" 
                                                            value="{{ old("translates.{$language->id}.title", $translation?->title) }}"
-                                                           placeholder="Enter title"
+                                                           placeholder="{{ __('Enter title') }}"
                                                            required>
                                                     @error("translates.{$language->id}.title")
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -156,11 +156,11 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-3">
-                                                    <label class="form-label">Position *</label>
+                                                    <label class="form-label">{{ __('Position') }} *</label>
                                                     <input type="text" class="form-control @error("translates.{$language->id}.position") is-invalid @enderror" 
                                                            name="translates[{{ $language->id }}][position]" 
                                                            value="{{ old("translates.{$language->id}.position", $translation?->position) }}"
-                                                           placeholder="Enter position"
+                                                           placeholder="{{ __('Enter position') }}"
                                                            required>
                                                     @error("translates.{$language->id}.position")
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -175,10 +175,10 @@
                             </div>
 
                             <div class="d-flex justify-content-end gap-2">
-                                <a href="{{ route('admin.administrations.index') }}" class="btn btn-secondary">
+                                <a href="{{ route('admin.administrations.index') }}" class="btn btn-secondary" title="{{ __('Cancel') }}">
                                     <i class="material-icons-outlined">arrow_back</i>
                                 </a>
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary" title="{{ __('Save') }}">
                                     <i class="material-icons-outlined">save</i>
                                 </button>
                             </div>

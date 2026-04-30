@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Yeni Tövsiyyə</h3>
+                    <h3>{{ __('New Suggestion') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -16,9 +16,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.suggestions.index') }}">Tövsiyyələr</a>
+                            <a href="{{ route('admin.suggestions.index') }}">{{ __('Suggestions') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Yarat</li>
+                        <li class="breadcrumb-item active">{{ __('Create') }}</li>
                     </ol>
                 </div>
             </div>
@@ -35,7 +35,7 @@
 
         @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <h6 class="alert-heading">Aşağıdakı xətaları düzəldin:</h6>
+            <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
             <ul class="mb-0">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -49,7 +49,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Yeni Tövsiyyə Əlavə Et</h5>
+                        <h5>{{ __('Add New Suggestion') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.suggestions.store') }}" method="POST" enctype="multipart/form-data">
@@ -58,10 +58,10 @@
                             <!-- Media Section -->
                             <div class="row mb-4">
                                 <div class="col-md-12">
-                                    <h6 class="mb-3">Media</h6>
+                                    <h6 class="mb-3">{{ __('Media') }}</h6>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Şəkil *</label>
+                                            <label class="form-label">{{ __('Image') }} *</label>
                                             <div class="image-upload-container">
                                                 <input type="file" 
                                                        class="form-control @error('image') is-invalid @enderror image-file-input" 
@@ -72,7 +72,7 @@
                                                 @error('image')
                                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                                 @enderror
-                                                <div class="form-text">Maksimum ölçü: 2MB. Formatlar: JPEG, PNG, JPG, GIF</div>
+                                                <div class="form-text">{{ __('Maximum size: 2MB. Formats: JPEG, PNG, JPG, GIF') }}</div>
                                                 <div class="image-preview mt-2" id="image-preview"></div>
                                             </div>
                                         </div>
@@ -83,7 +83,7 @@
                             <!-- Content Translations Section -->
                             <div class="row mb-4">
                                 <div class="col-md-12">
-                                    <h6 class="mb-3">Məzmun Tərcümələri</h6>
+                                    <h6 class="mb-3">{{ __('Content Translations') }}</h6>
                                     
                                     <!-- Language Tabs -->
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
@@ -117,24 +117,24 @@
                                                 
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Başlıq *</label>
+                                                        <label class="form-label">{{ __('Title') }} *</label>
                                                         <input type="text" 
                                                                class="form-control @error("translates.{$language->id}.title") is-invalid @enderror" 
                                                                name="translates[{{ $language->id }}][title]" 
                                                                value="{{ old("translates.{$language->id}.title") }}"
-                                                               placeholder="Başlıq daxil edin"
+                                                               placeholder="{{ __('Enter title') }}"
                                                                required>
                                                         @error("translates.{$language->id}.title")
                                                             <div class="invalid-feedback d-block">{{ $message }}</div>
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Şəkil Alt Mətni</label>
+                                                        <label class="form-label">{{ __('Image Alt Text') }}</label>
                                                         <input type="text" 
                                                                class="form-control @error("translates.{$language->id}.image_alt_text") is-invalid @enderror" 
                                                                name="translates[{{ $language->id }}][image_alt_text]" 
                                                                value="{{ old("translates.{$language->id}.image_alt_text") }}"
-                                                               placeholder="Şəkil alt mətni daxil edin">
+                                                               placeholder="{{ __('Enter image alt text') }}">
                                                         @error("translates.{$language->id}.image_alt_text")
                                                             <div class="invalid-feedback d-block">{{ $message }}</div>
                                                         @enderror
@@ -155,7 +155,7 @@
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ old('status', '1') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Aktiv Status
+                                            {{ __('Active Status') }}
                                         </label>
                                     </div>
                                 </div>
@@ -164,10 +164,10 @@
                             <div class="row mt-4">
                                 <div class="col-md-12">
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary" title="{{ __('Save') }}">
                                             <i class="material-icons-outlined">save</i>
                                         </button>
-                                        <a href="{{ route('admin.suggestions.index') }}" class="btn btn-secondary">
+                                        <a href="{{ route('admin.suggestions.index') }}" class="btn btn-secondary" title="{{ __('Cancel') }}">
                                             <i class="material-icons-outlined">cancel</i>
                                         </a>
                                     </div>

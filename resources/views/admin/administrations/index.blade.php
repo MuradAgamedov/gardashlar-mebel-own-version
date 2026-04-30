@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Administrations</h3>
+                    <h3>{{ __('Administrations') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -15,7 +15,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Administrations</li>
+                        <li class="breadcrumb-item active">{{ __('Administrations') }}</li>
                     </ol>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Administration Members</h5>
+                            <h5>{{ __('Administration Members') }}</h5>
                             <a href="{{ route('admin.administrations.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -56,11 +56,11 @@
                                     <thead>
                                         <tr>
                                             <th width="50">#</th>
-                                            <th width="100">Image</th>
-                                            <th>Title</th>
-                                            <th>Position</th>
-                                            <th>Status</th>
-                                            <th width="200">Actions</th>
+                                            <th width="100">{{ __('Image') }}</th>
+                                            <th>{{ __('Title') }}</th>
+                                            <th>{{ __('Position') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th width="200">{{ __('Actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="sortable-list">
@@ -84,7 +84,7 @@
                                                 <td>
                                                     @if($administration->image)
                                                         <img src="{{ asset('storage/' . $administration->image) }}" 
-                                                             alt="Administration Image" 
+                                                             alt="{{ __('Administration Image') }}" 
                                                              class="img-thumbnail" 
                                                              style="width: 60px; height: 60px; object-fit: cover;">
                                                     @else
@@ -96,20 +96,20 @@
                                                 </td>
                                                 <td>
                                                     <div>
-                                                        <strong>{{ $mainTranslate?->title ?? 'No title' }}</strong>
+                                                        <strong>{{ $mainTranslate?->title ?? __('No title') }}</strong>
                                                         @if($mainTranslate)
                                                             <span class="badge bg-info ms-1">{{ $mainTranslate->language->lang_code }}</span>
                                                         @endif
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <span class="text-muted">{{ $mainTranslate?->position ?? 'No position' }}</span>
+                                                    <span class="text-muted">{{ $mainTranslate?->position ?? __('No position') }}</span>
                                                 </td>
                                                 <td>
                                                     @if($administration->status)
-                                                        <span class="badge bg-success">Active</span>
+                                                        <span class="badge bg-success">{{ __('Active') }}</span>
                                                     @else
-                                                        <span class="badge bg-danger">Inactive</span>
+                                                        <span class="badge bg-danger">{{ __('Inactive') }}</span>
                                                     @endif
                                                 </td>
                                                 <td>
@@ -121,7 +121,7 @@
                                                         <button type="button" 
                                                                 class="btn btn-sm btn-outline-danger delete-btn" 
                                                                 data-id="{{ $administration->id }}"
-                                                                data-title="{{ $mainTranslate?->title ?? 'This administration member' }}">
+                                                                data-title="{{ $mainTranslate?->title ?? __('This administration member') }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
                                                     </div>
@@ -134,8 +134,8 @@
                         @else
                             <div class="text-center py-5">
                                 <i class="material-icons-outlined text-muted" style="font-size: 4rem;">people</i>
-                                <h5 class="mt-3 text-muted">No administration members found</h5>
-                                <p class="text-muted">Click the button below to add the first administration member.</p>
+                                <h5 class="mt-3 text-muted">{{ __('No administration members found') }}</h5>
+                                <p class="text-muted">{{ __('Click the button below to add the first administration member.') }}</p>
                                 <a href="{{ route('admin.administrations.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
                                 </a>

@@ -99,11 +99,11 @@ class SuggestionController extends Controller
             }
 
             return redirect()->route('admin.suggestions.index')
-                ->with('success', 'Tövsiyyə uğurla əlavə edildi.');
+                ->with('success', __('Suggestion created successfully.'));
 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));;
         }
     }
 
@@ -198,11 +198,11 @@ class SuggestionController extends Controller
             }
 
             return redirect()->route('admin.suggestions.index')
-                ->with('success', 'Tövsiyyə uğurla yeniləndi.');
+                ->with('success', __('Suggestion updated successfully.'));
 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));;
         }
     }
 
@@ -234,10 +234,10 @@ class SuggestionController extends Controller
             }
 
             return redirect()->route('admin.suggestions.index')
-                ->with('success', 'Tövsiyyə uğurla silindi.');
+                ->with('success', __('Suggestion deleted successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));;
         }
     }
 
@@ -305,10 +305,10 @@ class SuggestionController extends Controller
             }
 
             return redirect()->route('admin.suggestions.index')
-                ->with('success', count($request->input('ids')) . ' tövsiyyə uğurla silindi.');
+                ->with('success', __(':count suggestion(s) deleted successfully.', ['count' => count($request->input('ids'))]));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));;
         }
     }
 }

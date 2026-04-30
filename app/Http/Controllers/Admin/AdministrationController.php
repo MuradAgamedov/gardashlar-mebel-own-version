@@ -38,10 +38,10 @@ class AdministrationController extends Controller
             );
 
             return redirect()->route('admin.administrations.index')
-                ->with('success', 'Administration member created successfully.');
+                ->with('success', __('Administration member created successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error creating administration member: ' . $e->getMessage());
+            return back()->with('error', __('Error creating administration member: :error', ['error' => $e->getMessage()]));;
         }
     }
 
@@ -63,10 +63,10 @@ class AdministrationController extends Controller
             );
 
             return redirect()->route('admin.administrations.index')
-                ->with('success', 'Administration member updated successfully.');
+                ->with('success', __('Administration member updated successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error updating administration member: ' . $e->getMessage());
+            return back()->with('error', __('Error updating administration member: :error', ['error' => $e->getMessage()]));;
         }
     }
 
@@ -76,10 +76,10 @@ class AdministrationController extends Controller
             $this->repository->deleteAdministration($administration);
             
             return redirect()->route('admin.administrations.index')
-                ->with('success', 'Administration member deleted successfully.');
+                ->with('success', __('Administration member deleted successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting administration member: ' . $e->getMessage());
+            return back()->with('error', __('Error deleting administration member: :error', ['error' => $e->getMessage()]));;
         }
     }
 

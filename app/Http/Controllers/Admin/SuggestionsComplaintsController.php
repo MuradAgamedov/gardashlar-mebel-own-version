@@ -55,6 +55,6 @@ class SuggestionsComplaintsController extends Controller
         }
 
         return redirect()->route('admin.suggestions-complaints.edit')
-            ->with('success', 'Suggestions and Complaints section updated successfully!');
+            ->with('success', __('Suggestions and Complaints section updated successfully!'));
     }
 }

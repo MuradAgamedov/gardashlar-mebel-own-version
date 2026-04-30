@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Tövsiyyələr</h3>
+                    <h3>{{ __('Suggestions') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -15,7 +15,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Tövsiyyələr</li>
+                        <li class="breadcrumb-item active">{{ __('Suggestions') }}</li>
                     </ol>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Bütün Tövsiyyələr</h5>
+                            <h5>{{ __('All Suggestions') }}</h5>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
                                     <i class="material-icons-outlined">delete</i>
@@ -72,7 +72,7 @@
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="selectAll">
                                     <label class="form-check-label" for="selectAll">
-                                        Hamısını Seç
+                                        {{ __('Select All') }}
                                     </label>
                                 </div>
                             </div>
@@ -85,12 +85,12 @@
                                         <th width="50">
                                             <input type="checkbox" class="form-check-input" id="selectAllHeader">
                                         </th>
-                                        <th width="50">Sıra</th>
-                                        <th width="100">Şəkil</th>
-                                        <th>Başlıq</th>
-                                        <th>Dillər</th>
-                                        <th width="80">Status</th>
-                                        <th width="150">Əməliyyatlar</th>
+                                        <th width="50">{{ __('Order') }}</th>
+                                        <th width="100">{{ __('Image') }}</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th>{{ __('Languages') }}</th>
+                                        <th width="80">{{ __('Status') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-suggestions">
@@ -145,7 +145,7 @@
                                                     $firstTranslation = $suggestion->translates->firstWhere('language_id', $mainLanguageId)
                                                         ?? $suggestion->translates->first();
                                                 @endphp
-                                                {{ $firstTranslation ? $firstTranslation->title : 'Tərcümə yoxdur' }}
+                                                {{ $firstTranslation ? $firstTranslation->title : __('No translation') }}
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-1">
@@ -156,9 +156,9 @@
                                             </td>
                                             <td>
                                                 @if($suggestion->status)
-                                                    <span class="badge bg-success">Aktiv</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Deaktiv</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -167,7 +167,7 @@
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Tövsiyyə #' . $suggestion->id }}"
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : __('Suggestion #') . $suggestion->id }}"
                                                             data-url="{{ route('admin.suggestions.destroy', $suggestion) }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
@@ -179,7 +179,7 @@
                                             <td colspan="7" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">lightbulb</i>
-                                                    <p class="mt-2">Tövsiyyə tapılmadı</p>
+                                                    <p>{{ __('No suggestions found') }}</p>
                                                     <a href="{{ route('admin.suggestions.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>

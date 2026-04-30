@@ -41,10 +41,10 @@ class AboutController extends Controller
             );
 
             return redirect()->route('admin.abouts.index')
-                ->with('success', 'Haqqımızda məlumatı uğurla əlavə edildi.');
+                ->with('success', __('About information created successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));;
         }
     }
 
@@ -69,10 +69,10 @@ class AboutController extends Controller
             );
 
             return redirect()->route('admin.abouts.index')
-                ->with('success', 'Haqqımızda məlumatı uğurla yeniləndi.');
+                ->with('success', __('About information updated successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));;
         }
     }
 
@@ -82,10 +82,10 @@ class AboutController extends Controller
             $this->repository->deleteAbout($about);
             
             return redirect()->route('admin.abouts.index')
-                ->with('success', 'Haqqımızda məlumatı uğurla silindi.');
+                ->with('success', __('About information deleted successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));;
         }
     }
 

@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Suggestions & Complaints')
+@section('title', __('Edit Suggestions & Complaints'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Suggestions & Complaints</h3>
+                    <h3>{{ __('Edit Suggestions & Complaints') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -19,8 +19,8 @@
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item">Suggestions & Complaints</li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item">{{ __('Suggestions & Complaints') }}</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>
@@ -31,7 +31,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Suggestions & Complaints Section</h5>
+                        <h5>{{ __('Edit Suggestions & Complaints Section') }}</h5>
                     </div>
                     <div class="card-body">
                         @if ($errors->any())
@@ -97,13 +97,13 @@
                                         <div class="row mt-3">
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <label for="title_{{ $language->id }}">Title <span class="text-danger">*</span></label>
+                                                    <label for="title_{{ $language->id }}">{{ __('Title') }} <span class="text-danger">*</span></label>
                                                     <input type="text" 
                                                            class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
                                                            id="title_{{ $language->id }}" 
                                                            name="translations[{{ $language->id }}][title]" 
                                                            value="{{ old("translations.{$language->id}.title", $translation->title ?? '') }}" 
-                                                           placeholder="Enter title for {{ $language->lang_code }}">
+                                                           placeholder="{{ __('Enter title for :lang', ['lang' => $language->lang_code]) }}">
                                                     @error("translations.{$language->id}.title")
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -114,11 +114,11 @@
                                         <div class="row mt-3">
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <label for="description_{{ $language->id }}">Description <span class="text-danger">*</span></label>
+                                                    <label for="description_{{ $language->id }}">{{ __('Description') }} <span class="text-danger">*</span></label>
                                                     <textarea class="form-control ckeditor @error("translations.{$language->id}.description") is-invalid @enderror" 
                                                               id="description_{{ $language->id }}" 
                                                               name="translations[{{ $language->id }}][description]" 
-                                                              placeholder="Enter description for {{ $language->lang_code }}">{{ old("translations.{$language->id}.description", $translation->description ?? '') }}</textarea>
+                                                              placeholder="{{ __('Enter description for :lang', ['lang' => $language->lang_code]) }}">{{ old("translations.{$language->id}.description", $translation->description ?? '') }}</textarea>
                                                     @error("translations.{$language->id}.description")
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -136,8 +136,8 @@
                             <div class="row mt-4">
                                 <div class="col-12">
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">Update Suggestions & Complaints</button>
-                                        <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">Cancel</a>
+                                        <button type="submit" class="btn btn-primary">{{ __('Update Suggestions & Complaints') }}</button>
+                                        <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">{{ __('Cancel') }}</a>
                                     </div>
                                 </div>
                             </div>
