@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Vacancies')
+@section('title', __('Vacancies'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Vacancies</h3>
+                    <h3>{{ __('Vacancies') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -19,7 +19,7 @@
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Vacancies</li>
+                        <li class="breadcrumb-item active">{{ __('Vacancies') }}</li>
                     </ol>
                 </div>
             </div>
@@ -47,10 +47,10 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>All Vacancies</h5>
+                            <h5>{{ __('All Vacancies') }}</h5>
                             <a href="{{ route('admin.vacancies.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New Vacancy
+                                {{ __('Add New Vacancy') }}
                             </a>
                         </div>
                     </div>
@@ -59,15 +59,15 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th width="50">Order</th>
-                                        <th>Title</th>
-                                        <th>Position</th>
-                                        <th>Experience</th>
-                                        <th>Address</th>
-                                        <th>Last Apply Date</th>
-                                        <th>Email</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
+                                        <th width="50">{{ __('Order') }}</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th>{{ __('Position') }}</th>
+                                        <th>{{ __('Experience') }}</th>
+                                        <th>{{ __('Address') }}</th>
+                                        <th>{{ __('Last Apply Date') }}</th>
+                                        <th>{{ __('Email') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th>{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-vacancies">
@@ -92,9 +92,9 @@
                                                     $mainTranslation = $vacancy->translates->firstWhere('language_id', $mainLanguageId)
                                                         ?? $vacancy->translates->first();
                                                 @endphp
-                                                <strong>{{ $mainTranslation->title ?? 'N/A' }}</strong>
+                                                <strong>{{ $mainTranslation->title ?? __('N/A') }}</strong>
                                                 @if($vacancy->last_apply_date && now()->greaterThan($vacancy->last_apply_date))
-                                                        <span class="badge bg-danger ms-2">Expired</span>
+                                                        <span class="badge bg-danger ms-2">{{ __('Expired') }}</span>
                                                     @endif
 
 
@@ -105,7 +105,7 @@
                                                     $mainTranslation = $vacancy->translates->firstWhere('language_id', $mainLanguageId)
                                                         ?? $vacancy->translates->first();
                                                 @endphp
-                                                {{ $mainTranslation->position ?? 'N/A' }}
+                                                {{ $mainTranslation->position ?? __('N/A') }}
                                             </td>
                                             <td>
                                                 @php
@@ -113,7 +113,7 @@
                                                     $mainTranslation = $vacancy->translates->firstWhere('language_id', $mainLanguageId)
                                                         ?? $vacancy->translates->first();
                                                 @endphp
-                                                {{ $mainTranslation->experience ?? 'N/A' }}
+                                                {{ $mainTranslation->experience ?? __('N/A') }}
                                             </td>
                                             <td>{{ $vacancy->address }}</td>
                                             <td>
@@ -125,16 +125,15 @@
                                             <td>{{ $vacancy->email }}</td>
                                             <td>
                                                 @if($vacancy->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                <div class="d-flex gap-2">
-                                                    <a href="{{ route('admin.vacancy-requirements.create-for-vacancy', $vacancy->id) }}" 
+                                                <div class="d-flex gap-2"                                                     <a href="{{ route('admin.vacancy-requirements.create-for-vacancy', $vacancy->id) }}" 
                                                        class="btn btn-sm btn-outline-success" 
-                                                       title="Add Requirements">
+                                                       title="{{ __('Add Requirements') }}">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>
                                                     <a href="{{ route('admin.vacancies.edit', $vacancy) }}" 
@@ -144,8 +143,8 @@
                                                     <button type="button" 
                                                             class="btn btn-sm btn-outline-danger delete-vacancy-btn" 
                                                             data-vacancy-id="{{ $vacancy->id }}"
-                                                            data-vacancy-title="{{ $mainTranslation->title ?? 'N/A' }}"
-                                                            data-delete-url="{{ route('admin.vacancies.destroy', $vacancy) }}">
+                                                            data-vacancy-title="{{ $mainTranslation->title ?? __('N/A') }}"
+                                                            data-delete-url="{{ route('admin.vacancies.destroy', $vacancy) }}">">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
                                                 </div>
@@ -153,7 +152,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="9" class="text-center">No vacancies found.</td>
+                                            <td colspan="9" class="text-center">{{ __('No vacancies found.') }}</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -231,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const requirementTitle = this.getAttribute('data-requirement-title');
             const deleteUrl = this.getAttribute('data-delete-url');
             
-            if (confirm(`Are you sure you want to delete requirement "${requirementTitle}"?`)) {
+            if (confirm('{{ __("Are you sure you want to delete requirement \":title\"?", ["title" => ":title"]) }}'.replace(':title', requirementTitle))) {
                 const form = document.getElementById('delete-vacancy-form');
                 form.action = deleteUrl;
                 form.submit();
@@ -292,7 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const vacancyTitle = this.getAttribute('data-vacancy-title');
             const deleteUrl = this.getAttribute('data-delete-url');
             
-            if (confirm(`Do you want to delete "${vacancyTitle}"? This action cannot be undone.`)) {
+            if (confirm('{{ __("Do you want to delete \":title\"? This action cannot be undone.", ["title" => ":title"]) }}'.replace(':title', vacancyTitle))) {
                 const form = document.getElementById('delete-vacancy-form');
                 form.action = deleteUrl;
                 form.submit();

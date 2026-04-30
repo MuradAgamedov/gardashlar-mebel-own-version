@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Reports')
+@section('title', __('Reports'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Reports</h3>
+                    <h3>{{ __('Reports') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Reports</li>
+                        <li class="breadcrumb-item active">{{ __('Reports') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Reports</h5>
+                            <h5>{{ __('Reports') }}</h5>
                             <a href="{{ route('admin.reports.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -53,13 +53,13 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th width="50">Order</th>
-                                        <th width="100">Image</th>
-                                        <th>Title</th>
-                                        <th>Languages</th>
-                                        <th>PDF</th>
-                                        <th width="80">Status</th>
-                                        <th width="150">Actions</th>
+                                        <th width="50">{{ __('Order') }}</th>
+                                        <th width="100">{{ __('Image') }}</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th>{{ __('Languages') }}</th>
+                                        <th>{{ __('PDF') }}</th>
+                                        <th width="80">{{ __('Status') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-reports">
@@ -82,7 +82,7 @@
                                             </td>
                                             <td>
                                                 @if($report->image_url)
-                                                    <img src="{{ $report->image_url }}" alt="Report Image" class="img-thumbnail" style="width: 80px; height: 60px; object-fit: cover;">
+                                                    <img src="{{ $report->image_url }}" alt="{{ __('Report Image') }}" class="img-thumbnail" style="width: 80px; height: 60px; object-fit: cover;">
                                                 @else
                                                     <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 60px;">
                                                         <i class="material-icons-outlined text-muted">image</i>
@@ -91,7 +91,7 @@
                                             </td>
                                             <td>
                                                 <div>
-                                                    <strong>{{ $firstTranslation ? $firstTranslation->title : 'No translation' }}</strong>
+                                                    <strong>{{ $firstTranslation ? $firstTranslation->title : __('No translation') }}</strong>
                                                     @if($firstTranslation && $firstTranslation->description)
                                                         <br><small class="text-muted">{{ Str::limit($firstTranslation->description, 100) }}</small>
                                                     @endif
@@ -108,17 +108,17 @@
                                                 @if($report->pdf_url)
                                                     <a href="{{ $report->pdf_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                                         <i class="material-icons-outlined">file_present</i>
-                                                        View PDF
+                                                        {{ __('View PDF') }}
                                                     </a>
                                                 @else
-                                                    <span class="text-muted">No PDF</span>
+                                                    <span class="text-muted">{{ __('No PDF') }}</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if($report->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -127,7 +127,7 @@
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Report #' . $report->id }}"
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : __('Report #:id', ['id' => $report->id]) }}"
                                                             data-url="{{ route('admin.reports.destroy', $report) }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
@@ -139,7 +139,7 @@
                                             <td colspan="7" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">description</i>
-                                                    <p class="mt-2">No reports found</p>
+                                                    <p class="mt-2">{{ __('No reports found') }}</p>
                                                     <a href="{{ route('admin.reports.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>
@@ -212,16 +212,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (data.success) {
                         Swal.fire({
-                            title: 'Success!',
-                            text: 'Reports reordered successfully!',
+                            title: '{{ __("Success!") }}',
+                            text: '{{ __("Reports reordered successfully!") }}',
                             icon: 'success',
                             timer: 1500,
                             showConfirmButton: false
                         });
                     } else {
                         Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to reorder reports',
+                            title: '{{ __("Error!") }}',
+                            text: data.message || '{{ __("Failed to reorder reports") }}',
                             icon: 'error'
                         });
                     }
@@ -240,13 +240,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to delete "${title}"?`,
+                title: '{{ __("Are you sure?") }}',
+                text: '{{ __("Do you want to delete :title?", ["title" => ":title"]) }}'.replace(':title', title),
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __("Yes, delete it!") }}',
+                cancelButtonText: '{{ __("Cancel") }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');

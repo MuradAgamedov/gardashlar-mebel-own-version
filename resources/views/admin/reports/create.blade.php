@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Create Report')
+@section('title', __('Create Report'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Create Report</h3>
+                    <h3>{{ __('Create Report') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.reports.index') }}">Reports</a>
+                            <a href="{{ route('admin.reports.index') }}">{{ __('Reports') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Create Report</li>
+                        <li class="breadcrumb-item active">{{ __('Create Report') }}</li>
                     </ol>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Create New Report</h5>
+                        <h5>{{ __('Create New Report') }}</h5>
                     </div>
                     <div class="card-body">
                         @if ($errors->any())
@@ -51,12 +51,12 @@
                             <!-- File Upload Section -->
                             <div class="row mb-4">
                                 <div class="col-md-12">
-                                    <label for="pdf" class="form-label">PDF File</label>
+                                    <label for="pdf" class="form-label">{{ __('PDF File') }}</label>
                                     <input type="file" class="form-control @error('pdf') is-invalid @enderror" id="pdf" name="pdf" accept=".pdf">
                                     @error('pdf')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="form-text text-muted">PDF format only. Max size: 10MB</small>
+                                    <small class="form-text text-muted">{{ __('PDF format only. Max size: 10MB') }}</small>
                                 </div>
                             </div>
 
@@ -69,7 +69,7 @@
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ old('status', '1') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Active Status
+                                            {{ __('Active Status') }}
                                         </label>
                                     </div>
                                 </div>
@@ -109,14 +109,14 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
                                                         <label for="title_{{ $language->id }}" class="form-label">
-                                                            Title <span class="text-danger">*</span>
+                                                            {{ __('Title') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
                                                                id="title_{{ $language->id }}" 
                                                                name="translations[{{ $language->id }}][title]" 
                                                                value="{{ old("translations.{$language->id}.title") }}" 
-                                                               placeholder="Enter title for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Enter title for :lang', ['lang' => $language->lang_code]) }}">
                                                         @error("translations.{$language->id}.title")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
@@ -126,13 +126,13 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
                                                         <label for="description_{{ $language->id }}" class="form-label">
-                                                            Description <span class="text-danger">*</span>
+                                                            {{ __('Description') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <textarea class="form-control @error("translations.{$language->id}.description") is-invalid @enderror" 
                                                                   id="description_{{ $language->id }}" 
                                                                   name="translations[{{ $language->id }}][description]" 
                                                                   rows="4" 
-                                                                  placeholder="Enter description for {{ $language->lang_code }}">{{ old("translations.{$language->id}.description") }}</textarea>
+                                                                  placeholder="{{ __('Enter description for :lang', ['lang' => $language->lang_code]) }}">{{ old("translations.{$language->id}.description") }}</textarea>
                                                         @error("translations.{$language->id}.description")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror

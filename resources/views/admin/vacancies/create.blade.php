@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Create Vacancy')
+@section('title', __('Create Vacancy'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Create Vacancy</h3>
+                    <h3>{{ __('Create Vacancy') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -20,9 +20,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.vacancies.index') }}">Vacancies</a>
+                            <a href="{{ route('admin.vacancies.index') }}">{{ __('Vacancies') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Create</li>
+                        <li class="breadcrumb-item active">{{ __('Create') }}</li>
                     </ol>
                 </div>
             </div>
@@ -32,7 +32,7 @@
     <div class="container-fluid">
         @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <h6 class="alert-heading">Please fix the following errors:</h6>
+            <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
             <ul class="mb-0">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -46,7 +46,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Create New Vacancy</h5>
+                        <h5>{{ __('Create New Vacancy') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.vacancies.store') }}" method="POST">
@@ -55,15 +55,15 @@
                             <!-- Basic Information Section -->
                             <div class="row mb-4">
                                 <div class="col-md-12">
-                                    <h6 class="mb-3">Basic Information</h6>
+                                    <h6 class="mb-3">{{ __('Basic Information') }}</h6>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                                            <label class="form-label">{{ __('Email') }} <span class="text-danger">*</span></label>
                                             <input type="email" 
                                                    class="form-control @error('email') is-invalid @enderror" 
                                                    name="email" 
                                                    value="{{ old('email') }}"
-                                                   placeholder="Enter contact email">
+                                                   placeholder="{{ __('Enter contact email') }}">
                                             @error('email')
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
@@ -71,12 +71,12 @@
 
                                         <!-- ✅ Phone Field -->
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Phone</label>
+                                            <label class="form-label">{{ __('Phone') }}</label>
                                             <input type="text" 
                                                    class="form-control @error('phone') is-invalid @enderror" 
                                                    name="phone" 
                                                    value="{{ old('phone') }}"
-                                                   placeholder="Enter phone number">
+                                                   placeholder="{{ __('Enter phone number') }}">
                                             @error('phone')
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
@@ -85,12 +85,12 @@
 
                                         <!-- ✅ Age Field -->
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Age</label>
+                                            <label class="form-label">{{ __('Age') }}</label>
                                             <input type="number" 
                                                    class="form-control @error('age') is-invalid @enderror" 
                                                    name="age" 
                                                    value="{{ old('age') }}"
-                                                   placeholder="Enter age requirement">
+                                                   placeholder="{{ __('Enter age requirement') }}">
                                             @error('age')
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
@@ -98,7 +98,7 @@
                                         <!-- ✅ END Age Field -->
 
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Last Apply Date</label>
+                                            <label class="form-label">{{ __('Last Apply Date') }}</label>
                                             <input type="date" 
                                                    class="form-control @error('last_apply_date') is-invalid @enderror" 
                                                    name="last_apply_date" 
@@ -115,7 +115,7 @@
                             <!-- Content Translations Section -->
                             <div class="row mb-4">
                                 <div class="col-md-12">
-                                    <h6 class="mb-3">Content Translations</h6>
+                                    <h6 class="mb-3">{{ __('Content Translations') }}</h6>
                                     
                                     <!-- Language Tabs -->
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
@@ -145,71 +145,71 @@
                                                 
                                                 <div class="row mt-3">
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Title <span class="text-danger">*</span></label>
+                                                        <label class="form-label">{{ __('Title') }} <span class="text-danger">*</span></label>
                                                         <input type="text" 
                                                                class="form-control" 
                                                                name="translations[{{ $language->id }}][title]" 
                                                                value="{{ old("translations.{$language->id}.title") }}"
-                                                               placeholder="Enter title for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Enter title for :lang', ['lang' => $language->lang_code]) }}">
                                                     </div>
                                                     
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Slug</label>
+                                                        <label class="form-label">{{ __('Slug') }}</label>
                                                         <input type="text" 
                                                                class="form-control" 
                                                                name="translations[{{ $language->id }}][slug]" 
                                                                value="{{ old("translations.{$language->id}.slug") }}"
-                                                               placeholder="Auto-generated slug for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Auto-generated slug for :lang', ['lang' => $language->lang_code]) }}">
                                                     </div>
                                                 </div>
 
                                                 <div class="row mt-3">
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Position</label>
+                                                        <label class="form-label">{{ __('Position') }}</label>
                                                         <input type="text" 
                                                                class="form-control" 
                                                                name="translations[{{ $language->id }}][position]" 
                                                                value="{{ old("translations.{$language->id}.position") }}"
-                                                               placeholder="Enter position for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Enter position for :lang', ['lang' => $language->lang_code]) }}">
                                                     </div>
 
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Experience</label>
+                                                        <label class="form-label">{{ __('Experience') }}</label>
                                                         <input type="text" 
                                                                class="form-control" 
                                                                name="translations[{{ $language->id }}][experience]" 
                                                                value="{{ old("translations.{$language->id}.experience") }}"
-                                                               placeholder="Enter experience for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Enter experience for :lang', ['lang' => $language->lang_code]) }}">
                                                     </div>
                                                 </div>
 
                                                 <div class="row mt-3">
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Work Schedule</label>
+                                                        <label class="form-label">{{ __('Work Schedule') }}</label>
                                                         <textarea class="form-control" 
                                                                   name="translations[{{ $language->id }}][work_schedule]" 
                                                                   rows="3"
-                                                                  placeholder="Enter work schedule for {{ $language->lang_code }}">{{ old("translations.{$language->id}.work_schedule") }}</textarea>
+                                                                  placeholder="{{ __('Enter work schedule for :lang', ['lang' => $language->lang_code]) }}">{{ old("translations.{$language->id}.work_schedule") }}</textarea>
                                                     </div>
 
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Salary</label>
+                                                        <label class="form-label">{{ __('Salary') }}</label>
                                                         <input type="text" 
                                                                class="form-control" 
                                                                name="translations[{{ $language->id }}][salary]" 
                                                                value="{{ old("translations.{$language->id}.salary") }}"
-                                                               placeholder="Enter salary for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Enter salary for :lang', ['lang' => $language->lang_code]) }}">
                                                     </div>
                                                 </div>
 
                                                 <!-- ✅ Address Field -->
                                                 <div class="row mt-3">
                                                     <div class="col-md-12 mb-3">
-                                                        <label class="form-label">Address</label>
+                                                        <label class="form-label">{{ __('Address') }}</label>
                                                         <textarea class="form-control" 
                                                                   name="translations[{{ $language->id }}][address]" 
                                                                   rows="3"
-                                                                  placeholder="Enter address for {{ $language->lang_code }}">{{ old("translations.{$language->id}.address") }}</textarea>
+                                                                  placeholder="{{ __('Enter address for :lang', ['lang' => $language->lang_code]) }}">{{ old("translations.{$language->id}.address") }}</textarea>
                                                     </div>
                                                 </div>
                                                 <!-- ✅ END Address -->
@@ -217,30 +217,30 @@
                                                 <!-- ✅ Additional Fields -->
                                                 <div class="row mt-3">
                                                     <div class="col-md-4 mb-3">
-                                                        <label class="form-label">Education</label>
+                                                        <label class="form-label">{{ __('Education') }}</label>
                                                         <input type="text" 
                                                                class="form-control" 
                                                                name="translations[{{ $language->id }}][education]" 
                                                                value="{{ old("translations.{$language->id}.education") }}"
-                                                               placeholder="Enter education requirement for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Enter education requirement for :lang', ['lang' => $language->lang_code]) }}">
                                                     </div>
 
                                                     <div class="col-md-4 mb-3">
-                                                        <label class="form-label">Related Person</label>
+                                                        <label class="form-label">{{ __('Related Person') }}</label>
                                                         <input type="text" 
                                                                class="form-control" 
                                                                name="translations[{{ $language->id }}][related_person]" 
                                                                value="{{ old("translations.{$language->id}.related_person") }}"
-                                                               placeholder="Enter related person for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Enter related person for :lang', ['lang' => $language->lang_code]) }}">
                                                     </div>
 
                                                     <div class="col-md-4 mb-3">
-                                                        <label class="form-label">City</label>
+                                                        <label class="form-label">{{ __('City') }}</label>
                                                         <input type="text" 
                                                                class="form-control" 
                                                                name="translations[{{ $language->id }}][city]" 
                                                                value="{{ old("translations.{$language->id}.city") }}"
-                                                               placeholder="Enter city for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Enter city for :lang', ['lang' => $language->lang_code]) }}">
                                                     </div>
                                                 </div>
                                                 <!-- ✅ END Additional Fields -->
@@ -248,11 +248,11 @@
                                                 <!-- SEO Section -->
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
-                                                        <h6 class="mb-3">SEO Settings</h6>
+                                                        <h6 class="mb-3">{{ __('SEO Settings') }}</h6>
                                                     </div>
 
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">SEO Title</label>
+                                                        <label class="form-label">{{ __('SEO Title') }}</label>
                                                         <input type="text" 
                                                                class="form-control" 
                                                                name="translations[{{ $language->id }}][seo_title]" 
@@ -260,14 +260,14 @@
                                                     </div>
 
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">SEO Keywords</label>
+                                                        <label class="form-label">{{ __('SEO Keywords') }}</label>
                                                         <textarea class="form-control" 
                                                                   name="translations[{{ $language->id }}][seo_keywords]" 
                                                                   rows="3">{{ old("translations.{$language->id}.seo_keywords") }}</textarea>
                                                     </div>
 
                                                     <div class="col-md-12 mb-3">
-                                                        <label class="form-label">SEO Description</label>
+                                                        <label class="form-label">{{ __('SEO Description') }}</label>
                                                         <textarea class="form-control" 
                                                                   name="translations[{{ $language->id }}][seo_description]" 
                                                                   rows="3">{{ old("translations.{$language->id}.seo_description") }}</textarea>
@@ -287,7 +287,7 @@
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ old('status', true) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Active Status
+                                            {{ __('Active Status') }}
                                         </label>
                                     </div>
                                 </div>

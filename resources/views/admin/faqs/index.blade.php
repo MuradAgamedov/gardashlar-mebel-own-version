@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'FAQs')
+@section('title', __('FAQs'))
 
 @section('content')
 <!-- Debug CSRF Token -->
@@ -12,7 +12,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>FAQs</h3>
+                    <h3>{{ __('FAQs') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -23,7 +23,7 @@
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">FAQs</li>
+                        <li class="breadcrumb-item active">{{ __('FAQs') }}</li>
                     </ol>
                 </div>
             </div>
@@ -51,11 +51,11 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>FAQs List</h5>
+                            <h5>{{ __('FAQs List') }}</h5>
                             <div class="d-flex gap-2">
                                 <form class="d-flex gap-2" method="GET" action="{{ route('admin.faqs.index') }}">
-                                    <input type="text" name="search" class="form-control" placeholder="Search questions..." value="{{ request('search') }}" style="width: 300px;">
-                                    <button type="submit" class="btn btn-outline-primary" title="Search" style="width: 50px; height: 50px;">
+                                    <input type="text" name="search" class="form-control" placeholder="{{ __('Search questions...') }}" value="{{ request('search') }}" style="width: 300px;">
+                                    <button type="submit" class="btn btn-outline-primary" title="{{ __('Search') }}" style="width: 50px; height: 50px;">
                                         <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">search</i>
                                     </button>
                                     @if(request('search'))
@@ -64,10 +64,10 @@
                                         </a>
                                     @endif
                                 </form>
-                                <button type="button" id="deleteSelectedBtn" class="btn btn-danger" title="Delete Selected" style="width: 50px; height: 50px; display: none;">
+                                <button type="button" id="deleteSelectedBtn" class="btn btn-danger" title="{{ __('Delete Selected') }}" style="width: 50px; height: 50px; display: none;">
                                     <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">delete</i>
                                 </button>
-                                <a href="{{ route('admin.faqs.create') }}" class="btn btn-primary" title="Add New FAQ" style="width: 50px; height: 50px;">
+                                <a href="{{ route('admin.faqs.create') }}" class="btn btn-primary" title="{{ __('Add New FAQ') }}" style="width: 50px; height: 50px;">
                                     <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">add</i>
                                 </a>
                             </div>
@@ -79,13 +79,13 @@
                                 <table class="table table-bordered">
                                     <thead class="table-light">
                                         <tr>
-                                            <th style="display: none;">Order</th>
+                                            <th style="display: none;">{{ __('Order') }}</th>
                                             <th width="50">
                                                 <input type="checkbox" id="selectAll" class="form-check-input">
                                             </th>
-                                            <th>Question</th>
-                                            <th>Status</th>
-                                            <th width="150">Actions</th>
+                                            <th>{{ __('Question') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th width="150">{{ __('Actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="sortable-faqs">
@@ -113,13 +113,13 @@
                                                     <input type="checkbox" class="form-check-input faq-checkbox" value="{{ $faq->id }}">
                                                 </td>
                                                 <td>
-                                                    {{ $mainTranslation->question ?? 'N/A' }}
+                                                    {{ $mainTranslation->question ?? __('N/A') }}
                                                 </td>
                                                 <td>
                                                     @if($faq->status)
-                                                        <span class="badge bg-success">Active</span>
+                                                        <span class="badge bg-success">{{ __('Active') }}</span>
                                                     @else
-                                                        <span class="badge bg-secondary">Inactive</span>
+                                                        <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                     @endif
                                                 </td>
                                                 <td>
@@ -131,7 +131,7 @@
                                                         <button type="button" 
                                                                 class="btn btn-sm btn-outline-danger delete-faq-btn" 
                                                                 data-faq-id="{{ $faq->id }}"
-                                                                data-faq-question="{{ $mainTranslation->question ?? 'N/A' }}"
+                                                                data-faq-question="{{ $mainTranslation->question ?? __('N/A') }}"
                                                                 data-delete-url="{{ route('admin.faqs.destroy', $faq) }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
@@ -145,9 +145,9 @@
                         @else
                             <div class="text-center text-muted py-5">
                                 <i class="material-icons-outlined" style="font-size: 64px; opacity: 0.3;">help</i>
-                                <h5 class="mt-3">No FAQs found</h5>
-                                <p>Start by adding your first FAQ.</p>
-                                <a href="{{ route('admin.faqs.create') }}" class="btn btn-primary" title="Add First FAQ" style="width: 50px; height: 50px;">
+                                <h5 class="mt-3">{{ __('No FAQs found') }}</h5>
+                                <p>{{ __('Start by adding your first FAQ.') }}</p>
+                                <a href="{{ route('admin.faqs.create') }}" class="btn btn-primary" title="{{ __('Add First FAQ') }}" style="width: 50px; height: 50px;">
                                     <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">add</i>
                                 </a>
                             </div>
@@ -259,11 +259,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedIds = Array.from(checkedBoxes).map(checkbox => checkbox.value);
         
         if (selectedIds.length === 0) {
-            alert('Please select at least one FAQ to delete.');
+            alert('{{ __("Please select at least one FAQ to delete.") }}');
             return;
         }
         
-        if (confirm(`Are you sure you want to delete ${selectedIds.length} selected FAQ(s)?`)) {
+        if (confirm('{{ __("Are you sure you want to delete :count selected FAQ(s)?", ["count" => ":count"]) }}'.replace(':count', selectedIds.length))) {
             console.log('CSRF Token:', csrfToken);
             console.log('Selected IDs:', selectedIds);
             // Create a form and submit it
@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const faqQuestion = this.getAttribute('data-faq-question');
             const deleteUrl = this.getAttribute('data-delete-url');
             
-            if (confirm(`Are you sure you want to delete the FAQ: "${faqQuestion}"?`)) {
+            if (confirm('{{ __("Are you sure you want to delete the FAQ: \":question\"?", ["question" => ":question"]) }}'.replace(':question', faqQuestion))) {
                 // Create a form and submit it
                 const form = document.createElement('form');
                 form.method = 'POST';

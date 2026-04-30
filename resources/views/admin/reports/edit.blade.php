@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Report')
+@section('title', __('Edit Report'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Report</h3>
+                    <h3>{{ __('Edit Report') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.reports.index') }}">Reports</a>
+                            <a href="{{ route('admin.reports.index') }}">{{ __('Reports') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit Report</li>
+                        <li class="breadcrumb-item active">{{ __('Edit Report') }}</li>
                     </ol>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Report</h5>
+                        <h5>{{ __('Edit Report') }}</h5>
                     </div>
                     <div class="card-body">
                         @if ($errors->any())
@@ -52,12 +52,12 @@
                             <!-- File Upload Section -->
                             <div class="row mb-4">
                                 <div class="col-md-12">
-                                    <label for="pdf" class="form-label">PDF File</label>
+                                    <label for="pdf" class="form-label">{{ __('PDF File') }}</label>
                                     <input type="file" class="form-control @error('pdf') is-invalid @enderror" id="pdf" name="pdf" accept=".pdf">
                                     @error('pdf')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="form-text text-muted">PDF format only. Max size: 10MB</small>
+                                    <small class="form-text text-muted">{{ __('PDF format only. Max size: 10MB') }}</small>
                                 </div>
                             </div>
 
@@ -69,12 +69,12 @@
                                             <a href="{{ $report->pdf_url }}" target="_blank" class="btn btn-outline-primary">
                                                 <i class="material-icons-outlined">file_present</i>
                                             </a>
-                                            <p class="text-muted mt-2">Current PDF file</p>
+                                            <p class="text-muted mt-2">{{ __('Current PDF file') }}</p>
                                         @else
                                             <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 200px; height: 100px;">
                                                 <i class="material-icons-outlined text-muted">description</i>
                                             </div>
-                                            <p class="text-muted mt-2">No PDF uploaded</p>
+                                            <p class="text-muted mt-2">{{ __('No PDF uploaded') }}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -87,7 +87,7 @@
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ old('status', $report->status) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Active Status
+                                            {{ __('Active Status') }}
                                         </label>
                                     </div>
                                 </div>
@@ -139,14 +139,14 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
                                                         <label for="title_{{ $language->id }}" class="form-label">
-                                                            Title <span class="text-danger">*</span>
+                                                            {{ __('Title') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
                                                                id="title_{{ $language->id }}" 
                                                                name="translations[{{ $language->id }}][title]" 
                                                                value="{{ old("translations.{$language->id}.title", $translation->title ?? '') }}" 
-                                                               placeholder="Enter title for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Enter title for :lang', ['lang' => $language->lang_code]) }}">
                                                         @error("translations.{$language->id}.title")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
@@ -156,13 +156,13 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
                                                         <label for="description_{{ $language->id }}" class="form-label">
-                                                            Description <span class="text-danger">*</span>
+                                                            {{ __('Description') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <textarea class="form-control @error("translations.{$language->id}.description") is-invalid @enderror" 
                                                                   id="description_{{ $language->id }}" 
                                                                   name="translations[{{ $language->id }}][description]" 
                                                                   rows="4" 
-                                                                  placeholder="Enter description for {{ $language->lang_code }}">{{ old("translations.{$language->id}.description", $translation->description ?? '') }}</textarea>
+                                                                  placeholder="{{ __('Enter description for :lang', ['lang' => $language->lang_code]) }}">{{ old("translations.{$language->id}.description", $translation->description ?? '') }}</textarea>
                                                         @error("translations.{$language->id}.description")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror

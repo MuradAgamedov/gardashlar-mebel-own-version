@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Create FAQ')
+@section('title', __('Create FAQ'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Create FAQ</h3>
+                    <h3>{{ __('Create FAQ') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -20,9 +20,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.faqs.index') }}">FAQs</a>
+                            <a href="{{ route('admin.faqs.index') }}">{{ __('FAQs') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Create</li>
+                        <li class="breadcrumb-item active">{{ __('Create') }}</li>
                     </ol>
                 </div>
             </div>
@@ -41,7 +41,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Create New FAQ</h5>
+                        <h5>{{ __('Create New FAQ') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.faqs.store') }}" method="POST">
@@ -54,7 +54,7 @@
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" value="1" {{ old('status', '1') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Active
+                                            {{ __('Active') }}
                                         </label>
                                     </div>
                                 </div>
@@ -63,11 +63,11 @@
                             <!-- Content Translations Section -->
                             <div class="row mb-4">
                                 <div class="col-md-12">
-                                    <h6 class="mb-3">Content Translations</h6>
+                                    <h6 class="mb-3">{{ __('Content Translations') }}</h6>
                                     
                                     @if ($errors->any())
                                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                        <h6 class="alert-heading">Please fix the following errors:</h6>
+                                        <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
                                         <ul class="mb-0">
                                             @foreach ($errors->all() as $error)
                                                 <li>{{ $error }}</li>
@@ -109,30 +109,30 @@
                                             
                                             <div class="card mt-3">
                                                 <div class="card-header">
-                                                    <h6 class="mb-0">{{ $language->title }} Content</h6>
+                                                    <h6 class="mb-0">{{ __(':lang Content', ['lang' => $language->title]) }}</h6>
                                                 </div>
                                                 <div class="card-body">
                                                     <input type="hidden" name="translations[{{ $index }}][language_id]" value="{{ $language->id }}">
                                                     
                                                     <div class="row">
                                                         <div class="col-md-12 mb-3">
-                                                            <label class="form-label">Question <span class="text-danger">*</span></label>
+                                                            <label class="form-label">{{ __('Question') }} <span class="text-danger">*</span></label>
                                                             <input type="text" 
                                                                    class="form-control @error('translations.'.$index.'.question') is-invalid @enderror" 
                                                                    name="translations[{{ $index }}][question]" 
                                                                    value="{{ old('translations.'.$index.'.question') }}"
-                                                                   placeholder="Enter question for {{ $language->lang_code }}">
+                                                                   placeholder="{{ __('Enter question for :lang', ['lang' => $language->lang_code]) }}">
                                                             @error('translations.'.$index.'.question')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
                                                         </div>
                                                         
                                                         <div class="col-md-12 mb-3">
-                                                            <label class="form-label">Answer <span class="text-danger">*</span></label>
+                                                            <label class="form-label">{{ __('Answer') }} <span class="text-danger">*</span></label>
                                                             <textarea class="form-control ckeditor @error('translations.'.$index.'.answer') is-invalid @enderror" 
                                                                       name="translations[{{ $index }}][answer]" 
                                                                       id="answer-{{ $language->id }}"
-                                                                      placeholder="Enter answer for {{ $language->lang_code }}">{{ old('translations.'.$index.'.answer') }}</textarea>
+                                                                      placeholder="{{ __('Enter answer for :lang', ['lang' => $language->lang_code]) }}">{{ old('translations.'.$index.'.answer') }}</textarea>
                                                             @error('translations.'.$index.'.answer')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
