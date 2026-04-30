@@ -94,11 +94,11 @@ class VacancyController extends Controller
         }
 
         return redirect()->route('admin.vacancies.index')
-            ->with('success', 'Vacancy created successfully!');
+            ->with('success', __('Vacancy created successfully!'));
 
     } catch (\Exception $e) {
         return redirect()->back()
-            ->withErrors(['error' => 'Error creating vacancy: ' . $e->getMessage()])
+            ->withErrors(['error' => __('Error creating vacancy: :error', ['error' => $e->getMessage()])])
             ->withInput();
     }
 }
@@ -185,7 +185,7 @@ class VacancyController extends Controller
         }
 
         return redirect()->route('admin.vacancies.index')
-            ->with('success', 'Vacancy updated successfully!');
+            ->with('success', __('Vacancy updated successfully!'));
 
     } catch (\Exception $e) {
         return redirect()->back()
@@ -204,7 +204,7 @@ class VacancyController extends Controller
         try {
             $vacancy->delete();
             return redirect()->route('admin.vacancies.index')
-                ->with('success', 'Vacancy deleted successfully!');
+                ->with('success', __('Vacancy deleted successfully!'));
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Error deleting vacancy: ' . $e->getMessage());

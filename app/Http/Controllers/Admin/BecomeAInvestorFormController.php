@@ -32,9 +32,9 @@ class BecomeAInvestorFormController extends Controller
         try {
             $this->repository->deleteForm($becomeAInvestorForm);
             return redirect()->route('admin.become-a-investor-forms.index')
-                ->with('success', 'Form deleted successfully!');
+                ->with('success', __('Form deleted successfully!'));
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error deleting form: ' . $e->getMessage());
+            return redirect()->back()->with('error', __('Error deleting form: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -59,9 +59,9 @@ class BecomeAInvestorFormController extends Controller
         try {
             $this->repository->deleteSelected($request->ids);
             return redirect()->route('admin.become-a-investor-forms.index')
-                ->with('success', count($request->ids) . ' form(s) deleted successfully.');
+                ->with('success', __(':count form(s) deleted successfully.', ['count' => count($request->ids)]));
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 }

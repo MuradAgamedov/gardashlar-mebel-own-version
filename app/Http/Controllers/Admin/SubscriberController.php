@@ -40,10 +40,10 @@ class SubscriberController extends Controller
             $subscriber->delete();
 
             return redirect()->route('admin.subscribers.index')
-                ->with('success', 'Subscriber deleted successfully!');
+                ->with('success', __('Subscriber deleted successfully!'));
         } catch (\Exception $e) {
             return redirect()->route('admin.subscribers.index')
-                ->with('error', 'Error deleting subscriber: ' . $e->getMessage());
+                ->with('error', __('Error deleting subscriber: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -61,10 +61,10 @@ class SubscriberController extends Controller
             $deletedCount = Subscriber::whereIn('id', $request->subscriber_ids)->delete();
 
             return redirect()->route('admin.subscribers.index')
-                ->with('success', "Successfully deleted {$deletedCount} subscriber(s)!");
+                ->with('success', __("Successfully deleted :count subscriber(s)!", ['count' => $deletedCount]));
         } catch (\Exception $e) {
             return redirect()->route('admin.subscribers.index')
-                ->with('error', 'Error deleting subscribers: ' . $e->getMessage());
+                ->with('error', __('Error deleting subscribers: :error', ['error' => $e->getMessage()]));
         }
     }
 }

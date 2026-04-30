@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Create New SEO Page</h3>
+                    <h3>{{ __('Create New SEO Page') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -16,9 +16,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.seo-pages.index') }}">SEO Pages</a>
+                            <a href="{{ route('admin.seo-pages.index') }}">{{ __('SEO Pages') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Create</li>
+                        <li class="breadcrumb-item active">{{ __('Create') }}</li>
                     </ol>
                 </div>
             </div>
@@ -54,14 +54,14 @@
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" value="1" checked>
                                         <label class="form-check-label" for="status">
-                                            Active
+                                            {{ __('Active') }}
                                         </label>
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Category</label>
+                                    <label class="form-label">{{ __('Category') }}</label>
                                     <select class="form-select @error('category_id') is-invalid @enderror" name="category_id">
-                                        <option value="">{{ app()->getLocale() === 'az' ? 'Kateqoriya seçin (İsteğe bağlı)' : 'Select Category (Optional)' }}</option>
+                                        <option value="">{{ __('Select Category (Optional)') }}</option>
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
                                                 @php
@@ -70,7 +70,7 @@
                                                 @if($categoryTranslation)
                                                     {{ $categoryTranslation->title }}
                                                 @else
-                                                    {{ app()->getLocale() === 'az' ? 'Kateqoriya #' : 'Category #' }}{{ $category->id }}
+                                                    {{ __('Category #:id', ['id' => $category->id]) }}
                                                 @endif
                                             </option>
                                         @endforeach
@@ -108,7 +108,7 @@
                                                 
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Title</label>
+                                                        <label class="form-label">{{ __('Title') }}</label>
                                                         <input type="text" 
                                                                class="form-control @error('translates.'.$index.'.title') is-invalid @enderror" 
                                                                name="translates[{{ $index }}][title]" 
@@ -118,7 +118,7 @@
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Slug</label>
+                                                        <label class="form-label">{{ __('Slug') }}</label>
                                                         <input type="text" 
                                                                class="form-control @error('translates.'.$index.'.slug') is-invalid @enderror" 
                                                                name="translates[{{ $index }}][slug]" 
@@ -131,7 +131,7 @@
 
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Meta Title</label>
+                                                        <label class="form-label">{{ __('Meta Title') }}</label>
                                                         <input type="text" 
                                                                class="form-control @error('translates.'.$index.'.meta_title') is-invalid @enderror" 
                                                                name="translates[{{ $index }}][meta_title]" 
@@ -141,7 +141,7 @@
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Meta Keywords</label>
+                                                        <label class="form-label">{{ __('Meta Keywords') }}</label>
                                                         <input type="text" 
                                                                class="form-control @error('translates.'.$index.'.meta_keywords') is-invalid @enderror" 
                                                                name="translates[{{ $index }}][meta_keywords]" 
@@ -153,7 +153,7 @@
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label class="form-label">Meta Description</label>
+                                                    <label class="form-label">{{ __('Meta Description') }}</label>
                                                     <textarea class="form-control @error('translates.'.$index.'.meta_description') is-invalid @enderror" 
                                                               name="translates[{{ $index }}][meta_description]" 
                                                               rows="3">{{ old('translates.'.$index.'.meta_description') }}</textarea>
@@ -163,7 +163,7 @@
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label class="form-label">Page Footer</label>
+                                                    <label class="form-label">{{ __('Page Footer') }}</label>
                                                     <textarea class="form-control ckeditor @error('translates.'.$index.'.page_footer') is-invalid @enderror" 
                                                               id="page_footer_{{ $language->id }}"
                                                               name="translates[{{ $index }}][page_footer]" 
@@ -181,10 +181,10 @@
                             <div class="row mt-4">
                                 <div class="col-12">
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary" title="Save SEO Page">
+                                        <button type="submit" class="btn btn-primary" title="{{ __('Save SEO Page') }}">
                                             <i class="material-icons-outlined">save</i>
                                         </button>
-                                        <a href="{{ route('admin.seo-pages.index') }}" class="btn btn-secondary" title="Back to List">
+                                        <a href="{{ route('admin.seo-pages.index') }}" class="btn btn-secondary" title="{{ __('Back to List') }}">
                                             <i class="material-icons-outlined">arrow_back</i>
                                         </a>
                                     </div>

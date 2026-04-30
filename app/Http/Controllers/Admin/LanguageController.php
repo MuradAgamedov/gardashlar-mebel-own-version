@@ -56,7 +56,7 @@ class LanguageController extends Controller
         Language::create($data);
 
         return redirect()->route('admin.languages.index')
-            ->with('success', 'Language created successfully.');
+            ->with('success', __('Language created successfully.'));
     }
 
     /**
@@ -100,7 +100,7 @@ class LanguageController extends Controller
         // Check if trying to deactivate the main language
         if ($currentIsMain && !$newIsMain) {
             return redirect()->route('admin.languages.index')
-                ->with('error', 'Cannot deactivate main language. Please set another language as main first.');
+                ->with('error', __('Cannot deactivate main language. Please set another language as main first.'));
         }
 
         // Check if trying to deactivate the only active language
@@ -108,7 +108,7 @@ class LanguageController extends Controller
             $activeLanguagesCount = Language::where('status', true)->count();
             if ($activeLanguagesCount <= 1) {
                 return redirect()->route('admin.languages.index')
-                    ->with('error', 'Cannot deactivate the only active language. Please activate another language first.');
+                    ->with('error', __('Cannot deactivate the only active language. Please activate another language first.'));
             }
         }
 
@@ -124,7 +124,7 @@ class LanguageController extends Controller
         $language->update($data);
 
         return redirect()->route('admin.languages.index')
-            ->with('success', 'Language updated successfully.');
+            ->with('success', __('Language updated successfully.'));
     }
 
     /**
@@ -136,25 +136,25 @@ class LanguageController extends Controller
             // Check if this is the main language
             if ($language->is_main_language) {
                 return redirect()->route('admin.languages.index')
-                    ->with('error', 'Cannot delete the main language. Please set another language as main first.');
+                    ->with('error', __('Cannot delete the main language. Please set another language as main first.'));
             }
 
             // Check if this is the only active language
             $activeLanguagesCount = Language::where('status', true)->count();
             if ($activeLanguagesCount <= 1 && $language->status) {
                 return redirect()->route('admin.languages.index')
-                    ->with('error', 'Cannot delete the only active language. Please activate another language first.');
+                    ->with('error', __('Cannot delete the only active language. Please activate another language first.'));
             }
 
             $languageName = $language->title;
             $language->delete();
 
             return redirect()->route('admin.languages.index')
-                ->with('success', "Language '{$languageName}' deleted successfully.");
+                ->with('success', __('Language ":lang" deleted successfully.', ['lang' => $languageName]));
 
         } catch (\Exception $e) {
             return redirect()->route('admin.languages.index')
-                ->with('error', 'An error occurred while deleting the language. Please try again.');
+                ->with('error', __('An error occurred while deleting the language. Please try again.'));
         }
     }
 
@@ -165,23 +165,30 @@ class LanguageController extends Controller
     {
         try {
             $languages = $request->input('languages', []);
+            \Log::info('Reorder request data:', $languages);
             
             foreach ($languages as $languageData) {
                 $language = Language::find($languageData['id']);
                 if ($language) {
+                    \Log::info("Updating language {$language->id} order to {$languageData['order']}");
                     $language->update(['order' => $languageData['order']]);
+                    \Log::info("Language {$language->id} updated successfully");
+                } else {
+                    \Log::warning("Language with ID {$languageData['id']} not found");
                 }
             }
             
+            \Log::info('Reorder completed successfully');
             return response()->json([
                 'success' => true,
-                'message' => 'Languages reordered successfully'
+                'message' => __('Languages reordered successfully')
             ]);
             
         } catch (\Exception $e) {
+            \Log::error('Reorder error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error reordering languages: ' . $e->getMessage()
+                'message' => __('Error reordering languages: :error', ['error' => $e->getMessage()])
             ], 500);
         }
     }

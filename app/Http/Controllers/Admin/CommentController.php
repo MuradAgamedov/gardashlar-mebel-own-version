@@ -28,20 +28,20 @@ class CommentController extends Controller
     public function destroy(Comment $comment)
     {
         $this->repository->deleteComment($comment);
-        return redirect()->route('admin.comments.index')->with('success', 'Şərh silindi');
+        return redirect()->route('admin.comments.index')->with('success', __('Comment deleted successfully!'));
     }
     public function markAsRead($id)
     {
         $comment = Comment::find($id);
         $this->repository->toggleReadStatus($comment);
-        return redirect()->back()->with('success', 'Şərh statusu yeniləndi');
+        return redirect()->back()->with('success', __('Comment status updated successfully!'));
     }
     
     
     public function toggleApprove(Comment $comment)
     {
         $this->repository->toggleApprove($comment);
-        return redirect()->back()->with('success', 'Şərhin təsdiq statusu dəyişdirildi');
+        return redirect()->back()->with('success', __('Comment approval status changed successfully!'));
     }
 
     
@@ -58,13 +58,13 @@ class CommentController extends Controller
         ]);
 
         $this->repository->storeAnswer($comment, ['text' => $request->text]);
-        return redirect()->back()->with('success', 'Cavab əlavə olundu');
+        return redirect()->back()->with('success', __('Reply added successfully!'));
     }
 
     public function destroyAnswer(CommentAnswer $answer)
     {
         $this->repository->deleteAnswer($answer);
-        return redirect()->back()->with('success', 'Cavab silindi');
+        return redirect()->back()->with('success', __('Reply deleted successfully!'));
     }
 
         

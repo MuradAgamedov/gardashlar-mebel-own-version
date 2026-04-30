@@ -79,11 +79,11 @@ class WhyChooseUsSliderController extends Controller
             ]);
 
             return redirect()->route('admin.why-choose-us-sliders.index')
-                ->with('success', 'Slider created successfully!');
+                ->with('success', __('Slider created successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error creating slider: ' . $e->getMessage())
+                ->with('error', __('Error creating slider: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -143,11 +143,11 @@ class WhyChooseUsSliderController extends Controller
             ]));
 
             return redirect()->route('admin.why-choose-us-sliders.index')
-                ->with('success', 'Slider updated successfully!');
+                ->with('success', __('Slider updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating slider: ' . $e->getMessage())
+                ->with('error', __('Error updating slider: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -160,10 +160,10 @@ class WhyChooseUsSliderController extends Controller
         try {
             $whyChooseUsSlider->delete();
             return redirect()->route('admin.why-choose-us-sliders.index')
-                ->with('success', 'Slider deleted successfully!');
+                ->with('success', __('Slider deleted successfully!'));
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting slider: ' . $e->getMessage());
+                ->with('error', __('Error deleting slider: :error', ['error' => $e->getMessage()]));
         }
     }
 

@@ -60,7 +60,7 @@ class RoluteeteActionController extends Controller
         }
 
         return redirect()->route('admin.roulette-actions.index')
-                         ->with('success', 'Roluteete Action created successfully!');
+                         ->with('success', __('Roulette Action created successfully!'));
     }
 
     public function edit($id)
@@ -114,7 +114,7 @@ class RoluteeteActionController extends Controller
         }
 
         return redirect()->route('admin.roulette-actions.index')
-                         ->with('success', 'Roluteete Action updated successfully!');
+                         ->with('success', __('Roulette Action updated successfully!'));
     }
 
     public function destroy($id)
@@ -129,7 +129,7 @@ class RoluteeteActionController extends Controller
         $action->delete();
 
         return redirect()->route('admin.roulette-actions.index')
-                         ->with('success', 'Roluteete Action deleted successfully!');
+                         ->with('success', __('Roulette Action deleted successfully!'));
     }
 
 
@@ -140,7 +140,7 @@ class RoluteeteActionController extends Controller
     $action->save();
 
     return redirect()->route('admin.roulette-actions.index')
-                     ->with('success', 'Status changed successfully!');
+                     ->with('success', __('Status changed successfully!'));
 }
 
 }

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 
 
@@ -12,7 +13,12 @@ use App\Http\Controllers\Admin\AuthController;
 
 
 
-Route::prefix('')->name('admin.')->group(function () {
+Route::group(
+    [
+        'prefix' => LaravelLocalization::setLocale()
+    ], function() {
+    
+    Route::prefix('')->name('admin.')->group(function () {
     // Auth routes (no middleware)
     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
@@ -79,7 +85,7 @@ Route::prefix('')->name('admin.')->group(function () {
         require __DIR__.'/web/users.php';
         require __DIR__.'/web/popupAd.php';
 
-
+    });
        
     });
 });

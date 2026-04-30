@@ -40,12 +40,12 @@ class PopupAdController extends Controller
             );
 
             return redirect()->route('admin.popup-ads.index')
-                ->with('success', 'PopupAd created successfully.');
+                ->with('success', __('PopupAd created successfully.'));
 
         } catch (\Exception $e) {
             dd($e->getMessage());
             return redirect()->back()->withInput()
-                ->with('error', 'Error creating popup ad: ' . $e->getMessage());
+                ->with('error', __('Error creating popup ad: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -70,12 +70,12 @@ class PopupAdController extends Controller
             );
 
             return redirect()->route('admin.popup-ads.index')
-                ->with('success', 'PopupAd updated successfully.');
+                ->with('success', __('PopupAd updated successfully.'));
 
         } catch (\Exception $e) {
             dd($e->getMessage());
             return redirect()->back()->withInput()
-                ->with('error', 'Error updating popup ad: ' . $e->getMessage());
+                ->with('error', __('Error updating popup ad: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -85,11 +85,11 @@ class PopupAdController extends Controller
             $this->repository->deletePopupAd($popupAd);
 
             return redirect()->route('admin.popup-ads.index')
-                ->with('success', 'PopupAd deleted successfully.');
+                ->with('success', __('PopupAd deleted successfully.'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting popup ad: ' . $e->getMessage());
+                ->with('error', __('Error deleting popup ad: :error', ['error' => $e->getMessage()]));
         }
     }
 

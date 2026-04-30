@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Pages Management</h3>
+                    <h3>{{ __('Pages Management') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -15,7 +15,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Pages</li>
+                        <li class="breadcrumb-item active">{{ __('Pages') }}</li>
                     </ol>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Pages List</h5>
+                            <h5>{{ __('Pages List') }}</h5>
                             {{-- <a href="{{ route('admin.pages.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a> --}}
@@ -52,19 +52,19 @@
                     <div class="card-body">
                         <div class="card overflow-hidden">
                             <div class="card-header card-no-border">
-                                <h3>Pages Table</h3>
-                                <p class="desc mb-0 mt-1">Manage your application pages.</p>
+                                <h3>{{ __('Pages Table') }}</h3>
+                                <p class="desc mb-0 mt-1">{{ __('Manage your application pages.') }}</p>
                             </div>
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead>
                                         <tr class="border-bottom-secondary border-top-0">
                                             {{-- <th scope="col">ID</th> --}}
-                                            <th scope="col">Title</th>
-                                            <th scope="col">Slug</th>
-                                            <th scope="col">Keyword</th>
-                                            <th scope="col">Status</th>
-                                            <th scope="col">Actions</th>
+                                            <th scope="col">{{ __('Title') }}</th>
+                                            <th scope="col">{{ __('Slug') }}</th>
+                                            <th scope="col">{{ __('Keyword') }}</th>
+                                            <th scope="col">{{ __('Status') }}</th>
+                                            <th scope="col">{{ __('Actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>

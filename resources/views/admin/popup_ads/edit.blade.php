@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Popup Ad</h3>
+                    <h3>{{ __('Edit Popup Ad') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.popup-ads.index') }}">Popup Ads</a>
+                            <a href="{{ route('admin.popup-ads.index') }}">{{ __('Popup Ads') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>

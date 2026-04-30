@@ -31,14 +31,14 @@ class ContactMessageController extends Controller
         $message = $this->repository->findMessage($id);
         $this->repository->deleteMessage($message);
         return redirect()->route('admin.contact-messages.index')
-            ->with('success', 'Message deleted successfully');
+            ->with('success', __('Message deleted successfully!'));
     }
 
     public function markAsRead(string $id)
     {
         $message = $this->repository->findMessage($id);
         $this->repository->markAsRead($message);
-        return redirect()->back()->with('success', 'Message marked as read');
+        return redirect()->back()->with('success', __('Message marked as read!'));
     }
 
     public function deleteSelected(Request $request)
@@ -53,9 +53,9 @@ class ContactMessageController extends Controller
         
         if ($idsArray && is_array($idsArray) && !empty($idsArray)) {
             $this->repository->deleteSelected($idsArray);
-            return response()->json(['success' => true, 'message' => 'Selected messages deleted successfully']);
+            return response()->json(['success' => true, 'message' => __('Selected messages deleted successfully')]);
         }
 
-        return response()->json(['success' => false, 'message' => 'No messages selected'], 400);
+        return response()->json(['success' => false, 'message' => __('No messages selected')], 400);
     }
 }

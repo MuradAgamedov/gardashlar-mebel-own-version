@@ -11,9 +11,17 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withProviders([
+        \Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider::class,
+    ])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'admin.auth' => \App\Http\Middleware\AdminAuth::class,
+            'locale' => \App\Http\Middleware\SetLocale::class,
+        ]);
+        
+        $middleware->web(append: [
+            \App\Http\Middleware\SetLocale::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

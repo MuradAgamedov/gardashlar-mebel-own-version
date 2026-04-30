@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Page</h3>
+                    <h3>{{ __('Edit Page') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -16,9 +16,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.pages.index') }}">Pages</a>
+                            <a href="{{ route('admin.pages.index') }}">{{ __('Pages') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>

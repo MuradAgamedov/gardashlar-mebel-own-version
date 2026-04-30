@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Popup Ads</h3>
+                    <h3>{{ __('Popup Ads') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -15,7 +15,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Popup Ads</li>
+                        <li class="breadcrumb-item active">{{ __('Popup Ads') }}</li>
                     </ol>
                 </div>
             </div>
@@ -48,7 +48,7 @@
 
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Popup Ads List</h5>
+                            <h5>{{ __('Popup Ads List') }}</h5>
                             <a href="{{ route('admin.popup-ads.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -64,9 +64,9 @@
                                         <tr>
                                             <th width="50">#</th>
                                             <th width="100">Image</th>
-                                            <th>Title</th>
-                                            <th>Status</th>
-                                            <th width="200">Actions</th>
+                                            <th>{{ __('Title') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th width="200">{{ __('Actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="sortable-list">

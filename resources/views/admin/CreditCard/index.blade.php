@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Credit Cards')
+@section('title', __('Credit Cards'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Credit Cards</h3>
+                    <h3>{{ __('Credit Cards') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Credit Cards</li>
+                        <li class="breadcrumb-item active">{{ __('Credit Cards') }}</li>
                     </ol>
                 </div>
             </div>
@@ -27,7 +27,7 @@
     <div class="container-fluid">
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Success:</h6>
+                <h6 class="alert-heading">{{ __('Success:') }}</h6>
                 <p class="mb-0">{{ session('success') }}</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -39,7 +39,7 @@
                     <div class="card-header">
                         <div class="row align-items-center">
                             <div class="col-md-6">
-                                <h5>Credit Cards</h5>
+                                <h5>{{ __('Credit Cards') }}</h5>
                             </div>
                             <div class="col-md-6">
                                 <div class="d-flex justify-content-end gap-2">
@@ -57,10 +57,10 @@
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th style="width: 50px;">#</th>
-                                            <th>Title</th>
-                                            <th>Image</th>
-                                            <th>Actions</th>
+                                            <th style="width: 50px;">{{ __('#') }}</th>
+                                            <th>{{ __('Title') }}</th>
+                                            <th>{{ __('Image') }}</th>
+                                            <th>{{ __('Actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="sortable">

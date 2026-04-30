@@ -140,11 +140,11 @@ class TestimonialController extends Controller
             }
 
             return redirect()->route('admin.testimonials.index')
-                ->with('success', 'Testimonial created successfully!');
+                ->with('success', __('Testimonial created successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error creating testimonial: ' . $e->getMessage())
+                ->with('error', __('Error creating testimonial: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -264,11 +264,11 @@ class TestimonialController extends Controller
             }
 
             return redirect()->route('admin.testimonials.index')
-                ->with('success', 'Testimonial updated successfully!');
+                ->with('success', __('Testimonial updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating testimonial: ' . $e->getMessage())
+                ->with('error', __('Error updating testimonial: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -281,10 +281,10 @@ class TestimonialController extends Controller
         try {
             $testimonial->delete();
             return redirect()->route('admin.testimonials.index')
-                ->with('success', 'Testimonial deleted successfully!');
+                ->with('success', __('Testimonial deleted successfully!'));
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting testimonial: ' . $e->getMessage());
+                ->with('error', __('Error deleting testimonial: :error', ['error' => $e->getMessage()]));
         }
     }
 

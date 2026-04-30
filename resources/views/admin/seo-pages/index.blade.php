@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>SEO Pages Management</h3>
+                    <h3>{{ __('SEO Pages Management') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -15,7 +15,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">SEO Pages</li>
+                        <li class="breadcrumb-item active">{{ __('SEO Pages') }}</li>
                     </ol>
                 </div>
             </div>
@@ -43,8 +43,8 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>SEO Pages List</h5>
-                            <a href="{{ route('admin.seo-pages.create') }}" class="btn btn-primary" title="Add New SEO Page">
+                            <h5>{{ __('SEO Pages List') }}</h5>
+                            <a href="{{ route('admin.seo-pages.create') }}" class="btn btn-primary" title="{{ __('Add New SEO Page') }}">
                                 <i class="material-icons-outlined">add</i>
                             </a>
                         </div>
@@ -54,14 +54,14 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Title</th>
-                                        <th>Category</th>
-                                        <th>Slug</th>
-                                        <th>Status</th>
-                                        <th>Languages</th>
-                                        <th>Created</th>
-                                        <th>Actions</th>
+                                        <th>{{ __('ID') }}</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th>{{ __('Category') }}</th>
+                                        <th>{{ __('Slug') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th>{{ __('Languages') }}</th>
+                                        <th>{{ __('Created') }}</th>
+                                        <th>{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>

@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Contact Messages')
+@section('title', __('Contact Messages'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Contact Messages</h3>
+                    <h3>{{ __('Contact Messages') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Contact Messages</li>
+                        <li class="breadcrumb-item active">{{ __('Contact Messages') }}</li>
                     </ol>
                 </div>
             </div>
@@ -27,7 +27,7 @@
     <div class="container-fluid">
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Success:</h6>
+                <h6 class="alert-heading">{{ __('Success:') }}</h6>
                 <p class="mb-0">{{ session('success') }}</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -39,7 +39,7 @@
                     <div class="card-header">
                         <div class="row align-items-center">
                             <div class="col-md-6">
-                                <h5>Contact Messages</h5>
+                                <h5>{{ __('Contact Messages') }}</h5>
                             </div>
                             <div class="col-md-6">
                                 <div class="d-flex justify-content-end gap-2">
@@ -59,7 +59,7 @@
                                            class="form-control" 
                                            name="search" 
                                            value="{{ request('search') }}" 
-                                           placeholder="Search by name, email, or city...">
+                                           placeholder="{{ __('Search by name, email, or city...') }}">
                                     <button type="submit" class="btn btn-primary">
                                         <i class="material-icons-outlined">search</i>
                                     </button>
@@ -69,9 +69,9 @@
                                 <form method="GET" action="{{ route('admin.contact-messages.index') }}" class="d-flex gap-2">
                                     <input type="hidden" name="search" value="{{ request('search') }}">
                                     <select name="status" class="form-select" onchange="this.form.submit()">
-                                        <option value="">All Messages</option>
-                                        <option value="unread" {{ request('status') === 'unread' ? 'selected' : '' }}>Unread</option>
-                                        <option value="read" {{ request('status') === 'read' ? 'selected' : '' }}>Read</option>
+                                        <option value="">{{ __('All Messages') }}</option>
+                                        <option value="unread" {{ request('status') === 'unread' ? 'selected' : '' }}>{{ __('Unread') }}</option>
+                                        <option value="read" {{ request('status') === 'read' ? 'selected' : '' }}>{{ __('Read') }}</option>
                                     </select>
                                     @if(request('search') || request('status'))
                                         <a href="{{ route('admin.contact-messages.index') }}" class="btn btn-secondary">
@@ -90,12 +90,12 @@
                                         <th>
                                             <input type="checkbox" id="selectAll" class="form-check-input">
                                         </th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>City</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                        <th>Actions</th>
+                                        <th>{{ __('Name') }}</th>
+                                        <th>{{ __('Email') }}</th>
+                                        <th>{{ __('City') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th>{{ __('Date') }}</th>
+                                        <th>{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -107,16 +107,16 @@
                                             <td>
                                                 <strong>{{ $message->name }}</strong>
                                                 @if(!$message->is_read)
-                                                    <span class="badge bg-danger ms-2">New</span>
+                                                    <span class="badge bg-danger ms-2">{{ __('New') }}</span>
                                                 @endif
                                             </td>
                                             <td>{{ $message->email }}</td>
                                             <td>{{ $message->city }}</td>
                                             <td>
                                                 @if($message->is_read)
-                                                    <span class="badge bg-success">Read</span>
+                                                    <span class="badge bg-success">{{ __('Read') }}</span>
                                                 @else
-                                                    <span class="badge bg-warning">Unread</span>
+                                                    <span class="badge bg-warning">{{ __('Unread') }}</span>
                                                 @endif
                                             </td>
                                             <td>{{ $message->created_at->format('d.m.Y H:i') }}</td>
@@ -124,13 +124,13 @@
                                                 <div class="btn-group" role="group">
                                                     <a href="{{ route('admin.contact-messages.show', $message->id) }}" 
                                                        class="btn btn-sm btn-primary" 
-                                                       title="View Message">
+                                                       title="{{ __('View Message') }}">
                                                         <i class="material-icons-outlined">visibility</i>
                                                     </a>
                                                     @if(!$message->is_read)
                                                         <form method="POST" action="{{ route('admin.contact-messages.mark-as-read', $message->id) }}" class="d-inline">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-sm btn-success" title="Mark as Read">
+                                                            <button type="submit" class="btn btn-sm btn-success" title="{{ __('Mark as Read') }}">
                                                                 <i class="material-icons-outlined">mark_email_read</i>
                                                             </button>
                                                         </form>
@@ -139,8 +139,8 @@
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-danger" 
-                                                                onclick="return confirm('Are you sure you want to delete this message?')"
-                                                                title="Delete">
+                                                                onclick="return confirm('{{ __('Are you sure you want to delete this message?') }}')"
+                                                                title="{{ __('Delete') }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
                                                     </form>
@@ -152,7 +152,7 @@
                                             <td colspan="7" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">inbox</i>
-                                                    <p class="mt-2">No messages found</p>
+                                                    <p class="mt-2">{{ __('No messages found') }}</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -219,11 +219,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const ids = Array.from(checkedBoxes).map(cb => cb.value);
 
         if (ids.length === 0) {
-            alert('Please select messages to delete');
+            alert('{{ __("Please select messages to delete") }}');
             return;
         }
 
-        if (!confirm(`Are you sure you want to delete ${ids.length} selected message(s)?`)) {
+        if (!confirm(`{{ __("Are you sure you want to delete selected message(s)?") }}`)) {
             return;
         }
 
@@ -240,12 +240,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 location.reload();
             } else {
-                alert(data.message || 'Error deleting messages');
+                alert(data.message || '{{ __("Error deleting messages") }}');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error deleting messages');
+            alert('{{ __("Error deleting messages") }}');
         });
     });
 });

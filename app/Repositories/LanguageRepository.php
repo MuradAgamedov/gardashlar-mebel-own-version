@@ -14,7 +14,7 @@ class LanguageRepository extends BaseRepository
     // Bütün dillər
     public function getAllLanguages()
     {
-        return $this->language->all();
+        return $this->language->orderBy('order')->get();
     }
 
     // Aktiv dillər

@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Create Credit Card')
+@section('title', __('Create Credit Card'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Create Credit Card</h3>
+                    <h3>{{ __('Create Credit Card') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.credit-cards.index') }}">Credit Cards</a>
+                            <a href="{{ route('admin.credit-cards.index') }}">{{ __('Credit Cards') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Create</li>
+                        <li class="breadcrumb-item active">{{ __('Create') }}</li>
                     </ol>
                 </div>
             </div>
@@ -37,7 +37,7 @@
 
         @if ($errors->any())
             <div class="alert alert-danger">
-                <h6 class="alert-heading">Validation Errors:</h6>
+                <h6 class="alert-heading">{{ __('Validation Errors:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -50,7 +50,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Create Credit Card</h5>
+                        <h5>{{ __('Create Credit Card') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.credit-cards.store') }}" method="POST" enctype="multipart/form-data">
@@ -58,14 +58,14 @@
 
                             {{-- Title --}}
                             <div class="mb-3">
-                                <label class="form-label">Title <span class="text-danger">*</span></label>
+                                <label class="form-label">{{ __('Title') }} <span class="text-danger">*</span></label>
                                 <input type="text" name="title" class="form-control"
                                        value="{{ old('title') }}" required>
                             </div>
 
                             {{-- Months --}}
                             <div class="mb-3">
-                                <label class="form-label">Months (e.g. 3, 6, 9, 12)</label>
+                                <label class="form-label">{{ __('Months (e.g. 3, 6, 9, 12)') }}</label>
                                 <input type="text" name="months" class="form-control"
                                        placeholder="Enter installment months (comma separated)"
                                        value="{{ old('months') }}">
@@ -76,7 +76,7 @@
 
                             {{-- Image --}}
                             <div class="mb-3">
-                                <label class="form-label">Image</label>
+                                <label class="form-label">{{ __('Image') }}</label>
                                 <input type="file" name="image" class="form-control" id="imageInput">
                                 <small class="form-text text-muted">
                                     Allowed types: jpg, jpeg, png, gif, webp (max 2MB)
@@ -84,7 +84,7 @@
 
                                 {{-- Preview --}}
                                 <div class="mt-3">
-                                    <img id="imagePreview" src="#" alt="Preview"
+                                    <img id="imagePreview" src="#" alt="{{ __('Preview') }}"
                                          style="display: none; max-height: 200px; border:1px solid #ddd; padding:4px; border-radius:6px;">
                                 </div>
                             </div>

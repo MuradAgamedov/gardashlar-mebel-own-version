@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Credit Card')
+@section('title', __('Edit Credit Card'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Credit Card</h3>
+                    <h3>{{ __('Edit Credit Card') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.credit-cards.index') }}">Credit Cards</a>
+                            <a href="{{ route('admin.credit-cards.index') }}">{{ __('Credit Cards') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>
@@ -51,7 +51,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Credit Card</h5>
+                        <h5>{{ __('Edit Credit Card') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.credit-cards.update', $creditCard->id) }}" method="POST" enctype="multipart/form-data">
@@ -60,14 +60,14 @@
 
                             {{-- Title --}}
                             <div class="mb-3">
-                                <label class="form-label">Title <span class="text-danger">*</span></label>
+                                <label class="form-label">{{ __('Title') }} <span class="text-danger">*</span></label>
                                 <input type="text" name="title" class="form-control" 
                                        value="{{ old('title', $creditCard->title) }}" required>
                             </div>
 
                             {{-- Months --}}
                             <div class="mb-3">
-                                <label class="form-label">Months (e.g. 3, 6, 9, 12)</label>
+                                <label class="form-label">{{ __('Months (e.g. 3, 6, 9, 12)') }}</label>
                                 <input type="text" name="months" class="form-control" 
                                        placeholder="Enter installment months (comma separated)"
                                        value="{{ old('months', $creditCard->months) }}">
@@ -78,7 +78,7 @@
 
                             {{-- Image Upload --}}
                             <div class="mb-3">
-                                <label class="form-label">Image</label>
+                                <label class="form-label">{{ __('Image') }}</label>
                                 <input type="file" name="image" class="form-control" id="imageInput">
                                 <small class="form-text text-muted">
                                     Allowed types: jpg, jpeg, png, gif, webp (max 2MB)

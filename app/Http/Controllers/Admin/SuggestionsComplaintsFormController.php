@@ -33,7 +33,7 @@ class SuggestionsComplaintsFormController extends Controller
         $form->delete();
         
         return redirect()->route('admin.suggestions-complaints-forms.index')
-            ->with('success', 'Form deleted successfully');
+            ->with('success', __('Form deleted successfully'));
     }
 
     public function deleteSelected(Request $request)
@@ -41,12 +41,12 @@ class SuggestionsComplaintsFormController extends Controller
         $ids = $request->input('ids', []);
         
         if (empty($ids)) {
-            return response()->json(['success' => false, 'message' => 'No forms selected']);
+            return response()->json(['success' => false, 'message' => __('No forms selected')]);
         }
         
         SuggestionsComplaintsForm::whereIn('id', $ids)->delete();
         
-        return response()->json(['success' => true, 'message' => 'Selected forms deleted successfully']);
+        return response()->json(['success' => true, 'message' => __('Selected forms deleted successfully')]);
     }
 
     public function markAsRead($id)
@@ -54,6 +54,6 @@ class SuggestionsComplaintsFormController extends Controller
         $form = SuggestionsComplaintsForm::findOrFail($id);
         $form->update(['is_read' => true]);
         
-        return response()->json(['success' => true, 'message' => 'Form marked as read']);
+        return response()->json(['success' => true, 'message' => __('Form marked as read')]);
     }
 } 

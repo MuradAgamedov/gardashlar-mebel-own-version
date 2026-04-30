@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Roulette Actions')
+@section('title', __('Roulette Actions'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Roulette Actions</h3>
+                    <h3>{{ __('Roulette Actions') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Roulette Actions</li>
+                        <li class="breadcrumb-item active">{{ __('Roulette Actions') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Actions</h5>
+                            <h5>{{ __('Actions') }}</h5>
                             <a href="{{ route('admin.roulette-actions.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -52,11 +52,11 @@
                         <table class="table table-bordered table-striped align-middle">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Image</th>
-                                    <th>Title</th>
-                                    <th>Status</th>
-                                    <th class="text-center">Actions</th>
+                                    <th>{{ __('ID') }}</th>
+                                    <th>{{ __('Image') }}</th>
+                                    <th>{{ __('Title') }}</th>
+                                    <th>{{ __('Status') }}</th>
+                                    <th class="text-center">{{ __('Actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

@@ -86,14 +86,14 @@ class SeoPageController extends Controller
         // Ən azı bir dildə tərcümə olmalıdır
         if (empty($translates)) {
             return back()
-                ->withErrors(['translates' => 'Ən azı bir dil üçün Title və Slug doldurulmalıdır.'])
+                ->withErrors(['translates' => __('At least one language must have Title and Slug filled.')])
                 ->withInput();
         }
 
         $this->repository->createSeoPage($data, $translates);
 
         return redirect()->route('admin.seo-pages.index')
-            ->with('success', 'SEO Page created successfully!');
+            ->with('success', __('SEO Page created successfully!'));
     }
 
     /**
@@ -148,7 +148,7 @@ class SeoPageController extends Controller
         $this->repository->updateSeoPage($id, $data, $translates);
 
         return redirect()->route('admin.seo-pages.index')
-            ->with('success', 'SEO Page updated successfully!');
+            ->with('success', __('SEO Page updated successfully!'));
     }
 
     /**
@@ -159,6 +159,6 @@ class SeoPageController extends Controller
         $this->repository->deleteSeoPage($id);
 
         return redirect()->route('admin.seo-pages.index')
-            ->with('success', 'SEO Page deleted successfully!');
+            ->with('success', __('SEO Page deleted successfully!'));
     }
 }

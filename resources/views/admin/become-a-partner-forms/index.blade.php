@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Become A Partner Forms')
+@section('title', __('Become A Partner Forms'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Become A Partner Forms</h3>
+                    <h3>{{ __('Become A Partner Forms') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Become A Partner Forms</li>
+                        <li class="breadcrumb-item active">{{ __('Become A Partner Forms') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Become A Partner Forms</h5>
+                            <h5>{{ __('Become A Partner Forms') }}</h5>
                             <div class="d-flex gap-2">
                                 <button type="button" id="deleteSelectedBtn" class="btn btn-danger" style="display: none;">
                                     <i class="material-icons-outlined">delete</i>
@@ -55,7 +55,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <form method="GET" action="{{ route('admin.become-a-partner-forms.index') }}" class="d-flex gap-2">
-                                    <input type="text" name="search" class="form-control" placeholder="Search by name, email, or mobile..." value="{{ request('search') }}">
+                                    <input type="text" name="search" class="form-control" placeholder="{{ __('Search by name, email, or mobile...') }}" value="{{ request('search') }}">
                                     <button type="submit" class="btn btn-primary">
                                         <i class="material-icons-outlined">search</i>
                                     </button>
@@ -67,9 +67,9 @@
                                         <input type="hidden" name="search" value="{{ request('search') }}">
                                     @endif
                                     <select name="status" class="form-select" onchange="this.form.submit()">
-                                        <option value="">All Status</option>
-                                        <option value="unread" {{ request('status') === 'unread' ? 'selected' : '' }}>Unread</option>
-                                        <option value="read" {{ request('status') === 'read' ? 'selected' : '' }}>Read</option>
+                                        <option value="">{{ __('All Status') }}</option>
+                                        <option value="unread" {{ request('status') === 'unread' ? 'selected' : '' }}>{{ __('Unread') }}</option>
+                                        <option value="read" {{ request('status') === 'read' ? 'selected' : '' }}>{{ __('Read') }}</option>
                                     </select>
                                 </form>
                             </div>
@@ -82,13 +82,13 @@
                                         <th width="50">
                                             <input type="checkbox" id="selectAll" class="form-check-input">
                                         </th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Mobile</th>
-                                        <th>File</th>
-                                        <th width="100">Status</th>
-                                        <th width="120">Date</th>
-                                        <th width="150">Actions</th>
+                                        <th>{{ __('Name') }}</th>
+                                        <th>{{ __('Email') }}</th>
+                                        <th>{{ __('Mobile') }}</th>
+                                        <th>{{ __('File') }}</th>
+                                        <th width="100">{{ __('Status') }}</th>
+                                        <th width="120">{{ __('Date') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -107,14 +107,14 @@
                                                         {{ $form->file_name }}
                                                     </a>
                                                 @else
-                                                    <span class="text-muted">No file</span>
+                                                    <span class="text-muted">{{ __('No file') }}</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if($form->is_read)
-                                                    <span class="badge bg-success">Read</span>
+                                                    <span class="badge bg-success">{{ __('Read') }}</span>
                                                 @else
-                                                    <span class="badge bg-warning">Unread</span>
+                                                    <span class="badge bg-warning">{{ __('Unread') }}</span>
                                                 @endif
                                             </td>
                                             <td>{{ $form->created_at->format('d.m.Y H:i') }}</td>
@@ -141,7 +141,7 @@
                                             <td colspan="8" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">inbox</i>
-                                                    <p class="mt-2">No forms found</p>
+                                                    <p class="mt-2">{{ __('No forms found') }}</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -212,13 +212,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
         
         Swal.fire({
-            title: 'Are you sure?',
-            text: `Do you want to delete ${checkedBoxes.length} selected form(s)?`,
+            title: '{{ __("Are you sure?") }}',
+            text: `{{ __("Do you want to delete selected form(s)?") }}`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete them!'
+            confirmButtonText: '{{ __("Yes, delete them!") }}'
         }).then((result) => {
             if (result.isConfirmed) {
                 const form = document.createElement('form');
@@ -265,13 +265,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to delete "${title}"?`,
+                title: '{{ __("Are you sure?") }}',
+                text: `{{ __("Do you want to delete this form?") }}`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __("Yes, delete it!") }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');
@@ -289,4 +289,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush 
+@endpush

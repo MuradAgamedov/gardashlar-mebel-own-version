@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Subscribers')
+@section('title', __('Subscribers'))
 
 @section('content')
 <div class="container-fluid">
@@ -8,8 +8,8 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Subscribers</h4>
-                    <p class="card-title-desc">Manage newsletter subscribers</p>
+                    <h4 class="card-title">{{ __('Subscribers') }}</h4>
+                    <p class="card-title-desc">{{ __('Manage newsletter subscribers') }}</p>
                 </div>
                 <div class="card-body">
                     
@@ -34,16 +34,16 @@
                                 <input type="text" 
                                        name="search" 
                                        class="form-control me-2" 
-                                       placeholder="Search by email..." 
+                                       placeholder="{{ __('Search by email...') }}" 
                                        value="{{ request('search') }}">
-                                <button type="submit" class="btn btn-primary">Search</button>
+                                <button type="submit" class="btn btn-primary">{{ __('Search') }}</button>
                                 @if(request('search'))
-                                    <a href="{{ route('admin.subscribers.index') }}" class="btn btn-secondary ms-2">Clear</a>
+                                    <a href="{{ route('admin.subscribers.index') }}" class="btn btn-secondary ms-2">{{ __('Clear') }}</a>
                                 @endif
                             </form>
                         </div>
                         <div class="col-md-6 text-end">
-                            <span class="badge bg-info">Total: {{ $subscribers->total() }} subscribers</span>
+                            <span class="badge bg-info">{{ __('Total: :count subscribers', ['count' => $subscribers->total()]) }}</span>
                         </div>
                     </div>
 
@@ -70,9 +70,9 @@
                                         <input type="checkbox" id="selectAll" onchange="toggleAll()">
                                         @endif
                                     </th>
-                                    <th>Email</th>
-                                    <th>Subscribed At</th>
-                                    <th>Actions</th>
+                                    <th>{{ __('Email') }}</th>
+                                    <th>{{ __('Subscribed At') }}</th>
+                                    <th>{{ __('Actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -101,8 +101,8 @@
                                 <tr>
                                     <td colspan="4" class="text-center py-4">
                                         <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                        <h5 class="text-muted">No subscribers found</h5>
-                                        <p class="text-muted">No email subscribers have been registered yet.</p>
+                                        <h5 class="text-muted">{{ __('No subscribers found') }}</h5>
+                                        <p class="text-muted">{{ __('No email subscribers have been registered yet.') }}</p>
                                     </td>
                                 </tr>
                                 @endforelse
@@ -132,20 +132,20 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <h5 class="modal-title" id="deleteModalLabel">{{ __('Confirm Delete') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete this subscriber?</p>
-                <p><strong>Email:</strong> <span id="subscriberEmail"></span></p>
-                <p class="text-danger">This action cannot be undone.</p>
+                <p>{{ __('Are you sure you want to delete this subscriber?') }}</p>
+                <p><strong>{{ __('Email:') }}</strong> <span id="subscriberEmail"></span></p>
+                <p class="text-danger">{{ __('This action cannot be undone.') }}</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
                 <form id="deleteForm" method="POST" style="display: inline;">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-danger">{{ __('Delete') }}</button>
                 </form>
             </div>
         </div>
@@ -157,16 +157,16 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="bulkDeleteModalLabel">Confirm Bulk Delete</h5>
+                <h5 class="modal-title" id="bulkDeleteModalLabel">{{ __('Confirm Bulk Delete') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete the selected subscribers?</p>
-                <p class="text-danger">This action cannot be undone.</p>
+                <p>{{ __('Are you sure you want to delete the selected subscribers?') }}</p>
+                <p class="text-danger">{{ __('This action cannot be undone.') }}</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" onclick="submitBulkDelete()">Delete Selected</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                <button type="button" class="btn btn-danger" onclick="submitBulkDelete()">{{ __('Delete Selected') }}</button>
             </div>
         </div>
     </div>
@@ -185,7 +185,7 @@ function confirmDelete(id, email) {
 function confirmBulkDelete() {
     const selectedCheckboxes = document.querySelectorAll('.subscriber-checkbox:checked');
     if (selectedCheckboxes.length === 0) {
-        alert('Please select at least one subscriber to delete.');
+        alert('{{ __("Please select at least one subscriber to delete.") }}');
         return;
     }
     new bootstrap.Modal(document.getElementById('bulkDeleteModal')).show();

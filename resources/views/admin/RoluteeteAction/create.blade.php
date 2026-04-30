@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Create Roulette Action')
+@section('title', __('Create Roulette Action'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Create Roulette Action</h3>
+                    <h3>{{ __('Create Roulette Action') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.roulette-actions.index') }}">Actions</a>
+                            <a href="{{ route('admin.roulette-actions.index') }}">{{ __('Actions') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Create</li>
+                        <li class="breadcrumb-item active">{{ __('Create') }}</li>
                     </ol>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Create New Action</h5>
+                        <h5>{{ __('Create New Action') }}</h5>
                     </div>
                     <div class="card-body">
                         {{-- Errors --}}
@@ -52,7 +52,7 @@
 
                             {{-- Image --}}
                             <div class="mb-3">
-                                <label for="image" class="form-label">Image</label>
+                                <label for="image" class="form-label">{{ __('Image') }}</label>
                                 <input type="file" name="image" id="image"
                                        class="form-control @error('image') is-invalid @enderror"
                                        accept="image/*">
@@ -69,11 +69,11 @@
 
                             {{-- Type --}}
                             <div class="mb-3">
-                                <label for="type" class="form-label">Type</label>
+                                <label for="type" class="form-label">{{ __('Type') }}</label>
                                 <select class="form-select @error('type') is-invalid @enderror" 
                                         id="type" name="type" required>
-                                    <option value="">-- Select Type --</option>
-                                    <option value="percent" {{ old('type') == 'percent' ? 'selected' : '' }}>Percent</option>
+                                    <option value="">{{ __('-- Select Type --') }}</option>
+                                    <option value="percent" {{ old('type') == 'percent' ? 'selected' : '' }}>{{ __('Percent') }}</option>
                                 </select>
                                 @error('type')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -82,7 +82,7 @@
 
                             {{-- Percent field (hidden by default) --}}
                             <div class="mb-3 d-none" id="percentField">
-                                <label for="percent_value" class="form-label">Percent Value</label>
+                                <label for="percent_value" class="form-label">{{ __('Percent Value') }}</label>
                                 <input type="number" 
                                        class="form-control @error('percent_value') is-invalid @enderror" 
                                        id="percent_value" 
@@ -116,7 +116,7 @@
 
                                         {{-- Title --}}
                                         <div class="mb-3">
-                                            <label class="form-label">Title ({{ $lang->lang_code }})</label>
+                                            <label class="form-label">{{ __('Title') }} ({{ $lang->lang_code }})</label>
                                             <input type="text" 
                                                    name="translations[{{ $lang->id }}][title]" 
                                                    class="form-control @error("translations.$lang->id.title") is-invalid @enderror" 
@@ -136,8 +136,8 @@
 
                             {{-- Buttons --}}
                             <div class="d-flex gap-2 mt-3">
-                                <button type="submit" class="btn btn-primary">Save</button>
-                                <a href="{{ route('admin.roulette-actions.index') }}" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                                <a href="{{ route('admin.roulette-actions.index') }}" class="btn btn-secondary">{{ __('Cancel') }}</a>
                             </div>
 
                         </form>

@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Suggestions & Complaints Forms')
+@section('title', __('Suggestions & Complaints Forms'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Suggestions & Complaints Forms</h3>
+                    <h3>{{ __('Suggestions & Complaints Forms') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Suggestions & Complaints</li>
+                        <li class="breadcrumb-item active">{{ __('Suggestions & Complaints') }}</li>
                     </ol>
                 </div>
             </div>
@@ -29,7 +29,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5>Suggestions & Complaints</h5>
+                        <h5>{{ __('Suggestions & Complaints') }}</h5>
                         <button id="deleteSelectedBtn" class="btn btn-danger" style="display:none;">
                             <i class="material-icons-outlined">delete</i>
                         </button>
@@ -48,14 +48,14 @@
                                 <thead>
                                     <tr>
                                         <th width="50"><input type="checkbox" id="selectAll"></th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Mobile</th>
-                                        <th>Message</th>
-                                        <th>File</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                        <th width="120">Actions</th>
+                                        <th>{{ __('Name') }}</th>
+                                        <th>{{ __('Email') }}</th>
+                                        <th>{{ __('Mobile') }}</th>
+                                        <th>{{ __('Message') }}</th>
+                                        <th>{{ __('File') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th>{{ __('Date') }}</th>
+                                        <th width="120">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -69,17 +69,17 @@
                                             <td>
                                                 @if($form->file)
                                                     <a href="{{ asset('storage/'.$form->file) }}" target="_blank" class="btn btn-sm btn-info">
-                                                        <i class="material-icons-outlined">download</i> File
+                                                        <i class="material-icons-outlined">download</i> {{ __('File') }}
                                                     </a>
                                                 @else
-                                                    <span class="text-muted">No file</span>
+                                                    <span class="text-muted">{{ __('No file') }}</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if($form->is_read)
-                                                    <span class="badge bg-success">Read</span>
+                                                    <span class="badge bg-success">{{ __('Read') }}</span>
                                                 @else
-                                                    <span class="badge bg-warning text-dark">Unread</span>
+                                                    <span class="badge bg-warning text-dark">{{ __('Unread') }}</span>
                                                 @endif
                                             </td>
                                             <td>{{ $form->created_at->format('d.m.Y H:i') }}</td>
@@ -103,7 +103,7 @@
                                         <tr>
                                             <td colspan="9" class="text-center text-muted py-4">
                                                 <i class="material-icons-outlined" style="font-size:40px;">inbox</i>
-                                                <p class="mt-2 mb-0">No forms found</p>
+                                                <p class="mt-2 mb-0">{{ __('No forms found') }}</p>
                                             </td>
                                         </tr>
                                     @endforelse
@@ -145,11 +145,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!ids.length) return;
 
         Swal.fire({
-            title: 'Are you sure?',
-            text: `Delete ${ids.length} selected form(s)?`,
+            title: '{{ __("Are you sure?") }}',
+            text: `{{ __("Delete selected form(s)?") }}`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Yes, delete',
+            confirmButtonText: '{{ __("Yes, delete") }}',
             confirmButtonColor: '#d33'
         }).then(result => {
             if (result.isConfirmed) {
@@ -186,11 +186,11 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             const id = btn.dataset.id;
             Swal.fire({
-                title: 'Are you sure?',
-                text: 'This form will be permanently deleted.',
+                title: '{{ __("Are you sure?") }}',
+                text: '{{ __("This form will be permanently deleted.") }}',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
+                confirmButtonText: '{{ __("Yes, delete it!") }}',
                 confirmButtonColor: '#d33'
             }).then(result => {
                 if (result.isConfirmed) {

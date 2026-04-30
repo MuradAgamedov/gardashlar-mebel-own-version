@@ -69,7 +69,7 @@ class VacancyFormController extends Controller
         $form = VacancyForm::findOrFail($id);
         $form->markAsRead();
 
-        return redirect()->back()->with('success', 'Form marked as read');
+        return redirect()->back()->with('success', __('Form marked as read'));
     }
 
     /**
@@ -80,7 +80,7 @@ class VacancyFormController extends Controller
         $form = VacancyForm::findOrFail($id);
         $form->update(['is_read' => false, 'read_at' => null]);
 
-        return redirect()->back()->with('success', 'Form marked as unread');
+        return redirect()->back()->with('success', __('Form marked as unread'));
     }
 
     /**
@@ -91,12 +91,12 @@ class VacancyFormController extends Controller
         $form = VacancyForm::findOrFail($id);
         
         if (!$form->file) {
-            return redirect()->back()->with('error', 'No file attached');
+            return redirect()->back()->with('error', __('No file attached'));
         }
 
         // Check if file exists in storage
         if (!Storage::exists($form->file)) {
-            return redirect()->back()->with('error', 'File not found in storage');
+            return redirect()->back()->with('error', __('File not found in storage'));
         }
 
         // Get original filename
@@ -121,6 +121,6 @@ class VacancyFormController extends Controller
         $form->delete();
 
         return redirect()->route('admin.vacancy-forms.index')
-            ->with('success', 'Form deleted successfully');
+            ->with('success', __('Form deleted successfully'));
     }
 }

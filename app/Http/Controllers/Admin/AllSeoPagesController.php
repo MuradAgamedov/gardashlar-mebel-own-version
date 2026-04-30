@@ -41,10 +41,10 @@ class AllSeoPagesController extends Controller
             $this->allSeoPagesRepository->update($request->all());
 
             return redirect()->route('admin.all-seo-pages.edit')
-                ->with('success', 'SEO Pages settings updated successfully!');
+                ->with('success', __('SEO Pages settings updated successfully!'));
         } catch (\Exception $e) {
             return redirect()->route('admin.all-seo-pages.edit')
-                ->with('error', 'An error occurred while updating SEO Pages settings: ' . $e->getMessage());
+                ->with('error', __('An error occurred while updating SEO Pages settings: :error', ['error' => $e->getMessage()]));
         }
     }
 }

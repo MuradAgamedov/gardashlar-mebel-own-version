@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Dictionary')
+@section('title', __('Dictionary'))
 
 @section('content')
 <div class="page-body">
@@ -10,7 +10,7 @@
                 <div class="col-6">
                     <h3>
                         <i class="material-icons-outlined">translate</i>
-                        Dictionary Management
+                        {{ __('Dictionary Management') }}
                     </h3>
                 </div>
                 <div class="col-6">
@@ -22,7 +22,7 @@
                         </li>
                         <li class="breadcrumb-item active">
                             <i class="material-icons-outlined">translate</i>
-                            Dictionary Management
+                            {{ __('Dictionary Management') }}
                         </li>
                     </ol>
                 </div>
@@ -52,7 +52,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>
                                 <i class="material-icons-outlined">translate</i>
-                                Dictionary Items
+                                {{ __('Dictionary Items') }}
                             </h5>
                             <a href="{{ route('admin.dictionaries.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
@@ -63,9 +63,9 @@
                             <div class="mt-2">
                                 <div class="alert alert-info alert-dismissible fade show" role="alert">
                                     <i class="material-icons-outlined">info</i>
-                                    <strong>Search Results:</strong>
-                                    <span class="badge bg-primary me-2">Keyword/Translation: "{{ request('search') }}"</span>
-                                    <span class="badge bg-secondary">{{ $dictionaries->count() }} result(s)</span>
+                                    <strong>{{ __('Search Results:') }}</strong>
+                                    <span class="badge bg-primary me-2">{{ __('Keyword/Translation: ":search"', ['search' => request('search')]) }}</span>
+                                    <span class="badge bg-secondary">{{ __(':count result(s)', ['count' => $dictionaries->count()]) }}</span>
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             </div>
@@ -106,15 +106,15 @@
                                     <tr>
                                         <th width="200">
                                             <i class="material-icons-outlined">key</i>
-                                            Keyword
+                                            {{ __('Keyword') }}
                                         </th>
                                         <th>
                                             <i class="material-icons-outlined">translate</i>
-                                            Translations
+                                            {{ __('Translations') }}
                                         </th>
                                         <th width="150">
                                             <i class="material-icons-outlined">settings</i>
-                                            Actions
+                                            {{ __('Actions') }}
                                         </th>
                                     </tr>
                                 </thead>
@@ -139,7 +139,7 @@
                                                     @else
                                                         <span class="badge bg-warning text-dark">
                                                             <i class="material-icons-outlined" style="font-size: 12px;">warning</i>
-                                                            No translations
+                                                            {{ __('No translations') }}
                                                         </span>
                                                     @endif
                                                 </div>

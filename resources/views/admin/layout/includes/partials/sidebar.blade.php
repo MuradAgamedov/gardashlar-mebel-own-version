@@ -7,71 +7,71 @@
       <li class="sidebar-list">
         <button class="sidebar-link cache-clear-btn" id="cache-clear-btn" type="button">
           <i class="fas fa-broom"></i>
-          <h6>Clear Cache</h6>
+          <h6>{{ __('Clear Cache') }}</h6>
         </button>
       </li>
 
       <!-- GENERAL -->
-      <li class="sidebar-main-title"><div><h5 class="sidebar-title">General</h5></div></li>
+      <li class="sidebar-main-title"><div><h5 class="sidebar-title">{{ __('General') }}</h5></div></li>
       <li class="sidebar-list">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-language"></i>
-          <h6>Languages & Dictionary</h6>
+          <h6>{{ __('Languages & Dictionary') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.languages.index') }}">Languages</a></li>
-          <li><a href="{{ route('admin.dictionaries.index') }}">Dictionary</a></li>
+          <li><a href="{{ route('admin.languages.index') }}">{{ __('Languages') }}</a></li>
+          <li><a href="{{ route('admin.dictionaries.index') }}">{{ __('Dictionary') }}</a></li>
         </ul>
       </li>
       <li class="sidebar-list">
         <a class="sidebar-link" href="{{ route('admin.pages.index') }}">
           <i class="fas fa-file-alt"></i>
-          <h6>Pages</h6>
+          <h6>{{ __('Pages') }}</h6>
         </a>
       </li>
       <li class="sidebar-list">
         <a class="sidebar-link" href="{{ route('admin.all-seo-pages.edit') }}">
           <i class="fas fa-search-plus"></i>
-          <h6>All SEO Pages</h6>
+          <h6>{{ __('All SEO Pages') }}</h6>
         </a>
       </li>
         <li class="sidebar-list">
     <a class="sidebar-link" href="{{ route('admin.popup-ads.index') }}">
         <i class="fas fa-rectangle-ad"></i>
-        <h6>Popup Ads</h6>
+        <h6>{{ __('Popup Ads') }}</h6>
     </a>
 </li>
 
       <li class="sidebar-list">
         <a class="sidebar-link" href="{{ route('admin.seo-pages.index') }}">
           <i class="fas fa-file-alt"></i>
-          <h6>SEO Pages</h6>
+          <h6>{{ __('SEO Pages') }}</h6>
         </a>
       </li>
 
       <li class="sidebar-list">
         <a class="sidebar-link" href="{{ route('admin.roulette-actions.index') }}">
           <i class="fas fa-file-alt"></i>
-          <h6>Roulette Actions</h6>
+          <h6>{{ __('Roulette Actions') }}</h6>
         </a>
       </li>
       <li class="sidebar-list">
         <a class="sidebar-link" href="{{ route('admin.orders.index') }}">
           <i class="fas fa-file-alt"></i>
-          <h6>Orders</h6>
+          <h6>{{ __('Orders') }}</h6>
         </a>
       </li>
       <li class="sidebar-list">
         <a class="sidebar-link" href="{{ route('admin.credit-cards.index') }}">
           <i class="fas fa-file-alt"></i>
-          <h6>Credit Cards</h6>
+          <h6>{{ __('Credit Cards') }}</h6>
         </a>
       </li>
       <li class="sidebar-list">
         <a class="sidebar-link" href="{{ route('admin.comments.index') }}">
           <i class="fas fa-file-alt"></i>
-          <h6>Comments</h6>
+          <h6>{{ __('Comments') }}</h6>
         </a>
       </li>
 
@@ -80,7 +80,7 @@
               <li class="sidebar-list">
           <a class="sidebar-link" href="{{ route('admin.contact-messages.index') }}">
             <i class="fas fa-envelope"></i>
-            <h6>Contact Messages</h6>
+            <h6>{{ __('Contact Messages') }}</h6>
             @php
               $unreadCount = \App\Models\ContactMessage::where('is_read', false)->count();
             @endphp
@@ -93,7 +93,7 @@
         <li class="sidebar-list">
           <a class="sidebar-link" href="{{ route('admin.become-a-partner-forms.index') }}">
             <i class="fas fa-handshake"></i>
-            <h6>Partner Forms</h6>
+            <h6>{{ __('Partner Forms') }}</h6>
             @php
               $unreadPartnerForms = \App\Models\BecomeAPartnerForm::where('is_read', false)->count();
             @endphp
@@ -106,7 +106,7 @@
         <li class="sidebar-list">
           <a class="sidebar-link" href="{{ route('admin.become-a-investor-forms.index') }}">
             <i class="fas fa-chart-line"></i>
-            <h6>Investor Forms</h6>
+            <h6>{{ __('Investor Forms') }}</h6>
             @php
               $unreadInvestorForms = \App\Models\BecomeAInvestorForm::where('is_read', false)->count();
             @endphp
@@ -119,7 +119,7 @@
         <li class="sidebar-list">
           <a class="sidebar-link" href="{{ route('admin.service-forms.index') }}">
             <i class="fas fa-cogs"></i>
-            <h6>Service Forms</h6>
+            <h6>{{ __('Service Forms') }}</h6>
             @php
               $unreadServiceForms = \App\Models\ServiceForm::where('is_read', false)->count();
             @endphp
@@ -132,7 +132,7 @@
         <li class="sidebar-list">
           <a class="sidebar-link" href="{{ route('admin.suggest-a-place-forms.index') }}">
             <i class="fas fa-map-marker-alt"></i>
-            <h6>Place Forms</h6>
+            <h6>{{ __('Place Forms') }}</h6>
             @php
               $unreadPlaceForms = \App\Models\SuggestAPlaceForm::where('is_read', false)->count();
             @endphp
@@ -145,7 +145,7 @@
         <li class="sidebar-list">
           <a class="sidebar-link" href="{{ route('admin.vacancy-forms.index') }}">
             <i class="fas fa-briefcase"></i>
-            <h6>Vacancy Forms</h6>
+            <h6>{{ __('Vacancy Forms') }}</h6>
             @php
               $unreadVacancyForms = \App\Models\VacancyForm::where('is_read', false)->count();
             @endphp
@@ -158,7 +158,7 @@
         <li class="sidebar-list">
           <a class="sidebar-link" href="{{ route('admin.subscribers.index') }}">
             <i class="fas fa-envelope-open-text"></i>
-            <h6>Subscribers</h6>
+            <h6>{{ __('Subscribers') }}</h6>
             @php
               $subscriberCount = \App\Models\Subscriber::count();
             @endphp
@@ -169,157 +169,157 @@
         </li>
 
       <!-- CONTENT MANAGEMENT -->
-      <li class="sidebar-main-title"><div><h5 class="sidebar-title">Content Management</h5></div></li>
+      <li class="sidebar-main-title"><div><h5 class="sidebar-title">{{ __('Content Management') }}</h5></div></li>
       <li class="sidebar-list">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-layer-group"></i>
-          <h6>Homepage Sections</h6>
+          <h6>{{ __('Homepage Sections') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.why-choose-us.edit') }}">Why Choose Us</a></li>
-          <li><a href="{{ route('admin.why-choose-us-sliders.index') }}">Why Choose Us Slider</a></li>
-          <li><a href="{{ route('admin.testimonials.index') }}">Testimonials</a></li>
-          <li><a href="{{ route('admin.home-page-projects.index') }}">Home Page Projects</a></li>
-          <li><a href="{{ route('admin.home-page-categories.index') }}">Home Page Categories</a></li>
-          <li><a href="{{route('admin.home-page-discount.edit')}}">Home Page Discount</a></li>
+          <li><a href="{{ route('admin.why-choose-us.edit') }}">{{ __('Why Choose Us') }}</a></li>
+          <li><a href="{{ route('admin.why-choose-us-sliders.index') }}">{{ __('Why Choose Us Slider') }}</a></li>
+          <li><a href="{{ route('admin.testimonials.index') }}">{{ __('Testimonials') }}</a></li>
+          <li><a href="{{ route('admin.home-page-projects.index') }}">{{ __('Home Page Projects') }}</a></li>
+          <li><a href="{{ route('admin.home-page-categories.index') }}">{{ __('Home Page Categories') }}</a></li>
+          <li><a href="{{route('admin.home-page-discount.edit')}}">{{ __('Home Page Discount') }}</a></li>
         </ul>
       </li>
 
       <li class="sidebar-list">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-phone"></i>
-          <h6>Contact</h6>
+          <h6>{{ __('Contact') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.phones.index') }}">Phone</a></li>
-          <li><a href="{{ route('admin.addresses.index') }}">Address</a></li>
-          <li><a href="{{ route('admin.emails.index') }}">Email</a></li>
-          <li><a href="{{ route('admin.maps.index') }}">Map</a></li>
-          <li><a href="{{ route('admin.social-networks.index') }}">Social Networks</a></li>
+          <li><a href="{{ route('admin.phones.index') }}">{{ __('Phone') }}</a></li>
+          <li><a href="{{ route('admin.addresses.index') }}">{{ __('Address') }}</a></li>
+          <li><a href="{{ route('admin.emails.index') }}">{{ __('Email') }}</a></li>
+          <li><a href="{{ route('admin.maps.index') }}">{{ __('Map') }}</a></li>
+          <li><a href="{{ route('admin.social-networks.index') }}">{{ __('Social Networks') }}</a></li>
         </ul>
       </li>
 
       <li class="sidebar-list">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-photo-video"></i>
-          <h6>KIV Management</h6>
+          <h6>{{ __('KIV Management') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.kiv-categories.index') }}">KIV Categories</a></li>
-          <li><a href="{{ route('admin.kivs.index') }}">KIVs</a></li>
+          <li><a href="{{ route('admin.kiv-categories.index') }}">{{ __('KIV Categories') }}</a></li>
+          <li><a href="{{ route('admin.kivs.index') }}">{{ __('KIVs') }}</a></li>
         </ul>
       </li>
 
       <!-- PARTNERSHIP -->
-      <li class="sidebar-main-title"><div><h5 class="sidebar-title">Partnership</h5></div></li>
+      <li class="sidebar-main-title"><div><h5 class="sidebar-title">{{ __('Partnership') }}</h5></div></li>
       <li class="sidebar-list">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-handshake"></i>
-          <h6>Partner Sections</h6>
+          <h6>{{ __('Partner Sections') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.become-a-partner.edit') }}">Become A Partner</a></li>
-          <li><a href="{{ route('admin.become-a-investor.edit') }}">Become An Investor</a></li>
-          <li><a href="{{ route('admin.partner-sliders.index') }}">Partner Slider</a></li>
+          <li><a href="{{ route('admin.become-a-partner.edit') }}">{{ __('Become A Partner') }}</a></li>
+          <li><a href="{{ route('admin.become-a-investor.edit') }}">{{ __('Become An Investor') }}</a></li>
+          <li><a href="{{ route('admin.partner-sliders.index') }}">{{ __('Partner Slider') }}</a></li>
         </ul>
       </li>
 
       <!-- POLICIES -->
-      <li class="sidebar-main-title"><div><h5 class="sidebar-title">Policies & Info</h5></div></li>
+      <li class="sidebar-main-title"><div><h5 class="sidebar-title">{{ __('Policies & Info') }}</h5></div></li>
       <li class="sidebar-list">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-shield-alt"></i>
-          <h6>Customer Policies</h6>
+          <h6>{{ __('Customer Policies') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.customer-rights.edit') }}">Customer Rights</a></li>
-          <li><a href="{{ route('admin.delivery-payment.edit') }}">Delivery & Payment</a></li>
-          <li><a href="{{ route('admin.warranty-policy.edit') }}">Warranty Policy</a></li>
-          <li><a href="{{ route('admin.refund-policy.edit') }}">Refund Policy</a></li>
-          <li><a href="{{ route('admin.site-usage-rules.edit') }}">Site Usage Rules</a></li>
-          <li><a href="{{ route('admin.privacy-policy.edit') }}">Privacy Policy</a></li>
+          <li><a href="{{ route('admin.customer-rights.edit') }}">{{ __('Customer Rights') }}</a></li>
+          <li><a href="{{ route('admin.delivery-payment.edit') }}">{{ __('Delivery & Payment') }}</a></li>
+          <li><a href="{{ route('admin.warranty-policy.edit') }}">{{ __('Warranty Policy') }}</a></li>
+          <li><a href="{{ route('admin.refund-policy.edit') }}">{{ __('Refund Policy') }}</a></li>
+          <li><a href="{{ route('admin.site-usage-rules.edit') }}">{{ __('Site Usage Rules') }}</a></li>
+          <li><a href="{{ route('admin.privacy-policy.edit') }}">{{ __('Privacy Policy') }}</a></li>
         </ul>
       </li>
 
       <!-- SERVICES -->
-      <li class="sidebar-main-title"><div><h5 class="sidebar-title">Services</h5></div></li>
+      <li class="sidebar-main-title"><div><h5 class="sidebar-title">{{ __('Services') }}</h5></div></li>
       <li class="sidebar-list">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-cogs"></i>
-          <h6>Services</h6>
+          <h6>{{ __('Services') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.services.index') }}">Services</a></li>
-          <li><a href="{{ route('admin.service-static-data.edit') }}">Service Static Data</a></li>
-          <li><a href="{{ route('admin.individual-project-orders.index') }}">Individual Project Orders</a></li>
+          <li><a href="{{ route('admin.services.index') }}">{{ __('Services') }}</a></li>
+          <li><a href="{{ route('admin.service-static-data.edit') }}">{{ __('Service Static Data') }}</a></li>
+          <li><a href="{{ route('admin.individual-project-orders.index') }}">{{ __('Individual Project Orders') }}</a></li>
         </ul>
       </li>
 
       <li class="sidebar-list">
         <a class="sidebar-link" href="{{ route('admin.catalogs.index') }}">
           <i class="fas fa-book"></i>
-          <h6>Catalogs</h6>
+          <h6>{{ __('Catalogs') }}</h6>
         </a>
       </li>
 
             <li class="sidebar-list">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-project-diagram"></i>
-          <h6>Projects</h6>
+          <h6>{{ __('Projects') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.project-categories.index') }}">Project Categories</a></li>
-          <li><a href="{{ route('admin.projects.index') }}">Projects</a></li>
-          <li><a href="{{ route('admin.home-page-project-categories.index') }}">Home Page Project Categories</a></li>
+          <li><a href="{{ route('admin.project-categories.index') }}">{{ __('Project Categories') }}</a></li>
+          <li><a href="{{ route('admin.projects.index') }}">{{ __('Projects') }}</a></li>
+          <li><a href="{{ route('admin.home-page-project-categories.index') }}">{{ __('Home Page Project Categories') }}</a></li>
         </ul>
       </li>
 
       <li class="sidebar-list">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-box"></i>
-          <h6>Products</h6>
+          <h6>{{ __('Products') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.product-categories.index') }}">Product Categories</a></li>
-          <li><a href="{{ route('admin.product-types.index') }}">Product Types</a></li>
-          <li><a href="{{ route('admin.product-price-filters.index') }}">Price Filters</a></li>
-          <li><a href="{{ route('admin.product-page-categories.index') }}">Product page categories</a></li>
-          <li><a href="{{ route('admin.hero-categories.index') }}">Hero Categories</a></li>
-          <li><a href="{{ route('admin.hero-products.index') }}">Hero Products</a></li>
+          <li><a href="{{ route('admin.product-categories.index') }}">{{ __('Product Categories') }}</a></li>
+          <li><a href="{{ route('admin.product-types.index') }}">{{ __('Product Types') }}</a></li>
+          <li><a href="{{ route('admin.product-price-filters.index') }}">{{ __('Price Filters') }}</a></li>
+          <li><a href="{{ route('admin.product-page-categories.index') }}">{{ __('Product page categories') }}</a></li>
+          <li><a href="{{ route('admin.hero-categories.index') }}">{{ __('Hero Categories') }}</a></li>
+          <li><a href="{{ route('admin.hero-products.index') }}">{{ __('Hero Products') }}</a></li>
 
-          <li><a href="{{ route('admin.product-colors.index') }}">Product Colors</a></li>
-          <li><a href="{{ route('admin.product-tags.index') }}">Product Tags</a></li>
-          <li><a href="{{ route('admin.products.index') }}">Products</a></li>
-          <li><a href="{{ route('admin.catalogs.index') }}">Catalogs</a></li>
+          <li><a href="{{ route('admin.product-colors.index') }}">{{ __('Product Colors') }}</a></li>
+          <li><a href="{{ route('admin.product-tags.index') }}">{{ __('Product Tags') }}</a></li>
+          <li><a href="{{ route('admin.products.index') }}">{{ __('Products') }}</a></li>
+          <li><a href="{{ route('admin.catalogs.index') }}">{{ __('Catalogs') }}</a></li>
 
         </ul>
       </li>
 
 
       <!-- OTHERS -->
-      <li class="sidebar-main-title"><div><h5 class="sidebar-title">Other Sections</h5></div></li>
+      <li class="sidebar-main-title"><div><h5 class="sidebar-title">{{ __('Other Sections') }}</h5></div></li>
       <li class="sidebar-list">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-th-list"></i>
-          <h6>General Content</h6>
+          <h6>{{ __('General Content') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.certificates.index') }}">Certificates</a></li>
-          <li><a href="{{ route('admin.our-goals.index') }}">Our Goals</a></li>
-          <li><a href="{{ route('admin.simple-images.index') }}">Simple Images</a></li>
-          <li><a href="{{ route('admin.currencies.index') }}">Currencies</a></li>
-          <li><a href="{{ route('admin.suggest-a-place.edit') }}">Suggest A Place</a></li>
-          <li><a href="{{ route('admin.suggestions-complaints.edit') }}">Suggestions & Complaints</a></li>
-          <li><a href="{{ route('admin.suggestions-complaints-forms.index') }}">Suggestions & Complaints Forms
+          <li><a href="{{ route('admin.certificates.index') }}">{{ __('Certificates') }}</a></li>
+          <li><a href="{{ route('admin.our-goals.index') }}">{{ __('Our Goals') }}</a></li>
+          <li><a href="{{ route('admin.simple-images.index') }}">{{ __('Simple Images') }}</a></li>
+          <li><a href="{{ route('admin.currencies.index') }}">{{ __('Currencies') }}</a></li>
+          <li><a href="{{ route('admin.suggest-a-place.edit') }}">{{ __('Suggest A Place') }}</a></li>
+          <li><a href="{{ route('admin.suggestions-complaints.edit') }}">{{ __('Suggestions & Complaints') }}</a></li>
+          <li><a href="{{ route('admin.suggestions-complaints-forms.index') }}">{{ __('Suggestions & Complaints Forms') }}
             @php
               $unreadSuggestionsForms = \App\Models\SuggestionsComplaintsForm::where('is_read', false)->count();
             @endphp
@@ -327,27 +327,27 @@
               <span class="badge bg-danger ms-2">{{ $unreadSuggestionsForms }}</span>
             @endif
           </a></li>
-          <li><a href="{{ route('admin.suggestions.index') }}">Suggestions</a></li>
-          <li><a href="{{ route('admin.abouts.index') }}">About us</a></li>
-          <li><a href="{{ route('admin.administrations.index') }}">Administrations</a></li>
-          <li><a href="{{ route('admin.campaigns.index') }}">Campaigns</a></li>
-          <li><a href="{{ route('admin.actions.index') }}">Actions</a></li>
-          <li><a href="{{ route('admin.company-management.edit') }}">Company Management</a></li>
-          <li><a href="{{ route('admin.reports.index') }}">Reports</a></li>
-          <li><a href="{{ route('admin.faqs.index') }}">FAQs</a></li>
-          <li><a href="{{ route('admin.vacancies.index') }}">Vacancies</a></li>
+          <li><a href="{{ route('admin.suggestions.index') }}">{{ __('Suggestions') }}</a></li>
+          <li><a href="{{ route('admin.abouts.index') }}">{{ __('About us') }}</a></li>
+          <li><a href="{{ route('admin.administrations.index') }}">{{ __('Administrations') }}</a></li>
+          <li><a href="{{ route('admin.campaigns.index') }}">{{ __('Campaigns') }}</a></li>
+          <li><a href="{{ route('admin.actions.index') }}">{{ __('Actions') }}</a></li>
+          <li><a href="{{ route('admin.company-management.edit') }}">{{ __('Company Management') }}</a></li>
+          <li><a href="{{ route('admin.reports.index') }}">{{ __('Reports') }}</a></li>
+          <li><a href="{{ route('admin.faqs.index') }}">{{ __('FAQs') }}</a></li>
+          <li><a href="{{ route('admin.vacancies.index') }}">{{ __('Vacancies') }}</a></li>
         </ul>
       </li>
 
       <li class="sidebar-list">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-blog"></i>
-          <h6>Blogs</h6>
+          <h6>{{ __('Blogs') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
                       <ul class="sidebar-submenu">
-                <li><a href="{{ route('admin.blog-categories.index') }}">Blog Categories</a></li>
-                <li><a href="{{ route('admin.blog-posts.index') }}">Blog Posts</a></li>
+                <li><a href="{{ route('admin.blog-categories.index') }}">{{ __('Blog Categories') }}</a></li>
+                <li><a href="{{ route('admin.blog-posts.index') }}">{{ __('Blog Posts') }}</a></li>
               </ul>
       </li>
 
@@ -366,7 +366,7 @@
       <li class="sidebar-list">
         <a class="sidebar-link" href="{{route('admin.registered-users')}}">
           <i class="fas fa-blog"></i>
-          <h6>Users</h6>
+          <h6>{{ __('Users') }}</h6>
         </a>
                 
       </li>

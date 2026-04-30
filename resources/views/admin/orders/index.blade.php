@@ -1,11 +1,11 @@
 @extends('admin.layout.app')
 
-@section('title', 'Orders Management')
+@section('title', __('Orders Management'))
 
 @section('content')
 <div class="page-body">
     <div class="container-fluid">
-        <h3 class="mb-4">Orders</h3>
+        <h3 class="mb-4">{{ __('Orders') }}</h3>
 
         <!-- Filter Section -->
         <div class="card mb-4">
@@ -13,30 +13,30 @@
                 <form method="GET" action="{{ route('admin.orders.index') }}" id="filter-form">
                     <div class="row g-3">
                         <div class="col-md-4">
-                            <label for="delivery_method" class="form-label">Delivery Method</label>
+                            <label for="delivery_method" class="form-label">{{ __('Delivery Method') }}</label>
                             <select name="delivery_method" id="delivery_method" class="form-select">
-                                <option value="">All Delivery Methods</option>
-                                <option value="pickup" {{ request('delivery_method') == 'pickup' ? 'selected' : '' }}>Pickup</option>
-                                <option value="delivery" {{ request('delivery_method') == 'delivery' ? 'selected' : '' }}>Delivery</option>
-                                <option value="express" {{ request('delivery_method') == 'express' ? 'selected' : '' }}>Express</option>
+                                <option value="">{{ __('All Delivery Methods') }}</option>
+                                <option value="pickup" {{ request('delivery_method') == 'pickup' ? 'selected' : '' }}>{{ __('Pickup') }}</option>
+                                <option value="delivery" {{ request('delivery_method') == 'delivery' ? 'selected' : '' }}>{{ __('Delivery') }}</option>
+                                <option value="express" {{ request('delivery_method') == 'express' ? 'selected' : '' }}>{{ __('Express') }}</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label for="payment_method" class="form-label">Payment Method</label>
+                            <label for="payment_method" class="form-label">{{ __('Payment Method') }}</label>
                             <select name="payment_method" id="payment_method" class="form-select">
-                                <option value="">All Payment Methods</option>
-                                <option value="cash" {{ request('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
-                                <option value="card" {{ request('payment_method') == 'card' ? 'selected' : '' }}>Card</option>
-                                <option value="credit" {{ request('payment_method') == 'credit' ? 'selected' : '' }}>Credit</option>
-                                <option value="online" {{ request('payment_method') == 'online' ? 'selected' : '' }}>Online</option>
+                                <option value="">{{ __('All Payment Methods') }}</option>
+                                <option value="cash" {{ request('payment_method') == 'cash' ? 'selected' : '' }}>{{ __('Cash') }}</option>
+                                <option value="card" {{ request('payment_method') == 'card' ? 'selected' : '' }}>{{ __('Card') }}</option>
+                                <option value="credit" {{ request('payment_method') == 'credit' ? 'selected' : '' }}>{{ __('Credit') }}</option>
+                                <option value="online" {{ request('payment_method') == 'online' ? 'selected' : '' }}>{{ __('Online') }}</option>
                             </select>
                         </div>
                         <div class="col-md-4 d-flex align-items-end">
                             <div class="btn-group w-100">
-                                <button type="submit" class="btn btn-primary" title="Filter">
+                                <button type="submit" class="btn btn-primary" title="{{ __('Filter') }}">
                                     <i class="fas fa-filter"></i>
                                 </button>
-                                <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary" title="Clear">
+                                <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary" title="{{ __('Clear') }}">
                                     <i class="fas fa-times"></i>
                                 </a>
                             </div>
@@ -49,17 +49,17 @@
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Full Name</th>
-                    <th>Fin</th>
-                    <th>Phone</th>
-                    <th>Email</th>
-                    <th>City</th>
-                    <th>Products</th>
-                    <th>Status</th>
-                    <th>Payment Status</th>
-                    <th>Credit Card</th>
-                    <th>Actions</th>
+                    <th>{{ __('#') }}</th>
+                    <th>{{ __('Full Name') }}</th>
+                    <th>{{ __('Fin') }}</th>
+                    <th>{{ __('Phone') }}</th>
+                    <th>{{ __('Email') }}</th>
+                    <th>{{ __('City') }}</th>
+                    <th>{{ __('Products') }}</th>
+                    <th>{{ __('Status') }}</th>
+                    <th>{{ __('Payment Status') }}</th>
+                    <th>{{ __('Credit Card') }}</th>
+                    <th>{{ __('Actions') }}</th>
                 </tr>
             </thead>
             <tbody>

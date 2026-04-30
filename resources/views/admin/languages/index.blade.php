@@ -1,12 +1,38 @@
 @extends('admin.layout.app')
 
 @section('content')
-<div class="page-body">
+<style>
+/* Languages page heading fixes */
+.languages-page .page-title h3 {
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.languages-page .card-header h5 {
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 0 !important;
+}
+
+.languages-page .card-header.card-no-border h3 {
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.languages-page .card-header.card-no-border p {
+    font-size: 0.875rem !important;
+    color: #6c757d !important;
+    margin-bottom: 0 !important;
+}
+</style>
+<div class="page-body languages-page">
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Languages Management</h3>
+                    <h3>{{ __('Languages Management') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -15,7 +41,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Languages</li>
+                        <li class="breadcrumb-item active">{{ __('Languages') }}</li>
                     </ol>
                 </div>
             </div>
@@ -43,7 +69,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Languages List</h5>
+                            <h5>{{ __('Languages List') }}</h5>
                             <a href="{{ route('admin.languages.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -52,21 +78,22 @@
                     <div class="card-body">
                         <div class="card overflow-hidden">
                             <div class="card-header card-no-border">
-                                <h3>Languages Table</h3>
-                                <p class="desc mb-0 mt-1">Manage your application languages. Drag and drop to reorder.</p>
+                                <h3>{{ __('Languages Table') }}</h3>
+                                <p class="desc mb-0 mt-1">{{ __('Manage your application languages. Drag and drop to reorder.') }}</p>
                             </div>
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead>
                                         <tr class="border-bottom-secondary border-top-0">
+                                            <th scope="col" style="width: 50px;"></th>
                                             <th scope="col" style="width: 50px;">#</th>
-                                            <th scope="col">Title</th>
-                                            <th scope="col">Language Code</th>
-                                            <th scope="col">Language Name</th>
-                                            <th scope="col">Order</th>
-                                            <th scope="col">Status</th>
-                                            <th scope="col">Main Language</th>
-                                            <th scope="col">Actions</th>
+                                            <th scope="col">{{ __('Title') }}</th>
+                                            <th scope="col">{{ __('Language Code') }}</th>
+                                            <th scope="col">{{ __('Language Name') }}</th>
+                                            <th scope="col">{{ __('Order') }}</th>
+                                            <th scope="col">{{ __('Status') }}</th>
+                                            <th scope="col">{{ __('Main Language') }}</th>
+                                            <th scope="col">{{ __('Actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="sortable-languages">
@@ -89,16 +116,16 @@
                                             <td>{{ $language->order }}</td>
                                             <td>
                                                 @if($language->status)
-                                                    <span class="badge badge-light-success">Active</span>
+                                                    <span class="badge badge-light-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge badge-light-danger">Inactive</span>
+                                                    <span class="badge badge-light-danger">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if($language->is_main_language)
-                                                    <span class="badge badge-light-warning">Main</span>
+                                                    <span class="badge badge-light-warning">{{ __('Main') }}</span>
                                                 @else
-                                                    <span class="badge badge-light-secondary">Secondary</span>
+                                                    <span class="badge badge-light-secondary">{{ __('Secondary') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -118,7 +145,7 @@
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="8" class="text-center">No languages found</td>
+                                            <td colspan="9" class="text-center">{{ __('No languages found') }}</td>
                                         </tr>
                                         @endforelse
                                     </tbody>
@@ -199,21 +226,27 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updateLanguageOrder(languageIds) {
+        console.log('Updating language order:', languageIds);
+        
         fetch('{{ route("admin.languages.reorder") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({ languages: languageIds })
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
         .then(data => {
+            console.log('Response data:', data);
             if (data.success) {
                 // Update order numbers in the table
                 const rows = sortableList.querySelectorAll('tr[data-language-id]');
                 rows.forEach((row, index) => {
-                    const orderCell = row.querySelector('td:nth-child(5)'); // Order column
+                    const orderCell = row.querySelector('td:nth-child(6)'); // Order column (6th column after drag handle)
                     if (orderCell) {
                         orderCell.textContent = index + 1;
                     }
@@ -225,6 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('Error updating language order:', error);
+            console.error('Error details:', error.message);
         });
     }
 });

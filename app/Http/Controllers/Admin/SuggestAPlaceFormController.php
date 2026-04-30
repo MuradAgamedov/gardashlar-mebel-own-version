@@ -52,9 +52,9 @@ class SuggestAPlaceFormController extends Controller
         try {
             $suggestAPlaceForm->delete();
             return redirect()->route('admin.suggest-a-place-forms.index')
-                ->with('success', 'Form deleted successfully!');
+                ->with('success', __('Form deleted successfully!'));
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error deleting form: ' . $e->getMessage());
+            return redirect()->back()->with('error', __('Error deleting form: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -79,9 +79,9 @@ class SuggestAPlaceFormController extends Controller
         try {
             SuggestAPlaceForm::whereIn('id', $request->ids)->delete();
             return redirect()->route('admin.suggest-a-place-forms.index')
-                ->with('success', count($request->ids) . ' form(s) deleted successfully.');
+                ->with('success', __(':count form(s) deleted successfully.', ['count' => count($request->ids)]));
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 }

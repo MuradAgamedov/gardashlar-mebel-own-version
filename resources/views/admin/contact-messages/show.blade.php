@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'View Message')
+@section('title', __('View Message'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>View Message</h3>
+                    <h3>{{ __('View Message') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.contact-messages.index') }}">Contact Messages</a>
+                            <a href="{{ route('admin.contact-messages.index') }}">{{ __('Contact Messages') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">View</li>
+                        <li class="breadcrumb-item active">{{ __('View') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
     <div class="container-fluid">
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Success:</h6>
+                <h6 class="alert-heading">{{ __('Success:') }}</h6>
                 <p class="mb-0">{{ session('success') }}</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -42,7 +42,7 @@
                     <div class="card-header">
                         <div class="row align-items-center">
                             <div class="col-md-6">
-                                <h5>Message Details</h5>
+                                <h5>{{ __('Message Details') }}</h5>
                             </div>
                             <div class="col-md-6">
                                 <div class="d-flex justify-content-end gap-2">
@@ -50,7 +50,7 @@
                                         <form method="POST" action="{{ route('admin.contact-messages.mark-as-read', $message->id) }}" class="d-inline">
                                             @csrf
                                             <button type="submit" class="btn btn-success">
-                                                <i class="material-icons-outlined">mark_email_read</i> Mark as Read
+                                                <i class="material-icons-outlined">mark_email_read</i> {{ __('Mark as Read') }}
                                             </button>
                                         </form>
                                     @endif
@@ -58,7 +58,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger" 
-                                                onclick="return confirm('Are you sure you want to delete this message?')">
+                                                onclick="return confirm('{{ __('Are you sure you want to delete this message?') }}')">
                                             <i class="material-icons-outlined">delete</i>
                                         </button>
                                     </form>
@@ -74,7 +74,7 @@
                             <div class="col-md-8">
                                 <!-- Message Content -->
                                 <div class="mb-4">
-                                    <h6 class="text-muted mb-2">Message:</h6>
+                                    <h6 class="text-muted mb-2">{{ __('Message:') }}</h6>
                                     <div style="color: black !important" class="">
                                         <p style="color: black" class="mb-0">{{ $message->message }}</p>
                                     </div>
@@ -84,13 +84,13 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label class="form-label text-muted">Name:</label>
+                                            <label class="form-label text-muted">{{ __('Name:') }}</label>
                                             <p style="color: black !important" class="form-control-plaintext">{{ $message->name }}</p>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label class="form-label text-muted">Email:</label>
+                                            <label class="form-label text-muted">{{ __('Email:') }}</label>
                                             <p class="form-control-plaintext">
                                                 <a href="mailto:{{ $message->email }}">{{ $message->email }}</a>
                                             </p>
@@ -101,23 +101,23 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label class="form-label text-muted">City:</label>
+                                            <label class="form-label text-muted">{{ __('City:') }}</label>
                                             <p class="form-control-plaintext">{{ $message->city }}</p>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label class="form-label text-muted">Status:</label>
+                                            <label class="form-label text-muted">{{ __('Status:') }}</label>
                                             <p class="form-control-plaintext">
                                                 @if($message->is_read)
-                                                    <span class="badge bg-success">Read</span>
+                                                    <span class="badge bg-success">{{ __('Read') }}</span>
                                                     @if($message->read_at)
                                                         <small class="text-muted d-block mt-1">
-                                                            Read on: {{ $message->read_at->format('d.m.Y H:i') }}
+                                                            {{ __('Read on:') }} {{ $message->read_at->format('d.m.Y H:i') }}
                                                         </small>
                                                     @endif
                                                 @else
-                                                    <span class="badge bg-warning">Unread</span>
+                                                    <span class="badge bg-warning">{{ __('Unread') }}</span>
                                                 @endif
                                             </p>
                                         </div>
@@ -129,28 +129,28 @@
                                 <!-- Message Info -->
                                 <div class="card border">
                                     <div class="card-header">
-                                        <h6 class="mb-0">Message Information</h6>
+                                        <h6 class="mb-0">{{ __('Message Information') }}</h6>
                                     </div>
                                     <div class="card-body">
                                         <div class="mb-3">
-                                            <label class="form-label text-muted">Sent:</label>
+                                            <label class="form-label text-muted">{{ __('Sent:') }}</label>
                                             <p class="form-control-plaintext">{{ $message->created_at->format('d.m.Y H:i') }}</p>
                                         </div>
                                         
                                         <div class="mb-3">
-                                            <label class="form-label text-muted">Message ID:</label>
+                                            <label class="form-label text-muted">{{ __('Message ID:') }}</label>
                                             <p class="form-control-plaintext">#{{ $message->id }}</p>
                                         </div>
 
                                         @if($message->is_read && $message->read_at)
                                             <div class="mb-3">
-                                                <label class="form-label text-muted">Read:</label>
+                                                <label class="form-label text-muted">{{ __('Read:') }}</label>
                                                 <p class="form-control-plaintext">{{ $message->read_at->format('d.m.Y H:i') }}</p>
                                             </div>
                                         @endif
 
                                         <div class="mb-3">
-                                            <label class="form-label text-muted">Time since sent:</label>
+                                            <label class="form-label text-muted">{{ __('Time since sent:') }}</label>
                                             <p class="form-control-plaintext">{{ $message->created_at->diffForHumans() }}</p>
                                         </div>
                                     </div>

@@ -40,10 +40,10 @@ class IndividualProjectOrderController extends Controller
             );
 
             return redirect()->route('admin.individual-project-orders.index')
-                ->with('success', 'Individual project order successfully added.');
+                ->with('success', __('Individual project order successfully added.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -64,10 +64,10 @@ class IndividualProjectOrderController extends Controller
             );
 
             return redirect()->route('admin.individual-project-orders.index')
-                ->with('success', 'Individual project order successfully updated.');
+                ->with('success', __('Individual project order successfully updated.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -76,10 +76,10 @@ class IndividualProjectOrderController extends Controller
         try {
             $this->repository->deleteIndividualProjectOrder($individualProjectOrder);
             return redirect()->route('admin.individual-project-orders.index')
-                ->with('success', 'Individual project order successfully deleted.');
+                ->with('success', __('Individual project order successfully deleted.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -109,10 +109,10 @@ class IndividualProjectOrderController extends Controller
         try {
             $count = $this->repository->deleteSelected($request->ids);
             return redirect()->route('admin.individual-project-orders.index')
-                ->with('success', $count . ' individual project order(s) deleted successfully.');
+                ->with('success', __(':count individual project order(s) deleted successfully.', ['count' => $count]));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 }

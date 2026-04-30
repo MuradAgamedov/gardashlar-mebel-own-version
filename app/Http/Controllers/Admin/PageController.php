@@ -56,11 +56,11 @@ class PageController extends Controller
             $this->repository->createPage($data, $request->translates);
 
             return redirect()->route('admin.pages.index')
-                ->with('success', 'Page created successfully!');
+                ->with('success', __('Page created successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error creating page: ' . $e->getMessage())
+                ->with('error', __('Error creating page: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -109,11 +109,11 @@ class PageController extends Controller
             $this->repository->updatePage($id, $data, $request->translates);
 
             return redirect()->route('admin.pages.index')
-                ->with('success', 'Page updated successfully!');
+                ->with('success', __('Page updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating page: ' . $e->getMessage())
+                ->with('error', __('Error updating page: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -123,11 +123,11 @@ class PageController extends Controller
         try {
             $this->repository->deletePage($id);
             return redirect()->route('admin.pages.index')
-                ->with('success', 'Page deleted successfully!');
+                ->with('success', __('Page deleted successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting page: ' . $e->getMessage());
+                ->with('error', __('Error deleting page: :error', ['error' => $e->getMessage()]));
         }
     }
 

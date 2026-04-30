@@ -52,11 +52,11 @@ class SocialNetworkController extends Controller
             ]);
 
             return redirect()->route('admin.social-networks.index')
-                ->with('success', 'Social network created successfully.');
+                ->with('success', __('Social network created successfully.'));
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error creating social network: ' . $e->getMessage());
+                ->with('error', __('Error creating social network: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -89,11 +89,11 @@ class SocialNetworkController extends Controller
             ]);
 
             return redirect()->route('admin.social-networks.index')
-                ->with('success', 'Social network updated successfully.');
+                ->with('success', __('Social network updated successfully.'));
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error updating social network: ' . $e->getMessage());
+                ->with('error', __('Error updating social network: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -105,9 +105,9 @@ class SocialNetworkController extends Controller
         try {
             $socialNetwork->delete();
             return redirect()->route('admin.social-networks.index')
-                ->with('success', 'Social network deleted successfully.');
+                ->with('success', __('Social network deleted successfully.'));
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting social network. Please try again.');
+            return back()->with('error', __('Error deleting social network. Please try again.'));
         }
     }
 
@@ -127,10 +127,10 @@ class SocialNetworkController extends Controller
             }
 
             return redirect()->route('admin.social-networks.index')
-                ->with('success', 'Social networks reordered successfully.');
+                ->with('success', __('Social networks reordered successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error reordering social networks. Please try again.');
+            return back()->with('error', __('Error reordering social networks. Please try again.'));
         }
     }
 
@@ -144,10 +144,10 @@ class SocialNetworkController extends Controller
             
             $status = $socialNetwork->status ? 'enabled' : 'disabled';
             return redirect()->route('admin.social-networks.index')
-                ->with('success', "Social network {$status} successfully.");
+                ->with('success', __('Social network :status successfully.', ['status' => $status]));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error updating social network status. Please try again.');
+            return back()->with('error', __('Error updating social network status. Please try again.'));
         }
     }
 }

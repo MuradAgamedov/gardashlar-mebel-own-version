@@ -6,8 +6,8 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-sm-6 col-12">
-                    <h2>All SEO Pages Settings</h2>
-                    <p class="mb-0 text-title-gray">Manage global SEO settings for all pages</p>
+                    <h2>{{ __('All SEO Pages Settings') }}</h2>
+                    <p class="mb-0 text-title-gray">{{ __('Manage global SEO settings for all pages') }}</p>
                 </div>
                 <div class="col-sm-6 col-12">
                     <ol class="breadcrumb">
@@ -16,8 +16,8 @@
                                 <i class="iconly-Home icli svg-color"></i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item">SEO Management</li>
-                        <li class="breadcrumb-item active">All SEO Pages</li>
+                        <li class="breadcrumb-item">{{ __('SEO Management') }}</li>
+                        <li class="breadcrumb-item active">{{ __('All SEO Pages') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,8 +30,8 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>SEO Pages Settings</h4>
-                        <p class="text-muted mb-0">Configure global SEO settings that apply to all pages</p>
+                        <h4>{{ __('SEO Pages Settings') }}</h4>
+                        <p class="text-muted mb-0">{{ __('Configure global SEO settings that apply to all pages') }}</p>
                     </div>
                     
                     <div class="card-body">
@@ -70,8 +70,8 @@
                                                        value="1"
                                                        {{ old('is_indexed', $seoPages->is_indexed) ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="is_indexed">
-                                                    <strong>Is Indexed</strong>
-                                                    <small class="d-block text-muted">Allow search engines to index pages</small>
+                                                    <strong>{{ __('Is Indexed') }}</strong>
+                                                    <small class="d-block text-muted">{{ __('Allow search engines to index pages') }}</small>
                                                 </label>
                                             </div>
 
@@ -84,8 +84,8 @@
                                                        value="1"
                                                        {{ old('is_followed', $seoPages->is_followed) ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="is_followed">
-                                                    <strong>Is Followed</strong>
-                                                    <small class="d-block text-muted">Allow search engines to follow links</small>
+                                                    <strong>{{ __('Is Followed') }}</strong>
+                                                    <small class="d-block text-muted">{{ __('Allow search engines to follow links') }}</small>
                                                 </label>
                                             </div>
                                         </div>
@@ -98,19 +98,19 @@
                                 <div class="col-md-6">
                                     <div class="card border">
                                         <div class="card-header bg-light">
-                                            <h5 style="color: black" class="mb-0">Page Header Code</h5>
+                                            <h5 style="color: black" class="mb-0">{{ __('Page Header Code') }}</h5>
                                         </div>
                                         <div class="card-body">
                                             <div class="form-group">
                                                 <label for="page_header" class="form-label">
-                                                    <strong>Page Header</strong>
-                                                    <small class="text-muted">(HTML/CSS/JS code for &lt;head&gt; section)</small>
+                                                    <strong>{{ __('Page Header') }}</strong>
+                                                    <small class="text-muted">{{ __('(HTML/CSS/JS code for <head> section)') }}</small>
                                                 </label>
                                                 <textarea class="form-control @error('page_header') is-invalid @enderror" 
                                                           id="page_header" 
                                                           name="page_header" 
                                                           rows="8" 
-                                                          placeholder="Enter HTML, CSS, or JavaScript code for page header...">{{ old('page_header', $seoPages->page_header) }}</textarea>
+                                                          placeholder="{{ __('Enter HTML, CSS, or JavaScript code for page header...') }}">{{ old('page_header', $seoPages->page_header) }}</textarea>
                                                 @error('page_header')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
@@ -128,19 +128,19 @@
                                 <div class="col-12">
                                     <div class="card border">
                                         <div class="card-header bg-light">
-                                            <h5 style="color: black" class="mb-0">Page Footer Code</h5>
+                                            <h5 style="color: black" class="mb-0">{{ __('Page Footer Code') }}</h5>
                                         </div>
                                         <div class="card-body">
                                             <div class="form-group">
                                                 <label for="page_footer" class="form-label">
-                                                    <strong>Page Footer</strong>
-                                                    <small class="text-muted">(HTML/CSS/JS code for before &lt;/body&gt; tag)</small>
+                                                    <strong>{{ __('Page Footer') }}</strong>
+                                                    <small class="text-muted">{{ __('(HTML/CSS/JS code for before </body> tag)') }}</small>
                                                 </label>
                                                 <textarea class="form-control @error('page_footer') is-invalid @enderror" 
                                                           id="page_footer" 
                                                           name="page_footer" 
                                                           rows="10" 
-                                                          placeholder="Enter HTML, CSS, or JavaScript code for page footer...">{{ old('page_footer', $seoPages->page_footer) }}</textarea>
+                                                          placeholder="{{ __('Enter HTML, CSS, or JavaScript code for page footer...') }}">{{ old('page_footer', $seoPages->page_footer) }}</textarea>
                                                 @error('page_footer')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
@@ -157,6 +157,7 @@
                                     <div class="text-end">
                                         <button type="submit" class="btn btn-primary btn-lg">
                                             <i class="fas fa-save me-2"></i>
+                                            {{ __('Save Settings') }}
                                         </button>
                                     </div>
                                 </div>

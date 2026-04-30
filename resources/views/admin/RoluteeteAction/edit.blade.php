@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Roulette Action')
+@section('title', __('Edit Roulette Action'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Roulette Action</h3>
+                    <h3>{{ __('Edit Roulette Action') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.roulette-actions.index') }}">Actions</a>
+                            <a href="{{ route('admin.roulette-actions.index') }}">{{ __('Actions') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Action</h5>
+                        <h5>{{ __('Edit Action') }}</h5>
                     </div>
                     <div class="card-body">
                         {{-- Errors --}}
@@ -56,13 +56,13 @@
                                 <div class="mb-3">
                                     <label class="form-label">Current Image</label><br>
                                     <img src="{{ asset('storage/' . $action->image) }}" 
-                                         alt="Current Image" style="max-width:200px; border:1px solid #ddd; border-radius:5px;">
+                                         alt="{{ __('Current Image') }}" style="max-width:200px; border:1px solid #ddd; border-radius:5px;">
                                 </div>
                             @endif
 
                             {{-- Upload New Image --}}
                             <div class="mb-3">
-                                <label for="image" class="form-label">Change Image</label>
+                                <label for="image" class="form-label">{{ __('Image') }}</label>
                                 <input type="file" name="image" id="image"
                                        class="form-control @error('image') is-invalid @enderror"
                                        accept="image/*">
@@ -72,18 +72,18 @@
 
                                 {{-- Preview --}}
                                 <div class="mt-2">
-                                    <img id="imagePreview" src="#" alt="Preview"
+                                    <img id="imagePreview" src="#" alt="{{ __('Preview') }}"
                                          style="max-width: 200px; display: none; border:1px solid #ddd; padding:5px; border-radius:5px;">
                                 </div>
                             </div>
 
                             {{-- Type --}}
                             <div class="mb-3">
-                                <label for="type" class="form-label">Type</label>
+                                <label for="type" class="form-label">{{ __('Type') }}</label>
                                 <select class="form-select @error('type') is-invalid @enderror" 
                                         id="type" name="type" required>
-                                    <option value="">-- Select Type --</option>
-                                    <option value="percent" {{ old('type', optional($action->translates->first())->type) == 'percent' ? 'selected' : '' }}>Percent</option>
+                                    <option value="">{{ __('-- Select Type --') }}</option>
+                                    <option value="percent" {{ old('type', optional($action->translates->first())->type) == 'percent' ? 'selected' : '' }}>{{ __('Percent') }}</option>
                                 </select>
                                 @error('type')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -92,7 +92,7 @@
 
                             {{-- Percent field --}}
                             <div class="mb-3 {{ old('type', optional($action->translates->first())->type) == 'percent' ? '' : 'd-none' }}" id="percentField">
-                                <label for="percent_value" class="form-label">Percent Value</label>
+                                <label for="percent_value" class="form-label">{{ __('Percent Value') }}</label>
                                 <input type="number" 
                                        class="form-control @error('percent_value') is-invalid @enderror" 
                                        id="percent_value" 
@@ -129,7 +129,7 @@
 
                                         {{-- Title --}}
                                         <div class="mb-3">
-                                            <label class="form-label">Title ({{ $lang->lang_code }})</label>
+                                            <label class="form-label">{{ __('Title') }} ({{ $lang->lang_code }})</label>
                                             <input type="text" 
                                                    name="translations[{{ $lang->id }}][title]" 
                                                    class="form-control @error("translations.$lang->id.title") is-invalid @enderror" 
@@ -148,8 +148,8 @@
 
                             {{-- Buttons --}}
                             <div class="d-flex gap-2 mt-3">
-                                <button type="submit" class="btn btn-success">Update</button>
-                                <a href="{{ route('admin.roulette-actions.index') }}" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">{{ __('Update') }}</button>
+                                <a href="{{ route('admin.roulette-actions.index') }}" class="btn btn-secondary">{{ __('Cancel') }}</a>
                             </div>
 
                         </form>

@@ -38,11 +38,11 @@ class CreditCardController extends Controller
             );
 
             return redirect()->route('admin.credit-cards.index')
-                ->with('success', 'Credit Card created successfully!');
+                ->with('success', __('Credit Card created successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error creating credit card: ' . $e->getMessage())
+                ->with('error', __('Error creating credit card: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -65,11 +65,11 @@ class CreditCardController extends Controller
             );
 
             return redirect()->route('admin.credit-cards.index')
-                ->with('success', 'Credit Card updated successfully!');
+                ->with('success', __('Credit Card updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating credit card: ' . $e->getMessage())
+                ->with('error', __('Error updating credit card: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -79,10 +79,10 @@ class CreditCardController extends Controller
         try {
             $this->repository->deleteCreditCard($creditCard);
             return redirect()->route('admin.credit-cards.index')
-                ->with('success', 'Credit Card deleted successfully!');
+                ->with('success', __('Credit Card deleted successfully!'));
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting credit card: ' . $e->getMessage());
+                ->with('error', __('Error deleting credit card: :error', ['error' => $e->getMessage()]));
         }
     }
 
