@@ -142,7 +142,7 @@ class SocialNetworkController extends Controller
         try {
             $socialNetwork->update(['status' => !$socialNetwork->status]);
             
-            $status = $socialNetwork->status ? 'enabled' : 'disabled';
+            $status = $socialNetwork->status ? __('enabled') : __('disabled');
             return redirect()->route('admin.social-networks.index')
                 ->with('success', __('Social network :status successfully.', ['status' => $status]));
 

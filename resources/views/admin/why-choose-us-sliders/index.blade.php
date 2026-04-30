@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Why Choose Us Sliders</h3>
+                    <h3>{{ __('Why Choose Us Sliders') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -15,7 +15,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Why Choose Us Sliders</li>
+                        <li class="breadcrumb-item active">{{ __('Why Choose Us Sliders') }}</li>
                     </ol>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Slider List</h5>
+                            <h5>{{ __('Slider List') }}</h5>
                             <a href="{{ route('admin.why-choose-us-sliders.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -55,11 +55,11 @@
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th width="50">Order</th>
-                                            <th width="100">Image</th>
-                                            <th>Video Link</th>
-                                            <th width="80">Status</th>
-                                            <th width="120">Actions</th>
+                                            <th width="50">{{ __('Order') }}</th>
+                                            <th width="100">{{ __('Image') }}</th>
+                                            <th>{{ __('Video Link') }}</th>
+                                            <th width="80">{{ __('Status') }}</th>
+                                            <th width="120">{{ __('Actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="sortable-sliders">
@@ -77,7 +77,7 @@
                                             </td>
                                             <td>
                                                 @if($slider->image_url)
-                                                    <img src="{{ $slider->image_url }}" alt="Slider Image" class="img-thumbnail" style="max-width: 60px; max-height: 60px;">
+                                                    <img src="{{ $slider->image_url }}" alt="{{ __('Slider Image') }}" class="img-thumbnail" style="max-width: 60px; max-height: 60px;">
                                                 @else
                                                     <div class="bg-light d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
                                                         <i class="material-icons-outlined text-muted">image</i>
@@ -90,28 +90,28 @@
                                                         <i class="material-icons-outlined">play_circle</i>
                                                     </a>
                                                 @else
-                                                    <span class="text-muted">No video</span>
+                                                    <span class="text-muted">{{ __('No video') }}</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if($slider->status)
-                                                    <span class="badge badge-success">Active</span>
+                                                    <span class="badge badge-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge badge-danger">Inactive</span>
+                                                    <span class="badge badge-danger">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-1">
                                                     <a href="{{ route('admin.why-choose-us-sliders.edit', $slider) }}" 
                                                        class="btn btn-sm btn-warning" 
-                                                       title="Edit">
+                                                       title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" 
                                                             class="btn btn-sm btn-danger delete-slider" 
                                                             data-id="{{ $slider->id }}"
-                                                            data-title="Slider #{{ $slider->id }}"
-                                                            title="Delete">
+                                                            data-title="{{ __('Slider') }} #{{ $slider->id }}"
+                                                            title="{{ __('Delete') }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
                                                 </div>
@@ -124,8 +124,8 @@
                         @else
                             <div class="text-center py-5">
                                 <i class="material-icons-outlined text-muted" style="font-size: 64px;">image</i>
-                                <h5 class="mt-3 text-muted">No sliders found</h5>
-                                <p class="text-muted">Create your first slider to get started.</p>
+                                <h5 class="mt-3 text-muted">{{ __('No sliders found') }}</h5>
+                                <p class="text-muted">{{ __('Create your first slider to get started.') }}</p>
                                 <a href="{{ route('admin.why-choose-us-sliders.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
                                 </a>
@@ -168,8 +168,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Show success message
                         Swal.fire({
                             icon: 'success',
-                            title: 'Order Updated!',
-                            text: 'Slider order has been updated successfully.',
+                            title: '{{ __("Order Updated!") }}',
+                            text: '{{ __("Slider order has been updated successfully.") }}',
                             timer: 1500,
                             showConfirmButton: false
                         });
@@ -181,8 +181,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('Error:', error);
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error!',
-                        text: 'Failed to update slider order.'
+                        title: '{{ __("Error!") }}',
+                        text: '{{ __("Failed to update slider order.") }}'
                     });
                 });
             }
@@ -196,14 +196,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const sliderTitle = this.dataset.title;
             
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to delete "${sliderTitle}"? This action cannot be undone.`,
+                title: '{{ __("Are you sure?") }}',
+                text: `{{ __("Do you want to delete this slider?") }}`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'Cancel'
+                confirmButtonText: '{{ __("Yes, delete it!") }}',
+                cancelButtonText: '{{ __("Cancel") }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Create and submit delete form
@@ -268,4 +268,4 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 16px;
 }
 </style>
-@endpush 
+@endpush

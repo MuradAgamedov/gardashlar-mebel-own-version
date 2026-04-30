@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Email Management')
+@section('title', __('Email Management'))
 
 @section('content')
 <div class="page-body">
@@ -8,16 +8,16 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Email Management</h3>
+                    <h3>{{ __('Email Management') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Email Management</li>
+                        <li class="breadcrumb-item active">{{ __('Email Management') }}</li>
                     </ol>
                 </div>
             </div>
@@ -28,14 +28,14 @@
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
@@ -44,7 +44,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Emails</h5>
+                            <h5>{{ __('Emails') }}</h5>
                             <a href="{{ route('admin.emails.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -56,10 +56,10 @@
                                 <thead>
                                     <tr>
                                         <th width="50">#</th>
-                                        <th>Email</th>
-                                        <th>Status</th>
-                                        <th>Order</th>
-                                        <th width="150">Actions</th>
+                                        <th>{{ __('Email') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th>{{ __('Order') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-emails">
@@ -83,9 +83,9 @@
                                             </td>
                                             <td>
                                                 @if($email->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>{{ $email->order }}</td>
@@ -107,7 +107,7 @@
                                             <td colspan="5" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">email</i>
-                                                    <p class="mt-2">No emails found</p>
+                                                    <p class="mt-2">{{ __('No emails found') }}</p>
                                                     <a href="{{ route('admin.emails.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>
@@ -180,8 +180,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (!data.success) {
                         Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to reorder emails',
+                            title: '{{ __("Error!") }}',
+                            text: data.message || '{{ __("Failed to reorder emails") }}',
                             icon: 'error'
                         });
                     }
@@ -200,13 +200,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to delete "${title}"?`,
+                title: '{{ __("Are you sure?") }}',
+                text: '{{ __("Do you want to delete \":title\"?", ["title" => ":title"]) }}'.replace(':title', title),
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __("Yes, delete it!") }}',
+                cancelButtonText: '{{ __("Cancel") }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');
@@ -224,4 +225,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush 
+@endpush

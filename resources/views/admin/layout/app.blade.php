@@ -81,10 +81,9 @@
   {{-- PROFILE --}}
   <li class="profile-nav custom-dropdown">
     <div class="user-wrap">
-      <div class="user-content">
+      <div style="display: flex; align-items: center;" class="user-content">
         <h6>{{ Auth::user()->name ?? 'Admin' }}</h6>
         <p class="mb-0">
-          {{ __('Dil') }}
           <i class="fa-solid fa-chevron-down"></i>
         </p>
       </div>

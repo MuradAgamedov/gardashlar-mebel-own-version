@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit KIV Category')
+@section('title', __('Edit KIV Category'))
 
 @section('content')
 <div class="page-body">
@@ -8,19 +8,19 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit KIV Category</h3>
+                    <h3>{{ __('Edit KIV Category') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.kiv-categories.index') }}">KIV Categories</a>
+                            <a href="{{ route('admin.kiv-categories.index') }}">{{ __('KIV Categories') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit Category</li>
+                        <li class="breadcrumb-item active">{{ __('Edit Category') }}</li>
                     </ol>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit KIV Category</h5>
+                        <h5>{{ __('Edit KIV Category') }}</h5>
                     </div>
                     <div class="card-body">
                         @if ($errors->any())
@@ -56,7 +56,7 @@
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ old('status', $kivCategory->status) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Active Status
+                                            {{ __('Active Status') }}
                                         </label>
                                     </div>
                                 </div>
@@ -108,14 +108,14 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
                                                         <label for="title_{{ $language->id }}" class="form-label">
-                                                            Title <span class="text-danger">*</span>
+                                                            {{ __('Title') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
                                                                id="title_{{ $language->id }}" 
                                                                name="translations[{{ $language->id }}][title]" 
                                                                value="{{ old("translations.{$language->id}.title", $translation->title ?? '') }}" 
-                                                               placeholder="Enter title for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Enter title for :lang', ['lang' => $language->lang_code]) }}">
                                                         @error("translations.{$language->id}.title")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
@@ -125,14 +125,14 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
                                                         <label for="subtitle_{{ $language->id }}" class="form-label">
-                                                            Subtitle
+                                                            {{ __('Subtitle') }}
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.subtitle") is-invalid @enderror" 
                                                                id="subtitle_{{ $language->id }}" 
                                                                name="translations[{{ $language->id }}][subtitle]" 
                                                                value="{{ old("translations.{$language->id}.subtitle", $translation->subtitle ?? '') }}" 
-                                                               placeholder="Enter subtitle for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Enter subtitle for :lang', ['lang' => $language->lang_code]) }}">
                                                         @error("translations.{$language->id}.subtitle")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror

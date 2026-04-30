@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Why Choose Us</h3>
+                    <h3>{{ __('Why Choose Us') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -15,7 +15,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Why Choose Us</li>
+                        <li class="breadcrumb-item active">{{ __('Why Choose Us') }}</li>
                     </ol>
                 </div>
             </div>
@@ -42,7 +42,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Why Choose Us Section</h5>
+                        <h5>{{ __('Edit Why Choose Us Section') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.why-choose-us.update') }}" method="POST" enctype="multipart/form-data">
@@ -52,10 +52,10 @@
                             <!-- Icons Section -->
                             <div class="row mb-4">
                                 <div class="col-md-12">
-                                    <h6 class="mb-3">Icons</h6>
+                                    <h6 class="mb-3">{{ __('Icons') }}</h6>
                                     <div class="row">
                                         <div class="col-md-3 mb-3">
-                                            <label class="form-label">First Icon</label>
+                                            <label class="form-label">{{ __('First Icon') }}</label>
                                             <div class="icon-upload-container">
                                                 <input type="file" 
                                                        class="form-control @error('first_icon') is-invalid @enderror icon-file-input" 
@@ -67,13 +67,13 @@
                                                 @enderror
                                                 <div class="icon-preview mt-2" id="first-icon-preview">
                                                     @if($whyChooseUs->first_icon_url)
-                                                        <img src="{{ $whyChooseUs->first_icon_url }}" alt="First Icon" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                                                        <img src="{{ $whyChooseUs->first_icon_url }}" alt="{{ __('First Icon') }}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
                                                     @endif
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-3 mb-3">
-                                            <label class="form-label">Second Icon</label>
+                                            <label class="form-label">{{ __('Second Icon') }}</label>
                                             <div class="icon-upload-container">
                                                 <input type="file" 
                                                        class="form-control @error('second_icon') is-invalid @enderror icon-file-input" 
@@ -85,13 +85,13 @@
                                                 @enderror
                                                 <div class="icon-preview mt-2" id="second-icon-preview">
                                                     @if($whyChooseUs->second_icon_url)
-                                                        <img src="{{ $whyChooseUs->second_icon_url }}" alt="Second Icon" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                                                        <img src="{{ $whyChooseUs->second_icon_url }}" alt="{{ __('Second Icon') }}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
                                                     @endif
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-3 mb-3">
-                                            <label class="form-label">Third Icon</label>
+                                            <label class="form-label">{{ __('Third Icon') }}</label>
                                             <div class="icon-upload-container">
                                                 <input type="file" 
                                                        class="form-control @error('third_icon') is-invalid @enderror icon-file-input" 
@@ -103,13 +103,13 @@
                                                 @enderror
                                                 <div class="icon-preview mt-2" id="third-icon-preview">
                                                     @if($whyChooseUs->third_icon_url)
-                                                        <img src="{{ $whyChooseUs->third_icon_url }}" alt="Third Icon" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                                                        <img src="{{ $whyChooseUs->third_icon_url }}" alt="{{ __('Third Icon') }}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
                                                     @endif
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-3 mb-3">
-                                            <label class="form-label">Fourth Icon</label>
+                                            <label class="form-label">{{ __('Fourth Icon') }}</label>
                                             <div class="icon-upload-container">
                                                 <input type="file" 
                                                        class="form-control @error('fourth_icon') is-invalid @enderror icon-file-input" 
@@ -121,7 +121,7 @@
                                                 @enderror
                                                 <div class="icon-preview mt-2" id="fourth-icon-preview">
                                                     @if($whyChooseUs->fourth_icon_url)
-                                                        <img src="{{ $whyChooseUs->fourth_icon_url }}" alt="Fourth Icon" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
+                                                        <img src="{{ $whyChooseUs->fourth_icon_url }}" alt="{{ __('Fourth Icon') }}" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">
                                                     @endif
                                                 </div>
                                             </div>
@@ -133,11 +133,11 @@
                             <!-- Content Section -->
                             <div class="row">
                                 <div class="col-md-12">
-                                    <h6 class="mb-3">Content Translations</h6>
+                                    <h6 class="mb-3">{{ __('Content Translations') }}</h6>
                                     
                                     @if ($errors->any())
                                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                        <h6 class="alert-heading">Please fix the following errors:</h6>
+                                        <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
                                         <ul class="mb-0">
                                             @foreach ($errors->all() as $error)
                                                 <li>{{ $error }}</li>
@@ -190,11 +190,11 @@
                                             
                                             <div class="card mt-3">
                                                 <div class="card-header">
-                                                    <h6 class="mb-0">{{ $language->title }} Content</h6>
+                                                    <h6 class="mb-0">{{ __(':language Content', ['language' => $language->title]) }}</h6>
                                                     @if($translate)
-                                                        <small class="text-success">Translation exists</small>
+                                                        <small class="text-success">{{ __('Translation exists') }}</small>
                                                     @else
-                                                        <small class="text-warning">No translation yet</small>
+                                                        <small class="text-warning">{{ __('No translation yet') }}</small>
                                                     @endif
                                                 </div>
                                                 <div class="card-body">
@@ -203,36 +203,36 @@
                                                     <!-- First Section -->
                                                     <div class="row mb-4">
                                                         <div class="col-md-12">
-                                                            <h6 class="text-primary">First Section</h6>
+                                                            <h6 class="text-primary">{{ __('First Section') }}</h6>
                                                         </div>
                                                         <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Icon Alt Text</label>
+                                                            <label class="form-label">{{ __('Icon Alt Text') }}</label>
                                                             <input type="text" 
                                                                    class="form-control @error('translates.'.$index.'.first_icon_alt_text') is-invalid @enderror" 
                                                                    name="translates[{{ $index }}][first_icon_alt_text]" 
                                                                    value="{{ old('translates.'.$index.'.first_icon_alt_text', $translate->first_icon_alt_text ?? '') }}"
-                                                                   placeholder="Icon alt text">
+                                                                   placeholder="{{ __('Icon alt text') }}">
                                                             @error('translates.'.$index.'.first_icon_alt_text')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
                                                         </div>
                                                         <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Title</label>
+                                                            <label class="form-label">{{ __('Title') }}</label>
                                                             <input type="text" 
                                                                    class="form-control @error('translates.'.$index.'.first_title') is-invalid @enderror" 
                                                                    name="translates[{{ $index }}][first_title]" 
                                                                    value="{{ old('translates.'.$index.'.first_title', $translate->first_title ?? '') }}"
-                                                                   placeholder="First section title">
+                                                                   placeholder="{{ __('First section title') }}">
                                                             @error('translates.'.$index.'.first_title')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
                                                         </div>
                                                         <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Description</label>
+                                                            <label class="form-label">{{ __('Description') }}</label>
                                                             <textarea class="form-control @error('translates.'.$index.'.first_description') is-invalid @enderror" 
                                                                       name="translates[{{ $index }}][first_description]" 
                                                                       rows="3" 
-                                                                      placeholder="First section description">{{ old('translates.'.$index.'.first_description', $translate->first_description ?? '') }}</textarea>
+                                                                      placeholder="{{ __('First section description') }}">{{ old('translates.'.$index.'.first_description', $translate->first_description ?? '') }}</textarea>
                                                             @error('translates.'.$index.'.first_description')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
@@ -242,36 +242,36 @@
                                                     <!-- Second Section -->
                                                     <div class="row mb-4">
                                                         <div class="col-md-12">
-                                                            <h6 class="text-primary">Second Section</h6>
+                                                            <h6 class="text-primary">{{ __('Second Section') }}</h6>
                                                         </div>
                                                         <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Icon Alt Text</label>
+                                                            <label class="form-label">{{ __('Icon Alt Text') }}</label>
                                                             <input type="text" 
                                                                    class="form-control @error('translates.'.$index.'.second_icon_alt_text') is-invalid @enderror" 
                                                                    name="translates[{{ $index }}][second_icon_alt_text]" 
                                                                    value="{{ old('translates.'.$index.'.second_icon_alt_text', $translate->second_icon_alt_text ?? '') }}"
-                                                                   placeholder="Icon alt text">
+                                                                   placeholder="{{ __('Icon alt text') }}">
                                                             @error('translates.'.$index.'.second_icon_alt_text')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
                                                         </div>
                                                         <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Title</label>
+                                                            <label class="form-label">{{ __('Title') }}</label>
                                                             <input type="text" 
                                                                    class="form-control @error('translates.'.$index.'.second_title') is-invalid @enderror" 
                                                                    name="translates[{{ $index }}][second_title]" 
                                                                    value="{{ old('translates.'.$index.'.second_title', $translate->second_title ?? '') }}"
-                                                                   placeholder="Second section title">
+                                                                   placeholder="{{ __('Second section title') }}">
                                                             @error('translates.'.$index.'.second_title')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
                                                         </div>
                                                         <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Description</label>
+                                                            <label class="form-label">{{ __('Description') }}</label>
                                                             <textarea class="form-control @error('translates.'.$index.'.second_description') is-invalid @enderror" 
                                                                       name="translates[{{ $index }}][second_description]" 
                                                                       rows="3" 
-                                                                      placeholder="Second section description">{{ old('translates.'.$index.'.second_description', $translate->second_description ?? '') }}</textarea>
+                                                                      placeholder="{{ __('Second section description') }}">{{ old('translates.'.$index.'.second_description', $translate->second_description ?? '') }}</textarea>
                                                             @error('translates.'.$index.'.second_description')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
@@ -281,36 +281,36 @@
                                                     <!-- Third Section -->
                                                     <div class="row mb-4">
                                                         <div class="col-md-12">
-                                                            <h6 class="text-primary">Third Section</h6>
+                                                            <h6 class="text-primary">{{ __('Third Section') }}</h6>
                                                         </div>
                                                         <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Icon Alt Text</label>
+                                                            <label class="form-label">{{ __('Icon Alt Text') }}</label>
                                                             <input type="text" 
                                                                    class="form-control @error('translates.'.$index.'.third_icon_alt_text') is-invalid @enderror" 
                                                                    name="translates[{{ $index }}][third_icon_alt_text]" 
                                                                    value="{{ old('translates.'.$index.'.third_icon_alt_text', $translate->third_icon_alt_text ?? '') }}"
-                                                                   placeholder="Icon alt text">
+                                                                   placeholder="{{ __('Icon alt text') }}">
                                                             @error('translates.'.$index.'.third_icon_alt_text')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
                                                         </div>
                                                         <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Title</label>
+                                                            <label class="form-label">{{ __('Title') }}</label>
                                                             <input type="text" 
                                                                    class="form-control @error('translates.'.$index.'.third_title') is-invalid @enderror" 
                                                                    name="translates[{{ $index }}][third_title]" 
                                                                    value="{{ old('translates.'.$index.'.third_title', $translate->third_title ?? '') }}"
-                                                                   placeholder="Third section title">
+                                                                   placeholder="{{ __('Third section title') }}">
                                                             @error('translates.'.$index.'.third_title')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
                                                         </div>
                                                         <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Description</label>
+                                                            <label class="form-label">{{ __('Description') }}</label>
                                                             <textarea class="form-control @error('translates.'.$index.'.third_description') is-invalid @enderror" 
                                                                       name="translates[{{ $index }}][third_description]" 
                                                                       rows="3" 
-                                                                      placeholder="Third section description">{{ old('translates.'.$index.'.third_description', $translate->third_description ?? '') }}</textarea>
+                                                                      placeholder="{{ __('Third section description') }}">{{ old('translates.'.$index.'.third_description', $translate->third_description ?? '') }}</textarea>
                                                             @error('translates.'.$index.'.third_description')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
@@ -320,36 +320,36 @@
                                                     <!-- Fourth Section -->
                                                     <div class="row mb-4">
                                                         <div class="col-md-12">
-                                                            <h6 class="text-primary">Fourth Section</h6>
+                                                            <h6 class="text-primary">{{ __('Fourth Section') }}</h6>
                                                         </div>
                                                         <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Icon Alt Text</label>
+                                                            <label class="form-label">{{ __('Icon Alt Text') }}</label>
                                                             <input type="text" 
                                                                    class="form-control @error('translates.'.$index.'.fourth_icon_alt_text') is-invalid @enderror" 
                                                                    name="translates[{{ $index }}][fourth_icon_alt_text]" 
                                                                    value="{{ old('translates.'.$index.'.fourth_icon_alt_text', $translate->fourth_icon_alt_text ?? '') }}"
-                                                                   placeholder="Icon alt text">
+                                                                   placeholder="{{ __('Icon alt text') }}">
                                                             @error('translates.'.$index.'.fourth_icon_alt_text')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
                                                         </div>
                                                         <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Title</label>
+                                                            <label class="form-label">{{ __('Title') }}</label>
                                                             <input type="text" 
                                                                    class="form-control @error('translates.'.$index.'.fourth_title') is-invalid @enderror" 
                                                                    name="translates[{{ $index }}][fourth_title]" 
                                                                    value="{{ old('translates.'.$index.'.fourth_title', $translate->fourth_title ?? '') }}"
-                                                                   placeholder="Fourth section title">
+                                                                   placeholder="{{ __('Fourth section title') }}">
                                                             @error('translates.'.$index.'.fourth_title')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
                                                         </div>
                                                         <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Description</label>
+                                                            <label class="form-label">{{ __('Description') }}</label>
                                                             <textarea class="form-control @error('translates.'.$index.'.fourth_description') is-invalid @enderror" 
                                                                       name="translates[{{ $index }}][fourth_description]" 
                                                                       rows="3" 
-                                                                      placeholder="Fourth section description">{{ old('translates.'.$index.'.fourth_description', $translate->fourth_description ?? '') }}</textarea>
+                                                                      placeholder="{{ __('Fourth section description') }}">{{ old('translates.'.$index.'.fourth_description', $translate->fourth_description ?? '') }}</textarea>
                                                             @error('translates.'.$index.'.fourth_description')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
@@ -512,4 +512,4 @@ document.addEventListener('DOMContentLoaded', function() {
     border-radius: 0.25rem;
 }
 </style>
-@endpush 
+@endpush

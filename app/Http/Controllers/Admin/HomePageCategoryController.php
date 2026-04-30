@@ -37,10 +37,10 @@ class HomePageCategoryController extends Controller
             ]);
 
             return redirect()->route('admin.home-page-categories.index')
-                ->with('success', 'Category added to home page successfully.');
+                ->with('success', __('Category added to home page successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -64,10 +64,10 @@ class HomePageCategoryController extends Controller
             ]);
 
             return redirect()->route('admin.home-page-categories.index')
-                ->with('success', 'Home page category updated successfully.');
+                ->with('success', __('Home page category updated successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -76,10 +76,10 @@ class HomePageCategoryController extends Controller
         try {
             $this->repository->deleteHomePageCategory($homePageCategory);
             return redirect()->route('admin.home-page-categories.index')
-                ->with('success', 'Home page category deleted successfully.');
+                ->with('success', __('Home page category deleted successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 

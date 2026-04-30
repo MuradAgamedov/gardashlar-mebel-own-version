@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Home Page Category')
+@section('title', __('Edit Home Page Category'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Home Page Category</h3>
+                    <h3>{{ __('Edit Home Page Category') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.home-page-categories.index') }}">Home Page Categories</a>
+                            <a href="{{ route('admin.home-page-categories.index') }}">{{ __('Home Page Categories') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,21 +30,21 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">{{ __('Error occurred:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">{{ __('Error occurred:') }}</h6>
                 <p class="mb-0">{{ session('error') }}</p>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
@@ -52,7 +52,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Home Page Category</h5>
+                        <h5>{{ __('Edit Home Page Category') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.home-page-categories.update', $homePageCategory) }}" method="POST">
@@ -63,28 +63,28 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        Select Category <span class="text-danger">*</span>
+                                        {{ __('Select Category') }} <span class="text-danger">*</span>
                                     </label>
                                     <select class="form-select @error('product_category_id') is-invalid @enderror" 
                                             name="product_category_id" 
                                             id="product_category_id" 
                                             required>
-                                        <option value="">Select category</option>
+                                        <option value="">{{ __('Select category') }}</option>
                                         @foreach($categories as $category)
                                             @php
                                                 $firstTranslation = $category->translates->first();
-                                                $title = $firstTranslation ? $firstTranslation->title : 'No title';
+                                                $title = $firstTranslation ? $firstTranslation->title : __('No title');
                                                 $indent = $category->parent_id ? '└─ ' : '';
                                             @endphp
                                             <option value="{{ $category->id }}" {{ old('product_category_id', $homePageCategory->product_category_id) == $category->id ? 'selected' : '' }}>
                                                 {{ $indent }}{{ $title }}
                                                 @if($category->parent)
-                                                    ({{ $category->parent->translates->first() ? $category->parent->translates->first()->title : 'Parent' }})
+                                                    ({{ $category->parent->translates->first() ? $category->parent->translates->first()->title : __('Parent') }})
                                                 @endif
                                             </option>
                                         @endforeach
                                     </select>
-                                    <small class="form-text text-muted">Select category to display on home page</small>
+                                    <small class="form-text text-muted">{{ __('Select category to display on home page') }}</small>
                                     @error('product_category_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -94,7 +94,7 @@
                             <!-- Status -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Status</label>
+                                    <label class="form-label">{{ __('Status') }}</label>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" 
                                                type="checkbox" 
@@ -102,7 +102,7 @@
                                                name="status" 
                                                value="1" 
                                                {{ old('status', $homePageCategory->status) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="status">Active</label>
+                                        <label class="form-check-label" for="status">{{ __('Active') }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -127,4 +127,4 @@
         </div>
     </div>
 </div>
-@endsection 
+@endsection

@@ -66,9 +66,9 @@
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">İstifadəçilər Siyahısı</h4>
+        <h4 class="mb-0">{{ __('Users List') }}</h4>
         <a href="{{ route('admin.registered-users.export') }}" class="btn btn-success btn-sm">
-            Excel Export
+            {{ __('Excel Export') }}
         </a>
 
     </div>
@@ -76,7 +76,7 @@
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Bağla"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
         </div>
     @endif
 
@@ -86,13 +86,13 @@
                 <thead class="table-dark">
                     <tr>
                         <th>#</th>
-                        <th>Ad</th>
-                        <th>Soyad</th>
-                        <th>Fin</th>
-                        <th>Email</th>
-                        <th>Telefon</th>
-                        <th>Yaradılma tarixi</th>
-                        <th class="text-center">Əməliyyatlar</th>
+                        <th>{{ __('Name') }}</th>
+                        <th>{{ __('Surname') }}</th>
+                        <th>{{ __('FIN') }}</th>
+                        <th>{{ __('Email') }}</th>
+                        <th>{{ __('Phone') }}</th>
+                        <th>{{ __('Created Date') }}</th>
+                        <th class="text-center">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -106,10 +106,10 @@
                             <td>{{ $user->phone ?: '-' }}</td>
                             <td>{{ $user->created_at?->format('d.m.Y H:i') ?: '-' }}</td>
                             <td class="text-center">
-                                <form action="{{ route('admin.registered-users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Bu istifadəçini silmək istədiyinizə əminsiniz?');" style="display:inline-block;">
+                                <form action="{{ route('admin.registered-users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure you want to delete this user?') }}');" style="display:inline-block;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="trash-btn" title="Sil">
+                                    <button type="submit" class="trash-btn" title="{{ __('Delete') }}">
                                         <div class="trash-icon">
                                             <span></span>
                                         </div>
@@ -119,7 +119,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted">İstifadəçi tapılmadı</td>
+                            <td colspan="8" class="text-center text-muted">{{ __('No users found') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

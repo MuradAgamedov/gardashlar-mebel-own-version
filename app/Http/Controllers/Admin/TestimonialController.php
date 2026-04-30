@@ -56,13 +56,13 @@ class TestimonialController extends Controller
             'company_logo' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
             'status' => 'boolean',
         ], [
-            'customer_image.image' => 'Customer image must be an image file.',
-            'customer_image.mimes' => 'Customer image must be a file of type: jpg, jpeg, png, gif, webp.',
-            'customer_image.max' => 'Customer image may not be greater than 2MB.',
-            'company_logo.image' => 'Company logo must be an image file.',
-            'company_logo.mimes' => 'Company logo must be a file of type: jpg, jpeg, png, gif, webp.',
-            'company_logo.max' => 'Company logo may not be greater than 2MB.',
-            'status.boolean' => 'Status must be true or false.',
+            'customer_image.image' => __('Customer image must be an image file.'),
+            'customer_image.mimes' => __('Customer image must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
+            'customer_image.max' => __('Customer image may not be greater than :size.', ['size' => '2MB']),
+            'company_logo.image' => __('Company logo must be an image file.'),
+            'company_logo.mimes' => __('Company logo must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
+            'company_logo.max' => __('Company logo may not be greater than :size.', ['size' => '2MB']),
+            'status.boolean' => __('Status must be true or false.'),
         ]);
 
         // Translation validation
@@ -72,12 +72,12 @@ class TestimonialController extends Controller
                 "translations.{$language->id}.position" => 'required|string|max:255',
                 "translations.{$language->id}.comment" => 'required|string|max:1000',
             ], [
-                "translations.{$language->id}.full_name.required" => "Full name is required for {$language->name}.",
-                "translations.{$language->id}.full_name.max" => "Full name may not be greater than 255 characters for {$language->name}.",
-                "translations.{$language->id}.position.required" => "Position is required for {$language->name}.",
-                "translations.{$language->id}.position.max" => "Position may not be greater than 255 characters for {$language->name}.",
-                "translations.{$language->id}.comment.required" => "Comment is required for {$language->name}.",
-                "translations.{$language->id}.comment.max" => "Comment may not be greater than 1000 characters for {$language->name}.",
+                "translations.{$language->id}.full_name.required" => __('Full name is required for :language.', ['language' => $language->name]),
+                "translations.{$language->id}.full_name.max" => __('Full name may not be greater than :max characters for :language.', ['max' => 255, 'language' => $language->name]),
+                "translations.{$language->id}.position.required" => __('Position is required for :language.', ['language' => $language->name]),
+                "translations.{$language->id}.position.max" => __('Position may not be greater than :max characters for :language.', ['max' => 255, 'language' => $language->name]),
+                "translations.{$language->id}.comment.required" => __('Comment is required for :language.', ['language' => $language->name]),
+                "translations.{$language->id}.comment.max" => __('Comment may not be greater than :max characters for :language.', ['max' => 1000, 'language' => $language->name]),
             ]);
         }
 
@@ -96,7 +96,7 @@ class TestimonialController extends Controller
                 
                 if (!$customerImagePath) {
                     return redirect()->back()
-                        ->with('error', 'Failed to upload customer image.')
+                        ->with('error', __('Failed to upload customer image.'))
                         ->withInput();
                 }
             }
@@ -115,7 +115,7 @@ class TestimonialController extends Controller
                 
                 if (!$companyLogoPath) {
                     return redirect()->back()
-                        ->with('error', 'Failed to upload company logo.')
+                        ->with('error', __('Failed to upload company logo.'))
                         ->withInput();
                 }
             }
@@ -149,8 +149,6 @@ class TestimonialController extends Controller
         }
     }
 
-
-
     /**
      * Show the form for editing the specified resource.
      */
@@ -175,13 +173,13 @@ class TestimonialController extends Controller
             'company_logo' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
             'status' => 'boolean',
         ], [
-            'customer_image.image' => 'Customer image must be an image file.',
-            'customer_image.mimes' => 'Customer image must be a file of type: jpg, jpeg, png, gif, webp.',
-            'customer_image.max' => 'Customer image may not be greater than 2MB.',
-            'company_logo.image' => 'Company logo must be an image file.',
-            'company_logo.mimes' => 'Company logo must be a file of type: jpg, jpeg, png, gif, webp.',
-            'company_logo.max' => 'Company logo may not be greater than 2MB.',
-            'status.boolean' => 'Status must be true or false.',
+            'customer_image.image' => __('Customer image must be an image file.'),
+            'customer_image.mimes' => __('Customer image must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
+            'customer_image.max' => __('Customer image may not be greater than :size.', ['size' => '2MB']),
+            'company_logo.image' => __('Company logo must be an image file.'),
+            'company_logo.mimes' => __('Company logo must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
+            'company_logo.max' => __('Company logo may not be greater than :size.', ['size' => '2MB']),
+            'status.boolean' => __('Status must be true or false.'),
         ]);
 
         // Translation validation
@@ -191,12 +189,12 @@ class TestimonialController extends Controller
                 "translations.{$language->id}.position" => 'required|string|max:255',
                 "translations.{$language->id}.comment" => 'required|string|max:1000',
             ], [
-                "translations.{$language->id}.full_name.required" => "Full name is required for {$language->name}.",
-                "translations.{$language->id}.full_name.max" => "Full name may not be greater than 255 characters for {$language->name}.",
-                "translations.{$language->id}.position.required" => "Position is required for {$language->name}.",
-                "translations.{$language->id}.position.max" => "Position may not be greater than 255 characters for {$language->name}.",
-                "translations.{$language->id}.comment.required" => "Comment is required for {$language->name}.",
-                "translations.{$language->id}.comment.max" => "Comment may not be greater than 1000 characters for {$language->name}.",
+                "translations.{$language->id}.full_name.required" => __('Full name is required for :language.', ['language' => $language->name]),
+                "translations.{$language->id}.full_name.max" => __('Full name may not be greater than :max characters for :language.', ['max' => 255, 'language' => $language->name]),
+                "translations.{$language->id}.position.required" => __('Position is required for :language.', ['language' => $language->name]),
+                "translations.{$language->id}.position.max" => __('Position may not be greater than :max characters for :language.', ['max' => 255, 'language' => $language->name]),
+                "translations.{$language->id}.comment.required" => __('Comment is required for :language.', ['language' => $language->name]),
+                "translations.{$language->id}.comment.max" => __('Comment may not be greater than :max characters for :language.', ['max' => 1000, 'language' => $language->name]),
             ]);
         }
 
@@ -218,7 +216,7 @@ class TestimonialController extends Controller
                     $imageData['customer_image'] = $uploadedPath;
                 } else {
                     return redirect()->back()
-                        ->with('error', 'Failed to upload customer image.')
+                        ->with('error', __('Failed to upload customer image.'))
                         ->withInput();
                 }
             }
@@ -239,7 +237,7 @@ class TestimonialController extends Controller
                     $imageData['company_logo'] = $uploadedPath;
                 } else {
                     return redirect()->back()
-                        ->with('error', 'Failed to upload company logo.')
+                        ->with('error', __('Failed to upload company logo.'))
                         ->withInput();
                 }
             }

@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Home Page Project')
+@section('title', __('Edit Home Page Project'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Home Page Project</h3>
+                    <h3>{{ __('Edit Home Page Project') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.home-page-projects.index') }}">Home Page Projects</a>
+                            <a href="{{ route('admin.home-page-projects.index') }}">{{ __('Home Page Projects') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit Project</li>
+                        <li class="breadcrumb-item active">{{ __('Edit Project') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,21 +30,21 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Please fix the following errors:</h6>
+                <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">{{ __('Error occurred:') }}</h6>
                 <p class="mb-0">{{ session('error') }}</p>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
@@ -52,11 +52,11 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Project: 
+                        <h5>{{ __('Edit Project') }}: 
                             @php
                                 $firstProjectTranslation = $homePageProject->project->translates->first();
                             @endphp
-                            <span class="text-primary">{{ $firstProjectTranslation ? $firstProjectTranslation->title : 'Project #' . $homePageProject->project_id }}</span>
+                            <span class="text-primary">{{ $firstProjectTranslation ? $firstProjectTranslation->title : __('Project') . ' #' . $homePageProject->project_id }}</span>
                         </h5>
                     </div>
                     <div class="card-body">
@@ -68,19 +68,19 @@
                             <div style="padding: 15px" class="row mb-3">
                                 <div class="col-md-12">
                                     <label class="form-label">
-                                        Select Category <span class="text-danger">*</span>
+                                        {{ __('Select Category') }} <span class="text-danger">*</span>
                                     </label>
                                     <select class="form-select @error('project_category_id') is-invalid @enderror" 
                                             name="project_category_id" 
                                             id="categorySelect"
                                             required>
-                                        <option value="">Choose a category...</option>
+                                        <option value="">{{ __('Choose a category...') }}</option>
                                         @foreach($categories as $category)
                                             @php
                                                 $translation = $category->translates->first();
                                             @endphp
                                             <option value="{{ $category->id }}" {{ old('project_category_id', $homePageProject->project_category_id) == $category->id ? 'selected' : '' }}>
-                                                {{ $translation ? $translation->title : 'Category #' . $category->id }}
+                                                {{ $translation ? $translation->title : __('Category') . ' #' . $category->id }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -90,7 +90,7 @@
                                         </div>
                                     @enderror
                                     <small class="form-text text-muted">
-                                        Select a category to filter projects
+                                        {{ __('Select a category to filter projects') }}
                                     </small>
                                 </div>
                             </div>
@@ -99,13 +99,13 @@
                             <div style="padding: 15px" class="row mb-3">
                                 <div class="col-md-12">
                                     <label class="form-label">
-                                        Select Project <span class="text-danger">*</span>
+                                        {{ __('Select Project') }} <span class="text-danger">*</span>
                                     </label>
                                     <select class="form-select @error('project_id') is-invalid @enderror" 
                                             name="project_id" 
                                             id="projectSelect"
                                             required>
-                                        <option value="">Loading projects...</option>
+                                        <option value="">{{ __('Loading projects...') }}</option>
                                     </select>
                                     @error('project_id')
                                         <div class="invalid-feedback">
@@ -113,7 +113,7 @@
                                         </div>
                                     @enderror
                                     <small class="form-text text-muted">
-                                        Select a project from the chosen category
+                                        {{ __('Select a project from the chosen category') }}
                                     </small>
                                 </div>
                             </div>
@@ -121,7 +121,7 @@
                             <!-- Status -->
                             <div style="padding: 15px" class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Status</label>
+                                    <label class="form-label">{{ __('Status') }}</label>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" 
                                                type="checkbox" 
@@ -129,7 +129,7 @@
                                                name="status" 
                                                value="1" 
                                                {{ old('status', $homePageProject->status) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="status">Active</label>
+                                        <label class="form-check-label" for="status">{{ __('Active') }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (categoryId) {
             // Show loading state
-            projectSelect.innerHTML = '<option value="">Loading projects...</option>';
+            projectSelect.innerHTML = '<option value="">{{ __("Loading projects...") }}</option>';
             projectSelect.disabled = true;
             
             // Fetch projects by category
@@ -176,11 +176,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(projects => {
                     // Clear and populate project select
-                    projectSelect.innerHTML = '<option value="">Choose a project...</option>';
+                    projectSelect.innerHTML = '<option value="">{{ __("Choose a project...") }}</option>';
                     
                     projects.forEach(project => {
                         const translation = project.translates[0];
-                        const title = translation ? translation.title : `Project #${project.id}`;
+                        const title = translation ? translation.title : `{{ __("Project") }} #${project.id}`;
                         
                         const option = document.createElement('option');
                         option.value = project.id;
@@ -198,12 +198,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .catch(error => {
                     console.error('Error loading projects:', error);
-                    projectSelect.innerHTML = '<option value="">Error loading projects</option>';
+                    projectSelect.innerHTML = '<option value="">{{ __("Error loading projects") }}</option>';
                     projectSelect.disabled = false;
                 });
         } else {
             // Reset project select when no category is selected
-            projectSelect.innerHTML = '<option value="">First select a category...</option>';
+            projectSelect.innerHTML = '<option value="">{{ __("First select a category...") }}</option>';
             projectSelect.disabled = true;
         }
     });
@@ -214,4 +214,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endpush 
+@endpush

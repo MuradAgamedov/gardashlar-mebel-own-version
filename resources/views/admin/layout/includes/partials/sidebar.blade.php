@@ -413,7 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cacheClearBtn.addEventListener('click', async function() {
       // Disable button and show loading state
       const originalText = this.innerHTML;
-      this.innerHTML = '<i class="fas fa-sync-alt"></i><h6>Clearing...</h6>';
+      this.innerHTML = '<i class="fas fa-sync-alt"></i><h6>' + '{{ __("Clearing...") }}' + '</h6>';
       this.disabled = true;
       
       try {
@@ -430,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (result.success) {
           // Show success message
-          this.innerHTML = '<i class="fas fa-check text-success"></i><h6>Cache Cleared!</h6>';
+          this.innerHTML = '<i class="fas fa-check text-success"></i><h6>' + '{{ __("Cache Cleared!") }}' + '</h6>';
           setTimeout(() => {
             this.innerHTML = originalText;
             this.disabled = false;
@@ -441,7 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (error) {
         console.error('Error clearing cache:', error);
         // Show error message
-        this.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i><h6>Error!</h6>';
+        this.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i><h6>' + '{{ __("Error!") }}' + '</h6>';
         setTimeout(() => {
           this.innerHTML = originalText;
           this.disabled = false;

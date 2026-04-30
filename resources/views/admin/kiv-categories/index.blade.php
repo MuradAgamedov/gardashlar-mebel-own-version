@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'KIV Categories')
+@section('title', __('KIV Categories'))
 
 @section('content')
 <div class="page-body">
@@ -8,16 +8,16 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>KIV Categories</h3>
+                    <h3>{{ __('KIV Categories') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">KIV Categories</li>
+                        <li class="breadcrumb-item active">{{ __('KIV Categories') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>KIV Categories</h5>
+                            <h5>{{ __('KIV Categories') }}</h5>
                             <a href="{{ route('admin.kiv-categories.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -53,11 +53,11 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th width="50">Order</th>
-                                        <th>Title</th>
-                                        <th>KIV Count</th>
-                                        <th width="80">Status</th>
-                                        <th width="150">Actions</th>
+                                        <th width="50">{{ __('Order') }}</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th>{{ __('KIV Count') }}</th>
+                                        <th width="80">{{ __('Status') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-categories">
@@ -80,7 +80,7 @@
                                             </td>
                                             <td>
                                                 <div>
-                                                    <strong>{{ $firstTranslation ? $firstTranslation->title : 'No translation' }}</strong>
+                                                    <strong>{{ $firstTranslation ? $firstTranslation->title : __('No translation') }}</strong>
                                                     @if($firstTranslation && $firstTranslation->subtitle)
                                                         <br><small class="text-muted">{{ $firstTranslation->subtitle }}</small>
                                                     @endif
@@ -92,9 +92,9 @@
                                             </td>
                                             <td>
                                                 @if($category->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -103,7 +103,7 @@
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Category #' . $category->id }}"
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : __('Category') . ' #' . $category->id }}"
                                                             data-url="{{ route('admin.kiv-categories.destroy', $category) }}"
                                                             data-kiv-count="{{ $category->kivs->count() }}">
                                                         <i class="material-icons-outlined">delete</i>
@@ -116,7 +116,7 @@
                                             <td colspan="6" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">folder</i>
-                                                    <p class="mt-2">No KIV categories found</p>
+                                                    <p class="mt-2">{{ __('No KIV categories found') }}</p>
                                                     <a href="{{ route('admin.kiv-categories.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>
@@ -189,16 +189,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (data.success) {
                         Swal.fire({
-                            title: 'Success!',
-                            text: 'KIV categories reordered successfully!',
+                            title: '{{ __("Success!") }}',
+                            text: '{{ __("KIV categories reordered successfully!") }}',
                             icon: 'success',
                             timer: 1500,
                             showConfirmButton: false
                         });
                     } else {
                         Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to reorder KIV categories',
+                            title: '{{ __("Error!") }}',
+                            text: data.message || '{{ __("Failed to reorder KIV categories") }}',
                             icon: 'error'
                         });
                     }
@@ -217,19 +217,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
             const kivCount = parseInt(this.getAttribute('data-kiv-count'));
 
-            let message = `Do you want to delete "${title}"?`;
+            let message = '{{ __("Do you want to delete \":title\"?", ["title" => ":title"]) }}'.replace(':title', title);
             if (kivCount > 0) {
-                message += `\n\nThis category has ${kivCount} KIV(s). You must delete all KIVs first.`;
+                message += '\n\n' + '{{ __("This category has :count KIV(s). You must delete all KIVs first.", ["count" => ":count"]) }}'.replace(':count', kivCount);
             }
 
             Swal.fire({
-                title: 'Are you sure?',
+                title: '{{ __("Are you sure?") }}',
                 text: message,
                 icon: kivCount > 0 ? 'warning' : 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __("Yes, delete it!") }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');

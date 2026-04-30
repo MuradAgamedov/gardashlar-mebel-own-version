@@ -44,11 +44,11 @@ class PhoneTypeController extends Controller
             );
 
             return redirect()->route('admin.phones.index')
-                ->with('success', 'Phone type created successfully!');
+                ->with('success', __('Phone type created successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error creating phone type: ' . $e->getMessage())
+                ->with('error', __('Error creating phone type: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -73,11 +73,11 @@ class PhoneTypeController extends Controller
             );
 
             return redirect()->route('admin.phones.index')
-                ->with('success', 'Phone type updated successfully!');
+                ->with('success', __('Phone type updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating phone type: ' . $e->getMessage())
+                ->with('error', __('Error updating phone type: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -87,10 +87,10 @@ class PhoneTypeController extends Controller
         try {
             $this->repository->deletePhoneType($phoneType);
             return redirect()->route('admin.phones.index')
-                ->with('success', 'Phone type deleted successfully!');
+                ->with('success', __('Phone type deleted successfully!'));
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting phone type: ' . $e->getMessage());
+                ->with('error', __('Error deleting phone type: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -103,4 +103,4 @@ class PhoneTypeController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
-} 
+}

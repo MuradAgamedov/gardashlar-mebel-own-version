@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Home Page Projects Management')
+@section('title', __('Home Page Projects Management'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Home Page Projects Management</h3>
+                    <h3>{{ __('Home Page Projects Management') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Home Page Projects</li>
+                        <li class="breadcrumb-item active">{{ __('Home Page Projects') }}</li>
                     </ol>
                 </div>
             </div>
@@ -28,15 +28,15 @@
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">{{ __('Error occurred:') }}</h6>
                 <p class="mb-0">{{ session('error') }}</p>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
@@ -45,7 +45,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Projects on Home Page</h5>
+                            <h5>{{ __('Projects on Home Page') }}</h5>
                             <a href="{{ route('admin.home-page-projects.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -57,12 +57,12 @@
                                 <thead>
                                     <tr>
                                         <th width="50">#</th>
-                                        <th>Project Name</th>
-                                        <th>Category</th>
-                                        <th>Languages</th>
-                                        <th>Status</th>
-                                        <th>Order</th>
-                                        <th width="150">Actions</th>
+                                        <th>{{ __('Project Name') }}</th>
+                                        <th>{{ __('Category') }}</th>
+                                        <th>{{ __('Languages') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th>{{ __('Order') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-projects">
@@ -87,7 +87,7 @@
                                                             $firstProjectTranslation = $homePageProject->project->translates->firstWhere('language_id', $mainLanguageId)
                                                                 ?? $homePageProject->project->translates->first();
                                                         @endphp
-                                                        <strong>{{ $firstProjectTranslation ? $firstProjectTranslation->title : 'No title' }}</strong>
+                                                        <strong>{{ $firstProjectTranslation ? $firstProjectTranslation->title : __('No title') }}</strong>
                                                     </div>
                                                 </div>
                                             </td>
@@ -99,10 +99,10 @@
                                                             ?? $homePageProject->projectCategory->translates->first();
                                                     @endphp
                                                     <span class="badge bg-secondary">
-                                                        {{ $firstCategoryTranslation ? $firstCategoryTranslation->title : 'No category' }}
+                                                        {{ $firstCategoryTranslation ? $firstCategoryTranslation->title : __('No category') }}
                                                     </span>
                                                 @else
-                                                    <span class="text-muted">No category</span>
+                                                    <span class="text-muted">{{ __('No category') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -114,9 +114,9 @@
                                             </td>
                                             <td>
                                                 @if($homePageProject->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>{{ $homePageProject->order }}</td>
@@ -126,7 +126,7 @@
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstProjectTranslation ? $firstProjectTranslation->title : 'Project #' . $homePageProject->id }}"
+                                                            data-title="{{ $firstProjectTranslation ? $firstProjectTranslation->title : __('Project') . ' #' . $homePageProject->id }}"
                                                             data-url="{{ route('admin.home-page-projects.destroy', $homePageProject) }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
@@ -138,7 +138,7 @@
                                             <td colspan="7" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">work</i>
-                                                    <p class="mt-2">No projects added to home page yet</p>
+                                                    <p class="mt-2">{{ __('No projects added to home page yet') }}</p>
                                                     <a href="{{ route('admin.home-page-projects.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>
@@ -211,8 +211,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (!data.success) {
                         Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to reorder projects',
+                            title: '{{ __("Error!") }}',
+                            text: data.message || '{{ __("Failed to reorder projects") }}',
                             icon: 'error'
                         });
                     }
@@ -231,13 +231,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to remove "${title}" from home page?`,
+                title: '{{ __("Are you sure?") }}',
+                text: `{{ __("Do you want to remove this project from home page?") }}`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, remove it!'
+                confirmButtonText: '{{ __("Yes, remove it!") }}',
+                cancelButtonText: '{{ __("Cancel") }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');
@@ -255,4 +256,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush 
+@endpush

@@ -61,19 +61,19 @@ class WhyChooseUsController extends Controller
             'translates.*.fourth_title' => 'nullable|string|max:255',
             'translates.*.fourth_description' => 'nullable|string',
         ], [
-            'translates.required' => 'At least one language translation is required.',
-            'first_icon.image' => 'First icon must be an image file.',
-            'first_icon.mimes' => 'First icon must be a file of type: jpg, jpeg, png, gif, webp.',
-            'first_icon.max' => 'First icon may not be greater than 2MB.',
-            'second_icon.image' => 'Second icon must be an image file.',
-            'second_icon.mimes' => 'Second icon must be a file of type: jpg, jpeg, png, gif, webp.',
-            'second_icon.max' => 'Second icon may not be greater than 2MB.',
-            'third_icon.image' => 'Third icon must be an image file.',
-            'third_icon.mimes' => 'Third icon must be a file of type: jpg, jpeg, png, gif, webp.',
-            'third_icon.max' => 'Third icon may not be greater than 2MB.',
-            'fourth_icon.image' => 'Fourth icon must be an image file.',
-            'fourth_icon.mimes' => 'Fourth icon must be a file of type: jpg, jpeg, png, gif, webp.',
-            'fourth_icon.max' => 'Fourth icon may not be greater than 2MB.',
+            'translates.required' => __('At least one language translation is required.'),
+            'first_icon.image' => __('First icon must be an image file.'),
+            'first_icon.mimes' => __('First icon must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
+            'first_icon.max' => __('First icon may not be greater than :size.', ['size' => '2MB']),
+            'second_icon.image' => __('Second icon must be an image file.'),
+            'second_icon.mimes' => __('Second icon must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
+            'second_icon.max' => __('Second icon may not be greater than :size.', ['size' => '2MB']),
+            'third_icon.image' => __('Third icon must be an image file.'),
+            'third_icon.mimes' => __('Third icon must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
+            'third_icon.max' => __('Third icon may not be greater than :size.', ['size' => '2MB']),
+            'fourth_icon.image' => __('Fourth icon must be an image file.'),
+            'fourth_icon.mimes' => __('Fourth icon must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
+            'fourth_icon.max' => __('Fourth icon may not be greater than :size.', ['size' => '2MB']),
         ]);
 
         try {
@@ -96,8 +96,9 @@ class WhyChooseUsController extends Controller
                     if ($uploadedPath) {
                         $iconData[$field] = $uploadedPath;
                     } else {
+                        $fieldLabel = str_replace('_', ' ', $field);
                         return redirect()->back()
-                            ->with('error', 'Failed to upload ' . str_replace('_', ' ', $field) . '.')
+                            ->with('error', __('Failed to upload :field.', ['field' => __($fieldLabel)]))
                             ->withInput();
                     }
                 }
@@ -131,11 +132,11 @@ class WhyChooseUsController extends Controller
             }
 
             return redirect()->route('admin.why-choose-us.edit')
-                ->with('success', 'Why Choose Us section updated successfully!');
+                ->with('success', __('Why Choose Us section updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating Why Choose Us section: ' . $e->getMessage())
+                ->with('error', __('Error updating Why Choose Us section: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }

@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Create Address for Type')
+@section('title', __('Create Address for Type'))
 
 @section('content')
 <div class="page-body">
@@ -8,19 +8,19 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Create Address for {{ $addressType->getTitle() }}</h3>
+                    <h3>{{ __('Create Address for :type', ['type' => $addressType->getTitle()]) }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.addresses.index') }}">Address Management</a>
+                            <a href="{{ route('admin.addresses.index') }}">{{ __('Address Management') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Create Address</li>
+                        <li class="breadcrumb-item active">{{ __('Create Address') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,33 +30,28 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Please fix the following errors:</h6>
+                <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
-
-        <!-- Debug Info -->
-        <div class="alert alert-info">
-            <strong>Debug Info:</strong> Address Type ID: {{ $addressType->id }}
-        </div>
 
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Add New Address for {{ $addressType->getTitle() }}</h5>
+                        <h5>{{ __('Add New Address for :type', ['type' => $addressType->getTitle()]) }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.addresses.store') }}" method="POST">
@@ -68,10 +63,10 @@
                             <!-- Status -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Status</label>
+                                    <label class="form-label">{{ __('Status') }}</label>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" value="1" checked>
-                                        <label class="form-check-label" for="status">Active</label>
+                                        <label class="form-check-label" for="status">{{ __('Active') }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -79,7 +74,7 @@
                             <!-- Language Tabs -->
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Address Information</label>
+                                    <label class="form-label">{{ __('Address Information') }}</label>
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
                                         @foreach($languages as $index => $language)
                                             <li class="nav-item" role="presentation">
@@ -105,12 +100,12 @@
                                                     <!-- Address -->
                                                     <div class="col-md-12">
                                                         <label class="form-label">
-                                                            Address <span class="text-danger">*</span>
+                                                            {{ __('Address') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <textarea class="form-control @error("translations.{$language->id}.address") is-invalid @enderror" 
                                                                   name="translations[{{ $language->id }}][address]" 
                                                                   rows="3"
-                                                                  placeholder="Enter full address">{{ old("translations.{$language->id}.address") }}</textarea>
+                                                                  placeholder="{{ __('Enter full address') }}">{{ old("translations.{$language->id}.address") }}</textarea>
                                                         @error("translations.{$language->id}.address")
                                                             <div class="invalid-feedback">
                                                                 {{ $message }}
@@ -154,16 +149,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (firstTextarea) {
         firstTextarea.focus();
     }
-    
-    // Debug: Log form data before submit
-    const form = document.querySelector('form');
-    form.addEventListener('submit', function(e) {
-        const formData = new FormData(form);
-        console.log('Form data before submit:');
-        for (let [key, value] of formData.entries()) {
-            console.log(key + ': ' + value);
-        }
-    });
 });
 </script>
-@endpush 
+@endpush

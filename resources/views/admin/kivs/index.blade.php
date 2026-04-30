@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'KIVs')
+@section('title', __('KIVs'))
 
 @section('content')
 <div class="page-body">
@@ -8,16 +8,16 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>KIVs</h3>
+                    <h3>{{ __('KIVs') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">KIVs</li>
+                        <li class="breadcrumb-item active">{{ __('KIVs') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>KIVs</h5>
+                            <h5>{{ __('KIVs') }}</h5>
                             <a href="{{ route('admin.kivs.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -54,7 +54,7 @@
                             <div class="col-md-4">
                                 <form method="GET" action="{{ route('admin.kivs.index') }}" class="d-flex gap-2">
                                     <select name="category_id" class="form-select">
-                                        <option value="">All Categories</option>
+                                        <option value="">{{ __('All Categories') }}</option>
                                         @foreach($categories as $category)
                                             @php
                                                 $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
@@ -62,7 +62,7 @@
                                                     ?? $category->translates->first();
                                             @endphp
                                             <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                                                {{ $categoryTranslation ? $categoryTranslation->title : 'Unknown Category' }}
+                                                {{ $categoryTranslation ? $categoryTranslation->title : __('Unknown Category') }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -82,12 +82,12 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th width="50">Order</th>
-                                        <th width="100">Image</th>
-                                        <th>Category</th>
-                                        <th>Video Link</th>
-                                        <th width="80">Status</th>
-                                        <th width="150">Actions</th>
+                                        <th width="50">{{ __('Order') }}</th>
+                                        <th width="100">{{ __('Image') }}</th>
+                                        <th>{{ __('Category') }}</th>
+                                        <th>{{ __('Video Link') }}</th>
+                                        <th width="80">{{ __('Status') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-kivs">
@@ -110,7 +110,7 @@
                                             </td>
                                             <td>
                                                 @if($kiv->image_url)
-                                                    <img src="{{ $kiv->image_url }}" alt="KIV Image" class="img-thumbnail" style="width: 80px; height: 60px; object-fit: cover;">
+                                                    <img src="{{ $kiv->image_url }}" alt="{{ __('KIV Image') }}" class="img-thumbnail" style="width: 80px; height: 60px; object-fit: cover;">
                                                 @else
                                                     <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 60px;">
                                                         <i class="material-icons-outlined text-muted">image</i>
@@ -118,7 +118,7 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <span class="badge bg-primary">{{ $categoryTranslation ? $categoryTranslation->title : 'Unknown Category' }}</span>
+                                                <span class="badge bg-primary">{{ $categoryTranslation ? $categoryTranslation->title : __('Unknown Category') }}</span>
                                             </td>
                                             <td>
                                                 @if($kiv->video_link)
@@ -126,14 +126,14 @@
                                                         <i class="material-icons-outlined">play_circle</i>
                                                     </a>
                                                 @else
-                                                    <span class="text-muted">No video link</span>
+                                                    <span class="text-muted">{{ __('No video link') }}</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if($kiv->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -154,7 +154,7 @@
                                             <td colspan="6" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">video_library</i>
-                                                    <p class="mt-2">No KIVs found</p>
+                                                    <p class="mt-2">{{ __('No KIVs found') }}</p>
                                                     <a href="{{ route('admin.kivs.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>
@@ -227,16 +227,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (data.success) {
                         Swal.fire({
-                            title: 'Success!',
-                            text: 'KIVs reordered successfully!',
+                            title: '{{ __('Success!') }}',
+                            text: '{{ __('KIVs reordered successfully!') }}',
                             icon: 'success',
                             timer: 1500,
                             showConfirmButton: false
                         });
                     } else {
                         Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to reorder KIVs',
+                            title: '{{ __('Error!') }}',
+                            text: data.message || '{{ __('Failed to reorder KIVs') }}',
                             icon: 'error'
                         });
                     }
@@ -255,13 +255,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to delete "${title}"?`,
+                title: '{{ __('Are you sure?') }}',
+                text: '{{ __('Do you want to delete :title?', ['title' => ':title']) }}'.replace(':title', title),
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __('Yes, delete it!') }}',
+                cancelButtonText: '{{ __('Cancel') }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');

@@ -48,13 +48,13 @@ class EmailController extends Controller
             ]);
 
             return redirect()->route('admin.emails.index')
-                ->with('success', 'Email created successfully.');
+                ->with('success', __('Email created successfully.'));
 
         } catch (\Exception $e) {
             Log::error('Error creating email: ' . $e->getMessage());
             
             return back()->withInput()
-                ->with('error', 'Error creating email. Please try again.');
+                ->with('error', __('Error creating email. Please try again.'));
         }
     }
 
@@ -83,13 +83,13 @@ class EmailController extends Controller
             ]);
 
             return redirect()->route('admin.emails.index')
-                ->with('success', 'Email updated successfully.');
+                ->with('success', __('Email updated successfully.'));
 
         } catch (\Exception $e) {
             Log::error('Error updating email: ' . $e->getMessage());
             
             return back()->withInput()
-                ->with('error', 'Error updating email. Please try again.');
+                ->with('error', __('Error updating email. Please try again.'));
         }
     }
 
@@ -101,10 +101,10 @@ class EmailController extends Controller
         try {
             $email->delete();
             return redirect()->route('admin.emails.index')
-                ->with('success', 'Email deleted successfully.');
+                ->with('success', __('Email deleted successfully.'));
         } catch (\Exception $e) {
             Log::error('Error deleting email: ' . $e->getMessage());
-            return back()->with('error', 'Error deleting email. Please try again.');
+            return back()->with('error', __('Error deleting email. Please try again.'));
         }
     }
 
@@ -126,7 +126,7 @@ class EmailController extends Controller
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             Log::error('Error reordering emails: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Error reordering emails'], 500);
+            return response()->json(['success' => false, 'message' => __('Error reordering emails')], 500);
         }
     }
 }

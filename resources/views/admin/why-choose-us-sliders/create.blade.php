@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Create Why Choose Us Slider</h3>
+                    <h3>{{ __('Create Why Choose Us Slider') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -16,9 +16,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.why-choose-us-sliders.index') }}">Why Choose Us Sliders</a>
+                            <a href="{{ route('admin.why-choose-us-sliders.index') }}">{{ __('Why Choose Us Sliders') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Create</li>
+                        <li class="breadcrumb-item active">{{ __('Create') }}</li>
                     </ol>
                 </div>
             </div>
@@ -35,7 +35,7 @@
 
         @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <h6 class="alert-heading">Please fix the following errors:</h6>
+            <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
             <ul class="mb-0">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -49,7 +49,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Add New Slider</h5>
+                        <h5>{{ __('Add New Slider') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.why-choose-us-sliders.store') }}" method="POST" enctype="multipart/form-data">
@@ -58,10 +58,10 @@
                             <!-- Media Section -->
                             <div class="row mb-4">
                                 <div class="col-md-12">
-                                    <h6 class="mb-3">Media</h6>
+                                    <h6 class="mb-3">{{ __('Media') }}</h6>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Slider Image</label>
+                                            <label class="form-label">{{ __('Slider Image') }}</label>
                                             <div class="image-upload-container">
                                                 <input type="file" 
                                                        class="form-control @error('image') is-invalid @enderror image-file-input" 
@@ -75,7 +75,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Video Link</label>
+                                            <label class="form-label">{{ __('Video Link') }}</label>
                                             <input type="url" 
                                                    class="form-control @error('video_link') is-invalid @enderror" 
                                                    name="video_link" 
@@ -84,7 +84,7 @@
                                             @error('video_link')
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
-                                            <small class="form-text text-muted">YouTube, Vimeo or any video URL</small>
+                                            <small class="form-text text-muted">{{ __('YouTube, Vimeo or any video URL') }}</small>
                                         </div>
                                     </div>
                                 </div>
@@ -97,7 +97,7 @@
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ old('status', '1') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Active Status
+                                            {{ __('Active Status') }}
                                         </label>
                                     </div>
                                 </div>
@@ -108,11 +108,11 @@
                                     <div class="d-flex gap-2">
                                         <button type="submit" class="btn btn-primary">
                                             <i class="material-icons-outlined">save</i>
-                                            Create Slider
+                                            {{ __('Create Slider') }}
                                         </button>
                                         <a href="{{ route('admin.why-choose-us-sliders.index') }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">cancel</i>
-                                            Cancel
+                                            {{ __('Cancel') }}
                                         </a>
                                     </div>
                                 </div>
@@ -175,4 +175,4 @@ document.addEventListener('DOMContentLoaded', function() {
     border-radius: 0.25rem;
 }
 </style>
-@endpush 
+@endpush

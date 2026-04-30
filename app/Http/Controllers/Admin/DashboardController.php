@@ -27,8 +27,8 @@ class DashboardController extends Controller
     {
         // Get current date info
         $currentDate = Carbon::now();
-        $currentMonth = $currentDate->format('F Y');
-        $currentDay = $currentDate->format('l j, M Y');
+        $currentMonth = $currentDate->translatedFormat('F Y');
+        $currentDay = $currentDate->translatedFormat('l j, M Y');
 
         // Statistics
         $stats = [
@@ -84,7 +84,7 @@ class DashboardController extends Controller
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
             $chartData[] = [
-                'date' => $date->format('M j'),
+                'date' => $date->translatedFormat('M j'),
                 'orders' => Order::whereDate('created_at', $date)->count(),
                 'messages' => ContactMessage::whereDate('created_at', $date)->count(),
                 'users' => User::whereDate('created_at', $date)->count(),
@@ -140,13 +140,13 @@ class DashboardController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cache cleared successfully!',
+                'message' => __('Cache cleared successfully!'),
                 'frontend_response' => $frontendResponse
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error clearing cache: ' . $e->getMessage()
+                'message' => __('Error clearing cache: :error', ['error' => $e->getMessage()])
             ], 500);
         }
     }

@@ -49,11 +49,11 @@ class AddressController extends Controller
             );
 
             return redirect()->route('admin.addresses.index')
-                ->with('success', 'Address created successfully.');
+                ->with('success', __('Address created successfully.'));
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error creating address. Please try again.');
+                ->with('error', __('Error creating address. Please try again.'));
         }
     }
 
@@ -78,11 +78,11 @@ class AddressController extends Controller
             );
 
             return redirect()->route('admin.addresses.index')
-                ->with('success', 'Address updated successfully.');
+                ->with('success', __('Address updated successfully.'));
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error updating address. Please try again.');
+                ->with('error', __('Error updating address. Please try again.'));
         }
     }
 
@@ -91,9 +91,9 @@ class AddressController extends Controller
         try {
             $this->repository->deleteAddress($address);
             return redirect()->route('admin.addresses.index')
-                ->with('success', 'Address deleted successfully.');
+                ->with('success', __('Address deleted successfully.'));
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting address. Please try again.');
+            return back()->with('error', __('Error deleting address. Please try again.'));
         }
     }
 
@@ -108,7 +108,7 @@ class AddressController extends Controller
             $this->repository->reorderAddresses($request->items);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error reordering addresses'], 500);
+            return response()->json(['success' => false, 'message' => __('Error reordering addresses')], 500);
         }
     }
 }

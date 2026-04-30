@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Create Testimonial</h3>
+                    <h3>{{ __('Create Testimonial') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -16,9 +16,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.testimonials.index') }}">Testimonials</a>
+                            <a href="{{ route('admin.testimonials.index') }}">{{ __('Testimonials') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Create</li>
+                        <li class="breadcrumb-item active">{{ __('Create') }}</li>
                     </ol>
                 </div>
             </div>
@@ -35,7 +35,7 @@
 
         @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <h6 class="alert-heading">Please fix the following errors:</h6>
+            <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
             <ul class="mb-0">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -49,7 +49,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Add New Testimonial</h5>
+                        <h5>{{ __('Add New Testimonial') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.testimonials.store') }}" method="POST" enctype="multipart/form-data">
@@ -58,10 +58,10 @@
                             <!-- Media Section -->
                             <div class="row mb-4">
                                 <div class="col-md-12">
-                                    <h6 class="mb-3">Media</h6>
+                                    <h6 class="mb-3">{{ __('Media') }}</h6>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Customer Image</label>
+                                            <label class="form-label">{{ __('Customer Image') }}</label>
                                             <div class="image-upload-container">
                                                 <input type="file" 
                                                        class="form-control @error('customer_image') is-invalid @enderror image-file-input" 
@@ -75,7 +75,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Company Logo</label>
+                                            <label class="form-label">{{ __('Company Logo') }}</label>
                                             <div class="image-upload-container">
                                                 <input type="file" 
                                                        class="form-control @error('company_logo') is-invalid @enderror image-file-input" 
@@ -95,7 +95,7 @@
                             <!-- Content Translations Section -->
                             <div class="row mb-4">
                                 <div class="col-md-12">
-                                    <h6 class="mb-3">Content Translations</h6>
+                                    <h6 class="mb-3">{{ __('Content Translations') }}</h6>
                                     
                                     <!-- Language Tabs -->
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
@@ -129,33 +129,33 @@
                                                 
                                                 <div class="row">
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Full Name</label>
+                                                        <label class="form-label">{{ __('Full Name') }}</label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.full_name") is-invalid @enderror" 
                                                                name="translations[{{ $language->id }}][full_name]" 
                                                                value="{{ old("translations.{$language->id}.full_name") }}"
-                                                               placeholder="Enter full name">
+                                                               placeholder="{{ __('Enter full name') }}">
                                                         @error("translations.{$language->id}.full_name")
                                                             <div class="invalid-feedback d-block">{{ $message }}</div>
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Position</label>
+                                                        <label class="form-label">{{ __('Position') }}</label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.position") is-invalid @enderror" 
                                                                name="translations[{{ $language->id }}][position]" 
                                                                value="{{ old("translations.{$language->id}.position") }}"
-                                                               placeholder="Enter position">
+                                                               placeholder="{{ __('Enter position') }}">
                                                         @error("translations.{$language->id}.position")
                                                             <div class="invalid-feedback d-block">{{ $message }}</div>
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-12 mb-3">
-                                                        <label class="form-label">Comment</label>
+                                                        <label class="form-label">{{ __('Comment') }}</label>
                                                         <textarea class="form-control @error("translations.{$language->id}.comment") is-invalid @enderror" 
                                                                   name="translations[{{ $language->id }}][comment]" 
                                                                   rows="4"
-                                                                  placeholder="Enter testimonial comment">{{ old("translations.{$language->id}.comment") }}</textarea>
+                                                                  placeholder="{{ __('Enter testimonial comment') }}">{{ old("translations.{$language->id}.comment") }}</textarea>
                                                         @error("translations.{$language->id}.comment")
                                                             <div class="invalid-feedback d-block">{{ $message }}</div>
                                                         @enderror
@@ -174,7 +174,7 @@
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ old('status', '1') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Active Status
+                                            {{ __('Active Status') }}
                                         </label>
                                     </div>
                                 </div>
@@ -185,9 +185,11 @@
                                     <div class="d-flex gap-2">
                                         <button type="submit" class="btn btn-primary">
                                             <i class="material-icons-outlined">save</i>
+                                            {{ __('Create Testimonial') }}
                                         </button>
                                         <a href="{{ route('admin.testimonials.index') }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">cancel</i>
+                                            {{ __('Cancel') }}
                                         </a>
                                     </div>
                                 </div>
@@ -278,4 +280,4 @@ document.addEventListener('DOMContentLoaded', function() {
     border-color: #e9ecef #e9ecef #dee2e6;
 }
 </style>
-@endpush 
+@endpush

@@ -44,11 +44,11 @@ class PhoneController extends Controller
             ]);
 
             return redirect()->route('admin.phones.index')
-                ->with('success', 'Phone created successfully!');
+                ->with('success', __('Phone created successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error creating phone: ' . $e->getMessage())
+                ->with('error', __('Error creating phone: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -70,11 +70,11 @@ class PhoneController extends Controller
             ]);
 
             return redirect()->route('admin.phones.index')
-                ->with('success', 'Phone updated successfully!');
+                ->with('success', __('Phone updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating phone: ' . $e->getMessage())
+                ->with('error', __('Error updating phone: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -84,10 +84,10 @@ class PhoneController extends Controller
         try {
             $this->repository->deletePhone($phone);
             return redirect()->route('admin.phones.index')
-                ->with('success', 'Phone deleted successfully!');
+                ->with('success', __('Phone deleted successfully!'));
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting phone: ' . $e->getMessage());
+                ->with('error', __('Error deleting phone: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -100,4 +100,4 @@ class PhoneController extends Controller
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
-} 
+}

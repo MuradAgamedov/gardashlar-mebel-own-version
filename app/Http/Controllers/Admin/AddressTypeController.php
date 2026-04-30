@@ -40,11 +40,11 @@ class AddressTypeController extends Controller
             );
 
             return redirect()->route('admin.addresses.index')
-                ->with('success', 'Address type created successfully.');
+                ->with('success', __('Address type created successfully.'));
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error creating address type. Please try again.');
+                ->with('error', __('Error creating address type. Please try again.'));
         }
     }
 
@@ -65,11 +65,11 @@ class AddressTypeController extends Controller
             );
 
             return redirect()->route('admin.addresses.index')
-                ->with('success', 'Address type updated successfully.');
+                ->with('success', __('Address type updated successfully.'));
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', 'Error updating address type. Please try again.');
+                ->with('error', __('Error updating address type. Please try again.'));
         }
     }
 
@@ -78,9 +78,9 @@ class AddressTypeController extends Controller
         try {
             $this->repository->deleteAddressType($addressType);
             return redirect()->route('admin.addresses.index')
-                ->with('success', 'Address type deleted successfully.');
+                ->with('success', __('Address type deleted successfully.'));
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting address type. Please try again.');
+            return back()->with('error', __('Error deleting address type. Please try again.'));
         }
     }
 
@@ -95,7 +95,7 @@ class AddressTypeController extends Controller
             $this->repository->reorderAddressTypes($request->items);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error reordering address types'], 500);
+            return response()->json(['success' => false, 'message' => __('Error reordering address types')], 500);
         }
     }
 }

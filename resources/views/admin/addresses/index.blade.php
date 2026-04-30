@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Address Management')
+@section('title', __('Address Management'))
 
 @section('content')
 <div class="page-body">
@@ -8,16 +8,16 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Address Management</h3>
+                    <h3>{{ __('Address Management') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Address Management</li>
+                        <li class="breadcrumb-item active">{{ __('Address Management') }}</li>
                     </ol>
                 </div>
             </div>
@@ -28,14 +28,14 @@
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
@@ -45,7 +45,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Address Types</h5>
+                            <h5>{{ __('Address Types') }}</h5>
                             <a href="{{ route('admin.address-types.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -75,7 +75,7 @@
                                                 </div>
                                                 <div>
                                                     <h6 class="mb-0">
-                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : 'No translation' }}</strong>
+                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : __('No translation') }}</strong>
                                                     </h6>
                                                     <div class="d-flex gap-1 mt-1">
                                                         @foreach($addressType->translates as $translate)
@@ -86,9 +86,9 @@
                                             </div>
                                             <div class="d-flex align-items-center gap-2">
                                                 @if($addressType->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.address-types.edit', $addressType) }}" class="btn btn-sm btn-warning">
@@ -98,7 +98,7 @@
                                                         <i class="material-icons-outlined">add</i> 
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Address Type #' . $addressType->id }}"
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : __('Address Type #') . $addressType->id }}"
                                                             data-url="{{ route('admin.address-types.destroy', $addressType) }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
@@ -137,18 +137,18 @@
                                                                                         <span class="text-truncate" style="max-width: 200px;">{{ $mainAddressTranslate->address }}</span>
                                                                                     </div>
                                                                                 @else
-                                                                                    <span class="text-muted">No translation</span>
+                                                                                    <span class="text-muted">{{ __('No translation') }}</span>
                                                                                 @endif
                                                                             </div>
                                                                         </div>
-                                                                        <span class="badge bg-info mt-1" style="font-size: 10px;">Address</span>
+                                                                        <span class="badge bg-info mt-1" style="font-size: 10px;">{{ __('Address') }}</span>
                                                                     </div>
                                                                 </div>
                                                                 <div class="d-flex align-items-center gap-1">
                                                                     @if($address->status)
-                                                                        <span class="badge bg-success" style="font-size: 10px;">Active</span>
+                                                                        <span class="badge bg-success" style="font-size: 10px;">{{ __('Active') }}</span>
                                                                     @else
-                                                                        <span class="badge bg-secondary" style="font-size: 10px;">Inactive</span>
+                                                                        <span class="badge bg-secondary" style="font-size: 10px;">{{ __('Inactive') }}</span>
                                                                     @endif
                                                                     <div class="d-flex gap-1">
                                                                         <a href="{{ route('admin.addresses.edit', $address) }}" class="btn btn-sm btn-warning" style="padding: 2px 6px;">
@@ -156,7 +156,7 @@
                                                                         </a>
                                                                         <button type="button" class="btn btn-sm btn-danger delete-btn" 
                                                                                 style="padding: 2px 6px;"
-                                                                                data-title="Address #{{ $address->id }}"
+                                                                                data-title="{{ __('Address #') . $address->id }}"
                                                                                 data-url="{{ route('admin.addresses.destroy', $address) }}">
                                                                             <i class="material-icons-outlined" style="font-size: 14px;">delete</i>
                                                                         </button>
@@ -168,7 +168,7 @@
                                                 @else
                                                     <div class="p-2 text-muted">
                                                         <i class="material-icons-outlined me-1" style="font-size: 14px;">info</i>
-                                                        <small>No addresses assigned to this type</small>
+                                                        <small>{{ __('No addresses assigned to this type') }}</small>
                                                     </div>
                                                 @endif
                                             </div>
@@ -179,7 +179,7 @@
                                 <div class="text-center py-4">
                                     <div class="text-muted">
                                         <i class="material-icons-outlined" style="font-size: 48px;">location_on</i>
-                                        <p class="mt-2">No address types found</p>
+                                        <p class="mt-2">{{ __('No address types found') }}</p>
                                         <a href="{{ route('admin.address-types.create') }}" class="btn btn-primary">
                                             <i class="material-icons-outlined">add</i>
                                         </a>
@@ -285,8 +285,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (!data.success) {
                         Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to reorder address types',
+                            title: '{{ __("Error!") }}',
+                            text: data.message || '{{ __("Failed to reorder address types") }}',
                             icon: 'error'
                         });
                     }
@@ -322,8 +322,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(data => {
                         if (!data.success) {
                             Swal.fire({
-                                title: 'Error!',
-                                text: data.message || 'Failed to reorder addresses',
+                                title: '{{ __("Error!") }}',
+                                text: data.message || '{{ __("Failed to reorder addresses") }}',
                                 icon: 'error'
                             });
                         }
@@ -343,13 +343,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to delete "${title}"?`,
+                title: '{{ __("Are you sure?") }}',
+                text: '{{ __("Do you want to delete \":title\"?", ["title" => ":title"]) }}'.replace(':title', title),
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __("Yes, delete it!") }}',
+                cancelButtonText: '{{ __("Cancel") }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');
@@ -367,4 +368,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush 
+@endpush

@@ -43,11 +43,11 @@ class HomePageProjectController extends Controller
             ]);
 
             return redirect()->route('admin.home-page-projects.index')
-                ->with('success', 'Project added to home page successfully!');
+                ->with('success', __('Project added to home page successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error creating home page project: ' . $e->getMessage())
+                ->with('error', __('Error creating home page project: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -75,11 +75,11 @@ class HomePageProjectController extends Controller
             ]);
 
             return redirect()->route('admin.home-page-projects.index')
-                ->with('success', 'Home page project updated successfully!');
+                ->with('success', __('Home page project updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating home page project: ' . $e->getMessage())
+                ->with('error', __('Error updating home page project: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -89,11 +89,11 @@ class HomePageProjectController extends Controller
         try {
             $this->repository->deleteHomePageProject($homePageProject);
             return redirect()->route('admin.home-page-projects.index')
-                ->with('success', 'Project removed from home page successfully!');
+                ->with('success', __('Project removed from home page successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting home page project: ' . $e->getMessage());
+                ->with('error', __('Error deleting home page project: :error', ['error' => $e->getMessage()]));
         }
     }
 

@@ -34,11 +34,11 @@ class HomePageDiscountController extends Controller
             );
 
             return redirect()->back()
-                ->with('success', 'Home Page Discount section updated successfully!');
+                ->with('success', __('Home Page Discount section updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating home page discount section: ' . $e->getMessage())
+                ->with('error', __('Error updating home page discount section: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }

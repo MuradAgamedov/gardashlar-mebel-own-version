@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\UsersExport;
+
 class UserController extends Controller
 {
     public function index()
@@ -20,7 +21,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->route('admin.registered-users')->with('success', 'İstifadəçi silindi.');
+        return redirect()->route('admin.registered-users')->with('success', __('User deleted successfully.'));
     }
 
     public function export()

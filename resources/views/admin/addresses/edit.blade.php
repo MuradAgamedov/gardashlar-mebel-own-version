@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Address')
+@section('title', __('Edit Address'))
 
 @section('content')
 <div class="page-body">
@@ -8,19 +8,19 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Address</h3>
+                    <h3>{{ __('Edit Address') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.addresses.index') }}">Address Management</a>
+                            <a href="{{ route('admin.addresses.index') }}">{{ __('Address Management') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit Address</li>
+                        <li class="breadcrumb-item active">{{ __('Edit Address') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,20 +30,20 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Please fix the following errors:</h6>
+                <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
@@ -51,7 +51,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Address</h5>
+                        <h5>{{ __('Edit Address') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.addresses.update', $address) }}" method="POST">
@@ -62,16 +62,16 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        Address Type <span class="text-danger">*</span>
+                                        {{ __('Address Type') }} <span class="text-danger">*</span>
                                     </label>
                                     <select class="form-select @error('address_type_id') is-invalid @enderror" name="address_type_id" required>
-                                        <option value="">Select Address Type</option>
+                                        <option value="">{{ __('Select Address Type') }}</option>
                                         @foreach($addressTypes as $addressType)
                                             @php
                                                 $firstTranslation = $addressType->translates->first();
                                             @endphp
                                             <option value="{{ $addressType->id }}" {{ old('address_type_id', $address->address_type_id) == $addressType->id ? 'selected' : '' }}>
-                                                {{ $firstTranslation ? $firstTranslation->title : 'No translation' }}
+                                                {{ $firstTranslation ? $firstTranslation->title : __('No translation') }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -86,10 +86,10 @@
                             <!-- Status -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Status</label>
+                                    <label class="form-label">{{ __('Status') }}</label>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" value="1" {{ $address->status ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="status">Active</label>
+                                        <label class="form-check-label" for="status">{{ __('Active') }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -97,7 +97,7 @@
                             <!-- Language Tabs -->
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Address Information</label>
+                                    <label class="form-label">{{ __('Address Information') }}</label>
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
                                         @foreach($languages as $index => $language)
                                             @php
@@ -129,12 +129,12 @@
                                                     <!-- Address -->
                                                     <div class="col-md-12">
                                                         <label class="form-label">
-                                                            Address <span class="text-danger">*</span>
+                                                            {{ __('Address') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <textarea class="form-control @error("translations.{$language->id}.address") is-invalid @enderror" 
                                                                   name="translations[{{ $language->id }}][address]" 
                                                                   rows="3"
-                                                                  placeholder="Enter full address">{{ old("translations.{$language->id}.address", $translation->address ?? '') }}</textarea>
+                                                                  placeholder="{{ __('Enter full address') }}">{{ old("translations.{$language->id}.address", $translation->address ?? '') }}</textarea>
                                                         @error("translations.{$language->id}.address")
                                                             <div class="invalid-feedback">
                                                                 {{ $message }}
@@ -180,4 +180,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endpush 
+@endpush

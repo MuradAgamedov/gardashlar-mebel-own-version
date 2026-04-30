@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Home Page Discount')
+@section('title', __('Home Page Discount'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Home Page Discount</h3>
+                    <h3>{{ __('Home Page Discount') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Home Page Discount</li>
+                        <li class="breadcrumb-item active">{{ __('Home Page Discount') }}</li>
                     </ol>
                 </div>
             </div>
@@ -29,7 +29,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Home Page Discount Section</h5>
+                        <h5>{{ __('Edit Home Page Discount Section') }}</h5>
                     </div>
                     <div class="card-body">
                         @if ($errors->any())
@@ -57,12 +57,12 @@
                                 <div class="col-md-12">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h6>Background Image</h6>
+                                            <h6>{{ __('Background Image') }}</h6>
                                         </div>
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col-md-6">
-                                                    <label for="bg_image" class="form-label">Background Image</label>
+                                                    <label for="bg_image" class="form-label">{{ __('Background Image') }}</label>
                                                     <input type="file" 
                                                            class="form-control @error('bg_image') is-invalid @enderror" 
                                                            id="bg_image" 
@@ -71,14 +71,14 @@
                                                     @error('bg_image')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
-                                                    <small class="form-text text-muted">Recommended size: 1920x600px. Max size: 2MB.</small>
+                                                    <small class="form-text text-muted">{{ __('Recommended size: 1920x600px. Max size: 2MB.') }}</small>
                                                 </div>
                                                 <div class="col-md-6">
                                                     @if($homePageDiscount->bg_image)
                                                         <div class="current-image-container">
-                                                            <label class="form-label">Current Background Image:</label>
+                                                            <label class="form-label">{{ __('Current Background Image:') }}</label>
                                                             <img src="{{ app('App\Services\ImageService')->getUrl($homePageDiscount->bg_image) }}" 
-                                                                 alt="Current Background Image" 
+                                                                 alt="{{ __('Current Background Image') }}" 
                                                                  class="img-fluid rounded" 
                                                                  style="max-height: 200px; width: auto;">
                                                         </div>
@@ -136,13 +136,13 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12 mb-3">
                                                         <label for="title_{{ $language->id }}" class="form-label">
-                                                            Title <span class="text-danger">*</span>
+                                                            {{ __('Title') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
                                                                id="title_{{ $language->id }}" 
                                                                name="translations[{{ $language->id }}][title]" 
-                                                               placeholder="Enter title for {{ $language->lang_code }}"
+                                                               placeholder="{{ __('Enter title for :lang', ['lang' => $language->lang_code]) }}"
                                                                value="{{ old("translations.{$language->id}.title", $translation->title ?? '') }}">
                                                         @error("translations.{$language->id}.title")
                                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -151,13 +151,13 @@
                                                     
                                                     <div class="col-md-12 mb-3">
                                                         <label for="subtitle_{{ $language->id }}" class="form-label">
-                                                            Subtitle <span class="text-danger">*</span>
+                                                            {{ __('Subtitle') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.subtitle") is-invalid @enderror" 
                                                                id="subtitle_{{ $language->id }}" 
                                                                name="translations[{{ $language->id }}][subtitle]" 
-                                                               placeholder="Enter subtitle for {{ $language->lang_code }}"
+                                                               placeholder="{{ __('Enter subtitle for :lang', ['lang' => $language->lang_code]) }}"
                                                                value="{{ old("translations.{$language->id}.subtitle", $translation->subtitle ?? '') }}">
                                                         @error("translations.{$language->id}.subtitle")
                                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -166,18 +166,18 @@
                                                     
                                                     <div class="col-md-12 mb-3">
                                                         <label for="button_link_{{ $language->id }}" class="form-label">
-                                                            Button Link <span class="text-danger">*</span>
+                                                            {{ __('Button Link') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.button_link") is-invalid @enderror" 
                                                                id="button_link_{{ $language->id }}" 
                                                                name="translations[{{ $language->id }}][button_link]" 
-                                                               placeholder="Enter button link for {{ $language->lang_code }} (e.g., /products, https://example.com)"
+                                                               placeholder="{{ __('Enter button link for :lang (e.g., /products, https://example.com)', ['lang' => $language->lang_code]) }}"
                                                                value="{{ old("translations.{$language->id}.button_link", $translation->button_link ?? '') }}">
                                                         @error("translations.{$language->id}.button_link")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
-                                                        <small class="form-text text-muted">You can use relative URLs (e.g., /products) or absolute URLs (e.g., https://example.com)</small>
+                                                        <small class="form-text text-muted">{{ __('You can use relative URLs (e.g., /products) or absolute URLs (e.g., https://example.com)') }}</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -192,11 +192,11 @@
                                     <div class="d-flex gap-2">
                                         <button type="submit" class="btn btn-primary">
                                             <i class="material-icons-outlined">save</i>
-                                            Update Home Page Discount
+                                            {{ __('Update Home Page Discount') }}
                                         </button>
                                         <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">cancel</i>
-                                            Cancel
+                                            {{ __('Cancel') }}
                                         </a>
                                     </div>
                                 </div>
@@ -274,8 +274,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     const previewContainer = document.createElement('div');
                     previewContainer.className = 'image-preview mt-2';
                     previewContainer.innerHTML = `
-                        <label class="form-label">Selected Image Preview:</label>
-                        <img src="${e.target.result}" alt="Selected Image Preview" class="img-fluid rounded" style="max-height: 200px; width: auto;">
+                        <label class="form-label">{{ __('Selected Image Preview:') }}</label>
+                        <img src="${e.target.result}" alt="{{ __('Selected Image Preview') }}" class="img-fluid rounded" style="max-height: 200px; width: auto;">
                     `;
                     
                     // Insert after the file input
@@ -287,4 +287,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endpush 
+@endpush

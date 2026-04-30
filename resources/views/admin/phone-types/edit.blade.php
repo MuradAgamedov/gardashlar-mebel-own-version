@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Phone Type')
+@section('title', __('Edit Phone Type'))
 
 @section('content')
 <div class="page-body">
@@ -8,19 +8,19 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Phone Type</h3>
+                    <h3>{{ __('Edit Phone Type') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.phones.index') }}">Contact Management</a>
+                            <a href="{{ route('admin.phones.index') }}">{{ __('Contact Management') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit Phone Type</li>
+                        <li class="breadcrumb-item active">{{ __('Edit Phone Type') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,20 +30,20 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Please fix the following errors:</h6>
+                <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
@@ -51,7 +51,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Phone Type</h5>
+                        <h5>{{ __('Edit Phone Type') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.phone-types.update', $phoneType) }}" method="POST">
@@ -61,10 +61,10 @@
                             <!-- Status -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Status</label>
+                                    <label class="form-label">{{ __('Status') }}</label>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" value="1" {{ $phoneType->status ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="status">Active</label>
+                                        <label class="form-check-label" for="status">{{ __('Active') }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -72,7 +72,7 @@
                             <!-- Language Tabs -->
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Phone Type Information</label>
+                                    <label class="form-label">{{ __('Phone Type Information') }}</label>
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
                                         @foreach($languages as $index => $language)
                                             @php
@@ -104,13 +104,13 @@
                                                     <!-- Title -->
                                                     <div class="col-md-12">
                                                         <label class="form-label">
-                                                            Title <span class="text-danger">*</span>
+                                                            {{ __('Title') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
                                                                name="translations[{{ $language->id }}][title]" 
                                                                value="{{ old("translations.{$language->id}.title", $translation->title ?? '') }}" 
-                                                               placeholder="e.g., General Inquiry, Support, Sales">
+                                                               placeholder="{{ __('e.g., General Inquiry, Support, Sales') }}">
                                                         @error("translations.{$language->id}.title")
                                                             <div class="invalid-feedback">
                                                                 {{ $message }}
@@ -156,4 +156,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endpush 
+@endpush

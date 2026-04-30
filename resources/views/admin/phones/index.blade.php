@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Contact Management')
+@section('title', __('Contact Management'))
 
 @section('content')
 <div class="page-body">
@@ -8,16 +8,16 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Contact Management</h3>
+                    <h3>{{ __('Contact Management') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Contact Management</li>
+                        <li class="breadcrumb-item active">{{ __('Contact Management') }}</li>
                     </ol>
                 </div>
             </div>
@@ -28,14 +28,14 @@
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
@@ -45,7 +45,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Phone Types</h5>
+                            <h5>{{ __('Phone Types') }}</h5>
                             <a href="{{ route('admin.phone-types.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -76,7 +76,7 @@
                                                 </div>
                                                 <div>
                                                     <h6 class="mb-0">
-                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : 'No translation' }}</strong>
+                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : __('No translation') }}</strong>
                                                     </h6>
                                                     <div class="d-flex gap-1 mt-1">
                                                         @foreach($phoneType->translates as $translate)
@@ -87,20 +87,20 @@
                                             </div>
                                             <div class="d-flex align-items-center gap-2">
                                                 @if($phoneType->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.phone-types.edit', $phoneType) }}" class="btn btn-sm btn-warning">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
-                                                                                                         <a href="{{ route('admin.phone-types.phones.create', $phoneType->id) }}" class="btn btn-sm btn-success">
-                                                         <i class="material-icons-outlined">add</i> 
-                                                     </a>
-                                                     @if($phoneType->id != 3 && $phoneType->id != 15)
+                                                    <a href="{{ route('admin.phone-types.phones.create', $phoneType->id) }}" class="btn btn-sm btn-success">
+                                                        <i class="material-icons-outlined">add</i> 
+                                                    </a>
+                                                    @if($phoneType->id != 3 && $phoneType->id != 15)
                                                         <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Phone Type #' . $phoneType->id }}"
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : __('Phone Type #') . $phoneType->id }}"
                                                             data-url="{{ route('admin.phone-types.destroy', $phoneType) }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
@@ -133,16 +133,16 @@
                                                                                 {{ $phone->phone }}
                                                                             </a>
                                                                         </div>
-                                                                        <span class="badge bg-info mt-1" style="font-size: 10px;">Phone</span>
+                                                                        <span class="badge bg-info mt-1" style="font-size: 10px;">{{ __('Phone') }}</span>
                                                                     </div>
                                                                 </div>
                                                                 <div class="d-flex align-items-center gap-1">
                                                                     @if($phone->status)
-                                                                        <span class="badge bg-success" style="font-size: 10px;">Active</span>
+                                                                        <span class="badge bg-success" style="font-size: 10px;">{{ __('Active') }}</span>
                                                                     @else
-                                                                        <span class="badge bg-secondary" style="font-size: 10px;">Inactive</span>
+                                                                        <span class="badge bg-secondary" style="font-size: 10px;">{{ __('Inactive') }}</span>
                                                                     @endif
-                                                                                                                                                                                                                  <div class="d-flex gap-1">
+                                                                    <div class="d-flex gap-1">
                                                                           <button type="button" class="btn btn-sm btn-danger delete-btn" 
                                                                                   style="padding: 2px 6px;"
                                                                                   data-title="{{ $phone->phone }}"
@@ -157,7 +157,7 @@
                                                 @else
                                                     <div class="p-2 text-muted">
                                                         <i class="material-icons-outlined me-1" style="font-size: 14px;">info</i>
-                                                        <small>No phones assigned to this type</small>
+                                                        <small>{{ __('No phones assigned to this type') }}</small>
                                                     </div>
                                                 @endif
                                             </div>
@@ -168,7 +168,7 @@
                                 <div class="text-center py-4">
                                     <div class="text-muted">
                                         <i class="material-icons-outlined" style="font-size: 48px;">phone</i>
-                                        <p class="mt-2">No phone types found</p>
+                                        <p class="mt-2">{{ __('No phone types found') }}</p>
                                         <a href="{{ route('admin.phone-types.create') }}" class="btn btn-primary">
                                             <i class="material-icons-outlined">add</i>
                                         </a>
@@ -274,8 +274,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (!data.success) {
                         Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to reorder phone types',
+                            title: '{{ __("Error!") }}',
+                            text: data.message || '{{ __("Failed to reorder phone types") }}',
                             icon: 'error'
                         });
                     }
@@ -311,8 +311,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(data => {
                         if (!data.success) {
                             Swal.fire({
-                                title: 'Error!',
-                                text: data.message || 'Failed to reorder phones',
+                                title: '{{ __("Error!") }}',
+                                text: data.message || '{{ __("Failed to reorder phones") }}',
                                 icon: 'error'
                             });
                         }
@@ -332,13 +332,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to delete "${title}"?`,
+                title: '{{ __("Are you sure?") }}',
+                text: '{{ __("Do you want to delete \":title\"?", ["title" => ":title"]) }}'.replace(':title', title),
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __("Yes, delete it!") }}',
+                cancelButtonText: '{{ __("Cancel") }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');
@@ -356,4 +357,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush 
+@endpush

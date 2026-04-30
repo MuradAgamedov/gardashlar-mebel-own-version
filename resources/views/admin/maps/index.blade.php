@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Map Management')
+@section('title', __('Map Management'))
 
 @section('content')
 <div class="page-body">
@@ -8,16 +8,16 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Map Management</h3>
+                    <h3>{{ __('Map Management') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Map Management</li>
+                        <li class="breadcrumb-item active">{{ __('Map Management') }}</li>
                     </ol>
                 </div>
             </div>
@@ -28,14 +28,14 @@
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
@@ -44,7 +44,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Maps</h5>
+                            <h5>{{ __('Maps') }}</h5>
                             <a href="{{ route('admin.maps.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -56,10 +56,10 @@
                                 <thead>
                                     <tr>
                                         <th width="50">#</th>
-                                        <th>Map</th>
-                                        <th>Status</th>
-                                        <th>Order</th>
-                                        <th width="150">Actions</th>
+                                        <th>{{ __('Map') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th>{{ __('Order') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-maps">
@@ -88,9 +88,9 @@
                                             </td>
                                             <td>
                                                 @if($map->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>{{ $map->order }}</td>
@@ -100,7 +100,7 @@
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="Map #{{ $map->id }}"
+                                                            data-title="{{ __('Map #') . $map->id }}"
                                                             data-url="{{ route('admin.maps.destroy', $map) }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
@@ -112,7 +112,7 @@
                                             <td colspan="5" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">map</i>
-                                                    <p class="mt-2">No maps found</p>
+                                                    <p class="mt-2">{{ __('No maps found') }}</p>
                                                     <a href="{{ route('admin.maps.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>
@@ -185,8 +185,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (!data.success) {
                         Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to reorder maps',
+                            title: '{{ __("Error!") }}',
+                            text: data.message || '{{ __("Failed to reorder maps") }}',
                             icon: 'error'
                         });
                     }
@@ -205,13 +205,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to delete "${title}"?`,
+                title: '{{ __("Are you sure?") }}',
+                text: '{{ __("Do you want to delete \":title\"?", ["title" => ":title"]) }}'.replace(':title', title),
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __("Yes, delete it!") }}',
+                cancelButtonText: '{{ __("Cancel") }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');
@@ -229,4 +230,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush 
+@endpush

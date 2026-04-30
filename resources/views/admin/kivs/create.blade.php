@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Create KIV')
+@section('title', __('Create KIV'))
 
 @section('content')
 <div class="page-body">
@@ -8,19 +8,19 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Create KIV</h3>
+                    <h3>{{ __('Create KIV') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.kivs.index') }}">KIVs</a>
+                            <a href="{{ route('admin.kivs.index') }}">{{ __('KIVs') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Create KIV</li>
+                        <li class="breadcrumb-item active">{{ __('Create KIV') }}</li>
                     </ol>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Create New KIV</h5>
+                        <h5>{{ __('Create New KIV') }}</h5>
                     </div>
                     <div class="card-body">
                         @if ($errors->any())
@@ -51,16 +51,16 @@
                             <!-- Image Upload Section -->
                             <div class="row mb-4">
                                 <div class="col-md-6">
-                                    <label for="image" class="form-label">Image</label>
+                                    <label for="image" class="form-label">{{ __('Image') }}</label>
                                     <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" accept="image/*">
                                     @error('image')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="form-text text-muted">Supported formats: JPG, JPEG, PNG, GIF, WEBP. Max size: 2MB</small>
+                                    <small class="form-text text-muted">{{ __('Supported formats: JPG, JPEG, PNG, GIF, WEBP. Max size: 2MB') }}</small>
                                 </div>
                                 <div class="col-md-6">
                                     <div id="image-preview" class="mt-3" style="display: none;">
-                                        <img id="preview-image" src="" alt="Image Preview" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
+                                        <img id="preview-image" src="" alt="{{ __('Image Preview') }}" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
                                     </div>
                                 </div>
                             </div>
@@ -68,27 +68,27 @@
                             <!-- Video Link Section -->
                             <div class="row mb-4">
                                 <div class="col-md-6">
-                                    <label for="video_link" class="form-label">Video Link</label>
-                                    <input type="url" class="form-control @error('video_link') is-invalid @enderror" id="video_link" name="video_link" value="{{ old('video_link') }}" placeholder="Enter video link (optional)">
+                                    <label for="video_link" class="form-label">{{ __('Video Link') }}</label>
+                                    <input type="url" class="form-control @error('video_link') is-invalid @enderror" id="video_link" name="video_link" value="{{ old('video_link') }}" placeholder="{{ __('Enter video link (optional)') }}">
                                     @error('video_link')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="form-text text-muted">YouTube video URL</small>
+                                    <small class="form-text text-muted">{{ __('YouTube video URL') }}</small>
                                 </div>
                             </div>
 
                             <!-- Category Selection -->
                             <div class="row mb-4">
                                 <div class="col-md-6">
-                                    <label for="kiv_category_id" class="form-label">Category <span class="text-danger">*</span></label>
+                                    <label for="kiv_category_id" class="form-label">{{ __('Category') }} <span class="text-danger">*</span></label>
                                     <select class="form-select @error('kiv_category_id') is-invalid @enderror" id="kiv_category_id" name="kiv_category_id" required>
-                                        <option value="">Select a category</option>
+                                        <option value="">{{ __('Select a category') }}</option>
                                         @foreach($categories as $category)
                                             @php
                                                 $categoryTranslation = $category->translates->first();
                                             @endphp
                                             <option value="{{ $category->id }}" {{ old('kiv_category_id') == $category->id ? 'selected' : '' }}>
-                                                {{ $categoryTranslation ? $categoryTranslation->title : 'Unknown Category' }}
+                                                {{ $categoryTranslation ? $categoryTranslation->title : __('Unknown Category') }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -105,7 +105,7 @@
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ old('status', '1') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Active Status
+                                            {{ __('Active Status') }}
                                         </label>
                                     </div>
                                 </div>

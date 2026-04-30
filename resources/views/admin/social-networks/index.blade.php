@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Social Networks')
+@section('title', __('Social Networks'))
 
 @section('content')
 <div class="page-body">
@@ -8,16 +8,16 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Social Networks</h3>
+                    <h3>{{ __('Social Networks') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Social Networks</li>
+                        <li class="breadcrumb-item active">{{ __('Social Networks') }}</li>
                     </ol>
                 </div>
             </div>
@@ -28,14 +28,14 @@
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
@@ -44,7 +44,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Social Networks</h5>
+                            <h5>{{ __('Social Networks') }}</h5>
                             <a href="{{ route('admin.social-networks.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -55,12 +55,12 @@
                             <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
-                                        <th style="width: 5%;">Order</th>
-                                        <th style="width: 15%;">Type</th>
-                                        <th style="width: 20%;">Name</th>
-                                        <th style="width: 30%;">URL</th>
-                                        <th style="width: 10%;">Status</th>
-                                        <th style="width: 20%;">Actions</th>
+                                        <th style="width: 5%;">{{ __('Order') }}</th>
+                                        <th style="width: 15%;">{{ __('Type') }}</th>
+                                        <th style="width: 20%;">{{ __('Name') }}</th>
+                                        <th style="width: 30%;">{{ __('URL') }}</th>
+                                        <th style="width: 10%;">{{ __('Status') }}</th>
+                                        <th style="width: 20%;">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable">
@@ -79,7 +79,7 @@
                                                     <div>
                                                         <strong class="text-dark">{{ ucfirst($socialNetwork->type) }}</strong>
                                                         <br>
-                                                        <small class="text-muted">ID: {{ $socialNetwork->id }}</small>
+                                                        <small class="text-muted">{{ __('ID') }}: {{ $socialNetwork->id }}</small>
                                                     </div>
                                                 </div>
                                             </td>
@@ -102,7 +102,7 @@
                                                     @csrf
                                                     <button type="submit" 
                                                             class="btn btn-sm {{ $socialNetwork->status ? 'btn-success' : 'btn-secondary' }}"
-                                                            title="{{ $socialNetwork->status ? 'Active' : 'Inactive' }}">
+                                                            title="{{ $socialNetwork->status ? __('Active') : __('Inactive') }}">
                                                         <i class="material-icons-outlined">{{ $socialNetwork->status ? 'check_circle' : 'cancel' }}</i>
                                                     </button>
                                                 </form>
@@ -111,18 +111,18 @@
                                                 <div class="d-flex gap-1">
                                                     <a href="{{ route('admin.social-networks.edit', $socialNetwork->id) }}" 
                                                        class="btn btn-sm btn-outline-primary" 
-                                                       title="Edit">
+                                                       title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <form action="{{ route('admin.social-networks.destroy', $socialNetwork->id) }}" 
                                                           method="POST" 
-                                                          onsubmit="return confirm('Are you sure you want to delete this social network?')"
+                                                          onsubmit="return confirm('{{ __('Are you sure you want to delete this social network?') }}')"
                                                           style="display: inline;">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" 
                                                                 class="btn btn-sm btn-outline-danger" 
-                                                                title="Delete">
+                                                                title="{{ __('Delete') }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
                                                     </form>
@@ -133,8 +133,8 @@
                                         <tr>
                                             <td colspan="6" class="text-center py-5">
                                                 <i class="material-icons-outlined" style="font-size: 48px; color: #6c757d;">share</i>
-                                                <h5 class="text-muted mt-3">No Social Networks</h5>
-                                                <p class="text-muted">Start by adding social networks.</p>
+                                                <h5 class="text-muted mt-3">{{ __('No Social Networks') }}</h5>
+                                                <p class="text-muted">{{ __('Start by adding social networks.') }}</p>
                                                 <a href="{{ route('admin.social-networks.create') }}" class="btn btn-primary">
                                                     <i class="material-icons-outlined">add</i>
                                                 </a>
@@ -187,4 +187,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endsection 
+@endsection

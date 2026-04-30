@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Map')
+@section('title', __('Edit Map'))
 
 @section('content')
 <div class="page-body">
@@ -8,19 +8,19 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Map</h3>
+                    <h3>{{ __('Edit Map') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.maps.index') }}">Map Management</a>
+                            <a href="{{ route('admin.maps.index') }}">{{ __('Map Management') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit Map</li>
+                        <li class="breadcrumb-item active">{{ __('Edit Map') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,20 +30,20 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Please fix the following errors:</h6>
+                <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
             </div>
         @endif
 
@@ -51,7 +51,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Map: #{{ $map->id }}</h5>
+                        <h5>{{ __('Edit Map: #:id', ['id' => $map->id]) }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.maps.update', $map) }}" method="POST">
@@ -62,12 +62,12 @@
                             <div class="row mb-3">
                                 <div class="col-md-8">
                                     <label class="form-label">
-                                        Map Content <span class="text-danger">*</span>
+                                        {{ __('Map Content') }} <span class="text-danger">*</span>
                                     </label>
                                     <textarea class="form-control @error('map') is-invalid @enderror" 
                                               name="map" 
                                               rows="8"
-                                              placeholder="Paste your map embed code here (e.g., Google Maps iframe, coordinates, etc.)"
+                                              placeholder="{{ __('Paste your map embed code here (e.g., Google Maps iframe, coordinates, etc.)') }}"
                                               required>{{ old('map', $map->map) }}</textarea>
                                     @error('map')
                                         <div class="invalid-feedback">
@@ -75,7 +75,7 @@
                                         </div>
                                     @enderror
                                     <small class="form-text text-muted">
-                                        You can paste Google Maps embed code, coordinates, or any map-related content here.
+                                        {{ __('You can paste Google Maps embed code, coordinates, or any map-related content here.') }}
                                     </small>
                                 </div>
                             </div>
@@ -83,7 +83,7 @@
                             <!-- Status -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Status</label>
+                                    <label class="form-label">{{ __('Status') }}</label>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" 
                                                type="checkbox" 
@@ -91,7 +91,7 @@
                                                name="status" 
                                                value="1" 
                                                {{ old('status', $map->status) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="status">Active</label>
+                                        <label class="form-check-label" for="status">{{ __('Active') }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -99,10 +99,10 @@
                             <!-- Order Info -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Current Order</label>
+                                    <label class="form-label">{{ __('Current Order') }}</label>
                                     <input type="text" class="form-control" value="{{ $map->order }}" readonly>
                                     <small class="form-text text-muted">
-                                        Order can be changed by dragging and dropping in the maps list.
+                                        {{ __('Order can be changed by dragging and dropping in the maps list.') }}
                                     </small>
                                 </div>
                             </div>
@@ -139,4 +139,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endpush 
+@endpush

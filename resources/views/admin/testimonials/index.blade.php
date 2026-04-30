@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Testimonials</h3>
+                    <h3>{{ __('Testimonials') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -15,7 +15,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Testimonials</li>
+                        <li class="breadcrumb-item active">{{ __('Testimonials') }}</li>
                     </ol>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>All Testimonials</h5>
+                            <h5>{{ __('All Testimonials') }}</h5>
                             <a href="{{ route('admin.testimonials.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -54,14 +54,14 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th width="50">Order</th>
-                                        <th width="80">Customer</th>
-                                        <th width="80">Company</th>
-                                        <th>Full Name</th>
-                                        <th>Position</th>
-                                        <th width="80">Status</th>
-                                        <th>Languages</th>
-                                        <th width="150">Actions</th>
+                                        <th width="50">{{ __('Order') }}</th>
+                                        <th width="80">{{ __('Customer') }}</th>
+                                        <th width="80">{{ __('Company') }}</th>
+                                        <th>{{ __('Full Name') }}</th>
+                                        <th>{{ __('Position') }}</th>
+                                        <th width="80">{{ __('Status') }}</th>
+                                        <th>{{ __('Languages') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-testimonials">
@@ -79,7 +79,7 @@
                                             </td>
                                             <td>
                                                 @if($testimonial->customer_image_url)
-                                                    <img src="{{ $testimonial->customer_image_url }}" alt="Customer" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                                    <img src="{{ $testimonial->customer_image_url }}" alt="{{ __('Customer') }}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
                                                 @else
                                                     <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
                                                         <i class="material-icons-outlined text-muted">person</i>
@@ -88,7 +88,7 @@
                                             </td>
                                             <td>
                                                 @if($testimonial->company_logo_url)
-                                                    <img src="{{ $testimonial->company_logo_url }}" alt="Company" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                                    <img src="{{ $testimonial->company_logo_url }}" alt="{{ __('Company') }}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
                                                 @else
                                                     <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
                                                         <i class="material-icons-outlined text-muted">business</i>
@@ -101,16 +101,16 @@
                                                     $firstTranslation = $testimonial->translates->firstWhere('language_id', $mainLanguageId)
                                                         ?? $testimonial->translates->first();
                                                 @endphp
-                                                {{ $firstTranslation ? $firstTranslation->full_name : 'No translation' }}
+                                                {{ $firstTranslation ? $firstTranslation->full_name : __('No translation') }}
                                             </td>
                                             <td>
-                                                {{ $firstTranslation ? $firstTranslation->position : 'No translation' }}
+                                                {{ $firstTranslation ? $firstTranslation->position : __('No translation') }}
                                             </td>
                                             <td>
                                                 @if($testimonial->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -126,7 +126,7 @@
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->full_name : 'Testimonial #' . $testimonial->id }}"
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->full_name : __('Testimonial') . ' #' . $testimonial->id }}"
                                                             data-url="{{ route('admin.testimonials.destroy', $testimonial) }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
@@ -138,7 +138,7 @@
                                             <td colspan="8" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">rate_review</i>
-                                                    <p class="mt-2">No testimonials found</p>
+                                                    <p class="mt-2">{{ __('No testimonials found') }}</p>
                                                     <a href="{{ route('admin.testimonials.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>
@@ -186,16 +186,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (data.success) {
                         Swal.fire({
-                            title: 'Success!',
-                            text: 'Testimonials reordered successfully!',
+                            title: '{{ __("Success!") }}',
+                            text: '{{ __("Testimonials reordered successfully!") }}',
                             icon: 'success',
                             timer: 1500,
                             showConfirmButton: false
                         });
                     } else {
                         Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to reorder testimonials',
+                            title: '{{ __("Error!") }}',
+                            text: data.message || '{{ __("Failed to reorder testimonials") }}',
                             icon: 'error'
                         });
                     }
@@ -214,13 +214,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to delete "${title}"?`,
+                title: '{{ __("Are you sure?") }}',
+                text: `{{ __("Do you want to delete this testimonial?") }}`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __("Yes, delete it!") }}',
+                cancelButtonText: '{{ __("Cancel") }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');
@@ -261,4 +262,4 @@ document.addEventListener('DOMContentLoaded', function() {
     background-color: #e3f2fd;
 }
 </style>
-@endpush 
+@endpush

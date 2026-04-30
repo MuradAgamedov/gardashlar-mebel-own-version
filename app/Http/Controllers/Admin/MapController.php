@@ -48,13 +48,13 @@ class MapController extends Controller
             ]);
 
             return redirect()->route('admin.maps.index')
-                ->with('success', 'Map created successfully.');
+                ->with('success', __('Map created successfully.'));
 
         } catch (\Exception $e) {
             Log::error('Error creating map: ' . $e->getMessage());
             
             return back()->withInput()
-                ->with('error', 'Error creating map. Please try again.');
+                ->with('error', __('Error creating map. Please try again.'));
         }
     }
 
@@ -83,13 +83,13 @@ class MapController extends Controller
             ]);
 
             return redirect()->route('admin.maps.index')
-                ->with('success', 'Map updated successfully.');
+                ->with('success', __('Map updated successfully.'));
 
         } catch (\Exception $e) {
             Log::error('Error updating map: ' . $e->getMessage());
             
             return back()->withInput()
-                ->with('error', 'Error updating map. Please try again.');
+                ->with('error', __('Error updating map. Please try again.'));
         }
     }
 
@@ -101,10 +101,10 @@ class MapController extends Controller
         try {
             $map->delete();
             return redirect()->route('admin.maps.index')
-                ->with('success', 'Map deleted successfully.');
+                ->with('success', __('Map deleted successfully.'));
         } catch (\Exception $e) {
             Log::error('Error deleting map: ' . $e->getMessage());
-            return back()->with('error', 'Error deleting map. Please try again.');
+            return back()->with('error', __('Error deleting map. Please try again.'));
         }
     }
 
@@ -126,7 +126,7 @@ class MapController extends Controller
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             Log::error('Error reordering maps: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Error reordering maps'], 500);
+            return response()->json(['success' => false, 'message' => __('Error reordering maps')], 500);
         }
     }
 }
