@@ -71,11 +71,11 @@ class SiteUsageRulesController extends Controller
             }
 
             return redirect()->back()
-                ->with('success', 'Site Usage Rules updated successfully!');
+                ->with('success', __('Site Usage Rules updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating site usage rules: ' . $e->getMessage())
+                ->with('error', __('Error updating site usage rules: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }

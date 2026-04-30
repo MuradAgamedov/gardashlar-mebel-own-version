@@ -30,11 +30,11 @@ class CustomerRightsController extends Controller
             $this->repository->updateCustomerRights($request->input('translations'), $languages);
 
             return redirect()->back()
-                ->with('success', 'Customer rights updated successfully!');
+                ->with('success', __('Customer rights updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating customer rights: ' . $e->getMessage())
+                ->with('error', __('Error updating customer rights: ') . $e->getMessage())
                 ->withInput();
         }
     }

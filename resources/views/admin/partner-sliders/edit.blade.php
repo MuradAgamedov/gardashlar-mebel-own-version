@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Partner Slider')
+@section('title', __('Edit Partner Slider'))
 
 @section('content')
 <div class="page-body">
@@ -8,19 +8,19 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Partner Slider</h3>
+                    <h3>{{ __('Edit Partner Slider') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.partner-sliders.index') }}">Partner Sliders</a>
+                            <a href="{{ route('admin.partner-sliders.index') }}">{{ __('Partner Sliders') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit Slider</li>
+                        <li class="breadcrumb-item active">{{ __('Edit Slider') }}</li>
                     </ol>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Partner Slider</h5>
+                        <h5>{{ __('Edit Partner Slider') }}</h5>
                     </div>
                     <div class="card-body">
                         @if ($errors->any())
@@ -52,23 +52,23 @@
                             <!-- Image Upload Section -->
                             <div class="row mb-4">
                                 <div class="col-md-6">
-                                    <label for="image" class="form-label">Image</label>
+                                    <label for="image" class="form-label">{{ __('Image') }}</label>
                                     <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" accept="image/*">
                                     @error('image')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="form-text text-muted">Supported formats: JPG, JPEG, PNG, GIF, WEBP. Max size: 2MB</small>
+                                    <small class="form-text text-muted">{{ __('Supported formats: JPG, JPEG, PNG, GIF, WEBP. Max size: 2MB') }}</small>
                                 </div>
                                 <div class="col-md-6">
                                     <div id="image-preview" class="mt-3">
                                         @if($partnerSlider->image_url)
-                                            <img id="preview-image" src="{{ $partnerSlider->image_url }}" alt="Current Image" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
-                                            <p class="text-muted mt-2">Current image</p>
+                                            <img id="preview-image" src="{{ $partnerSlider->image_url }}" alt="{{ __('Current Image') }}" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
+                                            <p class="text-muted mt-2">{{ __('Current image') }}</p>
                                         @else
                                             <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 200px; height: 150px;">
                                                 <i class="material-icons-outlined text-muted">image</i>
                                             </div>
-                                            <p class="text-muted mt-2">No image uploaded</p>
+                                            <p class="text-muted mt-2">{{ __('No image uploaded') }}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -77,7 +77,7 @@
                             <!-- Link Section -->
                             <div class="row mb-4">
                                 <div class="col-md-12">
-                                    <label for="link" class="form-label">Link (optional)</label>
+                                    <label for="link" class="form-label">{{ __('Link (optional)') }}</label>
                                     <input type="url" 
                                            class="form-control @error('link') is-invalid @enderror" 
                                            id="link" 
@@ -87,7 +87,7 @@
                                     @error('link')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="form-text text-muted">Add a URL if you want the slider image to redirect somewhere.</small>
+                                    <small class="form-text text-muted">{{ __('Add a URL if you want the slider image to redirect somewhere.') }}</small>
                                 </div>
                             </div>
 
@@ -98,7 +98,7 @@
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ old('status', $partnerSlider->status) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Active Status
+                                            {{ __('Active Status') }}
                                         </label>
                                     </div>
                                 </div>
@@ -150,14 +150,14 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
                                                         <label for="title_{{ $language->id }}" class="form-label">
-                                                            Title <span class="text-danger">*</span>
+                                                            {{ __('Title') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
                                                                id="title_{{ $language->id }}" 
                                                                name="translations[{{ $language->id }}][title]" 
                                                                value="{{ old("translations.{$language->id}.title", $translation->title ?? '') }}" 
-                                                               placeholder="Enter title for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Enter title for :lang', ['lang' => $language->lang_code]) }}">
                                                         @error("translations.{$language->id}.title")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
@@ -174,10 +174,10 @@
                                 <div class="col-md-12">
                                     <div class="d-flex gap-2">
                                         <button type="submit" class="btn btn-primary">
-                                            <i class="material-icons-outlined">save</i> Save
+                                            <i class="material-icons-outlined">save</i> {{ __('Save') }}
                                         </button>
                                         <a href="{{ route('admin.partner-sliders.index') }}" class="btn btn-secondary">
-                                            <i class="material-icons-outlined">cancel</i> Cancel
+                                            <i class="material-icons-outlined">cancel</i> {{ __('Cancel') }}
                                         </a>
                                     </div>
                                 </div>
@@ -232,14 +232,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     const newImage = document.createElement('img');
                     newImage.id = 'preview-image';
                     newImage.src = e.target.result;
-                    newImage.alt = 'Image Preview';
+                    newImage.alt = '{{ __('Image Preview') }}';
                     newImage.className = 'img-thumbnail';
                     newImage.style = 'max-width: 200px; max-height: 150px;';
                     
                     imagePreview.innerHTML = '';
                     imagePreview.appendChild(newImage);
                     const text = document.createElement('p');
-                    text.textContent = 'New image preview';
+                    text.textContent = '{{ __('New image preview') }}';
                     text.className = 'text-muted mt-2';
                     imagePreview.appendChild(text);
                 }

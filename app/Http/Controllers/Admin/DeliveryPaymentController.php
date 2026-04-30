@@ -30,11 +30,11 @@ class DeliveryPaymentController extends Controller
             $this->repository->updateDeliveryPayment($request->input('translations'), $languages);
 
             return redirect()->back()
-                ->with('success', 'Delivery & Payment updated successfully!');
+                ->with('success', __('Delivery & Payment updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating delivery & payment: ' . $e->getMessage())
+                ->with('error', __('Error updating delivery & payment: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }

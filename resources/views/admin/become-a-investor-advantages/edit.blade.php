@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Advantage')
+@section('title', __('Edit Advantage'))
 
 @section('content')
 <div class="page-body">
@@ -8,19 +8,19 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Advantage</h3>
+                    <h3>{{ __('Edit Advantage') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.become-a-investor.edit') }}">Become A Investor</a>
+                            <a href="{{ route('admin.become-a-investor.edit') }}">{{ __('Become A Investor') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit Advantage</li>
+                        <li class="breadcrumb-item active">{{ __('Edit Advantage') }}</li>
                     </ol>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Advantage</h5>
+                        <h5>{{ __('Edit Advantage') }}</h5>
                     </div>
                     <div class="card-body">
                         @if ($errors->any())
@@ -52,23 +52,23 @@
                             <!-- Icon Upload Section -->
                             <div class="row mb-4">
                                 <div class="col-md-6">
-                                    <label for="icon" class="form-label">Icon</label>
+                                    <label for="icon" class="form-label">{{ __('Icon') }}</label>
                                     <input type="file" class="form-control @error('icon') is-invalid @enderror" id="icon" name="icon" accept="image/*">
                                     @error('icon')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="form-text text-muted">Supported formats: JPG, JPEG, PNG, GIF, WEBP, SVG. Max size: 2MB</small>
+                                    <small class="form-text text-muted">{{ __('Supported formats: JPG, JPEG, PNG, GIF, WEBP, SVG. Max size: 2MB') }}</small>
                                 </div>
                                 <div class="col-md-6">
                                     <div id="icon-preview" class="mt-3">
                                         @if($becomeAInvestorAdvantage->icon_url)
-                                            <img id="preview-image" src="{{ $becomeAInvestorAdvantage->icon_url }}" alt="Current Icon" class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
-                                            <p class="text-muted mt-2">Current icon</p>
+                                            <img id="preview-image" src="{{ $becomeAInvestorAdvantage->icon_url }}" alt="{{ __('Current Icon') }}" class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                                            <p class="text-muted mt-2">{{ __('Current icon') }}</p>
                                         @else
                                             <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
                                                 <i class="material-icons-outlined text-muted">image</i>
                                             </div>
-                                            <p class="text-muted mt-2">No icon uploaded</p>
+                                            <p class="text-muted mt-2">{{ __('No icon uploaded') }}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -81,7 +81,7 @@
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" type="checkbox" name="status" id="status" value="1" {{ old('status', $becomeAInvestorAdvantage->status) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Active Status
+                                            {{ __('Active Status') }}
                                         </label>
                                     </div>
                                 </div>
@@ -133,14 +133,14 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
                                                         <label for="icon_alt_text_{{ $language->id }}" class="form-label">
-                                                            Icon Alt Text <span class="text-danger">*</span>
+                                                            {{ __('Icon Alt Text') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.icon_alt_text") is-invalid @enderror" 
                                                                id="icon_alt_text_{{ $language->id }}" 
                                                                name="translations[{{ $language->id }}][icon_alt_text]" 
                                                                value="{{ old("translations.{$language->id}.icon_alt_text", $translation->icon_alt_text ?? '') }}" 
-                                                               placeholder="Enter icon alt text for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Enter icon alt text for :lang', ['lang' => $language->lang_code]) }}">
                                                         @error("translations.{$language->id}.icon_alt_text")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
@@ -150,14 +150,14 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
                                                         <label for="title_{{ $language->id }}" class="form-label">
-                                                            Title <span class="text-danger">*</span>
+                                                            {{ __('Title') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
                                                                id="title_{{ $language->id }}" 
                                                                name="translations[{{ $language->id }}][title]" 
                                                                value="{{ old("translations.{$language->id}.title", $translation->title ?? '') }}" 
-                                                               placeholder="Enter title for {{ $language->lang_code }}">
+                                                               placeholder="{{ __('Enter title for :lang', ['lang' => $language->lang_code]) }}">
                                                         @error("translations.{$language->id}.title")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
@@ -167,13 +167,13 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
                                                         <label for="description_{{ $language->id }}" class="form-label">
-                                                            Description <span class="text-danger">*</span>
+                                                            {{ __('Description') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <textarea class="form-control @error("translations.{$language->id}.description") is-invalid @enderror" 
                                                                   id="description_{{ $language->id }}" 
                                                                   name="translations[{{ $language->id }}][description]" 
                                                                   rows="4" 
-                                                                  placeholder="Enter description for {{ $language->lang_code }}">{{ old("translations.{$language->id}.description", $translation->description ?? '') }}</textarea>
+                                                                  placeholder="{{ __('Enter description for :lang', ['lang' => $language->lang_code]) }}">{{ old("translations.{$language->id}.description", $translation->description ?? '') }}</textarea>
                                                         @error("translations.{$language->id}.description")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
@@ -249,14 +249,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     const newImage = document.createElement('img');
                     newImage.id = 'preview-image';
                     newImage.src = e.target.result;
-                    newImage.alt = 'Icon Preview';
+                    newImage.alt = '{{ __('Icon Preview') }}';
                     newImage.className = 'img-thumbnail';
                     newImage.style = 'max-width: 150px; max-height: 150px;';
                     
                     iconPreview.innerHTML = '';
                     iconPreview.appendChild(newImage);
-                    iconPreview.appendChild(document.createElement('p')).textContent = 'New icon preview';
-                    iconPreview.querySelector('p').className = 'text-muted mt-2';
+                    const p = document.createElement('p');
+                    p.textContent = '{{ __('New icon preview') }}';
+                    p.className = 'text-muted mt-2';
+                    iconPreview.appendChild(p);
                 }
             };
             reader.readAsDataURL(file);

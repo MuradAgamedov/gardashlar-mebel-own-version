@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Delivery & Payment')
+@section('title', __('Delivery & Payment'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Delivery & Payment</h3>
+                    <h3>{{ __('Delivery & Payment') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Delivery & Payment</li>
+                        <li class="breadcrumb-item active">{{ __('Delivery & Payment') }}</li>
                     </ol>
                 </div>
             </div>
@@ -29,7 +29,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Delivery & Payment Section</h5>
+                        <h5>{{ __('Edit Delivery & Payment Section') }}</h5>
                     </div>
                     <div class="card-body">
                         @if ($errors->any())
@@ -98,7 +98,7 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
                                                         <label for="content_{{ $language->id }}" class="form-label">
-                                                            Content <span class="text-danger">*</span>
+                                                            {{ __('Content') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <textarea class="form-control ckeditor @error("translations.{$language->id}.content") is-invalid @enderror" 
                                                                   id="content_{{ $language->id }}" 

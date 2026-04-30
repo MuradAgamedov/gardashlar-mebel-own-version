@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Become A Partner')
+@section('title', __('Become A Partner'))
 
 @section('content')
 <div class="page-body">
@@ -8,16 +8,16 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Become A Partner</h3>
+                    <h3>{{ __('Become A Partner') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Become A Partner</li>
+                        <li class="breadcrumb-item active">{{ __('Become A Partner') }}</li>
                     </ol>
                 </div>
             </div>
@@ -29,7 +29,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Become A Partner Section</h5>
+                        <h5>{{ __('Edit Become A Partner Section') }}</h5>
                     </div>
                     <div class="card-body">
                         @if ($errors->any())
@@ -98,12 +98,12 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
                                                         <label for="content_{{ $language->id }}" class="form-label">
-                                                            Content <span class="text-danger">*</span>
+                                                            {{ __('Content') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <textarea class="form-control ckeditor @error("translations.{$language->id}.content") is-invalid @enderror" 
                                                                   id="content_{{ $language->id }}" 
                                                                   name="translations[{{ $language->id }}][content]" 
-                                                                  placeholder="Enter content for {{ $language->lang_code }}">{{ old("translations.{$language->id}.content", $translation->content ?? '') }}</textarea>
+                                                                  placeholder="{{ __('Enter content for :lang', ['lang' => $language->lang_code]) }}">{{ old("translations.{$language->id}.content", $translation->content ?? '') }}</textarea>
                                                         @error("translations.{$language->id}.content")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
@@ -140,7 +140,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>The Advantages To Become A Partner</h5>
+                            <h5>{{ __('The Advantages To Become A Partner') }}</h5>
                             <div class="d-flex gap-2">
                                 <button type="button" id="deleteSelectedAdvantagesBtn" class="btn btn-danger" style="display: none;">
                                     <i class="material-icons-outlined">delete</i>
@@ -159,11 +159,11 @@
                                         <th width="50">
                                             <input type="checkbox" id="selectAllAdvantages" class="form-check-input">
                                         </th>
-                                        <th width="50">Order</th>
-                                        <th width="80">Icon</th>
-                                        <th>Title</th>
-                                        <th width="80">Status</th>
-                                        <th width="150">Actions</th>
+                                        <th width="50">{{ __('Order') }}</th>
+                                        <th width="80">{{ __('Icon') }}</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th width="80">{{ __('Status') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-advantages">
@@ -190,7 +190,7 @@
                                             </td>
                                             <td>
                                                 @if($advantage->icon_url)
-                                                    <img src="{{ $advantage->icon_url }}" alt="Icon" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                                    <img src="{{ $advantage->icon_url }}" alt="{{ __('Icon') }}" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
                                                 @else
                                                     <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
                                                         <i class="material-icons-outlined text-muted">image</i>
@@ -198,14 +198,14 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                {{ $firstTranslation ? $firstTranslation->title : 'No translation' }}
+                                                {{ $firstTranslation ? $firstTranslation->title : __('No translation') }}
                                             </td>
                                           
                                             <td>
                                                 @if($advantage->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -214,7 +214,7 @@
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Advantage #' . $advantage->id }}"
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : __('Advantage :id', ['id' => $advantage->id]) }}"
                                                             data-url="{{ route('admin.become-a-partner-advantages.destroy', $advantage) }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
@@ -226,7 +226,7 @@
                                             <td colspan="7" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">trending_up</i>
-                                                    <p class="mt-2">No advantages found</p>
+                                                    <p class="mt-2">{{ __('No advantages found') }}</p>
                                                     <a href="{{ route('admin.become-a-partner-advantages.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>
@@ -342,16 +342,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (data.success) {
                         Swal.fire({
-                            title: 'Success!',
-                            text: 'Advantages reordered successfully!',
+                            title: '{{ __('Success!') }}',
+                            text: '{{ __('Advantages reordered successfully!') }}',
                             icon: 'success',
                             timer: 1500,
                             showConfirmButton: false
                         });
                     } else {
                         Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to reorder advantages',
+                            title: '{{ __('Error!') }}',
+                            text: data.message || '{{ __('Failed to reorder advantages') }}',
                             icon: 'error'
                         });
                     }
@@ -406,13 +406,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
         
         Swal.fire({
-            title: 'Are you sure?',
-            text: `Do you want to delete ${checkedBoxes.length} selected advantage(s)?`,
+            title: '{{ __('Are you sure?') }}',
+            text: '{{ __('Do you want to delete :count selected advantage(s)?', ['count' => ':count']) }}'.replace(':count', checkedBoxes.length),
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete them!'
+            confirmButtonText: '{{ __('Yes, delete them!') }}',
+            cancelButtonText: '{{ __('Cancel') }}'
         }).then((result) => {
             if (result.isConfirmed) {
                 const form = document.createElement('form');
@@ -435,13 +436,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to delete "${title}"?`,
+                title: '{{ __('Are you sure?') }}',
+                text: '{{ __('Do you want to delete :title?', ['title' => ':title']) }}'.replace(':title', title),
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __('Yes, delete it!') }}',
+                cancelButtonText: '{{ __('Cancel') }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');

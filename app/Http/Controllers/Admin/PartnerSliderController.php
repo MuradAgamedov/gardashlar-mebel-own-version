@@ -50,11 +50,11 @@ class PartnerSliderController extends Controller
             );
 
             return redirect()->route('admin.partner-sliders.index')
-                ->with('success', 'Partner slider created successfully!');
+                ->with('success', __('Partner slider created successfully!'));
 
         } catch (\Throwable $e) {
             return redirect()->back()
-                ->with('error', 'Error creating partner slider: ' . $e->getMessage())
+                ->with('error', __('Error creating partner slider: ') . $e->getMessage())
                 ->withInput();
         }
     }
@@ -84,11 +84,11 @@ class PartnerSliderController extends Controller
             );
 
             return redirect()->route('admin.partner-sliders.index')
-                ->with('success', 'Partner slider updated successfully!');
+                ->with('success', __('Partner slider updated successfully!'));
 
         } catch (\Throwable $e) {
             return redirect()->back()
-                ->with('error', 'Error updating partner slider: ' . $e->getMessage())
+                ->with('error', __('Error updating partner slider: ') . $e->getMessage())
                 ->withInput();
         }
     }
@@ -98,10 +98,10 @@ class PartnerSliderController extends Controller
         try {
             $this->repository->deletePartnerSlider($partnerSlider);
             return redirect()->route('admin.partner-sliders.index')
-                ->with('success', 'Partner slider deleted successfully!');
+                ->with('success', __('Partner slider deleted successfully!'));
         } catch (\Throwable $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting partner slider: ' . $e->getMessage());
+                ->with('error', __('Error deleting partner slider: ') . $e->getMessage());
         }
     }
 

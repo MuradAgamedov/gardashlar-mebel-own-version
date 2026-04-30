@@ -72,11 +72,11 @@ class RefundPolicyController extends Controller
             });
             
             return redirect()->back()
-                ->with('success', 'Refund Policy updated successfully!');
+                ->with('success', __('Refund Policy updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating refund policy: ' . $e->getMessage())
+                ->with('error', __('Error updating refund policy: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }

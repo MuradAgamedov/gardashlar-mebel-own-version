@@ -30,10 +30,10 @@ class PrivacyPolicyController extends Controller
             $this->repository->updatePrivacyPolicy($request->input('translates'), $languages);
 
             return redirect()->route('admin.privacy-policy.edit')
-                ->with('success', 'Gizlilik siyasəti uğurla yeniləndi.');
+                ->with('success', __('Privacy Policy updated successfully!'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            return back()->with('error', __('Error updating privacy policy: :error', ['error' => $e->getMessage()]));
         }
     }
 } 

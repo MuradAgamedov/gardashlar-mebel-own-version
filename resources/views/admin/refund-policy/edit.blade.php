@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Refund Policy')
+@section('title', __('Refund Policy'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Refund Policy</h3>
+                    <h3>{{ __('Refund Policy') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Refund Policy</li>
+                        <li class="breadcrumb-item active">{{ __('Refund Policy') }}</li>
                     </ol>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Partner Sliders')
+@section('title', __('Partner Sliders'))
 
 @section('content')
 <div class="page-body">
@@ -8,16 +8,16 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Partner Sliders</h3>
+                    <h3>{{ __('Partner Sliders') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Partner Sliders</li>
+                        <li class="breadcrumb-item active">{{ __('Partner Sliders') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Partner Sliders</h5>
+                            <h5>{{ __('Partner Sliders') }}</h5>
                             <a href="{{ route('admin.partner-sliders.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -54,11 +54,11 @@
                                 <thead>
                                     <tr>
                                         <th width="50">#</th>
-                                        <th width="100">Image</th>
-                                        <th>Title</th>
-                                        <th>Link</th>
-                                        <th width="80">Status</th>
-                                        <th width="150">Actions</th>
+                                        <th width="100">{{ __('Image') }}</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th>{{ __('Link') }}</th>
+                                        <th width="80">{{ __('Status') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-sliders">
@@ -79,7 +79,7 @@
                                             </td>
                                             <td>
                                                 @if($slider->image_url)
-                                                    <img src="{{ $slider->image_url }}" alt="Slider Image" class="img-thumbnail" style="width: 80px; height: 60px; object-fit: cover;">
+                                                    <img src="{{ $slider->image_url }}" alt="{{ __('Slider Image') }}" class="img-thumbnail" style="width: 80px; height: 60px; object-fit: cover;">
                                                 @else
                                                     <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 60px;">
                                                         <i class="material-icons-outlined text-muted">image</i>
@@ -87,7 +87,7 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                {{ $firstTranslation ? $firstTranslation->title : 'No translation' }}
+                                                {{ $firstTranslation ? $firstTranslation->title : __('No translation') }}
                                             </td>
                                             <td>
                                                 @if($slider->link)
@@ -100,9 +100,9 @@
                                             </td>
                                             <td>
                                                 @if($slider->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -111,7 +111,7 @@
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Slider #' . $slider->id }}"
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : __('Slider :id', ['id' => $slider->id]) }}"
                                                             data-url="{{ route('admin.partner-sliders.destroy', $slider) }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
@@ -123,7 +123,7 @@
                                             <td colspan="6" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">image</i>
-                                                    <p class="mt-2">No partner sliders found</p>
+                                                    <p class="mt-2">{{ __('No partner sliders found') }}</p>
                                                     <a href="{{ route('admin.partner-sliders.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>
@@ -196,8 +196,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (!data.success) {
                         Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to reorder partner sliders',
+                            title: '{{ __('Error!') }}',
+                            text: data.message || '{{ __('Failed to reorder partner sliders') }}',
                             icon: 'error'
                         });
                     }
@@ -216,13 +216,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to delete "${title}"?`,
+                title: '{{ __('Are you sure?') }}',
+                text: '{{ __('Do you want to delete :title?', ['title' => ':title']) }}'.replace(':title', title),
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __('Yes, delete it!') }}',
+                cancelButtonText: '{{ __('Cancel') }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');

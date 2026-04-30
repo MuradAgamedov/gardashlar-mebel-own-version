@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Customer Rights')
+@section('title', __('Customer Rights'))
 
 @section('content')
 <div class="page-body">
@@ -8,16 +8,16 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Customer Rights</h3>
+                    <h3>{{ __('Customer Rights') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Customer Rights</li>
+                        <li class="breadcrumb-item active">{{ __('Customer Rights') }}</li>
                     </ol>
                 </div>
             </div>
@@ -29,7 +29,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Customer Rights Section</h5>
+                        <h5>{{ __('Edit Customer Rights Section') }}</h5>
                     </div>
                     <div class="card-body">
                         @if ($errors->any())
@@ -98,12 +98,12 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
                                                         <label for="content_{{ $language->id }}" class="form-label">
-                                                            Content <span class="text-danger">*</span>
+                                                            {{ __('Content') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <textarea class="form-control ckeditor @error("translations.{$language->id}.content") is-invalid @enderror" 
                                                                   id="content_{{ $language->id }}" 
                                                                   name="translations[{{ $language->id }}][content]" 
-                                                                  placeholder="Enter content for {{ $language->lang_code }}">{{ old("translations.{$language->id}.content", $translation->content ?? '') }}</textarea>
+                                                                  placeholder="{{ __('Enter content for :lang', ['lang' => $language->lang_code]) }}">{{ old("translations.{$language->id}.content", $translation->content ?? '') }}</textarea>
                                                         @error("translations.{$language->id}.content")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror

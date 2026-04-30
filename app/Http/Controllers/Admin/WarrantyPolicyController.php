@@ -71,11 +71,11 @@ class WarrantyPolicyController extends Controller
             }
 
             return redirect()->back()
-                ->with('success', 'Warranty Policy updated successfully!');
+                ->with('success', __('Warranty Policy updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating warranty policy: ' . $e->getMessage())
+                ->with('error', __('Error updating warranty policy: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
