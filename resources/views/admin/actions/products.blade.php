@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Manage Action Products')
+@section('title', __('Manage Action Products'))
 
 @section('content')
 <div class="container-fluid">
@@ -10,13 +10,13 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h4 class="card-title mb-0">Manage Products for Action</h4>
+                            <h4 class="card-title mb-0">{{ __('Manage Products for Action') }}</h4>
                             <p class="text-muted mb-0">
-                                <strong>{{ $action->translate()->first()->title ?? 'No Title' }}</strong> 
-                                - {{ $action->company->translate()->first()->title ?? 'No Company' }}
+                                <strong>{{ $action->translate()->first()->title ?? __('No Title') }}</strong> 
+                                - {{ $action->company->translate()->first()->title ?? __('No Company') }}
                             </p>
                         </div>
-                        <a href="{{ route('admin.actions.index') }}" class="btn btn-secondary" title="Back to Actions">
+                        <a href="{{ route('admin.actions.index') }}" class="btn btn-secondary" title="{{ __('Back to Actions') }}">
                             <i class="material-icons-outlined">arrow_back</i>
                         </a>
                     </div>
@@ -27,7 +27,7 @@
                         <div class="col-md-6">
                             <form method="GET" action="{{ route('admin.actions.products', $action) }}" class="d-flex">
                                 <input type="text" name="search" class="form-control me-2" 
-                                       placeholder="Search products..." 
+                                       placeholder="{{ __('Search products...') }}" 
                                        value="{{ request('search') }}">
                                 <button type="submit" class="btn btn-outline-primary">
                                     <i class="material-icons-outlined">search</i>
@@ -36,7 +36,7 @@
                         </div>
                         <div class="col-md-6 text-end">
                             <span class="badge bg-info">
-                                {{ $products->where('companyProducts', '!=', null)->count() }} products in this action
+                                {{ $products->where('companyProducts', '!=', null)->count() }} {{ __('products in this action') }}
                             </span>
                         </div>
                     </div>
@@ -54,7 +54,7 @@
                                         @if($mainTranslate && $mainTranslate->image)
                                             <img src="{{ asset('storage/' . $mainTranslate->image) }}" 
                                                  class="card-img-top" 
-                                                 alt="{{ $mainTranslate->image_alt_text ?? 'Product Image' }}"
+                                                 alt="{{ $mainTranslate->image_alt_text ?? __('Product Image') }}"
                                                  style="height: 200px; object-fit: cover;">
                                         @else
                                             <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
@@ -68,29 +68,29 @@
                                             <div class="position-absolute top-0 end-0 m-2">
                                                 <span class="badge bg-success">
                                                     <i class="material-icons-outlined" style="font-size: 1rem;">local_offer</i>
-                                                    In Action
+                                                    {{ __('In Action') }}
                                                 </span>
                                             </div>
                                         @endif
                                     </div>
                                     
                                     <div class="card-body d-flex flex-column">
-                                        <h6 class="card-title">{{ $mainTranslate->title ?? 'No Title' }}</h6>
+                                        <h6 class="card-title">{{ $mainTranslate->title ?? __('No Title') }}</h6>
                                         <p class="card-text text-muted small flex-grow-1">
-                                            {{ Str::limit($mainTranslate->description ?? 'No description', 100) }}
+                                            {{ Str::limit($mainTranslate->description ?? __('No description'), 100) }}
                                         </p>
                                         
                                         <div class="mt-auto">
                                             @if($isInAction)
                                                 <button type="button" class="btn btn-danger btn-sm w-100" 
                                                         onclick="removeProduct({{ $product->id }})"
-                                                        title="Remove from Action">
+                                                        title="{{ __('Remove from Action') }}">
                                                     <i class="material-icons-outlined">remove</i>
                                                 </button>
                                             @else
                                                 <button type="button" class="btn btn-success btn-sm w-100" 
                                                         onclick="addProduct({{ $product->id }})"
-                                                        title="Add to Action">
+                                                        title="{{ __('Add to Action') }}">
                                                     <i class="material-icons-outlined">add</i>
                                                 </button>
                                             @endif
@@ -102,8 +102,8 @@
                             <div class="col-12">
                                 <div class="text-center py-5">
                                     <i class="material-icons-outlined text-muted" style="font-size: 4rem;">inventory</i>
-                                    <h5 class="text-muted mt-3">No products found</h5>
-                                    <p class="text-muted">Try adjusting your search criteria</p>
+                                    <h5 class="text-muted mt-3">{{ __('No products found') }}</h5>
+                                    <p class="text-muted">{{ __('Try adjusting your search criteria') }}</p>
                                 </div>
                             </div>
                         @endforelse
@@ -125,9 +125,9 @@
         <div class="modal-content">
             <div class="modal-body text-center py-4">
                 <div class="spinner-border text-primary mb-3" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden">{{ __('Loading...') }}</span>
                 </div>
-                <p class="mb-0">Processing...</p>
+                <p class="mb-0">{{ __('Processing...') }}</p>
             </div>
         </div>
     </div>
@@ -156,18 +156,18 @@ function addProduct(productId) {
             // Reload the page to update the UI
             location.reload();
         } else {
-            alert('Error: ' + data.message);
+            alert('{{ __('Error') }}: ' + data.message);
         }
     })
     .catch(error => {
         loadingModal.hide();
         console.error('Error:', error);
-        alert('An error occurred while adding the product');
+        alert('{{ __('An error occurred while adding the product') }}');
     });
 }
 
 function removeProduct(productId) {
-    if (!confirm('Are you sure you want to remove this product from the action?')) {
+    if (!confirm('{{ __('Are you sure you want to remove this product from the action?') }}')) {
         return;
     }
     
@@ -192,13 +192,13 @@ function removeProduct(productId) {
             // Reload the page to update the UI
             location.reload();
         } else {
-            alert('Error: ' + data.message);
+            alert('{{ __('Error') }}: ' + data.message);
         }
     })
     .catch(error => {
         loadingModal.hide();
         console.error('Error:', error);
-        alert('An error occurred while removing the product');
+        alert('{{ __('An error occurred while removing the product') }}');
     });
 }
 </script>

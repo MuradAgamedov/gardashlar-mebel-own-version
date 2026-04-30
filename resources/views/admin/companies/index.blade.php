@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Campaigns</h3>
+                    <h3>{{ __('Campaigns') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -15,7 +15,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Campaigns</li>
+                        <li class="breadcrumb-item active">{{ __('Campaigns') }}</li>
                     </ol>
                 </div>
             </div>
@@ -43,10 +43,10 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Campaigns List</h5>
+                            <h5>{{ __('Campaigns List') }}</h5>
                             <a href="{{ route('admin.campaigns.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add New
+                                {{ __('Add New') }}
                             </a>
                         </div>
                     </div>
@@ -57,13 +57,13 @@
                                     <thead>
                                         <tr>
                                             <th width="50">#</th>
-                                            <th width="100">Card Image</th>
-                                            <th width="100">Inner Image</th>
-                                            <th>Title</th>
-                                            <th>Languages</th>
-                                            <th>Status</th>
-                                            <th>Order</th>
-                                            <th width="200">Actions</th>
+                                            <th width="100">{{ __('Card Image') }}</th>
+                                            <th width="100">{{ __('Inner Image') }}</th>
+                                            <th>{{ __('Title') }}</th>
+                                            <th>{{ __('Languages') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th>{{ __('Order') }}</th>
+                                            <th width="200">{{ __('Actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="sortable-list">
@@ -87,7 +87,7 @@
                                                 <td>
                                                     @if($mainTranslate && $mainTranslate->card_image)
                                                         <img src="{{ asset('storage/' . $mainTranslate->card_image) }}" 
-                                                             alt="{{ $mainTranslate->card_image_alt_text ?? 'Card Image' }}" 
+                                                             alt="{{ $mainTranslate->card_image_alt_text ?? __('Card Image') }}" 
                                                              class="img-thumbnail" 
                                                              style="width: 60px; height: 60px; object-fit: cover;">
                                                     @else
@@ -100,7 +100,7 @@
                                                 <td>
                                                     @if($mainTranslate && $mainTranslate->inner_image)
                                                         <img src="{{ asset('storage/' . $mainTranslate->inner_image) }}" 
-                                                             alt="{{ $mainTranslate->inner_image_alt_text ?? 'Inner Image' }}" 
+                                                             alt="{{ $mainTranslate->inner_image_alt_text ?? __('Inner Image') }}" 
                                                              class="img-thumbnail" 
                                                              style="width: 60px; height: 60px; object-fit: cover;">
                                                     @else
@@ -112,7 +112,7 @@
                                                 </td>
                                                 <td>
                                                     <div>
-                                                        <strong>{{ $mainTranslate?->title ?? 'No title' }}</strong>
+                                                        <strong>{{ $mainTranslate?->title ?? __('No title') }}</strong>
                                                         @if($mainTranslate)
                                                             <span class="badge bg-info ms-1">{{ $mainTranslate->language->lang_code }}</span>
                                                         @endif
@@ -128,9 +128,9 @@
                                                 </td>
                                                 <td>
                                                     @if($company->status)
-                                                        <span class="badge bg-success">Active</span>
+                                                        <span class="badge bg-success">{{ __('Active') }}</span>
                                                     @else
-                                                        <span class="badge bg-danger">Inactive</span>
+                                                        <span class="badge bg-danger">{{ __('Inactive') }}</span>
                                                     @endif
                                                 </td>
                                                 <td>{{ $company->order }}</td>
@@ -138,7 +138,7 @@
                                                     <div class="btn-group" role="group">
                                                         <a href="{{ route('admin.campaigns.actions', $company->id) }}" 
                                                            class="btn btn-sm btn-outline-success" 
-                                                           title="Məhsul Əlavə Et">
+                                                           title="{{ __('Add Product') }}">
                                                             <i class="material-icons-outlined">inventory</i>
                                                         </a>
                                                         <a href="{{ route('admin.campaigns.edit', $company->id) }}" 
@@ -148,7 +148,7 @@
                                                         <button type="button" 
                                                                 class="btn btn-sm btn-outline-danger delete-btn" 
                                                                 data-id="{{ $company->id }}"
-                                                                data-title="{{ $mainTranslate?->title ?? 'This company' }}"
+                                                                data-title="{{ $mainTranslate?->title ?? __('This company') }}"
                                                                 data-url="{{ route('admin.campaigns.destroy', $company->id) }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
@@ -162,11 +162,11 @@
                         @else
                             <div class="text-center py-5">
                                 <i class="material-icons-outlined text-muted" style="font-size: 4rem;">business</i>
-                                <h5 class="mt-3 text-muted">No companies found</h5>
-                                <p class="text-muted">Click the button below to add the first company.</p>
+                                <h5 class="mt-3 text-muted">{{ __('No companies found') }}</h5>
+                                <p class="text-muted">{{ __('Click the button below to add the first company.') }}</p>
                                 <a href="{{ route('admin.campaigns.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
-                                    Add First Company
+                                    {{ __('Add First Company') }}
                                 </a>
                             </div>
                         @endif

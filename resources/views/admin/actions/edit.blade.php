@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Action')
+@section('title', __('Edit Action'))
 
 @section('content')
 <div class="container-fluid">
@@ -9,8 +9,8 @@
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="card-title mb-0">Edit Action</h4>
-                        <a href="{{ route('admin.actions.index') }}" class="btn btn-secondary" title="Back to Actions">
+                        <h4 class="card-title mb-0">{{ __('Edit Action') }}</h4>
+                        <a href="{{ route('admin.actions.index') }}" class="btn btn-secondary" title="{{ __('Back to Actions') }}">
                             <i class="material-icons-outlined">arrow_back</i>
                         </a>
                     </div>
@@ -25,17 +25,17 @@
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5>Basic Information</h5>
+                                        <h5>{{ __('Basic Information') }}</h5>
                                     </div>
                                     <div class="card-body">
                                         <div class="mb-3">
-                                            <label class="form-label">Company <span class="text-danger">*</span></label>
+                                            <label class="form-label">{{ __('Company') }} <span class="text-danger">*</span></label>
                                             <select name="company_id" class="form-select @error('company_id') is-invalid @enderror" required>
-                                                <option value="">Select Company</option>
+                                                <option value="">{{ __('Select Company') }}</option>
                                                 @foreach($companies as $company)
                                                     <option value="{{ $company->id }}" 
                                                             {{ old('company_id', $action->company_id) == $company->id ? 'selected' : '' }}>
-                                                        {{ $company->translate()->first()->title ?? 'No Title' }}
+                                                        {{ $company->translate()->first()->title ?? __('No Title') }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -45,18 +45,18 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label">Icon</label>
+                                            <label class="form-label">{{ __('Icon') }}</label>
                                             <input type="text" name="icon" class="form-control @error('icon') is-invalid @enderror" 
-                                                   placeholder="e.g., local_offer, campaign, flash_on" 
+                                                   placeholder="{{ __('e.g., local_offer, campaign, flash_on') }}" 
                                                    value="{{ old('icon', $action->icon) }}">
-                                            <div class="form-text">Material Icons name (optional)</div>
+                                            <div class="form-text">{{ __('Material Icons name (optional)') }}</div>
                                             @error('icon')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label">Start Date</label>
+                                            <label class="form-label">{{ __('Start Date') }}</label>
                                             <input type="date" name="start_date" class="form-control @error('start_date') is-invalid @enderror" 
                                                    value="{{ old('start_date', $action->start_date?->format('Y-m-d')) }}">
                                             @error('start_date')
@@ -65,7 +65,7 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label">End Date</label>
+                                            <label class="form-label">{{ __('End Date') }}</label>
                                             <input type="date" name="end_date" class="form-control @error('end_date') is-invalid @enderror" 
                                                    value="{{ old('end_date', $action->end_date?->format('Y-m-d')) }}">
                                             @error('end_date')
@@ -88,7 +88,7 @@
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5>Translations</h5>
+                                        <h5>{{ __('Translations') }}</h5>
                                     </div>
                                     <div class="card-body">
                                         @foreach($languages as $language)
@@ -99,7 +99,7 @@
                                                 <h6 class="text-primary">{{ $language->name }}</h6>
                                                 
                                                 <div class="mb-3">
-                                                    <label class="form-label">Title <span class="text-danger">*</span></label>
+                                                    <label class="form-label">{{ __('Title') }} <span class="text-danger">*</span></label>
                                                     <input type="text" name="translates[{{ $language->id }}][title]" 
                                                            class="form-control @error('translates.'.$language->id.'.title') is-invalid @enderror" 
                                                            value="{{ old('translates.'.$language->id.'.title', $translate->title ?? '') }}" required>
@@ -162,10 +162,10 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="d-flex justify-content-end gap-2">
-                                    <a href="{{ route('admin.actions.index') }}" class="btn btn-secondary">Cancel</a>
+                                    <a href="{{ route('admin.actions.index') }}" class="btn btn-secondary">{{ __('Cancel') }}</a>
                                     <button type="submit" class="btn btn-primary">
                                         <i class="material-icons-outlined">save</i>
-                                        Update Action
+                                        {{ __('Update Action') }}
                                     </button>
                                 </div>
                             </div>

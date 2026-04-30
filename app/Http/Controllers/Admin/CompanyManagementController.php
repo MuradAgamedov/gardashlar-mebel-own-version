@@ -30,11 +30,11 @@ class CompanyManagementController extends Controller
             $this->repository->updateCompanyManagement($request->input('translations'), $languages);
 
             return redirect()->back()
-                ->with('success', 'Company Management updated successfully!');
+                ->with('success', __('Company Management updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating company management: ' . $e->getMessage())
+                ->with('error', __('Error updating company management: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }

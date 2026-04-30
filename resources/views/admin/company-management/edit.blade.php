@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Company Management')
+@section('title', __('Company Management'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Company Management</h3>
+                    <h3>{{ __('Company Management') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -19,7 +19,7 @@
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Company Management</li>
+                        <li class="breadcrumb-item active">{{ __('Company Management') }}</li>
                     </ol>
                 </div>
             </div>
@@ -46,7 +46,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Company Management</h5>
+                        <h5>{{ __('Edit Company Management') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.company-management.update') }}" method="POST">
@@ -56,20 +56,20 @@
                             <!-- Content Translations Section -->
                             <div class="row mb-4">
                                 <div class="col-md-12">
-                                    <h6 class="mb-3">Content Translations</h6>
+                                    <h6 class="mb-3">{{ __('Content Translations') }}</h6>
                                     
                                     <!-- Custom Image Upload Button -->
                                     <div class="mb-3">
                                         <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('customImageUpload').click();">
-                                            <i class="material-icons-outlined">image</i> Şəkil Yüklə (Base64)
+                                            <i class="material-icons-outlined">image</i> {{ __('Upload Image (Base64)') }}
                                         </button>
                                         <input type="file" id="customImageUpload" accept="image/*" style="display:none;" onchange="handleCustomImageUpload(event)">
-                                        <small class="text-muted ms-2">Şəkil seçin və Base64 formatında content-ə əlavə olunacaq</small>
+                                        <small class="text-muted ms-2">{{ __('Select image and it will be added to content in Base64 format') }}</small>
                                     </div>
                                     
                                     @if ($errors->any())
                                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                        <h6 class="alert-heading">Please fix the following errors:</h6>
+                                        <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
                                         <ul class="mb-0">
                                             @foreach ($errors->all() as $error)
                                                 <li>{{ $error }}</li>
@@ -122,11 +122,11 @@
                                             
                                             <div class="card mt-3">
                                                 <div class="card-header">
-                                                    <h6 class="mb-0">{{ $language->title }} Content</h6>
+                                                    <h6 class="mb-0">{{ $language->title }} {{ __('Content') }}</h6>
                                                     @if($translate)
-                                                        <small class="text-success">Translation exists</small>
+                                                        <small class="text-success">{{ __('Translation exists') }}</small>
                                                     @else
-                                                        <small class="text-warning">No translation yet</small>
+                                                        <small class="text-warning">{{ __('No translation yet') }}</small>
                                                     @endif
                                                 </div>
                                                 <div class="card-body">
@@ -134,11 +134,11 @@
                                                     
                                                     <div class="row">
                                                         <div class="col-md-12 mb-3">
-                                                            <label class="form-label">Content <span class="text-danger">*</span></label>
+                                                            <label class="form-label">{{ __('Content') }} <span class="text-danger">*</span></label>
                                                             <textarea class="form-control ckeditor @error('translations.'.$index.'.content') is-invalid @enderror" 
                                                                       name="translations[{{ $index }}][content]" 
                                                                       id="content-{{ $language->id }}"
-                                                                      placeholder="Enter content for {{ $language->lang_code }}">{{ old('translations.'.$index.'.content', $translate->content ?? '') }}</textarea>
+                                                                      placeholder="{{ __('Enter content for :lang', ['lang' => $language->lang_code]) }}">{{ old('translations.'.$index.'.content', $translate->content ?? '') }}</textarea>
                                                             @error('translations.'.$index.'.content')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                                             @enderror
@@ -235,9 +235,9 @@ function handleCustomImageUpload(event) {
         reader.onload = function(e) {
             const base64 = e.target.result;
             
-            // Şəkil ölçüsünü soruş
-            const imgWidth = prompt("Şəklin enini daxil edin (px):", "400");
-            const imgAlt = prompt("Alt text daxil edin:", "Uploaded Image");
+            // Ask for image width
+            const imgWidth = prompt("{{ __('Enter image width (px):') }}", "400");
+            const imgAlt = prompt("{{ __('Enter alt text:') }}", "{{ __('Uploaded Image') }}");
             
             if (imgWidth) {
                 const imgTag = `<img src="${base64}" alt="${imgAlt}" style="width: ${imgWidth}px; height: auto;">`;

@@ -42,10 +42,10 @@ class CompanyController extends Controller
             );
 
             return redirect()->route('admin.campaigns.index')
-                ->with('success', 'Kampaniya uğurla əlavə edildi.');
+                ->with('success', __('Campaign created successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -67,10 +67,10 @@ class CompanyController extends Controller
             );
 
             return redirect()->route('admin.campaigns.index')
-                ->with('success', 'Kampaniya uğurla yeniləndi.');
+                ->with('success', __('Campaign updated successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -79,10 +79,10 @@ class CompanyController extends Controller
         try {
             $this->repository->deleteCompany($campaign);
             return redirect()->route('admin.campaigns.index')
-                ->with('success', 'Kampaniya uğurla silindi.');
+                ->with('success', __('Campaign deleted successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 

@@ -51,12 +51,12 @@ class ActionController extends Controller
             );
 
             return redirect()->route('admin.actions.index')
-                ->with('success', 'Action created successfully.');
+                ->with('success', __('Action created successfully.'));
 
         } catch (\Exception $e) {
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Error creating action: ' . $e->getMessage());
+                ->with('error', __('Error creating action: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -90,12 +90,12 @@ class ActionController extends Controller
             );
 
             return redirect()->route('admin.actions.index')
-                ->with('success', 'Action updated successfully.');
+                ->with('success', __('Action updated successfully.'));
 
         } catch (\Exception $e) {
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Error updating action: ' . $e->getMessage());
+                ->with('error', __('Error updating action: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -105,11 +105,11 @@ class ActionController extends Controller
             $this->repository->deleteAction($action);
 
             return redirect()->route('admin.actions.index')
-                ->with('success', 'Action deleted successfully.');
+                ->with('success', __('Action deleted successfully.'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting action: ' . $e->getMessage());
+                ->with('error', __('Error deleting action: :error', ['error' => $e->getMessage()]));
         }
     }
 
