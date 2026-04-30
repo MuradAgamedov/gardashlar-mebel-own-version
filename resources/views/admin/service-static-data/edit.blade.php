@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Service Static Data')
+@section('title', __('Service Static Data'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Service Static Data</h3>
+                    <h3>{{ __('Service Static Data') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Service Static Data</li>
+                        <li class="breadcrumb-item active">{{ __('Service Static Data') }}</li>
                     </ol>
                 </div>
             </div>

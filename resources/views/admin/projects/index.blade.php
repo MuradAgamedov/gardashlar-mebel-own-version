@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Projects Management')
+@section('title', __('Projects Management'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Projects Management</h3>
+                    <h3>{{ __('Projects Management') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Projects Management</li>
+                        <li class="breadcrumb-item active">{{ __('Projects Management') }}</li>
                     </ol>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Projects</h5>
+                            <h5>{{ __('Projects') }}</h5>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
                                     <i class="material-icons-outlined">delete</i>
@@ -60,9 +60,9 @@
                     <div class="card-body border-bottom">
                         <form method="GET" action="{{ route('admin.projects.index') }}" class="row g-3">
                             <div class="col-md-3">
-                                <label for="category_id" class="form-label">Filter by Category</label>
+                                <label for="category_id" class="form-label">{{ __('Filter by Category') }}</label>
                                 <select class="form-select" id="category_id" name="category_id">
-                                    <option value="">All Categories</option>
+                                    <option value="">{{ __('All Categories') }}</option>
                                     @foreach($categories as $category)
                                         @php
                                             $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
@@ -70,15 +70,15 @@
                                                 ?? $category->translates->first();
                                         @endphp
                                         <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                                            {{ $translation ? $translation->title : 'Category #' . $category->id }}
+                                            {{ $translation ? $translation->title : __('Category #:id', ['id' => $category->id]) }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <label for="searchInput" class="form-label">Search Projects</label>
+                                <label for="searchInput" class="form-label">{{ __('Search Projects') }}</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="searchInput" placeholder="Search projects...">
+                                    <input type="text" class="form-control" id="searchInput" placeholder="{{ __('Search projects...') }}">
                                     <button class="btn btn-outline-secondary" type="button" id="searchBtn">
                                         <i class="material-icons-outlined">search</i>
                                     </button>
@@ -87,12 +87,12 @@
                             <div class="col-md-3 d-flex align-items-end">
                                 <button type="submit" class="btn btn-outline-primary me-2">
                                     <i class="material-icons-outlined">filter_list</i>
-                                    Filter
+                                    {{ __('Filter') }}
                                 </button>
                                 @if(request('category_id'))
                                     <a href="{{ route('admin.projects.index') }}" class="btn btn-outline-secondary">
                                         <i class="material-icons-outlined">clear</i>
-                                        Clear
+                                        {{ __('Clear') }}
                                     </a>
                                 @endif
                             </div>
@@ -100,7 +100,7 @@
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="selectAll">
                                     <label class="form-check-label" for="selectAll">
-                                        Select All
+                                        {{ __('Select All') }}
                                     </label>
                                 </div>
                             </div>
@@ -115,12 +115,12 @@
                                             <input type="checkbox" class="form-check-input" id="headerCheckbox">
                                         </th>
                                         <th width="50">#</th>
-                                        <th>Title</th>
-                                        <th>Slug</th>
-                                        <th>Company</th>
-                                        <th>Category</th>
-                                        <th>Status</th>
-                                        <th width="150">Actions</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th>{{ __('Slug') }}</th>
+                                        <th>{{ __('Company') }}</th>
+                                        <th>{{ __('Category') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-projects">
@@ -148,7 +148,7 @@
                                                             $firstTranslation = $project->translates->firstWhere('language_id', $mainLanguageId)
                                                                 ?? $project->translates->first();
                                                         @endphp
-                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
+                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : __('No title') }}</strong>
                                                     </div>
                                                 </div>
                                             </td>
@@ -156,14 +156,14 @@
                                                 @if($firstTranslation && $firstTranslation->slug)
                                                     <code class="text-primary">{{ $firstTranslation->slug }}</code>
                                                 @else
-                                                    <span class="text-muted">No slug</span>
+                                                    <span class="text-muted">{{ __('No slug') }}</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if($firstTranslation && $firstTranslation->company_name)
                                                     <span class="badge bg-info">{{ $firstTranslation->company_name }}</span>
                                                 @else
-                                                    <span class="text-muted">No company name</span>
+                                                    <span class="text-muted">{{ __('No company name') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -174,18 +174,18 @@
                                                             ?? $project->category->translates->first();
                                                     @endphp
                                                     <span class="badge bg-secondary">
-                                                        {{ $categoryTranslation ? $categoryTranslation->title : 'No category' }}
+                                                        {{ $categoryTranslation ? $categoryTranslation->title : __('No category') }}
                                                     </span>
                                                 @else
-                                                    <span class="text-muted">No category</span>
+                                                    <span class="text-muted">{{ __('No category') }}</span>
                                                 @endif
                                             </td>
                                          
                                             <td>
                                                 @if($project->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -200,7 +200,7 @@
                                                         <i class="material-icons-outlined">image</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Project #' . $project->id }}"
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : __('Project #:id', ['id' => $project->id]) }}"
                                                             data-url="{{ route('admin.projects.destroy', $project) }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
@@ -212,7 +212,7 @@
                                             <td colspan="10" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">work</i>
-                                                    <p class="mt-2">No projects found</p>
+                                                    <p class="mt-2">{{ __('No projects found') }}</p>
                                                     <a href="{{ route('admin.projects.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>

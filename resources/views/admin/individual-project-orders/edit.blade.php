@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Individual Project Order</h3>
+                    <h3>{{ __('Edit Individual Project Order') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -16,9 +16,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.individual-project-orders.index') }}">Individual Project Orders</a>
+                            <a href="{{ route('admin.individual-project-orders.index') }}">{{ __('Individual Project Orders') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>
@@ -27,7 +27,7 @@
     <div class="container-fluid">
         @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <h6 class="alert-heading">Please fix the following errors:</h6>
+            <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
             <ul class="mb-0">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -41,7 +41,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Individual Project Order</h5>
+                        <h5>{{ __('Edit Individual Project Order') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.individual-project-orders.update', $individualProjectOrder->id) }}" method="POST">
@@ -56,7 +56,7 @@
                                             <input class="form-check-input" type="checkbox" name="status" value="1" 
                                                    id="status" {{ old('status', $individualProjectOrder->status ? '1' : '0') ? 'checked' : '' }}>
                                             <label class="form-check-label" for="status">
-                                                Active
+                                                {{ __('Active') }}
                                             </label>
                                         </div>
                                     </div>
@@ -100,11 +100,11 @@
                                          aria-labelledby="tab-{{ $language->id }}">
                                         
                                         <div class="mb-3">
-                                            <label class="form-label">Title *</label>
+                                            <label class="form-label">{{ __('Title') }} *</label>
                                             <input type="text" class="form-control @error("translates.{$language->id}.title") is-invalid @enderror" 
                                                    name="translates[{{ $language->id }}][title]" 
                                                    value="{{ old("translates.{$language->id}.title", $translate?->title) }}"
-                                                   placeholder="Enter title"
+                                                   placeholder="{{ __('Enter title') }}"
                                                    required>
                                             @error("translates.{$language->id}.title")
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -112,11 +112,11 @@
                                         </div>
                                         
                                         <div class="mb-3">
-                                            <label class="form-label">Description *</label>
+                                            <label class="form-label">{{ __('Description') }} *</label>
                                             <textarea class="form-control @error("translates.{$language->id}.description") is-invalid @enderror" 
                                                       name="translates[{{ $language->id }}][description]" 
                                                       rows="8"
-                                                      placeholder="Enter description"
+                                                      placeholder="{{ __('Enter description') }}"
                                                       required>{{ old("translates.{$language->id}.description", $translate?->description) }}</textarea>
                                             @error("translates.{$language->id}.description")
                                                 <div class="invalid-feedback">{{ $message }}</div>

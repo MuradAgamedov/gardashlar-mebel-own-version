@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Catalog')
+@section('title', __('Edit Catalog'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Catalog</h3>
+                    <h3>{{ __('Edit Catalog') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.catalogs.index') }}">Catalogs</a>
+                            <a href="{{ route('admin.catalogs.index') }}">{{ __('Catalogs') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Please fix the following errors:</h6>
+                <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -44,7 +44,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Catalog</h5>
+                        <h5>{{ __('Edit Catalog') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.catalogs.update', $catalog) }}" method="POST" enctype="multipart/form-data">
@@ -54,15 +54,15 @@
                             <!-- Status and PDF -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Status</label>
+                                    <label class="form-label">{{ __('Status') }}</label>
                                     <div class="form-check form-switch">
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" value="1" {{ old('status', $catalog->status ? '1' : '0') ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="status">Active</label>
+                                        <label class="form-check-label" for="status">{{ __('Active') }}</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Catalog PDF</label>
+                                    <label class="form-label">{{ __('Catalog PDF') }}</label>
                                     <input type="file" 
                                            class="form-control @error('catalog_pdf') is-invalid @enderror" 
                                            name="catalog_pdf" 
@@ -77,7 +77,7 @@
                                         <div class="mt-2">
                                             <div class="alert alert-success">
                                                 <i class="material-icons-outlined">file_present</i>
-                                                <strong>Current PDF:</strong> 
+                                                <strong>{{ __('Current PDF:') }}</strong> 
                                                 <a href="{{ asset('storage/' . $catalog->catalog_pdf) }}" target="_blank">
                                                     {{ basename($catalog->catalog_pdf) }}
                                                 </a>
@@ -99,7 +99,7 @@
                             <!-- Language Tabs -->
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Catalog Information</label>
+                                    <label class="form-label">{{ __('Catalog Information') }}</label>
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
                                         @foreach($languages as $index => $language)
                                             @php
@@ -131,13 +131,13 @@
                                                     <!-- Catalog Year -->
                                                     <div class="col-md-12">
                                                         <label class="form-label">
-                                                            Catalog Year <span class="text-danger">*</span>
+                                                            {{ __('Catalog Year') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.catalog_year") is-invalid @enderror" 
                                                                name="translations[{{ $language->id }}][catalog_year]" 
                                                                value="{{ old("translations.{$language->id}.catalog_year", $translation->catalog_year ?? '') }}" 
-                                                               placeholder="e.g., 2024, 2023-2024">
+                                                               placeholder="{{ __('e.g., 2024, 2023-2024') }}"
                                                         @error("translations.{$language->id}.catalog_year")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror

@@ -42,11 +42,11 @@ class CatalogController extends Controller
             );
 
             return redirect()->route('admin.catalogs.index')
-                ->with('success', 'Catalog created successfully!');
+                ->with('success', __('Catalog created successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error creating catalog: ' . $e->getMessage())
+                ->with('error', __('Error creating catalog: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -69,11 +69,11 @@ class CatalogController extends Controller
             );
 
             return redirect()->route('admin.catalogs.index')
-                ->with('success', 'Catalog updated successfully!');
+                ->with('success', __('Catalog updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating catalog: ' . $e->getMessage())
+                ->with('error', __('Error updating catalog: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -83,10 +83,10 @@ class CatalogController extends Controller
         try {
             $this->repository->deleteCatalog($catalog);
             return redirect()->route('admin.catalogs.index')
-                ->with('success', 'Catalog deleted successfully!');
+                ->with('success', __('Catalog deleted successfully!'));
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting catalog: ' . $e->getMessage());
+                ->with('error', __('Error deleting catalog: :error', ['error' => $e->getMessage()]));
         }
     }
 

@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Site Usage Rules')
+@section('title', __('Site Usage Rules'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Site Usage Rules</h3>
+                    <h3>{{ __('Site Usage Rules') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Site Usage Rules</li>
+                        <li class="breadcrumb-item active">{{ __('Site Usage Rules') }}</li>
                     </ol>
                 </div>
             </div>

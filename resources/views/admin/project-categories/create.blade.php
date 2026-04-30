@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Create Project Category')
+@section('title', __('Create Project Category'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Create Project Category</h3>
+                    <h3>{{ __('Create Project Category') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.project-categories.index') }}">Project Categories Management</a>
+                            <a href="{{ route('admin.project-categories.index') }}">{{ __('Project Categories Management') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Create Project Category</li>
+                        <li class="breadcrumb-item active">{{ __('Create Project Category') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Please fix the following errors:</h6>
+                <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -51,7 +51,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Add New Project Category</h5>
+                        <h5>{{ __('Add New Project Category') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.project-categories.store') }}" method="POST" enctype="multipart/form-data">
@@ -60,7 +60,7 @@
                             <!-- Image Upload -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Category Image (optional)</label>
+                                    <label class="form-label">{{ __('Category Image (optional)') }}</label>
                                     <input type="file" class="form-control @error('image') is-invalid @enderror" id="image" name="image" accept="image/*">
                                     @error('image')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -72,10 +72,10 @@
                             <!-- Status -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Status</label>
+                                    <label class="form-label">{{ __('Status') }}</label>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" value="1" checked>
-                                        <label class="form-check-label" for="status">Active</label>
+                                        <label class="form-check-label" for="status">{{ __('Active') }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -83,7 +83,7 @@
                             <!-- Language Tabs -->
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Project Category Information</label>
+                                    <label class="form-label">{{ __('Project Category Information') }}</label>
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
                                         @foreach($languages as $index => $language)
                                             <li class="nav-item" role="presentation">
@@ -109,14 +109,14 @@
                                                     <!-- Title -->
                                                     <div class="col-md-6">
                                                         <label class="form-label">
-                                                            Title <span class="text-danger">*</span>
+                                                            {{ __('Title') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
                                                                name="translations[{{ $language->id }}][title]" 
                                                                id="title_{{ $language->id }}"
                                                                value="{{ old("translations.{$language->id}.title") }}" 
-                                                               placeholder="Enter title in {{ $language->lang_name }}"
+                                                               placeholder="{{ __('Enter title in :lang', ['lang' => $language->lang_name]) }}"
                                                                required>
                                                         @error("translations.{$language->id}.title")
                                                             <div class="invalid-feedback">
@@ -128,14 +128,14 @@
                                                     <!-- Slug -->
                                                     <div class="col-md-6">
                                                         <label class="form-label">
-                                                            Slug <span class="text-danger">*</span>
+                                                            {{ __('Slug') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.slug") is-invalid @enderror" 
                                                                name="translations[{{ $language->id }}][slug]" 
                                                                id="slug_{{ $language->id }}"
                                                                value="{{ old("translations.{$language->id}.slug") }}" 
-                                                               placeholder="Enter slug in {{ $language->lang_name }}"
+                                                               placeholder="{{ __('Enter slug in :lang', ['lang' => $language->lang_name]) }}"
                                                                required>
                                                         @error("translations.{$language->id}.slug")
                                                             <div class="invalid-feedback">
@@ -143,18 +143,18 @@
                                                             </div>
                                                         @enderror
                                                         <small class="form-text text-muted">
-                                                            URL-friendly version of the title.
+                                                            {{ __('URL-friendly version of the title.') }}
                                                         </small>
                                                     </div>
                                                     
                                                     <!-- SEO Title -->
                                                     <div class="col-md-12">
-                                                        <label class="form-label">SEO Title</label>
+                                                        <label class="form-label">{{ __('SEO Title') }}</label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.seo_title") is-invalid @enderror" 
                                                                name="translations[{{ $language->id }}][seo_title]" 
                                                                value="{{ old("translations.{$language->id}.seo_title") }}" 
-                                                               placeholder="SEO title for {{ $language->lang_name }}">
+                                                               placeholder="{{ __('SEO title for :lang', ['lang' => $language->lang_name]) }}">
                                                         @error("translations.{$language->id}.seo_title")
                                                             <div class="invalid-feedback">
                                                                 {{ $message }}
@@ -164,11 +164,11 @@
                                                     
                                                     <!-- SEO Keywords -->
                                                     <div class="col-md-12">
-                                                        <label class="form-label">SEO Keywords</label>
+                                                        <label class="form-label">{{ __('SEO Keywords') }}</label>
                                                         <textarea class="form-control @error("translations.{$language->id}.seo_keywords") is-invalid @enderror" 
                                                                   name="translations[{{ $language->id }}][seo_keywords]" 
                                                                   rows="3"
-                                                                  placeholder="SEO keywords for {{ $language->lang_name }} (comma separated)">{{ old("translations.{$language->id}.seo_keywords") }}</textarea>
+                                                                  placeholder="{{ __('SEO keywords for :lang (comma separated)', ['lang' => $language->lang_name]) }}">{{ old("translations.{$language->id}.seo_keywords") }}</textarea>
                                                         @error("translations.{$language->id}.seo_keywords")
                                                             <div class="invalid-feedback">
                                                                 {{ $message }}
@@ -178,11 +178,11 @@
                                                     
                                                     <!-- SEO Description -->
                                                     <div class="col-md-12">
-                                                        <label class="form-label">SEO Description</label>
+                                                        <label class="form-label">{{ __('SEO Description') }}</label>
                                                         <textarea class="form-control @error("translations.{$language->id}.seo_description") is-invalid @enderror" 
                                                                   name="translations[{{ $language->id }}][seo_description]" 
                                                                   rows="3"
-                                                                  placeholder="SEO description for {{ $language->lang_name }}">{{ old("translations.{$language->id}.seo_description") }}</textarea>
+                                                                  placeholder="{{ __('SEO description for :lang', ['lang' => $language->lang_name]) }}">{{ old("translations.{$language->id}.seo_description") }}</textarea>
                                                         @error("translations.{$language->id}.seo_description")
                                                             <div class="invalid-feedback">
                                                                 {{ $message }}
@@ -193,12 +193,12 @@
                                                     
                                                     <!-- Image Alt Text -->
                                                     <div class="col-md-12">
-                                                        <label class="form-label">Image Alt Text</label>
+                                                        <label class="form-label">{{ __('Image Alt Text') }}</label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.image_alt_text") is-invalid @enderror" 
                                                                name="translations[{{ $language->id }}][image_alt_text]" 
                                                                value="{{ old("translations.{$language->id}.image_alt_text") }}" 
-                                                               placeholder="Image alt text for {{ $language->lang_name }}">
+                                                               placeholder="{{ __('Image alt text for :lang', ['lang' => $language->lang_name]) }}">
                                                         @error("translations.{$language->id}.image_alt_text")
                                                             <div class="invalid-feedback">
                                                                 {{ $message }}

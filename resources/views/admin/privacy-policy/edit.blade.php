@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Gizlilik Siyasəti</h3>
+                    <h3>{{ __('Privacy Policy') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -15,7 +15,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Gizlilik Siyasəti</li>
+                        <li class="breadcrumb-item active">{{ __('Privacy Policy') }}</li>
                     </ol>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Project Categories Management')
+@section('title', __('Project Categories Management'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Project Categories Management</h3>
+                    <h3>{{ __('Project Categories Management') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Project Categories Management</li>
+                        <li class="breadcrumb-item active">{{ __('Project Categories Management') }}</li>
                     </ol>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Project Categories</h5>
+                            <h5>{{ __('Project Categories') }}</h5>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-danger" id="deleteSelectedBtn" style="display: none;">
                                     <i class="material-icons-outlined">delete</i>
@@ -60,7 +60,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="searchInput" placeholder="Search project categories...">
+                                    <input type="text" class="form-control" id="searchInput" placeholder="{{ __('Search project categories...') }}">
                                     <button class="btn btn-outline-secondary" type="button" id="searchBtn">
                                         <i class="material-icons-outlined">search</i>
                                     </button>
@@ -70,7 +70,7 @@
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="selectAll">
                                     <label class="form-check-label" for="selectAll">
-                                        Select All
+                                        {{ __('Select All') }}
                                     </label>
                                 </div>
                             </div>
@@ -84,10 +84,10 @@
                                             <input type="checkbox" class="form-check-input" id="headerCheckbox">
                                         </th>
                                         <th width="50">#</th>
-                                        <th>Title</th>
-                                        <th>Slug</th>
-                                        <th>Status</th>
-                                        <th width="150">Actions</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th>{{ __('Slug') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-project-categories">
@@ -115,19 +115,19 @@
                                                             $firstTranslation = $projectCategory->translates->firstWhere('language_id', $mainLanguageId)
                                                                 ?? $projectCategory->translates->first();
                                                         @endphp
-                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
+                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : __('No title') }}</strong>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
-                                                <code>{{ $firstTranslation ? $firstTranslation->slug : 'No slug' }}</code>
+                                                <code>{{ $firstTranslation ? $firstTranslation->slug : __('No slug') }}</code>
                                             </td>
                                          
                                             <td>
                                                 @if($projectCategory->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -136,7 +136,7 @@
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Project Category #' . $projectCategory->id }}"
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : __('Project Category #:id', ['id' => $projectCategory->id]) }}"
                                                             data-url="{{ route('admin.project-categories.destroy', $projectCategory) }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
@@ -148,7 +148,7 @@
                                             <td colspan="8" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">category</i>
-                                                    <p class="mt-2">No project categories found</p>
+                                                    <p class="mt-2">{{ __('No project categories found') }}</p>
                                                     <a href="{{ route('admin.project-categories.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>

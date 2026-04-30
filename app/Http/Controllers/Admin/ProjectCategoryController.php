@@ -106,13 +106,13 @@ class ProjectCategoryController extends Controller
             $this->clearProjectCategoriesCache();
 
             return redirect()->route('admin.project-categories.index')
-                ->with('success', 'Project category created successfully.');
+                ->with('success', __('Project category created successfully.'));
 
         } catch (\Exception $e) {
             Log::error('Error creating project category: ' . $e->getMessage());
             
             return back()->withInput()
-                ->with('error', 'Error creating project category. Please try again.');
+                ->with('error', __('Error creating project category. Please try again.'));
         }
     }
 
@@ -182,13 +182,13 @@ class ProjectCategoryController extends Controller
             $this->clearProjectCategoriesCache();
 
             return redirect()->route('admin.project-categories.index')
-                ->with('success', 'Project category updated successfully.');
+                ->with('success', __('Project category updated successfully.'));
 
         } catch (\Exception $e) {
             Log::error('Error updating project category: ' . $e->getMessage());
             
             return back()->withInput()
-                ->with('error', 'Error updating project category. Please try again.');
+                ->with('error', __('Error updating project category. Please try again.'));
         }
     }
 
@@ -204,10 +204,10 @@ class ProjectCategoryController extends Controller
             $this->clearProjectCategoriesCache();
             
             return redirect()->route('admin.project-categories.index')
-                ->with('success', 'Project category deleted successfully.');
+                ->with('success', __('Project category deleted successfully.'));
         } catch (\Exception $e) {
             Log::error('Error deleting project category: ' . $e->getMessage());
-            return back()->with('error', 'Error deleting project category. Please try again.');
+            return back()->with('error', __('Error deleting project category. Please try again.'));
         }
     }
 
@@ -253,9 +253,9 @@ class ProjectCategoryController extends Controller
             $this->clearProjectCategoriesCache();
             
             return redirect()->route('admin.project-categories.index')
-                ->with('success', "{$deletedCount} project category(ies) deleted successfully!");
+                ->with('success', __(':count project category(ies) deleted successfully!', ['count' => $deletedCount]));
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting project categories: ' . $e->getMessage());
+            return back()->with('error', __('Error deleting project categories: :error', ['error' => $e->getMessage()]));
         }
     }
 }

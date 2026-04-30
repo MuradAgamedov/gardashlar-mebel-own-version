@@ -91,11 +91,11 @@ class ServiceController extends Controller
             }
 
             return redirect()->route('admin.services.index')
-                ->with('success', 'Service created successfully!');
+                ->with('success', __('Service created successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error creating service: ' . $e->getMessage())
+                ->with('error', __('Error creating service: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -172,11 +172,11 @@ class ServiceController extends Controller
             }
 
             return redirect()->route('admin.services.index')
-                ->with('success', 'Service updated successfully!');
+                ->with('success', __('Service updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating service: ' . $e->getMessage())
+                ->with('error', __('Error updating service: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -191,11 +191,11 @@ class ServiceController extends Controller
             $service->delete();
 
             return redirect()->route('admin.services.index')
-                ->with('success', 'Service deleted successfully!');
+                ->with('success', __('Service deleted successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting service: ' . $e->getMessage());
+                ->with('error', __('Error deleting service: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -257,10 +257,10 @@ class ServiceController extends Controller
             Service::whereIn('id', $request->ids)->delete();
 
             return redirect()->route('admin.services.index')
-                ->with('success', count($request->ids) . ' service(s) deleted successfully.');
+                ->with('success', __(':count service(s) deleted successfully.', ['count' => count($request->ids)]));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 } 

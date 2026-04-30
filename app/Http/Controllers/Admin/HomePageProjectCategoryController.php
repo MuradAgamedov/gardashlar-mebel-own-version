@@ -36,7 +36,7 @@ class HomePageProjectCategoryController extends Controller
         ]);
 
         return redirect()->route('admin.home-page-project-categories.index')
-            ->with('success', 'Project category added to home page successfully.');
+            ->with('success', __('Project category added to home page successfully.'));
     }
 
     public function show(string $id)
@@ -59,14 +59,14 @@ class HomePageProjectCategoryController extends Controller
         ]);
 
         return redirect()->route('admin.home-page-project-categories.index')
-            ->with('success', 'Project category updated successfully.');
+            ->with('success', __('Project category updated successfully.'));
     }
 
     public function destroy(string $id): RedirectResponse
     {
         $this->repository->deleteHomePageProjectCategory($id);
         return redirect()->route('admin.home-page-project-categories.index')
-            ->with('success', 'Project category removed from home page successfully.');
+            ->with('success', __('Project category removed from home page successfully.'));
     }
 
     public function reorder(Request $request): \Illuminate\Http\JsonResponse

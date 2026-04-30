@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Catalogs')
+@section('title', __('Catalogs'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Catalogs</h3>
+                    <h3>{{ __('Catalogs') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Catalogs</li>
+                        <li class="breadcrumb-item active">{{ __('Catalogs') }}</li>
                     </ol>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>All Catalogs</h5>
+                            <h5>{{ __('All Catalogs') }}</h5>
                             <a href="{{ route('admin.catalogs.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -55,11 +55,11 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th width="50">Order</th>
-                                        <th>Catalog Year</th>
-                                        <th>PDF</th>
-                                        <th width="80">Status</th>
-                                        <th width="150">Actions</th>
+                                        <th width="50">{{ __('Order') }}</th>
+                                        <th>{{ __('Catalog Year') }}</th>
+                                        <th>{{ __('PDF') }}</th>
+                                        <th width="80">{{ __('Status') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-catalogs">
@@ -81,23 +81,23 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                {{ $firstTranslation ? $firstTranslation->catalog_year : 'No translation' }}
+                                                {{ $firstTranslation ? $firstTranslation->catalog_year : __('No translation') }}
                                             </td>
                                             <td>
                                                 @if($catalog->catalog_pdf)
-                                                    <a href="{{ asset('storage/' . $catalog->catalog_pdf) }}" target="_blank" class="btn btn-sm btn-outline-primary p-1" title="View PDF" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
+                                                    <a href="{{ asset('storage/' . $catalog->catalog_pdf) }}" target="_blank" class="btn btn-sm btn-outline-primary p-1" title="{{ __('View PDF') }}" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;">
                                                         <i class="material-icons-outlined" style="font-size: 16px;">visibility</i>
                                                     </a>
                                                 @else
-                                                    <span class="text-muted">No PDF</span>
+                                                    <span class="text-muted">{{ __('No PDF') }}</span>
                                                 @endif
                                             </td>
                                            
                                             <td>
                                                 @if($catalog->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -106,7 +106,7 @@
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->catalog_year : 'Catalog #' . $catalog->id }}"
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->catalog_year : __('Catalog #:id', ['id' => $catalog->id]) }}"
                                                             data-url="{{ route('admin.catalogs.destroy', $catalog) }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
@@ -118,7 +118,7 @@
                                             <td colspan="6" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">folder</i>
-                                                    <p class="mt-2">No catalogs found</p>
+                                                    <p class="mt-2">{{ __('No catalogs found') }}</p>
                                                     <a href="{{ route('admin.catalogs.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>

@@ -29,7 +29,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Refund Policy Section</h5>
+                        <h5>{{ __('Edit Refund Policy Section') }}</h5>
                     </div>
                     <div class="card-body">
                         @if ($errors->any())
@@ -98,7 +98,7 @@
                                                 <div class="row mt-3">
                                                     <div class="col-md-12">
                                                         <label for="content_{{ $language->id }}" class="form-label">
-                                                            Content <span class="text-danger">*</span>
+                                                            {{ __('Content') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <textarea class="form-control ckeditor @error("translations.{$language->id}.content") is-invalid @enderror" 
                                                                   id="content_{{ $language->id }}" 

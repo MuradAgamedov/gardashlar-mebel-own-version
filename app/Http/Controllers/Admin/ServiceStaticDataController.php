@@ -107,7 +107,7 @@ class ServiceStaticDataController extends Controller
                         $imageData[$imageField] = $uploadedPath;
                     } else {
                         return redirect()->back()
-                            ->with('error', "Failed to upload {$imageField}.")
+                            ->with('error', __('Failed to upload :field.', ['field' => $imageField]))
                             ->withInput();
                     }
                 }
@@ -138,11 +138,11 @@ class ServiceStaticDataController extends Controller
             }
 
             return redirect()->route('admin.service-static-data.edit')
-                ->with('success', 'Service Static Data updated successfully!');
+                ->with('success', __('Service Static Data updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating Service Static Data: ' . $e->getMessage())
+                ->with('error', __('Error updating Service Static Data: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }

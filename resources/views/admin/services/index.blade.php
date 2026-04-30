@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Services')
+@section('title', __('Services'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Services</h3>
+                    <h3>{{ __('Services') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Services</li>
+                        <li class="breadcrumb-item active">{{ __('Services') }}</li>
                     </ol>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>All Services</h5>
+                            <h5>{{ __('All Services') }}</h5>
                             <div class="d-flex gap-2">
                                 <a href="{{ route('admin.services.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
@@ -41,9 +41,9 @@
                             <div class="mt-2">
                                 <div class="alert alert-info alert-dismissible fade show" role="alert">
                                     <i class="material-icons-outlined">info</i>
-                                    <strong>Search Results:</strong>
-                                    <span class="badge bg-primary me-2">Title/Description: "{{ request('search') }}"</span>
-                                    <span class="badge bg-secondary">{{ $services->count() }} result(s)</span>
+                                    <strong>{{ __('Search Results:') }}</strong>
+                                    <span class="badge bg-primary me-2">{{ __('Title/Description:') }} "{{ request('search') }}"</span>
+                                    <span class="badge bg-secondary">{{ $services->count() }} {{ __('result(s)') }}</span>
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             </div>
@@ -61,16 +61,16 @@
                                                class="form-control" 
                                                name="search" 
                                                value="{{ request('search') }}"
-                                               placeholder="Search by title or description...">
+                                               placeholder="{{ __('Search by title or description...') }}">
                                     </div>
                                 </div>
                                 <div class="col-md-1">
-                                    <button type="submit" class="btn btn-outline-primary" title="Search" style="width: 50px; height: 50px;">
+                                    <button type="submit" class="btn btn-outline-primary" title="{{ __('Search') }}" style="width: 50px; height: 50px;">
                                         <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">search</i>
                                     </button>
                                 </div>
                                 <div class="col-md-1">
-                                    <a href="{{ route('admin.services.index') }}" class="btn btn-outline-secondary" title="Clear" style="width: 50px; height: 50px;">
+                                    <a href="{{ route('admin.services.index') }}" class="btn btn-outline-secondary" title="{{ __('Clear') }}" style="width: 50px; height: 50px;">
                                         <i class="material-icons-outlined" style="font-size: 24px; line-height: 1.5;">clear</i>
                                     </a>
                                 </div>
@@ -96,10 +96,10 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Status</th>
-                                        <th>Title</th>
-                                        <th>Card Description</th>
-                                        <th>Actions</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th>{{ __('Card Description') }}</th>
+                                        <th>{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-services">
@@ -107,9 +107,9 @@
                                         <tr data-id="{{ $service->id }}">
                                             <td>
                                                 @if($service->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -118,32 +118,32 @@
                                                     $mainTranslate = $service->translates->firstWhere('language_id', $mainLanguageId)
                                                         ?? $service->translates->first();
                                                 @endphp
-                                                {{ $mainTranslate ? $mainTranslate->title : 'No title' }}
+                                                {{ $mainTranslate ? $mainTranslate->title : __('No title') }}
                                             </td>
                                             <td>
                                                 @if($mainTranslate)
                                                     {{ Str::limit($mainTranslate->card_description, 100) }}
                                                 @else
-                                                    No description
+                                                    {{ __('No description') }}
                                                 @endif
                                             </td>
                                             <td>
                                                 <div class="btn-group" role="group">
                                                     <a href="{{ route('admin.service-advantages.index', $service->id) }}" 
                                                        class="btn btn-sm btn-info">
-                                                        Advantages
+                                                        {{ __('Advantages') }}
                                                     </a>
                                                     <a href="{{ route('admin.services.edit', $service->id) }}" 
                                                        class="btn btn-sm btn-warning">
-                                                        Edit
+                                                        {{ __('Edit') }}
                                                     </a>
                                                     <form action="{{ route('admin.services.destroy', $service->id) }}" 
                                                           method="POST" class="d-inline" 
-                                                          onsubmit="return confirm('Are you sure you want to delete this service?')">
+                                                          onsubmit="return confirm('{{ __('Are you sure you want to delete this service?') }}')">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-danger">
-                                                            Delete
+                                                            {{ __('Delete') }}
                                                         </button>
                                                     </form>
                                                 </div>
@@ -151,7 +151,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center">No services found.</td>
+                                            <td colspan="4" class="text-center">{{ __('No services found.') }}</td>
                                         </tr>
                                     @endforelse
                                 </tbody>

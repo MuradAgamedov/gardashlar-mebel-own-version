@@ -86,13 +86,13 @@ class ProjectController extends Controller
             }
 
             return redirect()->route('admin.projects.index')
-                ->with('success', 'Project created successfully.');
+                ->with('success', __('Project created successfully.'));
         } catch (\Exception $e) {
             Log::error('Error creating project: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
 
             return back()->withInput()
-                ->with('error', 'Error creating project: ' . $e->getMessage());
+                ->with('error', __('Error creating project: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -182,12 +182,12 @@ class ProjectController extends Controller
             }
 
             return redirect()->route('admin.projects.index')
-                ->with('success', 'Project updated successfully.');
+                ->with('success', __('Project updated successfully.'));
         } catch (\Exception $e) {
             Log::error('Error updating project: ' . $e->getMessage());
 
             return back()->withInput()
-                ->with('error', 'Error updating project. Please try again.');
+                ->with('error', __('Error updating project. Please try again.'));
         }
     }
 
@@ -199,10 +199,10 @@ class ProjectController extends Controller
         try {
             $project->delete();
             return redirect()->route('admin.projects.index')
-                ->with('success', 'Project deleted successfully.');
+                ->with('success', __('Project deleted successfully.'));
         } catch (\Exception $e) {
             Log::error('Error deleting project: ' . $e->getMessage());
-            return back()->with('error', 'Error deleting project. Please try again.');
+            return back()->with('error', __('Error deleting project. Please try again.'));
         }
     }
 
@@ -242,9 +242,9 @@ class ProjectController extends Controller
             $deletedCount = Project::whereIn('id', $request->ids)->delete();
 
             return redirect()->route('admin.projects.index')
-                ->with('success', "{$deletedCount} project(s) deleted successfully!");
+                ->with('success', __(':count project(s) deleted successfully!', ['count' => $deletedCount]));
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deleting projects: ' . $e->getMessage());
+            return back()->with('error', __('Error deleting projects: :error', ['error' => $e->getMessage()]));
         }
     }
 }
