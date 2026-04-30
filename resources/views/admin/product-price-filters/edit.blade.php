@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Qiymət Filtirini Redaktə Et</h3>
+                    <h3>{{ __('Edit Price Filter') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -16,9 +16,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.product-price-filters.index') }}">Qiymət Filtrləri</a>
+                            <a href="{{ route('admin.product-price-filters.index') }}">{{ __('Price Filters') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Redaktə Et</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>
@@ -37,7 +37,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Qiymət Filtirini Redaktə Et</h5>
+                        <h5>{{ __('Edit Price Filter') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.product-price-filters.update', $productPriceFilter->id) }}" method="POST">
@@ -47,7 +47,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="min_price" class="form-label">Min Qiymət (₼)</label>
+                                        <label for="min_price" class="form-label">{{ __('Min Price (₼)') }}</label>
                                         <input type="number" 
                                                class="form-control @error('min_price') is-invalid @enderror" 
                                                id="min_price" 
@@ -59,13 +59,13 @@
                                         @error('min_price')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
-                                        <small class="form-text text-muted">Boş buraxa bilərsiniz</small>
+                                        <small class="form-text text-muted">{{ __('You can leave this empty') }}</small>
                                     </div>
                                 </div>
                                 
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="max_price" class="form-label">Max Qiymət (₼)</label>
+                                        <label for="max_price" class="form-label">{{ __('Max Price (₼)') }}</label>
                                         <input type="number" 
                                                class="form-control @error('max_price') is-invalid @enderror" 
                                                id="max_price" 
@@ -77,7 +77,7 @@
                                         @error('max_price')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
-                                        <small class="form-text text-muted">Boş buraxa bilərsiniz</small>
+                                        <small class="form-text text-muted">{{ __('You can leave this empty') }}</small>
                                     </div>
                                 </div>
                             </div>
@@ -91,7 +91,7 @@
                                            value="1" 
                                            {{ old('status', $productPriceFilter->status ? '1' : '0') ? 'checked' : '' }}>
                                     <label class="form-check-label" for="status">
-                                        Aktiv
+{{ __('Active') }}
                                     </label>
                                 </div>
                             </div>
@@ -135,12 +135,12 @@
                                          aria-labelledby="tab-{{ $language->id }}">
                                         
                                         <div class="mb-3">
-                                            <label class="form-label">Başlıq *</label>
+                                            <label class="form-label">{{ __('Title') }} *</label>
                                             <input type="text" 
                                                    class="form-control @error("translates.{$language->id}.title") is-invalid @enderror" 
                                                    name="translates[{{ $language->id }}][title]" 
                                                    value="{{ $title }}"
-                                                   placeholder="Qiymət aralığı başlığı"
+                                                   placeholder="{{ __('Price range title') }}"
                                                    required>
                                             @error("translates.{$language->id}.title")
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -155,11 +155,11 @@
                             <div class="d-flex justify-content-between mt-4">
                                 <a href="{{ route('admin.product-price-filters.index') }}" class="btn btn-secondary">
                                     <i class="material-icons-outlined">arrow_back</i>
-                                    Geri
+                                    {{ __('Back') }}
                                 </a>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="material-icons-outlined">save</i>
-                                    Yenilə
+                                    {{ __('Update') }}
                                 </button>
                             </div>
                         </form>

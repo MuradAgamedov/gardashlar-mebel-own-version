@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Qiymət Filtrləri</h3>
+                    <h3>{{ __('Price Filters') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -15,7 +15,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Qiymət Filtrləri</li>
+                        <li class="breadcrumb-item active">{{ __('Price Filters') }}</li>
                     </ol>
                 </div>
             </div>
@@ -43,10 +43,10 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Qiymət Filtrləri Siyahısı</h5>
+                            <h5>{{ __('Price Filters List') }}</h5>
                             <a href="{{ route('admin.product-price-filters.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Yeni Əlavə Et
+                                {{ __('Add New') }}
                             </a>
                         </div>
                     </div>
@@ -57,12 +57,12 @@
                                     <thead>
                                         <tr>
                                             <th width="50">#</th>
-                                            <th>Başlıq</th>
-                                            <th>Min Qiymət</th>
-                                            <th>Max Qiymət</th>
-                                            <th>Status</th>
-                                            <th>Sıra</th>
-                                            <th width="200">Əməliyyatlar</th>
+                                            <th>{{ __('Title') }}</th>
+                                            <th>{{ __('Min Price') }}</th>
+                                            <th>{{ __('Max Price') }}</th>
+                                            <th>{{ __('Status') }}</th>
+                                            <th>{{ __('Order') }}</th>
+                                            <th width="200">{{ __('Actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="sortable-list">
@@ -85,11 +85,11 @@
                                                             $mainTranslate = $filter->translates->firstWhere('language_id', $mainLanguageId)
                                                                 ?? $filter->translates->first();
                                                         @endphp
-                                                        <strong>{{ $mainTranslate?->title ?? 'Başlıq yoxdur' }}</strong>
+                                                        <strong>{{ $mainTranslate?->title ?? __('No title') }}</strong>
                                                         @if($mainTranslate)
                                                             <br>
                                                             <small class="text-muted">
-                                                                {{ $mainTranslate->language->title ?? 'Dil yoxdur' }}
+                                                                {{ $mainTranslate->language->title ?? __('No language') }}
                                                             </small>
                                                         @endif
                                                     </div>
@@ -110,9 +110,9 @@
                                                 </td>
                                                 <td>
                                                     @if($filter->status)
-                                                        <span class="badge bg-success">Aktiv</span>
+                                                        <span class="badge bg-success">{{ __('Active') }}</span>
                                                     @else
-                                                        <span class="badge bg-danger">Passiv</span>
+                                                        <span class="badge bg-danger">{{ __('Inactive') }}</span>
                                                     @endif
                                                 </td>
                                                 <td>
@@ -122,7 +122,7 @@
                                                     <div class="btn-group" role="group">
                                                         <a href="{{ route('admin.product-price-filters.edit', $filter->id) }}" 
                                                            class="btn btn-sm btn-outline-primary" 
-                                                           title="Redaktə et">
+                                                           title="{{ __('Edit') }}">
                                                             <i class="material-icons-outlined">edit</i>
                                                         </a>
                                                         <form action="{{ route('admin.product-price-filters.destroy', $filter->id) }}" 
@@ -132,8 +132,8 @@
                                                             @method('DELETE')
                                                             <button type="button" 
                                                                     class="btn btn-sm btn-outline-danger delete-btn" 
-                                                                    title="Sil"
-                                                                    data-title="{{ $mainTranslate?->title ?? 'Qiymət filtiri' }}">
+                                                                    title="{{ __('Delete') }}"
+                                                                    data-title="{{ $mainTranslate?->title ?? __('Price filter') }}">
                                                                 <i class="material-icons-outlined">delete</i>
                                                             </button>
                                                         </form>
@@ -147,10 +147,10 @@
                         @else
                             <div class="text-center py-4">
                                 <i class="material-icons-outlined text-muted" style="font-size: 48px;">filter_list</i>
-                                <p class="text-muted mt-2">Hələ heç bir qiymət filtiri əlavə edilməyib.</p>
+                                <p class="text-muted mt-2">{{ __('No price filters added yet.') }}</p>
                                 <a href="{{ route('admin.product-price-filters.create') }}" class="btn btn-primary">
                                     <i class="material-icons-outlined">add</i>
-                                    İlk Filtiri Əlavə Et
+                                    {{ __('Add First Filter') }}
                                 </a>
                             </div>
                         @endif

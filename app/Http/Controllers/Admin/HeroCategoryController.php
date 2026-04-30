@@ -37,10 +37,10 @@ class HeroCategoryController extends Controller
             ]);
 
             return redirect()->route('admin.hero-categories.index')
-                ->with('success', 'Category added to hero section successfully.');
+                ->with('success', __('Category added to hero section successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -64,10 +64,10 @@ class HeroCategoryController extends Controller
             ]);
 
             return redirect()->route('admin.hero-categories.index')
-                ->with('success', 'Hero category updated successfully.');
+                ->with('success', __('Hero category updated successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -76,10 +76,10 @@ class HeroCategoryController extends Controller
         try {
             $this->repository->deleteHeroCategory($heroCategory);
             return redirect()->route('admin.hero-categories.index')
-                ->with('success', 'Hero category deleted successfully.');
+                ->with('success', __('Hero category deleted successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 

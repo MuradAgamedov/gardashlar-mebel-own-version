@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Product Color')
+@section('title', __('Edit Product Color'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Product Color</h3>
+                    <h3>{{ __('Edit Product Color') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.product-colors.index') }}">Product Colors</a>
+                            <a href="{{ route('admin.product-colors.index') }}">{{ __('Product Colors') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">{{ __('Error occurred:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -42,7 +42,7 @@
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">{{ __('Error occurred:') }}</h6>
                 <p class="mb-0">{{ session('error') }}</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -52,7 +52,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Product Color</h5>
+                        <h5>{{ __('Edit Product Color') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.product-colors.update', $productColor) }}" method="POST">
@@ -63,7 +63,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        Color Code <span class="text-danger">*</span>
+                                        {{ __('Color Code') }} <span class="text-danger">*</span>
                                     </label>
                                     <div class="input-group">
                                         <input type="color" 
@@ -71,7 +71,7 @@
                                                id="color_picker"
                                                value="{{ old('color_code', $productColor->color_code) }}"
                                                style="width: 60px; height: 38px;"
-                                               title="Color picker (hex only)">
+                                               title="{{ __('Color picker (hex only)') }}">
                                         <input type="text" 
                                                class="form-control @error('color_code') is-invalid @enderror" 
                                                name="color_code" 
@@ -80,14 +80,14 @@
                                                placeholder="#FF0000 or rgba(255,0,0,0.5)"
                                                required>
                                     </div>
-                                    <small class="form-text text-muted">Select a color or enter hex code (e.g., #FF0000) or rgba (e.g., rgba(255,0,0,0.5))</small>
+                                    <small class="form-text text-muted">{{ __('Select a color or enter hex code (e.g., #FF0000) or rgba (e.g., rgba(255,0,0,0.5))') }}</small>
                                     @error('color_code')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 
                                 <div class="col-md-6">
-                                    <label class="form-label">Color Preview</label>
+                                    <label class="form-label">{{ __('Color Preview') }}</label>
                                     <div class="color-preview" 
                                          id="color_preview"
                                          style="width: 100px; height: 100px; border-radius: 12px; border: 3px solid #ddd; margin-top: 8px;">
@@ -99,10 +99,10 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary" title="{{ __('Update') }}">
                                             <i class="material-icons-outlined">save</i>
                                         </button>
-                                        <a href="{{ route('admin.product-colors.index') }}" class="btn btn-secondary">
+                                        <a href="{{ route('admin.product-colors.index') }}" class="btn btn-secondary" title="{{ __('Cancel') }}">
                                             <i class="material-icons-outlined">cancel</i>
                                         </a>
                                     </div>

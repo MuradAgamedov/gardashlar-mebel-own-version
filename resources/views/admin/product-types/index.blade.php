@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Product Types')
+@section('title', __('Product Types'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Product Types</h3>
+                    <h3>{{ __('Product Types') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Product Types</li>
+                        <li class="breadcrumb-item active">{{ __('Product Types') }}</li>
                     </ol>
                 </div>
             </div>
@@ -27,7 +27,7 @@
     <div class="container-fluid">
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Success!</h6>
+                <h6 class="alert-heading">{{ __('Success!') }}</h6>
                 <p class="mb-0">{{ session('success') }}</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -35,7 +35,7 @@
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">{{ __('Error occurred:') }}</h6>
                 <p class="mb-0">{{ session('error') }}</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -46,7 +46,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Product Types</h5>
+                            <h5>{{ __('Product Types') }}</h5>
                             {{-- <a href="{{ route('admin.product-types.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a> --}}
@@ -60,7 +60,7 @@
                                     <input type="text" 
                                            name="search" 
                                            class="form-control me-2" 
-                                           placeholder="Search by title..."
+                                           placeholder="{{ __('Search by title...') }}"
                                            value="{{ request('search') }}">
                                     <button type="submit" class="btn btn-outline-primary">
                                         <i class="material-icons-outlined">search</i>
@@ -79,9 +79,9 @@
                                 <thead>
                                     <tr>
                                         <th width="50">#</th>
-                                        <th>Title</th>
-                                        <th>Status</th>
-                                        <th width="150">Actions</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-types">
@@ -106,28 +106,28 @@
                                                             $firstTranslation = $type->translates->firstWhere('language_id', $mainLanguageId)
                                                                 ?? $type->translates->first();
                                                         @endphp
-                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
+                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : __('No title') }}</strong>
                                                     </div>
                                                 </div>
                                             </td>
                                            
                                             <td>
                                                 @if($type->status)
-                                                    <span class="badge badge-light-success">Active</span>
+                                                    <span class="badge badge-light-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge badge-light-danger">Inactive</span>
+                                                    <span class="badge badge-light-danger">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.product-type-products.index', $type) }}" 
                                                        class="btn btn-sm btn-outline-info" 
-                                                       title="View Products">
+                                                       title="{{ __('View Products') }}">
                                                         <i class="material-icons-outlined">inventory_2</i>
                                                     </a>
                                                     <a href="{{ route('admin.product-types.edit', $type) }}" 
                                                        class="btn btn-sm btn-outline-primary" 
-                                                       title="Edit">
+                                                       title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     {{-- <a href="{{ route('admin.product-types.show', $type) }}" 
@@ -138,12 +138,12 @@
                                                     <form action="{{ route('admin.product-types.destroy', $type) }}" 
                                                           method="POST" 
                                                           class="d-inline"
-                                                          onsubmit="return confirm('Are you sure you want to delete this type?')">
+                                                          onsubmit="return confirm('{{ __('Are you sure you want to delete this type?') }}')">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" 
                                                                 class="btn btn-sm btn-outline-danger" 
-                                                                title="Delete">
+                                                                title="{{ __('Delete') }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
                                                     </form> --}}
@@ -155,10 +155,10 @@
                                             <td colspan="5" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">inbox</i>
-                                                    <p class="mt-2">No product types found</p>
+                                                    <p class="mt-2">{{ __('No product types found') }}</p>
                                                     {{-- <a href="{{ route('admin.product-types.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Type
+                                                        {{ __('Add First Type') }}
                                                     </a> --}}
                                                 </div>
                                             </td>

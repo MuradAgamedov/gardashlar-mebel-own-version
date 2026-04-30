@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Home Page Project Category')
+@section('title', __('Edit Home Page Project Category'))
 
 @section('content')
 <div class="page-body">
@@ -8,19 +8,19 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Home Page Project Category</h3>
+                    <h3>{{ __('Edit Home Page Project Category') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.home-page-project-categories.index') }}">Home Page Project Categories</a>
+                            <a href="{{ route('admin.home-page-project-categories.index') }}">{{ __('Home Page Project Categories') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">{{ __('Error occurred:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -42,7 +42,7 @@
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">{{ __('Error occurred:') }}</h6>
                 <p class="mb-0">{{ session('error') }}</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -52,7 +52,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Home Page Project Category</h5>
+                        <h5>{{ __('Edit Home Page Project Category') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.home-page-project-categories.update', $homePageProjectCategory->id) }}" method="POST">
@@ -63,7 +63,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        Change Project Category
+                                        {{ __('Change Project Category') }}
                                     </label>
                                     <select class="form-select @error('project_category_id') is-invalid @enderror" 
                                             name="project_category_id" 
@@ -71,7 +71,7 @@
                                         @foreach($projectCategories as $category)
                                             @php
                                                 $firstTranslation = $category->translates->first();
-                                                $title = $firstTranslation ? $firstTranslation->title : 'No title';
+                                                $title = $firstTranslation ? $firstTranslation->title : __('No title');
                                             @endphp
                                             <option value="{{ $category->id }}" 
                                                     {{ old('project_category_id', $homePageProjectCategory->project_category_id) == $category->id ? 'selected' : '' }}>
@@ -79,7 +79,7 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    <small class="form-text text-muted">You can change the project category if needed</small>
+                                    <small class="form-text text-muted">{{ __('You can change the project category if needed') }}</small>
                                     @error('project_category_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -89,7 +89,7 @@
                             <!-- Status -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Status</label>
+                                    <label class="form-label">{{ __('Status') }}</label>
                                     <div class="form-check form-switch">
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" 
@@ -99,10 +99,10 @@
                                                value="1"
                                                {{ old('status', $homePageProjectCategory->status ? '1' : '0') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Active
+                                            {{ __('Active') }}
                                         </label>
                                     </div>
-                                    <small class="form-text text-muted">Toggle to show/hide this category on the home page</small>
+                                    <small class="form-text text-muted">{{ __('Toggle to show/hide this category on the home page') }}</small>
                                 </div>
                             </div>
 
@@ -112,11 +112,11 @@
                                     <div class="d-flex justify-content-end gap-2">
                                         <a href="{{ route('admin.home-page-project-categories.index') }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">arrow_back</i>
-                                            Back
+                                            {{ __('Back') }}
                                         </a>
                                         <button type="submit" class="btn btn-primary">
                                             <i class="material-icons-outlined">save</i>
-                                            Update Changes
+                                            {{ __('Update Changes') }}
                                         </button>
                                     </div>
                                 </div>
@@ -128,6 +128,5 @@
         </div>
     </div>
 </div>
-
 
 @endsection 

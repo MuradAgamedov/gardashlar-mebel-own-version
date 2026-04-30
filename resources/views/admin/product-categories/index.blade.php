@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Product Categories Management')
+@section('title', __('Product Categories Management'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Product Categories Management</h3>
+                    <h3>{{ __('Product Categories Management') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Product Categories</li>
+                        <li class="breadcrumb-item active">{{ __('Product Categories') }}</li>
                     </ol>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Product Categories</h5>
+                            <h5>{{ __('Product Categories') }}</h5>
                             <div class="d-flex gap-2">
                                 <button type="button" id="delete-selected-btn" class="btn btn-danger" style="display: none;">
                                     <i class="material-icons-outlined">delete</i>
@@ -63,7 +63,7 @@
                                     <input type="text" 
                                            name="search" 
                                            class="form-control me-2" 
-                                           placeholder="Search by title, slug, or SEO title..."
+                                           placeholder="{{ __('Search by title, slug, or SEO title...') }}"
                                            value="{{ request('search') }}">
                                     <button type="submit" class="btn btn-outline-primary">
                                         <i class="material-icons-outlined">search</i>
@@ -112,7 +112,7 @@
                                                     <div class="d-flex align-items-center">
                                                         @if($mainCategory->image)
                                                             <img src="{{ asset('storage/' . $mainCategory->image) }}" 
-                                                                 alt="{{ $firstTranslation ? $firstTranslation->title : 'Category' }}" 
+                                                                 alt="{{ $firstTranslation ? $firstTranslation->title : __('Category') }}" 
                                                                  class="img-thumbnail me-3" 
                                                                  style="width: 40px; height: 40px; object-fit: cover;">
                                                         @else
@@ -124,7 +124,7 @@
                                                         <div>
                                                             <h6 class="mb-0">
                                                                 <i class="material-icons-outlined text-muted me-2" style="font-size: 16px;">category</i>
-                                                                <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
+                                                                <strong>{{ $firstTranslation ? $firstTranslation->title : __('No title') }}</strong>
                                                             </h6>
                                                             <div class="d-flex gap-1 mt-1">
                                                                 @foreach($mainCategory->translates as $translate)
@@ -137,26 +137,26 @@
                                             </div>
                                             <div class="d-flex align-items-center gap-2">
                                                 @if($mainCategory->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.product-categories.edit', $mainCategory) }}" 
                                                        class="btn btn-sm btn-warning" 
-                                                       title="Edit">
+                                                       title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <a href="{{ route('admin.product-categories.create', ['parent_id' => $mainCategory->id]) }}" 
                                                        class="btn btn-sm btn-success" 
-                                                       title="Add Subcategory">
+                                                       title="{{ __('Add Subcategory') }}">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>
                                                     <button type="button" 
                                                             class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Untitled' }}"
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : __('Untitled') }}"
                                                             data-url="{{ route('admin.product-categories.destroy', $mainCategory) }}"
-                                                            title="Delete">
+                                                            title="{{ __('Delete') }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
                                                 </div>
@@ -212,22 +212,22 @@
                                                                 </div>
                                                                 <div class="d-flex align-items-center gap-2">
                                                                     @if($subCategory->status)
-                                                                        <span class="badge bg-success">Active</span>
+                                                                        <span class="badge bg-success">{{ __('Active') }}</span>
                                                                     @else
-                                                                        <span class="badge bg-secondary">Inactive</span>
+                                                                        <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                                     @endif
                                                                     <span class="badge bg-info">{{ $subCategory->order }}</span>
                                                                     <div class="d-flex gap-2">
                                                                         <a href="{{ route('admin.product-categories.edit', $subCategory) }}" 
                                                                            class="btn btn-sm btn-warning" 
-                                                                           title="Edit">
+                                                                           title="{{ __('Edit') }}">
                                                                             <i class="material-icons-outlined">edit</i>
                                                                         </a>
                                                                         <button type="button" 
                                                                                 class="btn btn-sm btn-danger delete-btn" 
                                                                                 data-title="{{ $subTranslation ? $subTranslation->title : 'Untitled' }}"
                                                                                 data-url="{{ route('admin.product-categories.destroy', $subCategory) }}"
-                                                                                title="Delete">
+                                                                                title="{{ __('Delete') }}">
                                                                             <i class="material-icons-outlined">delete</i>
                                                                         </button>
                                                                     </div>
@@ -244,9 +244,9 @@
                                 <div class="text-center py-4">
                                     <div class="text-muted">
                                         <i class="material-icons-outlined" style="font-size: 48px;">category</i>
-                                        <p class="mt-2">No product categories found</p>
+                                        <p class="mt-2">{{ __('No product categories found') }}</p>
                                         <a href="{{ route('admin.product-categories.create') }}" class="btn btn-primary">
-                                            Create First Category
+                                            {{ __('Create First Category') }}
                                         </a>
                                     </div>
                                 </div>

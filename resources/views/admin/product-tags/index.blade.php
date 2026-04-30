@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Product Tags')
+@section('title', __('Product Tags'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Product Tags</h3>
+                    <h3>{{ __('Product Tags') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Product Tags</li>
+                        <li class="breadcrumb-item active">{{ __('Product Tags') }}</li>
                     </ol>
                 </div>
             </div>
@@ -44,10 +44,10 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Product Tags</h5>
+                            <h5>{{ __('Product Tags') }}</h5>
                             <a href="{{ route('admin.product-tags.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
-                                Add Tag
+                                {{ __('Add Tag') }}
                             </a>
                         </div>
                     </div>
@@ -57,11 +57,11 @@
                                 <thead>
                                     <tr>
                                         <th width="50">#</th>
-                                        <th>Title</th>
-                                        <th>Slug</th>
-                                        <th>Status</th>
-                                        <th>Order</th>
-                                        <th width="150">Actions</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th>{{ __('Slug') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th>{{ __('Order') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-tags">
@@ -86,18 +86,18 @@
                                                             $firstTranslation = $productTag->translates->firstWhere('language_id', $mainLanguageId)
                                                                 ?? $productTag->translates->first();
                                                         @endphp
-                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
+                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : __('No title') }}</strong>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
-                                                <code>{{ $firstTranslation ? $firstTranslation->slug : 'No slug' }}</code>
+                                                <code>{{ $firstTranslation ? $firstTranslation->slug : __('No slug') }}</code>
                                             </td>
                                             <td>
                                                 @if($productTag->status)
-                                                    <span class="badge badge-light-success">Active</span>
+                                                    <span class="badge badge-light-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge badge-light-danger">Inactive</span>
+                                                    <span class="badge badge-light-danger">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>

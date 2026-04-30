@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Product Page Categories')
+@section('title', __('Product Page Categories'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Product Page Categories</h3>
+                    <h3>{{ __('Product Page Categories') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Product Page Categories</li>
+                        <li class="breadcrumb-item active">{{ __('Product Page Categories') }}</li>
                     </ol>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Categories to Display on Product Page</h5>
+                            <h5>{{ __('Categories to Display on Product Page') }}</h5>
                             <a href="{{ route('admin.product-page-categories.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -56,11 +56,11 @@
                                 <thead>
                                     <tr>
                                         <th width="50">#</th>
-                                        <th>Category</th>
-                                        <th>Parent</th>
-                                        <th>Status</th>
-                                        <th>Order</th>
-                                        <th width="150">Actions</th>
+                                        <th>{{ __('Category') }}</th>
+                                        <th>{{ __('Parent') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th>{{ __('Order') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-categories">
@@ -89,7 +89,7 @@
                                                             $firstTranslation = $productPageCategory->productCategory->translates->firstWhere('language_id', $mainLanguageId)
                                                                 ?? $productPageCategory->productCategory->translates->first();
                                                         @endphp
-                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
+                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : __('No title') }}</strong>
                                                     </div>
                                                 </div>
                                             </td>
@@ -102,20 +102,20 @@
                                                     @endphp
                                                     <span class="badge bg-secondary">
                                                         <i class="material-icons-outlined" style="font-size: 12px;">subdirectory_arrow_right</i>
-                                                        {{ $parentTranslation ? $parentTranslation->title : 'Untitled Parent' }}
+                                                        {{ $parentTranslation ? $parentTranslation->title : __('Untitled Parent') }}
                                                     </span>
                                                 @else
                                                     <span class="badge bg-success">
                                                         <i class="material-icons-outlined" style="font-size: 12px;">folder</i>
-                                                        Main Category
+                                                        {{ __('Main Category') }}
                                                     </span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if($productPageCategory->status)
-                                                    <span class="badge badge-light-success">Active</span>
+                                                    <span class="badge badge-light-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge badge-light-danger">Inactive</span>
+                                                    <span class="badge badge-light-danger">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -125,18 +125,18 @@
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.product-page-categories.edit', $productPageCategory) }}" 
                                                        class="btn btn-sm btn-outline-primary" 
-                                                       title="Edit">
+                                                       title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <form action="{{ route('admin.product-page-categories.destroy', $productPageCategory) }}" 
                                                           method="POST" 
                                                           class="d-inline"
-                                                          onsubmit="return confirm('Are you sure you want to delete this category?')">
+                                                          onsubmit="return confirm('{{ __('Are you sure you want to delete this category?') }}')">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" 
                                                                 class="btn btn-sm btn-outline-danger" 
-                                                                title="Delete">
+                                                                title="{{ __('Delete') }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
                                                     </form>
@@ -148,9 +148,9 @@
                                             <td colspan="6" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">category</i>
-                                                    <p class="mt-2">No categories selected for product page</p>
+                                                    <p class="mt-2">{{ __('No categories selected for product page') }}</p>
                                                     <a href="{{ route('admin.product-page-categories.create') }}" class="btn btn-primary">
-                                                        Add First Category
+                                                        {{ __('Add First Category') }}
                                                     </a>
                                                 </div>
                                             </td>

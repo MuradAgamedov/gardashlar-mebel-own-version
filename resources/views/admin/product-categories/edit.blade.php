@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Product Category')
+@section('title', __('Edit Product Category'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Product Category</h3>
+                    <h3>{{ __('Edit Product Category') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.product-categories.index') }}">Product Categories</a>
+                            <a href="{{ route('admin.product-categories.index') }}">{{ __('Product Categories') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit Category</li>
+                        <li class="breadcrumb-item active">{{ __('Edit Category') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Please fix the following errors:</h6>
+                <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -42,7 +42,7 @@
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">{{ __('Error occurred:') }}</h6>
                 <p class="mb-0">{{ session('error') }}</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -52,7 +52,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Product Category</h5>
+                        <h5>{{ __('Edit Product Category') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.product-categories.update', $productCategory) }}" method="POST" enctype="multipart/form-data">
@@ -62,27 +62,27 @@
                             <!-- Parent Category -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Parent Category</label>
+                                    <label class="form-label">{{ __('Parent Category') }}</label>
                                     <select class="form-select @error('parent_id') is-invalid @enderror" name="parent_id" id="parent_id">
-                                        <option value="">Select Parent Category (Optional)</option>
+                                        <option value="">{{ __('Select Parent Category (Optional)') }}</option>
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}" {{ old('parent_id', $productCategory->parent_id) == $category->id ? 'selected' : '' }}>
                                                 {{ $category->translate() ? $category->translate()->title : 'Untitled' }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    <small class="form-text text-muted">Leave empty to make this a main category</small>
+                                    <small class="form-text text-muted">{{ __('Leave empty to make this a main category') }}</small>
                                     @error('parent_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 
                                 <div class="col-md-6">
-                                    <label class="form-label">Status</label>
+                                    <label class="form-label">{{ __('Status') }}</label>
                                     <div class="form-check form-switch">
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" value="1" {{ old('status', $productCategory->status ? '1' : '0') ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="status">Active</label>
+                                        <label class="form-check-label" for="status">{{ __('Active') }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -90,17 +90,17 @@
                             <!-- Image -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Category Image</label>
+                                    <label class="form-label">{{ __('Category Image') }}</label>
                                     @if($productCategory->image)
                                         <div class="mb-2">
                                             <img src="{{ asset('storage/' . $productCategory->image) }}" 
-                                                 alt="Current image" 
+                                                 alt="{{ __('Current image') }}" 
                                                  class="img-thumbnail" 
                                                  style="max-width: 200px; max-height: 200px;">
                                             <div class="mt-2">
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" id="remove_image" name="remove_image" value="1">
-                                                    <label class="form-check-label text-danger" for="remove_image">
+                                                    <label class="form-check-label text-danger" for="remove_image">{{ __('Remove current image') }}</label>
                                                         <i class="material-icons-outlined">delete</i> 
                                                     </label>
                                                 </div>
@@ -116,7 +116,7 @@
                                         @if($productCategory->image)
                                             Upload a new image to replace the current one, or check the box above to remove it
                                         @else
-                                            Upload an image for this category (optional)
+                                            {{ __('Upload an image for this category (optional)') }}
                                         @endif
                                     </small>
                                     @error('image')
@@ -125,9 +125,9 @@
                                     
                                     <!-- Image Preview -->
                                     <div id="imagePreview" class="mt-2" style="display: none;">
-                                        <img id="previewImg" src="" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                                        <img id="previewImg" src="" alt="{{ __('Preview') }}" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
                                         <button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="removeImage()">
-                                            <i class="material-icons-outlined">delete</i> Remove New Image
+                                            <i class="material-icons-outlined">delete</i> {{ __('Remove New Image') }}
                                         </button>
                                     </div>
                                 </div>
@@ -136,7 +136,7 @@
                             <!-- Language Tabs -->
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Translations</label>
+                                    <label class="form-label">{{ __('Translations') }}</label>
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
                                         @foreach($languages as $index => $language)
                                         @php
@@ -180,7 +180,7 @@
                                             <div class="row mt-3">
                                                 <div class="col-md-6">
                                                     <label class="form-label">
-                                                        Title <span class="text-danger">*</span>
+                                                        {{ __('Title') }} <span class="text-danger">*</span>
                                                     </label>
                                                     <input type="text" 
                                                            class="form-control @error('translates.'.$index.'.title') is-invalid @enderror" 
@@ -194,7 +194,7 @@
                                                 
                                                 <div class="col-md-6">
                                                     <label class="form-label">
-                                                        Slug <span class="text-danger">*</span>
+                                                        {{ __('Slug') }} <span class="text-danger">*</span>
                                                     </label>
                                                     <div class="input-group">
                                                         <input type="text" 
@@ -218,7 +218,7 @@
 
                                             <div class="row mt-3">
                                                 <div class="col-md-12">
-                                                    <label class="form-label">SEO Title</label>
+                                                    <label class="form-label">{{ __('SEO Title') }}</label>
                                                     <input type="text" 
                                                            class="form-control @error('translates.'.$index.'.seo_title') is-invalid @enderror" 
                                                            name="translates[{{ $index }}][seo_title]" 
@@ -232,7 +232,7 @@
 
                                             <div class="row mt-3">
                                                 <div class="col-md-12">
-                                                    <label class="form-label">SEO Keywords</label>
+                                                    <label class="form-label">{{ __('SEO Keywords') }}</label>
                                                     <textarea class="form-control @error('translates.'.$index.'.seo_keywords') is-invalid @enderror" 
                                                               name="translates[{{ $index }}][seo_keywords]" 
                                                               rows="3"
@@ -245,7 +245,7 @@
 
                                             <div class="row mt-3">
                                                 <div class="col-md-12">
-                                                    <label class="form-label">SEO Description</label>
+                                                    <label class="form-label">{{ __('SEO Description') }}</label>
                                                     <textarea class="form-control @error('translates.'.$index.'.seo_description') is-invalid @enderror" 
                                                               name="translates[{{ $index }}][seo_description]" 
                                                               rows="3"
@@ -258,7 +258,7 @@
 
                                             <div class="row mt-3">
                                                 <div class="col-md-12">
-                                                    <label class="form-label">SEO Text</label>
+                                                    <label class="form-label">{{ __('SEO Text') }}</label>
                                                     <textarea class="form-control ckeditor @error('translates.'.$index.'.seo_text') is-invalid @enderror" 
                                                               name="translates[{{ $index }}][seo_text]" 
                                                               id="seo-text-{{ $language->lang_code }}"
@@ -268,14 +268,14 @@
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                     <small class="form-text text-muted">
-                                                        Detailed SEO content with rich text formatting.
+                                                        {{ __('Detailed SEO content with rich text formatting.') }}
                                                     </small>
                                                 </div>
                                             </div>
 
                                             <div class="row mt-3">
                                                 <div class="col-md-12">
-                                                    <label class="form-label">Image Alt Text</label>
+                                                    <label class="form-label">{{ __('Image Alt Text') }}</label>
                                                     <input type="text" 
                                                            class="form-control @error('translates.'.$index.'.image_alt_text') is-invalid @enderror" 
                                                            name="translates[{{ $index }}][image_alt_text]" 
@@ -298,10 +298,10 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary" title="{{ __('Save') }}">
                                             <i class="material-icons-outlined">save</i>
                                         </button>
-                                        <a href="{{ route('admin.product-categories.index') }}" class="btn btn-secondary">
+                                        <a href="{{ route('admin.product-categories.index') }}" class="btn btn-secondary" title="{{ __('Cancel') }}">
                                             <i class="material-icons-outlined">cancel</i>
                                         </a>
                                     </div>

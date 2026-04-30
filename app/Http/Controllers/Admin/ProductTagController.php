@@ -67,10 +67,10 @@ class ProductTagController extends Controller
             }
 
             return redirect()->route('admin.product-tags.index')
-                ->with('success', 'Product tag added successfully.');
+                ->with('success', __('Product tag added successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -126,10 +126,10 @@ class ProductTagController extends Controller
             }
 
             return redirect()->route('admin.product-tags.index')
-                ->with('success', 'Product tag updated successfully.');
+                ->with('success', __('Product tag updated successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -142,10 +142,10 @@ class ProductTagController extends Controller
             $productTag->delete();
 
             return redirect()->route('admin.product-tags.index')
-                ->with('success', 'Product tag deleted successfully.');
+                ->with('success', __('Product tag deleted successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 

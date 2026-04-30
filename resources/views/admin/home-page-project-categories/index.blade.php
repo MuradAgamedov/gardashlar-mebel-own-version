@@ -14,7 +14,7 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
                         <li class="breadcrumb-item active">{{ __('Home Page Project Categories') }}</li>
@@ -44,7 +44,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Project Categories to Display on Home Page</h5>
+                            <h5>{{ __('Project Categories to Display on Home Page') }}</h5>
                             <a href="{{ route('admin.home-page-project-categories.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -56,10 +56,10 @@
                                 <thead>
                                     <tr>
                                         <th width="50">#</th>
-                                        <th>Category</th>
-                                        <th>Status</th>
-                                        <th>Order</th>
-                                        <th width="150">Actions</th>
+                                        <th>{{ __('Category') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th>{{ __('Order') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-categories">
@@ -84,7 +84,7 @@
                                                             $firstTranslation = $homePageProjectCategory->projectCategory->translates->firstWhere('language_id', $mainLanguageId)
                                                                 ?? $homePageProjectCategory->projectCategory->translates->first();
                                                         @endphp
-                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
+                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : __('No title') }}</strong>
                                                         @if($firstTranslation && $firstTranslation->description)
                                                             <br><small class="text-muted">{{ Str::limit($firstTranslation->description, 100) }}</small>
                                                         @endif
@@ -95,12 +95,12 @@
                                                 @if($homePageProjectCategory->status)
                                                     <span class="badge bg-success">
                                                         <i class="material-icons-outlined" style="font-size: 12px;">check_circle</i>
-                                                        Active
+                                                        {{ __('Active') }}
                                                     </span>
                                                 @else
                                                     <span class="badge bg-danger">
                                                         <i class="material-icons-outlined" style="font-size: 12px;">cancel</i>
-                                                        Inactive
+                                                        {{ __('Inactive') }}
                                                     </span>
                                                 @endif
                                             </td>
@@ -115,7 +115,7 @@
                                                     </a>
                                                     <form action="{{ route('admin.home-page-project-categories.destroy', $homePageProjectCategory->id) }}" 
                                                           method="POST" 
-                                                          onsubmit="return confirm('Are you sure you want to remove this project category from home page?')"
+                                                          onsubmit="return confirm('{{ __('Are you sure you want to remove this project category from home page?') }}')"
                                                           style="display: inline;">
                                                         @csrf
                                                         @method('DELETE')
@@ -130,8 +130,8 @@
                                         <tr>
                                             <td colspan="5" class="text-center py-5">
                                                 <i class="material-icons-outlined" style="font-size: 48px; color: #6c757d;">folder_open</i>
-                                                <h5 class="text-muted mt-3">No Project Categories Selected</h5>
-                                                <p class="text-muted">Start by adding project categories to display on the home page.</p>
+                                                <h5 class="text-muted mt-3">{{ __('No Project Categories Selected') }}</h5>
+                                                <p class="text-muted">{{ __('Start by adding project categories to display on the home page.') }}</p>
                                                 <a href="{{ route('admin.home-page-project-categories.create') }}" class="btn btn-primary">
                                                     <i class="material-icons-outlined">add</i>
                                                 </a>
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const alert = document.createElement('div');
                         alert.className = 'alert alert-success alert-dismissible fade show';
                         alert.innerHTML = `
-                            Order updated successfully
+                            {{ __('Order updated successfully') }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         `;
                         document.querySelector('.container-fluid').insertBefore(alert, document.querySelector('.row'));

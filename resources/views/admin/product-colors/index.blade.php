@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Product Colors')
+@section('title', __('Product Colors'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Product Colors</h3>
+                    <h3>{{ __('Product Colors') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Product Colors</li>
+                        <li class="breadcrumb-item active">{{ __('Product Colors') }}</li>
                     </ol>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Product Colors</h5>
+                            <h5>{{ __('Product Colors') }}</h5>
                             <a href="{{ route('admin.product-colors.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -55,9 +55,9 @@
                     <div class="card-body border-bottom">
                         <form method="GET" action="{{ route('admin.product-colors.index') }}" class="row g-3">
                             <div class="col-md-6">
-                                <label for="search" class="form-label">Search</label>
+                                <label for="search" class="form-label">{{ __('Search') }}</label>
                                 <input type="text" class="form-control" id="search" name="search" 
-                                       value="{{ request('search') }}" placeholder="Search by color code...">
+                                       value="{{ request('search') }}" placeholder="{{ __('Search by color code...') }}">
                             </div>
                             <div class="col-md-6 d-flex align-items-end">
                                 <div class="d-flex gap-2 w-100">
@@ -93,10 +93,10 @@
                                             <input type="checkbox" id="select-all-colors">
                                         </th>
                                         <th width="50">#</th>
-                                        <th>Color Preview</th>
-                                        <th>Color Code</th>
-                                        <th>Created At</th>
-                                        <th width="150">Actions</th>
+                                        <th>{{ __('Color Preview') }}</th>
+                                        <th>{{ __('Color Code') }}</th>
+                                        <th>{{ __('Created At') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -124,18 +124,18 @@
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.product-colors.edit', $productColor) }}" 
                                                        class="btn btn-sm btn-outline-primary" 
-                                                       title="Edit">
+                                                       title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <form action="{{ route('admin.product-colors.destroy', $productColor) }}" 
                                                           method="POST" 
                                                           class="d-inline"
-                                                          onsubmit="return confirm('Are you sure you want to delete this color?')">
+                                                          onsubmit="return confirm('{{ __('Are you sure you want to delete this color?') }}')">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" 
                                                                 class="btn btn-sm btn-outline-danger" 
-                                                                title="Delete">
+                                                                title="{{ __('Delete') }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
                                                     </form>
@@ -147,9 +147,9 @@
                                             <td colspan="6" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">palette</i>
-                                                    <p class="mt-2">No colors added yet</p>
+                                                    <p class="mt-2">{{ __('No colors added yet') }}</p>
                                                     <a href="{{ route('admin.product-colors.create') }}" class="btn btn-primary">
-                                                        Add First Color
+                                                        {{ __('Add First Color') }}
                                                     </a>
                                                 </div>
                                             </td>

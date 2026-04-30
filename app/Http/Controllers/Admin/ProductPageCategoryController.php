@@ -52,10 +52,10 @@ class ProductPageCategoryController extends Controller
             ]);
 
             return redirect()->route('admin.product-page-categories.index')
-                ->with('success', 'Category added to product page successfully.');
+                ->with('success', __('Category added to product page successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -94,10 +94,10 @@ class ProductPageCategoryController extends Controller
             ]);
 
             return redirect()->route('admin.product-page-categories.index')
-                ->with('success', 'Product page category updated successfully.');
+                ->with('success', __('Product page category updated successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -110,10 +110,10 @@ class ProductPageCategoryController extends Controller
             $productPageCategory->delete();
 
             return redirect()->route('admin.product-page-categories.index')
-                ->with('success', 'Product page category deleted successfully.');
+                ->with('success', __('Product page category deleted successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 

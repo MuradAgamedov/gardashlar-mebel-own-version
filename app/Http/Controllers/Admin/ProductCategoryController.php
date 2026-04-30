@@ -45,11 +45,11 @@ class ProductCategoryController extends Controller
             );
 
             return redirect()->route('admin.product-categories.index')
-                ->with('success', 'Product category created successfully!');
+                ->with('success', __('Product category created successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error creating product category: ' . $e->getMessage())
+                ->with('error', __('Error creating product category: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -83,11 +83,11 @@ class ProductCategoryController extends Controller
             );
 
             return redirect()->route('admin.product-categories.index')
-                ->with('success', 'Product category updated successfully!');
+                ->with('success', __('Product category updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating product category: ' . $e->getMessage())
+                ->with('error', __('Error updating product category: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -97,10 +97,10 @@ class ProductCategoryController extends Controller
         try {
             $this->repository->deleteProductCategory($productCategory);
             return redirect()->route('admin.product-categories.index')
-                ->with('success', 'Product category deleted successfully!');
+                ->with('success', __('Product category deleted successfully!'));
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting product category: ' . $e->getMessage());
+                ->with('error', __('Error deleting product category: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -127,17 +127,17 @@ class ProductCategoryController extends Controller
             }
             
             if (empty($selectedIds)) {
-                return redirect()->back()->with('error', 'No categories selected for deletion.');
+                return redirect()->back()->with('error', __('No categories selected for deletion.'));
             }
 
             $count = $this->repository->deleteSelectedCategories($selectedIds);
 
             return redirect()->route('admin.product-categories.index')
-                ->with('success', $count . ' categories deleted successfully!');
+                ->with('success', __(':count categories deleted successfully!', ['count' => $count]));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting categories: ' . $e->getMessage());
+                ->with('error', __('Error deleting categories: :error', ['error' => $e->getMessage()]));
         }
     }
 }

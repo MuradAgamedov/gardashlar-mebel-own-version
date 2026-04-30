@@ -74,11 +74,11 @@ class ProductPriceFilterController extends Controller
             DB::commit();
     
             return redirect()->route('admin.product-price-filters.index')
-                ->with('success', 'Qiymət filtiri uğurla əlavə edildi.');
+                ->with('success', __('Price filter created successfully!'));
     
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            return back()->with('error', __('Error creating price filter: :error', ['error' => $e->getMessage()]));
         }
     }
     
@@ -139,11 +139,11 @@ class ProductPriceFilterController extends Controller
             DB::commit();
 
             return redirect()->route('admin.product-price-filters.index')
-                ->with('success', 'Qiymət filtiri uğurla yeniləndi.');
+                ->with('success', __('Price filter updated successfully!'));
 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            return back()->with('error', __('Error updating price filter: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -164,11 +164,11 @@ class ProductPriceFilterController extends Controller
             DB::commit();
 
             return redirect()->route('admin.product-price-filters.index')
-                ->with('success', 'Qiymət filtiri uğurla silindi.');
+                ->with('success', __('Price filter deleted successfully!'));
 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Xəta baş verdi: ' . $e->getMessage());
+            return back()->with('error', __('Error deleting price filter: :error', ['error' => $e->getMessage()]));
         }
     }
 

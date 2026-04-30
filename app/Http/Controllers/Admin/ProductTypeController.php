@@ -67,11 +67,11 @@ class ProductTypeController extends Controller
             }
 
             return redirect()->route('admin.product-types.index')
-                ->with('success', 'Product type created successfully!');
+                ->with('success', __('Product type created successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error creating product type: ' . $e->getMessage())
+                ->with('error', __('Error creating product type: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -137,11 +137,11 @@ class ProductTypeController extends Controller
             }
 
             return redirect()->route('admin.product-types.index')
-                ->with('success', 'Product type updated successfully!');
+                ->with('success', __('Product type updated successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error updating product type: ' . $e->getMessage())
+                ->with('error', __('Error updating product type: :error', ['error' => $e->getMessage()]))
                 ->withInput();
         }
     }
@@ -154,10 +154,10 @@ class ProductTypeController extends Controller
         try {
             $productType->delete();
             return redirect()->route('admin.product-types.index')
-                ->with('success', 'Product type deleted successfully!');
+                ->with('success', __('Product type deleted successfully!'));
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Error deleting product type: ' . $e->getMessage());
+                ->with('error', __('Error deleting product type: :error', ['error' => $e->getMessage()]));
         }
     }
 

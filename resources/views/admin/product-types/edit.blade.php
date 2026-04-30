@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Product Type')
+@section('title', __('Edit Product Type'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Product Type</h3>
+                    <h3>{{ __('Edit Product Type') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.product-types.index') }}">Product Types</a>
+                            <a href="{{ route('admin.product-types.index') }}">{{ __('Product Types') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit Type</li>
+                        <li class="breadcrumb-item active">{{ __('Edit Type') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Please fix the following errors:</h6>
+                <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -42,7 +42,7 @@
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">{{ __('Error occurred:') }}</h6>
                 <p class="mb-0">{{ session('error') }}</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -52,7 +52,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Product Type</h5>
+                        <h5>{{ __('Edit Product Type') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.product-types.update', $productType) }}" method="POST">
@@ -62,10 +62,10 @@
                             <!-- Status -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Status</label>
+                                    <label class="form-label">{{ __('Status') }}</label>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" value="1" {{ $productType->status ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="status">Active</label>
+                                        <label class="form-check-label" for="status">{{ __('Active') }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -73,7 +73,7 @@
                             <!-- Language Tabs -->
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Translations</label>
+                                    <label class="form-label">{{ __('Translations') }}</label>
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
                                         @foreach($languages as $index => $language)
                                         @php
@@ -109,7 +109,7 @@
                                             <div class="row mt-3">
                                                 <div class="col-md-12">
                                                     <label class="form-label">
-                                                        Title <span class="text-danger">*</span>
+                                                        {{ __('Title') }} <span class="text-danger">*</span>
                                                     </label>
                                                     <input type="text" 
                                                            class="form-control @error('translates.'.$index.'.title') is-invalid @enderror" 
@@ -133,10 +133,10 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary" title="{{ __('Save') }}">
                                             <i class="material-icons-outlined">save</i>
                                         </button>
-                                        <a href="{{ route('admin.product-types.index') }}" class="btn btn-secondary">
+                                        <a href="{{ route('admin.product-types.index') }}" class="btn btn-secondary" title="{{ __('Cancel') }}">
                                             <i class="material-icons-outlined">cancel</i>
                                         </a>
                                     </div>

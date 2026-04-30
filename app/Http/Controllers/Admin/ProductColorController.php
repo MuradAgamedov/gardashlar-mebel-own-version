@@ -30,10 +30,10 @@ class ProductColorController extends Controller
         try {
             $this->repository->createProductColor($request->input('color_code'));
             return redirect()->route('admin.product-colors.index')
-                ->with('success', 'Color added successfully.');
+                ->with('success', __('Color added successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -47,10 +47,10 @@ class ProductColorController extends Controller
         try {
             $this->repository->updateProductColor($productColor, $request->input('color_code'));
             return redirect()->route('admin.product-colors.index')
-                ->with('success', 'Color updated successfully.');
+                ->with('success', __('Color updated successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -59,10 +59,10 @@ class ProductColorController extends Controller
         try {
             $this->repository->deleteProductColor($productColor);
             return redirect()->route('admin.product-colors.index')
-                ->with('success', 'Color deleted successfully.');
+                ->with('success', __('Color deleted successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -70,7 +70,7 @@ class ProductColorController extends Controller
     {
         try {
             $count = $this->repository->bulkDeleteProductColors($request->input('ids', []));
-            return response()->json(['success' => true, 'message' => 'Seçilən rənglər silindi!']);
+            return response()->json(['success' => true, 'message' => __('Selected colors deleted!')]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }

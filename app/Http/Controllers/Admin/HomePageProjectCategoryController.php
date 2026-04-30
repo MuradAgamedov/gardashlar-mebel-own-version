@@ -78,6 +78,6 @@ class HomePageProjectCategoryController extends Controller
         ]);
 
         $this->repository->reorderHomePageProjectCategories($request->items);
-        return response()->json(['success' => true, 'message' => 'Order updated successfully']);
+        return response()->json(['success' => true, 'message' => __('Order updated successfully')]);
     }
 }
