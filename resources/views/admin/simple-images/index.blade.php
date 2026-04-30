@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Simple Images')
+@section('title', __('Simple Images'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Simple Images</h3>
+                    <h3>{{ __('Simple Images') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Simple Images</li>
+                        <li class="breadcrumb-item active">{{ __('Simple Images') }}</li>
                     </ol>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Simple Images</h5>
+                            <h5>{{ __('Simple Images') }}</h5>
                             <a href="{{ route('admin.simple-images.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -55,10 +55,10 @@
                             <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
-                                        <th style="width: 20%;">Keyword</th>
-                                        <th style="width: 15%;">Image</th>
-                                        <th style="width: 45%;">Go URLs</th>
-                                        <th style="width: 20%;">Actions</th>
+                                        <th style="width: 20%;">{{ __('Keyword') }}</th>
+                                        <th style="width: 15%;">{{ __('Image') }}</th>
+                                        <th style="width: 45%;">{{ __('Go URLs') }}</th>
+                                        <th style="width: 20%;">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -92,7 +92,7 @@
                                                     <div class="text-center">
                                                         <i class="material-icons-outlined text-muted" style="font-size: 40px;">image_not_supported</i>
                                                         <br>
-                                                        <small class="text-muted">No image</small>
+                                                        <small class="text-muted">{{ __('No image') }}</small>
                                                     </div>
                                                 @endif
                                             </td>
@@ -118,18 +118,18 @@
                                                 <div class="d-flex gap-1">
                                                     <a href="{{ route('admin.simple-images.edit', $image->id) }}" 
                                                        class="btn btn-sm btn-outline-primary" 
-                                                       title="Edit">
+                                                       title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <form action="{{ route('admin.simple-images.destroy', $image->id) }}" 
                                                           method="POST" 
-                                                          onsubmit="return confirm('Are you sure you want to delete this image?')"
+                                                          onsubmit="return confirm('{{ __('Are you sure you want to delete this image?') }}')"
                                                           style="display: inline;">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" 
                                                                 class="btn btn-sm btn-outline-danger" 
-                                                                title="Delete">
+                                                                title="{{ __('Delete') }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
                                                     </form>
@@ -140,8 +140,8 @@
                                         <tr>
                                             <td colspan="4" class="text-center py-5">
                                                 <i class="material-icons-outlined" style="font-size: 48px; color: #6c757d;">image</i>
-                                                <h5 class="text-muted mt-3">No Simple Images</h5>
-                                                <p class="text-muted">Start by adding simple images with keywords.</p>
+                                                <h5 class="text-muted mt-3">{{ __('No Simple Images') }}</h5>
+                                                <p class="text-muted">{{ __('Start by adding simple images with keywords.') }}</p>
                                                 <a href="{{ route('admin.simple-images.create') }}" class="btn btn-primary">
                                                     <i class="material-icons-outlined">add</i>
                                                 </a>

@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Our Goal')
+@section('title', __('Edit Our Goal'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Our Goal</h3>
+                    <h3>{{ __('Edit Our Goal') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.our-goals.index') }}">Our Goals</a>
+                            <a href="{{ route('admin.our-goals.index') }}">{{ __('Our Goals') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit Our Goal</li>
+                        <li class="breadcrumb-item active">{{ __('Edit Our Goal') }}</li>
                     </ol>
                 </div>
             </div>
@@ -32,7 +32,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Our Goal</h5>
+                        <h5>{{ __('Edit Our Goal') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.our-goals.update', $ourGoal) }}" method="POST">
@@ -45,7 +45,7 @@
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" id="status" name="status" value="1" {{ old('status', $ourGoal->status) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Active Status
+                                            {{ __('Active Status') }}
                                         </label>
                                     </div>
                                 </div>
@@ -56,7 +56,7 @@
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h5>Translations</h5>
+                                            <h5>{{ __('Translations') }}</h5>
                                         </div>
                                         <div class="card-body">
                                             <ul class="nav nav-tabs" id="languageTabs" role="tablist">
@@ -89,12 +89,12 @@
                                                         <div class="row">
                                                             <!-- Title -->
                                                             <div class="col-md-12">
-                                                                <label class="form-label">Title <span class="text-danger">*</span></label>
+                                                                <label class="form-label">{{ __('Title') }} <span class="text-danger">*</span></label>
                                                                 <input type="text" 
                                                                        class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
                                                                        name="translations[{{ $language->id }}][title]" 
                                                                        value="{{ old("translations.{$language->id}.title", $translation ? $translation->title : '') }}" 
-                                                                       placeholder="Title for {{ $language->lang_name }}"
+                                                                       placeholder="{{ __('Title for :lang', ['lang' => $language->lang_name]) }}"
                                                                        required>
                                                                 @error("translations.{$language->id}.title")
                                                                     <div class="invalid-feedback">
@@ -105,11 +105,11 @@
                                                             
                                                             <!-- Description -->
                                                             <div class="col-md-12">
-                                                                <label class="form-label">Description <span class="text-danger">*</span></label>
+                                                                <label class="form-label">{{ __('Description') }} <span class="text-danger">*</span></label>
                                                                 <textarea class="form-control @error("translations.{$language->id}.description") is-invalid @enderror" 
                                                                           name="translations[{{ $language->id }}][description]" 
                                                                           rows="4"
-                                                                          placeholder="Description for {{ $language->lang_name }}"
+                                                                          placeholder="{{ __('Description for :lang', ['lang' => $language->lang_name]) }}"
                                                                           required>{{ old("translations.{$language->id}.description", $translation ? $translation->description : '') }}</textarea>
                                                                 @error("translations.{$language->id}.description")
                                                                     <div class="invalid-feedback">
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!isValid) {
             e.preventDefault();
-            alert('Please fill in all required fields.');
+            alert('{{ __("Please fill in all required fields.") }}');
         }
     });
 });

@@ -8,16 +8,16 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Products</h3>
+                    <h3>{{ __('Products') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Products</li>
+                        <li class="breadcrumb-item active">{{ __('Products') }}</li>
                     </ol>
                 </div>
             </div>
@@ -44,8 +44,8 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Products</h5>
-                            <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
+                            <h5>{{ __('Products') }}</h5>
+                            <a href="{{ route('admin.products.create') }}" class="btn btn-primary" title="{{ __('Add') }}">
                                 <i class="material-icons-outlined">add</i>
                             </a>
                         </div>
@@ -55,32 +55,32 @@
                     <div class="card-body border-bottom">
                         <form method="GET" action="{{ route('admin.products.index') }}" class="row g-3">
                             <div class="col-md-4">
-                                <label for="search" class="form-label">Search</label>
+                                <label for="search" class="form-label">{{ __('Search') }}</label>
                                 <input type="text" class="form-control" id="search" name="search"
-                                       value="{{ request('search') }}" placeholder="Search by title or description...">
+                                       value="{{ request('search') }}" placeholder="{{ __('Search by title or description...') }}">
                             </div>
                             <div class="col-md-2">
-                                <label for="category" class="form-label">Category</label>
+                                <label for="category" class="form-label">{{ __('Category') }}</label>
                                 <select class="form-select" id="category" name="category">
-                                    <option value="">All Categories</option>
+                                    <option value="">{{ __('All Categories') }}</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
-                                            {{ $category->translate()->title ?? 'No title' }}
+                                            {{ $category->translate()->title ?? __('No title') }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-md-2">
-    <label for="type" class="form-label">Type</label>
+    <label for="type" class="form-label">{{ __('Type') }}</label>
     <select class="form-select" id="type" name="type">
         <option value="" {{ !request()->has('type') || request('type') == '' ? 'selected' : '' }}>
-            All Types
+            {{ __('All Types') }}
         </option>
         @if($types->count() > 0)
             @foreach($types as $type)
                 <option value="{{ $type->id }}"
                     {{ request()->has('type') && request('type') == $type->id ? 'selected' : '' }}>
-                    {{ $type->translate()->title ?? 'No title' }}
+                    {{ $type->translate()->title ?? __('No title') }}
                 </option>
             @endforeach
         @endif
@@ -88,11 +88,11 @@
 </div>
 
                             <div class="col-md-2">
-                                <label for="status" class="form-label">Status</label>
+                                <label for="status" class="form-label">{{ __('Status') }}</label>
                                 <select class="form-select" id="status" name="status">
-                                    <option value="">All Status</option>
-                                    <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
-                                    <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactive</option>
+                                    <option value="">{{ __('All Status') }}</option>
+                                    <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>{{ __('Active') }}</option>
+                                    <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>{{ __('Inactive') }}</option>
                                 </select>
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
@@ -112,10 +112,10 @@
                         <!-- Results Summary -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div class="text-muted">
-                                Showing {{ $products->firstItem() ?? 0 }} to {{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results
+                                {{ __('Showing :first to :last of :total results', ['first' => $products->firstItem() ?? 0, 'last' => $products->lastItem() ?? 0, 'total' => $products->total()]) }}
                             </div>
                             <div class="text-muted">
-                                Page {{ $products->currentPage() }} of {{ $products->lastPage() }}
+                                {{ __('Page :current of :last_page', ['current' => $products->currentPage(), 'last_page' => $products->lastPage()]) }}
                             </div>
                             <button id="delete-selected-products" class="btn btn-danger btn-sm ms-3" disabled>
                                 <i class="material-icons-outlined">delete</i>
@@ -130,13 +130,13 @@
                                             <input type="checkbox" id="select-all-products">
                                         </th>
                                         <th width="50">#</th>
-                                        <th>Title</th>
-                                        <th>Category</th>
-                                        <th>Type</th>
-                                        <th>Views</th>
-                                        <th>Discount</th>
-                                        <th>Status</th>
-                                        <th width="150">Actions</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th>{{ __('Category') }}</th>
+                                        <th>{{ __('Type') }}</th>
+                                        <th>{{ __('Views') }}</th>
+                                        <th>{{ __('Discount') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-products">
@@ -164,7 +164,7 @@
                                                             $firstTranslation = $product->translates->firstWhere('language_id', $mainLanguageId)
                                                                 ?? $product->translates->first();
                                                         @endphp
-                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
+                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : __('No title') }}</strong>
                                                         <div class="mt-1">
                                                             <small class="text-muted">ID: {{ $product->id }}</small>
                                                         </div>
@@ -181,7 +181,7 @@
                                                                     $categoryTranslation = $category->translates->firstWhere('language_id', $mainLanguageId)
                                                                         ?? $category->translates->first();
                                                                 @endphp
-                                                                {{ $categoryTranslation ? $categoryTranslation->title : 'No title' }}
+                                                                {{ $categoryTranslation ? $categoryTranslation->title : __('No title') }}
                                                             </span>
                                                         @endforeach
                                                         @if($product->categories->count() > 2)
@@ -191,7 +191,7 @@
                                                         @endif
                                                     </div>
                                                 @else
-                                                    <span class="badge badge-light-secondary">No categories</span>
+                                                    <span class="badge badge-light-secondary">{{ __('No categories') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -204,7 +204,7 @@
                                                                     $typeTranslation = $type->translates->firstWhere('language_id', $mainLanguageId)
                                                                         ?? $type->translates->first();
                                                                 @endphp
-                                                                {{ $typeTranslation ? $typeTranslation->title : 'No title' }}
+                                                                {{ $typeTranslation ? $typeTranslation->title : __('No title') }}
                                                             </span>
                                                         @endforeach
                                                         @if($product->types->count() > 2)
@@ -214,7 +214,7 @@
                                                         @endif
                                                     </div>
                                                 @else
-                                                    <span class="badge badge-light-secondary">No types</span>
+                                                    <span class="badge badge-light-secondary">{{ __('No types') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -230,14 +230,14 @@
                                                         {{ $product->discount_price }}
                                                     </span>
                                                 @else
-                                                    <span class="badge badge-light-secondary">No discount</span>
+                                                    <span class="badge badge-light-secondary">{{ __('No discount') }}</span>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if($product->status)
-                                                    <span class="badge badge-light-success">Active</span>
+                                                    <span class="badge badge-light-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge badge-light-danger">Inactive</span>
+                                                    <span class="badge badge-light-danger">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
 
@@ -245,22 +245,22 @@
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.products.details.index', $product) }}?page={{ request('page', 1) }}"
                                                        class="btn btn-sm btn-outline-warning"
-                                                       title="Product Details">
+                                                       title="{{ __('Product Details') }}">
                                                         <i class="material-icons-outlined">info</i>
                                                     </a>
                                                     <a href="{{ route('admin.products.accordions.index', $product) }}?page={{ request('page', 1) }}"
                                                        class="btn btn-sm btn-outline-info"
-                                                       title="Accordions">
+                                                       title="{{ __('Accordions') }}">
                                                         <i class="material-icons-outlined">expand_more</i>
                                                     </a>
                                                     <a href="{{ route('admin.products.images.index', $product) }}?page={{ request('page', 1) }}"
                                                        class="btn btn-sm btn-outline-success"
-                                                       title="Images">
+                                                       title="{{ __('Images') }}">
                                                         <i class="material-icons-outlined">image</i>
                                                     </a>
                                                     <a href="{{ route('admin.products.edit', $product) }}?page={{ request('page', 1) }}"
                                                        class="btn btn-sm btn-outline-primary"
-                                                       title="Edit">
+                                                       title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <form action="{{ route('admin.products.duplicate', $product) }}" method="POST" class="d-inline-flex align-items-center gap-2">
@@ -269,13 +269,13 @@
                                                             <select name="category_id" id="categorySelect{{ $product->id }}"
                                                                     class="form-select form-select-sm category-select border-0 bg-transparent flex-grow-1"
                                                                     required>
-                                                                <option value="">Category</option>
+                                                                <option value="">{{ __('Category') }}</option>
                                                                 @foreach($categories as $cat)
-                                                                    <option value="{{ $cat->id }}">{{ Str::limit($cat->translate()->title ?? 'No title', 20) }}</option>
+                                                                    <option value="{{ $cat->id }}">{{ Str::limit($cat->translate()->title ?? __('No title'), 20) }}</option>
                                                                 @endforeach
                                                             </select>
                                                             <button type="submit" class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center"
-                                                                    title="Duplicate Product" onclick="return validateDuplicate({{ $product->id }})">
+                                                                    title="{{ __('Duplicate Product') }}" onclick="return validateDuplicate({{ $product->id }})">
                                                                 <i class="material-icons-outlined" style="font-size: 16px;">content_copy</i>
                                                             </button>
                                                         </div>
@@ -284,12 +284,12 @@
                                                     <form action="{{ route('admin.products.destroy', $product) }}"
                                                           method="POST"
                                                           class="d-inline"
-                                                          onsubmit="return confirm('Are you sure you want to delete this product?')">
+                                                          onsubmit="return confirm('{{ __('Are you sure you want to delete this product?') }}')">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit"
                                                                 class="btn btn-sm btn-outline-danger"
-                                                                title="Delete">
+                                                                title="{{ __('Delete') }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
                                                     </form>
@@ -301,7 +301,7 @@
                                             <td colspan="9" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">inventory_2</i>
-                                                    <p class="mt-2">No products found</p>
+                                                    <p class="mt-2">{{ __('No products found') }}</p>
                                                     @if(request('search') || request('category') || request('type') || request('status'))
                                                         <a href="{{ route('admin.products.index') }}" class="btn btn-outline-primary me-2">
                                                         </a>
@@ -435,7 +435,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Select2 for category selects
     $(document).ready(function() {
         $('.category-select').select2({
-            placeholder: 'Category',
+            placeholder: '{{ __('Category') }}',
             allowClear: false,
             width: '120px',
             dropdownAutoWidth: false,
@@ -478,7 +478,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const alert = document.createElement('div');
                         alert.className = 'alert alert-success alert-dismissible fade show';
                         alert.innerHTML = `
-                            Order updated successfully
+                            {{ __('Order updated successfully') }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         `;
                         document.querySelector('.container-fluid').insertBefore(alert, document.querySelector('.row'));
@@ -522,7 +522,7 @@ function toggleDeleteButton() {
 deleteBtn.addEventListener('click', function() {
     let ids = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
     if (ids.length === 0) return;
-    if (!confirm('Seçilən məhsulları silmək istədiyinizə əminsiniz?')) return;
+    if (!confirm('{{ __('Are you sure you want to delete selected products?') }}')) return;
     fetch("{{ route('admin.products.bulk-delete') }}", {
         method: 'DELETE',
         headers: {
@@ -541,7 +541,7 @@ deleteBtn.addEventListener('click', function() {
 function validateDuplicate(productId) {
     const selectedCategory = document.getElementById('categorySelect' + productId).value;
     if (!selectedCategory) {
-        alert('Please select a category for duplication');
+        alert('{{ __('Please select a category for duplication') }}');
         return false;
     }
     return true;

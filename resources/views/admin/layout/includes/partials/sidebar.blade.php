@@ -261,12 +261,7 @@
         </ul>
       </li>
 
-      <li class="sidebar-list">
-        <a class="sidebar-link" href="{{ route('admin.catalogs.index') }}">
-          <i class="fas fa-book"></i>
-          <h6>{{ __('Catalogs') }}</h6>
-        </a>
-      </li>
+    
 
             <li class="sidebar-list">
         <a class="sidebar-link" href="javascript:void(0)">

@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Quick Upload - ' . $keyword)
+@section('title', __('Quick Upload') . ' - ' . $keyword)
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Quick Upload - {{ $keyword }}</h3>
+                    <h3>{{ __('Quick Upload') }} - {{ $keyword }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.simple-images.index') }}">Simple Images</a>
+                            <a href="{{ route('admin.simple-images.index') }}">{{ __('Simple Images') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Quick Upload - {{ $keyword }}</li>
+                        <li class="breadcrumb-item active">{{ __('Quick Upload') }} - {{ $keyword }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Validation Errors:</h6>
+                <h6 class="alert-heading">{{ __('Validation Errors:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -50,7 +50,7 @@
 
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Success:</h6>
+                <h6 class="alert-heading">{{ __('Success:') }}</h6>
                 <p class="mb-0">{{ session('success') }}</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -60,29 +60,29 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Quick Upload for Keyword: <span class="text-primary">{{ $keyword }}</span></h5>
+                        <h5>{{ __('Quick Upload for Keyword:') }} <span class="text-primary">{{ $keyword }}</span></h5>
                     </div>
                     <div class="card-body">
                         @if($simpleImage)
                             <div class="alert alert-info">
-                                <h6>Current Image:</h6>
+                                <h6>{{ __('Current Image:') }}</h6>
                                 <div class="row align-items-center">
                                     <div class="col-md-2">
                                         <img src="{{ $simpleImage->image_url }}" alt="{{ $simpleImage->keyword }}" class="img-fluid img-thumbnail" style="max-height: 100px;">
                                     </div>
                                     <div class="col-md-10">
-                                        <p class="mb-1"><strong>Keyword:</strong> {{ $simpleImage->keyword }}</p>
-                                        <p class="mb-1"><strong>Current Image:</strong> {{ $simpleImage->image_path }}</p>
-                                        <p class="mb-0"><strong>Created:</strong> {{ $simpleImage->created_at->format('d.m.Y H:i') }}</p>
+                                        <p class="mb-1"><strong>{{ __('Keyword:') }}</strong> {{ $simpleImage->keyword }}</p>
+                                        <p class="mb-1"><strong>{{ __('Current Image:') }}</strong> {{ $simpleImage->image_path }}</p>
+                                        <p class="mb-0"><strong>{{ __('Created:') }}</strong> {{ $simpleImage->created_at->format('d.m.Y H:i') }}</p>
                                     </div>
                                 </div>
                                 <hr>
-                                <p class="mb-0 text-warning"><i class="material-icons">warning</i> Uploading a new image will replace the current one.</p>
+                                <p class="mb-0 text-warning"><i class="material-icons">warning</i> {{ __('Uploading a new image will replace the current one.') }}</p>
                             </div>
                         @else
                             <div class="alert alert-info">
-                                <h6>New Image:</h6>
-                                <p class="mb-0">No image exists for keyword "<strong>{{ $keyword }}</strong>". Uploading will create a new entry.</p>
+                                <h6>{{ __('New Image:') }}</h6>
+                                <p class="mb-0">{{ __('No image exists for keyword ":keyword". Uploading will create a new entry.', ['keyword' => $keyword]) }}</p>
                             </div>
                         @endif
 
@@ -93,7 +93,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        Image <span class="text-danger">*</span>
+                                        {{ __('Image') }} <span class="text-danger">*</span>
                                     </label>
                                     <input type="file" 
                                            class="form-control @error('image') is-invalid @enderror" 
@@ -101,7 +101,7 @@
                                            accept="image/jpeg,image/png,image/gif,image/webp"
                                            id="imageInput"
                                            required>
-                                    <small class="form-text text-muted">Supported formats: JPG, PNG, GIF, WebP</small>
+                                    <small class="form-text text-muted">{{ __('Supported formats: JPG, PNG, GIF, WebP') }}</small>
                                     <div id="fileInfo" class="mt-2 d-none">
                                         <small class="text-info">
                                             <span id="fileName"></span> (<span id="fileSize"></span>)
@@ -116,7 +116,7 @@
                             <!-- Translations -->
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Translations</label>
+                                    <label class="form-label">{{ __('Translations') }}</label>
                                     <div class="card border">
                                         <div class="card-body">
                                             @foreach($languages as $language)
@@ -159,10 +159,10 @@
                             <div class="row">
                                 <div class="col-12">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="material-icons">upload</i> Upload Image
+                                        <i class="material-icons">upload</i> {{ __('Upload Image') }}
                                     </button>
                                     <a href="{{ route('admin.simple-images.index') }}" class="btn btn-secondary">
-                                        <i class="material-icons">arrow_back</i> Back to List
+                                        <i class="material-icons">arrow_back</i> {{ __('Back to List') }}
                                     </a>
                                 </div>
                             </div>

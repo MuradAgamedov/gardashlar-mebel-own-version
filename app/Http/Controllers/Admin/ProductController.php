@@ -121,10 +121,10 @@ class ProductController extends Controller
             }
 
             return redirect()->route('admin.products.index')
-                ->with('success', 'Product added successfully.');
+                ->with('success', __('Product added successfully.'));
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -222,10 +222,10 @@ class ProductController extends Controller
     
             return redirect()
                 ->route('admin.products.index', ['page' => $request->input('current_page', 1)])
-                ->with('success', 'Product updated successfully.');
+                ->with('success', __('Product updated successfully.'));
     
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
     
@@ -239,9 +239,9 @@ class ProductController extends Controller
         try {
             $product->delete();
             return redirect()->route('admin.products.index')
-                ->with('success', 'Product deleted successfully.');
+                ->with('success', __('Product deleted successfully.'));
         } catch (\Exception $e) {
-            return back()->with('error', 'Error occurred: ' . $e->getMessage());
+            return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -253,9 +253,9 @@ class ProductController extends Controller
         $ids = $request->input('ids', []);
         if (!empty($ids)) {
             Product::whereIn('id', $ids)->delete();
-            return response()->json(['success' => true, 'message' => 'Seçilən məhsullar silindi!']);
+            return response()->json(['success' => true, 'message' => __('Selected products deleted successfully!')]);
         }
-        return response()->json(['success' => false, 'message' => 'Heç bir məhsul seçilməyib!']);
+        return response()->json(['success' => false, 'message' => __('No product selected!')]);
     }
 
     /**
@@ -366,10 +366,10 @@ class ProductController extends Controller
             }
     
             return redirect()->route('admin.products.index')
-                ->with('success', 'Product duplicated successfully.');
+                ->with('success', __('Product duplicated successfully.'));
     
         } catch (\Exception $e) {
-            return back()->with('error', 'Error duplicating product: ' . $e->getMessage());
+            return back()->with('error', __('Error duplicating product: :error', ['error' => $e->getMessage()]));
         }
     }
     

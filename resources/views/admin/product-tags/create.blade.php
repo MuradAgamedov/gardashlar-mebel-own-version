@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Add Product Tag')
+@section('title', __('Add Product Tag'))
 
 @section('content')
 <div class="page-body">
@@ -8,19 +8,19 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Add Product Tag</h3>
+                    <h3>{{ __('Add Product Tag') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i>
+                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.product-tags.index') }}">Product Tags</a>
+                            <a href="{{ route('admin.product-tags.index') }}">{{ __('Product Tags') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Add</li>
+                        <li class="breadcrumb-item active">{{ __('Add') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">{{ __('Error occurred:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -42,7 +42,7 @@
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error occurred:</h6>
+                <h6 class="alert-heading">{{ __('Error occurred:') }}</h6>
                 <p class="mb-0">{{ session('error') }}</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -52,7 +52,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>New Product Tag</h5>
+                        <h5>{{ __('New Product Tag') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.product-tags.store') }}" novalidate method="POST">
@@ -61,7 +61,7 @@
                             <!-- Language Tabs -->
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Tag Information</label>
+                                    <label class="form-label">{{ __('Tag Information') }}</label>
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
                                         @foreach($languages as $index => $language)
                                             <li class="nav-item" role="presentation">
@@ -87,13 +87,13 @@
                                                     <!-- Title -->
                                                     <div class="col-md-6">
                                                         <label class="form-label">
-                                                            Title <span class="text-danger">*</span>
+                                                            {{ __('Title') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.title") is-invalid @enderror" 
                                                                name="translations[{{ $language->id }}][title]" 
                                                                value="{{ old("translations.{$language->id}.title") }}" 
-                                                               placeholder="Enter title"
+                                                               placeholder="{{ __('Enter title') }}"
                                                                required>
                                                         @error("translations.{$language->id}.title")
                                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -103,7 +103,7 @@
                                                     <!-- Slug -->
                                                     <div class="col-md-6">
                                                         <label class="form-label">
-                                                            Slug <span class="text-danger">*</span>
+                                                            {{ __('Slug') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <div class="input-group">
                                                             <input type="text" 
@@ -111,7 +111,7 @@
                                                                    name="translations[{{ $language->id }}][slug]" 
                                                                    id="slug_{{ $language->id }}"
                                                                    value="{{ old("translations.{$language->id}.slug") }}" 
-                                                                   placeholder="Enter slug"
+                                                                   placeholder="{{ __('Enter slug') }}"
                                                                    required>
                                                             <button type="button" 
                                                                     class="btn btn-outline-secondary generate-slug" 
@@ -138,7 +138,7 @@
                             <!-- Status -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Status</label>
+                                    <label class="form-label">{{ __('Status') }}</label>
                                     <div class="form-check form-switch">
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" 
@@ -147,7 +147,7 @@
                                                name="status" 
                                                value="1" 
                                                {{ old('status', '1') ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="status">Active</label>
+                                        <label class="form-check-label" for="status">{{ __('Active') }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -158,11 +158,11 @@
                                     <div class="d-flex gap-2">
                                         <button type="submit" class="btn btn-primary">
                                             <i class="material-icons-outlined">save</i>
-                                            Add Tag
+                                            {{ __('Add Tag') }}
                                         </button>
                                         <a href="{{ route('admin.product-tags.index') }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">cancel</i>
-                                            Cancel
+                                            {{ __('Cancel') }}
                                         </a>
                                     </div>
                                 </div>

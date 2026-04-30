@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Our Goals Management')
+@section('title', __('Our Goals Management'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Our Goals Management</h3>
+                    <h3>{{ __('Our Goals Management') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Our Goals Management</li>
+                        <li class="breadcrumb-item active">{{ __('Our Goals Management') }}</li>
                     </ol>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Our Goals</h5>
+                            <h5>{{ __('Our Goals') }}</h5>
                             <a href="{{ route('admin.our-goals.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -56,10 +56,10 @@
                                 <thead>
                                     <tr>
                                         <th width="50">#</th>
-                                        <th>Title</th>
-                                        <th>Description</th>
-                                        <th>Status</th>
-                                        <th width="150">Actions</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th>{{ __('Description') }}</th>
+                                        <th>{{ __('Status') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-our-goals">
@@ -84,20 +84,20 @@
                                                             $firstTranslation = $ourGoal->translates->firstWhere('language_id', $mainLanguageId)
                                                                 ?? $ourGoal->translates->first();
                                                         @endphp
-                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : 'No title' }}</strong>
+                                                        <strong>{{ $firstTranslation ? $firstTranslation->title : __('No title') }}</strong>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="text-muted">
-                                                    {{ $firstTranslation ? Str::limit($firstTranslation->description, 100) : 'No description' }}
+                                                    {{ $firstTranslation ? Str::limit($firstTranslation->description, 100) : __('No description') }}
                                                 </div>
                                             </td>
                                             <td>
                                                 @if($ourGoal->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -106,7 +106,7 @@
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Our Goal #' . $ourGoal->id }}"
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : __('Our Goal #:id', ['id' => $ourGoal->id]) }}"
                                                             data-url="{{ route('admin.our-goals.destroy', $ourGoal) }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
@@ -118,7 +118,7 @@
                                             <td colspan="5" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">flag</i>
-                                                    <p class="mt-2">No our goals found</p>
+                                                    <p class="mt-2">{{ __('No our goals found') }}</p>
                                                     <a href="{{ route('admin.our-goals.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>
@@ -208,13 +208,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to delete "${title}"?`,
+                title: '{{ __("Are you sure?") }}',
+                text: '{{ __("Do you want to delete :title?", ["title" => ":title"]) }}'.replace(':title', title),
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __("Yes, delete it!") }}',
+                cancelButtonText: '{{ __("Cancel") }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');

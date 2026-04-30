@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Product')
+@section('title', __('Edit Product'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Product</h3>
+                    <h3>{{ __('Edit Product') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.products.index') }}">Products</a>
+                            <a href="{{ route('admin.products.index') }}">{{ __('Products') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Please fix the following errors:</h6>
+                <h6 class="alert-heading">{{ __('Please fix the following errors:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -42,7 +42,7 @@
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Error:</h6>
+                <h6 class="alert-heading">{{ __('Error:') }}</h6>
                 <p class="mb-0">{{ session('error') }}</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -52,7 +52,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Product</h5>
+                        <h5>{{ __('Edit Product') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.products.update', $product) }}" method="POST" novalidate>
@@ -63,12 +63,12 @@
                             <!-- Basic Information -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Product Categories</label>
+                                    <label class="form-label">{{ __('Product Categories') }}</label>
                                     <div class="position-relative">
                                         <input type="text" 
                                                class="form-control categories-input" 
                                                id="categoriesInput" 
-                                               placeholder="Type to search categories..."
+                                               placeholder="{{ __('Type to search categories...') }}"
                                                autocomplete="off">
                                         <div class="categories-dropdown" id="categoriesDropdown" style="display: none;">
                                             <!-- Categories will be loaded here -->
@@ -78,19 +78,19 @@
                                            name="product_categories" 
                                            id="categoriesHiddenInput" 
                                            value="{{ old('product_categories', json_encode($product->categories->pluck('id')->toArray())) }}">
-                                    <small class="form-text text-muted">Click on categories to select/deselect</small>
+                                    <small class="form-text text-muted">{{ __('Click on categories to select/deselect') }}</small>
                                     @error('product_categories')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 
                                 <div class="col-md-6">
-                                    <label class="form-label">Product Types</label>
+                                    <label class="form-label">{{ __('Product Types') }}</label>
                                     <div class="position-relative">
                                         <input type="text" 
                                                class="form-control types-input" 
                                                id="typesInput" 
-                                               placeholder="Type to search product types..."
+                                               placeholder="{{ __('Type to search product types...') }}"
                                                autocomplete="off">
                                         <div class="types-dropdown" id="typesDropdown" style="display: none;">
                                             <!-- Types will be loaded here -->
@@ -100,7 +100,7 @@
                                            name="product_types" 
                                            id="typesHiddenInput" 
                                            value="{{ old('product_types', json_encode($product->types->pluck('id')->toArray())) }}">
-                                    <small class="form-text text-muted">Click on types to select/deselect</small>
+                                    <small class="form-text text-muted">{{ __('Click on types to select/deselect') }}</small>
                                     @error('product_types')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -110,7 +110,7 @@
                             <!-- Product Details -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Price</label>
+                                    <label class="form-label">{{ __('Price') }}</label>
                                     <input type="number" 
                                            class="form-control @error('price') is-invalid @enderror" 
                                            name="price" 
@@ -124,7 +124,7 @@
                                 </div>
                                 
                                 <div class="col-md-6">
-                                    <label class="form-label">Discount price </label>
+                                    <label class="form-label">{{ __('Discount Price') }}</label>
                                     <input type="number" 
                                            class="form-control @error('discount_price') is-invalid @enderror" 
                                            name="discount_price" 
@@ -142,7 +142,7 @@
                             <!-- Product Tags -->
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Product Tags</label>
+                                    <label class="form-label">{{ __('Product Tags') }}</label>
                                     <div class="custom-tags-container">
                                         <div class="tags-input-wrapper">
                                             <div class="selected-tags" id="selectedTags">
@@ -151,7 +151,7 @@
                                             <input type="text" 
                                                    class="form-control tags-input" 
                                                    id="tagsInput" 
-                                                   placeholder="Type to search tags..."
+                                                   placeholder="{{ __('Type to search tags...') }}"
                                                    autocomplete="off">
                                             <div class="tags-dropdown" id="tagsDropdown" style="display: none;">
                                                 <!-- Tags will be loaded here -->
@@ -162,7 +162,7 @@
                                                id="tagsHiddenInput" 
                                                value="{{ old('product_tags', json_encode($product->tags->pluck('id')->toArray())) }}">
                                     </div>
-                                    <small class="form-text text-muted">Click on tags to select/deselect</small>
+                                    <small class="form-text text-muted">{{ __('Click on tags to select/deselect') }}</small>
                                     @error('product_tags')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -172,7 +172,7 @@
                             <!-- Language Tabs -->
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Product Information</label>
+                                    <label class="form-label">{{ __('Product Information') }}</label>
                                     <ul class="nav nav-tabs" id="languageTabs" role="tablist">
                                         @foreach($languages as $index => $language)
                                             <li class="nav-item" role="presentation">
@@ -201,13 +201,13 @@
                                                     <!-- Title -->
                                                     <div class="col-md-6">
                                                         <label class="form-label">
-                                                            Title <span class="text-danger">*</span>
+                                                            {{ __('Title') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.title") is-invalid @enderror title-input" 
                                                                name="translations[{{ $language->id }}][title]" 
                                                                value="{{ old("translations.{$language->id}.title", $translation ? $translation->title : '') }}" 
-                                                               placeholder="Enter product title"
+                                                               placeholder="{{ __('Enter product title') }}"
                                                                required>
                                                         @error("translations.{$language->id}.title")
                                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -217,7 +217,7 @@
                                                     <!-- Slug -->
                                                     <div class="col-md-6">
                                                         <label class="form-label">
-                                                            Slug <span class="text-danger">*</span>
+                                                            {{ __('Slug') }} <span class="text-danger">*</span>
                                                         </label>
                                                         <div class="input-group">
                                                             <input type="text" 
@@ -225,7 +225,7 @@
                                                                    name="translations[{{ $language->id }}][slug]" 
                                                                    id="slug_{{ $language->id }}"
                                                                    value="{{ old("translations.{$language->id}.slug", $translation ? $translation->slug : '') }}" 
-                                                                   placeholder="Enter slug"
+                                                                   placeholder="{{ __('Enter slug') }}"
                                                                    data-language="{{ $language->lang_code }}"
                                                                    required>
                                                             <button type="button" 
@@ -242,11 +242,11 @@
                                                     
                                                     <!-- Description -->
                                                     <div class="col-12 mt-3">
-                                                        <label class="form-label">Description</label>
+                                                        <label class="form-label">{{ __('Description') }}</label>
                                                         <textarea class="form-control @error("translations.{$language->id}.description") is-invalid @enderror" 
                                                                   name="translations[{{ $language->id }}][description]" 
                                                                   rows="4"
-                                                                  placeholder="Enter product description">{{ old("translations.{$language->id}.description", $translation ? $translation->description : '') }}</textarea>
+                                                                  placeholder="{{ __('Enter product description') }}">{{ old("translations.{$language->id}.description", $translation ? $translation->description : '') }}</textarea>
                                                         @error("translations.{$language->id}.description")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
@@ -254,37 +254,37 @@
                                                     
                                                     <!-- SEO Fields -->
                                                     <div class="col-12 mt-3">
-                                                        <h6 class="mb-3">SEO Information</h6>
+                                                        <h6 class="mb-3">{{ __('SEO Information') }}</h6>
                                                     </div>
                                                     <div class="col-md-4">
-                                                        <label class="form-label">SEO Title</label>
+                                                        <label class="form-label">{{ __('SEO Title') }}</label>
                                                         <input type="text" 
                                                                class="form-control @error("translations.{$language->id}.seo_title") is-invalid @enderror" 
                                                                name="translations[{{ $language->id }}][seo_title]" 
                                                                value="{{ old("translations.{$language->id}.seo_title", $translation ? $translation->seo_title : '') }}" 
-                                                               placeholder="SEO optimized title">
+                                                               placeholder="{{ __('SEO optimized title') }}">
                                                         @error("translations.{$language->id}.seo_title")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>
                                                     
                                                     <div class="col-md-4">
-                                                        <label class="form-label">SEO Keywords</label>
+                                                        <label class="form-label">{{ __('SEO Keywords') }}</label>
                                                         <textarea class="form-control @error("translations.{$language->id}.seo_keywords") is-invalid @enderror" 
                                                                   name="translations[{{ $language->id }}][seo_keywords]" 
                                                                   rows="3"
-                                                                  placeholder="keyword1, keyword2, keyword3">{{ old("translations.{$language->id}.seo_keywords", $translation ? $translation->seo_keywords : '') }}</textarea>
+                                                                  placeholder="{{ __('keyword1, keyword2, keyword3') }}">{{ old("translations.{$language->id}.seo_keywords", $translation ? $translation->seo_keywords : '') }}</textarea>
                                                         @error("translations.{$language->id}.seo_keywords")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>
                                                     
                                                     <div class="col-md-4">
-                                                        <label class="form-label">SEO Description</label>
+                                                        <label class="form-label">{{ __('SEO Description') }}</label>
                                                         <textarea class="form-control @error("translations.{$language->id}.seo_description") is-invalid @enderror" 
                                                                   name="translations[{{ $language->id }}][seo_description]" 
                                                                   rows="3"
-                                                                  placeholder="SEO meta description">{{ old("translations.{$language->id}.seo_description", $translation ? $translation->seo_description : '') }}</textarea>
+                                                                  placeholder="{{ __('SEO meta description') }}">{{ old("translations.{$language->id}.seo_description", $translation ? $translation->seo_description : '') }}</textarea>
                                                         @error("translations.{$language->id}.seo_description")
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
@@ -292,7 +292,7 @@
                                                     
                                                     <!-- Product Details -->
                                                     <div class="col-12 mt-3">
-                                                        <h6 class="mb-3">Product Details</h6>
+                                                        <h6 class="mb-3">{{ __('Product Details') }}</h6>
                                                     </div>
 
                                                 </div>
@@ -309,7 +309,7 @@
                             <!-- Status -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Status</label>
+                                    <label class="form-label">{{ __('Status') }}</label>
                                     <div class="form-check form-switch">
                                         <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" 
@@ -319,7 +319,7 @@
                                                value="1" 
                                                {{ old('status', $product->status) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            <span class="status-indicator" id="statusText">Active</span>
+                                            <span class="status-indicator" id="statusText">{{ __('Active') }}</span>
                                         </label>
                                     </div>
                                 </div>
@@ -498,11 +498,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function updateStatusDisplay() {
         if (statusCheckbox.checked) {
-            statusText.textContent = 'Active';
+            statusText.textContent = '{{ __('Active') }}';
             statusText.style.color = '#28a745';
             statusHidden.disabled = true; // Disable hidden input when checkbox is checked
         } else {
-            statusText.textContent = 'Inactive';
+            statusText.textContent = '{{ __('Inactive') }}';
             statusText.style.color = '#6c757d';
             statusHidden.disabled = false; // Enable hidden input when checkbox is unchecked
         }
@@ -538,7 +538,7 @@ document.addEventListener('DOMContentLoaded', function() {
         @foreach($tags as $tag)
         {
             id: {{ $tag->id }},
-            title: "{{ $tag->translate()->title ?? 'No title' }}"
+            title: "{{ $tag->translate()->title ?? __('No title') }}"
         },
         @endforeach
     ];
@@ -665,7 +665,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let availableTypes = @json($types->map(function($type) {
         return [
             'id' => $type->id,
-            'title' => $type->translate()->title ?? 'No title'
+            'title' => $type->translate()->title ?? __('No title')
         ];
     }));
     
@@ -757,7 +757,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let availableCategories = @json($categories->map(function($category) {
         return [
             'id' => $category->id,
-            'title' => $category->translate()->title ?? 'No title'
+            'title' => $category->translate()->title ?? __('No title')
         ];
     }));
     

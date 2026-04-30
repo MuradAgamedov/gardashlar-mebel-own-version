@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Edit Simple Image')
+@section('title', __('Edit Simple Image'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit Simple Image</h3>
+                    <h3>{{ __('Edit Simple Image') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -18,9 +18,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.simple-images.index') }}">Simple Images</a>
+                            <a href="{{ route('admin.simple-images.index') }}">{{ __('Simple Images') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
     <div class="container-fluid">
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Validation Errors:</h6>
+                <h6 class="alert-heading">{{ __('Validation Errors:') }}</h6>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -58,7 +58,7 @@
 
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <h6 class="alert-heading">Success:</h6>
+                <h6 class="alert-heading">{{ __('Success:') }}</h6>
                 <p class="mb-0">{{ session('success') }}</p>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -68,7 +68,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit Simple Image</h5>
+                        <h5>{{ __('Edit Simple Image') }}</h5>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.simple-images.update', $simpleImage->id) }}" method="POST" enctype="multipart/form-data" id="imageUploadForm">
@@ -79,15 +79,15 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        Keyword <span class="text-danger">*</span>
+                                        {{ __('Keyword') }} <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" 
                                            class="form-control @error('keyword') is-invalid @enderror" 
                                            name="keyword" 
                                            value="{{ old('keyword', $simpleImage->keyword) }}" 
-                                           placeholder="Enter keyword (e.g., hero_image, logo)" 
+                                           placeholder="{{ __('Enter keyword (e.g., hero_image, logo)') }}" 
                                            required>
-                                    <small class="form-text text-muted">Use lowercase with underscores (e.g., hero_image, logo, banner)</small>
+                                    <small class="form-text text-muted">{{ __('Use lowercase with underscores (e.g., hero_image, logo, banner)') }}</small>
                                     @error('keyword')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -97,7 +97,7 @@
                             <!-- Current Image -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">Current Image</label>
+                                    <label class="form-label">{{ __('Current Image') }}</label>
                                     @if($simpleImage->image_path)
                                         <div class="border rounded p-3">
                                             <img src="{{ asset('storage/' . $simpleImage->image_path) }}" 
@@ -105,12 +105,12 @@
                                                  class="img-fluid" 
                                                  style="max-height: 200px;">
                                             <div class="mt-2">
-                                                <small class="text-muted">Current image: {{ $simpleImage->image_path }}</small>
+                                                <small class="text-muted">{{ __('Current image:') }} {{ $simpleImage->image_path }}</small>
                                             </div>
                                         </div>
                                     @else
                                         <div class="border rounded p-3 text-center">
-                                            <span class="text-muted">No image uploaded</span>
+                                            <span class="text-muted">{{ __('No image uploaded') }}</span>
                                         </div>
                                     @endif
                                 </div>
@@ -120,14 +120,14 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">
-                                        New Image <span class="text-muted">(Optional)</span>
+                                        {{ __('New Image') }} <span class="text-muted">({{ __('Optional') }})</span>
                                     </label>
                                     <input type="file" 
                                            class="form-control @error('image') is-invalid @enderror" 
                                            name="image" 
                                            accept="image/jpeg,image/png,image/gif,image/webp"
                                            id="imageInput">
-                                    <small class="form-text text-muted">Leave empty to keep current image. Supported formats: JPG, PNG, GIF, WebP</small>
+                                    <small class="form-text text-muted">{{ __('Leave empty to keep current image. Supported formats: JPG, PNG, GIF, WebP') }}</small>
                                     <div id="fileInfo" class="mt-2 d-none">
                                         <small class="text-info">
                                             <span id="fileName"></span> (<span id="fileSize"></span>)
@@ -143,7 +143,7 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <div id="imagePreview" class="d-none">
-                                        <label class="form-label">New Image Preview:</label>
+                                        <label class="form-label">{{ __('New Image Preview:') }}</label>
                                         <div class="border rounded p-3">
                                             <img id="previewImg" src="" alt="Preview" class="img-fluid" style="max-height: 200px;">
                                         </div>
@@ -154,7 +154,7 @@
                             <!-- Translations -->
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Translations</label>
+                                    <label class="form-label">{{ __('Translations') }}</label>
                                     <div class="card border">
                                         <div class="card-body">
                                             @foreach($languages as $language)
@@ -197,10 +197,10 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="d-flex justify-content-end gap-2">
-                                        <a href="{{ route('admin.simple-images.index') }}" class="btn btn-secondary">
+                                        <a href="{{ route('admin.simple-images.index') }}" class="btn btn-secondary" title="{{ __('Cancel') }}">
                                             <i class="material-icons-outlined">arrow_back</i>
                                         </a>
-                                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                                        <button type="submit" class="btn btn-primary" id="submitBtn" title="{{ __('Update') }}">
                                             <i class="material-icons-outlined">save</i>
                                         </button>
                                     </div>

@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
 
-@section('title', 'Certificates')
+@section('title', __('Certificates'))
 
 @section('content')
 <div class="page-body">
@@ -8,7 +8,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Certificates</h3>
+                    <h3>{{ __('Certificates') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -17,7 +17,7 @@
                                 <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active">Certificates</li>
+                        <li class="breadcrumb-item active">{{ __('Certificates') }}</li>
                     </ol>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Certificates</h5>
+                            <h5>{{ __('Certificates') }}</h5>
                             <a href="{{ route('admin.certificates.create') }}" class="btn btn-primary">
                                 <i class="material-icons-outlined">add</i>
                             </a>
@@ -53,12 +53,12 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th width="50">Order</th>
-                                        <th width="100">Image</th>
-                                        <th>Title</th>
-                                        <th>Date</th>
-                                        <th width="80">Status</th>
-                                        <th width="150">Actions</th>
+                                        <th width="50">{{ __('Order') }}</th>
+                                        <th width="100">{{ __('Image') }}</th>
+                                        <th>{{ __('Title') }}</th>
+                                        <th>{{ __('Date') }}</th>
+                                        <th width="80">{{ __('Status') }}</th>
+                                        <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sortable-certificates">
@@ -81,7 +81,7 @@
                                             </td>
                                             <td>
                                                 @if($certificate->image_url)
-                                                    <img src="{{ $certificate->image_url }}" alt="Certificate Image" class="img-thumbnail" style="width: 80px; height: 60px; object-fit: cover;">
+                                                    <img src="{{ $certificate->image_url }}" alt="{{ __('Certificate Image') }}" class="img-thumbnail" style="width: 80px; height: 60px; object-fit: cover;">
                                                 @else
                                                     <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 60px;">
                                                         <i class="material-icons-outlined text-muted">image</i>
@@ -89,7 +89,7 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                {{ $firstTranslation ? $firstTranslation->title : 'No translation' }}
+                                                {{ $firstTranslation ? $firstTranslation->title : __('No translation') }}
                                             </td>
                                             <td>
                                                 {{ $certificate->date }}
@@ -97,9 +97,9 @@
                                          
                                             <td>
                                                 @if($certificate->status)
-                                                    <span class="badge bg-success">Active</span>
+                                                    <span class="badge bg-success">{{ __('Active') }}</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Inactive</span>
+                                                    <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -108,7 +108,7 @@
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : 'Certificate #' . $certificate->id }}"
+                                                            data-title="{{ $firstTranslation ? $firstTranslation->title : __('Certificate #:id', ['id' => $certificate->id]) }}"
                                                             data-url="{{ route('admin.certificates.destroy', $certificate) }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
@@ -120,7 +120,7 @@
                                             <td colspan="7" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">certificate</i>
-                                                    <p class="mt-2">No certificates found</p>
+                                                    <p class="mt-2">{{ __('No certificates found') }}</p>
                                                     <a href="{{ route('admin.certificates.create') }}" class="btn btn-primary">
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>
@@ -193,16 +193,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (data.success) {
                         Swal.fire({
-                            title: 'Success!',
-                            text: 'Certificates reordered successfully!',
+                            title: '{{ __("Success!") }}',
+                            text: '{{ __("Certificates reordered successfully!") }}',
                             icon: 'success',
                             timer: 1500,
                             showConfirmButton: false
                         });
                     } else {
                         Swal.fire({
-                            title: 'Error!',
-                            text: data.message || 'Failed to reorder certificates',
+                            title: '{{ __("Error!") }}',
+                            text: data.message || '{{ __("Failed to reorder certificates") }}',
                             icon: 'error'
                         });
                     }
@@ -221,13 +221,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
 
             Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to delete "${title}"?`,
+                title: '{{ __("Are you sure?") }}',
+                text: '{{ __("Do you want to delete :title?", ["title" => ":title"]) }}'.replace(':title', title),
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonText: '{{ __("Yes, delete it!") }}',
+                cancelButtonText: '{{ __("Cancel") }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');

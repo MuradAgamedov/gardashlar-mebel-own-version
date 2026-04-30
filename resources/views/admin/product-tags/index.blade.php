@@ -110,18 +110,18 @@
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.product-tags.edit', $productTag) }}" 
                                                        class="btn btn-sm btn-outline-primary" 
-                                                       title="Edit">
+                                                       title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <form action="{{ route('admin.product-tags.destroy', $productTag) }}" 
                                                           method="POST" 
                                                           class="d-inline"
-                                                          onsubmit="return confirm('Are you sure you want to delete this tag?')">
+                                                          onsubmit="return confirm('{{ __('Are you sure you want to delete this tag?') }}')">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" 
                                                                 class="btn btn-sm btn-outline-danger" 
-                                                                title="Delete">
+                                                                title="{{ __('Delete') }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
                                                     </form>
@@ -133,9 +133,9 @@
                                             <td colspan="6" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">local_offer</i>
-                                                    <p class="mt-2">No product tags added yet</p>
+                                                    <p class="mt-2">{{ __('No product tags added yet') }}</p>
                                                     <a href="{{ route('admin.product-tags.create') }}" class="btn btn-primary">
-                                                        Add First Tag
+                                                        {{ __('Add First Tag') }}
                                                     </a>
                                                 </div>
                                             </td>
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const alert = document.createElement('div');
                         alert.className = 'alert alert-success alert-dismissible fade show';
                         alert.innerHTML = `
-                            Order updated successfully
+                            {{ __('Order updated successfully') }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         `;
                         document.querySelector('.container-fluid').insertBefore(alert, document.querySelector('.row'));
@@ -202,4 +202,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endpush 
+@endpush

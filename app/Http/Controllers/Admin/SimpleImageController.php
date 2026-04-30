@@ -77,14 +77,14 @@ class SimpleImageController extends Controller
                     UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.',
                 ];
                 
-                $errorMessage = $errorMessages[$file->getError()] ?? 'Unknown upload error occurred.';
-                return back()->withInput()->with('error', 'File upload failed: ' . $errorMessage);
+                $errorMessage = $errorMessages[$file->getError()] ?? __('Unknown upload error occurred.');
+                return back()->withInput()->with('error', __('File upload failed: :error', ['error' => $errorMessage]));
             }
 
             // Check file type manually
             $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
             if (!in_array($file->getMimeType(), $allowedTypes)) {
-                return back()->withInput()->with('error', 'Invalid file type. Please upload a JPG, PNG, GIF, or WebP image.');
+                return back()->withInput()->with('error', __('Invalid file type. Please upload a JPG, PNG, GIF, or WebP image.'));
             }
 
             try {
@@ -92,7 +92,7 @@ class SimpleImageController extends Controller
                 
                 if (!$imagePath) {
                     return back()->withInput()
-                        ->with('error', 'Failed to upload image. Please check server storage permissions and try again.');
+                        ->with('error', __('Failed to upload image. Please check server storage permissions and try again.'));
                 }
             } catch (\Exception $uploadException) {
                 // Log the specific upload error
@@ -104,7 +104,7 @@ class SimpleImageController extends Controller
                 ]);
                 
                 return back()->withInput()
-                    ->with('error', 'Image upload failed: ' . $uploadException->getMessage());
+                    ->with('error', __('Image upload failed: :error', ['error' => $uploadException->getMessage()]));
             }
 
             $simpleImage = SimpleImage::create([
@@ -123,12 +123,12 @@ class SimpleImageController extends Controller
             }
 
             return redirect()->route('admin.simple-images.index')
-                ->with('success', 'Image created successfully.');
+                ->with('success', __('Image created successfully.'));
 
         } catch (\Exception $e) {
             \Log::error('SimpleImage store error: ' . $e->getMessage());
             return back()->withInput()
-                ->with('error', 'Error creating image: ' . $e->getMessage());
+                ->with('error', __('Error creating image: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -179,14 +179,14 @@ class SimpleImageController extends Controller
                         UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.',
                     ];
                     
-                    $errorMessage = $errorMessages[$file->getError()] ?? 'Unknown upload error occurred.';
-                    return back()->withInput()->with('error', 'File upload failed: ' . $errorMessage);
+                    $errorMessage = $errorMessages[$file->getError()] ?? __('Unknown upload error occurred.');
+                    return back()->withInput()->with('error', __('File upload failed: :error', ['error' => $errorMessage]));
                 }
 
                 // Check file type manually
                 $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
                 if (!in_array($file->getMimeType(), $allowedTypes)) {
-                    return back()->withInput()->with('error', 'Invalid file type. Please upload a JPG, PNG, GIF, or WebP image.');
+                    return back()->withInput()->with('error', __('Invalid file type. Please upload a JPG, PNG, GIF, or WebP image.'));
                 }
 
                 // Delete old image
@@ -200,7 +200,7 @@ class SimpleImageController extends Controller
                     
                     if (!$imagePath) {
                         return back()->withInput()
-                            ->with('error', 'Failed to upload image. Please check server storage permissions and try again.');
+                            ->with('error', __('Failed to upload image. Please check server storage permissions and try again.'));
                     }
                 } catch (\Exception $uploadException) {
                     // Log the specific upload error
@@ -212,7 +212,7 @@ class SimpleImageController extends Controller
                     ]);
                     
                     return back()->withInput()
-                        ->with('error', 'Image upload failed: ' . $uploadException->getMessage());
+                        ->with('error', __('Image upload failed: :error', ['error' => $uploadException->getMessage()]));
                 }
                 
                 $data['image_path'] = $imagePath;
@@ -235,12 +235,12 @@ class SimpleImageController extends Controller
             }
 
             return redirect()->route('admin.simple-images.index')
-                ->with('success', 'Image updated successfully.');
+                ->with('success', __('Image updated successfully.'));
 
         } catch (\Exception $e) {
             \Log::error('SimpleImage update error: ' . $e->getMessage());
             return back()->withInput()
-                ->with('error', 'Error updating image: ' . $e->getMessage());
+                ->with('error', __('Error updating image: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -292,13 +292,13 @@ class SimpleImageController extends Controller
                     UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload.',
                 ];
                 
-                $errorMessage = $errorMessages[$file->getError()] ?? 'Unknown upload error occurred.';
-                return back()->withInput()->with('error', 'File upload failed: ' . $errorMessage);
+                $errorMessage = $errorMessages[$file->getError()] ?? __('Unknown upload error occurred.');
+                return back()->withInput()->with('error', __('File upload failed: :error', ['error' => $errorMessage]));
             }
 
             $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
             if (!in_array($file->getMimeType(), $allowedTypes)) {
-                return back()->withInput()->with('error', 'Invalid file type. Please upload a JPG, PNG, GIF, or WebP image.');
+                return back()->withInput()->with('error', __('Invalid file type. Please upload a JPG, PNG, GIF, or WebP image.'));
             }
 
             try {
@@ -306,7 +306,7 @@ class SimpleImageController extends Controller
                 
                 if (!$imagePath) {
                     return back()->withInput()
-                        ->with('error', 'Failed to upload image. Please check server storage permissions and try again.');
+                        ->with('error', __('Failed to upload image. Please check server storage permissions and try again.'));
                 }
             } catch (\Exception $uploadException) {
                 \Log::error('Image upload error in quick upload: ' . $uploadException->getMessage(), [
@@ -318,7 +318,7 @@ class SimpleImageController extends Controller
                 ]);
                 
                 return back()->withInput()
-                    ->with('error', 'Image upload failed: ' . $uploadException->getMessage());
+                    ->with('error', __('Image upload failed: :error', ['error' => $uploadException->getMessage()]));
             }
 
             // Find existing or create new
@@ -352,12 +352,12 @@ class SimpleImageController extends Controller
             }
 
             return redirect()->route('admin.simple-images.quick-upload', $keyword)
-                ->with('success', 'Image uploaded successfully for keyword: ' . $keyword);
+                ->with('success', __('Image uploaded successfully for keyword: :keyword', ['keyword' => $keyword]));
 
         } catch (\Exception $e) {
             \Log::error('SimpleImage quick upload error: ' . $e->getMessage());
             return back()->withInput()
-                ->with('error', 'Error uploading image: ' . $e->getMessage());
+                ->with('error', __('Error uploading image: :error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -375,10 +375,10 @@ class SimpleImageController extends Controller
             $simpleImage->delete();
             
             return redirect()->route('admin.simple-images.index')
-                ->with('success', 'Image deleted successfully.');
+                ->with('success', __('Image deleted successfully.'));
         } catch (\Exception $e) {
             \Log::error('SimpleImage destroy error: ' . $e->getMessage());
-            return back()->with('error', 'Error deleting image: ' . $e->getMessage());
+            return back()->with('error', __('Error deleting image: :error', ['error' => $e->getMessage()]));
         }
     }
 
