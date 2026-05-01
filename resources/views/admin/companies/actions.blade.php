@@ -89,9 +89,7 @@
                                             
                                             <div class="card-body d-flex flex-column">
                                                 <h6 class="card-title">{{ $mainTranslate->title ?? __('No Title') }}</h6>
-                                                <p class="card-text text-muted small flex-grow-1">
-                                                    {{ Str::limit($mainTranslate->description ?? __('No description'), 100) }}
-                                                </p>
+                                                
                                                 
                                                 <div class="mt-auto">
                                                     @if($isInAnyAction)
