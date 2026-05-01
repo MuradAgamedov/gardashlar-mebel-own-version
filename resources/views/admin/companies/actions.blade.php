@@ -69,7 +69,7 @@
                                                 <img src="{{ asset('storage/' . $mainImage->image) }}"
                                                     class="card-img-top"
                                                     alt="{{ $mainTranslate->image_alt_text ?? __('Product Image') }}"
-                                                    style="height: 200px; object-fit: cover;">
+                                                    style="height: 200px; object-fit: contain;">
                                             @else
                                                 <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
                                                     style="height: 200px;">
