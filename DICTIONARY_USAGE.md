@@ -136,3 +136,7 @@ composer dump-autoload
 ```
 
 Artıq hər yerdə `dict()`, `dict_id()`, `dict_all()` funksiyalarını istifadə edə bilərsiniz!
+
+---
+
+Copyright © {{ date('Y') }} Gardashlar MMC. Bütün hüquqlar qorunur.

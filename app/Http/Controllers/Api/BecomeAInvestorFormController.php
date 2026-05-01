@@ -34,7 +34,7 @@ class BecomeAInvestorFormController extends Controller
                 'mobile' => 'required|string|max:20',
                 'email' => 'required|email|max:255',
                 'message' => 'required|string|max:1000',
-                'file' => 'nullable|file|max:10240|mimes:pdf,doc,docx'
+                'file' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx,txt'
             ], [
                 'name.required' => 'Name is required',
                 'mobile.required' => 'Mobile number is required',
@@ -42,7 +42,7 @@ class BecomeAInvestorFormController extends Controller
                 'email.email' => 'Please enter a valid email address',
                 'message.required' => 'Message is required',
                 'file.max' => 'File size must not exceed 10MB',
-                'file.mimes' => 'File must be PDF, DOC, or DOCX format'
+                'file.mimes' => 'File must be PDF, DOC, DOCX, XLS, XLSX, or TXT format'
             ]);
 
             if ($validator->fails()) {
@@ -58,7 +58,14 @@ class BecomeAInvestorFormController extends Controller
             // Handle file upload
             $filePath = null;
             if ($request->hasFile('file')) {
-                $filePath = $this->fileService->upload($request->file('file'), 'become-a-investor-forms');
+                $filePath = $this->fileService->upload(
+                    $request->file('file'),
+                    'become-a-investor-forms',
+                    [
+                        'generate_unique_name' => false,
+                        'allowed_types' => ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt'],
+                    ]
+                );
             }
 
             // Create form submission

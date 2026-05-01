@@ -5,6 +5,7 @@
     "Çıxış": "Logout",
     "Çıxış etmək istədiyinizə əminsiniz?": "Are you sure you want to logout?",
     "Bütün hüquqlar qorunur.": "All rights reserved.",
+    "Copyright": "Copyright {{ date('Y') }} © Gardashlar LLC.",
     "Clear Cache": "Clear Cache",
     "Search menu...": "Search menu...",
     "General": "General",
