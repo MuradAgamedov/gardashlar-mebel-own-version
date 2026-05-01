@@ -125,7 +125,7 @@
                                                 <td>
                                                     <div class="d-flex gap-2">
                                                         <a href="{{ route('admin.faqs.edit', $faq) }}" 
-                                                           class="btn btn-sm btn-outline-primary">
+                                                           class="btn btn-sm btn-outline-primary" title="{{ __('Edit') }}">
                                                             <i class="material-icons-outlined">edit</i>
                                                         </a>
                                                         <button type="button" 

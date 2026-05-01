@@ -52,13 +52,11 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Images for: {{ $news_post->title ?? 'News Post #' . $news_post->id }}</h5>
                             <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal" title="{{ __('Add Image') }}">
                                     <i class="material-icons-outlined">add</i>
-                                    Add Image
                                 </button>
-                                <a href="{{ route('admin.news-posts.edit', $news_post) }}" class="btn btn-secondary">
+                                <a href="{{ route('admin.news-posts.edit', $news_post) }}" class="btn btn-secondary" title="{{ __('Back to Post') }}">
                                     <i class="material-icons-outlined">arrow_back</i>
-                                    Back to Post
                                 </a>
                             </div>
                         </div>

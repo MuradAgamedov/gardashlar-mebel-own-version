@@ -106,9 +106,8 @@
                                             </td>
                                             <td>
                                                 @if($report->pdf_url)
-                                                    <a href="{{ $report->pdf_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <a href="{{ $report->pdf_url }}" target="_blank" class="btn btn-sm btn-outline-primary" title="{{ __('View PDF') }}">
                                                         <i class="material-icons-outlined">file_present</i>
-                                                        {{ __('View PDF') }}
                                                     </a>
                                                 @else
                                                     <span class="text-muted">{{ __('No PDF') }}</span>

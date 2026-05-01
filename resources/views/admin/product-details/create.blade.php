@@ -38,8 +38,8 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Add New Detail for: <strong>{{ $product->translate()->title ?? 'Product' }}</strong></h5>
-                            <a href="{{ route('admin.products.details.index', $product) }}" class="btn btn-outline-secondary">
-                                <i class="material-icons-outlined">arrow_back</i> Back to Details
+                            <a href="{{ route('admin.products.details.index', $product) }}" class="btn btn-outline-secondary" title="{{ __('Back to Details') }}">
+                                <i class="material-icons-outlined">arrow_back</i>
                             </a>
                         </div>
                     </div>

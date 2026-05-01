@@ -10,17 +10,17 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title">{{ __('Vacancy Form Details') }}</h3>
                     <div>
-                        <a href="{{ route('admin.vacancy-forms.index') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> {{ __('Back to List') }}
+                        <a href="{{ route('admin.vacancy-forms.index') }}" class="btn btn-secondary" title="{{ __('Back to List') }}">
+                            <i class="fas fa-arrow-left"></i>
                         </a>
                         @if($form->is_read)
                             <form method="POST" action="{{ route('admin.vacancy-forms.mark-unread', $form->id) }}" 
                                   style="display: inline;">
                                 @csrf
                                 @method('PATCH')
-                                <button type="submit" class="btn btn-warning" 
+                                <button type="submit" class="btn btn-warning" title="{{ __('Mark as Unread') }}"
                                         onclick="return confirm('{{ __('Mark as unread?') }}')">
-                                    <i class="fas fa-envelope"></i> {{ __('Mark as Unread') }}
+                                    <i class="fas fa-envelope"></i>
                                 </button>
                             </form>
                         @else
@@ -28,9 +28,9 @@
                                   style="display: inline;">
                                 @csrf
                                 @method('PATCH')
-                                <button type="submit" class="btn btn-success" 
+                                <button type="submit" class="btn btn-success" title="{{ __('Mark as Read') }}"
                                         onclick="return confirm('{{ __('Mark as read?') }}')">
-                                    <i class="fas fa-check"></i> {{ __('Mark as Read') }}
+                                    <i class="fas fa-check"></i>
                                 </button>
                             </form>
                         @endif
@@ -121,8 +121,8 @@
                                 <div class="border p-3 rounded bg-light">
                                     <p><strong>{{ __('File:') }}</strong> {{ $form->file_name }}</p>
                                     <a href="{{ asset('storage/' . $form->file) }}" 
-                                       class="btn btn-primary">
-                                        <i class="fas fa-download"></i> {{ __('Download File') }}
+                                       class="btn btn-primary" title="{{ __('Download File') }}">
+                                        <i class="fas fa-download"></i>
                                     </a>
                                 </div>
                             </div>
@@ -136,15 +136,15 @@
                                       onsubmit="return confirm('{{ __('Are you sure you want to delete this form? This action cannot be undone.') }}')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="fas fa-trash"></i> 
+                                    <button type="submit" class="btn btn-danger" title="{{ __('Delete') }}">
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
                                 
                                 <div>
                                     <a href="mailto:{{ $form->email }}?subject=Re: Your Job Application" 
-                                       class="btn btn-info">
-                                        <i class="fas fa-reply"></i> 
+                                       class="btn btn-info" title="{{ __('Reply') }}">
+                                        <i class="fas fa-reply"></i>
                                     </a>
                                 </div>
                             </div>

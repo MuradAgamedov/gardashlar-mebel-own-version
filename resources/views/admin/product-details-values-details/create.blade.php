@@ -86,11 +86,11 @@
                         
                         <div class="card-footer">
                             <div class="d-flex justify-content-end gap-2">
-                                <a href="{{ route('admin.products.detail-values.details.index', [$product, $detailValue]) }}" class="btn btn-secondary">
-                                    Cancel
+                                <a href="{{ route('admin.products.detail-values.details.index', [$product, $detailValue]) }}" class="btn btn-outline-secondary" title="{{ __('Cancel') }}">
+                                    <i class="material-icons-outlined">cancel</i>
                                 </a>
-                                <button type="submit" class="btn btn-primary" id="submitBtn">
-                                    <i class="material-icons-outlined">save</i> Create Details
+                                <button type="submit" class="btn btn-primary" id="submitBtn" title="{{ __('Create Details') }}">
+                                    <i class="material-icons-outlined">save</i>
                                 </button>
                             </div>
                         </div>
@@ -207,8 +207,8 @@ function createLanguageTabs() {
                     <!-- Keyword & Value pairs will be added here -->
                 </div>
                 <div class="mt-3">
-                    <button type="button" class="btn btn-sm btn-primary" onclick="addKeywordValuePairForLanguage({{ $language->id }})">
-                        <i class="material-icons-outlined">add</i> Add Keyword & Value for {{ $language->lang_code }}
+                    <button type="button" class="btn btn-sm btn-primary" onclick="addKeywordValuePairForLanguage({{ $language->id }})" title="{{ __('Add Keyword & Value for :lang', ['lang' => $language->lang_code]) }}">
+                        <i class="material-icons-outlined">add</i>
                     </button>
                 </div>
             </div>

@@ -119,13 +119,11 @@
                             <div class="row mt-4">
                                 <div class="col-md-12">
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary" title="{{ __('Update Refund Policy') }}">
                                             <i class="material-icons-outlined">save</i>
-                                            Update Refund Policy
                                         </button>
-                                        <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">
+                                        <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary" title="{{ __('Cancel') }}">
                                             <i class="material-icons-outlined">cancel</i>
-                                            Cancel
                                         </a>
                                     </div>
                                 </div>

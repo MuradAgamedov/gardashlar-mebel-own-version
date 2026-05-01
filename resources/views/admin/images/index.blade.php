@@ -45,9 +45,8 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Images</h5>
-                            <a href="{{ route('admin.images.create') }}" class="btn btn-primary">
+                            <a href="{{ route('admin.images.create') }}" class="btn btn-primary" title="{{ __('Add Image') }}">
                                 <i class="material-icons-outlined">add</i>
-                                Add Image
                             </a>
                         </div>
                     </div>
@@ -115,9 +114,8 @@
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">image</i>
                                                     <p class="mt-2">No images found</p>
-                                                    <a href="{{ route('admin.images.create') }}" class="btn btn-primary">
+                                                    <a href="{{ route('admin.images.create') }}" class="btn btn-primary" title="{{ __('Add First Image') }}">
                                                         <i class="material-icons-outlined">add</i>
-                                                        Add First Image
                                                     </a>
                                                 </div>
                                             </td>

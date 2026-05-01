@@ -48,9 +48,8 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Address Types</h5>
-                            <a href="{{ route('admin.address-types.create') }}" class="btn btn-primary">
+                            <a href="{{ route('admin.address-types.create') }}" class="btn btn-primary" title="{{ __('Add Address Type') }}">
                                 <i class="material-icons-outlined">add</i>
-                                Add Address Type
                             </a>
                         </div>
                     </div>

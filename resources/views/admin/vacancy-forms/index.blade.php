@@ -18,7 +18,7 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control" name="search" 
                                            value="{{ request('search') }}" placeholder="{{ __('Search by name, email, mobile...') }}">
-                                    <button class="btn btn-outline-secondary" type="submit">
+                                    <button class="btn btn-outline-secondary" type="submit" title="{{ __('Search') }}">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
@@ -47,8 +47,8 @@
                             </form>
                         </div>
                         <div class="col-md-3">
-                            <a style="width: max-content" href="{{ route('admin.vacancy-forms.index') }}" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> 
+                            <a style="width: max-content" href="{{ route('admin.vacancy-forms.index') }}" class="btn btn-secondary" title="{{ __('Clear') }}">
+                                <i class="fas fa-times"></i>
                             </a>
                         </div>
                     </div>
@@ -86,8 +86,8 @@
                                         <td>
                                             @if($form->file)
                                                 <a target="_blank" href="{{ asset('storage/' . $form->file) }}" 
-                                                   class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-download"></i> {{ __('Download') }}
+                                                   class="btn btn-sm btn-outline-primary" title="{{ __('Download') }}">
+                                                    <i class="fas fa-download"></i>
                                                 </a>
                                             @else
                                                 <span class="text-muted">{{ __('No file') }}</span>
@@ -104,7 +104,7 @@
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <a href="{{ route('admin.vacancy-forms.show', $form->id) }}" 
-                                                   class="btn btn-sm btn-primary">
+                                                   class="btn btn-sm btn-primary" title="{{ __('View') }}">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                                 @if($form->is_read)
@@ -112,7 +112,7 @@
                                                           style="display: inline;">
                                                         @csrf
                                                         @method('PATCH')
-                                                        <button type="submit" class="btn btn-sm btn-warning" 
+                                                        <button type="submit" class="btn btn-sm btn-warning" title="{{ __('Mark as Unread') }}"
                                                                 onclick="return confirm('{{ __('Mark as unread?') }}')">
                                                             <i class="fas fa-envelope"></i>
                                                         </button>
@@ -122,7 +122,7 @@
                                                           style="display: inline;">
                                                         @csrf
                                                         @method('PATCH')
-                                                        <button type="submit" class="btn btn-sm btn-success" 
+                                                        <button type="submit" class="btn btn-sm btn-success" title="{{ __('Mark as Read') }}"
                                                                 onclick="return confirm('{{ __('Mark as read?') }}')">
                                                             <i class="fas fa-check"></i>
                                                         </button>
@@ -133,7 +133,7 @@
                                                       onsubmit="return confirm('{{ __('Are you sure you want to delete this form?') }}')">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="{{ __('Delete') }}">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>

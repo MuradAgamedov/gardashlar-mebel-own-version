@@ -127,11 +127,11 @@
                         
                         <div class="card-footer">
                             <div class="d-flex justify-content-end gap-2">
-                                <a href="{{ route('admin.products.detail-values.details.index', [$product, $detailValue]) }}" class="btn btn-secondary">
-                                    Cancel
+                                <a href="{{ route('admin.products.detail-values.details.index', [$product, $detailValue]) }}" class="btn btn-outline-secondary" title="{{ __('Cancel') }}">
+                                    <i class="material-icons-outlined">cancel</i>
                                 </a>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="material-icons-outlined">save</i> Update Detail
+                                <button type="submit" class="btn btn-primary" title="{{ __('Update Detail') }}">
+                                    <i class="material-icons-outlined">save</i>
                                 </button>
                             </div>
                         </div>

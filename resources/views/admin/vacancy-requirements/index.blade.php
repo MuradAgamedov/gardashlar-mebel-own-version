@@ -64,14 +64,12 @@
                                     @endforeach
                                 </select>
                                 @if(request('vacancy_id'))
-                                    <a href="{{ route('admin.vacancy-requirements.create-for-vacancy', request('vacancy_id')) }}" class="btn btn-primary">
+                                    <a href="{{ route('admin.vacancy-requirements.create-for-vacancy', request('vacancy_id')) }}" class="btn btn-primary" title="{{ __('Add New Requirement') }}">
                                         <i class="material-icons-outlined">add</i>
-                                        Add New Requirement
                                     </a>
                                 @else
-                                    <a href="{{ route('admin.vacancy-requirements.create') }}" class="btn btn-primary">
+                                    <a href="{{ route('admin.vacancy-requirements.create') }}" class="btn btn-primary" title="{{ __('Add New Requirement') }}">
                                         <i class="material-icons-outlined">add</i>
-                                        Add New Requirement
                                     </a>
                                 @endif
                             </div>
@@ -130,14 +128,15 @@
                                             <td>
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.vacancy-requirements.edit', $requirement) }}" 
-                                                       class="btn btn-sm btn-outline-primary">
+                                                       class="btn btn-sm btn-outline-primary" title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" 
                                                             class="btn btn-sm btn-outline-danger delete-requirement-btn" 
                                                             data-requirement-id="{{ $requirement->id }}"
                                                             data-requirement-title="{{ $mainTranslation->title ?? 'N/A' }}"
-                                                            data-delete-url="{{ route('admin.vacancy-requirements.destroy', $requirement) }}">
+                                                            data-delete-url="{{ route('admin.vacancy-requirements.destroy', $requirement) }}"
+                                                            title="{{ __('Delete') }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
                                                 </div>

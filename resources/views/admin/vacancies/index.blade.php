@@ -48,9 +48,8 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>{{ __('All Vacancies') }}</h5>
-                            <a href="{{ route('admin.vacancies.create') }}" class="btn btn-primary">
+                            <a href="{{ route('admin.vacancies.create') }}" class="btn btn-primary" title="{{ __('Add New Vacancy') }}">
                                 <i class="material-icons-outlined">add</i>
-                                {{ __('Add New Vacancy') }}
                             </a>
                         </div>
                     </div>
@@ -137,14 +136,15 @@
                                                         <i class="material-icons-outlined">add</i>
                                                     </a>
                                                     <a href="{{ route('admin.vacancies.edit', $vacancy) }}" 
-                                                       class="btn btn-sm btn-outline-primary">
+                                                       class="btn btn-sm btn-outline-primary" title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" 
                                                             class="btn btn-sm btn-outline-danger delete-vacancy-btn" 
                                                             data-vacancy-id="{{ $vacancy->id }}"
                                                             data-vacancy-title="{{ $mainTranslation->title ?? __('N/A') }}"
-                                                            data-delete-url="{{ route('admin.vacancies.destroy', $vacancy) }}">">
+                                                            data-delete-url="{{ route('admin.vacancies.destroy', $vacancy) }}"
+                                                            title="{{ __('Delete') }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
                                                 </div>

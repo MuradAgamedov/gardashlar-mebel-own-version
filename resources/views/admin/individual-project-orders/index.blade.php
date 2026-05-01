@@ -153,7 +153,7 @@
                                                 <td>
                                                     <div class="btn-group" role="group">
                                                         <a href="{{ route('admin.individual-project-orders.edit', $order->id) }}" 
-                                                           class="btn btn-sm btn-outline-primary">
+                                                           class="btn btn-sm btn-outline-primary" title="{{ __('Edit') }}">
                                                             <i class="material-icons-outlined">edit</i>
                                                         </a>
                                                         <button type="button" 

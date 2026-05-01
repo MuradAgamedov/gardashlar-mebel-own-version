@@ -44,7 +44,7 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>{{ __('Slider List') }}</h5>
-                            <a href="{{ route('admin.why-choose-us-sliders.create') }}" class="btn btn-primary">
+                            <a href="{{ route('admin.why-choose-us-sliders.create') }}" class="btn btn-primary" title="{{ __('Add New Slider') }}">
                                 <i class="material-icons-outlined">add</i>
                             </a>
                         </div>
@@ -126,7 +126,7 @@
                                 <i class="material-icons-outlined text-muted" style="font-size: 64px;">image</i>
                                 <h5 class="mt-3 text-muted">{{ __('No sliders found') }}</h5>
                                 <p class="text-muted">{{ __('Create your first slider to get started.') }}</p>
-                                <a href="{{ route('admin.why-choose-us-sliders.create') }}" class="btn btn-primary">
+                                <a href="{{ route('admin.why-choose-us-sliders.create') }}" class="btn btn-primary" title="{{ __('Add New Slider') }}">
                                     <i class="material-icons-outlined">add</i>
                                 </a>
                             </div>

@@ -148,13 +148,11 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary" title="{{ __('Update Image') }}">
                                             <i class="material-icons-outlined">save</i>
-                                            Update Image
                                         </button>
-                                        <a href="{{ route('admin.images.index') }}" class="btn btn-secondary">
+                                        <a href="{{ route('admin.images.index') }}" class="btn btn-secondary" title="{{ __('Cancel') }}">
                                             <i class="material-icons-outlined">cancel</i>
-                                            Cancel
                                         </a>
                                     </div>
                                 </div>

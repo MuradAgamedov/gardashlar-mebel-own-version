@@ -45,11 +45,11 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>Detail Information</h5>
                             <div class="d-flex gap-2">
-                                <a href="{{ route('admin.products.detail-values.details.edit', [$product, $detailValue, $detail]) }}" class="btn btn-outline-primary">
-                                    <i class="material-icons-outlined">edit</i> Edit
+                                <a href="{{ route('admin.products.detail-values.details.edit', [$product, $detailValue, $detail]) }}" class="btn btn-outline-primary" title="{{ __('Edit') }}">
+                                    <i class="material-icons-outlined">edit</i>
                                 </a>
-                                <a href="{{ route('admin.products.detail-values.details.index', [$product, $detailValue]) }}" class="btn btn-outline-secondary">
-                                    <i class="material-icons-outlined">arrow_back</i> Back
+                                <a href="{{ route('admin.products.detail-values.details.index', [$product, $detailValue]) }}" class="btn btn-outline-secondary" title="{{ __('Back') }}">
+                                    <i class="material-icons-outlined">arrow_back</i>
                                 </a>
                             </div>
                         </div>

@@ -124,9 +124,8 @@
                             <div class="row mt-4">
                                 <div class="col-12">
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary" title="{{ __('Update Image') }}">
                                             <i class="material-icons-outlined">save</i>
-                                            Update Image
                                         </button>
                                         <a href="{{ route('admin.products.images.index', $product) }}" class="btn btn-secondary">
                                             <i class="material-icons-outlined">arrow_back</i>

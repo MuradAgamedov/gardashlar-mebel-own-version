@@ -83,9 +83,8 @@
                                             </div>
                                             @if($image->is_main_image)
                                                 <div class="position-absolute top-0 end-0 m-2">
-                                                    <span class="badge bg-warning">
+                                                    <span class="badge bg-warning" title="{{ __('Main') }}">
                                                         <i class="material-icons-outlined" style="font-size: 12px;">star</i>
-                                                        Main
                                                     </span>
                                                 </div>
                                             @endif

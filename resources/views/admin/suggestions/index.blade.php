@@ -163,12 +163,13 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-2">
-                                                    <a href="{{ route('admin.suggestions.edit', $suggestion) }}" class="btn btn-sm btn-warning">
+                                                    <a href="{{ route('admin.suggestions.edit', $suggestion) }}" class="btn btn-sm btn-warning" title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
                                                             data-title="{{ $firstTranslation ? $firstTranslation->title : __('Suggestion #') . $suggestion->id }}"
-                                                            data-url="{{ route('admin.suggestions.destroy', $suggestion) }}">
+                                                            data-url="{{ route('admin.suggestions.destroy', $suggestion) }}"
+                                                            title="{{ __('Delete') }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
                                                 </div>

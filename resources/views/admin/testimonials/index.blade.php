@@ -122,12 +122,13 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-2">
-                                                    <a href="{{ route('admin.testimonials.edit', $testimonial) }}" class="btn btn-sm btn-warning">
+                                                    <a href="{{ route('admin.testimonials.edit', $testimonial) }}" class="btn btn-sm btn-warning" title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
                                                     <button type="button" class="btn btn-sm btn-danger delete-btn" 
                                                             data-title="{{ $firstTranslation ? $firstTranslation->full_name : __('Testimonial') . ' #' . $testimonial->id }}"
-                                                            data-url="{{ route('admin.testimonials.destroy', $testimonial) }}">
+                                                            data-url="{{ route('admin.testimonials.destroy', $testimonial) }}"
+                                                            title="{{ __('Delete') }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
                                                 </div>

@@ -142,7 +142,7 @@
                                                             <i class="material-icons-outlined">inventory</i>
                                                         </a>
                                                         <a href="{{ route('admin.campaigns.edit', $company->id) }}" 
-                                                           class="btn btn-sm btn-outline-primary">
+                                                           class="btn btn-sm btn-outline-primary" title="{{ __('Edit') }}">
                                                             <i class="material-icons-outlined">edit</i>
                                                         </a>
                                                         <button type="button" 

@@ -68,8 +68,8 @@
                                             <td>{{ Str::limit($form->message, 50) }}</td>
                                             <td>
                                                 @if($form->file)
-                                                    <a href="{{ asset('storage/'.$form->file) }}" target="_blank" class="btn btn-sm btn-info">
-                                                        <i class="material-icons-outlined">download</i> {{ __('File') }}
+                                                    <a href="{{ asset('storage/'.$form->file) }}" target="_blank" class="btn btn-sm btn-info" title="{{ __('Download File') }}">
+                                                        <i class="material-icons-outlined">download</i>
                                                     </a>
                                                 @else
                                                     <span class="text-muted">{{ __('No file') }}</span>
@@ -85,15 +85,15 @@
                                             <td>{{ $form->created_at->format('d.m.Y H:i') }}</td>
                                             <td>
                                                 <div class="d-flex gap-2">
-                                                    <a href="{{ route('admin.suggestions-complaints-forms.show', $form->id) }}" class="btn btn-sm btn-primary">
+                                                    <a href="{{ route('admin.suggestions-complaints-forms.show', $form->id) }}" class="btn btn-sm btn-primary" title="{{ __('View') }}">
                                                         <i class="material-icons-outlined">visibility</i>
                                                     </a>
                                                     @if(!$form->is_read)
-                                                        <button type="button" class="btn btn-sm btn-success mark-as-read" data-id="{{ $form->id }}">
+                                                        <button type="button" class="btn btn-sm btn-success mark-as-read" data-id="{{ $form->id }}" title="{{ __('Mark as Read') }}">
                                                             <i class="material-icons-outlined">mark_email_read</i>
                                                         </button>
                                                     @endif
-                                                    <button type="button" class="btn btn-sm btn-danger delete-btn" data-id="{{ $form->id }}">
+                                                    <button type="button" class="btn btn-sm btn-danger delete-btn" data-id="{{ $form->id }}" title="{{ __('Delete') }}">
                                                         <i class="material-icons-outlined">delete</i>
                                                     </button>
                                                 </div>

@@ -188,13 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        Swal.fire({
-                            title: '{{ __("Success!") }}',
-                            text: '{{ __("KIV categories reordered successfully!") }}',
-                            icon: 'success',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
+                        // Reordered successfully (silent)
                     } else {
                         Swal.fire({
                             title: '{{ __("Error!") }}',
