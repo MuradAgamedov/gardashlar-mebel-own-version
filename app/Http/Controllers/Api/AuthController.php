@@ -856,7 +856,7 @@ class AuthController extends Controller
                 'surname' => 'sometimes|required|string|max:255',
                 'phone' => 'sometimes|nullable|string|max:20',
                 'email' => 'sometimes|nullable|email|unique:users,email,' . $user->id,
-                'fin' => "nullable"
+                'fin' => 'nullable|string|unique:users,fin,' . $user->id
             ], [
                 'name.required' => 'Ad məcburidir',
                 'name.string' => 'Ad mətn formatında olmalıdır',
@@ -868,6 +868,8 @@ class AuthController extends Controller
                 'phone.max' => 'Telefon nömrəsi 20 simvoldan çox ola bilməz',
                 'email.email' => 'Düzgün email ünvanı daxil edin',
                 'email.unique' => 'Bu email ünvanı artıq istifadə olunub',
+                'fin.string' => 'FIN mətn formatında olmalıdır',
+                'fin.unique' => 'Bu FIN artıq istifadə olunub',
             ]);
 
             if ($validator->fails()) {
