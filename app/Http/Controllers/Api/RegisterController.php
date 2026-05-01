@@ -96,7 +96,7 @@ class RegisterController extends Controller
         if ($existingUser) {
             return response()->json([
                 'success' => false,
-                'message' => __('User already exists'),
+                'message' => 'user_already_exists',
                 'data' => [
                     'error' => __('A user with this email already exists')
                 ]
