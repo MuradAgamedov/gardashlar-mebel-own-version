@@ -106,13 +106,11 @@
                             <div class="row mt-4">
                                 <div class="col-md-12">
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary" title="{{ __('Create Slider') }}">
                                             <i class="material-icons-outlined">save</i>
-                                            {{ __('Create Slider') }}
                                         </button>
-                                        <a href="{{ route('admin.why-choose-us-sliders.index') }}" class="btn btn-secondary">
+                                        <a href="{{ route('admin.why-choose-us-sliders.index') }}" class="btn btn-secondary" title="{{ __('Cancel') }}">
                                             <i class="material-icons-outlined">cancel</i>
-                                            {{ __('Cancel') }}
                                         </a>
                                     </div>
                                 </div>

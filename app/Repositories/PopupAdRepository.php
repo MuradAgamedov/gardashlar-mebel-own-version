@@ -104,9 +104,9 @@ class PopupAdRepository
         });
     }
 
-    public function reorder(array $order)
+    public function reorder(array $items)
     {
-        foreach ($order as $id => $index) {
+        foreach ($items as $index => $id) {
             $this->popupAd->where('id', $id)->update(['order' => $index]);
         }
     }

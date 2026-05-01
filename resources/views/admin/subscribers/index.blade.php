@@ -3,124 +3,148 @@
 @section('title', __('Subscribers'))
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">{{ __('Subscribers') }}</h4>
-                    <p class="card-title-desc">{{ __('Manage newsletter subscribers') }}</p>
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>{{ __('Subscribers') }}</h3>
                 </div>
-                <div class="card-body">
-                    
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('admin.dashboard') }}">
+                                <i class="material-icons-outlined">home</i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ __('Subscribers') }}</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    <!-- Search and Actions -->
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <form method="GET" action="{{ route('admin.subscribers.index') }}" class="d-flex">
-                                <input type="text" 
-                                       name="search" 
-                                       class="form-control me-2" 
-                                       placeholder="{{ __('Search by email...') }}" 
-                                       value="{{ request('search') }}">
-                                <button type="submit" class="btn btn-primary">{{ __('Search') }}</button>
-                                @if(request('search'))
-                                    <a href="{{ route('admin.subscribers.index') }}" class="btn btn-secondary ms-2">{{ __('Clear') }}</a>
-                                @endif
-                            </form>
-                        </div>
-                        <div class="col-md-6 text-end">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>{{ __('Subscribers List') }}</h5>
                             <span class="badge bg-info">{{ __('Total: :count subscribers', ['count' => $subscribers->total()]) }}</span>
                         </div>
                     </div>
+                    <div class="card-body">
+                        
+                        @if(session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="material-icons-outlined">check_circle</i>
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
 
-                    <!-- Bulk Actions -->
-                    @if($subscribers->count() > 0)
-                    <form id="bulkForm" method="POST" action="{{ route('admin.subscribers.bulk-delete') }}">
-                        @csrf
-                        <div class="row mb-3">
+                        @if(session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="material-icons-outlined">error</i>
+                                {{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+
+                        <!-- Search and Actions -->
+                        <div class="row mb-4">
                             <div class="col-md-6">
-                                <button type="button" class="btn btn-danger" onclick="confirmBulkDelete()">
-                                    <i class="fas fa-trash"></i> 
-                                </button>
+                                <form method="GET" action="{{ route('admin.subscribers.index') }}" class="d-flex">
+                                    <div class="input-group">
+                                        <input type="text" 
+                                               name="search" 
+                                               class="form-control" 
+                                               placeholder="{{ __('Search by email...') }}" 
+                                               value="{{ request('search') }}">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="material-icons-outlined">search</i>
+                                        </button>
+                                        @if(request('search'))
+                                            <a href="{{ route('admin.subscribers.index') }}" class="btn btn-secondary">
+                                                <i class="material-icons-outlined">close</i>
+                                            </a>
+                                        @endif
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                @if($subscribers->count() > 0)
+                                    <button type="button" class="btn btn-danger" onclick="confirmBulkDelete()" title="{{ __('Delete Selected') }}">
+                                        <i class="material-icons-outlined">delete_sweep</i>
+                                    </button>
+                                @endif
                             </div>
                         </div>
-                    @endif
 
-                    <!-- Subscribers Table -->
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>
-                                        @if($subscribers->count() > 0)
-                                        <input type="checkbox" id="selectAll" onchange="toggleAll()">
-                                        @endif
-                                    </th>
-                                    <th>{{ __('Email') }}</th>
-                                    <th>{{ __('Subscribed At') }}</th>
-                                    <th>{{ __('Actions') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($subscribers as $subscriber)
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" name="subscriber_ids[]" value="{{ $subscriber->id }}" class="subscriber-checkbox">
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-envelope text-primary me-2"></i>
-                                        {{ $subscriber->email }}
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-calendar text-muted me-2"></i>
-                                        {{ $subscriber->created_at->format('M d, Y H:i') }}
-                                    </td>
-                                    <td>
-                                        <button type="button" 
-                                                class="btn btn-danger btn-sm" 
-                                                onclick="confirmDelete({{ $subscriber->id }}, '{{ $subscriber->email }}')">
-                                            <i class="fas fa-trash"></i> 
-                                        </button>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="4" class="text-center py-4">
-                                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                        <h5 class="text-muted">{{ __('No subscribers found') }}</h5>
-                                        <p class="text-muted">{{ __('No email subscribers have been registered yet.') }}</p>
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                        <!-- Subscribers Table -->
+                        <div class="table-responsive">
+                            @if($subscribers->count() > 0)
+                            <form id="bulkForm" method="POST" action="{{ route('admin.subscribers.bulk-delete') }}">
+                                @csrf
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th width="50">
+                                                <input type="checkbox" id="selectAll" onchange="toggleAll()" class="form-check-input">
+                                            </th>
+                                            <th>{{ __('Email') }}</th>
+                                            <th>{{ __('Subscribed At') }}</th>
+                                            <th width="150" class="text-end">{{ __('Actions') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($subscribers as $subscriber)
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" name="subscriber_ids[]" value="{{ $subscriber->id }}" class="subscriber-checkbox form-check-input">
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="material-icons-outlined text-primary me-2">email</i>
+                                                    {{ $subscriber->email }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="material-icons-outlined text-muted me-2">calendar_today</i>
+                                                    {{ $subscriber->created_at->format('M d, Y H:i') }}
+                                                </div>
+                                            </td>
+                                            <td class="text-end">
+                                                <button type="button" 
+                                                        class="btn btn-outline-danger btn-sm" 
+                                                        onclick="confirmDelete({{ $subscriber->id }}, '{{ $subscriber->email }}')">
+                                                    <i class="material-icons-outlined">delete</i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </form>
+                            @else
+                                <div class="text-center py-5">
+                                    <i class="material-icons-outlined text-muted" style="font-size: 4rem;">inbox</i>
+                                    <h5 class="mt-3 text-muted">{{ __('No subscribers found') }}</h5>
+                                    <p class="text-muted">{{ __('No email subscribers have been registered yet.') }}</p>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Pagination -->
+                        @if($subscribers->hasPages())
+                        <div class="d-flex justify-content-center mt-4">
+                            {{ $subscribers->appends(request()->query())->links() }}
+                        </div>
+                        @endif
+
                     </div>
-
-                    @if($subscribers->count() > 0)
-                    </form>
-                    @endif
-
-                    <!-- Pagination -->
-                    @if($subscribers->hasPages())
-                    <div class="d-flex justify-content-center mt-4">
-                        {{ $subscribers->appends(request()->query())->links() }}
-                    </div>
-                    @endif
-
                 </div>
             </div>
         </div>
@@ -138,7 +162,6 @@
             <div class="modal-body">
                 <p>{{ __('Are you sure you want to delete this subscriber?') }}</p>
                 <p><strong>{{ __('Email:') }}</strong> <span id="subscriberEmail"></span></p>
-                <p class="text-danger">{{ __('This action cannot be undone.') }}</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
@@ -162,7 +185,6 @@
             </div>
             <div class="modal-body">
                 <p>{{ __('Are you sure you want to delete the selected subscribers?') }}</p>
-                <p class="text-danger">{{ __('This action cannot be undone.') }}</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>

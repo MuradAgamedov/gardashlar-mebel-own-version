@@ -59,7 +59,6 @@
                                         <th>{{ __('Category') }}</th>
                                         <th>{{ __('Parent') }}</th>
                                         <th>{{ __('Status') }}</th>
-                                        <th>{{ __('Order') }}</th>
                                         <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
@@ -119,9 +118,6 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <span class="badge badge-light-info">{{ $homePageCategory->order }}</span>
-                                            </td>
-                                            <td>
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.home-page-categories.edit', $homePageCategory) }}" 
                                                        class="btn btn-sm btn-outline-primary" 
@@ -145,7 +141,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center py-4">
+                                            <td colspan="5" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">category</i>
                                                     <p class="mt-2">{{ __('No categories selected for home page') }}</p>

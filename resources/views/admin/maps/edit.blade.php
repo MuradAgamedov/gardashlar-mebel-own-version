@@ -14,7 +14,7 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
+                                <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
                         <li class="breadcrumb-item">
@@ -96,16 +96,7 @@
                                 </div>
                             </div>
 
-                            <!-- Order Info -->
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">{{ __('Current Order') }}</label>
-                                    <input type="text" class="form-control" value="{{ $map->order }}" readonly>
-                                    <small class="form-text text-muted">
-                                        {{ __('Order can be changed by dragging and dropping in the maps list.') }}
-                                    </small>
-                                </div>
-                            </div>
+
 
                             <!-- Submit Buttons -->
                             <div class="row">

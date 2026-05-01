@@ -14,7 +14,7 @@ class UpdateHomePageCategoryRequest extends FormRequest
     public function rules()
     {
         return [
-            'product_category_id' => 'required|exists:product_categories,id|unique:home_page_categories,product_category_id,' . $this->homePageCategory->id,
+            'product_category_id' => 'required|exists:product_categories,id|unique:home_page_categories,product_category_id,' . $this->route('home_page_category')->id,
             'status' => 'boolean'
         ];
     }

@@ -95,6 +95,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label">{{ __('Status') }}</label>
                                     <div class="form-check form-switch">
+                                        <input type="hidden" name="status" value="0">
                                         <input class="form-check-input" 
                                                type="checkbox" 
                                                id="status" 

@@ -208,13 +208,11 @@
                             <div class="row mt-4">
                                 <div class="col-md-12">
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary" title="{{ __('Update Testimonial') }}">
                                             <i class="material-icons-outlined">save</i>
-                                            {{ __('Update Testimonial') }}
                                         </button>
-                                        <a href="{{ route('admin.testimonials.index') }}" class="btn btn-secondary">
+                                        <a href="{{ route('admin.testimonials.index') }}" class="btn btn-secondary" title="{{ __('Cancel') }}">
                                             <i class="material-icons-outlined">cancel</i>
-                                            {{ __('Cancel') }}
                                         </a>
                                     </div>
                                 </div>

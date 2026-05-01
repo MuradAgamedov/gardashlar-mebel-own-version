@@ -75,8 +75,8 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     @if($homePageDiscount->bg_image)
+                                                        <label class="form-label">{{ __('Current Background Image:') }}</label>
                                                         <div class="current-image-container">
-                                                            <label class="form-label">{{ __('Current Background Image:') }}</label>
                                                             <img src="{{ app('App\Services\ImageService')->getUrl($homePageDiscount->bg_image) }}" 
                                                                  alt="{{ __('Current Background Image') }}" 
                                                                  class="img-fluid rounded" 
@@ -190,13 +190,11 @@
                             <div class="row mt-4">
                                 <div class="col-md-12">
                                     <div class="d-flex gap-2">
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-primary" title="{{ __('Update Home Page Discount') }}">
                                             <i class="material-icons-outlined">save</i>
-                                            {{ __('Update Home Page Discount') }}
                                         </button>
-                                        <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">
+                                        <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary" title="{{ __('Cancel') }}">
                                             <i class="material-icons-outlined">cancel</i>
-                                            {{ __('Cancel') }}
                                         </a>
                                     </div>
                                 </div>

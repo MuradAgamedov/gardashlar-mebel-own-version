@@ -14,7 +14,7 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
+                                <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
                         <li class="breadcrumb-item active">{{ __('Map Management') }}</li>
@@ -58,7 +58,6 @@
                                         <th width="50">#</th>
                                         <th>{{ __('Map') }}</th>
                                         <th>{{ __('Status') }}</th>
-                                        <th>{{ __('Order') }}</th>
                                         <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
@@ -93,7 +92,6 @@
                                                     <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
-                                            <td>{{ $map->order }}</td>
                                             <td>
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.maps.edit', $map) }}" class="btn btn-sm btn-warning">
@@ -109,7 +107,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="text-center py-4">
+                                            <td colspan="4" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">map</i>
                                                     <p class="mt-2">{{ __('No maps found') }}</p>

@@ -33,7 +33,7 @@ class HomePageCategoryController extends Controller
         try {
             $this->repository->createHomePageCategory([
                 'product_category_id' => $request->input('product_category_id'),
-                'status' => $request->boolean('status', true)
+                'status' => $request->boolean('status')
             ]);
 
             return redirect()->route('admin.home-page-categories.index')
@@ -60,7 +60,7 @@ class HomePageCategoryController extends Controller
         try {
             $this->repository->updateHomePageCategory($homePageCategory, [
                 'product_category_id' => $request->input('product_category_id'),
-                'status' => $request->boolean('status', true)
+                'status' => $request->boolean('status')
             ]);
 
             return redirect()->route('admin.home-page-categories.index')

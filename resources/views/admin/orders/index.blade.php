@@ -32,11 +32,11 @@
                             </select>
                         </div>
                         <div class="col-md-4 d-flex align-items-end">
-                            <div class="btn-group w-100">
-                                <button type="submit" class="btn btn-primary" title="{{ __('Filter') }}">
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-primary" title="{{ __('Filter') }}" style="width: 40px;">
                                     <i class="fas fa-filter"></i>
                                 </button>
-                                <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary" title="{{ __('Clear') }}">
+                                <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary" title="{{ __('Clear') }}" style="width: 40px;">
                                     <i class="fas fa-times"></i>
                                 </a>
                             </div>

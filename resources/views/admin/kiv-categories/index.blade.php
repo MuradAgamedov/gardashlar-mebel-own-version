@@ -14,7 +14,7 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('admin.dashboard') }}">
-                                <i class="material-icons-outlined">home</i> {{ __('Home') }}
+                                <i class="material-icons-outlined">home</i>
                             </a>
                         </li>
                         <li class="breadcrumb-item active">{{ __('KIV Categories') }}</li>

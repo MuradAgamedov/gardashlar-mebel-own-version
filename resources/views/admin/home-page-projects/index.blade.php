@@ -61,7 +61,6 @@
                                         <th>{{ __('Category') }}</th>
                                         <th>{{ __('Languages') }}</th>
                                         <th>{{ __('Status') }}</th>
-                                        <th>{{ __('Order') }}</th>
                                         <th width="150">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
@@ -119,7 +118,6 @@
                                                     <span class="badge bg-secondary">{{ __('Inactive') }}</span>
                                                 @endif
                                             </td>
-                                            <td>{{ $homePageProject->order }}</td>
                                             <td>
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.home-page-projects.edit', $homePageProject) }}" class="btn btn-sm btn-warning">
@@ -135,7 +133,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center py-4">
+                                            <td colspan="6" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="material-icons-outlined" style="font-size: 48px;">work</i>
                                                     <p class="mt-2">{{ __('No projects added to home page yet') }}</p>

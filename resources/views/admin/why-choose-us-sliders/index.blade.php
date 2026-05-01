@@ -165,14 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Show success message
-                        Swal.fire({
-                            icon: 'success',
-                            title: '{{ __("Order Updated!") }}',
-                            text: '{{ __("Slider order has been updated successfully.") }}',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
+                        // Order updated silently
                     } else {
                         console.error('Reorder failed:', data.message);
                     }
@@ -209,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Create and submit delete form
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = `{{ url('admin/why-choose-us-sliders') }}/${sliderId}`;
+                    form.action = '{{ route("admin.why-choose-us-sliders.destroy", ":id") }}'.replace(':id', sliderId);
                     
                     const csrfToken = document.createElement('input');
                     csrfToken.type = 'hidden';
