@@ -1,139 +1,110 @@
 @extends('admin.layout.app')
 
 @section('content')
-
-{{-- Bootstrap 5 CSS --}}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<style>
-.trash-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s ease, color 0.2s ease;
-}
-.trash-icon {
-    width: 18px;
-    height: 18px;
-    display: inline-block;
-    position: relative;
-}
-.trash-icon::before, .trash-icon::after {
-    content: '';
-    position: absolute;
-    background: #555;
-    transition: background 0.2s;
-}
-.trash-icon::before {
-    width: 12px;
-    height: 10px;
-    bottom: 0;
-    left: 3px;
-    border: 1.5px solid #555;
-    border-top: none;
-    border-radius: 1px 1px 2px 2px;
-}
-.trash-icon::after {
-    width: 12px;
-    height: 2px;
-    top: 0;
-    left: 3px;
-    border-radius: 2px;
-    background: #555;
-}
-.trash-icon span {
-    position: absolute;
-    top: 2px;
-    left: 8px;
-    width: 2px;
-    height: 6px;
-    background: #555;
-    border-radius: 1px;
-    transition: background 0.2s;
-}
-
-/* Hover efekti */
-.trash-btn:hover .trash-icon::before,
-.trash-btn:hover .trash-icon::after,
-.trash-btn:hover .trash-icon span {
-    background: #dc3545;
-    border-color: #dc3545;
-}
-.trash-btn:hover {
-    transform: scale(1.1);
-}
-</style>
-
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">{{ __('Users List') }}</h4>
-        <a href="{{ route('admin.registered-users.export') }}" class="btn btn-success btn-sm">
-            {{ __('Excel Export') }}
-        </a>
-
-    </div>
-
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('Close') }}"></button>
-        </div>
-    @endif
-
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <table class="table table-bordered table-striped align-middle mb-0">
-                <thead class="table-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>{{ __('Name') }}</th>
-                        <th>{{ __('Surname') }}</th>
-                        <th>{{ __('FIN') }}</th>
-                        <th>{{ __('Email') }}</th>
-                        <th>{{ __('Phone') }}</th>
-                        <th>{{ __('Created Date') }}</th>
-                        <th class="text-center">{{ __('Actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($users as $index => $user)
-                        <tr>
-                            <td>{{ $users->firstItem() + $index }}</td>
-                            <td>{{ $user->name ?: '-' }}</td>
-                            <td>{{ $user->surname ?: '-' }}</td>
-                            <td>{{ $user->fin ?: '-' }}</td>
-                            <td>{{ $user->email }}</td>
-                            <td>{{ $user->phone ?: '-' }}</td>
-                            <td>{{ $user->created_at?->format('d.m.Y H:i') ?: '-' }}</td>
-                            <td class="text-center">
-                                <form action="{{ route('admin.registered-users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure you want to delete this user?') }}');" style="display:inline-block;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="trash-btn" title="{{ __('Delete') }}">
-                                        <div class="trash-icon">
-                                            <span></span>
-                                        </div>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="text-center text-muted">{{ __('No users found') }}</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+<div class="page-body">
+    <div class="container-fluid">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-6">
+                    <h3>{{ __('Users') }}</h3>
+                </div>
+                <div class="col-6">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('admin.dashboard') }}">
+                                <i class="material-icons-outlined">home</i>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ __('Registered Users') }}</li>
+                    </ol>
+                </div>
+            </div>
         </div>
     </div>
+    <div class="container-fluid">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="material-icons-outlined">check_circle</i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
 
-    {{-- Pagination --}}
-    <div class="d-flex justify-content-center mt-3">
-        {{ $users->links('pagination::bootstrap-5') }}
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="material-icons-outlined">error</i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5>{{ __('Registered Users List') }}</h5>
+                            <a href="{{ route('admin.registered-users.export') }}" class="btn btn-success">
+                                <i class="material-icons-outlined">download</i>
+                                {{ __('Excel Export') }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if($users->count() > 0)
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th width="50">#</th>
+                                            <th>{{ __('Name') }}</th>
+                                            <th>{{ __('Surname') }}</th>
+                                            <th>{{ __('FIN') }}</th>
+                                            <th>{{ __('Email') }}</th>
+                                            <th>{{ __('Phone') }}</th>
+                                            <th>{{ __('Created Date') }}</th>
+                                            <th width="100">{{ __('Actions') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($users as $index => $user)
+                                            <tr>
+                                                <td>{{ $users->firstItem() + $index }}</td>
+                                                <td>{{ $user->name ?: '-' }}</td>
+                                                <td>{{ $user->surname ?: '-' }}</td>
+                                                <td>{{ $user->fin ?: '-' }}</td>
+                                                <td>{{ $user->email }}</td>
+                                                <td>{{ $user->phone ?: '-' }}</td>
+                                                <td>{{ $user->created_at?->format('d.m.Y H:i') ?: '-' }}</td>
+                                                <td>
+                                                    <form action="{{ route('admin.registered-users.destroy', $user->id) }}" method="POST" style="display:inline-block;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger" title="{{ __('Delete') }}" onclick="return confirm('{{ __('Are you sure you want to delete this user?') }}');">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                                <path d="M5.5 5.5A.5.5 0 0 1 6 5h4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5H6a.5.5 0 0 1-.5-.5v-7zM4.118 4 4 4.059V4h8v.059L11.882 4H4.118zM2.5 3h11a.5.5 0 0 1 0 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a.5.5 0 0 1 0-1z"/>
+                                                            </svg>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="d-flex justify-content-center mt-3">
+                                {{ $users->links('pagination::bootstrap-5') }}
+                            </div>
+                        @else
+                            <div class="text-center text-muted py-5">
+                                <i class="material-icons-outlined mb-3" style="font-size: 48px;">people</i>
+                                <p>{{ __('No users found') }}</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
-{{-- Bootstrap 5 JS --}}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 @endsection
