@@ -28,6 +28,18 @@ function isActiveRoute($route) {
         </button>
       </li>
 
+      <!-- SIDEBAR SEARCH -->
+      <li class="sidebar-list sidebar-search-wrapper" style="padding: 10px 15px;">
+        <div class="sidebar-search-container" style="position: relative;">
+          <input type="text" 
+                 id="sidebar-search" 
+                 class="form-control form-control-sm sidebar-search-input" 
+                 placeholder="{{ __('Search menu...') }}"
+                 style="border-radius: 20px; padding-left: 15px; padding-right: 15px; background: #f7fafc; color: #000; border: 1px solid #cbd5e0; font-size: 13px; height: 38px; width: 100%;">
+          <small style="display: block; margin-top: 5px; color: #000; font-size: 11px; text-align: center;">məs: məhsul, sifariş, xəbər</small>
+        </div>
+      </li>
+
       <!-- GENERAL -->
       <li class="sidebar-main-title"><div><h5 class="sidebar-title">{{ __('General') }}</h5></div></li>
       <li class="sidebar-list {{ isActiveSection(['admin.languages', 'admin.dictionaries']) ? 'active' : '' }}">
@@ -526,4 +538,168 @@ document.addEventListener('DOMContentLoaded', () => {
   font-weight: 600;
   font-size: 14px;
 }
+
+/* Sidebar Search Styles */
+.sidebar-search-container {
+  position: relative;
+}
+
+.sidebar-search-wrapper .form-control::placeholder {
+  color: #4a5568;
+  font-size: 13px;
+  opacity: 1;
+}
+
+.sidebar-search-wrapper .form-control:focus {
+  background: #fff !important;
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  outline: none;
+}
+
+/* Search Highlight Styles */
+.sidebar-list.search-match > .sidebar-link {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  border-radius: 8px;
+  animation: pulse 1.5s infinite;
+}
+
+.sidebar-list.search-match > .sidebar-link i,
+.sidebar-list.search-match > .sidebar-link h6 {
+  color: white !important;
+}
+
+.sidebar-submenu li.search-match {
+  background: rgba(102, 126, 234, 0.1);
+  border-left: 3px solid #667eea;
+}
+
+.sidebar-submenu li.search-match a {
+  color: #667eea;
+  font-weight: 600;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(102, 126, 234, 0); }
+}
+
+.sidebar-list.hidden-by-search,
+.sidebar-submenu li.hidden-by-search {
+  display: none !important;
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('sidebar-search');
+    const sidebarMenu = document.getElementById('simple-bar');
+    
+    if (!searchInput || !sidebarMenu) return;
+    
+    // Get all menu items with their text
+    const menuItems = [];
+    const allListItems = sidebarMenu.querySelectorAll('.sidebar-list');
+    
+    allListItems.forEach(item => {
+        const link = item.querySelector('.sidebar-link');
+        const h6 = item.querySelector('h6');
+        const submenu = item.querySelector('.sidebar-submenu');
+        
+        if (h6) {
+            const text = h6.textContent.toLowerCase().trim();
+            menuItems.push({
+                element: item,
+                text: text,
+                isParent: !!submenu,
+                submenu: submenu
+            });
+        }
+    });
+    
+    // Get all submenu items
+    const submenuItems = [];
+    sidebarMenu.querySelectorAll('.sidebar-submenu li').forEach(item => {
+        const link = item.querySelector('a');
+        if (link) {
+            submenuItems.push({
+                element: item,
+                text: link.textContent.toLowerCase().trim()
+            });
+        }
+    });
+    
+    // Search function
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        
+        if (query === '') {
+            // Reset all
+            menuItems.forEach(item => {
+                item.element.classList.remove('search-match', 'hidden-by-search');
+                if (item.submenu) {
+                    item.submenu.classList.remove('open');
+                }
+            });
+            submenuItems.forEach(item => {
+                item.element.classList.remove('search-match', 'hidden-by-search');
+            });
+            return;
+        }
+        
+        // First pass: find and show matching submenu items
+        let hasSubmenuMatch = false;
+        submenuItems.forEach(item => {
+            if (item.text.includes(query)) {
+                item.element.classList.add('search-match');
+                item.element.classList.remove('hidden-by-search');
+                hasSubmenuMatch = true;
+                
+                // Show parent dropdown
+                const parentLi = item.element.closest('.sidebar-list');
+                if (parentLi) {
+                    parentLi.classList.remove('hidden-by-search');
+                    const parentSubmenu = parentLi.querySelector('.sidebar-submenu');
+                    if (parentSubmenu) {
+                        parentSubmenu.classList.add('open');
+                    }
+                }
+            } else {
+                item.element.classList.remove('search-match');
+                item.element.classList.add('hidden-by-search');
+            }
+        });
+        
+        // Second pass: find and show matching parent items
+        menuItems.forEach(item => {
+            if (item.text.includes(query)) {
+                item.element.classList.add('search-match');
+                item.element.classList.remove('hidden-by-search');
+                // Open the dropdown
+                if (item.submenu) {
+                    item.submenu.classList.add('open');
+                }
+            } else if (!hasSubmenuMatch || !item.submenu) {
+                // Hide non-matching parent items unless they have matching children
+                const hasVisibleChildren = item.submenu && 
+                    item.submenu.querySelectorAll('li.search-match').length > 0;
+                
+                if (!hasVisibleChildren) {
+                    item.element.classList.add('hidden-by-search');
+                } else {
+                    item.element.classList.remove('hidden-by-search');
+                }
+            }
+        });
+    });
+    
+    // Clear search on escape key
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            this.value = '';
+            this.dispatchEvent(new Event('input'));
+        }
+    });
+});
+</script>
