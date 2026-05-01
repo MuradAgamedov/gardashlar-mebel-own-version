@@ -45,7 +45,7 @@ class AuthController extends Controller
             'phone.nullable' => 'Telefon nömrəsi seçimlidir',
             'email.nullable' => 'Email ünvanı seçimlidir',
             'email.email' => 'Düzgün email ünvanı daxil edin',
-            'email.unique' => 'Bu email ünvanı artıq istifadə olunub',
+            'email.unique' => 'user_already_exists',
             'password.required' => 'Şifrə məcburidir',
             'password.min' => 'Şifrə ən azı 6 simvol olmalıdır',
             'password.confirmed' => 'Şifrə təkrarı düzgün deyil',
@@ -867,7 +867,7 @@ class AuthController extends Controller
                 'phone.string' => 'Telefon nömrəsi mətn formatında olmalıdır',
                 'phone.max' => 'Telefon nömrəsi 20 simvoldan çox ola bilməz',
                 'email.email' => 'Düzgün email ünvanı daxil edin',
-                'email.unique' => 'Bu email ünvanı artıq istifadə olunub',
+                'email.unique' => 'user_already_exists',
                 'fin.string' => 'FIN mətn formatında olmalıdır',
                 'fin.unique' => 'Bu FIN artıq istifadə olunub',
             ]);
