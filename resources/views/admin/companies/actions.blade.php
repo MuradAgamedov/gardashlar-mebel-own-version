@@ -60,17 +60,22 @@
                                     <div class="col-md-4 col-lg-3 mb-4">
                                         <div class="card h-100 {{ $isInAnyAction ? 'border-success' : '' }}">
                                             <div class="position-relative">
-                                                @if($mainTranslate && $mainTranslate->image)
-                                                    <img src="{{ asset('storage/' . $mainTranslate->image) }}" 
-                                                         class="card-img-top" 
-                                                         alt="{{ $mainTranslate->image_alt_text ?? __('Product Image') }}"
-                                                         style="height: 200px; object-fit: cover;">
-                                                @else
-                                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
-                                                         style="height: 200px;">
-                                                        <i class="material-icons-outlined text-muted" style="font-size: 3rem;">image</i>
-                                                    </div>
-                                                @endif
+                                          
+                                            @php
+                                                $mainImage = $product->images->where('is_main', 1)->first();
+                                            @endphp
+
+                                            @if($mainTranslate && $mainImage && $mainImage->image)
+                                                <img src="{{ asset('storage/' . $mainImage->image) }}"
+                                                    class="card-img-top"
+                                                    alt="{{ $mainTranslate->image_alt_text ?? __('Product Image') }}"
+                                                    style="height: 200px; object-fit: cover;">
+                                            @else
+                                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                                    style="height: 200px;">
+                                                    <i class="material-icons-outlined text-muted" style="font-size: 3rem;">image</i>
+                                                </div>
+                                            @endif
                                                 
                                                 <!-- Action Badge -->
                                                 @if($isInAnyAction)
