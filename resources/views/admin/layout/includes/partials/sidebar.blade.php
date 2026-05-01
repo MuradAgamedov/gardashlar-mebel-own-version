@@ -203,104 +203,104 @@ function isActiveRoute($route) {
         </ul>
       </li>
 
-      <li class="sidebar-list">
+      <li class="sidebar-list {{ isActiveSection(['admin.phones', 'admin.addresses', 'admin.emails', 'admin.maps', 'admin.social-networks']) ? 'active' : '' }}">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-phone"></i>
           <h6>{{ __('Contact') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.phones.index') }}">{{ __('Phone') }}</a></li>
-          <li><a href="{{ route('admin.addresses.index') }}">{{ __('Address') }}</a></li>
-          <li><a href="{{ route('admin.emails.index') }}">{{ __('Email') }}</a></li>
-          <li><a href="{{ route('admin.maps.index') }}">{{ __('Map') }}</a></li>
-          <li><a href="{{ route('admin.social-networks.index') }}">{{ __('Social Networks') }}</a></li>
+          <li class="{{ isActiveSection('admin.phones') ? 'active' : '' }}"><a href="{{ route('admin.phones.index') }}">{{ __('Phone') }}</a></li>
+          <li class="{{ isActiveSection('admin.addresses') ? 'active' : '' }}"><a href="{{ route('admin.addresses.index') }}">{{ __('Address') }}</a></li>
+          <li class="{{ isActiveSection('admin.emails') ? 'active' : '' }}"><a href="{{ route('admin.emails.index') }}">{{ __('Email') }}</a></li>
+          <li class="{{ isActiveSection('admin.maps') ? 'active' : '' }}"><a href="{{ route('admin.maps.index') }}">{{ __('Map') }}</a></li>
+          <li class="{{ isActiveSection('admin.social-networks') ? 'active' : '' }}"><a href="{{ route('admin.social-networks.index') }}">{{ __('Social Networks') }}</a></li>
         </ul>
       </li>
 
-      <li class="sidebar-list">
+      <li class="sidebar-list {{ isActiveSection(['admin.kiv-categories', 'admin.kivs']) ? 'active' : '' }}">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-photo-video"></i>
           <h6>{{ __('KIV Management') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.kiv-categories.index') }}">{{ __('KIV Categories') }}</a></li>
-          <li><a href="{{ route('admin.kivs.index') }}">{{ __('KIVs') }}</a></li>
+          <li class="{{ isActiveSection('admin.kiv-categories') ? 'active' : '' }}"><a href="{{ route('admin.kiv-categories.index') }}">{{ __('KIV Categories') }}</a></li>
+          <li class="{{ isActiveSection('admin.kivs') ? 'active' : '' }}"><a href="{{ route('admin.kivs.index') }}">{{ __('KIVs') }}</a></li>
         </ul>
       </li>
 
       <!-- PARTNERSHIP -->
       <li class="sidebar-main-title"><div><h5 class="sidebar-title">{{ __('Partnership') }}</h5></div></li>
-      <li class="sidebar-list">
+      <li class="sidebar-list {{ isActiveSection(['admin.become-a-partner', 'admin.become-a-investor', 'admin.partner-sliders']) ? 'active' : '' }}">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-handshake"></i>
           <h6>{{ __('Partner Sections') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.become-a-partner.edit') }}">{{ __('Become A Partner') }}</a></li>
-          <li><a href="{{ route('admin.become-a-investor.edit') }}">{{ __('Become An Investor') }}</a></li>
-          <li><a href="{{ route('admin.partner-sliders.index') }}">{{ __('Partner Slider') }}</a></li>
+          <li class="{{ isActiveSection('admin.become-a-partner') ? 'active' : '' }}"><a href="{{ route('admin.become-a-partner.edit') }}">{{ __('Become A Partner') }}</a></li>
+          <li class="{{ isActiveSection('admin.become-a-investor') ? 'active' : '' }}"><a href="{{ route('admin.become-a-investor.edit') }}">{{ __('Become An Investor') }}</a></li>
+          <li class="{{ isActiveSection('admin.partner-sliders') ? 'active' : '' }}"><a href="{{ route('admin.partner-sliders.index') }}">{{ __('Partner Slider') }}</a></li>
         </ul>
       </li>
 
       <!-- POLICIES -->
       <li class="sidebar-main-title"><div><h5 class="sidebar-title">{{ __('Policies & Info') }}</h5></div></li>
-      <li class="sidebar-list">
+      <li class="sidebar-list {{ isActiveSection(['admin.customer-rights', 'admin.delivery-payment', 'admin.warranty-policy', 'admin.refund-policy', 'admin.site-usage-rules', 'admin.privacy-policy']) ? 'active' : '' }}">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-shield-alt"></i>
           <h6>{{ __('Customer Policies') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.customer-rights.edit') }}">{{ __('Customer Rights') }}</a></li>
-          <li><a href="{{ route('admin.delivery-payment.edit') }}">{{ __('Delivery & Payment') }}</a></li>
-          <li><a href="{{ route('admin.warranty-policy.edit') }}">{{ __('Warranty Policy') }}</a></li>
-          <li><a href="{{ route('admin.refund-policy.edit') }}">{{ __('Refund Policy') }}</a></li>
-          <li><a href="{{ route('admin.site-usage-rules.edit') }}">{{ __('Site Usage Rules') }}</a></li>
-          <li><a href="{{ route('admin.privacy-policy.edit') }}">{{ __('Privacy Policy') }}</a></li>
+          <li class="{{ isActiveSection('admin.customer-rights') ? 'active' : '' }}"><a href="{{ route('admin.customer-rights.edit') }}">{{ __('Customer Rights') }}</a></li>
+          <li class="{{ isActiveSection('admin.delivery-payment') ? 'active' : '' }}"><a href="{{ route('admin.delivery-payment.edit') }}">{{ __('Delivery & Payment') }}</a></li>
+          <li class="{{ isActiveSection('admin.warranty-policy') ? 'active' : '' }}"><a href="{{ route('admin.warranty-policy.edit') }}">{{ __('Warranty Policy') }}</a></li>
+          <li class="{{ isActiveSection('admin.refund-policy') ? 'active' : '' }}"><a href="{{ route('admin.refund-policy.edit') }}">{{ __('Refund Policy') }}</a></li>
+          <li class="{{ isActiveSection('admin.site-usage-rules') ? 'active' : '' }}"><a href="{{ route('admin.site-usage-rules.edit') }}">{{ __('Site Usage Rules') }}</a></li>
+          <li class="{{ isActiveSection('admin.privacy-policy') ? 'active' : '' }}"><a href="{{ route('admin.privacy-policy.edit') }}">{{ __('Privacy Policy') }}</a></li>
         </ul>
       </li>
 
       <!-- SERVICES -->
       <li class="sidebar-main-title"><div><h5 class="sidebar-title">{{ __('Services') }}</h5></div></li>
-      <li class="sidebar-list">
+      <li class="sidebar-list {{ isActiveSection(['admin.services', 'admin.service-static-data', 'admin.individual-project-orders']) ? 'active' : '' }}">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-cogs"></i>
           <h6>{{ __('Services') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.services.index') }}">{{ __('Services') }}</a></li>
-          <li><a href="{{ route('admin.service-static-data.edit') }}">{{ __('Service Static Data') }}</a></li>
-          <li><a href="{{ route('admin.individual-project-orders.index') }}">{{ __('Individual Project Orders') }}</a></li>
+          <li class="{{ isActiveSection('admin.services') ? 'active' : '' }}"><a href="{{ route('admin.services.index') }}">{{ __('Services') }}</a></li>
+          <li class="{{ isActiveSection('admin.service-static-data') ? 'active' : '' }}"><a href="{{ route('admin.service-static-data.edit') }}">{{ __('Service Static Data') }}</a></li>
+          <li class="{{ isActiveSection('admin.individual-project-orders') ? 'active' : '' }}"><a href="{{ route('admin.individual-project-orders.index') }}">{{ __('Individual Project Orders') }}</a></li>
         </ul>
       </li>
 
     
 
-            <li class="sidebar-list">
+            <li class="sidebar-list {{ isActiveSection(['admin.project-categories', 'admin.projects', 'admin.home-page-project-categories']) ? 'active' : '' }}">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-project-diagram"></i>
           <h6>{{ __('Projects') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.project-categories.index') }}">{{ __('Project Categories') }}</a></li>
-          <li><a href="{{ route('admin.projects.index') }}">{{ __('Projects') }}</a></li>
-          <li><a href="{{ route('admin.home-page-project-categories.index') }}">{{ __('Home Page Project Categories') }}</a></li>
+          <li class="{{ isActiveSection('admin.project-categories') ? 'active' : '' }}"><a href="{{ route('admin.project-categories.index') }}">{{ __('Project Categories') }}</a></li>
+          <li class="{{ isActiveSection('admin.projects') ? 'active' : '' }}"><a href="{{ route('admin.projects.index') }}">{{ __('Projects') }}</a></li>
+          <li class="{{ isActiveSection('admin.home-page-project-categories') ? 'active' : '' }}"><a href="{{ route('admin.home-page-project-categories.index') }}">{{ __('Home Page Project Categories') }}</a></li>
         </ul>
       </li>
 
-      <li class="sidebar-list {{ isActiveSection(['admin.products', 'admin.product-types', 'admin.product-price-filters', 'admin.product-page-categories', 'admin.hero-categories', 'admin.hero-products', 'admin.product-colors', 'admin.product-tags', 'admin.catalogs']) ? 'active' : '' }}">
+      <li class="sidebar-list {{ isActiveSection(['admin.products', 'admin.product-categories', 'admin.product-types', 'admin.product-price-filters', 'admin.product-page-categories', 'admin.hero-categories', 'admin.hero-products', 'admin.product-colors', 'admin.product-tags', 'admin.catalogs']) ? 'active' : '' }}">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-box"></i>
           <h6>{{ __('Products') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.product-categories.index') }}">{{ __('Product Categories') }}</a></li>
+          <li class="{{ isActiveSection('admin.product-categories') ? 'active' : '' }}"><a href="{{ route('admin.product-categories.index') }}">{{ __('Product Categories') }}</a></li>
           <li class="{{ isActiveSection('admin.product-types') ? 'active' : '' }}"><a href="{{ route('admin.product-types.index') }}">{{ __('Product Types') }}</a></li>
           <li class="{{ isActiveSection('admin.product-price-filters') ? 'active' : '' }}"><a href="{{ route('admin.product-price-filters.index') }}">{{ __('Price Filters') }}</a></li>
           <li class="{{ isActiveSection('admin.product-page-categories') ? 'active' : '' }}"><a href="{{ route('admin.product-page-categories.index') }}">{{ __('Product page categories') }}</a></li>
@@ -316,20 +316,20 @@ function isActiveRoute($route) {
 
       <!-- OTHERS -->
       <li class="sidebar-main-title"><div><h5 class="sidebar-title">{{ __('Other Sections') }}</h5></div></li>
-      <li class="sidebar-list">
+      <li class="sidebar-list {{ isActiveSection(['admin.certificates', 'admin.our-goals', 'admin.simple-images', 'admin.currencies', 'admin.suggest-a-place', 'admin.suggestions-complaints', 'admin.suggestions-complaints-forms', 'admin.suggestions', 'admin.abouts', 'admin.administrations', 'admin.campaigns', 'admin.actions', 'admin.company-management', 'admin.reports', 'admin.faqs', 'admin.vacancies']) ? 'active' : '' }}">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-th-list"></i>
           <h6>{{ __('General Content') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
         <ul class="sidebar-submenu">
-          <li><a href="{{ route('admin.certificates.index') }}">{{ __('Certificates') }}</a></li>
-          <li><a href="{{ route('admin.our-goals.index') }}">{{ __('Our Goals') }}</a></li>
-          <li><a href="{{ route('admin.simple-images.index') }}">{{ __('Simple Images') }}</a></li>
-          <li><a href="{{ route('admin.currencies.index') }}">{{ __('Currencies') }}</a></li>
-          <li><a href="{{ route('admin.suggest-a-place.edit') }}">{{ __('Suggest A Place') }}</a></li>
-          <li><a href="{{ route('admin.suggestions-complaints.edit') }}">{{ __('Suggestions & Complaints') }}</a></li>
-          <li><a href="{{ route('admin.suggestions-complaints-forms.index') }}">{{ __('Suggestions & Complaints Forms') }}
+          <li class="{{ isActiveSection('admin.certificates') ? 'active' : '' }}"><a href="{{ route('admin.certificates.index') }}">{{ __('Certificates') }}</a></li>
+          <li class="{{ isActiveSection('admin.our-goals') ? 'active' : '' }}"><a href="{{ route('admin.our-goals.index') }}">{{ __('Our Goals') }}</a></li>
+          <li class="{{ isActiveSection('admin.simple-images') ? 'active' : '' }}"><a href="{{ route('admin.simple-images.index') }}">{{ __('Simple Images') }}</a></li>
+          <li class="{{ isActiveSection('admin.currencies') ? 'active' : '' }}"><a href="{{ route('admin.currencies.index') }}">{{ __('Currencies') }}</a></li>
+          <li class="{{ isActiveSection('admin.suggest-a-place') ? 'active' : '' }}"><a href="{{ route('admin.suggest-a-place.edit') }}">{{ __('Suggest A Place') }}</a></li>
+          <li class="{{ isActiveSection('admin.suggestions-complaints') ? 'active' : '' }}"><a href="{{ route('admin.suggestions-complaints.edit') }}">{{ __('Suggestions & Complaints') }}</a></li>
+          <li class="{{ isActiveSection('admin.suggestions-complaints-forms') ? 'active' : '' }}"><a href="{{ route('admin.suggestions-complaints-forms.index') }}">{{ __('Suggestions & Complaints Forms') }}
             @php
               $unreadSuggestionsForms = \App\Models\SuggestionsComplaintsForm::where('is_read', false)->count();
             @endphp
@@ -337,43 +337,43 @@ function isActiveRoute($route) {
               <span class="badge bg-danger ms-2">{{ $unreadSuggestionsForms }}</span>
             @endif
           </a></li>
-          <li><a href="{{ route('admin.suggestions.index') }}">{{ __('Suggestions') }}</a></li>
-          <li><a href="{{ route('admin.abouts.index') }}">{{ __('About us') }}</a></li>
-          <li><a href="{{ route('admin.administrations.index') }}">{{ __('Administrations') }}</a></li>
-          <li><a href="{{ route('admin.campaigns.index') }}">{{ __('Campaigns') }}</a></li>
-          <li><a href="{{ route('admin.actions.index') }}">{{ __('Actions') }}</a></li>
-          <li><a href="{{ route('admin.company-management.edit') }}">{{ __('Company Management') }}</a></li>
-          <li><a href="{{ route('admin.reports.index') }}">{{ __('Reports') }}</a></li>
-          <li><a href="{{ route('admin.faqs.index') }}">{{ __('FAQs') }}</a></li>
-          <li><a href="{{ route('admin.vacancies.index') }}">{{ __('Vacancies') }}</a></li>
+          <li class="{{ isActiveSection('admin.suggestions') ? 'active' : '' }}"><a href="{{ route('admin.suggestions.index') }}">{{ __('Suggestions') }}</a></li>
+          <li class="{{ isActiveSection('admin.abouts') ? 'active' : '' }}"><a href="{{ route('admin.abouts.index') }}">{{ __('About us') }}</a></li>
+          <li class="{{ isActiveSection('admin.administrations') ? 'active' : '' }}"><a href="{{ route('admin.administrations.index') }}">{{ __('Administrations') }}</a></li>
+          <li class="{{ isActiveSection('admin.campaigns') ? 'active' : '' }}"><a href="{{ route('admin.campaigns.index') }}">{{ __('Campaigns') }}</a></li>
+          <li class="{{ isActiveSection('admin.actions') ? 'active' : '' }}"><a href="{{ route('admin.actions.index') }}">{{ __('Actions') }}</a></li>
+          <li class="{{ isActiveSection('admin.company-management') ? 'active' : '' }}"><a href="{{ route('admin.company-management.edit') }}">{{ __('Company Management') }}</a></li>
+          <li class="{{ isActiveSection('admin.reports') ? 'active' : '' }}"><a href="{{ route('admin.reports.index') }}">{{ __('Reports') }}</a></li>
+          <li class="{{ isActiveSection('admin.faqs') ? 'active' : '' }}"><a href="{{ route('admin.faqs.index') }}">{{ __('FAQs') }}</a></li>
+          <li class="{{ isActiveSection('admin.vacancies') ? 'active' : '' }}"><a href="{{ route('admin.vacancies.index') }}">{{ __('Vacancies') }}</a></li>
         </ul>
       </li>
 
-      <li class="sidebar-list">
+      <li class="sidebar-list {{ isActiveSection(['admin.blog-categories', 'admin.blog-posts']) ? 'active' : '' }}">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-blog"></i>
           <h6>{{ __('Blogs') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
                       <ul class="sidebar-submenu">
-                <li><a href="{{ route('admin.blog-categories.index') }}">{{ __('Blog Categories') }}</a></li>
-                <li><a href="{{ route('admin.blog-posts.index') }}">{{ __('Blog Posts') }}</a></li>
+                <li class="{{ isActiveSection('admin.blog-categories') ? 'active' : '' }}"><a href="{{ route('admin.blog-categories.index') }}">{{ __('Blog Categories') }}</a></li>
+                <li class="{{ isActiveSection('admin.blog-posts') ? 'active' : '' }}"><a href="{{ route('admin.blog-posts.index') }}">{{ __('Blog Posts') }}</a></li>
               </ul>
       </li>
 
-      <!-- <li class="sidebar-list">
+      <li class="sidebar-list {{ isActiveSection(['admin.news-categories', 'admin.news-posts']) ? 'active' : '' }}">
         <a class="sidebar-link" href="javascript:void(0)">
           <i class="fas fa-newspaper"></i>
-          <h6>News</h6>
+          <h6>{{ __('News') }}</h6>
           <i class="fas fa-chevron-down float-end"></i>
         </a>
                       <ul class="sidebar-submenu">
-                <li><a href="{{ route('admin.news-categories.index') }}">News Categories</a></li>
-                <li><a href="{{ route('admin.news-posts.index') }}">News Posts</a></li>
+                <li class="{{ isActiveSection('admin.news-categories') ? 'active' : '' }}"><a href="{{ route('admin.news-categories.index') }}">{{ __('News Categories') }}</a></li>
+                <li class="{{ isActiveSection('admin.news-posts') ? 'active' : '' }}"><a href="{{ route('admin.news-posts.index') }}">{{ __('News Posts') }}</a></li>
               </ul>
-      </li> -->
+      </li>
 
-      <li class="sidebar-list">
+      <li class="sidebar-list {{ isActiveSection('admin.registered-users') ? 'active' : '' }}">
         <a class="sidebar-link" href="{{route('admin.registered-users')}}">
           <i class="fas fa-blog"></i>
           <h6>{{ __('Users') }}</h6>
