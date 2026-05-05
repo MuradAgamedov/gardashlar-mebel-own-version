@@ -98,7 +98,7 @@ function isActiveRoute($route) {
         </a>
       </li>
       <li class="sidebar-list {{ isActiveSection('admin.excel-imports') ? 'active' : '' }}">
-        <a class="sidebar-link" href="{{ url('admin/excel-imports/edit') }}">
+        <a class="sidebar-link" href="{{ route('admin.excel-imports.edit') }}">
           <i class="fas fa-file-excel"></i>
           <h6>{{ __('Excel File Upload') }}</h6>
         </a>
