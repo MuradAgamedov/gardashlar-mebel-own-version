@@ -872,6 +872,7 @@ class AuthController extends Controller
                 'fin.unique' => $request->header,
             ]);
 
+            
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
