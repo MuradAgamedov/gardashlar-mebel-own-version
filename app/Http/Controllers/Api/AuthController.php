@@ -871,13 +871,13 @@ class AuthController extends Controller
                 'email.email' => 'Düzgün email ünvanı daxil edin',
                 'email.unique' => 'user_already_exists',
                 'fin.string' => 'FIN mətn formatında olmalıdır',
-                'fin.unique' => Dictionary::where('keyword', 'home_page')->first()->translate($languageId)->value,
+                'fin.unique' => Dictionary::where('keyword', 'fin_unique')->first()->translate($languageId)->value,
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => request()->header('locale') ,
+                    'message' => Dictionary::where('keyword', 'validation_error')->first()->translate($languageId)->value ,
                     'errors' => $validator->errors()
                 ], 422);
             }
