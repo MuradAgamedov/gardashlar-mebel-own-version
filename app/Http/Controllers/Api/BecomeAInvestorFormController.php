@@ -36,13 +36,26 @@ class BecomeAInvestorFormController extends Controller
                 'message' => 'required|string|max:1000',
                 'file' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx,txt'
             ], [
-                'name.required' => 'Name is required',
-                'mobile.required' => 'Mobile number is required',
-                'email.required' => 'Email is required',
-                'email.email' => 'Please enter a valid email address',
-                'message.required' => 'Message is required',
-                'file.max' => 'File size must not exceed 10MB',
-                'file.mimes' => 'File must be PDF, DOC, DOCX, XLS, XLSX, or TXT format'
+                // 'name.required' => 'Name is required',
+                // 'mobile.required' => 'Mobile number is required',
+                // 'email.required' => 'Email is required',
+                // 'email.email' => 'Please enter a valid email address',
+                // 'message.required' => 'Message is required',
+                // 'file.max' => 'File size must not exceed 10MB',
+                // 'file.mimes' => 'File must be PDF, DOC, DOCX, XLS, XLSX, or TXT format'
+
+                'name.required' => dict('name_required'),
+                'name.max' => dict('name_max'),
+                'mobile.required' => dict('mobile_required'),
+                'mobile.max' => dict('mobile_max'),
+                'email.required' => dict('email_required'),
+                'email.email' => dict('email_email'),
+                'email.max' => dict('email_max'),
+                'file.file' => dict('file_invalid'),
+                'file.mimes' => dict('file_mimes'),
+                'file.max' => dict('file_max'),
+                'message.required' => dict('message_required'),
+                'message.max' => dict('message_max'),
             ]);
 
             if ($validator->fails()) {
