@@ -14,7 +14,6 @@ class ExcelImportController extends Controller
      */
     public function edit()
     {
-        dd(1);
         $excelImport = ExcelImport::first();
         return view('admin.excel-imports.edit', compact('excelImport'));
     }
