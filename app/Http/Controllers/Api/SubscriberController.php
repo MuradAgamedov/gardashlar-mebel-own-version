@@ -70,7 +70,7 @@ class SubscriberController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Subscription failed',
+                    'message' => dict('subscribe_error'),
                     'errors' => $validator->errors()
                 ], 422);
             }
@@ -81,7 +81,7 @@ class SubscriberController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Email successfully subscribed',
+                'message' => dict('subscribe_success'),
                 'data' => [
                     'id' => $subscriber->id,
                     'email' => $subscriber->email,
