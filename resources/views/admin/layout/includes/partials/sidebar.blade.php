@@ -97,6 +97,12 @@ function isActiveRoute($route) {
           <h6>{{ __('Credit Cards') }}</h6>
         </a>
       </li>
+      <li class="sidebar-list {{ isActiveSection('admin.excel-imports') ? 'active' : '' }}">
+        <a class="sidebar-link" href="{{ route('admin.excel-imports.edit') }}">
+          <i class="fas fa-file-excel"></i>
+          <h6>Excel Fayl Yükləmə</h6>
+        </a>
+      </li>
       <li class="sidebar-list {{ isActiveSection('admin.comments') ? 'active' : '' }}">
         <a class="sidebar-link" href="{{ route('admin.comments.index') }}">
           <i class="fas fa-file-alt"></i>

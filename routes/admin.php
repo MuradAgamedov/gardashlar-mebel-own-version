@@ -84,6 +84,7 @@ Route::group(
         require __DIR__.'/web/users.php';
         require __DIR__.'/web/users.php';
         require __DIR__.'/web/popupAd.php';
+        require __DIR__.'/web/excel-imports.php';
 
     });
        
