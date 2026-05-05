@@ -44,7 +44,7 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('admin.excel-imports.update', $excelImport?->id ?? 1) }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('admin.excel-imports.update') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
 
@@ -86,7 +86,7 @@
     </div>
 </div>
 
-<form id="deleteForm" action="{{ route('admin.excel-imports.destroy', $excelImport?->id ?? 1) }}" method="POST" style="display: none;">
+<form id="deleteForm" action="{{ route('admin.excel-imports.destroy') }}" method="POST" style="display: none;">
     @csrf
     @method('DELETE')
 </form>
