@@ -12,6 +12,10 @@ if (!function_exists('dict')) {
      */
     function dict(string $keyword, ?string $langCode = null): string
     {
+        // If no langCode provided, get from request header
+        if ($langCode === null) {
+            $langCode = request()->header('locale');
+        }
         return DictionaryHelper::trans($keyword, $langCode);
     }
 }
