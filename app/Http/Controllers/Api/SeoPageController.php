@@ -235,8 +235,8 @@ class SeoPageController extends Controller
             // Əgər title və ya slug boşdursa, sadəcə boş array qaytar
             if (empty($seoPageData['title']) || empty($seoPageData['slug'])) {
                 return response()->json([
-                    'success' => true,
-                    'data' => [],
+                    'success' => false,
+                    'data' => 'SEO page not found',
                 ], 200);
             }
 
