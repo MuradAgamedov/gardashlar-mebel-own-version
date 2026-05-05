@@ -849,7 +849,6 @@ class AuthController extends Controller
     public function updateProfile(Request $request)
     {
         $locale = request()->header('locale');
-        $languageId = Language::where('lang_code', $locale)->first()->id;
         try {
             $user = auth()->user();
 
@@ -871,13 +870,13 @@ class AuthController extends Controller
                 'email.email' => 'Düzgün email ünvanı daxil edin',
                 'email.unique' => 'user_already_exists',
                 'fin.string' => 'FIN mətn formatında olmalıdır',
-                'fin.unique' => Dictionary::where('keyword', 'fin_unique')->first()->translate($languageId)->value,
+                'fin.unique' => dict('fin_unique', $locale),
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::where('keyword', 'validation_error')->first()->translate($languageId)->value ,
+                    'message' => dict('validation_error', $locale),
                     'errors' => $validator->errors()
                 ], 422);
             }
