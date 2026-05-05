@@ -21,13 +21,13 @@ use App\Models\Language;
  */
 abstract class Controller
 {
-    protected $locale;
-    protected $languageId;
+    protected $localeMain;
+    protected $languageIdMain;
     
     public function __construct()
     {
-        $this->locale = request()->header('locale');
-        $this->languageId = Language::where('lang_code', $this->locale)->first()->id;
+        $this->localeMain = request()->header('locale');
+        $this->languageIdMain = Language::where('lang_code', $this->localeMain)->first()->id;
     }
 }
     
