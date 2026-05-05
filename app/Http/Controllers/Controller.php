@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use OpenApi\Annotations as OA;
-
+use App\Models\Language;
 /**
  * @OA\Info(
  *     version="1.0.0",
@@ -21,5 +21,13 @@ use OpenApi\Annotations as OA;
  */
 abstract class Controller
 {
-    //
+    protected $locale;
+    protected $languageId;
+    
+    public function __construct()
+    {
+        $this->locale = request()->header('locale');
+        $this->languageId = Language::where('lang_code', $this->locale)->first()->id;
+    }
 }
+    
