@@ -59,11 +59,11 @@
                                 <div class="mb-3">
                                     <label class="form-label">Mövcud Fayl</label>
                                     <div class="d-flex align-items-center gap-2">
-                                        <a href="{{ route('admin.excel-imports.download') }}" class="btn btn-sm btn-info" target="_blank">
-                                            <i class="fas fa-download"></i> Faylı Yüklə
+                                        <a href="{{ route('admin.excel-imports.download') }}" class="btn btn-sm btn-info" target="_blank" title="Faylı Yüklə">
+                                            <i class="fas fa-download"></i>
                                         </a>
-                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete()">
-                                            <i class="fas fa-trash"></i> Faylı Sil
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete()" title="Faylı Sil">
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                         <small class="text-muted">{{ $excelImport->file_url }}</small>
                                     </div>
@@ -71,11 +71,11 @@
                             @endif
 
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-upload"></i> Yüklə
+                                <button type="submit" class="btn btn-primary" title="Yüklə">
+                                    <i class="fas fa-upload"></i>
                                 </button>
-                                <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">
-                                    <i class="fas fa-arrow-left"></i> Geri
+                                <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary" title="Geri">
+                                    <i class="fas fa-arrow-left"></i>
                                 </a>
                             </div>
                         </form>
@@ -112,7 +112,7 @@ document.getElementById('excel_file').addEventListener('change', function(e) {
         }
         
         if (!allowedTypes.includes(file.type)) {
-            alert('Yalnız Excel faylları (.xlsx, .xls) qəbul edilir!');
+            alert('Yalnız .xls və .xlsx formatında fayllar qəbul edilir!');
             e.target.value = '';
             return;
         }

@@ -24,7 +24,29 @@ class ExcelImportController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'excel_file' => 'required|file|mimes:xlsx,xls|max:10240', // 10MB max
+            'excel_file' => [
+                'required',
+                'file',
+                'mimes:xlsx,xls',
+                'max:10240', // 10MB max
+                function ($attribute, $value, $fail) {
+                    // Additional validation for Excel file MIME types
+                    $allowedMimeTypes = [
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+                        'application/vnd.ms-excel', // .xls
+                        'application/octet-stream' // Sometimes Excel files are detected as this
+                    ];
+                    
+                    if ($value && !in_array($value->getMimeType(), $allowedMimeTypes)) {
+                        $fail('Yalnız .xls və .xlsx formatında Excel faylları qəbul edilir.');
+                    }
+                },
+            ],
+        ], [
+            'excel_file.required' => 'Excel faylı seçilməyib.',
+            'excel_file.file' => 'Fayl yüklənməlidir.',
+            'excel_file.mimes' => 'Yalnız .xls və .xlsx formatında fayllar qəbul edilir.',
+            'excel_file.max' => 'Fayl ölçüsü maksimum 10MB ola bilər.',
         ]);
 
         try {
@@ -97,5 +119,31 @@ class ExcelImportController extends Controller
 
         return redirect()->route('admin.excel-imports.edit')
             ->with('success', 'Excel faylı uğurla silindi');
+    }
+
+    /**
+     * API endpoint to get Excel file.
+     */
+    public function apiGetExcel()
+    {
+        $excelImport = ExcelImport::first();
+        
+        if (!$excelImport || !$excelImport->file_url) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Excel faylı tapılmadı'
+            ], 404);
+        }
+
+        $filePath = storage_path('app/public/' . $excelImport->file_url);
+        
+        if (!file_exists($filePath)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Fayl mövcud deyil'
+            ], 404);
+        }
+
+        return response()->download($filePath, 'excel-import.xlsx');
     }
 }

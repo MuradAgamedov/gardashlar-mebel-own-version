@@ -459,4 +459,7 @@ Route::get('download/simple-images/{keyword}', function () {
     return response()->download($filePath);
 })->name('simple-images.download');
 
+// Excel Import API Routes
+Route::get('/excel-import/download', [\App\Http\Controllers\Admin\ExcelImportController::class, 'apiGetExcel'])->name('api.excel-import.download');
+
 }); // Close throttle middleware group
