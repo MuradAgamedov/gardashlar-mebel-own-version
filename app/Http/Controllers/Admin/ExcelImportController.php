@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ExcelImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class ExcelImportController extends Controller
 {
@@ -71,8 +73,11 @@ class ExcelImportController extends Controller
                 ]);
             }
 
+            // Send file to external API
+            $this->sendFileToExternalApi($file);
+
             return redirect()->route('admin.excel-imports.edit')
-                ->with('success', 'Excel faylı uğurla yükləndi');
+                ->with('success', __('Excel file uploaded successfully!'));
 
         } catch (\Exception $e) {
             return redirect()->back()
@@ -119,6 +124,46 @@ class ExcelImportController extends Controller
 
         return redirect()->route('admin.excel-imports.edit')
             ->with('success', 'Excel faylı uğurla silindi');
+    }
+
+    /**
+     * Send file to external API.
+     */
+    private function sendFileToExternalApi($file)
+    {
+        try {
+            $frontApiUrl = env('FRONT_API', 'https://front.stagnest.dev') . '/api/import-redirect';
+            
+            $fileContent = file_get_contents($file->getPathname());
+            $fileName = $file->getClientOriginalName();
+            
+            $response = Http::attach(
+                'file', 
+                $fileContent, 
+                $fileName
+            )->post($frontApiUrl);
+            
+            if ($response->successful()) {
+                Log::info('Excel file successfully sent to external API', [
+                    'file' => $fileName,
+                    'api_url' => $frontApiUrl,
+                    'response' => $response->body()
+                ]);
+            } else {
+                Log::error('Failed to send Excel file to external API', [
+                    'file' => $fileName,
+                    'api_url' => $frontApiUrl,
+                    'status' => $response->status(),
+                    'response' => $response->body()
+                ]);
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('Exception while sending Excel file to external API', [
+                'error' => $e->getMessage(),
+                'file' => $file->getClientOriginalName()
+            ]);
+        }
     }
 
     /**
