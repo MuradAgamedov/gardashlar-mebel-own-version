@@ -14,7 +14,7 @@ class ExcelImportSeeder extends Seeder
     {
         // Create a default Excel import record
         ExcelImport::create([
-            'file_url' => null, // No file uploaded initially
+            'file_url' => "null", // No file uploaded initially
         ]);
     }
 }
