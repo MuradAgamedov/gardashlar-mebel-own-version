@@ -13,16 +13,8 @@ return new class extends Migration
     {
         Schema::create('excel_imports', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('slug')->unique();
-            $table->text('description')->nullable();
             $table->string('file_url');
-            $table->string('original_filename');
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-            
-            $table->index('is_active');
-            $table->index('slug');
+     
         });
     }
 
