@@ -58,14 +58,16 @@
                             @if($excelImport && $excelImport->file_url)
                                 <div class="mb-3">
                                     <label class="form-label">Mövcud Fayl</label>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <a href="{{ route('admin.excel-imports.download') }}" class="btn btn-sm btn-info" target="_blank" title="Faylı Yüklə">
-                                            <i class="fas fa-download"></i>
-                                        </a>
-                                        <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete()" title="Faylı Sil">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        <small class="text-muted">{{ $excelImport->file_url }}</small>
+                                    <div class="d-flex align-items-center justify-content-between gap-2">
+                                        <small class="text-muted flex-grow-1">{{ $excelImport->file_url }}</small>
+                                        <div class="d-flex gap-1">
+                                            <a href="{{ route('admin.excel-imports.download') }}" class="btn btn-sm btn-info" target="_blank" title="Faylı Yüklə">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete()" title="Faylı Sil">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             @endif
