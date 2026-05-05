@@ -58,18 +58,18 @@ class BecomeAPartnerFormController extends Controller
                 'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,txt|max:10240', // 10MB max
                 'message' => 'required|string|max:2000',
             ], [
-                'name.required' => 'Name is required.',
-                'name.max' => 'Name may not be greater than 255 characters.',
-                'mobile.required' => 'Mobile number is required.',
-                'mobile.max' => 'Mobile number may not be greater than 20 characters.',
-                'email.required' => 'Email is required.',
-                'email.email' => 'Email must be a valid email address.',
-                'email.max' => 'Email may not be greater than 255 characters.',
-                'file.file' => 'File must be a valid file.',
-                'file.mimes' => 'File must be a file of type: pdf, doc, docx, xls, xlsx, txt.',
-                'file.max' => 'File may not be greater than 10MB.',
-                'message.required' => 'Message is required.',
-                'message.max' => 'Message may not be greater than 2000 characters.',
+                'name.required' => dict('name_required'),
+                'name.max' => dict('name_max'),
+                'mobile.required' => dict('mobile_required'),
+                'mobile.max' => dict('mobile_max'),
+                'email.required' => dict('email_required'),
+                'email.email' => dict('email_email'),
+                'email.max' => dict('email_max'),
+                'file.file' => dict('file_invalid'),
+                'file.mimes' => dict('file_mimes'),
+                'file.max' => dict('file_max'),
+                'message.required' => dict('message_required'),
+                'message.max' => dict('message_max'),
             ]);
 
             // Handle file upload
