@@ -61,16 +61,16 @@ class SubscriberController extends Controller
             $validator = Validator::make($request->all(), [
                 'email' => 'required|email|unique:subscribers,email|max:255',
             ], [
-                'email.required' => 'Email is required',
-                'email.email' => 'Please provide a valid email address',
-                'email.unique' => 'This email is already subscribed',
-                'email.max' => 'Email must not exceed 255 characters',
+                'email.required' => dict('email_required'),
+                'email.email' => dict('email_email'),
+                'email.unique' => dict('email_exists'),
+                'email.max' => dict('email_max'),
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Validation failed',
+                    'message' => 'Subscription failed',
                     'errors' => $validator->errors()
                 ], 422);
             }
