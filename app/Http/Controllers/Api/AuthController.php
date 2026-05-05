@@ -858,17 +858,17 @@ class AuthController extends Controller
                 'email' => 'sometimes|nullable|email|unique:users,email,' . $user->id,
                 'fin' => 'nullable|string|unique:users,fin,' . $user->id
             ], [
-                'name.required' => 'Ad məcburidir',
-                'name.string' => 'Ad mətn formatında olmalıdır',
-                'name.max' => 'Ad 255 simvoldan çox ola bilməz',
-                'surname.required' => 'Soyad məcburidir',
-                'surname.string' => 'Soyad mətn formatında olmalıdır',
-                'surname.max' => 'Soyad 255 simvoldan çox ola bilməz',
-                'phone.string' => 'Telefon nömrəsi mətn formatında olmalıdır',
-                'phone.max' => 'Telefon nömrəsi 20 simvoldan çox ola bilməz',
-                'email.email' => 'Düzgün email ünvanı daxil edin',
-                'email.unique' => 'user_already_exists',
-                'fin.string' => 'FIN mətn formatında olmalıdır',
+                'name.required' => dict('name_required'),
+                'name.string' => dict('name_invalid'),
+                'name.max' => dict('name_max'),
+                'surname.required' => dict('surname_required'),
+                'surname.string' => dict('surname_invalid'),
+                'surname.max' => dict('surname_max'),
+                'phone.string' => dict('phone_invalid'),
+                'phone.max' => dict('phone_max'),
+                'email.email' => dict('email_invalid'),
+                'email.unique' => dict('email_exists'),
+                'fin.string' => dict('fin_invalid'),
                 'fin.unique' => dict('fin_unique'),
             ]);
 
