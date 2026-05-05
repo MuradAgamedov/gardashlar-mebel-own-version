@@ -869,7 +869,7 @@ class AuthController extends Controller
                 'email.email' => 'Düzgün email ünvanı daxil edin',
                 'email.unique' => 'user_already_exists',
                 'fin.string' => 'FIN mətn formatında olmalıdır',
-                'fin.unique' => __('home_page'),
+                'fin.unique' => Dictionary::where('keyword', 'home_page')->first()->translate()->value,
             ]);
 
             if ($validator->fails()) {
