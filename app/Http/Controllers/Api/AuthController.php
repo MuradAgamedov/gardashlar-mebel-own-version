@@ -869,10 +869,10 @@ class AuthController extends Controller
                 'email.email' => 'Düzgün email ünvanı daxil edin',
                 'email.unique' => 'user_already_exists',
                 'fin.string' => 'FIN mətn formatında olmalıdır',
-                'fin.unique' => $request->header,
+                'fin.unique' => $request->all(),
             ]);
 
-            
+
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
