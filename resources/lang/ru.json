@@ -6,6 +6,7 @@
     "Çıxış etmək istədiyinizə əminsiniz?": "Вы уверены, что хотите выйти?",
     "Bütün hüquqlar qorunur.": "Все права защищены.",
     "Copyright": "Copyright {{ date('Y') }} © Gardashlar MMC.",
+    "Category not found": "Категория не найдена",
     "Clear Cache": "Очистить кэш",
     "Search menu...": "Поиск в меню...",
     "General": "Общее",

@@ -173,10 +173,15 @@ class ProductsController extends Controller
                     $query->where('slug', $categorySlug)->where('language_id', $languageId);
                 })->first();
 
-                if ($selectedCategory) {
-                    $categoryTranslation = $selectedCategory->translates()->where('language_id', $languageId)->first();
-                    $categorySeoText = $categoryTranslation ? $categoryTranslation->seo_text : null;
+                if (!$selectedCategory) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => __('messages.category_not_found')
+                    ], 404);
                 }
+
+                $categoryTranslation = $selectedCategory->translates()->where('language_id', $languageId)->first();
+                $categorySeoText = $categoryTranslation ? $categoryTranslation->seo_text : null;
             }
 
             // Convert filters to arrays
@@ -301,13 +306,18 @@ class ProductsController extends Controller
                     $query->where('slug', $categorySlug);
                 })->first();
 
-                if ($category) {
-                    $children = ProductCategory::where('parent_id', $category->id)->pluck('id');
-                    $categoryIds = $children->isNotEmpty() ? $children->push($category->id)->toArray() : [$category->id];
-                    $productsQuery->whereHas('categories', function($query) use ($categoryIds) {
-                        $query->whereIn('product_categories.id', $categoryIds);
-                    });
+                if (!$category) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => __('messages.category_not_found')
+                    ], 404);
                 }
+
+                $children = ProductCategory::where('parent_id', $category->id)->pluck('id');
+                $categoryIds = $children->isNotEmpty() ? $children->push($category->id)->toArray() : [$category->id];
+                $productsQuery->whereHas('categories', function($query) use ($categoryIds) {
+                    $query->whereIn('product_categories.id', $categoryIds);
+                });
             }
 
             if (!empty($typeIds)) {
@@ -442,35 +452,40 @@ if ($categorySlug) {
         $query->where('slug', $categorySlug);
     })->first();
 
-    if ($selectedCategory) {
-        // bütün dilləri çək
-        $languages = \App\Models\Language::all();
+    if (!$selectedCategory) {
+        return response()->json([
+            'success' => false,
+            'message' => __('messages.category_not_found')
+        ], 404);
+    }
 
-        $slugTranslations = [];
-        $parentSlugTranslations = [];
+    // bütün dilləri çək
+    $languages = \App\Models\Language::all();
 
-        foreach ($languages as $lang) {
-            $langCode = $lang->lang_code; // YALNIZ BİR PROPERTY istifadə et
+    $slugTranslations = [];
+    $parentSlugTranslations = [];
 
-            $catTr = $selectedCategory->translates()->where('language_id', $lang->id)->first();
-            $slugTranslations[$langCode] = $catTr ? $catTr->slug : null;
+    foreach ($languages as $lang) {
+        $langCode = $lang->lang_code; // YALNIZ BİR PROPERTY istifadə et
 
-            $parentSlugTranslations[$langCode] = null;
-            if ($selectedCategory->parent_id) {
-                $parent = ProductCategory::find($selectedCategory->parent_id);
-                if ($parent) {
-                    $parentTr = $parent->translates()->where('language_id', $lang->id)->first();
-                    $parentSlugTranslations[$langCode] = $parentTr ? $parentTr->slug : null;
-                }
+        $catTr = $selectedCategory->translates()->where('language_id', $lang->id)->first();
+        $slugTranslations[$langCode] = $catTr ? $catTr->slug : null;
+
+        $parentSlugTranslations[$langCode] = null;
+        if ($selectedCategory->parent_id) {
+            $parent = ProductCategory::find($selectedCategory->parent_id);
+            if ($parent) {
+                $parentTr = $parent->translates()->where('language_id', $lang->id)->first();
+                $parentSlugTranslations[$langCode] = $parentTr ? $parentTr->slug : null;
             }
         }
-
-
-        $translatesData = [
-            'slug' => $slugTranslations,
-            'parentSlug' => $parentSlugTranslations
-        ];
     }
+
+
+    $translatesData = [
+        'slug' => $slugTranslations,
+        'parentSlug' => $parentSlugTranslations
+    ];
 }
 
             return response()->json([
