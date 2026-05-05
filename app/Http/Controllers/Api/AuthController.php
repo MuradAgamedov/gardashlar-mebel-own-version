@@ -869,14 +869,13 @@ class AuthController extends Controller
                 'email.email' => 'Düzgün email ünvanı daxil edin',
                 'email.unique' => 'user_already_exists',
                 'fin.string' => 'FIN mətn formatında olmalıdır',
-                'fin.unique' => $request->all(),
+                'fin.unique' => Dictionary::where('keyword', 'home_page')->first()->translate()->value,
             ]);
-
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('home_page'),
+                    'message' => request()->header('locale') ,
                     'errors' => $validator->errors()
                 ], 422);
             }
