@@ -464,3 +464,6 @@ Route::get('download/simple-images/{keyword}', function () {
 Route::get('/excel-import/download', [\App\Http\Controllers\Admin\ExcelImportController::class, 'apiGetExcel'])->name('api.excel-import.download');
 
 }); // Close throttle middleware group
+
+
+Route::post('/auth/google', [AuthController::class, 'googleLogin']);

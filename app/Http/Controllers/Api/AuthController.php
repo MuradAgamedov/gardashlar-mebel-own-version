@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-
+use Google\Client as GoogleClient;
 use App\Models\Dictionary;
 use App\Models\Language;
 class AuthController extends Controller
@@ -1220,5 +1220,42 @@ class AuthController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+
+    public function googleLogin(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+        ]);
+
+        $client = new GoogleClient([
+            'client_id' => env('GOOGLE_CLIENT_ID'),
+        ]);
+
+        $payload = $client->verifyIdToken($request->token);
+
+        if (!$payload) {
+            return response()->json([
+                'message' => 'Google token yanlışdır'
+            ], 401);
+        }
+
+        $user = User::updateOrCreate(
+            ['email' => $payload['email']],
+            [
+                'name' => $payload['name'] ?? 'Google User',
+                'google_id' => $payload['sub'],
+                'email_verified_at' => now(),
+            ]
+        );
+
+        $token = $user->createToken('google-login')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Google login uğurludur',
+            'token' => $token,
+            'user' => $user,
+        ]);
     }
 }
