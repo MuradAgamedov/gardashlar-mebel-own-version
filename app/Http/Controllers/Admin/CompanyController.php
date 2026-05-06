@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\CompanyProduct;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use App\Models\ProductCategory;
 use App\Repositories\CompanyRepository;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Repositories\LanguageRepository;
 use App\Http\Requests\Admin\Company\StoreCompanyRequest;
 use App\Http\Requests\Admin\Company\UpdateCompanyRequest;
