@@ -10,7 +10,10 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h4 class="card-title mb-0">{{ __('Products Management') }}</h4>
+                            <h4 class="card-title mb-0">
+                                <i class="material-icons-outlined me-2">settings_applications</i>
+                                {{ __('Products Management') }}
+                            </h4>
                             @php
                                 $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
                                 $companyMainTranslate = $company->translates->firstWhere('language_id', $mainLanguageId)
@@ -21,9 +24,8 @@
                             </p>
                         </div>
                         <div class="d-flex gap-2">
-                            <a href="{{ route('admin.campaigns.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('admin.campaigns.index') }}" class="btn btn-secondary" title="{{ __('Back') }}">
                                 <i class="material-icons-outlined">arrow_back</i>
-                                {{ __('Back') }}
                             </a>
                         </div>
                     </div>
@@ -32,7 +34,10 @@
                     <!-- Categories Section -->
                     <div class="row mb-4">
                         <div class="col-12">
-                            <h5 class="mb-3">{{ __('Add Products by Category') }}</h5>
+                            <h5 class="mb-3">
+                            <i class="material-icons-outlined me-2">category</i>
+                            {{ __('Add Products by Category') }}
+                        </h5>
                             
                             <div class="card">
                                 <div class="card-body">
@@ -40,7 +45,10 @@
                                         <div class="row">
                                             <div class="col-md-8">
                                                 <div class="mb-3">
-                                                    <label class="form-label">{{ __('Select Categories') }}</label>
+                                                    <label class="form-label">
+                                                            <i class="material-icons-outlined me-1">checklist</i>
+                                                            {{ __('Select Categories') }}
+                                                        </label>
                                                     <div class="category-selection" style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 1rem;">
                                                         @forelse($categories as $category)
                                                             @php
@@ -101,18 +109,15 @@
                                             </div>
                                             
                                             <div class="col-md-4">
-                                                <div class="d-grid gap-2">
-                                                    <button type="button" class="btn btn-primary" onclick="addCategoryProducts()">
+                                                <div class="d-flex gap-2">
+                                                    <button type="button" class="btn btn-primary" onclick="addCategoryProducts()" title="{{ __('Add Selected Categories') }}">
                                                         <i class="material-icons-outlined">add_circle</i>
-                                                        {{ __('Add Selected Categories') }}
                                                     </button>
-                                                    <button type="button" class="btn btn-outline-secondary" onclick="selectAllCategories()">
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="selectAllCategories()" title="{{ __('Select All') }}">
                                                         <i class="material-icons-outlined">select_all</i>
-                                                        {{ __('Select All') }}
                                                     </button>
-                                                    <button type="button" class="btn btn-outline-secondary" onclick="deselectAllCategories()">
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="deselectAllCategories()" title="{{ __('Deselect All') }}">
                                                         <i class="material-icons-outlined">deselect</i>
-                                                        {{ __('Deselect All') }}
                                                     </button>
                                                 </div>
                                             </div>
@@ -126,7 +131,10 @@
                     <!-- Products Section -->
                     <div class="row">
                         <div class="col-12">
-                            <h5 class="mb-3">{{ __('Products') }} ({{ $products->total() }})</h5>
+                            <h5 class="mb-3">
+                            <i class="material-icons-outlined me-2">inventory_2</i>
+                            {{ __('Products') }} ({{ $products->total() }})
+                        </h5>
                             
                             <!-- Search -->
                             <div class="row mb-3">
