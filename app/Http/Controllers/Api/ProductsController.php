@@ -159,48 +159,9 @@ class ProductsController extends Controller
             $perPage = $request->get('per_page', 12);
             $page = $request->get('page', 1);
             $categorySlug = $request->get('category_slug');
-            // Handle multiple type_id parameters from URL like ?type_id=2&type_id=3&type_id=4
-$typeIds = $request->get('type_id', []);
-if (!is_array($typeIds)) {
-    // If it's a single value, convert to array
-    $typeIds = $typeIds ? [$typeIds] : [];
-}
-// Also check if there are multiple type_id parameters in the query string
-if (empty($typeIds) && $request->has('type_id')) {
-    // Get all type_id parameters from query string
-    $allTypeIds = $request->query('type_id');
-    if (is_string($allTypeIds)) {
-        // Parse query string to extract all type_id values
-        parse_str($request->getQueryString(), $queryParams);
-        if (isset($queryParams['type_id'])) {
-            $typeIds = is_array($queryParams['type_id']) ? $queryParams['type_id'] : [$queryParams['type_id']];
-        }
-    }
-}
-            
-            // Handle multiple filters parameters
+            $typeIds = $request->get('type_id', []);
             $filterIds = $request->get('filters', []);
-if (!is_array($filterIds)) {
-    $filterIds = $filterIds ? [$filterIds] : [];
-}
-if (empty($filterIds) && $request->has('filters')) {
-    parse_str($request->getQueryString(), $queryParams);
-    if (isset($queryParams['filters'])) {
-        $filterIds = is_array($queryParams['filters']) ? $queryParams['filters'] : [$queryParams['filters']];
-    }
-}
-            
-            // Handle multiple color parameters
             $colorIds = $request->get('color', []);
-if (!is_array($colorIds)) {
-    $colorIds = $colorIds ? [$colorIds] : [];
-}
-if (empty($colorIds) && $request->has('color')) {
-    parse_str($request->getQueryString(), $queryParams);
-    if (isset($queryParams['color'])) {
-        $colorIds = is_array($queryParams['color']) ? $queryParams['color'] : [$queryParams['color']];
-    }
-}
             $sort = $request->get('sort', 'view_count');
             $minPrice = $request->get('min_price');
             $maxPrice = $request->get('max_price');
@@ -223,7 +184,11 @@ if (empty($colorIds) && $request->has('color')) {
                 $categorySeoText = $categoryTranslation ? $categoryTranslation->seo_text : null;
             }
 
-            
+            // Convert filters to arrays
+            if (!is_array($filterIds)) $filterIds = $filterIds ? [$filterIds] : [];
+            if (!is_array($colorIds)) $colorIds = $colorIds ? [$colorIds] : [];
+            if (!is_array($typeIds)) $typeIds = $typeIds ? [$typeIds] : [];
+
             // === Məhsul query ===
             $productsQuery = Product::with([
                 'translates' => function($query) use ($languageId) {
