@@ -159,32 +159,10 @@ class ProductsController extends Controller
             $perPage = $request->get('per_page', 12);
             $page = $request->get('page', 1);
             $categorySlug = $request->get('category_slug');
-            // Handle multiple type_id parameters from URL like ?type_id=2&type_id=3&type_id=4
-$typeIds = $request->get('type_id', []);
-if (!is_array($typeIds)) {
-    $typeIds = $typeIds ? [$typeIds] : [];
-}
+            parse_str($_SERVER['QUERY_STRING'], $query);
 
-// Manual parsing of query string to get all type_id values
-if ($request->has('type_id')) {
-    $queryString = $request->getQueryString();
-    if ($queryString) {
-        // Split by & and then by = to find all type_id parameters
-        $pairs = explode('&', $queryString);
-        $extractedTypeIds = [];
-        
-        foreach ($pairs as $pair) {
-            $parts = explode('=', $pair, 2);
-            if (count($parts) === 2 && $parts[0] === 'type_id') {
-                $extractedTypeIds[] = $parts[1];
-            }
-        }
-        
-        if (!empty($extractedTypeIds)) {
-            $typeIds = $extractedTypeIds;
-        }
-    }
-}
+$typeIds = $query['type_id'] ?? [];
+$typeIds = (array) $typeIds;
             $filterIds = $request->get('filters', []);
             $colorIds = $request->get('color', []);
             $sort = $request->get('sort', 'view_count');
