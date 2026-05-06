@@ -105,15 +105,6 @@
                                                         @endforelse
                                                     </div>
                                                 </div>
-                                                
-                                                <div class="mb-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="includeSubcategories" checked>
-                                                        <label class="form-check-label" for="includeSubcategories">
-                                                            {{ __('Include all subcategories when selecting main categories') }}
-                                                        </label>
-                                                    </div>
-                                                </div>
                                             </div>
                                             
                                             <div class="col-md-4">
@@ -304,7 +295,7 @@ function addCategoryProducts() {
         selectedCategories.push(checkbox.value);
     });
     
-    const includeSubcategories = document.getElementById('includeSubcategories').checked;
+    const includeSubcategories = true; // Always include subcategories
     
     const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
     loadingModal.show();
@@ -355,7 +346,7 @@ function removeCategoryProducts() {
         selectedCategories.push(checkbox.value);
     });
     
-    const includeSubcategories = document.getElementById('includeSubcategories').checked;
+    const includeSubcategories = true; // Always include subcategories
     
     const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
     loadingModal.show();
