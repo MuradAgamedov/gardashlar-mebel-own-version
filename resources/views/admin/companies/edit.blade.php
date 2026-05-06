@@ -997,4 +997,3 @@ function removeImage(inputId) {
     display: block !important;
 }
 </style>
-@endpush
