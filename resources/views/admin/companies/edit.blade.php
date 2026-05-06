@@ -152,6 +152,36 @@
                                             </div>
                                         </div>
 
+                                        <!-- Discount Section -->
+                                        @if($index === 0)
+                                        <div class="form-section mb-4">
+                                            <h6 class="section-title">
+                                                <i class="material-icons-outlined me-2">discount</i>
+                                                {{ __('Discount Settings') }}
+                                            </h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-floating mb-3">
+                                                        <input type="number" 
+                                                            class="form-control @error('discount_percent') is-invalid @enderror" 
+                                                            name="discount_percent" 
+                                                            id="discount_percent"
+                                                            value="{{ old('discount_percent', $company->discount_percent) }}"
+                                                            placeholder="{{ __('Enter discount percentage') }}"
+                                                            step="0.01"
+                                                            min="0"
+                                                            max="100">
+                                                        <label for="discount_percent">{{ __('Discount Percent') }} (%)</label>
+                                                        @error('discount_percent')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                        <div class="form-text">{{ __('Enter discount percentage (0-100). Leave empty for no discount.') }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+
                                         <!-- Images Section -->
                                         <div class="form-section mb-4">
                                             <h6 class="section-title">

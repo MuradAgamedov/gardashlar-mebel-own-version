@@ -12,14 +12,16 @@ class Company extends Model
 
     protected $fillable = [
         'order',
-        'status'
+        'status',
+        'discount_percent'
     ];
 
     protected $primaryKey = 'id';
 
     protected $casts = [
         'status' => 'boolean',
-        'order' => 'integer'
+        'order' => 'integer',
+        'discount_percent' => 'decimal:2'
     ];
 
     protected static function boot()

@@ -36,7 +36,10 @@ class CompanyController extends Controller
     {
         try {
             $this->repository->createCompany(
-                ['status' => $request->input('status', true)],
+                [
+                    'status' => $request->input('status', true),
+                    'discount_percent' => $request->input('discount_percent')
+                ],
                 $request->input('translates'),
                 $request
             );
@@ -61,7 +64,10 @@ class CompanyController extends Controller
         try {
             $this->repository->updateCompany(
                 $campaign,
-                ['status' => $request->input('status', true)],
+                [
+                    'status' => $request->input('status', true),
+                    'discount_percent' => $request->input('discount_percent')
+                ],
                 $request->input('translates'),
                 $request
             );

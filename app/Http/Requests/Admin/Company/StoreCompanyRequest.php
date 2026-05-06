@@ -23,6 +23,7 @@ class StoreCompanyRequest extends FormRequest
             'translates.*.inner_image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'translates.*.inner_image_alt_text' => 'nullable|string|max:255',
             'translates.*.description' => 'required|string',
+            'discount_percent' => 'nullable|numeric|min:0|max:100',
             'status' => 'boolean'
         ];
     }

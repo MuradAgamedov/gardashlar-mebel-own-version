@@ -26,7 +26,15 @@ class CompanyRepository extends BaseRepository
     public function createCompany(array $data, array $translates, $request)
     {
         return DB::transaction(function () use ($data, $translates, $request) {
-            $company = $this->company->create(['status' => $data['status'] ?? true]);
+            $companyData = [
+                'status' => $data['status'] ?? true
+            ];
+            
+            if (isset($data['discount_percent'])) {
+                $companyData['discount_percent'] = $data['discount_percent'];
+            }
+            
+            $company = $this->company->create($companyData);
 
             foreach ($translates as $translate) {
                 $cardImagePath = $this->imageService->upload(
@@ -58,7 +66,13 @@ class CompanyRepository extends BaseRepository
     public function updateCompany(Company $company, array $data, array $translates, $request)
     {
         return DB::transaction(function () use ($company, $data, $translates, $request) {
-            $company->update(['status' => $data['status'] ?? true]);
+            $companyData = ['status' => $data['status'] ?? true];
+            
+            if (isset($data['discount_percent'])) {
+                $companyData['discount_percent'] = $data['discount_percent'];
+            }
+            
+            $company->update($companyData);
 
             foreach ($translates as $translate) {
                 $translateData = [
