@@ -697,6 +697,144 @@ function removeImage(inputId) {
     noImage.style.display = 'block';
 }
 
+    // Check if CKEditor is available
+    if (typeof ClassicEditor === 'undefined') {
+        console.error('CKEditor ClassicEditor is not available');
+        return;
+    }
+    
+    const ckeditorElements = document.querySelectorAll('.ckeditor');
+    console.log('Found', ckeditorElements.length, 'CKEditor elements');
+    
+    // Initialize CKEditor for each textarea
+    ckeditorElements.forEach(function(textarea) {
+        // Hide the original textarea
+        textarea.style.display = 'none';
+        
+        ClassicEditor
+            .create(textarea, {
+                toolbar: {
+                    items: [
+                        'undo', 'redo',
+                        '|', 'heading',
+                        '|', 'bold', 'italic', 'underline', 'strikethrough',
+                        '|', 'fontColor', 'fontBackgroundColor',
+                        '|', 'link', 'blockQuote', 'insertTable',
+                        '|', 'bulletedList', 'numberedList',
+                        '|', 'outdent', 'indent',
+                        '|', 'alignment',
+                        '|', 'removeFormat'
+                    ]
+                },
+                language: 'en',
+                placeholder: 'Enter description...',
+                branding: false
+            })
+            .then(editor => {
+                console.log('CKEditor initialized successfully for:', textarea.id);
+                // Store editor reference on textarea for later use
+                textarea._ckeditor = editor;
+                textarea._focusEditor = () => editor.editing.view.focus();
+
+                // Override the focus method to focus on the editor instead of textarea
+                textarea.focus = function() {
+                    editor.editing.view.focus();
+                };
+
+                // Override validation methods to prevent browser validation
+                textarea.checkValidity = function() {
+                    return true;
+                };
+
+                textarea.reportValidity = function() {
+                    return true;
+                };
+            })
+            .catch(error => {
+                console.error('CKEditor initialization failed:', error);
+                // Show textarea as fallback if CKEditor fails
+                textarea.style.display = 'block';
+                textarea.classList.add('form-control');
+            });
+    });
+
+    // Override form validation to handle CKEditor fields
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Update all CKEditor instances before validation
+            document.querySelectorAll('.ckeditor').forEach(function(textarea) {
+                if (textarea._ckeditor) {
+                    textarea._ckeditor.updateSourceElement();
+                }
+            });
+
+            // Check if any required CKEditor fields are empty
+            let hasEmptyFields = false;
+            let firstEmptyField = null;
+
+            document.querySelectorAll('.ckeditor').forEach(function(textarea) {
+                if (textarea._ckeditor) {
+                    const content = textarea._ckeditor.getData().trim();
+                    if (!content) {
+                        hasEmptyFields = true;
+                        
+                        // Store first empty field for focus
+                        if (!firstEmptyField) {
+                            firstEmptyField = textarea;
+                        }
+                        
+                        // Add error styling
+                        textarea.classList.add('is-invalid');
+                        if (!textarea.nextElementSibling || !textarea.nextElementSibling.classList.contains('invalid-feedback')) {
+                            const errorDiv = document.createElement('div');
+                            errorDiv.className = 'invalid-feedback';
+                            errorDiv.textContent = 'This field is required.';
+                            textarea.parentNode.insertBefore(errorDiv, textarea.nextSibling);
+                        }
+                    } else {
+                        textarea.classList.remove('is-invalid');
+                        const errorDiv = textarea.nextElementSibling;
+                        if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
+                            errorDiv.remove();
+                        }
+                    }
+                }
+            });
+
+            if (hasEmptyFields) {
+                e.preventDefault();
+                
+                // Focus on first empty field and switch to its tab
+                if (firstEmptyField && firstEmptyField._focusEditor) {
+                    // Find the tab pane containing this textarea
+                    const pane = firstEmptyField.closest('.tab-pane');
+                    if (pane) {
+                        const tabId = pane.getAttribute('id');
+                        const tabTrigger = document.querySelector(`[data-bs-target="#${tabId}"]`);
+                        if (tabTrigger) {
+                            // Switch to the tab first
+                            const tab = new bootstrap.Tab(tabTrigger);
+                            tab.show();
+                            
+                            // Focus on editor after tab is shown
+                            setTimeout(() => {
+                                firstEmptyField._focusEditor();
+                            }, 100);
+                        }
+                    } else {
+                        firstEmptyField._focusEditor();
+                    }
+                }
+                
+                return false;
+            }
+        });
+    }
+});
+</script>
+@endpush
+
 <style>
 /* Form Sections */
 .form-section {
@@ -883,147 +1021,7 @@ function removeImage(inputId) {
 .nav-tabs .nav-link:hover {
     border-color: #e9ecef #e9ecef #dee2e6;
 }
-</style>
 
-    // Check if CKEditor is available
-    if (typeof ClassicEditor === 'undefined') {
-        console.error('CKEditor ClassicEditor is not available');
-        return;
-    }
-    
-    const ckeditorElements = document.querySelectorAll('.ckeditor');
-    console.log('Found', ckeditorElements.length, 'CKEditor elements');
-    
-    // Initialize CKEditor for each textarea
-    ckeditorElements.forEach(function(textarea) {
-        // Hide the original textarea
-        textarea.style.display = 'none';
-        
-        ClassicEditor
-            .create(textarea, {
-                toolbar: {
-                    items: [
-                        'undo', 'redo',
-                        '|', 'heading',
-                        '|', 'bold', 'italic', 'underline', 'strikethrough',
-                        '|', 'fontColor', 'fontBackgroundColor',
-                        '|', 'link', 'blockQuote', 'insertTable',
-                        '|', 'bulletedList', 'numberedList',
-                        '|', 'outdent', 'indent',
-                        '|', 'alignment',
-                        '|', 'removeFormat'
-                    ]
-                },
-                language: 'en',
-                placeholder: 'Enter description...',
-                branding: false
-            })
-            .then(editor => {
-                console.log('CKEditor initialized successfully for:', textarea.id);
-                // Store editor reference on textarea for later use
-                textarea._ckeditor = editor;
-                textarea._focusEditor = () => editor.editing.view.focus();
-
-                // Override the focus method to focus on the editor instead of textarea
-                textarea.focus = function() {
-                    editor.editing.view.focus();
-                };
-
-                // Override validation methods to prevent browser validation
-                textarea.checkValidity = function() {
-                    return true;
-                };
-
-                textarea.reportValidity = function() {
-                    return true;
-                };
-            })
-            .catch(error => {
-                console.error('CKEditor initialization failed:', error);
-                // Show textarea as fallback if CKEditor fails
-                textarea.style.display = 'block';
-                textarea.classList.add('form-control');
-            });
-    });
-
-    // Override form validation to handle CKEditor fields
-    const form = document.querySelector('form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            // Update all CKEditor instances before validation
-            document.querySelectorAll('.ckeditor').forEach(function(textarea) {
-                if (textarea._ckeditor) {
-                    textarea._ckeditor.updateSourceElement();
-                }
-            });
-
-            // Check if any required CKEditor fields are empty
-            let hasEmptyFields = false;
-            let firstEmptyField = null;
-
-            document.querySelectorAll('.ckeditor').forEach(function(textarea) {
-                if (textarea._ckeditor) {
-                    const content = textarea._ckeditor.getData().trim();
-                    if (!content) {
-                        hasEmptyFields = true;
-                        
-                        // Store first empty field for focus
-                        if (!firstEmptyField) {
-                            firstEmptyField = textarea;
-                        }
-                        
-                        // Add error styling
-                        textarea.classList.add('is-invalid');
-                        if (!textarea.nextElementSibling || !textarea.nextElementSibling.classList.contains('invalid-feedback')) {
-                            const errorDiv = document.createElement('div');
-                            errorDiv.className = 'invalid-feedback';
-                            errorDiv.textContent = 'This field is required.';
-                            textarea.parentNode.insertBefore(errorDiv, textarea.nextSibling);
-                        }
-                    } else {
-                        textarea.classList.remove('is-invalid');
-                        const errorDiv = textarea.nextElementSibling;
-                        if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
-                            errorDiv.remove();
-                        }
-                    }
-                }
-            });
-
-            if (hasEmptyFields) {
-                e.preventDefault();
-                
-                // Focus on first empty field and switch to its tab
-                if (firstEmptyField && firstEmptyField._focusEditor) {
-                    // Find the tab pane containing this textarea
-                    const pane = firstEmptyField.closest('.tab-pane');
-                    if (pane) {
-                        const tabId = pane.getAttribute('id');
-                        const tabTrigger = document.querySelector(`[data-bs-target="#${tabId}"]`);
-                        if (tabTrigger) {
-                            // Switch to the tab first
-                            const tab = new bootstrap.Tab(tabTrigger);
-                            tab.show();
-                            
-                            // Focus on editor after tab is shown
-                            setTimeout(() => {
-                                firstEmptyField._focusEditor();
-                            }, 100);
-                        }
-                    } else {
-                        firstEmptyField._focusEditor();
-                    }
-                }
-                
-                return false;
-            }
-        });
-    }
-});
-</script>
-@endpush
-
-<style>
 .invalid-feedback {
     display: block !important;
 }
