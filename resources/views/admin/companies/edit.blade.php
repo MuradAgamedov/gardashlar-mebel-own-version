@@ -587,43 +587,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Update tab error indicators
-        document.querySelectorAll('.nav-link').forEach(function(tab) {
-            const targetId = tab.getAttribute('data-bs-target');
-            const tabPane = document.querySelector(targetId);
-            
-            if (tabPane && tabPane.querySelector('.is-invalid')) {
-                tab.style.borderColor = '#dc3545';
-                tab.style.color = '#dc3545';
-                if (!tab.querySelector('.error-icon')) {
-                    const errorIcon = document.createElement('i');
-                    errorIcon.className = 'material-icons-outlined text-danger ms-1 error-icon';
-                    errorIcon.style.fontSize = '16px';
-                    errorIcon.textContent = 'error';
-                    tab.appendChild(errorIcon);
-                }
-            } else {
-                tab.style.borderColor = '';
-                tab.style.color = '';
-                const errorIcon = tab.querySelector('.error-icon');
-                if (errorIcon) {
-                    errorIcon.remove();
-                }
-            }
-        });
-        
-        if (hasErrors) {
-            // Switch to first error tab
-            if (firstErrorTab) {
-                const tabTrigger = document.querySelector(`[data-bs-target="#${firstErrorTab}"]`);
-                if (tabTrigger) {
-                    const tab = new bootstrap.Tab(tabTrigger);
-                    tab.show();
-                }
-            }
-            return false;
-        }
-        
         // Override form validation to handle CKEditor fields
         const form = document.querySelector('form');
         if (form) {
