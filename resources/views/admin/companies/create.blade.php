@@ -280,6 +280,65 @@
                                                 @enderror
                                             </div>
                                         </div>
+
+                                        <!-- SEO Fields Section -->
+                                        <div class="form-section">
+                                            <h6 class="section-title">
+                                                <i class="material-icons-outlined me-2">search</i>
+                                                SEO Settings
+                                            </h6>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-floating mb-3">
+                                                        <input type="text" 
+                                                               class="form-control @error("translates.{$language->id}.seo_title") is-invalid @enderror" 
+                                                               name="translates[{{ $language->id }}][seo_title]" 
+                                                               id="seo-title-{{ $language->id }}"
+                                                               value="{{ old("translates.{$language->id}.seo_title") }}"
+                                                               placeholder="{{ __('Enter SEO title') }}">
+                                                        <label for="seo-title-{{ $language->id }}">{{ __('SEO Title') }}</label>
+                                                        @error("translates.{$language->id}.seo_title")
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                        <div class="form-text">Recommended length: 50-60 characters</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-floating mb-3">
+                                                        <textarea class="form-control @error("translates.{$language->id}.seo_description") is-invalid @enderror" 
+                                                                  name="translates[{{ $language->id }}][seo_description]" 
+                                                                  id="seo-description-{{ $language->id }}"
+                                                                  rows="3"
+                                                                  placeholder="{{ __('Enter SEO description') }}">{{ old("translates.{$language->id}.seo_description") }}</textarea>
+                                                        <label for="seo-description-{{ $language->id }}">{{ __('SEO Description') }}</label>
+                                                        @error("translates.{$language->id}.seo_description")
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                        <div class="form-text">Recommended length: 150-160 characters</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-floating mb-3">
+                                                        <textarea class="form-control @error("translates.{$language->id}.seo_keywords") is-invalid @enderror" 
+                                                                  name="translates[{{ $language->id }}][seo_keywords]" 
+                                                                  id="seo-keywords-{{ $language->id }}"
+                                                                  rows="2"
+                                                                  placeholder="Enter SEO keywords (comma separated)">{{ old("translates.{$language->id}.seo_keywords") }}</textarea>
+                                                        <label for="seo-keywords-{{ $language->id }}">{{ __('SEO Keywords') }}</label>
+                                                        @error("translates.{$language->id}.seo_keywords")
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                        <div class="form-text">Separate keywords with commas</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         
                                         <input type="hidden" name="translates[{{ $language->id }}][language_id]" value="{{ $language->id }}">
                                     </div>
@@ -349,6 +408,8 @@
 <script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Campaign create script loaded');
+    
     // Prevent browser validation
     const form = document.getElementById('companyForm');
     form.setAttribute('novalidate', 'novalidate');
@@ -419,15 +480,27 @@ document.addEventListener('DOMContentLoaded', function() {
         setupImagePreview('inner-image-{{ $language->id }}', 'inner-image-preview-{{ $language->id }}', 'inner-preview-img-{{ $language->id }}', 'inner-no-image-{{ $language->id }}');
     @endforeach
     
-    // Initialize CKEditor
-    document.querySelectorAll('.ckeditor').forEach(function(textarea) {
+    // Check if CKEditor is available
+    if (typeof ClassicEditor === 'undefined') {
+        console.error('CKEditor ClassicEditor is not available');
+        return;
+    }
+    
+    const ckeditorElements = document.querySelectorAll('.ckeditor');
+    console.log('Found', ckeditorElements.length, 'CKEditor elements');
+    
+    // Initialize CKEditor for each textarea
+    ckeditorElements.forEach(function(textarea) {
+        // Hide the original textarea
+        textarea.style.display = 'none';
+        
         ClassicEditor
             .create(textarea, {
                 toolbar: {
                     items: [
                         'undo', 'redo',
                         '|', 'heading',
-                        '|', 'bold', 'italic', 'underline',
+                        '|', 'bold', 'italic', 'underline', 'strikethrough',
                         '|', 'fontColor', 'fontBackgroundColor',
                         '|', 'link', 'blockQuote', 'insertTable',
                         '|', 'bulletedList', 'numberedList',
@@ -440,11 +513,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 placeholder: 'Enter description...'
             })
             .then(editor => {
+                console.log('CKEditor initialized successfully for:', textarea.id);
+                // Store editor reference on textarea for later use
                 textarea._ckeditor = editor;
                 textarea._focusEditor = () => editor.editing.view.focus();
+
+                // Override the focus method to focus on the editor instead of textarea
+                textarea.focus = function() {
+                    editor.editing.view.focus();
+                };
+
+                // Override validation methods to prevent browser validation
+                textarea.checkValidity = function() {
+                    return true;
+                };
+
+                textarea.reportValidity = function() {
+                    return true;
+                };
             })
             .catch(error => {
-                console.error(error);
+                console.error('CKEditor initialization failed:', error);
+                // Show textarea as fallback if CKEditor fails
+                textarea.style.display = 'block';
+                textarea.classList.add('form-control');
             });
     });
     
@@ -601,6 +693,34 @@ function removeImage(inputId) {
 .status-indicator {
     font-weight: 600;
     transition: color 0.3s ease;
+}
+
+/* CKEditor Styles */
+.ck-editor__editable {
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.ck.ck-editor {
+    margin-bottom: 1rem;
+}
+
+.ck.ck-editor__main > .ck-editor__editable {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+}
+
+.ck.ck-editor__main > .ck-editor__editable:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.ck.ck-toolbar {
+    border: 1px solid #ced4da;
+    border-bottom: none;
+    border-radius: 0.375rem 0.375rem 0 0;
 }
 
 /* Image Upload Cards */

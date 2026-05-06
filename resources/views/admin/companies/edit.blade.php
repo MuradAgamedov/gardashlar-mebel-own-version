@@ -351,6 +351,8 @@
 <script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Campaign edit script loaded');
+    
     // Status toggle functionality
     const statusCheckbox = document.getElementById('status');
     const statusText = document.getElementById('statusText');
@@ -432,8 +434,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     @endforeach
 
+    // Check if CKEditor is available
+    if (typeof ClassicEditor === 'undefined') {
+        console.error('CKEditor ClassicEditor is not available');
+        return;
+    }
+    
+    const ckeditorElements = document.querySelectorAll('.ckeditor');
+    console.log('Found', ckeditorElements.length, 'CKEditor elements');
+    
     // Initialize CKEditor for each textarea
-    document.querySelectorAll('.ckeditor').forEach(function(textarea) {
+    ckeditorElements.forEach(function(textarea) {
+        // Hide the original textarea
+        textarea.style.display = 'none';
+        
         ClassicEditor
             .create(textarea, {
                 toolbar: {
@@ -453,6 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 placeholder: 'Enter description...'
             })
             .then(editor => {
+                console.log('CKEditor initialized successfully for:', textarea.id);
                 // Store editor reference on textarea for later use
                 textarea._ckeditor = editor;
                 textarea._focusEditor = () => editor.editing.view.focus();
@@ -472,7 +487,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
             })
             .catch(error => {
-                console.error(error);
+                console.error('CKEditor initialization failed:', error);
+                // Show textarea as fallback if CKEditor fails
+                textarea.style.display = 'block';
+                textarea.classList.add('form-control');
             });
     });
 
