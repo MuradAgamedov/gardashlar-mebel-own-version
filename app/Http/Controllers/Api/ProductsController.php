@@ -489,7 +489,6 @@ if ($categorySlug) {
 }
 
             return response()->json([
-                "type_ids" => $typeIds,
 
                 'success' => true,
                 'message' => __('messages.product_categories_retrieved_successfully'),
@@ -503,6 +502,7 @@ if ($categorySlug) {
                     'sort_translations' => $sortTranslations,
                     'products' => $productsData,
                     'pagination' => $paginationData,
+                    'type_ids' => $typeIds,
                     'applied_filters' => [
                         'min_price' => $actualMinPrice,
                         'max_price' => $actualMaxPrice
