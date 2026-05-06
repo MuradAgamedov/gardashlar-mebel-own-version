@@ -116,6 +116,21 @@ class ContactMessageController extends Controller
                 'city' => 'required|string|max:255',
                 'message' => 'required|string|max:5000',
                 'recaptcha_token' => 'required|string'
+            ], [
+                'name.required' => dict('name_required'),
+                'name.string' => dict('name_string'),
+                'name.max' => dict('name_max'),
+                'email.required' => dict('email_required'),
+                'email.email' => dict('email_valid'),
+                'email.max' => dict('email_max'),
+                'city.required' => dict('city_required'),
+                'city.string' => dict('city_string'),
+                'city.max' => dict('city_max'),
+                'message.required' => dict('message_required'),
+                'message.string' => dict('message_string'),
+                'message.max' => dict('message_max'),
+                'recaptcha_token.required' => dict('recaptcha_required'),
+                'recaptcha_token.string' => dict('recaptcha_string')
             ]);
 
             if ($validator->fails()) {
@@ -146,14 +161,14 @@ class ContactMessageController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Mesajınız uğurla göndərildi',
+                'message' => dict('message_sent_successfully'),
                 'data' => $message
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Mesaj göndərilərkən xəta baş verdi: ' . $e->getMessage(),
+                'message' => dict('message_send_error') . ': ' . $e->getMessage(),
                 'data' => null
             ], 500);
         }
