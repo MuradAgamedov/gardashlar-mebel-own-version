@@ -127,6 +127,13 @@ class CompanyController extends Controller
             });
         }
 
+        // Order products so that those in the campaign appear first
+        $query->orderByRaw('CASE WHEN EXISTS (
+            SELECT 1 FROM company_products 
+            WHERE company_products.product_id = products.id 
+            AND company_products.company_id = ?
+        ) THEN 0 ELSE 1 END', [$campaign->id]);
+
         $products = $query->paginate(20);
         
         // Get all categories for selection

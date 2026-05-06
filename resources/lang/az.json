@@ -1807,5 +1807,6 @@
     "message_sent_successfully": "Mesajınız uğurla göndərildi",
     "message_send_error": "Mesaj göndərilərkən xəta baş verdi",
     "Add Products by Category": "Kateqoriyaya görə məhsul əlavə et",
-    "Select Categories": "Kateqoriyaları seç"
+    "Select Categories": "Kateqoriyaları seç",
+    "Include all subcategories when selecting main categories": "Ana kateqoriyaları seçərkən bütün alt kateqoriyaları daxil et"
 }
