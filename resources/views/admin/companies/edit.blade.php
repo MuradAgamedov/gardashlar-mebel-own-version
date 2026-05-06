@@ -697,67 +697,6 @@ function removeImage(inputId) {
     noImage.style.display = 'block';
 }
 
-    // Check if CKEditor is available
-    if (typeof ClassicEditor === 'undefined') {
-        console.error('CKEditor ClassicEditor is not available');
-        return;
-    }
-    
-    const ckeditorElements = document.querySelectorAll('.ckeditor');
-    console.log('Found', ckeditorElements.length, 'CKEditor elements');
-    
-    // Initialize CKEditor for each textarea
-    ckeditorElements.forEach(function(textarea) {
-        // Hide the original textarea
-        textarea.style.display = 'none';
-        
-        ClassicEditor
-            .create(textarea, {
-                toolbar: {
-                    items: [
-                        'undo', 'redo',
-                        '|', 'heading',
-                        '|', 'bold', 'italic', 'underline', 'strikethrough',
-                        '|', 'fontColor', 'fontBackgroundColor',
-                        '|', 'link', 'blockQuote', 'insertTable',
-                        '|', 'bulletedList', 'numberedList',
-                        '|', 'outdent', 'indent',
-                        '|', 'alignment',
-                        '|', 'removeFormat'
-                    ]
-                },
-                language: 'en',
-                placeholder: 'Enter description...',
-                branding: false
-            })
-            .then(editor => {
-                console.log('CKEditor initialized successfully for:', textarea.id);
-                // Store editor reference on textarea for later use
-                textarea._ckeditor = editor;
-                textarea._focusEditor = () => editor.editing.view.focus();
-
-                // Override the focus method to focus on the editor instead of textarea
-                textarea.focus = function() {
-                    editor.editing.view.focus();
-                };
-
-                // Override validation methods to prevent browser validation
-                textarea.checkValidity = function() {
-                    return true;
-                };
-
-                textarea.reportValidity = function() {
-                    return true;
-                };
-            })
-            .catch(error => {
-                console.error('CKEditor initialization failed:', error);
-                // Show textarea as fallback if CKEditor fails
-                textarea.style.display = 'block';
-                textarea.classList.add('form-control');
-            });
-    });
-
     // Override form validation to handle CKEditor fields
     const form = document.querySelector('form');
     if (form) {
