@@ -532,62 +532,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     });
     
-    // Form validation
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Update CKEditor instances
-        document.querySelectorAll('.ckeditor').forEach(function(textarea) {
-            if (textarea._ckeditor) {
-                textarea._ckeditor.updateSourceElement();
-            }
-        });
-        
-        // Clear previous errors
-        document.querySelectorAll('.is-invalid').forEach(function(element) {
-            element.classList.remove('is-invalid');
-        });
-        document.querySelectorAll('.invalid-feedback').forEach(function(element) {
-            element.remove();
-        });
-        
-        let hasErrors = false;
-        let firstErrorTab = null;
-        
-        // Validate all required fields
-        document.querySelectorAll('input[required], textarea[required]').forEach(function(input) {
-            let isValid = true;
-            
-            if (input.type === 'file') {
-                // For edit form, files are not required
-                isValid = true;
-            } else if (input.tagName === 'TEXTAREA' && input.classList.contains('ckeditor')) {
-                if (input._ckeditor) {
-                    isValid = input._ckeditor.getData().trim() !== '';
-                }
-            } else {
-                isValid = input.value.trim() !== '';
-            }
-            
-            if (!isValid) {
-                hasErrors = true;
-                input.classList.add('is-invalid');
-                
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'invalid-feedback';
-                errorDiv.textContent = 'This field is required.';
-                input.parentNode.appendChild(errorDiv);
-                
-                if (!firstErrorTab) {
-                    const pane = input.closest('.tab-pane');
-                    if (pane) {
-                        firstErrorTab = pane.getAttribute('id');
-                    }
-                }
-            }
-        });
-        
-        // Override form validation to handle CKEditor fields
+    // Override form validation to handle CKEditor fields
         const form = document.querySelector('form');
         if (form) {
             form.addEventListener('submit', function(e) {
