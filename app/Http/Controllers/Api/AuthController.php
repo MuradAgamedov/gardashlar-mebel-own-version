@@ -39,7 +39,19 @@ class AuthController extends Controller
             'email' => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'password_confirmation' => 'required|string|min:6',
-            'fin' => ['nullable', 'regex:/^[A-NP-Z0-9]{7}$/'],
+            'fin' => [
+                'nullable', 
+                'regex:/^[A-NP-Z0-9]{7}$/',
+                function ($attribute, $value, $fail) {
+                    // Check if FIN already exists in database
+                    if ($value) {
+                        $exists = \App\Models\User::where('fin', $value)->exists();
+                        if ($exists) {
+                            $fail(dict('fin_unique'));
+                        }
+                    }
+                }
+            ],
         ], [
             'full_name.required' => 'Ad və soyad məcburidir',
             'phone.nullable' => 'Telefon nömrəsi seçimlidir',
