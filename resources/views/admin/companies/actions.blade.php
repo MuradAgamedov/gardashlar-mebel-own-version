@@ -29,6 +29,100 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <!-- Categories Section -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="mb-3">{{ __('Add Products by Category') }}</h5>
+                            
+                            <div class="card">
+                                <div class="card-body">
+                                    <form id="categoryForm">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <div class="mb-3">
+                                                    <label class="form-label">{{ __('Select Categories') }}</label>
+                                                    <div class="category-selection" style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 1rem;">
+                                                        @forelse($categories as $category)
+                                                            @php
+                                                                $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
+                                                                $categoryTranslate = $category->translate($mainLanguageId);
+                                                            @endphp
+                                                            <div class="category-item mb-2">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input category-checkbox" 
+                                                                           type="checkbox" 
+                                                                           value="{{ $category->id }}" 
+                                                                           id="category_{{ $category->id }}"
+                                                                           data-category-name="{{ $categoryTranslate->title ?? 'Untitled Category' }}">
+                                                                    <label class="form-check-label" for="category_{{ $category->id }}">
+                                                                        <strong>{{ $categoryTranslate->title ?? 'Untitled Category' }}</strong>
+                                                                        <span class="text-muted">({{ $category->products()->count() }} {{ __('products') }})</span>
+                                                                    </label>
+                                                                </div>
+                                                                
+                                                                @if($category->children->isNotEmpty())
+                                                                    <div class="ms-4 mt-2">
+                                                                        @foreach($category->children as $child)
+                                                                            @php
+                                                                                $childTranslate = $child->translate($mainLanguageId);
+                                                                            @endphp
+                                                                            <div class="category-item mb-1">
+                                                                                <div class="form-check">
+                                                                                    <input class="form-check-input category-checkbox subcategory" 
+                                                                                           type="checkbox" 
+                                                                                           value="{{ $child->id }}" 
+                                                                                           id="category_{{ $child->id }}"
+                                                                                           data-category-name="{{ $childTranslate->title ?? 'Untitled Subcategory' }}"
+                                                                                           data-parent-id="{{ $category->id }}">
+                                                                                    <label class="form-check-label" for="category_{{ $child->id }}">
+                                                                                        {{ $childTranslate->title ?? 'Untitled Subcategory' }}
+                                                                                        <span class="text-muted">({{ $child->products()->count() }} {{ __('products') }})</span>
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        @endforeach
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+                                                        @empty
+                                                            <p class="text-muted">{{ __('No categories found') }}</p>
+                                                        @endforelse
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="includeSubcategories">
+                                                        <label class="form-check-label" for="includeSubcategories">
+                                                            {{ __('Include all subcategories when selecting main categories') }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-4">
+                                                <div class="d-grid gap-2">
+                                                    <button type="button" class="btn btn-primary" onclick="addCategoryProducts()">
+                                                        <i class="material-icons-outlined">add_circle</i>
+                                                        {{ __('Add Selected Categories') }}
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="selectAllCategories()">
+                                                        <i class="material-icons-outlined">select_all</i>
+                                                        {{ __('Select All') }}
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-secondary" onclick="deselectAllCategories()">
+                                                        <i class="material-icons-outlined">deselect</i>
+                                                        {{ __('Deselect All') }}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Products Section -->
                     <div class="row">
                         <div class="col-12">
@@ -147,6 +241,67 @@
 </div>
 
 <script>
+function addCategoryProducts() {
+    const selectedCategories = [];
+    const categoryCheckboxes = document.querySelectorAll('.category-checkbox:checked');
+    
+    if (categoryCheckboxes.length === 0) {
+        alert('{{ __('Please select at least one category') }}');
+        return;
+    }
+    
+    categoryCheckboxes.forEach(checkbox => {
+        selectedCategories.push(checkbox.value);
+    });
+    
+    const includeSubcategories = document.getElementById('includeSubcategories').checked;
+    
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    loadingModal.show();
+    
+    fetch('{{ route("admin.campaigns.add-category-products-to-action", $company) }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            category_ids: selectedCategories,
+            include_subcategories: includeSubcategories
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        loadingModal.hide();
+        
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert('{{ __('Error') }}: ' + data.message);
+        }
+    })
+    .catch(error => {
+        loadingModal.hide();
+        console.error('Error:', error);
+        alert('{{ __('Error occurred while adding category products') }}');
+    });
+}
+
+function selectAllCategories() {
+    const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
+    categoryCheckboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+}
+
+function deselectAllCategories() {
+    const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
+    categoryCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+}
+
 function addToCompany(productId) {
     const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
     loadingModal.show();

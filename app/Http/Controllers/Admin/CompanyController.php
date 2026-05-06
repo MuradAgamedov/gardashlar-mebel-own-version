@@ -125,7 +125,21 @@ class CompanyController extends Controller
         }
 
         $products = $query->paginate(20);
-        return view('admin.companies.actions', ['company' => $campaign, 'products' => $products]);
+        
+        // Get all categories for selection
+        $categories = ProductCategory::with(['translates.language', 'children' => function($q) {
+            $q->with(['translates.language']);
+        }])
+        ->whereNull('parent_id')
+        ->active()
+        ->ordered()
+        ->get();
+        
+        return view('admin.companies.actions', [
+            'company' => $campaign, 
+            'products' => $products,
+            'categories' => $categories
+        ]);
     }
 
     public function addProductToAction(Request $request, Company $campaign)
@@ -177,5 +191,76 @@ class CompanyController extends Controller
                 'message' => 'Error removing product: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function addCategoryProductsToAction(Request $request, Company $campaign)
+    {
+        $request->validate([
+            'category_ids' => 'required|array',
+            'category_ids.*' => 'exists:product_categories,id',
+            'include_subcategories' => 'boolean'
+        ]);
+
+        try {
+            $categoryIds = $request->category_ids;
+            $includeSubcategories = $request->boolean('include_subcategories', false);
+
+            // If include_subcategories is true, get all descendant categories
+            if ($includeSubcategories) {
+                $allCategoryIds = collect($categoryIds);
+                
+                foreach ($categoryIds as $categoryId) {
+                    $category = ProductCategory::find($categoryId);
+                    if ($category) {
+                        $descendants = $this->getAllDescendantIds($category);
+                        $allCategoryIds = $allCategoryIds->merge($descendants);
+                    }
+                }
+                
+                $categoryIds = $allCategoryIds->unique()->toArray();
+            }
+
+            // Get all products from the selected categories
+            $products = Product::whereHas('categories', function($query) use ($categoryIds) {
+                $query->whereIn('product_categories.id', $categoryIds);
+            })
+            ->whereDoesntHave('companyProducts', function($query) use ($campaign) {
+                $query->where('company_id', $campaign->id);
+            })
+            ->get();
+
+            $addedCount = 0;
+            foreach ($products as $product) {
+                $this->repository->addProductToCompany($campaign, $product->id);
+                $addedCount++;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully added {$addedCount} products to the campaign",
+                'added_count' => $addedCount
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error adding category products: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get all descendant category IDs recursively
+     */
+    private function getAllDescendantIds($category)
+    {
+        $ids = collect();
+        
+        foreach ($category->children as $child) {
+            $ids->push($child->id);
+            $ids = $ids->merge($this->getAllDescendantIds($child));
+        }
+        
+        return $ids;
     }
 }
