@@ -1805,5 +1805,7 @@
     "recaptcha_string": "reCAPTCHA yalnız mətn olmalıdır",
     "recaptcha_verification_failed": "reCAPTCHA təsdiqlənmədi",
     "message_sent_successfully": "Mesajınız uğurla göndərildi",
-    "message_send_error": "Mesaj göndərilərkən xəta baş verdi"
+    "message_send_error": "Mesaj göndərilərkən xəta baş verdi",
+    "Add Products by Category": "Kateqoriyaya görə məhsul əlavə et",
+    "Select Categories": "Kateqoriyaları seç"
 }

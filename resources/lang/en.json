@@ -1810,5 +1810,7 @@
     "recaptcha_string": "reCAPTCHA must be a string",
     "recaptcha_verification_failed": "reCAPTCHA verification failed",
     "message_sent_successfully": "Message sent successfully",
-    "message_send_error": "Error sending message"
+    "message_send_error": "Error sending message",
+    "Add Products by Category": "Add Products by Category",
+    "Select Categories": "Select Categories"
 }

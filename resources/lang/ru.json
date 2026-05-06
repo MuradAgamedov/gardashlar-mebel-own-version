@@ -1813,5 +1813,7 @@
     "recaptcha_string": "reCAPTCHA должен быть строкой",
     "recaptcha_verification_failed": "Проверка reCAPTCHA не пройдена",
     "message_sent_successfully": "Сообщение успешно отправлено",
-    "message_send_error": "Ошибка отправки сообщения"
+    "message_send_error": "Ошибка отправки сообщения",
+    "Add Products by Category": "Добавить товары по категории",
+    "Select Categories": "Выберите категории"
 }
