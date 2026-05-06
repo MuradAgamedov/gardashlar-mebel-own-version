@@ -61,8 +61,7 @@
                                                                            type="checkbox" 
                                                                            value="{{ $category->id }}" 
                                                                            id="category_{{ $category->id }}"
-                                                                           data-category-name="{{ $categoryTranslate->title ?? 'Untitled Category' }}"
-                                                                           onchange="handleCategoryChange(this)">
+                                                                           data-category-name="{{ $categoryTranslate->title ?? 'Untitled Category' }}">
                                                                     <label class="form-check-label" for="category_{{ $category->id }}">
                                                                         <strong>{{ $categoryTranslate->title ?? 'Untitled Category' }}</strong>
                                                                         <span class="text-muted">({{ $category->products()->count() }} {{ __('products') }})</span>
@@ -82,8 +81,7 @@
                                                                                            value="{{ $child->id }}" 
                                                                                            id="category_{{ $child->id }}"
                                                                                            data-category-name="{{ $childTranslate->title ?? 'Untitled Subcategory' }}"
-                                                                                           data-parent-id="{{ $category->id }}"
-                                                                                           onchange="handleCategoryChange(this)">
+                                                                                           data-parent-id="{{ $category->id }}">
                                                                                     <label class="form-check-label" for="category_{{ $child->id }}">
                                                                                         {{ $childTranslate->title ?? 'Untitled Subcategory' }}
                                                                                         <span class="text-muted">({{ $child->products()->count() }} {{ __('products') }})</span>
@@ -248,6 +246,20 @@
 </div>
 
 <script>
+// Initialize category checkboxes when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Add onchange event to all category checkboxes
+    const allCheckboxes = document.querySelectorAll('.category-checkbox');
+    allCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            handleCategoryChange(this);
+        });
+    });
+    
+    // Initial auto-select check
+    checkAndAutoSelectAll();
+});
+
 // Auto-select subcategories when main category changes
 function handleCategoryChange(checkbox) {
     const isMainCategory = !checkbox.classList.contains('subcategory');
@@ -256,12 +268,21 @@ function handleCategoryChange(checkbox) {
         const categoryId = checkbox.value;
         const subcategories = document.querySelectorAll(`.subcategory[data-parent-id="${categoryId}"]`);
         
+        console.log('Main category changed:', categoryId, 'checked:', checkbox.checked);
+        console.log('Found subcategories:', subcategories.length);
+        
         if (checkbox.checked) {
             // If main category is checked, check all subcategories
-            subcategories.forEach(sub => sub.checked = true);
+            subcategories.forEach(sub => {
+                sub.checked = true;
+                console.log('Checking subcategory:', sub.value);
+            });
         } else {
             // If main category is unchecked, uncheck all subcategories
-            subcategories.forEach(sub => sub.checked = false);
+            subcategories.forEach(sub => {
+                sub.checked = false;
+                console.log('Unchecking subcategory:', sub.value);
+            });
         }
     }
     
