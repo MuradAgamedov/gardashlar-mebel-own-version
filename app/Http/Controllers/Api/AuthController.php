@@ -855,8 +855,17 @@ class AuthController extends Controller
                 'name' => 'sometimes|required|string|max:255',
                 'surname' => 'sometimes|required|string|max:255',
                 'phone' => 'sometimes|nullable|string|max:20',
-                'email' => 'sometimes|nullable|email|unique:users,email,' . $user->id,
-                'fin' => 'nullable|string|unique:users,fin,' . $user->id
+                'email' => [
+    'sometimes',
+    'nullable',
+    'email',
+    'unique:users,email,' . $user->id . ',id'
+],
+                'fin' => [
+    'nullable',
+    'string',
+    'unique:users,fin,' . $user->id . ',id'
+]
             ], [
                 'name.required' => dict('name_required'),
                 'name.string' => dict('name_invalid'),
