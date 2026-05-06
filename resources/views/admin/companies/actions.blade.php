@@ -113,12 +113,6 @@
                                                     <button type="button" class="btn btn-primary" onclick="addCategoryProducts()" title="{{ __('Add Selected Categories') }}">
                                                         <i class="material-icons-outlined">add_circle</i>
                                                     </button>
-                                                    <button type="button" class="btn btn-outline-secondary" onclick="selectAllCategories()" title="{{ __('Select All') }}">
-                                                        <i class="material-icons-outlined">select_all</i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-secondary" onclick="deselectAllCategories()" title="{{ __('Deselect All') }}">
-                                                        <i class="material-icons-outlined">deselect</i>
-                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -296,19 +290,6 @@ function addCategoryProducts() {
     });
 }
 
-function selectAllCategories() {
-    const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
-    categoryCheckboxes.forEach(checkbox => {
-        checkbox.checked = true;
-    });
-}
-
-function deselectAllCategories() {
-    const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
-    categoryCheckboxes.forEach(checkbox => {
-        checkbox.checked = false;
-    });
-}
 
 function addToCompany(productId) {
     const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
