@@ -135,9 +135,7 @@
                     <div class="row">
                         <div class="col-12">
                             @php
-                                $companyProductsCount = $products->filter(function($product) {
-                                    return $product->companyProducts->isNotEmpty();
-                                })->count();
+                                $companyProductsCount = $company->products()->count();
                             @endphp
                             <h5 class="mb-3">
                             <i class="material-icons-outlined me-2">inventory_2</i>
