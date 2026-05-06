@@ -439,6 +439,7 @@ class ProductsController extends Controller
             $paginationData = [
                 'current_page' => $products->currentPage(),
                 'per_page' => $products->perPage(),
+                "type_ids" => $typeIds,
                 'total' => $products->total(),
                 'last_page' => $products->lastPage(),
                 'from' => $products->firstItem(),
