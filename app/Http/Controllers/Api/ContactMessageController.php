@@ -7,6 +7,7 @@ use App\Models\ContactMessage;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
 use OpenApi\Annotations as OA;
 
 /**
@@ -27,11 +28,12 @@ class ContactMessageController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name","email","city","message"},
+     *             required={"name","email","city","message","recaptcha_token"},
      *             @OA\Property(property="name", type="string", example="John Doe", description="Full name of the sender"),
      *             @OA\Property(property="email", type="string", format="email", example="john@example.com", description="Email address of the sender"),
      *             @OA\Property(property="city", type="string", example="Baku", description="City of the sender"),
-     *             @OA\Property(property="message", type="string", example="Hello, I have a question about your products...", description="The message content")
+     *             @OA\Property(property="message", type="string", example="Hello, I have a question about your products...", description="The message content"),
+     *             @OA\Property(property="recaptcha_token", type="string", example="03AOLTBLR5...", description="reCAPTCHA token from frontend")
      *         )
      *     ),
      *     @OA\Response(
@@ -84,6 +86,11 @@ class ContactMessageController extends Controller
      *                     property="message",
      *                     type="array",
      *                     @OA\Items(type="string", example="Mesaj tələb olunur")
+     *                 ),
+     *                 @OA\Property(
+     *                     property="recaptcha_token",
+     *                     type="array",
+     *                     @OA\Items(type="string", example="reCAPTCHA tələb olunur")
      *                 )
      *             )
      *         )
@@ -107,7 +114,8 @@ class ContactMessageController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|max:255',
                 'city' => 'required|string|max:255',
-                'message' => 'required|string|max:5000'
+                'message' => 'required|string|max:5000',
+                'recaptcha_token' => 'required|string'
             ]);
 
             if ($validator->fails()) {
@@ -115,6 +123,16 @@ class ContactMessageController extends Controller
                     'success' => false,
                     'message' => 'Validation failed',
                     'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Verify reCAPTCHA token
+            $recaptchaResponse = $this->verifyRecaptcha($request->recaptcha_token);
+            if (!$recaptchaResponse['success']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'reCAPTCHA verification failed',
+                    'errors' => ['recaptcha' => ['reCAPTCHA təsdiqlənmədi']]
                 ], 422);
             }
 
@@ -137,6 +155,68 @@ class ContactMessageController extends Controller
                 'success' => false,
                 'message' => 'Mesaj göndərilərkən xəta baş verdi: ' . $e->getMessage(),
                 'data' => null
+            ], 500);
+        }
+    }
+
+    /**
+     * Verify reCAPTCHA token
+     */
+    private function verifyRecaptcha(string $token): array
+    {
+        try {
+            $secretKey = env('SECRET_KEY');
+            $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                'secret' => $secretKey,
+                'response' => $token
+            ]);
+
+            return $response->json();
+        } catch (\Exception $e) {
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Get reCAPTCHA site key
+     * 
+     * @OA\Get(
+     *     path="/api/recaptcha/site-key",
+     *     operationId="getRecaptchaSiteKey",
+     *     tags={"Contact Messages"},
+     *     summary="Get reCAPTCHA site key",
+     *     description="Returns the reCAPTCHA site key for frontend integration",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Site key retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="site_key", type="string", example="6LeIxAcTAAAAAJcZVRqyHh71UMIEbUjQ...")
+     *         )
+     *     )
+     * )
+     */
+    public function getRecaptchaSiteKey(): JsonResponse
+    {
+        try {
+            $siteKey = env('SITE_KEY');
+            
+            if (!$siteKey) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'reCAPTCHA site key not configured'
+                ], 500);
+            }
+
+            return response()->json([
+                'success' => true,
+                'site_key' => $siteKey
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving site key: ' . $e->getMessage()
             ], 500);
         }
     }

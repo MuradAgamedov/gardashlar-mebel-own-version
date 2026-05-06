@@ -225,6 +225,7 @@ Route::get('/maps', [MapController::class, 'index'])->name('api.maps.index');
 
 // Contact Messages API Routes (Frontend only)
 Route::post('/contact-messages', [ContactMessageController::class, 'store'])->name('api.contact-messages.store');
+Route::get('/recaptcha/site-key', [ContactMessageController::class, 'getRecaptchaSiteKey'])->name('api.recaptcha.site-key');
 
 // Become A Partner API Routes
 Route::get('/become-a-partner', [BecomeAPartnerController::class, 'index'])->name('api.become-a-partner.index');
