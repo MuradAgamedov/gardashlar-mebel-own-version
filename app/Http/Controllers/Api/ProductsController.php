@@ -159,9 +159,25 @@ class ProductsController extends Controller
             $perPage = $request->get('per_page', 12);
             $page = $request->get('page', 1);
             $categorySlug = $request->get('category_slug');
-            $typeIds = $request->get('type_id', []);
-            $filterIds = $request->get('filters', []);
-            $colorIds = $request->get('color', []);
+            
+            // Fix query parameter parsing for multiple values
+            parse_str($request->server('QUERY_STRING'), $query);
+            
+            $typeIds = $query['type_id'] ?? [];
+            if (!is_array($typeIds)) {
+                $typeIds = $typeIds ? [$typeIds] : [];
+            }
+            
+            $filterIds = $query['filters'] ?? [];
+            if (!is_array($filterIds)) {
+                $filterIds = $filterIds ? [$filterIds] : [];
+            }
+            
+            $colorIds = $query['color'] ?? [];
+            if (!is_array($colorIds)) {
+                $colorIds = $colorIds ? [$colorIds] : [];
+            }
+            
             $sort = $request->get('sort', 'view_count');
             $minPrice = $request->get('min_price');
             $maxPrice = $request->get('max_price');
@@ -184,10 +200,7 @@ class ProductsController extends Controller
                 $categorySeoText = $categoryTranslation ? $categoryTranslation->seo_text : null;
             }
 
-            // Convert filters to arrays
-            if (!is_array($filterIds)) $filterIds = $filterIds ? [$filterIds] : [];
-            if (!is_array($colorIds)) $colorIds = $colorIds ? [$colorIds] : [];
-            if (!is_array($typeIds)) $typeIds = $typeIds ? [$typeIds] : [];
+            // Array parameters are now properly handled above with parse_str
 
             // === Məhsul query ===
             $productsQuery = Product::with([
@@ -503,6 +516,15 @@ if ($categorySlug) {
                     'products' => $productsData,
                     'pagination' => $paginationData,
                     'type_ids' => $typeIds,
+                    'selected_types' => !empty($typeIds) ? ProductType::with(['translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    }])->whereIn('id', $typeIds)->get()->map(function ($type) {
+                        $translation = $type->translates->first();
+                        return [
+                            'id' => $type->id,
+                            'title' => $translation ? $translation->title : ''
+                        ];
+                    }) : [],
                     'applied_filters' => [
                         'min_price' => $actualMinPrice,
                         'max_price' => $actualMaxPrice
