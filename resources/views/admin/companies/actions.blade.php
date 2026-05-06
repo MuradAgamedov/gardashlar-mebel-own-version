@@ -61,7 +61,8 @@
                                                                            type="checkbox" 
                                                                            value="{{ $category->id }}" 
                                                                            id="category_{{ $category->id }}"
-                                                                           data-category-name="{{ $categoryTranslate->title ?? 'Untitled Category' }}">
+                                                                           data-category-name="{{ $categoryTranslate->title ?? 'Untitled Category' }}"
+                                                                           style="opacity: 1 !important; visibility: visible !important; display: block !important;">
                                                                     <label class="form-check-label" for="category_{{ $category->id }}">
                                                                         <strong>{{ $categoryTranslate->title ?? 'Untitled Category' }}</strong>
                                                                         @php
@@ -87,7 +88,8 @@
                                                                                            value="{{ $child->id }}" 
                                                                                            id="category_{{ $child->id }}"
                                                                                            data-category-name="{{ $childTranslate->title ?? 'Untitled Subcategory' }}"
-                                                                                           data-parent-id="{{ $category->id }}">
+                                                                                           data-parent-id="{{ $category->id }}"
+                                                                                           style="opacity: 1 !important; visibility: visible !important; display: block !important;">
                                                                                     <label class="form-check-label" for="category_{{ $child->id }}">
                                                                                         {{ $childTranslate->title ?? 'Untitled Subcategory' }}
                                                                                         <span class="text-muted">({{ $child->products()->count() }} {{ __('products') }})</span>
