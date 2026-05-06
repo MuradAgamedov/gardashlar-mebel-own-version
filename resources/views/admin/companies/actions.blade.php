@@ -135,7 +135,7 @@
                     <div class="row">
                         <div class="col-12">
                             @php
-                                $companyProductsCount = $company->products()->count();
+                                $companyProductsCount = $company->companyProducts()->count();
                             @endphp
                             <h5 class="mb-3">
                             <i class="material-icons-outlined me-2">inventory_2</i>
