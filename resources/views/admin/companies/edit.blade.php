@@ -458,7 +458,6 @@
 @endsection
 @include('admin.partials.slug-generator') 
 @push('scripts')
-<script src="https://cdn.ckeditor.com/ckeditor5/40.1.0/classic/ckeditor.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Campaign edit script loaded');
