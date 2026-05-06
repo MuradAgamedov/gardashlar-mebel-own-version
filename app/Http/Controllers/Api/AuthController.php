@@ -856,16 +856,36 @@ class AuthController extends Controller
                 'surname' => 'sometimes|required|string|max:255',
                 'phone' => 'sometimes|nullable|string|max:20',
                 'email' => [
-    'sometimes',
-    'nullable',
-    'email',
-    'unique:users,email,' . $user->id . ',id'
-],
-                'fin' => [
-    'nullable',
-    'string',
-    'unique:users,fin,' . $user->id . ',id'
-]
+                    'sometimes',
+                    'nullable',
+                    'email',
+                    function ($attribute, $value, $fail) use ($user) {
+                        // Only check uniqueness if email is actually being changed
+                        if ($value && $value !== $user->email) {
+                            $exists = \App\Models\User::where('email', $value)
+                                ->where('id', '!=', $user->id)
+                                ->exists();
+                            if ($exists) {
+                                $fail(dict('email_exists'));
+                            }
+                        }
+                    }
+                ],
+                                'fin' => [
+                    'nullable',
+                    'string',
+                    function ($attribute, $value, $fail) use ($user) {
+                        // Only check uniqueness if FIN is actually being changed
+                        if ($value && $value !== $user->fin) {
+                            $exists = \App\Models\User::where('fin', $value)
+                                ->where('id', '!=', $user->id)
+                                ->exists();
+                            if ($exists) {
+                                $fail(dict('fin_unique'));
+                            }
+                        }
+                    }
+                ]
             ], [
                 'name.required' => dict('name_required'),
                 'name.string' => dict('name_invalid'),
