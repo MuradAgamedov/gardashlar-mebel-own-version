@@ -537,7 +537,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Override form validation to handle CKEditor fields
-    const form = document.querySelector('form');
     if (form) {
         form.addEventListener('submit', function(e) {
             // Update all CKEditor instances before submission
