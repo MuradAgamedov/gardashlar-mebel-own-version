@@ -121,7 +121,7 @@ class ContactMessageController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Validation failed',
+                    'message' => dict("validation_error"),
                     'errors' => $validator->errors()
                 ], 422);
             }
@@ -131,8 +131,8 @@ class ContactMessageController extends Controller
             if (!$recaptchaResponse['success']) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'reCAPTCHA verification failed',
-                    'errors' => ['recaptcha' => ['reCAPTCHA təsdiqlənmədi']]
+                    'message' => dict('recaptcha_verification_failed'),
+                    'errors' => ['recaptcha' => [dict('recaptcha_verification_failed')]]
                 ], 422);
             }
 

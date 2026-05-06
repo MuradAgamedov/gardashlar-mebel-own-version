@@ -535,100 +535,21 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     });
     
-    // Form validation
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Update CKEditor instances
-        document.querySelectorAll('.ckeditor').forEach(function(textarea) {
-            if (textarea._ckeditor) {
-                textarea._ckeditor.updateSourceElement();
-            }
-        });
-        
-        // Clear previous errors
-        document.querySelectorAll('.is-invalid').forEach(function(element) {
-            element.classList.remove('is-invalid');
-        });
-        document.querySelectorAll('.invalid-feedback').forEach(function(element) {
-            element.remove();
-        });
-        
-        let hasErrors = false;
-        let firstErrorTab = null;
-        
-        // Validate all required fields
-        document.querySelectorAll('input[required], textarea[required], input[data-required="true"], textarea[data-required="true"]').forEach(function(input) {
-            let isValid = true;
+    // Override form validation to handle CKEditor fields
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Update all CKEditor instances before submission
+            document.querySelectorAll('.ckeditor').forEach(function(textarea) {
+                if (textarea._ckeditor) {
+                    textarea._ckeditor.updateSourceElement();
+                }
+            });
             
-            if (input.type === 'file') {
-                isValid = input.files && input.files.length > 0;
-            } else if (input.tagName === 'TEXTAREA' && input.classList.contains('ckeditor')) {
-                if (input._ckeditor) {
-                    isValid = input._ckeditor.getData().trim() !== '';
-                }
-            } else {
-                isValid = input.value.trim() !== '';
-            }
-            
-            if (!isValid) {
-                hasErrors = true;
-                input.classList.add('is-invalid');
-                
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'invalid-feedback';
-                errorDiv.textContent = 'This field is required.';
-                input.parentNode.appendChild(errorDiv);
-                
-                if (!firstErrorTab) {
-                    const pane = input.closest('.tab-pane');
-                    if (pane) {
-                        firstErrorTab = pane.getAttribute('id');
-                    }
-                }
-            }
+            // Let the form submit normally - browser will handle validation
+            console.log('Form submitted successfully');
         });
-        
-        // Update tab error indicators
-        document.querySelectorAll('.nav-link').forEach(function(tab) {
-            const targetId = tab.getAttribute('data-bs-target');
-            const tabPane = document.querySelector(targetId);
-            
-            if (tabPane && tabPane.querySelector('.is-invalid')) {
-                tab.style.borderColor = '#dc3545';
-                tab.style.color = '#dc3545';
-                if (!tab.querySelector('.error-icon')) {
-                    const errorIcon = document.createElement('i');
-                    errorIcon.className = 'material-icons-outlined text-danger ms-1 error-icon';
-                    errorIcon.style.fontSize = '16px';
-                    errorIcon.textContent = 'error';
-                    tab.appendChild(errorIcon);
-                }
-            } else {
-                tab.style.borderColor = '';
-                tab.style.color = '';
-                const errorIcon = tab.querySelector('.error-icon');
-                if (errorIcon) {
-                    errorIcon.remove();
-                }
-            }
-        });
-        
-        if (hasErrors) {
-            // Switch to first error tab
-            if (firstErrorTab) {
-                const tabTrigger = document.querySelector(`[data-bs-target="#${firstErrorTab}"]`);
-                if (tabTrigger) {
-                    const tab = new bootstrap.Tab(tabTrigger);
-                    tab.show();
-                }
-            }
-            return false;
-        }
-        
-        // Submit form if no errors
-        form.submit();
-    });
+    }
 });
 
 function setupImagePreview(inputId, previewId, imgId, noImageId) {
