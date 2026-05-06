@@ -439,7 +439,6 @@ class ProductsController extends Controller
             $paginationData = [
                 'current_page' => $products->currentPage(),
                 'per_page' => $products->perPage(),
-                "type_ids" => $typeIds,
                 'total' => $products->total(),
                 'last_page' => $products->lastPage(),
                 'from' => $products->firstItem(),
@@ -490,6 +489,8 @@ if ($categorySlug) {
 }
 
             return response()->json([
+                "type_ids" => $typeIds,
+
                 'success' => true,
                 'message' => __('messages.product_categories_retrieved_successfully'),
                 'data' => [
