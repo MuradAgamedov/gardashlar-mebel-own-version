@@ -696,7 +696,6 @@ function removeImage(inputId) {
     preview.style.display = 'none';
     noImage.style.display = 'block';
 }
-</script>
 
 <style>
 /* Form Sections */
