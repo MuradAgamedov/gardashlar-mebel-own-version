@@ -259,6 +259,62 @@ class CompanyController extends Controller
         }
     }
 
+    public function removeCategoryProductsFromAction(Request $request, Company $campaign)
+    {
+        $request->validate([
+            'category_ids' => 'required|array',
+            'category_ids.*' => 'exists:product_categories,id',
+            'include_subcategories' => 'boolean'
+        ]);
+
+        try {
+            $categoryIds = $request->category_ids;
+            $includeSubcategories = $request->boolean('include_subcategories', false);
+
+            // If include_subcategories is true, get all descendant categories
+            if ($includeSubcategories) {
+                $allCategoryIds = collect($categoryIds);
+                
+                foreach ($categoryIds as $categoryId) {
+                    $category = ProductCategory::find($categoryId);
+                    if ($category) {
+                        $descendants = $this->getAllDescendantIds($category);
+                        $allCategoryIds = $allCategoryIds->merge($descendants);
+                    }
+                }
+                
+                $categoryIds = $allCategoryIds->unique()->toArray();
+            }
+
+            // Get all products from the selected categories that are in the campaign
+            $products = Product::whereHas('categories', function($query) use ($categoryIds) {
+                $query->whereIn('product_categories.id', $categoryIds);
+            })
+            ->whereHas('companyProducts', function($query) use ($campaign) {
+                $query->where('company_id', $campaign->id);
+            })
+            ->get();
+
+            $removedCount = 0;
+            foreach ($products as $product) {
+                $this->repository->removeProductFromCompany($campaign, $product->id);
+                $removedCount++;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully removed {$removedCount} products from the campaign",
+                'removed_count' => $removedCount
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error removing category products: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * Get all descendant category IDs recursively
      */

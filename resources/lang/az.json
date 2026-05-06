@@ -1808,5 +1808,7 @@
     "message_send_error": "Mesaj göndərilərkən xəta baş verdi",
     "Add Products by Category": "Kateqoriyaya görə məhsul əlavə et",
     "Select Categories": "Kateqoriyaları seç",
-    "Include all subcategories when selecting main categories": "Ana kateqoriyaları seçərkən bütün alt kateqoriyaları daxil et"
+    "Include all subcategories when selecting main categories": "Ana kateqoriyaları seçərkən bütün alt kateqoriyaları daxil et",
+    "Remove Selected Categories": "Seçilmiş kateqoriyaları sil",
+    "Are you sure you want to remove products from selected categories?": "Seçilmiş kateqoriyalardan məhsulları silmək istədiyinizə əminsiniz?"
 }

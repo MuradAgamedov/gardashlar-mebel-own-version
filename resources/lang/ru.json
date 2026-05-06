@@ -1816,5 +1816,7 @@
     "message_send_error": "Ошибка отправки сообщения",
     "Add Products by Category": "Добавить товары по категории",
     "Select Categories": "Выберите категории",
-    "Include all subcategories when selecting main categories": "Включать все подкатегории при выборе основных категорий"
+    "Include all subcategories when selecting main categories": "Включать все подкатегории при выборе основных категорий",
+    "Remove Selected Categories": "Удалить выбранные категории",
+    "Are you sure you want to remove products from selected categories?": "Вы уверены, что хотите удалить товары из выбранных категорий?"
 }

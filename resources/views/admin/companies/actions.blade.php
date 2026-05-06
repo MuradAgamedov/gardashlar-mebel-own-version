@@ -61,7 +61,8 @@
                                                                            type="checkbox" 
                                                                            value="{{ $category->id }}" 
                                                                            id="category_{{ $category->id }}"
-                                                                           data-category-name="{{ $categoryTranslate->title ?? 'Untitled Category' }}">
+                                                                           data-category-name="{{ $categoryTranslate->title ?? 'Untitled Category' }}"
+                                                                           onchange="handleCategoryChange(this)">
                                                                     <label class="form-check-label" for="category_{{ $category->id }}">
                                                                         <strong>{{ $categoryTranslate->title ?? 'Untitled Category' }}</strong>
                                                                         <span class="text-muted">({{ $category->products()->count() }} {{ __('products') }})</span>
@@ -81,7 +82,8 @@
                                                                                            value="{{ $child->id }}" 
                                                                                            id="category_{{ $child->id }}"
                                                                                            data-category-name="{{ $childTranslate->title ?? 'Untitled Subcategory' }}"
-                                                                                           data-parent-id="{{ $category->id }}">
+                                                                                           data-parent-id="{{ $category->id }}"
+                                                                                           onchange="handleCategoryChange(this)">
                                                                                     <label class="form-check-label" for="category_{{ $child->id }}">
                                                                                         {{ $childTranslate->title ?? 'Untitled Subcategory' }}
                                                                                         <span class="text-muted">({{ $child->products()->count() }} {{ __('products') }})</span>
@@ -112,6 +114,9 @@
                                                 <div class="d-flex gap-2">
                                                     <button type="button" class="btn btn-primary" onclick="addCategoryProducts()" title="{{ __('Add Selected Categories') }}">
                                                         <i class="material-icons-outlined">add_circle</i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger" onclick="removeCategoryProducts()" title="{{ __('Remove Selected Categories') }}">
+                                                        <i class="material-icons-outlined">remove_circle</i>
                                                     </button>
                                                 </div>
                                             </div>
@@ -243,6 +248,40 @@
 </div>
 
 <script>
+// Auto-select subcategories when main category changes
+function handleCategoryChange(checkbox) {
+    const isMainCategory = !checkbox.classList.contains('subcategory');
+    
+    if (isMainCategory) {
+        const categoryId = checkbox.value;
+        const subcategories = document.querySelectorAll(`.subcategory[data-parent-id="${categoryId}"]`);
+        
+        if (checkbox.checked) {
+            // If main category is checked, check all subcategories
+            subcategories.forEach(sub => sub.checked = true);
+        } else {
+            // If main category is unchecked, uncheck all subcategories
+            subcategories.forEach(sub => sub.checked = false);
+        }
+    }
+    
+    // Check if no main categories are selected, then auto-select all
+    checkAndAutoSelectAll();
+}
+
+// Check if no main categories are selected and auto-select all
+function checkAndAutoSelectAll() {
+    const mainCategories = document.querySelectorAll('.category-checkbox:not(.subcategory)');
+    const anyMainChecked = Array.from(mainCategories).some(cat => cat.checked);
+    
+    if (!anyMainChecked) {
+        // If no main categories are selected, select all categories
+        document.querySelectorAll('.category-checkbox').forEach(cat => {
+            cat.checked = true;
+        });
+    }
+}
+
 function addCategoryProducts() {
     const selectedCategories = [];
     const categoryCheckboxes = document.querySelectorAll('.category-checkbox:checked');
@@ -287,6 +326,57 @@ function addCategoryProducts() {
         loadingModal.hide();
         console.error('Error:', error);
         alert('{{ __('Error occurred while adding category products') }}');
+    });
+}
+
+function removeCategoryProducts() {
+    const selectedCategories = [];
+    const categoryCheckboxes = document.querySelectorAll('.category-checkbox:checked');
+    
+    if (categoryCheckboxes.length === 0) {
+        alert('{{ __('Please select at least one category') }}');
+        return;
+    }
+    
+    if (!confirm('{{ __('Are you sure you want to remove products from selected categories?') }}')) {
+        return;
+    }
+    
+    categoryCheckboxes.forEach(checkbox => {
+        selectedCategories.push(checkbox.value);
+    });
+    
+    const includeSubcategories = document.getElementById('includeSubcategories').checked;
+    
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    loadingModal.show();
+    
+    fetch('{{ route("admin.campaigns.remove-category-products-from-action", $company) }}', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            category_ids: selectedCategories,
+            include_subcategories: includeSubcategories
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        loadingModal.hide();
+        
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert('{{ __('Error') }}: ' + data.message);
+        }
+    })
+    .catch(error => {
+        loadingModal.hide();
+        console.error('Error:', error);
+        alert('{{ __('Error occurred while removing category products') }}');
     });
 }
 

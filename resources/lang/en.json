@@ -1813,5 +1813,7 @@
     "message_send_error": "Error sending message",
     "Add Products by Category": "Add Products by Category",
     "Select Categories": "Select Categories",
-    "Include all subcategories when selecting main categories": "Include all subcategories when selecting main categories"
+    "Include all subcategories when selecting main categories": "Include all subcategories when selecting main categories",
+    "Remove Selected Categories": "Remove Selected Categories",
+    "Are you sure you want to remove products from selected categories?": "Are you sure you want to remove products from selected categories?"
 }
