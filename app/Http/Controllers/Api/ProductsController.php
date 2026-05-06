@@ -159,10 +159,7 @@ class ProductsController extends Controller
             $perPage = $request->get('per_page', 12);
             $page = $request->get('page', 1);
             $categorySlug = $request->get('category_slug');
-            parse_str($_SERVER['QUERY_STRING'], $query);
-
-$typeIds = $query['type_id'] ?? [];
-$typeIds = (array) $typeIds;
+            $typeIds = $request->get('type_id', []);
             $filterIds = $request->get('filters', []);
             $colorIds = $request->get('color', []);
             $sort = $request->get('sort', 'view_count');
