@@ -993,6 +993,7 @@ function removeImage(inputId) {
     }
 });
 </script>
+@endpush
 
 <style>
 .invalid-feedback {
