@@ -21,6 +21,29 @@ class ProductsController extends Controller
 {
     use LocaleFromHeader;
 
+    /**
+     * Custom query parser to handle duplicate keys correctly
+     */
+    private function getQueryArray(Request $request, string $key): array
+    {
+        $values = [];
+
+        foreach (explode('&', $request->server('QUERY_STRING', '')) as $param) {
+            if ($param === '') continue;
+
+            [$paramKey, $paramValue] = array_pad(explode('=', $param, 2), 2, null);
+
+            $paramKey = urldecode($paramKey);
+            $paramValue = urldecode($paramValue ?? '');
+
+            if ($paramKey === $key || $paramKey === $key . '[]') {
+                $values[] = $paramValue;
+            }
+        }
+
+        return array_values(array_filter($values, fn($v) => $v !== ''));
+    }
+
     public function categories(Request $request)
     {
         try {
@@ -160,23 +183,10 @@ class ProductsController extends Controller
             $page = $request->get('page', 1);
             $categorySlug = $request->get('category_slug');
             
-            // Fix query parameter parsing for multiple values
-            parse_str($request->server('QUERY_STRING'), $query);
-            
-            $typeIds = $query['type_id'] ?? [];
-            if (!is_array($typeIds)) {
-                $typeIds = $typeIds ? [$typeIds] : [];
-            }
-            
-            $filterIds = $query['filters'] ?? [];
-            if (!is_array($filterIds)) {
-                $filterIds = $filterIds ? [$filterIds] : [];
-            }
-            
-            $colorIds = $query['color'] ?? [];
-            if (!is_array($colorIds)) {
-                $colorIds = $colorIds ? [$colorIds] : [];
-            }
+            // Fix query parameter parsing for multiple values using custom parser
+            $typeIds = $this->getQueryArray($request, 'type_id');
+            $filterIds = $this->getQueryArray($request, 'filters');
+            $colorIds = $this->getQueryArray($request, 'color');
             
             $sort = $request->get('sort', 'view_count');
             $minPrice = $request->get('min_price');
