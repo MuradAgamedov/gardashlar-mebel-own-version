@@ -184,17 +184,8 @@
                         
                         <!-- Pagination -->
                         @if($dictionaries->hasPages())
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <div class="text-muted">
-                                    {{ __('Showing :from to :to of :total entries', [
-                                        'from' => $dictionaries->firstItem(),
-                                        'to' => $dictionaries->lastItem(),
-                                        'total' => $dictionaries->total()
-                                    ]) }}
-                                </div>
-                                <div>
-                                    {{ $dictionaries->links() }}
-                                </div>
+                            <div class="mt-3">
+                                {{ $dictionaries->links('vendor.pagination.bootstrap-5') }}
                             </div>
                         @endif
                     </div>
