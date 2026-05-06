@@ -17,21 +17,24 @@ class ProductRepository extends BaseRepository
     // Məhsulları filtrlə və gətir - Optimized
     public function getProducts($request)
     {
+        // Get current language ID dynamically
+        $currentLanguageId = \App\Models\Language::getMainLanguage()->id ?? 1;
+        
         // Sadəcə lazım olan əlaqələri yüklə
         $query = $this->product->select(['products.id', 'products.price', 'products.discount_price', 'products.status', 'products.view_count', 'products.created_at'])
             ->with([
-                'translates' => function($q) {
+                'translates' => function($q) use ($currentLanguageId) {
                     $q->select(['product_id', 'language_id', 'title', 'slug'])
-                      ->where('language_id', 1); // Sadəcə default dil
+                      ->where('language_id', $currentLanguageId); // Mövcud dil
                 },
-                'categories' => function($q) {
-                    $q->select(['product_categories.id'])->with(['translates' => function($tq) {
-                        $tq->select(['product_category_id', 'title'])->where('language_id', 1);
+                'categories' => function($q) use ($currentLanguageId) {
+                    $q->select(['product_categories.id'])->with(['translates' => function($tq) use ($currentLanguageId) {
+                        $tq->select(['product_category_id', 'title'])->where('language_id', $currentLanguageId);
                     }]);
                 },
-                'types' => function($q) {
-                    $q->select(['product_types.id'])->with(['translates' => function($tq) {
-                        $tq->select(['product_type_id', 'title'])->where('language_id', 1);
+                'types' => function($q) use ($currentLanguageId) {
+                    $q->select(['product_types.id'])->with(['translates' => function($tq) use ($currentLanguageId) {
+                        $tq->select(['product_type_id', 'title'])->where('language_id', $currentLanguageId);
                     }]);
                 }
             ]);
@@ -39,9 +42,9 @@ class ProductRepository extends BaseRepository
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->whereHas('translates', function($q) use ($search) {
+            $query->whereHas('translates', function($q) use ($search, $currentLanguageId) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->where('language_id', 1); // Default dildə axtarış
+                  ->where('language_id', $currentLanguageId); // Mövcuddildə axtarış
             });
         }
         
