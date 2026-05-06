@@ -855,7 +855,6 @@ function removeImage(inputId) {
     border-color: #e9ecef #e9ecef #dee2e6;
 }
 </style>
-@endpush
 
     // Check if CKEditor is available
     if (typeof ClassicEditor === 'undefined') {
