@@ -534,20 +534,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Override form validation to handle CKEditor fields
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                // Update all CKEditor instances before submission
-                document.querySelectorAll('.ckeditor').forEach(function(textarea) {
-                    if (textarea._ckeditor) {
-                        textarea._ckeditor.updateSourceElement();
-                    }
-                });
-                
-                // Let the form submit normally - browser will handle validation
-                console.log('Form submitted successfully');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Update all CKEditor instances before submission
+            document.querySelectorAll('.ckeditor').forEach(function(textarea) {
+                if (textarea._ckeditor) {
+                    textarea._ckeditor.updateSourceElement();
+                }
             });
-        }
-    });
+            
+            // Let the form submit normally - browser will handle validation
+            console.log('Form submitted successfully');
+        });
+    }
 });
 
 function setupImagePreview(inputId, previewId, imgId, noImageId) {
