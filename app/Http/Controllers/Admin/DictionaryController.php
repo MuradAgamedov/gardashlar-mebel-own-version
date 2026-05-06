@@ -69,7 +69,7 @@ class DictionaryController extends Controller
                 }
             }
 
-            return redirect()->route('admin.dictionaries.index')
+            return redirect()->route('admin.dictionaries.index', ['page' => $request->input('page', 1)])
                 ->with('success', __('Dictionary item created successfully.'));
 
         } catch (\Exception $e) {
@@ -120,7 +120,7 @@ class DictionaryController extends Controller
                 }
             }
 
-            return redirect()->route('admin.dictionaries.index')
+            return redirect()->route('admin.dictionaries.index', ['page' => $request->input('page', 1)])
                 ->with('success', __('Dictionary item updated successfully.'));
 
         } catch (\Exception $e) {
@@ -136,7 +136,7 @@ class DictionaryController extends Controller
     {
         try {
             $dictionary->delete();
-            return redirect()->route('admin.dictionaries.index')
+            return redirect()->route('admin.dictionaries.index', ['page' => $request->input('page', 1)])
                 ->with('success', __('Dictionary item deleted successfully.'));
         } catch (\Exception $e) {
             return back()->with('error', __('Error deleting dictionary item. Please try again.'));

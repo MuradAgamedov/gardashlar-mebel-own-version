@@ -55,7 +55,7 @@
                         <h5>Edit Dictionary Item</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.dictionaries.update', $dictionary->id) }}" method="POST">
+                        <form action="{{ route('admin.dictionaries.update', $dictionary->id) }}?page={{ request('page', 1) }}" method="POST">
                             @csrf
                             @method('PUT')
                             

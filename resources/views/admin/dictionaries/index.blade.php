@@ -65,7 +65,7 @@
                                     <i class="material-icons-outlined">info</i>
                                     <strong>{{ __('Search Results:') }}</strong>
                                     <span class="badge bg-primary me-2">{{ __('Keyword/Translation: ":search"', ['search' => request('search')]) }}</span>
-                                    <span class="badge bg-secondary">{{ __(':count result(s)', ['count' => $dictionaries->count()]) }}</span>
+                                    <span class="badge bg-secondary">{{ __(':count result(s)', ['count' => $dictionaries->total()]) }}</span>
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             </div>
@@ -146,16 +146,17 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group" role="group">
-                                                    <a href="{{ route('admin.dictionaries.edit', $dictionary->id) }}" 
+                                                    <a href="{{ route('admin.dictionaries.edit', $dictionary->id) }}?page={{ request('page', 1) }}" 
                                                        class="btn btn-sm btn-outline-primary" title="{{ __('Edit') }}">
                                                         <i class="material-icons-outlined">edit</i>
                                                     </a>
-                                                    <form action="{{ route('admin.dictionaries.destroy', $dictionary->id) }}" 
+                                                    <form action="{{ route('admin.dictionaries.destroy', $dictionary->id) }}?page={{ request('page', 1) }}" 
                                                           method="POST" 
                                                           onsubmit="return confirm('Are you sure you want to delete this dictionary item?')"
                                                           style="display: inline;">
                                                         @csrf
                                                         @method('DELETE')
+                                                        <input type="hidden" name="page" value="{{ request('page', 1) }}">
                                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ __('Delete') }}">
                                                             <i class="material-icons-outlined">delete</i>
                                                         </button>
@@ -180,6 +181,22 @@
                                 </tbody>
                             </table>
                         </div>
+                        
+                        <!-- Pagination -->
+                        @if($dictionaries->hasPages())
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="text-muted">
+                                    {{ __('Showing :from to :to of :total entries', [
+                                        'from' => $dictionaries->firstItem(),
+                                        'to' => $dictionaries->lastItem(),
+                                        'total' => $dictionaries->total()
+                                    ]) }}
+                                </div>
+                                <div>
+                                    {{ $dictionaries->links() }}
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

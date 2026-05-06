@@ -27,6 +27,6 @@ class DictionaryRepository extends BaseRepository
             });
         }
 
-        return $query->get();
+        return $query->paginate(40)->withQueryString();
     }
 }

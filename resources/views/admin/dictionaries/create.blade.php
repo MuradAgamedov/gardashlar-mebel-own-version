@@ -55,7 +55,7 @@
                         <h5>{{ __('New Dictionary Item') }}</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('admin.dictionaries.store') }}" method="POST">
+                        <form action="{{ route('admin.dictionaries.store') }}?page={{ request('page', 1) }}" method="POST">
                             @csrf
                             
                             <!-- Keyword -->
