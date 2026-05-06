@@ -1225,6 +1225,7 @@ class AuthController extends Controller
 
     public function googleLogin(Request $request)
     {
+        dd(1);
         $request->validate([
             'token' => 'required|string',
         ]);
