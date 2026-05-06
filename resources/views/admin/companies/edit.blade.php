@@ -506,7 +506,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     ]
                 },
                 language: 'en',
-                placeholder: 'Enter description...'
+                placeholder: 'Enter description...',
+                branding: false
             })
             .then(editor => {
                 console.log('CKEditor initialized successfully for:', textarea.id);
@@ -886,7 +887,8 @@ function removeImage(inputId) {
                     ]
                 },
                 language: 'en',
-                placeholder: 'Enter description...'
+                placeholder: 'Enter description...',
+                branding: false
             })
             .then(editor => {
                 console.log('CKEditor initialized successfully for:', textarea.id);
