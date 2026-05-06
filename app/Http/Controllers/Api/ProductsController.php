@@ -1503,6 +1503,7 @@ public function categoryBySlug(Request $request, $slug)
 
             return response()->json([
                 'success' => true,
+                'type_ids' => $typeIds,
                 'message' => 'Product details retrieved successfully',
                 'data' => $data
             ]);
