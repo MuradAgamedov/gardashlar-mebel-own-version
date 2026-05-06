@@ -1811,5 +1811,6 @@
     "Select Categories": "Kateqoriyaları seç",
     "Include all subcategories when selecting main categories": "Ana kateqoriyaları seçərkən bütün alt kateqoriyaları daxil et",
     "Remove Selected Categories": "Seçilmiş kateqoriyaları sil",
-    "Are you sure you want to remove products from selected categories?": "Seçilmiş kateqoriyalardan məhsulları silmək istədiyinizə əminsiniz?"
+    "Are you sure you want to remove products from selected categories?": "Seçilmiş kateqoriyalardan məhsulları silmək istədiyinizə əminsiniz?",
+    "Please select at least one category": "Zəhmət olmasa ən azı bir kateqoriya seçin"
 }

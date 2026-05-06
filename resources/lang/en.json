@@ -1816,5 +1816,6 @@
     "Select Categories": "Select Categories",
     "Include all subcategories when selecting main categories": "Include all subcategories when selecting main categories",
     "Remove Selected Categories": "Remove Selected Categories",
-    "Are you sure you want to remove products from selected categories?": "Are you sure you want to remove products from selected categories?"
+    "Are you sure you want to remove products from selected categories?": "Are you sure you want to remove products from selected categories?",
+    "Please select at least one category": "Please select at least one category"
 }

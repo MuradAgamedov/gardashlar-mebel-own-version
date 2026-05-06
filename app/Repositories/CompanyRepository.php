@@ -148,6 +148,21 @@ class CompanyRepository extends BaseRepository
             return false;
         }
 
+        // Get the product to calculate discount price
+        $product = \App\Models\Product::find($productId);
+        if (!$product) {
+            return false;
+        }
+
+        // Calculate discount price based on company's discount_percent
+        $discountPrice = 0;
+        if ($company->discount_percent && $product->price) {
+            $discountPrice = $product->price * (1 - ($company->discount_percent / 100));
+        }
+
+        // Update product's discount price
+        $product->update(['discount_price' => $discountPrice]);
+
         CompanyProduct::create([
             'company_id' => $company->id,
             'product_id' => $productId,
@@ -160,6 +175,13 @@ class CompanyRepository extends BaseRepository
 
     public function removeProductFromCompany(Company $company, int $productId)
     {
+        // Get the product to reset discount price
+        $product = \App\Models\Product::find($productId);
+        if ($product) {
+            // Set discount price to 0 when removing from company
+            $product->update(['discount_price' => 0]);
+        }
+
         return CompanyProduct::where('company_id', $company->id)
             ->where('product_id', $productId)
             ->delete();
