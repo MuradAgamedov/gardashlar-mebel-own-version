@@ -64,7 +64,13 @@
                                                                            data-category-name="{{ $categoryTranslate->title ?? 'Untitled Category' }}">
                                                                     <label class="form-check-label" for="category_{{ $category->id }}">
                                                                         <strong>{{ $categoryTranslate->title ?? 'Untitled Category' }}</strong>
-                                                                        <span class="text-muted">({{ $category->products()->count() }} {{ __('products') }})</span>
+                                                                        @php
+                                                                $totalProducts = $category->products()->count();
+                                                                foreach($category->children as $child) {
+                                                                    $totalProducts += $child->products()->count();
+                                                                }
+                                                            @endphp
+                                                            <span class="text-muted">({{ $totalProducts }} {{ __('products') }})</span>
                                                                     </label>
                                                                 </div>
                                                                 
