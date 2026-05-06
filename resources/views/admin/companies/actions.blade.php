@@ -248,68 +248,35 @@
 <script>
 // Initialize category checkboxes when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Initializing category checkboxes...');
-    
     // Add onchange event to all category checkboxes
     const allCheckboxes = document.querySelectorAll('.category-checkbox');
-    console.log('Found checkboxes:', allCheckboxes.length);
     
     allCheckboxes.forEach(checkbox => {
-        console.log('Setting up checkbox:', checkbox.value, checkbox.classList.contains('subcategory') ? 'subcategory' : 'main');
         checkbox.addEventListener('change', function() {
-            console.log('Checkbox changed:', this.value, 'checked:', this.checked);
             handleCategoryChange(this);
         });
     });
-    
-    // Initial auto-select check
-    checkAndAutoSelectAll();
 });
 
-// Auto-select subcategories when main category changes
+// Handle checkbox changes for categories and subcategories
 function handleCategoryChange(checkbox) {
     const isMainCategory = !checkbox.classList.contains('subcategory');
-    console.log('handleCategoryChange called - isMainCategory:', isMainCategory, 'value:', checkbox.value, 'checked:', checkbox.checked);
     
     if (isMainCategory) {
         const categoryId = checkbox.value;
         const subcategories = document.querySelectorAll(`.subcategory[data-parent-id="${categoryId}"]`);
         
-        console.log('Main category changed:', categoryId, 'checked:', checkbox.checked);
-        console.log('Looking for subcategories with selector:', `.subcategory[data-parent-id="${categoryId}"]`);
-        console.log('Found subcategories:', subcategories.length);
-        
         if (checkbox.checked) {
             // If main category is checked, check all subcategories
-            subcategories.forEach((sub, index) => {
-                console.log(`Checking subcategory ${index}:`, sub.value, 'current checked:', sub.checked);
+            subcategories.forEach(sub => {
                 sub.checked = true;
-                console.log(`After checking - subcategory ${index}:`, sub.value, 'new checked:', sub.checked);
             });
         } else {
             // If main category is unchecked, uncheck all subcategories
-            subcategories.forEach((sub, index) => {
-                console.log(`Unchecking subcategory ${index}:`, sub.value, 'current checked:', sub.checked);
+            subcategories.forEach(sub => {
                 sub.checked = false;
-                console.log(`After unchecking - subcategory ${index}:`, sub.value, 'new checked:', sub.checked);
             });
         }
-    }
-    
-    // Check if no main categories are selected, then auto-select all
-    checkAndAutoSelectAll();
-}
-
-// Check if no main categories are selected and auto-select all
-function checkAndAutoSelectAll() {
-    const mainCategories = document.querySelectorAll('.category-checkbox:not(.subcategory)');
-    const anyMainChecked = Array.from(mainCategories).some(cat => cat.checked);
-    
-    if (!anyMainChecked) {
-        // If no main categories are selected, select all categories
-        document.querySelectorAll('.category-checkbox').forEach(cat => {
-            cat.checked = true;
-        });
     }
 }
 
