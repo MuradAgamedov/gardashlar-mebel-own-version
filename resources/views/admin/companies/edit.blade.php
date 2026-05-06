@@ -460,7 +460,7 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Campaign edit script loaded');
+    console.log('Campaign edit script loaded - v2');
     
     // Prevent browser validation
     const form = document.getElementById('companyForm');
@@ -658,6 +658,80 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
         
+        // Override form validation to handle CKEditor fields
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                // Update all CKEditor instances before validation
+                document.querySelectorAll('.ckeditor').forEach(function(textarea) {
+                    if (textarea._ckeditor) {
+                        textarea._ckeditor.updateSourceElement();
+                    }
+                });
+
+                // Check if any required CKEditor fields are empty
+                let hasEmptyFields = false;
+                let firstEmptyField = null;
+
+                document.querySelectorAll('.ckeditor').forEach(function(textarea) {
+                    if (textarea._ckeditor) {
+                        const content = textarea._ckeditor.getData().trim();
+                        if (!content) {
+                            hasEmptyFields = true;
+                            
+                            // Store first empty field for focus
+                            if (!firstEmptyField) {
+                                firstEmptyField = textarea;
+                            }
+                            
+                            // Add error styling
+                            textarea.classList.add('is-invalid');
+                            if (!textarea.nextElementSibling || !textarea.nextElementSibling.classList.contains('invalid-feedback')) {
+                                const errorDiv = document.createElement('div');
+                                errorDiv.className = 'invalid-feedback';
+                                errorDiv.textContent = 'This field is required.';
+                                textarea.parentNode.insertBefore(errorDiv, textarea.nextSibling);
+                            }
+                        } else {
+                            textarea.classList.remove('is-invalid');
+                            const errorDiv = textarea.nextElementSibling;
+                            if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
+                                errorDiv.remove();
+                            }
+                        }
+                    }
+                });
+
+                if (hasEmptyFields) {
+                    e.preventDefault();
+                    
+                    // Focus on first empty field and switch to its tab
+                    if (firstEmptyField && firstEmptyField._focusEditor) {
+                        // Find the tab pane containing this textarea
+                        const pane = firstEmptyField.closest('.tab-pane');
+                        if (pane) {
+                            const tabId = pane.getAttribute('id');
+                            const tabTrigger = document.querySelector(`[data-bs-target="#${tabId}"]`);
+                            if (tabTrigger) {
+                                // Switch to the tab first
+                                const tab = new bootstrap.Tab(tabTrigger);
+                                tab.show();
+                                
+                                // Focus on editor after tab is shown
+                                setTimeout(() => {
+                                    firstEmptyField._focusEditor();
+                                }, 100);
+                            }
+                        } else {
+                            firstEmptyField._focusEditor();
+                        }
+                    }
+                    
+                    return false;
+                }
+            });
+        }
+        
         // Submit form if no errors
         form.submit();
     });
@@ -695,81 +769,6 @@ function removeImage(inputId) {
     preview.style.display = 'none';
     noImage.style.display = 'block';
 }
-
-    // Override form validation to handle CKEditor fields
-    const form = document.querySelector('form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            // Update all CKEditor instances before validation
-            document.querySelectorAll('.ckeditor').forEach(function(textarea) {
-                if (textarea._ckeditor) {
-                    textarea._ckeditor.updateSourceElement();
-                }
-            });
-
-            // Check if any required CKEditor fields are empty
-            let hasEmptyFields = false;
-            let firstEmptyField = null;
-
-            document.querySelectorAll('.ckeditor').forEach(function(textarea) {
-                if (textarea._ckeditor) {
-                    const content = textarea._ckeditor.getData().trim();
-                    if (!content) {
-                        hasEmptyFields = true;
-                        
-                        // Store first empty field for focus
-                        if (!firstEmptyField) {
-                            firstEmptyField = textarea;
-                        }
-                        
-                        // Add error styling
-                        textarea.classList.add('is-invalid');
-                        if (!textarea.nextElementSibling || !textarea.nextElementSibling.classList.contains('invalid-feedback')) {
-                            const errorDiv = document.createElement('div');
-                            errorDiv.className = 'invalid-feedback';
-                            errorDiv.textContent = 'This field is required.';
-                            textarea.parentNode.insertBefore(errorDiv, textarea.nextSibling);
-                        }
-                    } else {
-                        textarea.classList.remove('is-invalid');
-                        const errorDiv = textarea.nextElementSibling;
-                        if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
-                            errorDiv.remove();
-                        }
-                    }
-                }
-            });
-
-            if (hasEmptyFields) {
-                e.preventDefault();
-                
-                // Focus on first empty field and switch to its tab
-                if (firstEmptyField && firstEmptyField._focusEditor) {
-                    // Find the tab pane containing this textarea
-                    const pane = firstEmptyField.closest('.tab-pane');
-                    if (pane) {
-                        const tabId = pane.getAttribute('id');
-                        const tabTrigger = document.querySelector(`[data-bs-target="#${tabId}"]`);
-                        if (tabTrigger) {
-                            // Switch to the tab first
-                            const tab = new bootstrap.Tab(tabTrigger);
-                            tab.show();
-                            
-                            // Focus on editor after tab is shown
-                            setTimeout(() => {
-                                firstEmptyField._focusEditor();
-                            }, 100);
-                        }
-                    } else {
-                        firstEmptyField._focusEditor();
-                    }
-                }
-                
-                return false;
-            }
-        });
-    }
-});
 </script>
 @endpush
 
