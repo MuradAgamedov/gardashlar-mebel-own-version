@@ -128,9 +128,14 @@
                     <!-- Products Section -->
                     <div class="row">
                         <div class="col-12">
+                            @php
+                                $companyProductsCount = $products->filter(function($product) {
+                                    return $product->companyProducts->isNotEmpty();
+                                })->count();
+                            @endphp
                             <h5 class="mb-3">
                             <i class="material-icons-outlined me-2">inventory_2</i>
-                            {{ __('Products') }} ({{ $products->total() }})
+                            {{ __('Products') }} ({{ $products->total() }}) | {{ __('Company Products') }} ({{ $companyProductsCount }})
                         </h5>
                             
                             <!-- Search -->
