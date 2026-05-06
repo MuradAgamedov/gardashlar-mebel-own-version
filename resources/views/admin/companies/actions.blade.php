@@ -108,7 +108,7 @@
                                                 
                                                 <div class="mb-3">
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="includeSubcategories">
+                                                        <input class="form-check-input" type="checkbox" id="includeSubcategories" checked>
                                                         <label class="form-check-label" for="includeSubcategories">
                                                             {{ __('Include all subcategories when selecting main categories') }}
                                                         </label>
