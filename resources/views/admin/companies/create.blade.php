@@ -416,13 +416,11 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="material-icons-outlined me-2">save</i>
-                                    {{ __('Create Campaign') }}
+                                <button type="submit" class="btn btn-primary btn-lg" title="{{ __('Create Campaign') }}">
+                                    <i class="material-icons-outlined">save</i>
                                 </button>
-                                <a href="{{ route('admin.campaigns.index') }}" class="btn btn-outline-secondary">
-                                    <i class="material-icons-outlined me-2">arrow_back</i>
-                                    {{ __('Back to List') }}
+                                <a href="{{ route('admin.campaigns.index') }}" class="btn btn-outline-secondary" title="{{ __('Back to List') }}">
+                                    <i class="material-icons-outlined">arrow_back</i>
                                 </a>
                             </div>
                         </div>

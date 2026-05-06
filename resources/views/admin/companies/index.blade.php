@@ -44,9 +44,8 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5>{{ __('Campaigns List') }}</h5>
-                            <a href="{{ route('admin.campaigns.create') }}" class="btn btn-primary">
+                            <a href="{{ route('admin.campaigns.create') }}" class="btn btn-primary" title="{{ __('Add New') }}">
                                 <i class="material-icons-outlined">add</i>
-                                {{ __('Add New') }}
                             </a>
                         </div>
                     </div>
@@ -164,9 +163,8 @@
                                 <i class="material-icons-outlined text-muted" style="font-size: 4rem;">business</i>
                                 <h5 class="mt-3 text-muted">{{ __('No companies found') }}</h5>
                                 <p class="text-muted">{{ __('Click the button below to add the first company.') }}</p>
-                                <a href="{{ route('admin.campaigns.create') }}" class="btn btn-primary">
+                                <a href="{{ route('admin.campaigns.create') }}" class="btn btn-primary" title="{{ __('Add First Company') }}">
                                     <i class="material-icons-outlined">add</i>
-                                    {{ __('Add First Company') }}
                                 </a>
                             </div>
                         @endif
