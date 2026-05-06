@@ -7,7 +7,6 @@ use App\Models\SuggestAPlaceForm;
 use App\Services\FileService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Helpers\DictionaryHelper;
 use OpenApi\Annotations as OA;
 
 /**
@@ -45,41 +44,41 @@ class SuggestAPlaceFormController extends Controller
                 'details' => 'required|string|max:2000',
                 'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,txt,jpg,jpeg,png|max:10240',
             ], [
-                'name_surname.required' => DictionaryHelper::trans('name_surname_required', $lang),
-                'name_surname.max' => DictionaryHelper::trans('name_surname_max', $lang),
+                'name_surname.required' => dict('name_surname_required', $lang),
+                'name_surname.max' => dict('name_surname_max', $lang),
 
-                'email.required' => DictionaryHelper::trans('email_required', $lang),
-                'email.email' => DictionaryHelper::trans('email_email', $lang),
-                'email.max' => DictionaryHelper::trans('email_max', $lang),
+                'email.required' => dict('email_required', $lang),
+                'email.email' => dict('email_email', $lang),
+                'email.max' => dict('email_max', $lang),
 
-                'area_sqm.required' => DictionaryHelper::trans('area_required', $lang),
-                'area_sqm.max' => DictionaryHelper::trans('area_max', $lang),
+                'area_sqm.required' => dict('area_required', $lang),
+                'area_sqm.max' => dict('area_max', $lang),
 
-                'mobile.required' => DictionaryHelper::trans('mobile_required', $lang),
-                'mobile.max' => DictionaryHelper::trans('mobile_max', $lang),
-                'mobile.regex' => DictionaryHelper::trans('mobile_invalid', $lang),
+                'mobile.required' => dict('mobile_required', $lang),
+                'mobile.max' => dict('mobile_max', $lang),
+                'mobile.regex' => dict('mobile_invalid', $lang),
 
-                'address.required' => DictionaryHelper::trans('address_required', $lang),
-                'address.max' => DictionaryHelper::trans('address_max', $lang),
+                'address.required' => dict('address_required', $lang),
+                'address.max' => dict('address_max', $lang),
 
-                'floor_count.required' => DictionaryHelper::trans('floor_count_required', $lang),
-                'floor_count.max' => DictionaryHelper::trans('floor_count_max', $lang),
+                'floor_count.required' => dict('floor_count_required', $lang),
+                'floor_count.max' => dict('floor_count_max', $lang),
 
-                'is_repaired.required' => DictionaryHelper::trans('is_repaired_required', $lang),
-                'is_repaired.boolean' => DictionaryHelper::trans('is_repaired_boolean', $lang),
+                'is_repaired.required' => dict('is_repaired_required', $lang),
+                'is_repaired.boolean' => dict('is_repaired_boolean', $lang),
 
-                'has_warehouse.required' => DictionaryHelper::trans('has_warehouse_required', $lang),
-                'has_warehouse.boolean' => DictionaryHelper::trans('has_warehouse_boolean', $lang),
+                'has_warehouse.required' => dict('has_warehouse_required', $lang),
+                'has_warehouse.boolean' => dict('has_warehouse_boolean', $lang),
 
-                'has_parking.required' => DictionaryHelper::trans('has_parking_required', $lang),
-                'has_parking.boolean' => DictionaryHelper::trans('has_parking_boolean', $lang),
+                'has_parking.required' => dict('has_parking_required', $lang),
+                'has_parking.boolean' => dict('has_parking_boolean', $lang),
 
-                'details.required' => DictionaryHelper::trans('details_required', $lang),
-                'details.max' => DictionaryHelper::trans('details_max', $lang),
+                'details.required' => dict('details_required', $lang),
+                'details.max' => dict('details_max', $lang),
 
-                'file.file' => DictionaryHelper::trans('file_invalid', $lang),
-                'file.mimes' => DictionaryHelper::trans('file_mimes', $lang),
-                'file.max' => DictionaryHelper::trans('file_max', $lang),
+                'file.file' => dict('file_invalid', $lang),
+                'file.mimes' => dict('file_mimes', $lang),
+                'file.max' => dict('file_max', $lang),
             ]);
 
             $filePath = null;
@@ -96,7 +95,7 @@ class SuggestAPlaceFormController extends Controller
                 if (!$filePath) {
                     return response()->json([
                         'success' => false,
-                        'message' => DictionaryHelper::trans('file_upload_failed', $lang),
+                        'message' => dict('file_upload_failed', $lang),
                         'data' => null
                     ], 500);
                 }
@@ -118,7 +117,7 @@ class SuggestAPlaceFormController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => DictionaryHelper::trans('form_submitted_success', $lang),
+                'message' => dict('form_submitted_success', $lang),
                 'data' => [
                     'id' => $form->id
                 ]
@@ -127,13 +126,13 @@ class SuggestAPlaceFormController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => DictionaryHelper::trans('validation_failed', $request->get('lang', 'az')),
+                'message' => dict('validation_failed', $request->get('lang', 'az')),
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => DictionaryHelper::trans('form_submit_error', $request->get('lang', 'az')) . ': ' . $e->getMessage(),
+                'message' => dict('form_submit_error', $request->get('lang', 'az')) . ': ' . $e->getMessage(),
                 'data' => null
             ], 500);
         }
