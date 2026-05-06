@@ -380,43 +380,11 @@
 
                 <!-- Sidebar -->
                 <div class="col-lg-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0">
-                                <i class="material-icons-outlined me-2">info</i>
-                                {{ __('Information') }}
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="info-item">
-                                <i class="material-icons-outlined">help_outline</i>
-                                <div>
-                                    <strong>{{ __('Required Fields') }}</strong>
-                                    <p>{{ __('All fields marked with * are required for each language.') }}</p>
-                                </div>
-                            </div>
-                            <div class="info-item">
-                                <i class="material-icons-outlined">image</i>
-                                <div>
-                                    <strong>{{ __('Image Requirements') }}</strong>
-                                    <p>{{ __('Upload high-quality images for better presentation.') }}</p>
-                                </div>
-                            </div>
-                            <div class="info-item">
-                                <i class="material-icons-outlined">description</i>
-                                <div>
-                                    <strong>{{ __('Description') }}</strong>
-                                    <p>{{ __('Provide detailed information about the company.') }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Action Buttons -->
                     <div class="card">
                         <div class="card-body">
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg" title="{{ __('Create Campaign') }}">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary" title="{{ __('Create Campaign') }}">
                                     <i class="material-icons-outlined">save</i>
                                 </button>
                                 <a href="{{ route('admin.campaigns.index') }}" class="btn btn-outline-secondary" title="{{ __('Back to List') }}">
