@@ -19,10 +19,21 @@ class TestPageController extends Controller
 
         if ($request->hasFile('file_input')) {
             $file = $request->file('file_input');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads'), $fileName);
             
-            return back()->with('success', 'File uploaded successfully: ' . $fileName);
+            try {
+                // Send file to external API
+                $response = \Http::asMultipart()
+                    ->attach('file', file->get(), $file->getClientOriginalName())
+                    ->post('https://front.stagnest.dev/api/import-redirect');
+
+                if ($response->successful()) {
+                    return back()->with('success', 'File sent successfully to external API');
+                } else {
+                    return back()->with('error', 'Failed to send file to external API: ' . $response->status());
+                }
+            } catch (\Exception $e) {
+                return back()->with('error', 'Error sending file: ' . $e->getMessage());
+            }
         }
 
         return back()->with('error', 'No file uploaded');
