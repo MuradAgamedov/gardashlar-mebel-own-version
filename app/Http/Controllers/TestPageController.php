@@ -26,8 +26,9 @@ class TestPageController extends Controller
                     ->attach('file', $file->get(), $file->getClientOriginalName())
                     ->post('https://front.stagnest.dev/api/import-redirect');
 
-                // Debug with dd
-                dd($response);
+                // Parse JSON response and debug with dd
+                $parsedResponse = $response->json();
+                dd($parsedResponse);
             } catch (\Exception $e) {
                 return back()->with('error', 'Error sending file: ' . $e->getMessage());
             }
