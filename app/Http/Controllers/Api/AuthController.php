@@ -1280,6 +1280,7 @@ public function googleLogin(Request $request)
                 'name' => $googleName,
                 'surname' => $googleSurname,
                 'email' => $googleEmail,
+                'password' => '', // Empty password for Google users
                 'email_verified_at' => now(),
             ]);
 
