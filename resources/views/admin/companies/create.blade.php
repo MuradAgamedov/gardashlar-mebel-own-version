@@ -35,7 +35,7 @@
                     <h6 class="alert-heading mb-1">Please fix the following errors:</h6>
                     <ul class="mb-0">
                         @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
+                            <li>{{ __($error) }}</li>
                         @endforeach
                     </ul>
                 </div>
@@ -118,7 +118,7 @@
                                                             @if($index === 0) required @else data-required="true" @endif>
                                                         <label for="title-{{ $language->id }}">{{ __('Campaign Title') }} *</label>
                                                         @error("translates.{$language->id}.title")
-                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                            <div class="invalid-feedback">{{ __($message) }}</div>
                                                         @enderror
                                                     </div>
                                                 </div>
@@ -137,7 +137,7 @@
                                                             @if($index === 0) required @else data-required="true" @endif>
                                                         <label for="slug-{{ $language->id }}">{{ __('Slug') }} *</label>
                                                         @error("translates.{$language->id}.slug")
-                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                            <div class="invalid-feedback">{{ __($message) }}</div>
                                                         @enderror
                                                         <div class="form-text">{{ __('Slug must be unique (e.g., my-company)') }}</div>
                                                     </div>
@@ -166,7 +166,7 @@
                                                             max="100">
                                                         <label for="discount_percent">{{ __('Discount Percent') }} (%)</label>
                                                         @error('discount_percent')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                            <div class="invalid-feedback">{{ __($message) }}</div>
                                                         @enderror
                                                         <div class="form-text">{{ __('Enter discount percentage (0-100). Leave empty for no discount.') }}</div>
                                                     </div>
@@ -197,7 +197,7 @@
                                                                accept="image/*" 
                                                                @if($index === 0) required @else data-required="true" @endif>
                                                         @error("translates.{$language->id}.card_image")
-                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                            <div class="invalid-feedback">{{ __($message) }}</div>
                                                         @enderror
                                                         <div class="form-text">{{ __('Max 2MB • JPEG, PNG, JPG, GIF, WEBP') }}</div>
                                                     </div>
@@ -233,7 +233,7 @@
                                                                accept="image/*" 
                                                                @if($index === 0) required @else data-required="true" @endif>
                                                         @error("translates.{$language->id}.inner_image")
-                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                            <div class="invalid-feedback">{{ __($message) }}</div>
                                                         @enderror
                                                         <div class="form-text">{{ __('Max 2MB • JPEG, PNG, JPG, GIF, WEBP') }}</div>
                                                     </div>
@@ -272,7 +272,7 @@
                                                                placeholder="{{ __('Enter card image alt text') }}">
                                                         <label for="card-alt-{{ $language->id }}">{{ __('Card Image Alt Text') }}</label>
                                                         @error("translates.{$language->id}.card_image_alt_text")
-                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                            <div class="invalid-feedback">{{ __($message) }}</div>
                                                         @enderror
                                                     </div>
                                                 </div>
@@ -286,7 +286,7 @@
                                                                placeholder="{{ __('Enter inner image alt text') }}">
                                                         <label for="inner-alt-{{ $language->id }}">{{ __('Inner Image Alt Text') }}</label>
                                                         @error("translates.{$language->id}.inner_image_alt_text")
-                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                            <div class="invalid-feedback">{{ __($message) }}</div>
                                                         @enderror
                                                     </div>
                                                 </div>
@@ -306,7 +306,7 @@
                                                           placeholder="{{ __('Enter detailed company description') }}"
                                                           @if($index === 0) required @else data-required="true" @endif>{{ old("translates.{$language->id}.description") }}</textarea>
                                                 @error("translates.{$language->id}.description")
-                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                    <div class="invalid-feedback">{{ __($message) }}</div>
                                                 @enderror
                                             </div>
                                         </div>
@@ -328,7 +328,7 @@
                                                                placeholder="{{ __('Enter SEO title') }}">
                                                         <label for="seo-title-{{ $language->id }}">{{ __('SEO Title') }}</label>
                                                         @error("translates.{$language->id}.seo_title")
-                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                            <div class="invalid-feedback">{{ __($message) }}</div>
                                                         @enderror
                                                         <div class="form-text">Recommended length: 50-60 characters</div>
                                                     </div>
@@ -345,7 +345,7 @@
                                                                   placeholder="{{ __('Enter SEO description') }}">{{ old("translates.{$language->id}.seo_description") }}</textarea>
                                                         <label for="seo-description-{{ $language->id }}">{{ __('SEO Description') }}</label>
                                                         @error("translates.{$language->id}.seo_description")
-                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                            <div class="invalid-feedback">{{ __($message) }}</div>
                                                         @enderror
                                                         <div class="form-text">Recommended length: 150-160 characters</div>
                                                     </div>
@@ -362,7 +362,7 @@
                                                                   placeholder="Enter SEO keywords (comma separated)">{{ old("translates.{$language->id}.seo_keywords") }}</textarea>
                                                         <label for="seo-keywords-{{ $language->id }}">{{ __('SEO Keywords') }}</label>
                                                         @error("translates.{$language->id}.seo_keywords")
-                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                            <div class="invalid-feedback">{{ __($message) }}</div>
                                                         @enderror
                                                         <div class="form-text">Separate keywords with commas</div>
                                                     </div>

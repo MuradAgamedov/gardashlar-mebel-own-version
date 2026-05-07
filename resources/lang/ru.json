@@ -1820,5 +1820,16 @@
     "Include all subcategories when selecting main categories": "Включать все подкатегории при выборе основных категорий",
     "Remove Selected Categories": "Удалить выбранные категории",
     "Are you sure you want to remove products from selected categories?": "Вы уверены, что хотите удалить товары из выбранных категорий?",
-    "Please select at least one category": "Пожалуйста, выберите хотя бы одну категорию"
+    "Please select at least one category": "Пожалуйста, выберите хотя бы одну категорию",
+    "validation.required": "Это поле обязательно.",
+    "The :attribute field is required.": "Поле :attribute обязательно.",
+    "The :attribute must be a file of type: :values.": ":attribute должен быть файлом типа: :values.",
+    "The :attribute may not be greater than :max kilobytes.": ":attribute не должен превышать :max килобайт.",
+    "The :attribute must be at least :min characters.": ":attribute должен содержать минимум :min символов.",
+    "The :attribute may not be greater than :max characters.": ":attribute не должен превышать :max символов.",
+    "The :attribute must be a valid email address.": ":attribute должен быть действительным email адресом.",
+    "The :attribute must be a number.": ":attribute должен быть числом.",
+    "The :attribute format is invalid.": "Формат :attribute недействителен.",
+    "Validation error": "Ошибка валидации",
+    "Validation failed": "Валидация не пройдена"
 }

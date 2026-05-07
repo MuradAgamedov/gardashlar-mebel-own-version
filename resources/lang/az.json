@@ -1812,5 +1812,16 @@
     "Include all subcategories when selecting main categories": "Ana kateqoriyaları seçərkən bütün alt kateqoriyaları daxil et",
     "Remove Selected Categories": "Seçilmiş kateqoriyaları sil",
     "Are you sure you want to remove products from selected categories?": "Seçilmiş kateqoriyalardan məhsulları silmək istədiyinizə əminsiniz?",
-    "Please select at least one category": "Zəhmət olmasa ən azı bir kateqoriya seçin"
+    "Please select at least one category": "Zəhmət olmasa ən azı bir kateqoriya seçin",
+    "validation.required": "Bu sahə mütləqdir.",
+    "The :attribute field is required.": ":attribute sahəsi mütləqdir.",
+    "The :attribute must be a file of type: :values.": ":attribute :values növündə fayl olmalıdır.",
+    "The :attribute may not be greater than :max kilobytes.": ":attribute :max kilobaytdan böyük ola bilməz.",
+    "The :attribute must be at least :min characters.": ":attribute ən azı :min simvol olmalıdır.",
+    "The :attribute may not be greater than :max characters.": ":attribute :max simvoldan çox ola bilməz.",
+    "The :attribute must be a valid email address.": ":attribute etibarlı email ünvanı olmalıdır.",
+    "The :attribute must be a number.": ":attribute rəqəm olmalıdır.",
+    "The :attribute format is invalid.": ":attribute formatı yanlışdır.",
+    "Validation error": "Validasiya xətası",
+    "Validation failed": "Validasiya uğursuz oldu"
 }
