@@ -1306,18 +1306,20 @@ public function googleLogin(Request $request)
 
         return response()->json([
             'success' => true,
-            'message' => __('Google login uğurludur'),
+            'message' => Dictionary::getValue('success_login'),
             'data' => [
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
                     'surname' => $user->surname,
+                    'phone' => $user->phone,
                     'email' => $user->email,
+                    'fin' => $user->fin,
                     'email_verified' => !is_null($user->email_verified_at),
-                    'email_verified_at' => $user->email_verified_at,
+                    'email_verified_at' => $user->email_verified_at ? $user->email_verified_at->toDateTimeString() : null
                 ],
                 'token' => $token,
-                'token_type' => 'Bearer',
+                'token_type' => 'Bearer'
             ]
         ]);
 
