@@ -26,11 +26,8 @@ class TestPageController extends Controller
                     ->attach('file', file->get(), $file->getClientOriginalName())
                     ->post('https://front.stagnest.dev/api/import-redirect');
 
-                if ($response->successful()) {
-                    return back()->with('success', 'File sent successfully to external API');
-                } else {
-                    return back()->with('error', 'Failed to send file to external API: ' . $response->status());
-                }
+                // Debug with dd
+                dd($response);
             } catch (\Exception $e) {
                 return back()->with('error', 'Error sending file: ' . $e->getMessage());
             }
