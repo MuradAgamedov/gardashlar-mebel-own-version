@@ -1511,7 +1511,6 @@
     "No image exists for keyword \":keyword\". Uploading will create a new entry.": "Изображение для ключевого слова \":keyword\" не существует. Загрузка создаст новую запись.",
     "Upload Image": "Загрузить Изображение",
     "Back to List": "Вернуться к списку",
-    "Validation Errors:": "Ошибки Валидации:",
     "Success:": "Успех:",
     "Upload Error:": "Ошибка Загрузки:",
     "Unknown upload error occurred.": "Произошла неизвестная ошибка загрузки.",

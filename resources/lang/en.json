@@ -1508,7 +1508,6 @@
     "No image exists for keyword \":keyword\". Uploading will create a new entry.": "No image exists for keyword \":keyword\". Uploading will create a new entry.",
     "Upload Image": "Upload Image",
     "Back to List": "Back to List",
-    "Validation Errors:": "Validation Errors:",
     "Success:": "Success:",
     "Upload Error:": "Upload Error:",
     "Unknown upload error occurred.": "Unknown upload error occurred.",
