@@ -1222,25 +1222,13 @@ class AuthController extends Controller
         }
     }
 
-
-  public function googleLogin(Request $request)
+public function googleLogin(Request $request)
 {
     $validator = Validator::make($request->all(), [
-        'name' => 'required|string|max:255',
-        'surname' => 'required|string|max:255',
-        'email' => 'required|email',
-        'client_id' => 'required|string',
+        'id_token' => 'required|string',
     ], [
-        'name.required' => __('Ad məcburidir'),
-        'name.string' => __('Ad mətn formatında olmalıdır'),
-        'name.max' => __('Ad ən çox 255 simvol ola bilər'),
-        'surname.required' => __('Soyad məcburidir'),
-        'surname.string' => __('Soyad mətn formatında olmalıdır'),
-        'surname.max' => __('Soyad ən çox 255 simvol ola bilər'),
-        'email.required' => __('Email məcburdur'),
-        'email.email' => __('Düzgün email formatı daxil edin'),
-        'client_id.required' => __('Client ID məcburdur'),
-        'client_id.string' => __('Client ID mətn formatında olmalıdır'),
+        'id_token.required' => __('Google ID token məcburdur'),
+        'id_token.string' => __('Google ID token mətn formatında olmalıdır'),
     ]);
 
     if ($validator->fails()) {
@@ -1252,22 +1240,67 @@ class AuthController extends Controller
     }
 
     try {
-        // Validate client_id
-        if ($request->client_id !== env('GOOGLE_CLIENT_ID')) {
+        // Verify Google ID token
+        $client = new GoogleClient(['client_id' => env('GOOGLE_CLIENT_ID')]);
+        $payload = $client->verifyIdToken($request->id_token);
+
+        if (!$payload) {
             return response()->json([
                 'success' => false,
-                'message' => __('Client ID yanlışdır')
+                'message' => __('Google token düzgün deyil və ya vaxtı keçib')
             ], 401);
         }
 
-        $user = User::updateOrCreate(
-            ['email' => $request->email],
-            [
-                'name' => $request->name,
-                'surname' => $request->surname,
+        // Extract user data from verified Google payload
+        $googleEmail = $payload['email'];
+        $googleName = $payload['given_name'] ?? null;
+        $googleSurname = $payload['family_name'] ?? null;
+        $googleFullName = $payload['name'] ?? null;
+
+        // If name/surname not separated, use full name for name field
+        if (!$googleName && $googleFullName) {
+            $nameParts = explode(' ', $googleFullName, 2);
+            $googleName = $nameParts[0];
+            $googleSurname = $nameParts[1] ?? null;
+        }
+
+        \Log::info('Google login attempt', [
+            'email' => $googleEmail,
+            'name' => $googleName,
+            'surname' => $googleSurname,
+            'payload' => $payload
+        ]);
+
+        // Check if user exists with this email
+        $user = User::where('email', $googleEmail)->first();
+
+        if (!$user) {
+            // Create new user if doesn't exist
+            $user = User::create([
+                'name' => $googleName,
+                'surname' => $googleSurname,
+                'email' => $googleEmail,
                 'email_verified_at' => now(),
-            ]
-        );
+                'full_name' => $googleFullName,
+            ]);
+
+            \Log::info('New user created via Google login', [
+                'user_id' => $user->id,
+                'email' => $user->email
+            ]);
+        } else {
+            // Update existing user's Google info if needed
+            $user->update([
+                'email_verified_at' => now(), // Ensure email is verified
+                'name' => $user->name ?: $googleName,
+                'surname' => $user->surname ?: $googleSurname,
+            ]);
+
+            \Log::info('Existing user logged in via Google', [
+                'user_id' => $user->id,
+                'email' => $user->email
+            ]);
+        }
 
         $token = $user->createToken('google-login')->plainTextToken;
 
@@ -1281,6 +1314,7 @@ class AuthController extends Controller
                     'surname' => $user->surname,
                     'email' => $user->email,
                     'email_verified' => !is_null($user->email_verified_at),
+                    'email_verified_at' => $user->email_verified_at,
                 ],
                 'token' => $token,
                 'token_type' => 'Bearer',
@@ -1288,6 +1322,12 @@ class AuthController extends Controller
         ]);
 
     } catch (\Exception $e) {
+        \Log::error('Google login error', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'id_token' => $request->id_token
+        ]);
+
         return response()->json([
             'success' => false,
             'message' => __('Google login zamanı xəta baş verdi'),
