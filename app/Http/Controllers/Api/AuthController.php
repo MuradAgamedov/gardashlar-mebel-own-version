@@ -1225,10 +1225,24 @@ class AuthController extends Controller
 public function googleLogin(Request $request)
 {
     $validator = Validator::make($request->all(), [
-        'id_token' => 'required|string',
+        'id_token' => 'required_without:client_id|string',
+        'client_id' => 'required_without:id_token|string',
+        'name' => 'required_if:client_id,*|string|max:255',
+        'surname' => 'required_if:client_id,*|string|max:255',
+        'email' => 'required_if:client_id,*|email',
     ], [
-        'id_token.required' => __('Google ID token məcburdur'),
+        'id_token.required_without' => __('Google ID token məcburdur'),
         'id_token.string' => __('Google ID token mətn formatında olmalıdır'),
+        'client_id.required_without' => __('Client ID məcburdur'),
+        'client_id.string' => __('Client ID mətn formatında olmalıdır'),
+        'name.required_if' => __('Ad məcbur'),
+        'name.string' => __('Ad mətn formatında olmalıdır'),
+        'name.max' => __('Ad ən çox 255 simvol ola bilər'),
+        'surname.required_if' => __('Soyad məcbur'),
+        'surname.string' => __('Soyad mətn formatında olmalıdır'),
+        'surname.max' => __('Soyad ən çox 255 simvol ola bilər'),
+        'email.required_if' => __('Email məcburdur'),
+        'email.email' => __('Düzgün email formatı daxil edin'),
     ]);
 
     if ($validator->fails()) {
@@ -1240,22 +1254,39 @@ public function googleLogin(Request $request)
     }
 
     try {
-        // Verify Google ID token
-        $client = new GoogleClient(['client_id' => env('GOOGLE_CLIENT_ID')]);
-        $payload = $client->verifyIdToken($request->id_token);
+        // Handle both old format (client_id) and new format (id_token)
+        if ($request->has('id_token')) {
+            // New secure format: Verify Google ID token
+            $client = new GoogleClient(['client_id' => env('GOOGLE_CLIENT_ID')]);
+            $payload = $client->verifyIdToken($request->id_token);
 
-        if (!$payload) {
-            return response()->json([
-                'success' => false,
-                'message' => __('Google token düzgün deyil və ya vaxtı keçib')
-            ], 401);
+            if (!$payload) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('Google token düzgün deyil və ya vaxtı keçib')
+                ], 401);
+            }
+
+            // Extract user data from verified Google payload
+            $googleEmail = $payload['email'];
+            $googleName = $payload['given_name'] ?? null;
+            $googleSurname = $payload['family_name'] ?? null;
+            $googleFullName = $payload['name'] ?? null;
+        } else {
+            // Old format: Use provided user data but validate client_id
+            if ($request->client_id !== env('GOOGLE_CLIENT_ID')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('Client ID yanlışdır')
+                ], 401);
+            }
+
+            // Use data sent from frontend (less secure but for backward compatibility)
+            $googleEmail = $request->email;
+            $googleName = $request->name;
+            $googleSurname = $request->surname;
+            $googleFullName = $request->name . ' ' . $request->surname;
         }
-
-        // Extract user data from verified Google payload
-        $googleEmail = $payload['email'];
-        $googleName = $payload['given_name'] ?? null;
-        $googleSurname = $payload['family_name'] ?? null;
-        $googleFullName = $payload['name'] ?? null;
 
         // If name/surname not separated, use full name for name field
         if (!$googleName && $googleFullName) {
