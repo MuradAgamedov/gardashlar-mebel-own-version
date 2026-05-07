@@ -1240,7 +1240,7 @@ public function googleLogin(Request $request)
     }
 
     try {
-        // Use token as Google ID token
+        // Use token as Google ID token with proper scopes
         $client = new GoogleClient(['client_id' => env('GOOGLE_CLIENT_ID')]);
         $payload = $client->verifyIdToken($request->token);
 
@@ -1256,7 +1256,38 @@ public function googleLogin(Request $request)
         $googleName = $payload['given_name'] ?? null;
         $googleSurname = $payload['family_name'] ?? null;
         $googleFullName = $payload['name'] ?? null;
-        $googlePhone = $payload['phone_number'] ?? null;
+        
+        // Google phone number is NOT included in standard ID token payload
+        // Google doesn't provide phone numbers in ID tokens for privacy reasons
+        $googlePhone = null;
+        
+        // Note: Phone numbers would require:
+        // 1. Additional OAuth scopes (openid email profile phone)
+        // 2. Google People API calls after authentication  
+        // 3. Additional user consent
+        // 4. Google People API enabled in Google Cloud Console
+        // For most applications, it's better to collect phone number separately
+        
+        // If you need phone numbers, uncomment and implement:
+        /*
+        if (isset($payload['access_token'])) {
+            try {
+                $peopleService = new Google\Service\PeopleService($client);
+                $client->setAccessToken($payload['access_token']);
+                $person = $peopleService->people->get('people/me', [
+                    'personFields' => 'phoneNumbers'
+                ]);
+                
+                if ($person->phoneNumbers) {
+                    $googlePhone = $person->phoneNumbers[0]->value;
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Failed to fetch phone number from Google People API', [
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
+        */
 
         // If name/surname not separated, use full name for name field
         if (!$googleName && $googleFullName) {
@@ -1270,7 +1301,9 @@ public function googleLogin(Request $request)
             'name' => $googleName,
             'surname' => $googleSurname,
             'phone' => $googlePhone,
-            'payload' => $payload
+            'payload_keys' => array_keys($payload),
+            'has_phone_number' => isset($payload['phone_number']),
+            'full_payload' => $payload
         ]);
 
         // Check if user exists with this email
