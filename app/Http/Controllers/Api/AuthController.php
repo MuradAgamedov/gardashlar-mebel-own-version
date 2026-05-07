@@ -1223,29 +1223,28 @@ class AuthController extends Controller
     }
 
 
-    public function googleLogin(Request $request)
-    {
-        $request->validate([
-            'token' => 'required|string',
-        ]);
+  public function googleLogin(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|string|max:255',
+        'surname' => 'required|string|max:255',
+        'email' => 'required|email',
+    ]);
 
-        $client = new GoogleClient([
-            'client_id' => env('GOOGLE_CLIENT_ID'),
-        ]);
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation failed',
+            'errors' => $validator->errors()
+        ], 422);
+    }
 
-        $payload = $client->verifyIdToken($request->token);
-
-        if (!$payload) {
-            return response()->json([
-                'message' => 'Google token yanlışdır'
-            ], 401);
-        }
-
+    try {
         $user = User::updateOrCreate(
-            ['email' => $payload['email']],
+            ['email' => $request->email],
             [
-                'name' => $payload['name'] ?? 'Google User',
-                'google_id' => $payload['sub'],
+                'name' => $request->name,
+                'surname' => $request->surname,
                 'email_verified_at' => now(),
             ]
         );
@@ -1253,9 +1252,27 @@ class AuthController extends Controller
         $token = $user->createToken('google-login')->plainTextToken;
 
         return response()->json([
+            'success' => true,
             'message' => 'Google login uğurludur',
-            'token' => $token,
-            'user' => $user,
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'surname' => $user->surname,
+                    'email' => $user->email,
+                    'email_verified' => !is_null($user->email_verified_at),
+                ],
+                'token' => $token,
+                'token_type' => 'Bearer',
+            ]
         ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Google login zamanı xəta baş verdi',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
 }
