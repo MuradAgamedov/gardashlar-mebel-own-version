@@ -59,7 +59,6 @@
                                             <th width="100">{{ __('Card Image') }}</th>
                                             <th width="100">{{ __('Inner Image') }}</th>
                                             <th>{{ __('Title') }}</th>
-                                            <th>{{ __('Languages') }}</th>
                                             <th>{{ __('Status') }}</th>
                                             <th>{{ __('Order') }}</th>
                                             <th width="200">{{ __('Actions') }}</th>
@@ -112,16 +111,6 @@
                                                 <td>
                                                     <div>
                                                         <strong>{{ $mainTranslate?->title ?? __('No title') }}</strong>
-                                                        @if($mainTranslate)
-                                                            <span class="badge bg-info ms-1">{{ $mainTranslate->language->lang_code }}</span>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex gap-1">
-                                                        @foreach($company->translates as $translate)
-                                                            <span class="badge bg-primary">{{ $translate->language->lang_code }}</span>
-                                                        @endforeach
                                                     </div>
                                                 </td>
                                                 <td>
@@ -203,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Update order numbers in the table
                         const rows = sortableList.querySelectorAll('.sortable-item');
                         rows.forEach((row, index) => {
-                            const orderCell = row.querySelector('td:nth-child(7)');
+                            const orderCell = row.querySelector('td:nth-child(6)');
                             if (orderCell) {
                                 orderCell.textContent = index + 1;
                             }

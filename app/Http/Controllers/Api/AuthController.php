@@ -1230,12 +1230,23 @@ class AuthController extends Controller
         'surname' => 'required|string|max:255',
         'email' => 'required|email',
         'client_id' => 'required|string',
+    ], [
+        'name.required' => __('Ad məcburidir'),
+        'name.string' => __('Ad mətn formatında olmalıdır'),
+        'name.max' => __('Ad ən çox 255 simvol ola bilər'),
+        'surname.required' => __('Soyad məcburidir'),
+        'surname.string' => __('Soyad mətn formatında olmalıdır'),
+        'surname.max' => __('Soyad ən çox 255 simvol ola bilər'),
+        'email.required' => __('Email məcburdur'),
+        'email.email' => __('Düzgün email formatı daxil edin'),
+        'client_id.required' => __('Client ID məcburdur'),
+        'client_id.string' => __('Client ID mətn formatında olmalıdır'),
     ]);
 
     if ($validator->fails()) {
         return response()->json([
             'success' => false,
-            'message' => 'Validation failed',
+            'message' => __('Validasiya xətası'),
             'errors' => $validator->errors()
         ], 422);
     }
@@ -1245,7 +1256,7 @@ class AuthController extends Controller
         if ($request->client_id !== env('GOOGLE_CLIENT_ID')) {
             return response()->json([
                 'success' => false,
-                'message' => 'Client ID yanlışdır'
+                'message' => __('Client ID yanlışdır')
             ], 401);
         }
 
@@ -1262,7 +1273,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Google login uğurludur',
+            'message' => __('Google login uğurludur'),
             'data' => [
                 'user' => [
                     'id' => $user->id,
@@ -1279,7 +1290,7 @@ class AuthController extends Controller
     } catch (\Exception $e) {
         return response()->json([
             'success' => false,
-            'message' => 'Google login zamanı xəta baş verdi',
+            'message' => __('Google login zamanı xəta baş verdi'),
             'error' => $e->getMessage()
         ], 500);
     }
