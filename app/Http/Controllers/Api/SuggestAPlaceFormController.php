@@ -44,41 +44,41 @@ class SuggestAPlaceFormController extends Controller
                 'details' => 'required|string|max:2000',
                 'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,txt,jpg,jpeg,png|max:10240',
             ], [
-                'name_surname.required' => dict('name_surname_required', $lang),
-                'name_surname.max' => dict('name_surname_max', $lang),
+                'name_surname.required' => dict('name_surname_required'),
+                'name_surname.max' => dict('name_surname_max'),
 
-                'email.required' => dict('email_required', $lang),
-                'email.email' => dict('email_email', $lang),
-                'email.max' => dict('email_max', $lang),
+                'email.required' => dict('email_required'),
+                'email.email' => dict('email_email'),
+                'email.max' => dict('email_max'),
 
-                'area_sqm.required' => dict('area_required', $lang),
-                'area_sqm.max' => dict('area_max', $lang),
+                'area_sqm.required' => dict('area_required'),
+                'area_sqm.max' => dict('area_max'),
 
-                'mobile.required' => dict('mobile_required', $lang),
-                'mobile.max' => dict('mobile_max', $lang),
-                'mobile.regex' => dict('mobile_invalid', $lang),
+                'mobile.required' => dict('mobile_required'),
+                'mobile.max' => dict('mobile_max'),
+                'mobile.regex' => dict('mobile_invalid'),
 
-                'address.required' => dict('address_required', $lang),
-                'address.max' => dict('address_max', $lang),
+                'address.required' => dict('address_required'),
+                'address.max' => dict('address_max'),
 
-                'floor_count.required' => dict('floor_count_required', $lang),
-                'floor_count.max' => dict('floor_count_max', $lang),
+                'floor_count.required' => dict('floor_count_required'),
+                'floor_count.max' => dict('floor_count_max'),
 
-                'is_repaired.required' => dict('is_repaired_required', $lang),
-                'is_repaired.boolean' => dict('is_repaired_boolean', $lang),
+                'is_repaired.required' => dict('is_repaired_required'),
+                'is_repaired.boolean' => dict('is_repaired_boolean'),
 
-                'has_warehouse.required' => dict('has_warehouse_required', $lang),
-                'has_warehouse.boolean' => dict('has_warehouse_boolean', $lang),
+                'has_warehouse.required' => dict('has_warehouse_required'),
+                'has_warehouse.boolean' => dict('has_warehouse_boolean'),
 
-                'has_parking.required' => dict('has_parking_required', $lang),
-                'has_parking.boolean' => dict('has_parking_boolean', $lang),
+                'has_parking.required' => dict('has_parking_required'),
+                'has_parking.boolean' => dict('has_parking_boolean'),
 
-                'details.required' => dict('details_required', $lang),
-                'details.max' => dict('details_max', $lang),
+                'details.required' => dict('details_required'),
+                'details.max' => dict('details_max'),
 
-                'file.file' => dict('file_invalid', $lang),
-                'file.mimes' => dict('file_mimes', $lang),
-                'file.max' => dict('file_max', $lang),
+                'file.file' => dict('file_invalid'),
+                'file.mimes' => dict('file_mimes'),
+                'file.max' => dict('file_max'),
             ]);
 
             $filePath = null;
@@ -95,7 +95,7 @@ class SuggestAPlaceFormController extends Controller
                 if (!$filePath) {
                     return response()->json([
                         'success' => false,
-                        'message' => dict('file_upload_failed', $lang),
+                        'message' => dict('file_upload_failed'),
                         'data' => null
                     ], 500);
                 }
@@ -117,7 +117,7 @@ class SuggestAPlaceFormController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => dict('form_submitted_success', $lang),
+                'message' => dict('form_submitted_success'),
                 'data' => [
                     'id' => $form->id
                 ]
