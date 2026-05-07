@@ -23,7 +23,7 @@ class TestPageController extends Controller
             try {
                 // Send file to external API
                 $response = \Http::asMultipart()
-                    ->attach('file', file->get(), $file->getClientOriginalName())
+                    ->attach('file', $file->get(), $file->getClientOriginalName())
                     ->post('https://front.stagnest.dev/api/import-redirect');
 
                 // Debug with dd
