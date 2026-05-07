@@ -1240,9 +1240,9 @@ public function googleLogin(Request $request)
     }
 
     try {
-        // Use client_id as Google ID token
-        $client = new GoogleClient(['token' => env('GOOGLE_CLIENT_ID')]);
-        $payload = $client->verifyIdToken($request->client_id);
+        // Use token as Google ID token
+        $client = new GoogleClient(['client_id' => env('GOOGLE_CLIENT_ID')]);
+        $payload = $client->verifyIdToken($request->token);
 
         if (!$payload) {
             return response()->json([
@@ -1325,7 +1325,7 @@ public function googleLogin(Request $request)
         \Log::error('Google login error', [
             'error' => $e->getMessage(),
             'trace' => $e->getTraceAsString(),
-            'id_token' => $request->id_token
+            'token' => $request->token
         ]);
 
         return response()->json([
