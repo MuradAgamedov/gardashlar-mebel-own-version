@@ -22,13 +22,14 @@ class TestPageController extends Controller
             
             try {
                 // Send file to external API
-                $response = \Http::asMultipart()
+                $response = \Http::withHeaders([
+                 "Origin" => env("APP_URL")   
+                ])->asMultipart()
                     ->attach('file', $file->get(), $file->getClientOriginalName())
                     ->post('https://front.stagnest.dev/api/import-redirect');
 
-                // Parse JSON response and debug with dd
-                $parsedResponse = $response->json();
-                dd($parsedResponse);
+                // Debug with dd
+                dd($response);
             } catch (\Exception $e) {
                 return back()->with('error', 'Error sending file: ' . $e->getMessage());
             }
