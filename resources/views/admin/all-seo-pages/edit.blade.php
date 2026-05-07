@@ -58,7 +58,7 @@
                                 <div class="col-md-6">
                                     <div class="card border">
                                         <div class="card-header bg-light">
-                                            <h5 style="color: black" class="mb-0">SEO Settings</h5>
+                                            <h5 style="color: black" class="mb-0">{{ __('SEO Settings') }}</h5>
                                         </div>
                                         <div class="card-body">
                                             <!-- Is Indexed -->
@@ -96,7 +96,7 @@
                                 <div class="col-md-6">
                                     <div class="card border">
                                         <div class="card-header bg-light">
-                                            <h5 style="color: black" class="mb-0">Display Settings</h5>
+                                            <h5 style="color: black" class="mb-0">{{ __('Display Settings') }}</h5>
                                         </div>
                                         <div class="card-body">
                                             <!-- Roulette Actions -->
