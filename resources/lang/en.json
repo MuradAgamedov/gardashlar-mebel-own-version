@@ -1827,5 +1827,6 @@
     "The :attribute must be a number.": "The :attribute must be a number.",
     "The :attribute format is invalid.": "The :attribute format is invalid.",
     "Validation error": "Validation error",
-    "Validation failed": "Validation failed"
+    "Validation failed": "Validation failed",
+    "Please fix the following errors:": "Please fix the following errors:"
 }

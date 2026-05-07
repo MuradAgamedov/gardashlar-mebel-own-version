@@ -1830,5 +1830,6 @@
     "The :attribute must be a number.": ":attribute должен быть числом.",
     "The :attribute format is invalid.": "Формат :attribute недействителен.",
     "Validation error": "Ошибка валидации",
-    "Validation failed": "Валидация не пройдена"
+    "Validation failed": "Валидация не пройдена",
+    "Please fix the following errors:": "Пожалуйста, исправьте следующие ошибки:"
 }

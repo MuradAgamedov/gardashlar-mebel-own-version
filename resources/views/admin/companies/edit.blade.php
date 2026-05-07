@@ -32,7 +32,7 @@
             <div class="d-flex align-items-center">
                 <i class="material-icons-outlined me-2">error</i>
                 <div>
-                    <h6 class="alert-heading mb-1">Please fix the following errors:</h6>
+                    <h6 class="alert-heading mb-1">{{ __('Please fix the following errors:') }}</h6>
                     <ul class="mb-0">
                         @foreach ($errors->all() as $error)
                             <li>{{ __($error) }}</li>

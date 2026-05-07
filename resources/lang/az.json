@@ -1822,5 +1822,6 @@
     "The :attribute must be a number.": ":attribute rəqəm olmalıdır.",
     "The :attribute format is invalid.": ":attribute formatı yanlışdır.",
     "Validation error": "Validasiya xətası",
-    "Validation failed": "Validasiya uğursuz oldu"
+    "Validation failed": "Validasiya uğursuz oldu",
+    "Please fix the following errors:": "Zəhmət olmasa aşağıdakı xətaları düzəldin:"
 }
