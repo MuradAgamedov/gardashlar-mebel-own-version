@@ -30,6 +30,8 @@ class AllSeoPagesController extends Controller
                 return [
                     'is_indexed' => (bool) $seoPages->is_indexed,
                     'is_followed' => (bool) $seoPages->is_followed,
+                    'rolette_actions' => (bool) $seoPages->rolette_actions,
+                    'popup_ads_show' => (bool) $seoPages->popup_ads_show,
                     'page_header' => $seoPages->page_header,
                     'page_footer' => $seoPages->page_footer,
                 ];

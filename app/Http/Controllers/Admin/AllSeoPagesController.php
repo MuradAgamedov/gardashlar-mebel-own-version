@@ -33,6 +33,8 @@ class AllSeoPagesController extends Controller
         $request->validate([
             'is_indexed' => 'nullable|boolean',
             'is_followed' => 'nullable|boolean',
+            'rolette_actions' => 'nullable|boolean',
+            'popup_ads_show' => 'nullable|boolean',
             'page_header' => 'nullable|string',
             'page_footer' => 'nullable|string',
         ]);

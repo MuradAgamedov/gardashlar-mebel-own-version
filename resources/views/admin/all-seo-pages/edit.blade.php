@@ -88,6 +88,34 @@
                                                     <small class="d-block text-muted">{{ __('Allow search engines to follow links') }}</small>
                                                 </label>
                                             </div>
+
+                                            <!-- Roulette Actions -->
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" 
+                                                       type="checkbox" 
+                                                       id="rolette_actions" 
+                                                       name="rolette_actions" 
+                                                       value="1"
+                                                       {{ old('rolette_actions', $seoPages->rolette_actions) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="rolette_actions">
+                                                    <strong>{{ __('Roulette Actions') }}</strong>
+                                                    <small class="d-block text-muted">{{ __('Enable roulette actions on pages') }}</small>
+                                                </label>
+                                            </div>
+
+                                            <!-- Popup Ads Show -->
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" 
+                                                       type="checkbox" 
+                                                       id="popup_ads_show" 
+                                                       name="popup_ads_show" 
+                                                       value="1"
+                                                       {{ old('popup_ads_show', $seoPages->popup_ads_show) ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="popup_ads_show">
+                                                    <strong>{{ __('Popup Ads Show') }}</strong>
+                                                    <small class="d-block text-muted">{{ __('Show popup advertisements on pages') }}</small>
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

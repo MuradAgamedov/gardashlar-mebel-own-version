@@ -23,6 +23,8 @@ class AllSeoPagesRepository
             [
                 'is_indexed' => true,
                 'is_followed' => true,
+                'rolette_actions' => false,
+                'popup_ads_show' => false,
                 'page_header' => null,
                 'page_footer' => null,
             ]
@@ -39,6 +41,8 @@ class AllSeoPagesRepository
         return $seoPages->update([
             'is_indexed' => isset($data['is_indexed']) ? (bool)$data['is_indexed'] : false,
             'is_followed' => isset($data['is_followed']) ? (bool)$data['is_followed'] : false,
+            'rolette_actions' => isset($data['rolette_actions']) ? (bool)$data['rolette_actions'] : false,
+            'popup_ads_show' => isset($data['popup_ads_show']) ? (bool)$data['popup_ads_show'] : false,
             'page_header' => $data['page_header'] ?? null,
             'page_footer' => $data['page_footer'] ?? null,
         ]);
