@@ -116,7 +116,6 @@
                                                             <span class="badge bg-info ms-1">{{ $mainTranslate->language->lang_code }}</span>
                                                         @endif
                                                     </div>
-                                                    <small class="text-muted">{{ Str::limit($mainTranslate?->description ?? '', 100) }}</small>
                                                 </td>
                                                 <td>
                                                     <div class="d-flex gap-1">
