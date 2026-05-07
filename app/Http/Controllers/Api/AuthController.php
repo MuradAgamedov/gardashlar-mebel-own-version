@@ -1229,6 +1229,7 @@ class AuthController extends Controller
         'name' => 'required|string|max:255',
         'surname' => 'required|string|max:255',
         'email' => 'required|email',
+        'client_id' => 'required|string',
     ]);
 
     if ($validator->fails()) {
@@ -1240,6 +1241,14 @@ class AuthController extends Controller
     }
 
     try {
+        // Validate client_id
+        if ($request->client_id !== env('GOOGLE_CLIENT_ID')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Client ID yanlışdır'
+            ], 401);
+        }
+
         $user = User::updateOrCreate(
             ['email' => $request->email],
             [
