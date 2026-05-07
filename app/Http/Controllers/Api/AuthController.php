@@ -248,10 +248,10 @@ class AuthController extends Controller
             'phone' => 'nullable|string|max:20',
             'password' => 'required|string',
         ], [
-            'email.nullable' => Dictionary::getValue('email_nullable'),
-            'email.email' => Dictionary::getValue('email_email'),
-            'phone.nullable' => Dictionary::getValue('phone_nullable'),
-            'password.required' => Dictionary::getValue('password_required'),
+            'email.nullable' => dict('email_nullable'),
+            'email.email' => dict('email_email'),
+            'phone.nullable' => dict('phone_nullable'),
+            'password.required' => dict('password_required'),
         ]);
 
         // Custom validation: either phone or email must be provided
@@ -281,9 +281,9 @@ class AuthController extends Controller
             if (!$user) {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('user_not_found'),
+                    'message' => dict('user_not_found'),
                     'errors' => [
-                        'credentials' => [Dictionary::getValue('invalid_credentials'),]
+                        'credentials' => [dict('invalid_credentials'),]
                     ]
                 ], 401);
             }
@@ -299,9 +299,9 @@ class AuthController extends Controller
             if (is_null($user->email_verified_at)) {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('account_not_verified'),
+                    'message' => dict('account_not_verified'),
                     'errors' => [
-                        'verification' => [Dictionary::getValue('verify_account')]
+                        'verification' => [dict('verify_account')]
                     ]
                 ], 403);
             }
@@ -310,9 +310,9 @@ class AuthController extends Controller
             if (!Hash::check($request->password, $user->password)) {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('invalid_credentials'),
+                    'message' => dict('invalid_credentials'),
                     'errors' => [
-                        'credentials' => [Dictionary::getValue('invalid_credentials')]
+                        'credentials' => [dict('invalid_credentials')]
                     ]
                 ], 401);
             }
@@ -322,7 +322,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => Dictionary::getValue('success_login'),
+                'message' => dict('success_login'),
                 'data' => [
                     'user' => [
                         'id' => $user->id,
@@ -347,7 +347,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => Dictionary::getValue('login_error', $request->header("locale")),
+                'message' => dict('login_error', $request->header("locale")),
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -361,12 +361,12 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => Dictionary::getValue('success_logout')
+                'message' => dict('success_logout')
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => Dictionary::getValue('logout_error'),
+                'message' => dict('logout_error'),
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -380,16 +380,16 @@ class AuthController extends Controller
             'email' => 'nullable|email',
             'purpose' => 'nullable|string|in:registration,password_reset',
         ], [
-            'phone.nullable' => Dictionary::getValue('phone_nullable'),
-            'email.nullable' => Dictionary::getValue('email_nullable'),
-            'email.email' => Dictionary::getValue('email_email'),
-            'purpose.in' => Dictionary::getValue('purpose_in'),
+            'phone.nullable' => dict('phone_nullable'),
+            'email.nullable' => dict('email_nullable'),
+            'email.email' => dict('email_email'),
+            'purpose.in' => dict('purpose_in'),
         ]);
 
         // Custom validation: either phone or email must be provided
         $validator->after(function ($validator) use ($request) {
             if (empty($request->phone) && empty($request->email)) {
-                $validator->errors()->add('contact_info', Dictionary::getValue('contact_info'));
+                $validator->errors()->add('contact_info', dict('contact_info'));
             }
         });
 
@@ -415,9 +415,9 @@ class AuthController extends Controller
             if ($recentOtp) {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('rate_limit'),
+                    'message' => dict('rate_limit'),
                     'errors' => [
-                        'rate_limit' => [Dictionary::getValue('rate_limit')]
+                        'rate_limit' => [dict('rate_limit')]
                     ]
                 ], 429);
             }
@@ -456,9 +456,9 @@ class AuthController extends Controller
             } elseif (!empty($request->phone)) {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('otp_not_available'),
+                    'message' => dict('otp_not_available'),
                     'errors' => [
-                        'phone' => [Dictionary::getValue('otp_not_available')]
+                        'phone' => [dict('otp_not_available')]
                     ]
                 ], 422);
             }
@@ -466,7 +466,7 @@ class AuthController extends Controller
             if ($otpSent) {
                 return response()->json([
                     'success' => true,
-                    'message' => Dictionary::getValue('otp_sent'),
+                    'message' => dict('otp_sent'),
                     'data' => [
                         'contact_type' => $contactType,
                         'contact_info' => $contactInfo,
@@ -477,7 +477,7 @@ class AuthController extends Controller
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => Dictionary::getValue('otp_not_sent'),
+                    'message' => dict('otp_not_sent'),
                 ], 500);
             }
 
@@ -490,7 +490,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => Dictionary::getValue('otp_not_sent'),
+                'message' => dict('otp_not_sent'),
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -504,11 +504,11 @@ class AuthController extends Controller
             'email' => 'nullable|email',
             'otp_code' => 'required|string|size:6',
         ], [
-            'phone.nullable' => Dictionary::getValue('phone_nullable'),
-            'email.nullable' => Dictionary::getValue('email_nullable'),
-            'email.email' => Dictionary::getValue('email_email'),
-            'otp_code.required' => Dictionary::getValue('otp_code_required'),
-            'otp_code.size' => Dictionary::getValue('otp_code_size'),
+            'phone.nullable' => dict('phone_nullable'),
+            'email.nullable' => dict('email_nullable'),
+            'email.email' => dict('email_email'),
+            'otp_code.required' => dict('otp_code_required'),
+            'otp_code.size' => dict('otp_code_size'),
         ]);
 
         // Custom validation: either phone or email must be provided
@@ -1306,7 +1306,7 @@ public function googleLogin(Request $request)
 
         return response()->json([
             'success' => true,
-            'message' => Dictionary::getValue('success_login'),
+            'message' => dict('success_login'),
             'data' => [
                 'user' => [
                     'id' => $user->id,
