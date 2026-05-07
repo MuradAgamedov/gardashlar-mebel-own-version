@@ -1281,7 +1281,6 @@ public function googleLogin(Request $request)
                 'surname' => $googleSurname,
                 'email' => $googleEmail,
                 'email_verified_at' => now(),
-                'full_name' => $googleFullName,
             ]);
 
             \Log::info('New user created via Google login', [
