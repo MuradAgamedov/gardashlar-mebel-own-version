@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TestPageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,9 @@ Route::middleware('throttle:6000,1')->group(function () {
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/test-page', [TestPageController::class, 'index'])->name('test.page');
+Route::post('/test-upload', [TestPageController::class, 'upload'])->name('test.upload');
 
 // admin route-lar
 require __DIR__.'/admin.php';
