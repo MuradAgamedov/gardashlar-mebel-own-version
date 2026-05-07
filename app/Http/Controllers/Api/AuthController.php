@@ -1225,10 +1225,10 @@ class AuthController extends Controller
 public function googleLogin(Request $request)
 {
     $validator = Validator::make($request->all(), [
-        'client_id' => 'required|string',
+        'token' => 'required|string',
     ], [
-        'client_id.required' => __('Client ID məcburdur'),
-        'client_id.string' => __('Client ID mətn formatında olmalıdır'),
+        'token.required' => __('Client ID məcburdur'),
+        'token.string' => __('Client ID mətn formatında olmalıdır'),
     ]);
 
     if ($validator->fails()) {
@@ -1241,7 +1241,7 @@ public function googleLogin(Request $request)
 
     try {
         // Use client_id as Google ID token
-        $client = new GoogleClient(['client_id' => env('GOOGLE_CLIENT_ID')]);
+        $client = new GoogleClient(['token' => env('GOOGLE_CLIENT_ID')]);
         $payload = $client->verifyIdToken($request->client_id);
 
         if (!$payload) {
