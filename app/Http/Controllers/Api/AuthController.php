@@ -1256,6 +1256,7 @@ public function googleLogin(Request $request)
         $googleName = $payload['given_name'] ?? null;
         $googleSurname = $payload['family_name'] ?? null;
         $googleFullName = $payload['name'] ?? null;
+        $googlePhone = $payload['phone_number'] ?? null;
 
         // If name/surname not separated, use full name for name field
         if (!$googleName && $googleFullName) {
@@ -1268,6 +1269,7 @@ public function googleLogin(Request $request)
             'email' => $googleEmail,
             'name' => $googleName,
             'surname' => $googleSurname,
+            'phone' => $googlePhone,
             'payload' => $payload
         ]);
 
@@ -1280,6 +1282,7 @@ public function googleLogin(Request $request)
                 'name' => $googleName,
                 'surname' => $googleSurname,
                 'email' => $googleEmail,
+                'phone' => $googlePhone,
                 'password' => '', // Empty password for Google users
                 'email_verified_at' => now(),
             ]);
@@ -1294,6 +1297,7 @@ public function googleLogin(Request $request)
                 'email_verified_at' => now(), // Ensure email is verified
                 'name' => $user->name ?: $googleName,
                 'surname' => $user->surname ?: $googleSurname,
+                'phone' => $user->phone ?: $googlePhone,
             ]);
 
             \Log::info('Existing user logged in via Google', [
