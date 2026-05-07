@@ -54,7 +54,7 @@
                             @method('PUT')
 
                             <div class="row">
-                                <!-- SEO Checkboxes -->
+                                <!-- SEO Checkboxes - Left Panel -->
                                 <div class="col-md-6">
                                     <div class="card border">
                                         <div class="card-header bg-light">
@@ -88,7 +88,17 @@
                                                     <small class="d-block text-muted">{{ __('Allow search engines to follow links') }}</small>
                                                 </label>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <!-- Display Settings - Right Panel -->
+                                <div class="col-md-6">
+                                    <div class="card border">
+                                        <div class="card-header bg-light">
+                                            <h5 style="color: black" class="mb-0">Display Settings</h5>
+                                        </div>
+                                        <div class="card-body">
                                             <!-- Roulette Actions -->
                                             <div class="form-check form-switch mb-3">
                                                 <input class="form-check-input" 
@@ -185,7 +195,6 @@
                                     <div class="text-end">
                                         <button type="submit" class="btn btn-primary btn-lg">
                                             <i class="fas fa-save me-2"></i>
-                                            {{ __('Save Settings') }}
                                         </button>
                                     </div>
                                 </div>
