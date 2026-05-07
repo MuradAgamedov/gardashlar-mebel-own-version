@@ -137,11 +137,11 @@ class ExcelImportController extends Controller
             $fileContent = file_get_contents($file->getPathname());
             $fileName = $file->getClientOriginalName();
             
-            $response = Http::attach(
-                'file', 
-                $fileContent, 
-                $fileName
-            )->post($frontApiUrl);
+           $response = \Http::withHeaders([
+                 "Origin" => env("APP_URL")   
+                ])->asMultipart()
+                    ->attach('file', $file->get(), $file->getClientOriginalName())
+                    ->post($frontApiUrl);
             
             if ($response->successful()) {
                 Log::info('Excel file successfully sent to external API', [
