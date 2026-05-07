@@ -1,21 +1,21 @@
 @extends('admin.layout.app')
 
-@section('title', 'Excel Fayl Yükləmə')
+@section('title', __('excel_import_title'))
 
 @section('content')
 <div class="content-body">
     <div class="row page-titles mx-0">
         <div class="col p-md-0">
             <div class="welcome-text">
-                <h4>Excel Fayl Yükləmə</h4>
+                <h4>{{ __('excel_import_title') }}</h4>
             </div>
         </div>
         <div class="col p-md-0 justify-content-end d-flex align-items-center">
             <div class="breadcrumb-right">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Ana Səhifə</a></li>
-                        <li class="breadcrumb-item active">Excel Fayl Yükləmə</li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">{{ __('Home') }}</a></li>
+                        <li class="breadcrumb-item active">{{ __('excel_import_title') }}</li>
                     </ol>
                 </nav>
             </div>
@@ -27,7 +27,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Excel Fayl Yüklə</h4>
+                        <h4 class="card-title">{{ __('excel_upload_title') }}</h4>
                     </div>
                     <div class="card-body">
                         @if(session('success'))
@@ -49,22 +49,22 @@
                             @method('PUT')
 
                             <div class="mb-3">
-                                <label for="excel_file" class="form-label">Excel Fayl</label>
+                                <label for="excel_file" class="form-label">{{ __('excel_file_label') }}</label>
                                 <input type="file" class="form-control" id="excel_file" name="excel_file" 
                                        accept=".xlsx,.xls" required>
-                                <div class="form-text">Yalnız .xlsx və .xls formatında fayllar qəbul edilir (Maksimum: 10MB)</div>
+                                <div class="form-text">{{ __('excel_file_help') }}</div>
                             </div>
 
                             @if($excelImport && $excelImport->file_url)
                                 <div class="mb-3">
-                                    <label class="form-label">Mövcud Fayl</label>
+                                    <label class="form-label">{{ __('existing_file_label') }}</label>
                                     <div class="d-flex align-items-center justify-content-between gap-2">
                                         <small class="text-muted flex-grow-1">{{ $excelImport->file_url }}</small>
                                         <div class="d-flex gap-1">
-                                            <a href="{{ route('admin.excel-imports.download') }}" class="btn btn-sm btn-info" target="_blank" title="Faylı Yüklə">
+                                            <a href="{{ route('admin.excel-imports.download') }}" class="btn btn-sm btn-info" target="_blank" title="{{ __('download_file_title') }}">
                                                 <i class="fas fa-download"></i>
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete()" title="Faylı Sil">
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete()" title="{{ __('delete_file_title') }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
@@ -73,10 +73,10 @@
                             @endif
 
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary" title="Yüklə">
+                                <button type="submit" class="btn btn-primary" title="{{ __('upload_title') }}">
                                     <i class="fas fa-upload"></i>
                                 </button>
-                                <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary" title="Geri">
+                                <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary" title="{{ __('back_title') }}">
                                     <i class="fas fa-arrow-left"></i>
                                 </a>
                             </div>
@@ -95,7 +95,7 @@
 
 <script>
 function confirmDelete() {
-    if (confirm('Excel faylını silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarıla bilməz.')) {
+    if (confirm('{{ __('excel_delete_confirm') }}')) {
         document.getElementById('deleteForm').submit();
     }
 }
@@ -108,13 +108,13 @@ document.getElementById('excel_file').addEventListener('change', function(e) {
     
     if (file) {
         if (file.size > maxSize) {
-            alert('Fayl ölçüsü 10MB-dan böyük ola bilməz!');
+            alert('{{ __('excel_file_size_error') }}');
             e.target.value = '';
             return;
         }
         
         if (!allowedTypes.includes(file.type)) {
-            alert('Yalnız .xls və .xlsx formatında fayllar qəbul edilir!');
+            alert('{{ __('excel_file_type_error') }}');
             e.target.value = '';
             return;
         }

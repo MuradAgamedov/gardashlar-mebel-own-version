@@ -16,7 +16,7 @@ class ExcelImportController extends Controller
      */
     public function edit()
     {
-        $excelImport = ExcelImport::first();
+        $excelImport = ExcelImport::getOrCreateSingle();
         return view('admin.excel-imports.edit', compact('excelImport'));
     }
 
@@ -40,15 +40,15 @@ class ExcelImportController extends Controller
                     ];
                     
                     if ($value && !in_array($value->getMimeType(), $allowedMimeTypes)) {
-                        $fail('Yalnız .xls və .xlsx formatında Excel faylları qəbul edilir.');
+                        $fail(__('excel_file_type_error'));
                     }
                 },
             ],
         ], [
-            'excel_file.required' => 'Excel faylı seçilməyib.',
-            'excel_file.file' => 'Fayl yüklənməlidir.',
-            'excel_file.mimes' => 'Yalnız .xls və .xlsx formatında fayllar qəbul edilir.',
-            'excel_file.max' => 'Fayl ölçüsü maksimum 10MB ola bilər.',
+            'excel_file.required' => __('excel_file_required'),
+            'excel_file.file' => __('excel_file_file'),
+            'excel_file.mimes' => __('excel_file_mimes'),
+            'excel_file.max' => __('excel_file_max'),
         ]);
 
         try {
@@ -62,26 +62,18 @@ class ExcelImportController extends Controller
             $file = $request->file('excel_file');
             $filePath = $file->store('excel-imports', 'public');
 
-            // Create or update record
-            if ($excelImport) {
-                $excelImport->update([
-                    'file_url' => $filePath,
-                ]);
-            } else {
-                $excelImport = ExcelImport::create([
-                    'file_url' => $filePath,
-                ]);
-            }
+            // Update the single record using model method
+            $excelImport = ExcelImport::updateSingleFile($filePath);
 
             // Send file to external API
             $this->sendFileToExternalApi($file);
 
             return redirect()->route('admin.excel-imports.edit')
-                ->with('success', __('Excel file uploaded successfully!'));
+                ->with('success', __('excel_file_uploaded_success'));
 
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', 'Fayl yüklənərkən xəta baş verdi: ' . $e->getMessage());
+                ->with('error', __('excel_upload_error', ['error' => $e->getMessage()]));
         }
     }
 
@@ -93,13 +85,13 @@ class ExcelImportController extends Controller
         $excelImport = ExcelImport::first();
         
         if (!$excelImport || !$excelImport->file_url) {
-            abort(404, 'Excel faylı tapılmadı');
+            abort(404, __('excel_file_not_found'));
         }
 
         $filePath = storage_path('app/public/' . $excelImport->file_url);
         
         if (!file_exists($filePath)) {
-            abort(404, 'Fayl mövcud deyil');
+            abort(404, __('file_not_exists'));
         }
 
         return response()->download($filePath, 'excel-import.xlsx');
@@ -123,7 +115,7 @@ class ExcelImportController extends Controller
         }
 
         return redirect()->route('admin.excel-imports.edit')
-            ->with('success', 'Excel faylı uğurla silindi');
+            ->with('success', __('excel_file_deleted_success'));
     }
 
     /**
@@ -176,7 +168,7 @@ class ExcelImportController extends Controller
         if (!$excelImport || !$excelImport->file_url) {
             return response()->json([
                 'success' => false,
-                'message' => 'Excel faylı tapılmadı'
+                'message' => __('excel_file_not_found')
             ], 404);
         }
 
@@ -185,7 +177,7 @@ class ExcelImportController extends Controller
         if (!file_exists($filePath)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Fayl mövcud deyil'
+                'message' => __('file_not_exists')
             ], 404);
         }
 
