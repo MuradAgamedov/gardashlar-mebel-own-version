@@ -10,7 +10,7 @@ class ServicesSitemapController extends Controller
 {
     public function index(Request $request)
     {
-        $services = Service::with("translates.language")->where('status', true)->get();
+        $services = Service::with("translates.language")->where('status', true)->orderBy('order')->get();
         
         $transformedServices = $services->map(function ($service) {
             $translations = [];
