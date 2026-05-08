@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Sitemap;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Vacancy;
 
 class VacanciesSitemapController extends Controller
 {
@@ -12,9 +13,11 @@ class VacanciesSitemapController extends Controller
      */
     public function index(Request $request)
     {
+        $vacancies = Vacancy::all();
         return response()->json([
             'success' => true,
-            'message' => 'Vacancies sitemap generated successfully'
+            'message' => 'Vacancies sitemap generated successfully',
+            'data' => $vacancies
         ]);
     }
 }
