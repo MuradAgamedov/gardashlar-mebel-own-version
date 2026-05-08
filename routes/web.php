@@ -20,6 +20,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
 // admin route-lar
 require __DIR__.'/admin.php';
 

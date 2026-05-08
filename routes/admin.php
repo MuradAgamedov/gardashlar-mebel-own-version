@@ -10,6 +10,7 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\LinkExtractorController;
 
 
 
@@ -85,6 +86,9 @@ Route::group(
         require __DIR__.'/web/users.php';
         require __DIR__.'/web/popupAd.php';
         require __DIR__.'/web/excel-imports.php';
+        
+        // Link Extractor routes
+        Route::get('/extract-links', [LinkExtractorController::class, 'extractLinks'])->name('link-extractor.index');
 
     });
        
