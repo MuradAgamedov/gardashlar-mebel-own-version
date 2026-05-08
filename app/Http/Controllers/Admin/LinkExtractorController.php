@@ -86,78 +86,154 @@ class LinkExtractorController extends Controller
     }
     
     /**
-     * Extract links from a single page.
+     * Extract links from a single page with pagination support.
      */
-    private function extractLinksFromPage($url, $baseUrl)
+    private function extractLinksFromPage($url, $baseUrl, &$visited = [])
     {
         try {
-            $response = Http::get($url);
+            $allLinks = [];
+            $currentPage = $url;
             
-            if (!$response->successful()) {
-                return [];
-            }
-            
-            $html = $response->body();
-            
-            // Parse HTML and extract links
-            libxml_use_internal_errors(true);
-            
-            $dom = new \DOMDocument();
-            $dom->loadHTML($html);
-            
-            $links = [];
-            
-            foreach ($dom->getElementsByTagName('a') as $tag) {
-                $href = $tag->getAttribute('href');
+            // Crawl all paginated pages
+            while ($currentPage && !in_array($currentPage, $visited)) {
+                $visited[] = $currentPage;
                 
-                if (!empty($href)) {
-                    // Convert relative URLs to absolute URLs
-                    if (strpos($href, 'http') !== 0) {
-                        // Handle different types of relative URLs
-                        if ($href[0] === '/') {
-                            $fullUrl = $baseUrl . $href;
+                $response = Http::get($currentPage);
+                
+                if (!$response->successful()) {
+                    break;
+                }
+                
+                $html = $response->body();
+                
+                // Parse HTML and extract links
+                libxml_use_internal_errors(true);
+                
+                $dom = new \DOMDocument();
+                $dom->loadHTML($html);
+                
+                $pageLinks = [];
+                
+                foreach ($dom->getElementsByTagName('a') as $tag) {
+                    $href = $tag->getAttribute('href');
+                    
+                    if (!empty($href)) {
+                        // Convert relative URLs to absolute URLs
+                        if (strpos($href, 'http') !== 0) {
+                            // Handle different types of relative URLs
+                            if ($href[0] === '/') {
+                                $fullUrl = $baseUrl . $href;
+                            } else {
+                                $fullUrl = $baseUrl . '/' . $href;
+                            }
+                            $pageLinks[] = $fullUrl;
                         } else {
-                            $fullUrl = $baseUrl . '/' . $href;
+                            // Already absolute URL
+                            $pageLinks[] = $href;
                         }
-                        $links[] = $fullUrl;
-                    } else {
-                        // Already absolute URL
-                        $links[] = $href;
-                    }
-                }
-            }
-            
-            // Filter out excluded domains
-            $excludedDomains = [
-                'facebook.com', 'twitter.com', 'instagram.com', 
-                'linkedin.com', 'youtube.com', 'tiktok.com',
-                'pinterest.com', 'reddit.com', 'whatsapp.com',
-                'telegram.org', 'vk.com', 'ok.ru',
-                'mailto:', 'tel:', 'cdn-cgi/l/email-protection',
-                'maps.app.goo.gl', 'google.com/maps', 'maps.google.com',
-                'yandex.com/maps', 'yandex.az/maps', 'bing.com/maps'
-            ];
-            
-            $filteredLinks = [];
-            foreach ($links as $link) {
-                $isExcluded = false;
-                
-                foreach ($excludedDomains as $domain) {
-                    if (strpos($link, $domain) !== false) {
-                        $isExcluded = true;
-                        break;
                     }
                 }
                 
-                if (!$isExcluded) {
-                    $filteredLinks[] = $link;
+                // Filter out excluded domains
+                $excludedDomains = [
+                    'facebook.com', 'twitter.com', 'instagram.com', 
+                    'linkedin.com', 'youtube.com', 'tiktok.com',
+                    'pinterest.com', 'reddit.com', 'whatsapp.com',
+                    'telegram.org', 'vk.com', 'ok.ru',
+                    'mailto:', 'tel:', 'cdn-cgi/l/email-protection',
+                    'maps.app.goo.gl', 'google.com/maps', 'maps.google.com',
+                    'yandex.com/maps', 'yandex.az/maps', 'bing.com/maps'
+                ];
+                
+                $filteredLinks = [];
+                foreach ($pageLinks as $link) {
+                    $isExcluded = false;
+                    
+                    foreach ($excludedDomains as $domain) {
+                        if (strpos($link, $domain) !== false) {
+                            $isExcluded = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!$isExcluded) {
+                        $filteredLinks[] = $link;
+                    }
+                }
+                
+                $allLinks = array_merge($allLinks, $filteredLinks);
+                
+                // Find next pagination link
+                $nextPage = $this->findNextPaginationLink($dom, $baseUrl);
+                
+                if ($nextPage && $nextPage !== $currentPage) {
+                    $currentPage = $nextPage;
+                } else {
+                    break;
                 }
             }
             
-            return array_values(array_unique($filteredLinks));
+            return array_values(array_unique($allLinks));
             
         } catch (\Exception $e) {
             return [];
         }
+    }
+    
+    /**
+     * Find the next pagination link from the page.
+     */
+    private function findNextPaginationLink($dom, $baseUrl)
+    {
+        $paginationSelectors = [
+            // Common pagination patterns
+            'a[rel="next"]',
+            'a[class*="next"]',
+            'a[class*="Next"]',
+            'a[contains(text(), "Next")]',
+            'a[contains(text(), "Sonraki")]',
+            'a[contains(text(), "next")]',
+            'a[contains(text(), "sonraki")]',
+            'a[class*="page-next"]',
+            'a[class*="pagination-next"]',
+            // Arrow indicators
+            'a[class*="arrow"]',
+            'a[class*="►"]',
+            'a[class*="→"]',
+        ];
+        
+        foreach ($paginationSelectors as $selector) {
+            $xpath = new \DOMXPath($dom);
+            
+            // Convert CSS selector to XPath (simplified)
+            if (strpos($selector, 'rel="next"') !== false) {
+                $nodes = $xpath->query('//a[@rel="next"]');
+            } elseif (strpos($selector, 'class*="') !== false) {
+                $className = str_replace(['a[class*="', '"]', 'contains(text(), '], '', $selector);
+                $nodes = $xpath->query('//a[contains(@class, "' . $className . '")]');
+            } elseif (strpos($selector, 'contains(text(),') !== false) {
+                $text = str_replace(['a[contains(text(), "', '")]'], '', $selector);
+                $nodes = $xpath->query('//a[contains(text(), "' . $text . '")]');
+            } else {
+                continue;
+            }
+            
+            if ($nodes->length > 0) {
+                $href = $nodes->item(0)->getAttribute('href');
+                if (!empty($href)) {
+                    // Convert to absolute URL
+                    if (strpos($href, 'http') !== 0) {
+                        if ($href[0] === '/') {
+                            return $baseUrl . $href;
+                        } else {
+                            return $baseUrl . '/' . $href;
+                        }
+                    }
+                    return $href;
+                }
+            }
+        }
+        
+        return null;
     }
 }
