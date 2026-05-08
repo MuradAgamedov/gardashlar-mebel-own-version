@@ -13,7 +13,7 @@ class VacanciesSitemapController extends Controller
      */
     public function index(Request $request)
     {
-        $vacancies = Vacancy::with("translates.language")->get();
+        $vacancies = Vacancy::with("translates.language")->where('status', true)->get();
         
         $transformedVacancies = $vacancies->map(function ($vacancy) {
             $translations = [];
