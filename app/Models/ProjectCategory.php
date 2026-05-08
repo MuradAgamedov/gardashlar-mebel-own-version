@@ -56,6 +56,14 @@ class ProjectCategory extends Model
     }
 
     /**
+     * Get the projects for this category
+     */
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
+
+    /**
      * Get the full URL for the image
      */
     public function getImageUrlAttribute()
