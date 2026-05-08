@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Sitemap\VacanciesSitemapController;
 use App\Http\Controllers\Api\Sitemap\ServicesSitemapController;
+use App\Http\Controllers\Api\Sitemap\CompaignsSitemapController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('sitemap')->name('api.sitemap.')->group(function () {
