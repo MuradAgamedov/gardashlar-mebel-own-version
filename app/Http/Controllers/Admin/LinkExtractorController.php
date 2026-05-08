@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -15,7 +16,9 @@ class LinkExtractorController extends Controller
     {
         $baseUrl = $request->get('url', 'https://gardashlar.com/');
         $maxDepth = $request->get('max_depth', 3); // Prevent infinite crawling
-        $languages = $request->get('languages', ['az', 'en']); // Default: az first, then en
+        // Get active languages from Language model
+        $activeLanguages = Language::getActiveLanguages();
+        $languages = $activeLanguages->isEmpty() ? ['az', 'en'] : $activeLanguages->pluck('lang_code')->toArray();
         
         try {
             $allLinks = [];
