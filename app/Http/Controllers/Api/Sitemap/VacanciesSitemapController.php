@@ -19,7 +19,7 @@ class VacanciesSitemapController extends Controller
             $translations = [];
             
             foreach ($vacancy->translates as $translate) {
-                $translations[$translate->language->lang_code ?? 'unknown'] = $translate->title ?? $translate->name ?? '';
+                $translations[$translate->language->lang_code ?? 'unknown'] = $translate->slug ?? '';
             }
             
             return $translations;
