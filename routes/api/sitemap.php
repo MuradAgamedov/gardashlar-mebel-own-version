@@ -7,5 +7,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('sitemap')->name('api.sitemap.')->group(function () {
     Route::get('/vacancies', [VacanciesSitemapController::class, 'index'])->name('vacancies');
     Route::get('/services', [ServicesSitemapController::class, 'index'])->name('services');
+    Route::get('/compaigns', [CompaignsSitemapController::class, 'index'])->name('compaigns');
+
 
 });
