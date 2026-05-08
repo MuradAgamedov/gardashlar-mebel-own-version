@@ -94,14 +94,24 @@ class LinkExtractorController extends Controller
             $allLinks = [];
             $currentPage = $url;
             
-            // Crawl all paginated pages
-            while ($currentPage && !in_array($currentPage, $visited)) {
+            // Crawl all paginated pages using queue approach
+            $pagesToCrawl = [$url];
+            $crawledPages = [];
+            
+            while (!empty($pagesToCrawl)) {
+                $currentPage = array_shift($pagesToCrawl);
+                
+                if (in_array($currentPage, $visited) || in_array($currentPage, $crawledPages)) {
+                    continue;
+                }
+                
                 $visited[] = $currentPage;
+                $crawledPages[] = $currentPage;
                 
                 $response = Http::get($currentPage);
                 
                 if (!$response->successful()) {
-                    break;
+                    continue;
                 }
                 
                 $html = $response->body();
@@ -163,13 +173,14 @@ class LinkExtractorController extends Controller
                 
                 $allLinks = array_merge($allLinks, $filteredLinks);
                 
-                // Find next pagination link
-                $nextPage = $this->findNextPaginationLink($dom, $baseUrl);
+                // Find all pagination links from current page
+                $paginationLinks = $this->findPaginationLinks($dom, $baseUrl, $currentPage);
                 
-                if ($nextPage && $nextPage !== $currentPage) {
-                    $currentPage = $nextPage;
-                } else {
-                    break;
+                // Add new pagination links to queue
+                foreach ($paginationLinks as $paginationLink) {
+                    if (!in_array($paginationLink, $visited) && !in_array($paginationLink, $crawledPages) && !in_array($paginationLink, $pagesToCrawl)) {
+                        $pagesToCrawl[] = $paginationLink;
+                    }
                 }
             }
             
@@ -181,59 +192,98 @@ class LinkExtractorController extends Controller
     }
     
     /**
-     * Find the next pagination link from the page.
+     * Find all pagination links from the page.
      */
-    private function findNextPaginationLink($dom, $baseUrl)
+    private function findPaginationLinks($dom, $baseUrl, $currentUrl)
     {
-        $paginationSelectors = [
-            // Common pagination patterns
-            'a[rel="next"]',
-            'a[class*="next"]',
-            'a[class*="Next"]',
-            'a[contains(text(), "Next")]',
-            'a[contains(text(), "Sonraki")]',
-            'a[contains(text(), "next")]',
-            'a[contains(text(), "sonraki")]',
-            'a[class*="page-next"]',
-            'a[class*="pagination-next"]',
-            // Arrow indicators
-            'a[class*="arrow"]',
-            'a[class*="►"]',
-            'a[class*="→"]',
+        $paginationLinks = [];
+        $xpath = new \DOMXPath($dom);
+        
+        // Method 1: Find pagination container first
+        $paginationContainers = [
+            '//div[contains(@class, "pagination")]',
+            '//ul[contains(@class, "pagination")]',
+            '//nav[contains(@class, "pagination")]',
+            '//div[contains(@class, "paging")]',
+            '//ul[contains(@class, "paging")]',
+            '//nav[contains(@class, "paging")]',
+            '//div[contains(@class, "pager")]',
+            '//ul[contains(@class, "pager")]',
         ];
         
-        foreach ($paginationSelectors as $selector) {
-            $xpath = new \DOMXPath($dom);
-            
-            // Convert CSS selector to XPath (simplified)
-            if (strpos($selector, 'rel="next"') !== false) {
-                $nodes = $xpath->query('//a[@rel="next"]');
-            } elseif (strpos($selector, 'class*="') !== false) {
-                $className = str_replace(['a[class*="', '"]', 'contains(text(), '], '', $selector);
-                $nodes = $xpath->query('//a[contains(@class, "' . $className . '")]');
-            } elseif (strpos($selector, 'contains(text(),') !== false) {
-                $text = str_replace(['a[contains(text(), "', '")]'], '', $selector);
-                $nodes = $xpath->query('//a[contains(text(), "' . $text . '")]');
-            } else {
-                continue;
-            }
-            
-            if ($nodes->length > 0) {
-                $href = $nodes->item(0)->getAttribute('href');
-                if (!empty($href)) {
-                    // Convert to absolute URL
-                    if (strpos($href, 'http') !== 0) {
-                        if ($href[0] === '/') {
-                            return $baseUrl . $href;
-                        } else {
-                            return $baseUrl . '/' . $href;
-                        }
+        $allLinks = [];
+        
+        // Try to find pagination container
+        foreach ($paginationContainers as $containerSelector) {
+            $containers = $xpath->query($containerSelector);
+            if ($containers->length > 0) {
+                // Get all links from pagination container
+                $links = $xpath->query('.//a', $containers->item(0));
+                foreach ($links as $link) {
+                    $href = $link->getAttribute('href');
+                    if (!empty($href)) {
+                        $allLinks[] = $href;
                     }
-                    return $href;
+                }
+                break; // Found pagination container, no need to check others
+            }
+        }
+        
+        // Method 2: If no container found, look for common pagination patterns
+        if (empty($allLinks)) {
+            $paginationPatterns = [
+                '//a[contains(@class, "page")]',
+                '//a[contains(@class, "pagination")]', 
+                '//a[contains(@href, "page")]',
+                '//a[contains(@href, "?page")]',
+                '//a[contains(@href, "&page")]',
+                '//a[contains(text(), "1")]', '//a[contains(text(), "2")]', '//a[contains(text(), "3")]', 
+                '//a[contains(text(), "4")]', '//a[contains(text(), "5")]', '//a[contains(text(), "6")]',
+                '//a[contains(text(), "7")]', '//a[contains(text(), "8")]', '//a[contains(text(), "9")]',
+                '//a[contains(text(), "10")]',
+                '//a[contains(text(), "Sonraki")]', '//a[contains(text(), "Next")]',
+                '//a[contains(text(), "sonraki")]', '//a[contains(text(), "next")]',
+                '//a[@rel="next"]',
+                '//a[contains(@class, "next")]',
+            ];
+            
+            foreach ($paginationPatterns as $pattern) {
+                $links = $xpath->query($pattern);
+                foreach ($links as $link) {
+                    $href = $link->getAttribute('href');
+                    if (!empty($href)) {
+                        $allLinks[] = $href;
+                    }
                 }
             }
         }
         
-        return null;
+        // Convert to absolute URLs and filter
+        foreach ($allLinks as $href) {
+            if (empty($href)) continue;
+            
+            // Skip non-pagination links
+            if (strpos($href, '#') === 0 || strpos($href, 'javascript:') === 0) {
+                continue;
+            }
+            
+            // Convert to absolute URL
+            if (strpos($href, 'http') !== 0) {
+                if ($href[0] === '/') {
+                    $fullUrl = $baseUrl . $href;
+                } else {
+                    $fullUrl = $baseUrl . '/' . $href;
+                }
+            } else {
+                $fullUrl = $href;
+            }
+            
+            // Only include links from the same domain and different from current
+            if (strpos($fullUrl, $baseUrl) === 0 && $fullUrl !== $currentUrl) {
+                $paginationLinks[] = $fullUrl;
+            }
+        }
+        
+        return array_values(array_unique($paginationLinks));
     }
 }
