@@ -15,7 +15,7 @@ class LinkExtractorController extends Controller
     public function extractLinks(Request $request)
     {
         $baseUrl = $request->get('url', 'https://gardashlar.com/');
-        $maxDepth = $request->get('max_depth', 3); // Prevent infinite crawling
+        $maxDepth = $request->get('max_depth', 6); // Increased depth for better crawling
         // Get active languages from Language model
         $activeLanguages = Language::getActiveLanguages();
         $languages = $activeLanguages->isEmpty() ? ['az', 'en'] : $activeLanguages->pluck('lang_code')->toArray();
@@ -23,11 +23,20 @@ class LinkExtractorController extends Controller
         try {
             $allLinks = [];
             
+            // First, try to get sitemap URLs
+            $sitemapLinks = $this->getSitemapLinks($baseUrl);
+            $allLinks = array_merge($allLinks, $sitemapLinks);
+            
+            // Then crawl each language
             foreach ($languages as $lang) {
                 $url = rtrim($baseUrl, '/') . '/' . $lang;
                 $langLinks = $this->crawlWebsite($url, $maxDepth);
                 $allLinks = array_merge($allLinks, $langLinks);
             }
+            
+            // Finally, get API-based product URLs if available
+            $apiLinks = $this->getApiProductLinks($baseUrl);
+            $allLinks = array_merge($allLinks, $apiLinks);
             
             // Remove duplicates and return
             $uniqueLinks = array_values(array_unique($allLinks));
@@ -108,7 +117,14 @@ class LinkExtractorController extends Controller
                 $visited[] = $currentPage;
                 $crawledPages[] = $currentPage;
                 
-                $response = Http::get($currentPage);
+                $response = Http::withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36',
+                    'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'Accept-Language' => 'az,en-US;q=0.9,en;q=0.8',
+                    'Accept-Encoding' => 'gzip, deflate, br',
+                    'Connection' => 'keep-alive',
+                    'Upgrade-Insecure-Requests' => '1'
+                ])->timeout(20)->get($currentPage);
                 
                 if (!$response->successful()) {
                     continue;
@@ -285,5 +301,161 @@ class LinkExtractorController extends Controller
         }
         
         return array_values(array_unique($paginationLinks));
+    }
+    
+    /**
+     * Get URLs from sitemap.xml
+     */
+    private function getSitemapLinks($baseUrl)
+    {
+        $sitemapUrls = [
+            rtrim($baseUrl, '/') . '/sitemap.xml',
+            rtrim($baseUrl, '/') . '/sitemap_index.xml',
+            rtrim($baseUrl, '/') . '/sitemap/sitemap.xml'
+        ];
+        
+        $links = [];
+        
+        foreach ($sitemapUrls as $sitemapUrl) {
+            try {
+                $response = Http::withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36',
+                    'Accept' => 'application/xml,text/xml'
+                ])->timeout(20)->get($sitemapUrl);
+                
+                if ($response->successful()) {
+                    $xml = $response->body();
+                    $dom = new \DOMDocument();
+                    $dom->loadXML($xml);
+                    
+                    $urlElements = $dom->getElementsByTagName('url');
+                    foreach ($urlElements as $urlElement) {
+                        $locElements = $urlElement->getElementsByTagName('loc');
+                        if ($locElements->length > 0) {
+                            $url = $locElements->item(0)->nodeValue;
+                            if (!empty($url) && strpos($url, $baseUrl) === 0) {
+                                $links[] = $url;
+                            }
+                        }
+                    }
+                    
+                    // Also check for sitemap index
+                    $sitemapElements = $dom->getElementsByTagName('sitemap');
+                    foreach ($sitemapElements as $sitemapElement) {
+                        $locElements = $sitemapElement->getElementsByTagName('loc');
+                        if ($locElements->length > 0) {
+                            $childSitemapUrl = $locElements->item(0)->nodeValue;
+                            $childLinks = $this->parseChildSitemap($childSitemapUrl, $baseUrl);
+                            $links = array_merge($links, $childLinks);
+                        }
+                    }
+                    
+                    break; // Found a valid sitemap
+                }
+            } catch (\Exception $e) {
+                continue; // Try next sitemap URL
+            }
+        }
+        
+        return array_values(array_unique($links));
+    }
+    
+    /**
+     * Parse child sitemap
+     */
+    private function parseChildSitemap($sitemapUrl, $baseUrl)
+    {
+        try {
+            $response = Http::withHeaders([
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36',
+                'Accept' => 'application/xml,text/xml'
+            ])->timeout(20)->get($sitemapUrl);
+            
+            if ($response->successful()) {
+                $xml = $response->body();
+                $dom = new \DOMDocument();
+                $dom->loadXML($xml);
+                
+                $links = [];
+                $urlElements = $dom->getElementsByTagName('url');
+                foreach ($urlElements as $urlElement) {
+                    $locElements = $urlElement->getElementsByTagName('loc');
+                    if ($locElements->length > 0) {
+                        $url = $locElements->item(0)->nodeValue;
+                        if (!empty($url) && strpos($url, $baseUrl) === 0) {
+                            $links[] = $url;
+                        }
+                    }
+                }
+                
+                return $links;
+            }
+        } catch (\Exception $e) {
+            return [];
+        }
+        
+        return [];
+    }
+    
+    /**
+     * Get product URLs from API endpoints
+     */
+    private function getApiProductLinks($baseUrl)
+    {
+        $links = [];
+        
+        // Try common API endpoints for products
+        $apiEndpoints = [
+            '/api/products',
+            '/api/v1/products', 
+            '/api/products/all',
+            '/api/catalog/products',
+            '/api/mebel/products'
+        ];
+        
+        foreach ($apiEndpoints as $endpoint) {
+            try {
+                $apiUrl = rtrim($baseUrl, '/') . $endpoint;
+                $response = Http::withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36',
+                    'Accept' => 'application/json',
+                    'Accept-Language' => 'az,en-US;q=0.9,en;q=0.8'
+                ])->timeout(20)->get($apiUrl);
+                
+                if ($response->successful()) {
+                    $data = $response->json();
+                    
+                    // Handle different API response structures
+                    if (isset($data['data'])) {
+                        $products = $data['data'];
+                    } elseif (isset($data['products'])) {
+                        $products = $data['products'];
+                    } elseif (is_array($data)) {
+                        $products = $data;
+                    } else {
+                        $products = [];
+                    }
+                    
+                    foreach ($products as $product) {
+                        if (isset($product['url']) || isset($product['slug'])) {
+                            $productUrl = isset($product['url']) ? $product['url'] : 
+                                         (rtrim($baseUrl, '/') . '/az/product/' . $product['slug']);
+                            
+                            if (strpos($productUrl, 'http') !== 0) {
+                                $productUrl = rtrim($baseUrl, '/') . '/' . ltrim($productUrl, '/');
+                            }
+                            
+                            if (strpos($productUrl, $baseUrl) === 0) {
+                                $links[] = $productUrl;
+                            }
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                continue; // Try next endpoint
+            }
+        }
+        
+        return array_values(array_unique($links));
     }
 }
