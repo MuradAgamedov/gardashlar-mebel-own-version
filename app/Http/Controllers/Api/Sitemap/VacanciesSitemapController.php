@@ -13,11 +13,21 @@ class VacanciesSitemapController extends Controller
      */
     public function index(Request $request)
     {
-        $vacancies = Vacancy::all();
+        $vacancies = Vacancy::with("translates.language")->get();
+        
+        $transformedVacancies = $vacancies->map(function ($vacancy) {
+            $translations = [];
+            
+            foreach ($vacancy->translates as $translate) {
+                $translations[$translate->language->lang_code ?? 'unknown'] = $translate->title ?? $translate->name ?? '';
+            }
+            
+            return $translations;
+        });
+        
         return response()->json([
             'success' => true,
-            'message' => 'Vacancies sitemap generated successfully',
-            'data' => $vacancies
+            'data' => $transformedVacancies
         ]);
     }
 }
