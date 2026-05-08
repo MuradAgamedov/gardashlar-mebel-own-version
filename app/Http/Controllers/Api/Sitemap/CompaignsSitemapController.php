@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Api\Sitemap;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Compaign;
+use App\Models\Company;
 
 class CompaignsSitemapController extends Controller
 {
      public function index(Request $request)
     {
-        $compaigns = Compaign::with("translates.language")->where('status', true)->get();
+        $compaigns = Company::with("translates.language")->where('status', true)->get();
         
         $transformedCompaigns = $compaigns->map(function ($compaign) {
             $translations = [];
