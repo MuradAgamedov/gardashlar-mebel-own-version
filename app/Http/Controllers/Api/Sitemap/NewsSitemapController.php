@@ -4,30 +4,49 @@ namespace App\Http\Controllers\Api\Sitemap;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\NewsCategory;
 use App\Models\NewsPost;
 
 class NewsSitemapController extends Controller
 {
     /**
-     * Generate news sitemap
+     * Generate news sitemap with categories and their news slugs
      */
     public function index(Request $request)
     {
-        $news = NewsPost::with("translates.language")->where('status', true)->get();
+        $categories = NewsCategory::with(['translates.language', 'newsPosts.translates.language'])
+            ->where('status', true)
+            ->orderBy('order')
+            ->get();
         
-        $transformedNews = $news->map(function ($newsPost) {
-            $translations = [];
-            
-            foreach ($newsPost->translates as $translate) {
-                $translations[$translate->language->lang_code ?? 'unknown'] = $translate->slug ?? '';
+        $transformedCategories = $categories->map(function ($category) {
+            // Get category slug translations
+            $categorySlugTranslates = [];
+            foreach ($category->translates as $translate) {
+                $categorySlugTranslates[$translate->language->lang_code ?? 'unknown'] = $translate->slug ?? '';
             }
             
-            return $translations;
+            // Get news posts in this category with their slug translations
+            $details = [];
+            foreach ($category->newsPosts->where('status', true) as $newsPost) {
+                $newsSlugTranslates = [];
+                foreach ($newsPost->translates as $translate) {
+                    $newsSlugTranslates[$translate->language->lang_code ?? 'unknown'] = $translate->slug ?? '';
+                }
+                $details[] = $newsSlugTranslates;
+            }
+            
+            return [
+                'categorySlugTranslates' => $categorySlugTranslates,
+                'details' => $details
+            ];
         });
         
         return response()->json([
             'success' => true,
-            'data' => $transformedNews
+            'data' => [
+                'categories' => $transformedCategories
+            ]
         ]);
     }
 }
