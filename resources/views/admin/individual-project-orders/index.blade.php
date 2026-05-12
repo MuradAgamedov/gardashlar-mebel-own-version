@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = `/admin/individual-project-orders/${id}`;
+                    form.action = '{{ route("admin.individual-project-orders.destroy", ":id") }}'.replace(':id', id);
                     form.innerHTML = `
                         @csrf
                         @method('DELETE')
