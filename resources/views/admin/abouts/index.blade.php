@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = `/admin/abouts/${id}`;
+                    form.action = '{{ route("admin.abouts.destroy", "") }}/' + id;
                     form.innerHTML = `
                         @csrf
                         @method('DELETE')

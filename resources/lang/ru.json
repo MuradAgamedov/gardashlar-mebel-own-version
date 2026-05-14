@@ -1831,5 +1831,8 @@
     "The :attribute format is invalid.": "Формат :attribute недействителен.",
     "Validation error": "Ошибка валидации",
     "Validation failed": "Валидация не пройдена",
-    "Please fix the following errors:": "Пожалуйста, исправьте следующие ошибки:"
+    "Please fix the following errors:": "Пожалуйста, исправьте следующие ошибки:",
+    "News": "Новости",
+    "News Categories": "Категории новостей",
+    "News Posts": "Новостные публикации"
 }

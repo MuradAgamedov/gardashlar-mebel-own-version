@@ -1850,5 +1850,8 @@
     "The :attribute format is invalid.": "The :attribute format is invalid.",
     "Validation error": "Validation error",
     "Validation failed": "Validation failed",
-    "Please fix the following errors:": "Please fix the following errors:"
+    "Please fix the following errors:": "Please fix the following errors:",
+    "News": "Xəbərlər",
+    "News Categories": "News Categories",
+    "News Posts": "Xəbərlər"
 }

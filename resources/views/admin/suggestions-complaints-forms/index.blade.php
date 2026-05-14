@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (result.isConfirmed) {
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = `/admin/suggestions-complaints/${id}`;
+                    form.action = '{{ route("admin.suggestions-complaints-forms.destroy", "") }}/' + id;
                     form.innerHTML = `@csrf @method('DELETE')`;
                     document.body.appendChild(form);
                     form.submit();
