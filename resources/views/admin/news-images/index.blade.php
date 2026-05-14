@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>News Post Images</h3>
+                    <h3>{{ __('News Post Images') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -16,12 +16,12 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.news-posts.index') }}">News Posts</a>
+                            <a href="{{ route('admin.news-posts.index') }}">{{ __('News Posts') }}</a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.news-posts.edit', $news_post) }}">Edit</a>
+                            <a href="{{ route('admin.news-posts.edit', $news_post) }}">{{ __('Edit') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Images</li>
+                        <li class="breadcrumb-item active">{{ __('Images') }}</li>
                     </ol>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5>Images for: {{ $news_post->title ?? 'News Post #' . $news_post->id }}</h5>
+                            <h5>{{ __('Images for:') }} {{ $news_post->title ?? __('News Post #') . $news_post->id }}</h5>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal" title="{{ __('Add Image') }}">
                                     <i class="material-icons-outlined">add</i>
@@ -65,7 +65,7 @@
                         <!-- Upload Form -->
 <div class="card mb-4">
     <div class="card-header">
-        <h5>Upload Images</h5>
+        <h5>{{ __('Upload Images') }}</h5>
     </div>
     <div class="card-body">
         <form method="POST" action="{{ route('admin.news-posts.images.store', $news_post) }}" enctype="multipart/form-data">
@@ -73,9 +73,9 @@
             <div class="row">
                 <div class="col-md-8">
                     <div class="mb-3">
-                        <label for="images" class="form-label">Select Multiple Images</label>
+                        <label for="images" class="form-label">{{ __('Select Multiple Images') }}</label>
                         <input type="file" class="form-control" id="images" name="images[]" accept="image/*" multiple required>
-                        <small class="text-muted">Supported formats: JPEG, PNG, JPG, GIF, WebP (Max: 2MB each)</small>
+                        <small class="text-muted">{{ __('Supported formats: JPEG, PNG, JPG, GIF, WebP (Max: 2MB each)') }}</small>
                     </div>
                     <div class="mb-3">
                         <div id="imagePreview" class="row g-2"></div>
@@ -84,7 +84,7 @@
                 <div class="col-md-4">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="material-icons-outlined">upload</i>
-                        Upload Images
+                        {{ __('Upload Images') }}
                     </button>
                 </div>
             </div>
@@ -96,7 +96,7 @@
 @if($news_post->images->count() > 0)
     <div class="card">
         <div class="card-header">
-            <h5>Existing Images ({{ $news_post->images->count() }})</h5>
+            <h5>{{ __('Existing Images') }} ({{ $news_post->images->count() }})</h5>
         </div>
         <div class="card-body">
             <div class="row" id="sortable-images">
@@ -105,14 +105,14 @@
                         <div class="card image-card">
                             <div class="card-body p-2">
                                 <div class="image-container">
-                                    <img src="{{ $image->image_url }}" alt="News Image" class="img-fluid rounded">
+                                    <img src="{{ $image->image_url }}" alt="{{ __('News Image') }}" class="img-fluid rounded">
                                     <div class="image-actions">
                                         <!-- Delete button - top right -->
                                         <form method="POST" action="{{ route('admin.news-posts.images.destroy', [$news_post, $image]) }}" style="display: inline;">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger" 
-                                                    onclick="return confirm('Are you sure you want to delete this image?')">
+                                                    onclick="return confirm('{{ __('Are you sure you want to delete this image?') }}')">
                                                 <i class="material-icons-outlined">delete</i>
                                             </button>
                                         </form>
@@ -137,7 +137,7 @@
     <div class="card">
         <div class="card-body text-center py-5">
             <i class="material-icons-outlined" style="font-size: 48px; color: #ccc;">photo_library</i>
-            <p class="text-muted mt-2">No images uploaded yet</p>
+            <p class="text-muted mt-2">{{ __('No images uploaded yet') }}</p>
         </div>
     </div>
 @endif

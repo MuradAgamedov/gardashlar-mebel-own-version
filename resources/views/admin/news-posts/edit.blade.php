@@ -6,7 +6,7 @@
         <div class="page-title">
             <div class="row">
                 <div class="col-6">
-                    <h3>Edit News Post</h3>
+                    <h3>{{ __('Edit News Post') }}</h3>
                 </div>
                 <div class="col-6">
                     <ol class="breadcrumb">
@@ -16,9 +16,9 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{ route('admin.news-posts.index') }}">News Posts</a>
+                            <a href="{{ route('admin.news-posts.index') }}">{{ __('News Posts') }}</a>
                         </li>
-                        <li class="breadcrumb-item active">Edit</li>
+                        <li class="breadcrumb-item active">{{ __('Edit') }}</li>
                     </ol>
                 </div>
             </div>
@@ -57,7 +57,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5>Edit News Post</h5>
+                        <h5>{{ __('Edit News Post') }}</h5>
                     </div>
                     <div class="card-body">
                         <form method="POST" action="{{ route('admin.news-posts.update', $newsPost) }}" enctype="multipart/form-data">
@@ -67,9 +67,9 @@
                             <!-- Basic Information -->
                             <div class="row mb-4">
                                 <div class="col-md-6">
-                                    <label for="news_category_id" class="form-label">Category <span class="text-danger">*</span></label>
+                                    <label for="news_category_id" class="form-label">{{ __('Category') }} <span class="text-danger">*</span></label>
                                     <select class="form-select" id="news_category_id" name="news_category_id" required>
-                                        <option value="">Select Category</option>
+                                        <option value="">{{ __('Select Category') }}</option>
                                         @foreach($categories as $category)
                                             @php
                                                 $mainLanguageId = \App\Models\Language::getMainLanguage()->id;
@@ -83,7 +83,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="published_at" class="form-label">Published At</label>
+                                    <label for="published_at" class="form-label">{{ __('Published At') }}</label>
                                     <input type="datetime-local" 
                                            class="form-control" 
                                            id="published_at" 
@@ -99,7 +99,7 @@
                                         <input class="form-check-input" type="checkbox" name="status" id="status" value="1" 
                                                {{ old('status', $newsPost->status ? '1' : '') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="status">
-                                            Active Status
+                                            {{ __('Active Status') }}
                                         </label>
                                     </div>
                                 </div>
@@ -108,11 +108,11 @@
                             <!-- Images -->
                             <div class="row mb-4">
                                 <div class="col-md-6">
-                                    <label for="card_image" class="form-label">Card Image</label>
+                                    <label for="card_image" class="form-label">{{ __('Card Image') }}</label>
                                     @if($newsPost->card_image)
                                         <div class="mb-2">
                                             <img src="{{ $newsPost->card_image_url }}" 
-                                                 alt="Current Card Image" 
+                                                 alt="{{ __('Current Card Image') }}" 
                                                  class="img-thumbnail" 
                                                  style="max-width: 200px;">
                                         </div>
@@ -122,18 +122,18 @@
                                            id="card_image" 
                                            name="card_image" 
                                            accept="image/*">
-                                    <small class="form-text text-muted">Recommended size: 400x300px, Max: 2MB</small>
+                                    <small class="form-text text-muted">{{ __('Recommended size: 400x300px, Max: 2MB') }}</small>
                                     <div class="mt-2">
                                         <img id="card_image_preview" src="" alt="Card Image Preview" 
                                              class="img-thumbnail" style="max-width: 200px; display: none;">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="inner_banner_image" class="form-label">Inner Banner Image</label>
+                                    <label for="inner_banner_image" class="form-label">{{ __('Inner Banner Image') }}</label>
                                     @if($newsPost->inner_banner_image)
                                         <div class="mb-2">
                                             <img src="{{ $newsPost->inner_banner_image_url }}" 
-                                                 alt="Current Inner Banner Image" 
+                                                 alt="{{ __('Current Inner Banner Image') }}" 
                                                  class="img-thumbnail" 
                                                  style="max-width: 200px;">
                                         </div>
@@ -143,7 +143,7 @@
                                            id="inner_banner_image" 
                                            name="inner_banner_image" 
                                            accept="image/*">
-                                    <small class="form-text text-muted">Recommended size: 1200x400px, Max: 2MB</small>
+                                    <small class="form-text text-muted">{{ __('Recommended size: 1200x400px, Max: 2MB') }}</small>
                                     <div class="mt-2">
                                         <img id="inner_banner_image_preview" src="" alt="Inner Banner Image Preview" 
                                              class="img-thumbnail" style="max-width: 200px; display: none;">
@@ -164,7 +164,7 @@
                                             {{ $language->name }}
                                                 <span class="badge bg-secondary ms-1">{{ strtoupper($language->lang_code) }}</span>
                                             @if($language->is_default)
-                                                <span class="badge bg-primary ms-1">Default</span>
+                                                <span class="badge bg-primary ms-1">{{ __('Default') }}</span>
                                             @endif
                                         </button>
                                     </li>
@@ -185,7 +185,7 @@
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="title_{{ $language->id }}" class="form-label">
-                                                        Title <span class="text-danger">*</span>
+                                                        {{ __('Title') }} <span class="text-danger">*</span>
                                                     </label>
                                                     <input type="text" 
                                                            class="form-control" 
@@ -198,7 +198,7 @@
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="slug_{{ $language->id }}" class="form-label">
-                                                        Slug <span class="text-danger">*</span>
+                                                        {{ __('Slug') }} <span class="text-danger">*</span>
                                                     </label>
                                                     <input type="text" 
                                                            class="form-control" 
@@ -214,7 +214,7 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="description_{{ $language->id }}" class="form-label">
-                                                        Description <span class="text-danger">*</span>
+                                                        {{ __('Description') }} <span class="text-danger">*</span>
                                                     </label>
                                                     <textarea class="form-control ckeditor" 
                                                               id="description_{{ $language->id }}" 
@@ -228,7 +228,7 @@
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="translations[{{ $language->id }}][card_image_alt_text]" class="form-label">
-                                                        Card Image Alt Text ({{ strtoupper($language->lang_code) }})
+                                                        {{ __('Card Image Alt Text') }} ({{ strtoupper($language->lang_code) }})
                                                     </label>
                                                     <input type="text" 
                                                            class="form-control" 
@@ -240,7 +240,7 @@
                                             <div class="col-md-6">
                                                 <div class="mb-3">
                                                     <label for="translations[{{ $language->id }}][inner_banner_alt_text]" class="form-label">
-                                                        Inner Banner Alt Text ({{ strtoupper($language->lang_code) }})
+                                                        {{ __('Inner Banner Alt Text') }} ({{ strtoupper($language->lang_code) }})
                                                     </label>
                                                     <input type="text" 
                                                            class="form-control" 
@@ -254,7 +254,7 @@
                                             <div class="col-md-12">
                                                 <div class="mb-3">
                                                     <label for="translations[{{ $language->id }}][card_description]" class="form-label">
-                                                        Card Description ({{ strtoupper($language->lang_code) }})
+                                                        {{ __('Card Description') }} ({{ strtoupper($language->lang_code) }})
                                                     </label>
                                                     <textarea class="form-control" 
                                                               name="translations[{{ $language->id }}][card_description]" 
@@ -266,14 +266,14 @@
                                         <!-- SEO Section -->
                                         <div class="row mt-4">
                                             <div class="col-12">
-                                                <h6 class="mb-3">SEO Settings ({{ strtoupper($language->lang_code) }})</h6>
+                                                <h6 class="mb-3">{{ __('SEO Settings') }} ({{ strtoupper($language->lang_code) }})</h6>
                                             </div>
                                         </div>
 
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="seo_title_{{ $language->id }}" class="form-label">SEO Title</label>
+                                                    <label for="seo_title_{{ $language->id }}" class="form-label">{{ __('SEO Title') }}</label>
                                                     <input type="text" 
                                                            class="form-control" 
                                                            id="seo_title_{{ $language->id }}" 
@@ -286,7 +286,7 @@
                                         <div class="row mt-3">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="seo_keywords_{{ $language->id }}" class="form-label">SEO Keywords</label>
+                                                    <label for="seo_keywords_{{ $language->id }}" class="form-label">{{ __('SEO Keywords') }}</label>
                                                     <textarea class="form-control" 
                                                               id="seo_keywords_{{ $language->id }}" 
                                                               name="translations[{{ $language->id }}][seo_keywords]" 
@@ -298,7 +298,7 @@
                                         <div class="row mt-3">
                                             <div class="col-md-12">
                                                 <div class="mb-3">
-                                                    <label for="seo_description_{{ $language->id }}" class="form-label">SEO Description</label>
+                                                    <label for="seo_description_{{ $language->id }}" class="form-label">{{ __('SEO Description') }}</label>
                                                     <textarea class="form-control" 
                                                               id="seo_description_{{ $language->id }}" 
                                                               name="translations[{{ $language->id }}][seo_description]" 
@@ -461,7 +461,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }, 100);
                 }
-                alert('Please fill in all required fields marked with *');
+                alert("{{ __('Please fill in all required fields marked with *') }}");
             }
         });
     }
