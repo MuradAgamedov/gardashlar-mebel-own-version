@@ -60,7 +60,7 @@
                         <h5>{{ __('Edit News Post') }}</h5>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="{{ route('admin.news-posts.update', $newsPost) }}" enctype="multipart/form-data">
+                        <form method="POST" novalidate action="{{ route('admin.news-posts.update', $newsPost) }}" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             
