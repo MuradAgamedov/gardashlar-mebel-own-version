@@ -341,19 +341,30 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize CKEditor for each description field
     @foreach($languages as $language)
-        ClassicEditor
-            .create(document.querySelector('#description_{{ $language->id }}'), {
-                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'outdent', 'indent', '|', 'blockQuote', 'insertTable', 'undo', 'redo'],
-                language: '{{ $language->lang_code }}',
-                initialData: @js(old("translations.{$language->id}.description", $translation?->description ?? ''))
-            })
-            .then(editor => {
-                editors['{{ $language->id }}'] = editor;
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    @endforeach
+    @php
+        $translation = $newsPost->translates->firstWhere('language_id', $language->id);
+    @endphp
+
+    ClassicEditor
+        .create(document.querySelector('#description_{{ $language->id }}'), {
+            toolbar: [
+                'heading', '|',
+                'bold', 'italic', 'link',
+                'bulletedList', 'numberedList', '|',
+                'outdent', 'indent', '|',
+                'blockQuote', 'insertTable',
+                'undo', 'redo'
+            ],
+            language: '{{ $language->lang_code }}',
+            initialData: @json(old("translations.{$language->id}.description", $translation?->description ?? ''))
+        })
+        .then(editor => {
+            editors['{{ $language->id }}'] = editor;
+        })
+        .catch(error => {
+            console.error(error);
+        });
+@endforeach
 
     // Image preview functionality
     function setupImagePreview(inputId, previewId) {
