@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Artisan;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -30,3 +30,10 @@ Route::view('/payment/cancel', 'payment.cancel')->name('payment.cancel');
 Route::view('/payment/decline', 'payment.decline')->name('payment.decline');
 
 }); // Close throttle middleware group
+
+
+Route::get('/run-currency-update', function () {
+    Artisan::call('currencies:update');
+
+    return nl2br(Artisan::output());
+});
