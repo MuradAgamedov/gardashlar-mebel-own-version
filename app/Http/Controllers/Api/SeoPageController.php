@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\SeoPage;
-use App\Models\Language;
-use App\Models\Product;
+use App\Interfaces\Services\Front\SeoPageServiceInterface;
+use App\Interfaces\Services\Front\ProductServiceInterface;
+use App\Http\Resources\Api\SeoPageResource;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -16,46 +16,38 @@ class SeoPageController extends Controller
 {
     use LocaleFromHeader;
 
+    protected SeoPageServiceInterface $seoPageService;
+    protected ProductServiceInterface $productService;
+
+    public function __construct(
+        SeoPageServiceInterface $seoPageService,
+        ProductServiceInterface $productService
+    ) {
+        $this->seoPageService = $seoPageService;
+        $this->productService = $productService;
+    }
+
     /**
      * Get all SEO pages with title and slug only
      */
     public function index(Request $request): JsonResponse
     {
         try {
-            // Get language ID from header using trait
             $languageId = $this->getLanguageIdFromHeader($request);
-            
             $cacheKey = "api_seo_pages_{$languageId}";
             
             $seoPages = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                return SeoPage::with(['translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId)
-                          ->select('seo_page_id', 'language_id', 'title', 'slug');
-                }])
-                ->where('status', true)
-                ->get(['id'])
-                ->map(function ($seoPage) {
-                    $translation = $seoPage->translates->first();
-
-                    $title = $translation?->title;
-                    $slug  = $translation?->slug;
-                    
-                    return [
-                        'id' => $seoPage->id,
-                        'title' => $title,
-                        'slug' => $slug,
-                    ];
-                })
-                ->filter(function ($item) {
-                    // Yalnız title və slug həqiqətən boş olmayanlar
-                    return !empty($item['title']) && !empty($item['slug']);
-                })
-                ->values();
+                return $this->seoPageService->getActiveOrderedWithTranslations($languageId);
             });
+
+            $filtered = $seoPages->filter(function ($page) {
+                $tr = $page->translates->first();
+                return !empty($tr?->title) && !empty($tr?->slug);
+            })->values();
 
             return response()->json([
                 'success' => true,
-                'data' => $seoPages
+                'data' => SeoPageResource::collection($filtered)
             ], 200);
 
         } catch (\Exception $e) {
@@ -73,23 +65,16 @@ class SeoPageController extends Controller
     public function show(Request $request, $slug): JsonResponse
     {
         try {
-            // Get language ID from header using trait
             $languageId = $this->getLanguageIdFromHeader($request);
-            
             $cacheKey = "api_seo_page_{$slug}_{$languageId}";
             
             $seoPageData = Cache::rememberForever($cacheKey, function () use ($slug, $languageId) {
-                // Find SEO page by slug and language
-                $seoPageTranslate = \App\Models\SeoPageTranslate::with(['seoPage.category.translates', 'language'])
-                    ->where('slug', $slug)
-                    ->where('language_id', $languageId)
-                    ->first();
+                $seoPageTranslate = $this->seoPageService->getTranslateBySlug($slug, $languageId);
 
-                if (!$seoPageTranslate || !$seoPageTranslate->seoPage->status) {
+                if (!$seoPageTranslate || !$seoPageTranslate->seoPage || !$seoPageTranslate->seoPage->status) {
                     return null;
                 }
 
-                // Get category info if exists
                 $categoryData = null;
                 if ($seoPageTranslate->seoPage->category) {
                     $categoryTranslate = $seoPageTranslate->seoPage->category
@@ -106,12 +91,10 @@ class SeoPageController extends Controller
                     }
                 }
 
-                // Get products for this SEO page's category
                 $products = [];
                 if ($seoPageTranslate->seoPage->category_id) {
                     $categoryId = $seoPageTranslate->seoPage->category_id;
                     
-                    // Get category and its children
                     $category = ProductCategory::find($categoryId);
                     $categoryIds = [$categoryId];
                     
@@ -122,35 +105,15 @@ class SeoPageController extends Controller
                         }
                     }
                     
-                    // Get products from these categories
-                    $products = Product::with([
-                        'translates' => function($query) use ($languageId) {
-                            $query->where('language_id', $languageId);
-                        },
-                        'images' => function($query) {
-                            $query->where('status', true)->orderBy('order');
-                        },
-                        'types.translates' => function($query) use ($languageId) {
-                            $query->where('language_id', $languageId);
-                        },
-                        'categories.translates' => function($query) use ($languageId) {
-                            $query->where('language_id', $languageId);
-                        }
-                    ])
-                    ->whereHas('categories', function($query) use ($categoryIds) {
-                        $query->whereIn('product_categories.id', $categoryIds);
-                    })
-                    ->active()
-                    ->orderBy('created_at', 'desc')
-                    ->limit(12)
-                    ->get()
-                    ->map(function ($product) use ($languageId) {
+                    $productsCollection = $this->productService->getProductsByCategories($categoryIds, $languageId, 12);
+                    
+                    $products = $productsCollection->map(function ($product) use ($languageId) {
                         $translation = $product->translates->first();
                         $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
                         
                         $categorySlug = null;
                         $parentSlug = null;
-                        if ($product->categories->isNotEmpty()) {
+                        if ($product->categories && $product->categories->isNotEmpty()) {
                             $category = $product->categories->first();
                             $categoryTranslation = $category->translates->first();
                             $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
@@ -195,18 +158,7 @@ class SeoPageController extends Controller
                     });
                 }
 
-                // Get all translations for slug_translations
-                $slugTranslations = \App\Models\SeoPageTranslate::where('seo_page_id', $seoPageTranslate->seo_page_id)
-                    ->with('language')
-                    ->get()
-                    ->mapWithKeys(function ($translation) {
-                        return [
-                            $translation->language->lang_code => $translation->slug
-                        ];
-                    })
-                    ->filter(function ($slug) {
-                        return !empty($slug); // Remove empty slugs
-                    });
+                $slugTranslations = $this->seoPageService->getSlugTranslations($seoPageTranslate->seo_page_id);
 
                 return [
                     'title' => $seoPageTranslate->title,
@@ -232,7 +184,6 @@ class SeoPageController extends Controller
                 ], 404);
             }
 
-            // Əgər title və ya slug boşdursa, sadəcə boş array qaytar
             if (empty($seoPageData['title']) || empty($seoPageData['slug'])) {
                 return response()->json([
                     'success' => false,
@@ -253,5 +204,4 @@ class SeoPageController extends Controller
             ], 500);
         }
     }
-
 }

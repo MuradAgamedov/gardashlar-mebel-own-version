@@ -11,51 +11,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 use OpenApi\Annotations as OA;
 
-/**
- * @OA\Tag(name="File Actions", description="API Endpoints for File Operations")
- */
 class FileActionController extends Controller
 {
-    /**
-     * @OA\Get(
-     *     path="/api/file/download",
-     *     operationId="downloadFile",
-     *     tags={"File Actions"},
-     *     summary="Download file by URL",
-     *     description="Downloads a file by providing the full URL path",
-     *     @OA\Parameter(
-     *         name="url",
-     *         in="query",
-     *         description="Full file URL (e.g., https://admin.gardaslar.coder.az/storage/kivs/filename.png)",
-     *         required=true,
-     *         @OA\Schema(type="string", example="https://admin.gardaslar.coder.az/storage/kivs/3eb74a1ab26761dc54a05d7e3de374790d39fe52_1754390181_p0aDbClx.png")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="File downloaded successfully",
-     *         @OA\MediaType(
-     *             mediaType="application/octet-stream",
-     *             @OA\Schema(type="string", format="binary")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="File not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="File not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Invalid URL provided",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Invalid URL provided")
-     *         )
-     *     )
-     * )
-     */
+   
     public function download(Request $request): Response|JsonResponse|BinaryFileResponse
     {
         try {

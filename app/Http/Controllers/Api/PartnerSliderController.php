@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\PartnerSliderResource;
 use App\Models\PartnerSlider;
-use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Traits\LocaleFromHeader;
@@ -21,26 +21,14 @@ class PartnerSliderController extends Controller
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
 
-            $sliders = PartnerSlider::with(['translates' => function($query) use ($languageId) {
-                $query->where('language_id', $languageId);
-            }])
-            ->active()
-            ->ordered()
-            ->get()
-            ->map(function ($slider) {
-                $translation = $slider->translates->first();
-                
-                return [
-                    'id' => $slider->id,
-                    'image_url' => $slider->image_url,
-                    'title' => $translation ? $translation->title : null,
-                    'link' => $slider->link,
-                ];
-            });
+            $sliders = PartnerSlider::with(['translates' => fn($q) => $q->where('language_id', $languageId)])
+                ->active()
+                ->ordered()
+                ->get();
 
             return response()->json([
                 'success' => true,
-                'data' => $sliders,
+                'data' => PartnerSliderResource::collection($sliders),
                 'message' => 'Partner sliders retrieved successfully'
             ]);
 
@@ -73,17 +61,9 @@ class PartnerSliderController extends Controller
                 ], 404);
             }
 
-            $translation = $slider->translates->first();
-
-            $data = [
-                'id' => $slider->id,
-                'image_url' => $slider->image_url,
-                'title' => $translation ? $translation->title : null,
-            ];
-
             return response()->json([
                 'success' => true,
-                'data' => $data,
+                'data' => new PartnerSliderResource($slider),
                 'message' => 'Partner slider retrieved successfully'
             ]);
 

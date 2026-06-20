@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\ProductType;
+use App\Interfaces\Services\Front\ProductTypeServiceInterface;
+use App\Interfaces\Services\Front\ProductServiceInterface;
 use App\Models\ProductCategory;
 use App\Models\ProductCompare;
 use Illuminate\Http\Request;
@@ -16,14 +16,26 @@ class ProductTypeProductController extends Controller
 {
     use LocaleFromHeader;
 
+    protected ProductTypeServiceInterface $productTypeService;
+    protected ProductServiceInterface $productService;
+
+    public function __construct(
+        ProductTypeServiceInterface $productTypeService,
+        ProductServiceInterface $productService
+    ) {
+        $this->productTypeService = $productTypeService;
+        $this->productService = $productService;
+    }
+
     public function index(Request $request, $productTypeId): JsonResponse
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
 
-            $productType = ProductType::where('id', $productTypeId)
-                ->where('status', true)
-                ->first();
+            $productType = $this->productTypeService->first([], [
+                'id' => $productTypeId,
+                'status' => true
+            ]);
 
             if (!$productType) {
                 return response()->json([
@@ -35,19 +47,7 @@ class ProductTypeProductController extends Controller
             $cacheKey = "api:product-type:{$productTypeId}:products:lang:{$languageId}";
 
             $products = Cache::rememberForever($cacheKey, function () use ($productTypeId, $languageId) {
-                return Product::whereHas('types', function ($q) use ($productTypeId) {
-                        $q->where('product_types.id', $productTypeId);
-                    })
-                    ->active()
-                    ->with([
-                        'translates' => fn ($q) => $q->where('language_id', $languageId),
-                        'types.translates' => fn ($q) => $q->where('language_id', $languageId),
-                        'images' => fn ($q) => $q->active()->ordered(),
-                        'images.translates' => fn ($q) => $q->where('language_id', $languageId),
-                        'categories.translates' => fn ($q) => $q->where('language_id', $languageId),
-                    ])
-                    ->orderBy('order')
-                    ->get();
+                return $this->productService->getProductsByProductType((int)$productTypeId, $languageId);
             });
 
             // 🔐 Auth user
@@ -68,7 +68,6 @@ class ProductTypeProductController extends Controller
                     ->pluck('product_id')
                     ->toArray();
 
-                // ✅ DÜZGÜN MODEL
                 $compareIds = ProductCompare::where('user_id', $user->id)
                     ->whereIn('product_id', $productIds)
                     ->pluck('product_id')
@@ -82,7 +81,7 @@ class ProductTypeProductController extends Controller
                 $categorySlug = null;
                 $parentSlug = null;
 
-                if ($product->categories->isNotEmpty()) {
+                if ($product->categories && $product->categories->isNotEmpty()) {
                     $category = $product->categories->first();
                     $tr = $category->translates->first();
                     $categorySlug = $tr ? $tr->slug : null;

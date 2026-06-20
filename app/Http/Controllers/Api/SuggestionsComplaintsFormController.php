@@ -3,16 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\SuggestionsComplaintsForm\StoreSuggestionsComplaintsFormRequest;
 use App\Models\SuggestionsComplaintsForm;
 use App\Services\FileService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Helpers\DictionaryHelper;
 use OpenApi\Annotations as OA;
 
-/**
- * @OA\Tag(name="Suggestions & Complaints Form", description="API Endpoints for Suggestions & Complaints Form")
- */
 class SuggestionsComplaintsFormController extends Controller
 {
     protected $fileService;
@@ -22,41 +19,10 @@ class SuggestionsComplaintsFormController extends Controller
         $this->fileService = $fileService;
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreSuggestionsComplaintsFormRequest $request): JsonResponse
     {
         try {
             $lang = $request->get('lang', 'az');
-
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'mobile' => [
-                    'required',
-                    'string',
-                    'max:20',
-                    'regex:/^(?:\+\d{1,3}[-\s]?)?(?:\(?\d{2,4}\)?[-\s]?){2,4}\d{2,4}$/'
-                ],
-                'email' => 'required|email|max:255',
-                'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,txt,jpg,jpeg,png|max:10240',
-                'message' => 'required|string|max:2000',
-            ], [
-                'name.required' => DictionaryHelper::trans('name_required', $lang),
-                'name.max' => DictionaryHelper::trans('name_max', $lang),
-
-                'mobile.required' => DictionaryHelper::trans('mobile_required', $lang),
-                'mobile.max' => DictionaryHelper::trans('mobile_max', $lang),
-                'mobile.regex' => DictionaryHelper::trans('mobile_invalid', $lang),
-
-                'email.required' => DictionaryHelper::trans('email_required', $lang),
-                'email.email' => DictionaryHelper::trans('email_email', $lang),
-                'email.max' => DictionaryHelper::trans('email_max', $lang),
-
-                'file.file' => DictionaryHelper::trans('file_invalid', $lang),
-                'file.mimes' => DictionaryHelper::trans('file_mimes', $lang),
-                'file.max' => DictionaryHelper::trans('file_max', $lang),
-
-                'message.required' => DictionaryHelper::trans('message_required', $lang),
-                'message.max' => DictionaryHelper::trans('message_max', $lang),
-            ]);
 
             $filePath = null;
             if ($request->hasFile('file')) {
@@ -94,12 +60,6 @@ class SuggestionsComplaintsFormController extends Controller
                 ]
             ], 201);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => DictionaryHelper::trans('validation_failed', $request->get('lang', 'az')),
-                'errors' => $e->errors()
-            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

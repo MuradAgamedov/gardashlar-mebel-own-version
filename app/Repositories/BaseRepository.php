@@ -222,11 +222,16 @@ abstract class BaseRepository implements BaseRepositoryInterface
             $query->ordered();
         }
         
-        $query->with(array_merge([
-            'translates' => function ($q) use ($languageId) {
-                $q->where('language_id', $languageId);
-            }
-        ], $relations));
+        $with = $relations;
+        if (method_exists($this->model, 'translates')) {
+            $with = array_merge([
+                'translates' => function ($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                }
+            ], $relations);
+        }
+        
+        $query->with($with);
         
         return $query->get();
     }
@@ -249,5 +254,23 @@ abstract class BaseRepository implements BaseRepositoryInterface
         ], $relations));
         
         return $query->find($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getActiveOrdered(array $with = []): Collection
+    {
+        $query = $this->query()->with($with);
+        
+        if (method_exists($this->model, 'scopeActive')) {
+            $query->active();
+        }
+        
+        if (method_exists($this->model, 'scopeOrdered')) {
+            $query->ordered();
+        }
+        
+        return $query->get();
     }
 }

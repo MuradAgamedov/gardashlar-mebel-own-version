@@ -24,18 +24,7 @@ class OurGoalController extends Controller
     }
 
 
-    /**
-     * @OA\Get(
-     *     path="/api/our-goals",
-     *     operationId="getOurGoals",
-     *     tags={"Our Goals"},
-     *     summary="Get all our goals",
-     *     description="Returns a list of all active our goals, translated based on locale header",
-     *     @OA\Parameter(name="locale", in="header", description="Language ID", required=false, @OA\Schema(type="integer", example=1)),
-     *     @OA\Response(response=200, description="Successful response", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=true), @OA\Property(property="data", type="array", @OA\Items(type="object", @OA\Property(property="id", type="integer", example=1), @OA\Property(property="title", type="string", example="Our Mission"), @OA\Property(property="description", type="string", example="To provide the best service to our customers"))))),
-     *     @OA\Response(response=500, description="Internal server error", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=false), @OA\Property(property="message", type="string", example="Error retrieving our goals")))
-     * )
-     */
+   
     public function index(Request $request): JsonResponse
     {
         try {

@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\ServiceForm\StoreServiceFormRequest;
 use App\Models\ServiceForm;
 use App\Models\Service;
 use App\Services\FileService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use App\Helpers\DictionaryHelper;
 
 class ServiceFormController extends Controller
@@ -19,53 +18,10 @@ class ServiceFormController extends Controller
         $this->fileService = $fileService;
     }
 
-    public function store(Request $request)
+    public function store(StoreServiceFormRequest $request)
     {
         try {
             $lang = $request->get('lang', 'az');
-
-            // Validate request
-            $validator = Validator::make($request->all(), [
-                'service_id' => 'required|integer|exists:services,id',
-                'name' => 'required|string|max:255',
-                'mobile' => [
-                    'required',
-                    'string',
-                    'max:20',
-                    'regex:/^(?:\+\d{1,3}[-\s]?)?(?:\(?\d{2,4}\)?[-\s]?){2,4}\d{2,4}$/'
-                ],
-                'email' => 'required|email|max:255',
-                'message' => 'required|string|max:1000',
-                'file' => 'nullable|file|max:10240|mimes:pdf,doc,docx',
-            ], [
-                'service_id.required' => DictionaryHelper::trans('service_id_required', $lang),
-                'service_id.exists' => DictionaryHelper::trans('service_not_found', $lang),
-
-                'name.required' => DictionaryHelper::trans('name_required', $lang),
-                'name.max' => DictionaryHelper::trans('name_max', $lang),
-
-                'mobile.required' => DictionaryHelper::trans('mobile_required', $lang),
-                'mobile.max' => DictionaryHelper::trans('mobile_max', $lang),
-                'mobile.regex' => DictionaryHelper::trans('mobile_invalid', $lang),
-
-                'email.required' => DictionaryHelper::trans('email_required', $lang),
-                'email.email' => DictionaryHelper::trans('email_email', $lang),
-                'email.max' => DictionaryHelper::trans('email_max', $lang),
-
-                'message.required' => DictionaryHelper::trans('message_required', $lang),
-                'message.max' => DictionaryHelper::trans('message_max', $lang),
-
-                'file.max' => DictionaryHelper::trans('file_max', $lang),
-                'file.mimes' => DictionaryHelper::trans('file_mimes', $lang),
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => DictionaryHelper::trans('validation_failed', $lang),
-                    'errors' => $validator->errors(),
-                ], 422);
-            }
 
             // Check if service exists and active
             $service = Service::active()->find($request->service_id);

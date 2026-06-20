@@ -12,9 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use OpenApi\Annotations as OA;
 
-/**
- * @OA\Tag(name="Become A Investor", description="API Endpoints for Become A Investor")
- */
+
 class BecomeAInvestorController extends Controller
 {
     use LocaleFromHeader;

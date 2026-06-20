@@ -3,97 +3,30 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\SocialNetwork\GetByTypesRequest;
+use App\Http\Resources\Api\SocialNetworkResource;
 use App\Models\SocialNetwork;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
-/**
- * @OA\Tag(
- *     name="Social Networks",
- *     description="API Endpoints for Social Networks"
- * )
- */
+
 class SocialNetworkController extends Controller
 {
-    /**
-     * @OA\Get(
-     *     path="/api/social-networks",
-     *     summary="Get all active social networks",
-     *     tags={"Social Networks"},
-     *     @OA\Response(
-     *         response=200,
-     *         description="List of social networks",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="array", @OA\Items(
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="type", type="string", example="facebook"),
-     *                 @OA\Property(property="name", type="string", example="Facebook"),
-     *                 @OA\Property(property="icon", type="string", example="fab fa-facebook"),
-     *                 @OA\Property(property="url", type="string", example="https://facebook.com/company"),
-     *                 @OA\Property(property="order", type="integer", example=1),
-     *                 @OA\Property(property="color", type="string", example="#1877F2")
-     *             ))
-     *         )
-     *     )
-     * )
-     */
+   
     public function index(): JsonResponse
     {
         $cacheKey = 'social_networks_active';
         
         $socialNetworks = Cache::remember($cacheKey, 3600, function () {
-            return SocialNetwork::getForFrontend();
+            return SocialNetwork::active()->ordered()->get();
         });
 
         return response()->json([
             'success' => true,
-            'data' => $socialNetworks
+            'data' => SocialNetworkResource::collection($socialNetworks)
         ]);
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/social-networks/{type}",
-     *     summary="Get social network by type",
-     *     tags={"Social Networks"},
-     *     @OA\Parameter(
-     *         name="type",
-     *         in="path",
-     *         required=true,
-     *         description="Social network type (e.g., facebook, instagram)",
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Social network details",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="type", type="string", example="facebook"),
-     *                 @OA\Property(property="name", type="string", example="Facebook"),
-     *                 @OA\Property(property="icon", type="string", example="fab fa-facebook"),
-     *                 @OA\Property(property="url", type="string", example="https://facebook.com/company"),
-     *                 @OA\Property(property="order", type="integer", example=1),
-     *                 @OA\Property(property="color", type="string", example="#1877F2")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Social network not found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Social network not found")
-     *         )
-     *     )
-     * )
-     */
     public function show(string $type): JsonResponse
     {
         $cacheKey = "social_network_{$type}";
@@ -111,10 +44,7 @@ class SocialNetworkController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'type' => $socialNetwork->type,
-                'url' => $socialNetwork->url
-            ]
+            'data' => new SocialNetworkResource($socialNetwork)
         ]);
     }
 
@@ -160,49 +90,24 @@ class SocialNetworkController extends Controller
      *     )
      * )
      */
-    public function getByTypesArray(Request $request): JsonResponse
+    public function getByTypesArray(GetByTypesRequest $request): JsonResponse
     {
-        $request->validate([
-            'types' => 'required|array',
-            'types.*' => 'string'
-        ]);
-
         $types = $request->types;
         $cacheKey = 'social_networks_by_types_' . md5(serialize($types));
         
         $socialNetworks = Cache::remember($cacheKey, 3600, function () use ($types) {
-            return SocialNetwork::getByTypes($types)
-                ->keyBy('type')
-                ->map(function ($socialNetwork) {
-                    return [
-                        'type' => $socialNetwork->type,
-                        'url' => $socialNetwork->url
-                    ];
-                });
+            return SocialNetwork::getByTypes($types)->keyBy('type');
         });
+
+        $data = $socialNetworks->map(fn($sn) => new SocialNetworkResource($sn));
 
         return response()->json([
             'success' => true,
-            'data' => $socialNetworks
+            'data' => $data
         ]);
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/social-networks/available-types",
-     *     summary="Get all available social network types",
-     *     tags={"Social Networks"},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Available social network types",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="array", @OA\Items(type="string"), example={"facebook", "instagram", "twitter"})
-     *         )
-     *     )
-     * )
-     */
+  
     public function getAvailableTypes(): JsonResponse
     {
         $cacheKey = 'social_networks_available_types';

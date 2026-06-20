@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Testimonial;
+use App\Interfaces\Services\Front\TestimonialServiceInterface;
+use App\Http\Resources\Api\TestimonialResource;
 use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -12,6 +13,13 @@ class TestimonialController extends Controller
 {
     use LocaleFromHeader;
 
+    protected TestimonialServiceInterface $testimonialService;
+
+    public function __construct(TestimonialServiceInterface $testimonialService)
+    {
+        $this->testimonialService = $testimonialService;
+    }
+
     /**
      * Display a listing of active testimonials.
      */
@@ -19,37 +27,14 @@ class TestimonialController extends Controller
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
-            
-            $query = Testimonial::with(['translates.language'])
-                ->where('status', true)
-                ->orderBy('order');
 
-            $testimonials = $query->get();
-
-            $formattedTestimonials = $testimonials->map(function ($testimonial) use ($languageId) {
-                // Get translation for the language from header
-                $translation = $testimonial->translates->where('language_id', $languageId)->first();
-                
-                // If no translation found for requested language, get the first available
-                if (!$translation) {
-                    $translation = $testimonial->translates->first();
-                }
-
-                return [
-                    'id' => $testimonial->id,
-                    'customer_image_url' => $testimonial->customer_image ? asset('storage/' . $testimonial->customer_image) : asset('images/default_image.webp'),
-                    'company_logo_url' => $testimonial->company_logo ? asset('storage/' . $testimonial->company_logo) : asset('images/default_image.webp'),
-                    'full_name' => $translation ? $translation->full_name : null,
-                    'position' => $translation ? $translation->position : null,
-                    'comment' => $translation ? $translation->comment : null,
-                ];
-            });
+            $testimonials = $this->testimonialService->getActiveOrderedWithTranslations($languageId);
 
             return response()->json([
                 'success' => true,
-                'data' => $formattedTestimonials,
+                'data' => TestimonialResource::collection($testimonials),
                 'message' => 'Testimonials retrieved successfully',
-                'total' => $formattedTestimonials->count(),
+                'total' => $testimonials->count(),
             ]);
 
         } catch (\Exception $e) {
@@ -69,30 +54,22 @@ class TestimonialController extends Controller
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
             
-            $testimonial = Testimonial::with(['translates.language'])
-                ->where('status', true)
-                ->findOrFail($id);
+            $testimonial = $this->testimonialService->first(['translates' => fn($q) => $q->where('language_id', $languageId)], [
+                'id' => $id,
+                'status' => true
+            ]);
 
-            // Get translation for the language from header
-            $translation = $testimonial->translates->where('language_id', $languageId)->first();
-            
-            // If no translation found for requested language, get the first available
-            if (!$translation) {
-                $translation = $testimonial->translates->first();
+            if (!$testimonial) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Testimonial not found',
+                    'data' => null
+                ], 404);
             }
-
-            $formattedTestimonial = [
-                'id' => $testimonial->id,
-                'customer_image_url' => $testimonial->customer_image ? asset('storage/' . $testimonial->customer_image) : null,
-                'company_logo_url' => $testimonial->company_logo ? asset('storage/' . $testimonial->company_logo) : null,
-                'full_name' => $translation ? $translation->full_name : null,
-                'position' => $translation ? $translation->position : null,
-                'comment' => $translation ? $translation->comment : null,
-            ];
 
             return response()->json([
                 'success' => true,
-                'data' => $formattedTestimonial,
+                'data' => new TestimonialResource($testimonial),
                 'message' => 'Testimonial retrieved successfully',
             ]);
 
@@ -111,11 +88,7 @@ class TestimonialController extends Controller
     public function withTranslations(Request $request): JsonResponse
     {
         try {
-            $query = Testimonial::with(['translates.language'])
-                ->where('status', true)
-                ->orderBy('order');
-
-            $testimonials = $query->get();
+            $testimonials = $this->testimonialService->getActiveOrdered(['translates.language']);
 
             $formattedTestimonials = $testimonials->map(function ($testimonial) {
                 $translations = $testimonial->translates->map(function ($translation) {

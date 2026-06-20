@@ -24,18 +24,7 @@ class CertificateController extends Controller
     }
 
 
-    /**
-     * @OA\Get(
-     *     path="/api/certificates",
-     *     operationId="getCertificates",
-     *     tags={"Certificates"},
-     *     summary="Get all certificates",
-     *     description="Returns a list of all active certificates, translated based on locale header",
-     *     @OA\Parameter(name="locale", in="header", description="Language ID", required=false, @OA\Schema(type="integer", example=1)),
-     *     @OA\Response(response=200, description="Successful response", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=true), @OA\Property(property="data", type="array", @OA\Items(type="object", @OA\Property(property="id", type="integer", example=1), @OA\Property(property="image_url", type="string", example="https://example.com/storage/certificates/certificate.jpg", nullable=true), @OA\Property(property="title", type="string", example="ISO 14001:2015 Certificate"), @OA\Property(property="date", type="string", example="2022-01-15"))))),
-     *     @OA\Response(response=500, description="Internal server error", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=false), @OA\Property(property="message", type="string", example="Error retrieving certificates")))
-     * )
-     */
+  
     public function index(Request $request): JsonResponse
     {
         try {

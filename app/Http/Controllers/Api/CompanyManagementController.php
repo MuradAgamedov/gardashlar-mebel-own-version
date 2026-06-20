@@ -22,51 +22,7 @@ class CompanyManagementController extends Controller
         $this->companyManagementService = $companyManagementService;
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/company-management",
-     *     summary="Get company management content",
-     *     description="Returns company management content with translated content based on header language",
-     *     tags={"Company Management"},
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language ID (1=Az, 2=En, 3=Ru)",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Company management retrieved successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Company management retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="content", type="string", example="<p>Şirkət idarəetməsi məzmunu...</p>")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Company management not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Company management not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving company management")
-     *         )
-     *     )
-     * )
-     */
+   
     public function index(Request $request)
     {
         try {

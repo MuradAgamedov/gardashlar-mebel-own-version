@@ -3,15 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\BecomeAPartnerForm\StoreBecomeAPartnerFormRequest;
 use App\Models\BecomeAPartnerForm;
 use App\Services\FileService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Annotations as OA;
 
-/**
- * @OA\Tag(name="Become A Partner Form", description="API Endpoints for Become A Partner Form")
- */
+
 class BecomeAPartnerFormController extends Controller
 {
     protected $fileService;
@@ -47,31 +45,9 @@ class BecomeAPartnerFormController extends Controller
      *     @OA\Response(response=500, description="Internal server error", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=false), @OA\Property(property="message", type="string", example="Error submitting form"), @OA\Property(property="data", type="object")))
      * )
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreBecomeAPartnerFormRequest $request): JsonResponse
     {
         try {
-            // Validation
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'mobile' => 'required|string|max:20',
-                'email' => 'required|email|max:255',
-                'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,txt|max:10240', // 10MB max
-                'message' => 'required|string|max:2000',
-            ], [
-                'name.required' => dict('name_required'),
-                'name.max' => dict('name_max'),
-                'mobile.required' => dict('mobile_required'),
-                'mobile.max' => dict('mobile_max'),
-                'email.required' => dict('email_required'),
-                'email.email' => dict('email_email'),
-                'email.max' => dict('email_max'),
-                'file.file' => dict('file_invalid'),
-                'file.mimes' => dict('file_mimes'),
-                'file.max' => dict('file_max'),
-                'message.required' => dict('message_required'),
-                'message.max' => dict('message_max'),
-            ]);
-
             // Handle file upload
             $filePath = null;
             if ($request->hasFile('file')) {
@@ -110,12 +86,6 @@ class BecomeAPartnerFormController extends Controller
                 ]
             ], 201);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

@@ -12,4 +12,13 @@ class CompanyRepository extends BaseRepository implements CompanyRepositoryInter
     {
         parent::__construct($model);
     }
+
+    public function getActiveBySlug(string $slug): ?Company
+    {
+        return $this->model->newQuery()
+            ->with(['translates.language'])
+            ->active()
+            ->whereHas('translates', fn($q) => $q->where('slug', $slug))
+            ->first();
+    }
 }

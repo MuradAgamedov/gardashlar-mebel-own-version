@@ -3,147 +3,72 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\PageResource;
 use App\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use App\Traits\LocaleFromHeader;
-use OpenApi\Annotations as OA;
 
 class PageController extends Controller
 {
     use LocaleFromHeader;
 
-   
-  public function index(Request $request): JsonResponse
-{
-    try {
-        $languageId = $this->getLanguageIdFromHeader($request);
-        $cacheKey = "api:pages:all:lang:{$languageId}";
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $languageId = $this->getLanguageIdFromHeader($request);
+            $cacheKey = "api:pages:all:lang:{$languageId}";
 
-        $pages = Cache::rememberForever($cacheKey, function () use ($languageId) {
-            return Page::where('status', true)
-                ->with(['translates.language']) // dil kodunu da almaq üçün
-                ->get()
-                ->map(function ($page) use ($languageId) {
-                    $translate = $page->translates->firstWhere('language_id', $languageId);
-
-                    // bütün dillər üzrə slug-lar
-                    $slugTranslations = $page->translates->mapWithKeys(function ($t) {
-                        return [$t->language->lang_code => $t->slug];
-                    });
-
-                    return [
-                        'id'              => $page->id,
-                        'keyword'         => $page->keyword,
-                        'title'           => $translate->title ?? null,
-                        'slug'            => $translate->slug ?? null,
-                        'seo_title'       => $translate->seo_title ?? null,
-                        'seo_keywords'    => $translate->seo_keywords ?? null,
-                        'seo_description' => $translate->seo_description ?? null,
-                        'opengraph_title' => $translate->opengraph_title ?? null,
-                        'opengraph_description' => $translate->opengraph_description ?? null,
-                        'opengraph_image' => $page->opengraph_image ? asset('storage/' . $page->opengraph_image) : null,
-                        'opengraph_image_width' => $page->opengraph_image_width ?? null,
-                        'opengraph_image_height' => $page->opengraph_image_height ?? null,
-                        'opengraph_image_alt_text' => $translate->opengraph_image_alt_text ?? null,
-
-                        // əlavə edilmiş çoxdilli slug array
-                        'translates' => [
-                            'slug' => $slugTranslations
-                        ],
-                    ];
-                });
-        });
-
-        return response()->json([
-            'success' => true,
-            'data' => $pages
-        ]);
-
-    } catch (\Throwable $e) {
-        report($e);
-        return response()->json([
-            'success' => false,
-            'message' => 'Error retrieving pages.',
-            'data' => []
-        ], 500);
-    }
-}
-
-public function findByKeyword(Request $request, $keyword): JsonResponse
-{
-    if (empty($keyword)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Keyword parameter is required',
-            'data' => null
-        ], 400);
-    }
-
-    try {
-        $languageId = $this->getLanguageIdFromHeader($request);
-        $cacheKey = "api:page:keyword:{$keyword}:lang:{$languageId}";
-
-        $responseData = Cache::rememberForever($cacheKey, function () use ($keyword, $languageId) {
-            $page = Page::where('status', true)
-                ->where('keyword', $keyword)
-                ->with(['translates.language']) // bütün dilləri və dil kodlarını gətir
-                ->first();
-
-            if (!$page) {
-                return null;
-            }
-
-            $translate = $page->translates->firstWhere('language_id', $languageId);
-
-            // bütün dillər üzrə slug-ları map edirik
-            $slugTranslations = $page->translates->mapWithKeys(function ($t) {
-                return [$t->language->lang_code => $t->slug];
+            $pages = Cache::rememberForever($cacheKey, function () {
+                return Page::where('status', true)
+                    ->with(['translates.language'])
+                    ->get();
             });
 
-            return [
-                'id'              => $page->id,
-                'title'           => $translate->title ?? null,
-                'slug'            => $translate->slug ?? null,
-                'seo_title'       => $translate->seo_title ?? null,
-                'seo_keywords'    => $translate->seo_keywords ?? null,
-                'seo_description' => $translate->seo_description ?? null,
-                'opengraph_title' => $translate->opengraph_title ?? null,
-                'opengraph_description' => $translate->opengraph_description ?? null,
-                'opengraph_image' => $page->opengraph_image ? asset('storage/' . $page->opengraph_image) : null,
-                'opengraph_image_width' => $page->opengraph_image_width ?? null,
-                'opengraph_image_height' => $page->opengraph_image_height ?? null,
-                'opengraph_image_alt_text' => $translate->opengraph_image_alt_text ?? null,
+            $resources = $pages->map(function ($page) use ($languageId) {
+                $resource = new PageResource($page);
+                $resource->languageId = $languageId;
+                return $resource;
+            });
 
-                // yeni əlavə olunan çoxdilli slug array
-                'translates' => [
-                    'slug' => $slugTranslations
-                ],
-            ];
-        });
+            return response()->json(['success' => true, 'data' => $resources]);
 
-        if (!$responseData) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Page not found with this keyword',
-                'data' => null
-            ], 404);
+        } catch (\Throwable $e) {
+            report($e);
+            return response()->json(['success' => false, 'message' => 'Error retrieving pages.', 'data' => []], 500);
+        }
+    }
+
+    public function findByKeyword(Request $request, $keyword): JsonResponse
+    {
+        if (empty($keyword)) {
+            return response()->json(['success' => false, 'message' => 'Keyword parameter is required', 'data' => null], 400);
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => $responseData
-        ]);
+        try {
+            $languageId = $this->getLanguageIdFromHeader($request);
+            $cacheKey = "api:page:keyword:{$keyword}:lang:{$languageId}";
 
-    } catch (\Throwable $e) {
-        report($e);
-        return response()->json([
-            'success' => false,
-            'message' => 'Error retrieving page.',
-            'data' => null
-        ], 500);
+            $page = Cache::rememberForever($cacheKey, function () use ($keyword) {
+                return Page::where('status', true)
+                    ->where('keyword', $keyword)
+                    ->with(['translates.language'])
+                    ->first();
+            });
+
+            if (!$page) {
+                return response()->json(['success' => false, 'message' => 'Page not found with this keyword', 'data' => null], 404);
+            }
+
+            $resource = new PageResource($page);
+            $resource->languageId = $languageId;
+
+            return response()->json(['success' => true, 'data' => $resource]);
+
+        } catch (\Throwable $e) {
+            report($e);
+            return response()->json(['success' => false, 'message' => 'Error retrieving page.', 'data' => null], 500);
+        }
     }
-}
-
 }

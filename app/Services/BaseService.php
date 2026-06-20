@@ -134,4 +134,12 @@ abstract class BaseService implements BaseServiceInterface
     {
         return $this->repository->getByIdWithTranslations($id, $languageId, $relations);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getActiveOrdered(array $with = []): Collection
+    {
+        return $this->repository->getActiveOrdered($with);
+    }
 }

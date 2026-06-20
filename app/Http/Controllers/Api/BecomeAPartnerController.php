@@ -12,12 +12,7 @@ use Illuminate\Support\Facades\Cache;
 use OpenApi\Annotations as OA;
 use App\Traits\LocaleFromHeader;
 
-/**
- * @OA\Tag(
- *     name="Become A Partner",
- *     description="API Endpoints for Become A Partner"
- * )
- */
+
 class BecomeAPartnerController extends Controller
 {
     use LocaleFromHeader;
@@ -33,68 +28,7 @@ class BecomeAPartnerController extends Controller
         $this->becomeAPartnerAdvantageService = $becomeAPartnerAdvantageService;
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/become-a-partner",
-     *     operationId="getBecomeAPartner",
-     *     tags={"Become A Partner"},
-     *     summary="Get become a partner data with advantages",
-     *     description="Returns become a partner information with all active advantages",
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language ID (1=En, 3=Az)",
-     *         required=true,
-     *         @OA\Schema(type="integer", example=3)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful response",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Become a partner data retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="content", type="string", example="Join our team and grow together..."),
-     *                 @OA\Property(
-     *                     property="advantages",
-     *                     type="array",
-     *                     @OA\Items(
-     *                         type="object",
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="icon", type="string", example="https://example.com/storage/become-a-partner-advantages/icon.svg"),
-     *                         @OA\Property(property="title", type="string", example="Quality Products"),
-     *                         @OA\Property(property="description", type="string", example="We offer the best quality products...")
-     *                     )
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Become a partner data not found",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Become a partner data not found"),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving become a partner data"),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     )
-     * )
-     */
+  
     public function index(Request $request): JsonResponse
     {
         try {

@@ -3,16 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Auth\RegisterRequest;
+use App\Http\Requests\Api\Auth\LoginRequest;
+use App\Http\Requests\Api\Auth\SendOtpRequest;
+use App\Http\Requests\Api\Auth\ResendOtpRequest;
+use App\Http\Requests\Api\Auth\VerifyOtpRequest;
+use App\Http\Requests\Api\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Api\Auth\VerifyResetOtpRequest;
+use App\Http\Requests\Api\Auth\ResetPasswordRequest;
+use App\Http\Requests\Api\Auth\UpdateProfileRequest;
+use App\Http\Requests\Api\Auth\ConfirmEmailChangeRequest;
+use App\Http\Requests\Api\Auth\GoogleLoginRequest;
 use App\Models\User;
 use App\Services\EmailService;
 use App\Services\PhoneService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Google\Client as GoogleClient;
-use App\Models\Dictionary;
-use App\Models\Language;
 class AuthController extends Controller
 {
     protected $emailService;
@@ -25,61 +33,13 @@ class AuthController extends Controller
     }
 
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
         // Debug: Log incoming request data
         \Log::info('Registration request received', [
             'data' => $request->all(),
             'headers' => $request->headers->all()
         ]);
-
-        $validator = Validator::make($request->all(), [
-            'full_name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-            'password_confirmation' => 'required|string|min:6',
-            'fin' => [
-                'nullable', 
-                'regex:/^[A-NP-Z0-9]{7}$/',
-                function ($attribute, $value, $fail) {
-                    // Check if FIN already exists in database
-                    if ($value) {
-                        $exists = \App\Models\User::where('fin', $value)->exists();
-                        if ($exists) {
-                            $fail(dict('fin_unique'));
-                        }
-                    }
-                }
-            ],
-        ], [
-            'full_name.required' => 'Ad və soyad məcburidir',
-            'phone.nullable' => 'Telefon nömrəsi seçimlidir',
-            'email.nullable' => 'Email ünvanı seçimlidir',
-            'email.email' => 'Düzgün email ünvanı daxil edin',
-            'email.unique' => 'user_already_exists',
-            'password.required' => 'Şifrə məcburidir',
-            'password.min' => 'Şifrə ən azı 6 simvol olmalıdır',
-            'password.confirmed' => 'Şifrə təkrarı düzgün deyil',
-            'password_confirmation.required' => 'Şifrə təkrarı məcburidir',
-            'fin.regex' => 'FIN yalnız 7 simvoldan ibarət olmalı və A-N, P-Z və 0-9 aralığında olmalıdır',
-        ]);
-        
-
-        // Custom validation: either phone or email must be provided
-        $validator->after(function ($validator) use ($request) {
-            if (empty($request->phone) && empty($request->email)) {
-                $validator->errors()->add('contact_info', 'Telefon nömrəsi və ya email ünvanından ən azı biri məcburidir');
-            }
-        });
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
 
         try {
             // Create user first
@@ -175,31 +135,8 @@ class AuthController extends Controller
     }
 
 
-    public function sendOTP(Request $request)
+    public function sendOTP(SendOtpRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email',
-        ], [
-            'phone.nullable' => 'Telefon nömrəsi seçimlidir',
-            'email.nullable' => 'Email ünvanı seçimlidir',
-            'email.email' => 'Düzgün email ünvanı daxil edin',
-        ]);
-
-        // Custom validation: either phone or email must be provided
-        $validator->after(function ($validator) use ($request) {
-            if (empty($request->phone) && empty($request->email)) {
-                $validator->errors()->add('contact_info', 'Telefon nömrəsi və ya email ünvanından ən azı biri məcburidir');
-            }
-        });
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
         app()->setLocale('en');    
         try {
             if (!empty($request->email)) {
@@ -241,34 +178,8 @@ class AuthController extends Controller
     }
 
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'nullable|email',
-            'phone' => 'nullable|string|max:20',
-            'password' => 'required|string',
-        ], [
-            'email.nullable' => dict('email_nullable'),
-            'email.email' => dict('email_email'),
-            'phone.nullable' => dict('phone_nullable'),
-            'password.required' => dict('password_required'),
-        ]);
-
-        // Custom validation: either phone or email must be provided
-        $validator->after(function ($validator) use ($request) {
-            if (empty($request->phone) && empty($request->email)) {
-                $validator->errors()->add('contact_info', __('Telefon nömrəsi və ya email ünvanından ən azı biri məcburidir'));
-            }
-        });
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         try {
             // Find user by email or phone
             $user = null;
@@ -373,34 +284,8 @@ class AuthController extends Controller
     }
 
    
-    public function resendOTP(Request $request)
+    public function resendOTP(ResendOtpRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email',
-            'purpose' => 'nullable|string|in:registration,password_reset',
-        ], [
-            'phone.nullable' => dict('phone_nullable'),
-            'email.nullable' => dict('email_nullable'),
-            'email.email' => dict('email_email'),
-            'purpose.in' => dict('purpose_in'),
-        ]);
-
-        // Custom validation: either phone or email must be provided
-        $validator->after(function ($validator) use ($request) {
-            if (empty($request->phone) && empty($request->email)) {
-                $validator->errors()->add('contact_info', dict('contact_info'));
-            }
-        });
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         try {
             $contactInfo = !empty($request->email) ? $request->email : $request->phone;
             $contactType = !empty($request->email) ? 'email' : 'phone';
@@ -497,35 +382,8 @@ class AuthController extends Controller
     }
 
   
-    public function verifyOTP(Request $request)
+    public function verifyOTP(VerifyOtpRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email',
-            'otp_code' => 'required|string|size:6',
-        ], [
-            'phone.nullable' => dict('phone_nullable'),
-            'email.nullable' => dict('email_nullable'),
-            'email.email' => dict('email_email'),
-            'otp_code.required' => dict('otp_code_required'),
-            'otp_code.size' => dict('otp_code_size'),
-        ]);
-
-        // Custom validation: either phone or email must be provided
-        $validator->after(function ($validator) use ($request) {
-            if (empty($request->phone) && empty($request->email)) {
-                $validator->errors()->add('contact_info', 'Telefon nömrəsi və ya email ünvanından ən azı biri məcburidir');
-            }
-        });
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         try {
             $otpVerified = false;
             $contactType = '';
@@ -575,23 +433,8 @@ class AuthController extends Controller
     }
 
    
-    public function forgotPassword(Request $request)
+    public function forgotPassword(ForgotPasswordRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-        ], [
-            'email.required' => 'Email ünvanı məcburidir',
-            'email.email' => 'Düzgün email ünvanı daxil edin',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         try {
             // Check if user exists
             $user = User::where('email', $request->email)->first();
@@ -668,26 +511,8 @@ class AuthController extends Controller
     }
 
    
-    public function verifyResetOTP(Request $request)
+    public function verifyResetOTP(VerifyResetOtpRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'otp_code' => 'required|string|size:6',
-        ], [
-            'email.required' => 'Email ünvanı məcburidir',
-            'email.email' => 'Düzgün email ünvanı daxil edin',
-            'otp_code.required' => 'OTP kodu məcburidir',
-            'otp_code.size' => 'OTP kodu 6 simvol olmalıdır',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         try {
             // Find the OTP record
             $otpRecord = \App\Models\OtpCode::where('contact_info', $request->email)
@@ -747,44 +572,8 @@ class AuthController extends Controller
     }
 
    
-    public function resetPassword(Request $request)
+    public function resetPassword(ResetPasswordRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'reset_token' => 'required|string',
-            'password' => 'required|string|min:8|confirmed',
-            'password_confirmation' => 'required|string|min:8',
-        ], [
-            'reset_token.required' => 'Reset token məcburidir',
-            'password.required' => 'Şifrə məcburidir',
-            'password.min' => 'Şifrə ən azı 8 simvol olmalıdır',
-            'password.confirmed' => 'Şifrə təkrarı düzgün deyil',
-            'password_confirmation.required' => 'Şifrə təkrarı məcburidir',
-        ]);
-
-        // Additional password validation with regex (like RegisterController)
-        $validator->after(function ($validator) use ($request) {
-            $password = $request->password;
-            if (!empty($password)) {
-                if (!preg_match('/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/', $password)) {
-                    $validator->errors()->add('password', 'Şifrədə ən azı bir xüsusi simvol olmalıdır (!@#$%^&* və s.)');
-                }
-                if (!preg_match('/\d/', $password)) {
-                    $validator->errors()->add('password', 'Şifrədə ən azı bir rəqəm olmalıdır');
-                }
-                if (!preg_match('/[A-Z]/', $password)) {
-                    $validator->errors()->add('password', 'Şifrədə ən azı bir böyük hərf olmalıdır');
-                }
-            }
-        });
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         try {
             // Get email from cache using reset token
             $email = \Cache::get("password_reset_token_{$request->reset_token}");
@@ -858,68 +647,10 @@ class AuthController extends Controller
     }
 
    
-    public function updateProfile(Request $request)
+    public function updateProfile(UpdateProfileRequest $request)
     {
         try {
             $user = auth()->user();
-
-            $validator = Validator::make($request->all(), [
-                'name' => 'sometimes|required|string|max:255',
-                'surname' => 'sometimes|required|string|max:255',
-                'phone' => 'sometimes|nullable|string|max:20',
-                'email' => [
-                    'sometimes',
-                    'nullable',
-                    'email',
-                    function ($attribute, $value, $fail) use ($user) {
-                        // Only check uniqueness if email is actually being changed
-                        if ($value && $value !== $user->email) {
-                            $exists = \App\Models\User::where('email', $value)
-                                ->where('id', '!=', $user->id)
-                                ->exists();
-                            if ($exists) {
-                                $fail(dict('email_exists'));
-                            }
-                        }
-                    }
-                ],
-                                'fin' => [
-                    'nullable',
-                    'string',
-                    function ($attribute, $value, $fail) use ($user) {
-                        // Only check uniqueness if FIN is actually being changed
-                        if ($value && $value !== $user->fin) {
-                            $exists = \App\Models\User::where('fin', $value)
-                                ->where('id', '!=', $user->id)
-                                ->exists();
-                            if ($exists) {
-                                $fail(dict('fin_unique'));
-                            }
-                        }
-                    }
-                ]
-            ], [
-                'name.required' => dict('name_required'),
-                'name.string' => dict('name_invalid'),
-                'name.max' => dict('name_max'),
-                'surname.required' => dict('surname_required'),
-                'surname.string' => dict('surname_invalid'),
-                'surname.max' => dict('surname_max'),
-                'phone.string' => dict('phone_invalid'),
-                'phone.max' => dict('phone_max'),
-                'email.email' => dict('email_invalid'),
-                'email.unique' => dict('email_exists'),
-                'fin.string' => dict('fin_invalid'),
-                'fin.unique' => dict('fin_unique'),
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => dict('validation_error'),
-                    'errors' => $validator->errors()
-                ], 422);
-            }
 
             $otpSent = false;
             $oldEmail = $user->email;
@@ -1012,26 +743,10 @@ class AuthController extends Controller
     }
 
     
-    public function confirmEmailChange(Request $request)
+    public function confirmEmailChange(ConfirmEmailChangeRequest $request)
     {
         try {
             $user = auth()->user();
-
-            $validator = Validator::make($request->all(), [
-                'otp_code' => 'required|string|size:6',
-            ], [
-                'otp_code.required' => 'OTP kod məcburidir',
-                'otp_code.string' => 'OTP kod mətn formatında olmalıdır',
-                'otp_code.size' => 'OTP kod 6 rəqəm olmalıdır',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
 
             // Check if user has pending email
             if (!$user->pending_email) {
@@ -1222,23 +937,8 @@ class AuthController extends Controller
         }
     }
 
-public function googleLogin(Request $request)
+public function googleLogin(GoogleLoginRequest $request)
 {
-    $validator = Validator::make($request->all(), [
-        'token' => 'required|string',
-    ], [
-        'token.required' => __('Client ID məcburdur'),
-        'token.string' => __('Client ID mətn formatında olmalıdır'),
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'success' => false,
-            'message' => __('Validasiya xətası'),
-            'errors' => $validator->errors()
-        ], 422);
-    }
-
     try {
         // Use token as Google ID token with proper scopes
         $client = new GoogleClient(['client_id' => env('GOOGLE_CLIENT_ID')]);

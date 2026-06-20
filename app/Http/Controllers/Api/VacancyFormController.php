@@ -3,81 +3,41 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\VacancyForm;
-use App\Models\Vacancy;
+use App\Http\Requests\Api\VacancyForm\StoreVacancyFormRequest;
+use App\Interfaces\Services\Front\VacancyFormServiceInterface;
+use App\Interfaces\Services\Front\VacancyServiceInterface;
 use App\Services\FileService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use App\Helpers\DictionaryHelper;
-use OpenApi\Annotations as OA;
 
-/**
- * @OA\Tag(name="Vacancy Form", description="API Endpoints for Vacancy Form Submission")
- */
 class VacancyFormController extends Controller
 {
-    protected $fileService;
+    protected FileService $fileService;
+    protected VacancyFormServiceInterface $vacancyFormService;
+    protected VacancyServiceInterface $vacancyService;
 
-    public function __construct(FileService $fileService)
-    {
+    public function __construct(
+        FileService $fileService,
+        VacancyFormServiceInterface $vacancyFormService,
+        VacancyServiceInterface $vacancyService
+    ) {
         $this->fileService = $fileService;
+        $this->vacancyFormService = $vacancyFormService;
+        $this->vacancyService = $vacancyService;
     }
 
-    public function store(Request $request)
+    public function store(StoreVacancyFormRequest $request)
     {
         try {
             $lang = $request->header('locale', 'az');
 
-            // Validation
-            $validator = Validator::make($request->all(), [
-                'vacancy_id' => 'required|integer|exists:vacancies,id',
-                'name' => 'required|string|max:255',
-                'mobile' => [
-                    'required',
-                    'string',
-                    'max:20',
-                    'regex:/^(?:\+\d{1,3}[-\s]?)?(?:\(?\d{2,4}\)?[-\s]?){2,4}\d{2,4}$/'
-                ],
-                'email' => 'required|email|max:255',
-                'message' => 'required|string|max:1000',
-                'file' => 'nullable|file|max:10240|mimes:pdf,doc,docx',
-            ], [
-                'vacancy_id.required' => DictionaryHelper::trans('vacancy_id_required', $lang),
-                'vacancy_id.exists' => DictionaryHelper::trans('vacancy_not_found', $lang),
-
-                'name.required' => DictionaryHelper::trans('name_required', $lang),
-                'name.max' => DictionaryHelper::trans('name_max', $lang),
-
-                'mobile.required' => DictionaryHelper::trans('mobile_required', $lang),
-                'mobile.max' => DictionaryHelper::trans('mobile_max', $lang),
-                'mobile.regex' => DictionaryHelper::trans('mobile_invalid', $lang),
-
-                'email.required' => DictionaryHelper::trans('email_required', $lang),
-                'email.email' => DictionaryHelper::trans('email_email', $lang),
-                'email.max' => DictionaryHelper::trans('email_max', $lang),
-
-                'message.required' => DictionaryHelper::trans('message_required', $lang),
-                'message.max' => DictionaryHelper::trans('message_max', $lang),
-
-                'file.max' => DictionaryHelper::trans('file_max', $lang),
-                'file.mimes' => DictionaryHelper::trans('file_mimes', $lang),
+            // Check if vacancy exists and active
+            $vacancy = $this->vacancyService->first([], [
+                'id' => $request->vacancy_id,
+                'status' => true
             ]);
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => DictionaryHelper::trans('validation_failed', $lang),
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            // Check if vacancy exists and active
-            $vacancy = Vacancy::where('id', $request->vacancy_id)
-                ->active()
-                ->notExpired()
-                ->first();
-
-            if (!$vacancy) {
+            // Check expiration on vacancy if needed
+            if (!$vacancy || ($vacancy->expire_date && \Carbon\Carbon::parse($vacancy->expire_date)->isPast())) {
                 return response()->json([
                     'success' => false,
                     'message' => DictionaryHelper::trans('vacancy_not_available', $lang),
@@ -106,7 +66,7 @@ class VacancyFormController extends Controller
             }
 
             // Create record
-            $form = VacancyForm::create([
+            $form = $this->vacancyFormService->create([
                 'vacancy_id' => $request->vacancy_id,
                 'name' => trim($request->name),
                 'mobile' => trim($request->mobile),

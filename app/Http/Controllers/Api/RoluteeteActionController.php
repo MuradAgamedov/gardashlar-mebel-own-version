@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Resources\Api\RoluteeteActionResource;
 use App\Models\RoluteeteAction;
 use App\Models\UserRoluteeteAction;
-use App\Models\Language;
+use Illuminate\Http\Request;
 use App\Traits\LocaleFromHeader;
 class RoluteeteActionController extends Controller
 {
@@ -16,23 +16,13 @@ class RoluteeteActionController extends Controller
         $languageId = $this->getLanguageIdFromHeader($request);
 
         $actions = RoluteeteAction::where('status', 1)
-            ->with(['translates' => function($q) use ($languageId) {
-                $q->where('language_id', $languageId);
-            }])
+            ->with(['translates' => fn($q) => $q->where('language_id', $languageId)])
             ->orderBy('id', 'desc')
-            ->get()
-            ->map(function ($action) {
-                $tr = $action->translates->first();
-                return [
-                    'id'      => $action->id,
-                    'percent' => $action->percent,
-                    'title'   => $tr ? $tr->title : null,
-                ];
-            });
+            ->get();
 
         return response()->json([
             'success' => true,
-            'data'    => $actions,
+            'data'    => RoluteeteActionResource::collection($actions),
         ]);
     }
 

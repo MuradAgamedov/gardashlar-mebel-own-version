@@ -9,66 +9,11 @@ use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
-/**
- * @OA\Tag(
- *     name="Suggestions",
- *     description="API Endpoints for suggestions"
- * )
- */
+
 class SuggestionController extends Controller
 {
     use LocaleFromHeader;
-    /**
-     * @OA\Get(
-     *     path="/api/suggestions",
-     *     summary="Get all active suggestions",
-     *     tags={"Suggestions"},
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language ID (1=az, 2=en, 3=ru)",
-     *         required=false,
-     *         @OA\Schema(type="integer", default=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Suggestions retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="title", type="string", example="Məhsul Tövsiyyəsi 1"),
-     *                     @OA\Property(property="image_alt_text", type="string", example="Məhsul tövsiyyəsi şəkli"),
-     *                     @OA\Property(property="image", type="string", example="https://admin.gardaslar.coder.az/storage/suggestions/sample-suggestion-1.jpg"),
-     *                     @OA\Property(property="pdf", type="string", nullable=true, example="https://admin.gardaslar.coder.az/storage/suggestions/pdfs/sample-pdf-1.pdf"),
-     *                     @OA\Property(property="has_pdf", type="boolean", example=true),
-     *                     @OA\Property(property="order", type="integer", example=1)
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Invalid language ID",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Invalid language ID")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving suggestions")
-     *         )
-     *     )
-     * )
-     */
+   
     public function index(Request $request)
     {
         try {
@@ -118,61 +63,7 @@ class SuggestionController extends Controller
         }
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/suggestions/{id}",
-     *     summary="Get a specific suggestion by ID",
-     *     tags={"Suggestions"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="Suggestion ID",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Parameter(
-     *         name="locale",
-     *         in="header",
-     *         description="Language ID (1=az, 2=en, 3=ru)",
-     *         required=false,
-     *         @OA\Schema(type="integer", default=1)
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful operation",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Suggestion retrieved successfully"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="title", type="string", example="Məhsul Tövsiyyəsi 1"),
-     *                 @OA\Property(property="image_alt_text", type="string", example="Məhsul tövsiyyəsi şəkli"),
-     *                 @OA\Property(property="image", type="string", example="suggestions/sample-suggestion-1.jpg"),
-     *                 @OA\Property(property="pdf", type="string", nullable=true, example="suggestions/pdfs/sample-pdf-1.pdf"),
-     *                 @OA\Property(property="order", type="integer", example=1)
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Suggestion not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Suggestion not found")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error retrieving suggestion")
-     *         )
-     *     )
-     * )
-     */
+ 
     public function show(Request $request, $id)
     {
         try {

@@ -3,19 +3,25 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\SuggestAPlace;
+use App\Interfaces\Services\Front\SuggestAPlaceServiceInterface;
+use App\Http\Resources\Api\SuggestAPlaceResource;
 use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use OpenApi\Annotations as OA;
 
-/**
- * @OA\Tag(name="Suggest A Place", description="API Endpoints for Suggest A Place")
- */
+
 class SuggestAPlaceController extends Controller
 {
     use LocaleFromHeader;
+
+    protected SuggestAPlaceServiceInterface $suggestAPlaceService;
+
+    public function __construct(SuggestAPlaceServiceInterface $suggestAPlaceService)
+    {
+        $this->suggestAPlaceService = $suggestAPlaceService;
+    }
    
     public function index(Request $request): JsonResponse
     {
@@ -23,34 +29,22 @@ class SuggestAPlaceController extends Controller
             $languageId = $this->getLanguageIdFromHeader($request);
             $cacheKey = "api_suggest_a_place_{$languageId}";
             
-            $data = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                $suggestAPlace = SuggestAPlace::first();
-                
-                if (!$suggestAPlace) {
-                    return null;
-                }
-                
-                $translation = $suggestAPlace->translates()->where('language_id', $languageId)->first();
-                
-                return [
-                    'id' => $suggestAPlace->id,
-                    'title' => $translation ? $translation->title : '',
-                    'description' => $translation ? $translation->description : '',
-                ];
+            $suggestAPlace = Cache::rememberForever($cacheKey, function () use ($languageId) {
+                return $this->suggestAPlaceService->first(['translates' => fn($q) => $q->where('language_id', $languageId)]);
             });
-            
-            if (!$data) {
+
+            if (!$suggestAPlace) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Suggest a place data not found',
                     'data' => null
                 ], 404);
             }
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Suggest a place data retrieved successfully',
-                'data' => $data
+                'data' => new SuggestAPlaceResource($suggestAPlace)
             ], 200);
             
         } catch (\Exception $e) {

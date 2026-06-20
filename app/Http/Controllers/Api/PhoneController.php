@@ -3,17 +3,27 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Phone;
+use App\Interfaces\Services\Front\PhoneServiceInterface;
+use App\Interfaces\Services\Front\PhoneTypeServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use App\Traits\LocaleFromHeader;
-use OpenApi\Annotations as OA;
 
 class PhoneController extends Controller
 {
     use LocaleFromHeader;
 
+    protected PhoneServiceInterface $phoneService;
+    protected PhoneTypeServiceInterface $phoneTypeService;
+
+    public function __construct(
+        PhoneServiceInterface $phoneService,
+        PhoneTypeServiceInterface $phoneTypeService
+    ) {
+        $this->phoneService = $phoneService;
+        $this->phoneTypeService = $phoneTypeService;
+    }
 
     public function generalPhones(Request $request): JsonResponse
     {
@@ -21,11 +31,7 @@ class PhoneController extends Controller
             $cacheKey = 'api_general_phones';
 
             $phones = Cache::rememberForever($cacheKey, function () {
-                return Phone::select(['id', 'phone'])
-                    ->where('phone_type_id', 3)
-                    ->where('status', true)
-                    ->orderBy('order')
-                    ->get();
+                return $this->phoneService->getPhonesByType(3);
             });
 
             return response()->json([
@@ -42,31 +48,16 @@ class PhoneController extends Controller
         }
     }
 
-
     public function phones(Request $request): JsonResponse
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
             $cacheKey = "api_phones_{$languageId}";
 
-            // 🔹 Cache təmizlə (test zamanı köhnə nəticə qalmasın)
             Cache::forget($cacheKey);
 
             $phoneTypes = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                return \App\Models\PhoneType::with([
-                    'translates' => function ($query) use ($languageId) {
-                        $query->where('language_id', $languageId);
-                    },
-                    'phones' => function ($query) {
-                        $query->where('status', true)
-                            ->where('id', '!=', 15) // 🔹 15 id-li phone çıxarılır
-                            ->orderBy('order');
-                    }
-                ])
-                    ->where('status', true)
-                    ->whereNotIn('id', [3, 15]) // 🔹 3 və 15 id-li PhoneType çıxarılır
-                    ->orderBy('order')
-                    ->get()
+                return $this->phoneTypeService->getPhonesGroupedByTypes($languageId)
                     ->map(function ($phoneType) {
                         $translation = $phoneType->translates->first();
                         return [
@@ -76,7 +67,7 @@ class PhoneController extends Controller
                                     'id' => $phone->id,
                                     'phone' => $phone->phone,
                                 ];
-                            })->values(), // 🔹 indexləri sıfırla (frontend üçün daha təmiz)
+                            })->values(),
                         ];
                     });
             });
@@ -95,26 +86,18 @@ class PhoneController extends Controller
         }
     }
 
-
     public function specialPhone(Request $request): JsonResponse
     {
         try {
             $cacheKey = 'api_special_phone_type_15';
 
             $phone = Cache::rememberForever($cacheKey, function () {
-                $phoneType = \App\Models\PhoneType::with(['phones' => function ($query) {
-                    $query->where('status', true)
-                          ->orderBy('order');
-                }])
-                ->where('id', 15) // 🔹 PhoneType id = 15
-                ->where('status', true)
-                ->first();
+                $phoneType = $this->phoneTypeService->getSpecialPhone(15);
 
                 if (!$phoneType || $phoneType->phones->isEmpty()) {
-                    return null; // Əgər 15-ci PhoneType və ya aktiv nömrə yoxdursa
+                    return null;
                 }
 
-                // 🔹 Yalnız birinci nömrəni götür və sadəcə nömrəni qaytar
                 return $phoneType->phones->first()->phone;
             });
 
@@ -131,8 +114,4 @@ class PhoneController extends Controller
             ], 500);
         }
     }
-
-
-
-
 }

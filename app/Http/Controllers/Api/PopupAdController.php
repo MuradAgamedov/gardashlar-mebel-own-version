@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\PopupAd;
+use App\Interfaces\Services\Front\PopupAdServiceInterface;
+use App\Http\Resources\Api\PopupAdResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -13,55 +14,35 @@ class PopupAdController extends Controller
 {
     use LocaleFromHeader;
 
-    /**
-     * GET /api/popup-ads
-     */
+    protected PopupAdServiceInterface $popupAdService;
+
+    public function __construct(PopupAdServiceInterface $popupAdService)
+    {
+        $this->popupAdService = $popupAdService;
+    }
+
     public function index(Request $request): JsonResponse
     {
         try {
-            // Dil ID-ni header-dən götür
             $languageId = $this->getLanguageIdFromHeader($request);
-
-            // Cache key
             $cacheKey = "api_popup_ads_{$languageId}";
 
             $popupAds = Cache::rememberForever($cacheKey, function () use ($languageId) {
-
-                return PopupAd::with(['translations' => function ($query) use ($languageId) {
-                        $query->where('language_id', $languageId);
-                    }])
-                    ->where('status', 1)   // <-- BURDA DÜZƏLDİLDİ
-                    ->orderBy('order')
-                    ->get()
-                    ->map(function ($popup) {
-                        $tr = $popup->translations->first();
-
-                        return [
-                            'id'            => $popup->id,
-
-                            'image_url'     => $popup->image
-                                ? asset('storage/' . $popup->image)
-                                : asset('images/default_image.webp'),
-
-                            'title'         => $tr?->title ?? '',
-                            'description'   => $tr?->description ?? '',
-                            'image_alt_text'=> $tr?->image_alt_text ?? '',
-                            'link'          => $tr?->link ?? '',
-                        ];
-                    });
+                return $this->popupAdService->getActiveOrderedWithTranslations($languageId, [
+                    'translations' => fn($q) => $q->where('language_id', $languageId)
+                ]);
             });
 
             return response()->json([
                 'success' => true,
-                'data'    => $popupAds
+                'data' => PopupAdResource::collection($popupAds),
             ], 200);
 
         } catch (\Exception $e) {
-
             return response()->json([
                 'success' => false,
                 'message' => 'Error retrieving popup ads: ' . $e->getMessage(),
-                'data' => []
+                'data' => [],
             ], 500);
         }
     }

@@ -77,4 +77,9 @@ interface BaseServiceInterface
      * ID ilə qeydi və onun tərcüməsini əldə et
      */
     public function getByIdWithTranslations(int $id, int $languageId, array $relations = []): ?Model;
+
+    /**
+     * Aktiv və sıralanmış qeydləri əldə et
+     */
+    public function getActiveOrdered(array $with = []): Collection;
 }

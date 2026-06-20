@@ -3,144 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\ContactMessage\StoreContactMessageRequest;
 use App\Models\ContactMessage;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
 use OpenApi\Annotations as OA;
 
-/**
- * @OA\Tag(
- *     name="Contact Messages",
- *     description="API Endpoints for Contact Messages"
- * )
- */
+
 class ContactMessageController extends Controller
 {
-        /**
-     * @OA\Post(
-     *     path="/api/contact-messages",
-     *     operationId="storeContactMessage",
-     *     tags={"Contact Messages"},
-     *     summary="Send contact message",
-     *     description="Send a new contact message from the contact form",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"name","email","city","message","recaptcha_token"},
-     *             @OA\Property(property="name", type="string", example="John Doe", description="Full name of the sender"),
-     *             @OA\Property(property="email", type="string", format="email", example="john@example.com", description="Email address of the sender"),
-     *             @OA\Property(property="city", type="string", example="Baku", description="City of the sender"),
-     *             @OA\Property(property="message", type="string", example="Hello, I have a question about your products...", description="The message content"),
-     *             @OA\Property(property="recaptcha_token", type="string", example="03AOLTBLR5...", description="reCAPTCHA token from frontend")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=201,
-     *         description="Contact message sent successfully",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Mesajınız uğurla göndərildi"),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="John Doe"),
-     *                 @OA\Property(property="email", type="string", example="john@example.com"),
-     *                 @OA\Property(property="city", type="string", example="Baku"),
-     *                 @OA\Property(property="message", type="string", example="Hello, I have a question..."),
-     *                 @OA\Property(property="is_read", type="boolean", example=false),
-     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-08-05T10:30:00.000000Z"),
-     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-08-05T10:30:00.000000Z")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Validation failed"),
-     *             @OA\Property(
-     *                 property="errors",
-     *                 type="object",
-     *                 @OA\Property(
-     *                     property="name",
-     *                     type="array",
-     *                     @OA\Items(type="string", example="Ad və soyad tələb olunur")
-     *                 ),
-     *                 @OA\Property(
-     *                     property="email",
-     *                     type="array",
-     *                     @OA\Items(type="string", example="Düzgün email ünvanı daxil edin")
-     *                 ),
-     *                 @OA\Property(
-     *                     property="city",
-     *                     type="array",
-     *                     @OA\Items(type="string", example="Şəhər tələb olunur")
-     *                 ),
-     *                 @OA\Property(
-     *                     property="message",
-     *                     type="array",
-     *                     @OA\Items(type="string", example="Mesaj tələb olunur")
-     *                 ),
-     *                 @OA\Property(
-     *                     property="recaptcha_token",
-     *                     type="array",
-     *                     @OA\Items(type="string", example="reCAPTCHA tələb olunur")
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Mesaj göndərilərkən xəta baş verdi"),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     )
-     * )
-     */
-    public function store(Request $request): JsonResponse
+     
+    public function store(StoreContactMessageRequest $request): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
-                'city' => 'required|string|max:255',
-                'message' => 'required|string|max:5000',
-                'recaptcha_token' => 'required|string'
-            ], [
-                'name.required' => dict('name_required'),
-                'name.string' => dict('name_string'),
-                'name.max' => dict('name_max'),
-                'email.required' => dict('email_required'),
-                'email.email' => dict('email_valid'),
-                'email.max' => dict('email_max'),
-                'city.required' => dict('city_required'),
-                'city.string' => dict('city_string'),
-                'city.max' => dict('city_max'),
-                'message.required' => dict('message_required'),
-                'message.string' => dict('message_string'),
-                'message.max' => dict('message_max'),
-                'recaptcha_token.required' => dict('recaptcha_required'),
-                'recaptcha_token.string' => dict('recaptcha_string')
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => dict("validation_error"),
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
             // Verify reCAPTCHA token
             $recaptchaResponse = $this->verifyRecaptcha($request->recaptcha_token);
             if (!$recaptchaResponse['success']) {
@@ -192,26 +67,7 @@ class ContactMessageController extends Controller
         }
     }
 
-    /**
-     * Get reCAPTCHA site key
-     * 
-     * @OA\Get(
-     *     path="/api/recaptcha/site-key",
-     *     operationId="getRecaptchaSiteKey",
-     *     tags={"Contact Messages"},
-     *     summary="Get reCAPTCHA site key",
-     *     description="Returns the reCAPTCHA site key for frontend integration",
-     *     @OA\Response(
-     *         response=200,
-     *         description="Site key retrieved successfully",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="site_key", type="string", example="6LeIxAcTAAAAAJcZVRqyHh71UMIEbUjQ...")
-     *         )
-     *     )
-     * )
-     */
+  
     public function getRecaptchaSiteKey(): JsonResponse
     {
         try {

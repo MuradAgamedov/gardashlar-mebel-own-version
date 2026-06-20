@@ -453,13 +453,13 @@ class AppServiceProvider extends ServiceProvider
             'About', 'Action', 'Address', 'Administration', 'BecomeAInvestor', 'BecomeAInvestorAdvantage',
             'BecomeAPartner', 'BecomeAPartnerAdvantage', 'BlogCategory', 'BlogPost', 'Catalog', 'Certificate',
             'Company', 'CompanyManagement', 'CreditCard', 'Currency', 'Dictionary',
-            'Faq', 'HeroCategory', 'HomePageCategory', 'IndividualProjectOrder', 'Kiv',
+            'Faq', 'HeroCategory', 'HeroProduct', 'HomePageCategory', 'HomePageDiscount', 'HomePageProjectCategory', 'IndividualProjectOrder', 'Kiv', 'KivCategory',
             'Language', 'Map', 'NewsCategory', 'NewsPost', 'OurGoal',
-            'Page', 'PartnerSlider', 'Phone', 'PopupAd', 'PrivacyPolicy',
-            'ProductType', 'ProjectCategory', 'Project', 'RefundPolicy', 'Report',
-            'RoluteeteAction', 'SeoPage', 'Service', 'SimpleImage', 'SocialNetwork',
-            'Subscriber', 'Suggestion', 'SuggestionsComplaints', 'Testimonial', 'Vacancy',
-            'WarrantyPolicy', 'WhyChooseUs', 'WhyChooseUsSlider'
+            'Page', 'PartnerSlider', 'Phone', 'PhoneType', 'PopupAd', 'PrivacyPolicy',
+            'Product', 'ProductType', 'ProjectCategory', 'Project', 'RefundPolicy', 'Report',
+            'RoluteeteAction', 'SeoPage', 'Service', 'ServiceStaticData', 'SimpleImage', 'SocialNetwork',
+            'Subscriber', 'Suggestion', 'SuggestAPlace', 'SuggestionsComplaints', 'Testimonial', 'Vacancy',
+            'VacancyForm', 'WarrantyPolicy', 'WhyChooseUs', 'WhyChooseUsSlider'
         ];
 
         foreach ($frontModules as $module) {

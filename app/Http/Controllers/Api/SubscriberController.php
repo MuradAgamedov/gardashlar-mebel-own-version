@@ -3,79 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Subscriber;
-use Illuminate\Http\Request;
+use App\Http\Requests\Api\Subscriber\StoreSubscriberRequest;
+use App\Interfaces\Services\Front\SubscriberServiceInterface;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Validator;
-use OpenApi\Annotations as OA;
 
 class SubscriberController extends Controller
 {
-    /**
-     * @OA\Post(
-     *     path="/api/subscribers",
-     *     operationId="subscribeEmail",
-     *     tags={"Subscribers"},
-     *     summary="Subscribe email to newsletter",
-     *     description="Add a new email to the subscribers list",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"email"},
-     *             @OA\Property(property="email", type="string", format="email", example="user@example.com")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successfully subscribed",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Email successfully subscribed")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Validation failed"),
-     *             @OA\Property(property="errors", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Internal server error",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error subscribing email")
-     *         )
-     *     )
-     * )
-     */
-    public function store(Request $request): JsonResponse
+    protected SubscriberServiceInterface $subscriberService;
+
+    public function __construct(SubscriberServiceInterface $subscriberService)
+    {
+        $this->subscriberService = $subscriberService;
+    }
+
+    public function store(StoreSubscriberRequest $request): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'email' => 'required|email|unique:subscribers,email|max:255',
-            ], [
-                'email.required' => dict('email_required'),
-                'email.email' => dict('email_email'),
-                'email.unique' => dict('email_exists'),
-                'email.max' => dict('email_max'),
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => dict('subscribe_error'),
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            $subscriber = Subscriber::create([
+            $subscriber = $this->subscriberService->create([
                 'email' => $request->email,
             ]);
 
@@ -96,6 +40,4 @@ class SubscriberController extends Controller
             ], 500);
         }
     }
-
- 
 }
