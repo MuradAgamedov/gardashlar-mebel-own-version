@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SuggestionsComplaints extends Model
 {
-    use HasFactory, App\Traits\Translatable;
+    use HasFactory, \App\Traits\Translatable;
 
     protected $table = 'suggestions_complaints';
 

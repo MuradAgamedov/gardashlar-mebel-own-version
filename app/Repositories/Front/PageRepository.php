@@ -12,4 +12,13 @@ class PageRepository extends BaseRepository implements PageRepositoryInterface
     {
         parent::__construct($model);
     }
+
+    public function getPageByKeyword(string $keyword)
+    {
+        return $this->model->newQuery()
+            ->where('status', true)
+            ->where('keyword', $keyword)
+            ->with(['translates.language'])
+            ->first();
+    }
 }

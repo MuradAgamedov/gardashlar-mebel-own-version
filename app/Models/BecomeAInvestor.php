@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BecomeAInvestor extends Model
 {
-    use HasFactory, App\Traits\Translatable;
+    use HasFactory, \App\Traits\Translatable;
 
     protected $table = 'become_a_investors';
     protected $fillable = []; // No direct fields on this table

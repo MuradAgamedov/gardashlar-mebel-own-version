@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Interfaces\Services\Front\SeoPageServiceInterface;
 use App\Interfaces\Services\Front\ProductServiceInterface;
+use App\Interfaces\Services\Front\ProductCategoryServiceInterface;
 use App\Http\Resources\Api\SeoPageResource;
-use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -18,13 +18,16 @@ class SeoPageController extends Controller
 
     protected SeoPageServiceInterface $seoPageService;
     protected ProductServiceInterface $productService;
+    protected ProductCategoryServiceInterface $productCategoryService;
 
     public function __construct(
         SeoPageServiceInterface $seoPageService,
-        ProductServiceInterface $productService
+        ProductServiceInterface $productService,
+        ProductCategoryServiceInterface $productCategoryService
     ) {
         $this->seoPageService = $seoPageService;
         $this->productService = $productService;
+        $this->productCategoryService = $productCategoryService;
     }
 
     /**
@@ -45,17 +48,10 @@ class SeoPageController extends Controller
                 return !empty($tr?->title) && !empty($tr?->slug);
             })->values();
 
-            return response()->json([
-                'success' => true,
-                'data' => SeoPageResource::collection($filtered)
-            ], 200);
+            return $this->success(SeoPageResource::collection($filtered), 'SEO pages fetched successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error fetching SEO pages: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error fetching SEO pages: ' . $e->getMessage());
         }
     }
 
@@ -94,16 +90,7 @@ class SeoPageController extends Controller
                 $products = [];
                 if ($seoPageTranslate->seoPage->category_id) {
                     $categoryId = $seoPageTranslate->seoPage->category_id;
-                    
-                    $category = ProductCategory::find($categoryId);
-                    $categoryIds = [$categoryId];
-                    
-                    if ($category) {
-                        $children = ProductCategory::where('parent_id', $categoryId)->pluck('id');
-                        if ($children->isNotEmpty()) {
-                            $categoryIds = array_merge($categoryIds, $children->toArray());
-                        }
-                    }
+                    $categoryIds = $this->productCategoryService->getCategoryWithChildrenIds($categoryId);
                     
                     $productsCollection = $this->productService->getProductsByCategories($categoryIds, $languageId, 12);
                     
@@ -118,12 +105,9 @@ class SeoPageController extends Controller
                             $categoryTranslation = $category->translates->first();
                             $categorySlug = $categoryTranslation ? $categoryTranslation->slug : null;
                             
-                            if ($category->parent_id) {
-                                $parentCategory = ProductCategory::find($category->parent_id);
-                                if ($parentCategory) {
-                                    $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
-                                    $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
-                                }
+                            if ($category->parent) {
+                                $parentTranslation = $category->parent->translates->first();
+                                $parentSlug = $parentTranslation ? $parentTranslation->slug : null;
                             }
                         }
                         
@@ -178,30 +162,17 @@ class SeoPageController extends Controller
             });
 
             if (!$seoPageData) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'SEO page not found'
-                ], 404);
+                return $this->notFound('SEO page not found');
             }
 
             if (empty($seoPageData['title']) || empty($seoPageData['slug'])) {
-                return response()->json([
-                    'success' => false,
-                    'data' => 'SEO page not found',
-                ], 200);
+                return $this->success(null, 'SEO page not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'data' => $seoPageData
-            ], 200);
+            return $this->success($seoPageData, 'SEO page fetched successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error fetching SEO page: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error fetching SEO page: ' . $e->getMessage());
         }
     }
 }

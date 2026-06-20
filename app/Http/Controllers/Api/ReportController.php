@@ -23,7 +23,7 @@ class ReportController extends Controller
 
 
    
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
@@ -32,20 +32,11 @@ class ReportController extends Controller
                 return $this->reportService->getActiveOrderedWithTranslations($languageId);
             });
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Reports retrieved successfully',
-                'data' => ReportResource::collection($reports)
-            ]);
+            return $this->success(ReportResource::collection($reports), 'Reports retrieved successfully');
 
         } catch (\Exception $e) {
             \Log::error('Error retrieving reports: ' . $e->getMessage());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving reports',
-                'data' => null
-            ], 500);
+            return $this->serverError('Error retrieving reports');
         }
     }
 }

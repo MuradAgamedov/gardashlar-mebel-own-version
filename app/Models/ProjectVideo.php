@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProjectVideo extends Model
 {
-    use HasFactory, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'project_id',

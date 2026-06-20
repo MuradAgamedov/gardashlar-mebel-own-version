@@ -25,7 +25,7 @@ class WarrantyPolicyController extends Controller
         $this->languageService = $languageService;
     }
 
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);

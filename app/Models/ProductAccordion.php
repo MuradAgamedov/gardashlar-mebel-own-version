@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductAccordion extends Model
 {
-    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\Translatable, \App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'product_id',

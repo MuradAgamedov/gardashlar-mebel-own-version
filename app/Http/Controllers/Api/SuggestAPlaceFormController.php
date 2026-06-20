@@ -37,11 +37,7 @@ class SuggestAPlaceFormController extends Controller
                 );
 
                 if (!$filePath) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => dict('file_upload_failed'),
-                        'data' => null
-                    ], 500);
+                    return $this->serverError(dict('file_upload_failed'));
                 }
             }
 
@@ -59,18 +55,10 @@ class SuggestAPlaceFormController extends Controller
                 'file' => $filePath,
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => dict('form_submitted_success'),
-                'data' => new SuggestAPlaceFormResource($form)
-            ], 201);
+            return $this->created(new SuggestAPlaceFormResource($form), dict('form_submitted_success'));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => dict('form_submit_error', $request->get('lang', 'az')) . ': ' . $e->getMessage(),
-                'data' => null
-            ], 500);
+            return $this->serverError(dict('form_submit_error', $request->get('lang', 'az')) . ': ' . $e->getMessage());
         }
     }
 }

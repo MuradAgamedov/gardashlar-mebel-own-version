@@ -22,9 +22,6 @@ class ServicesSitemapController extends Controller
             return $translations;
         });
         
-        return response()->json([
-            'success' => true,
-            'data' => $transformedServices
-        ]);
+        return $this->success($transformedServices);
     }
 }

@@ -4,32 +4,38 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ServiceForm\StoreServiceFormRequest;
-use App\Models\ServiceForm;
-use App\Models\Service;
+use App\Http\Resources\Api\ServiceFormResource;
+use App\Interfaces\Services\Front\ServiceServiceInterface;
+use App\Interfaces\Services\Front\ServiceFormServiceInterface;
 use App\Services\FileService;
 use App\Helpers\DictionaryHelper;
+use Illuminate\Http\JsonResponse;
 
 class ServiceFormController extends Controller
 {
-    protected $fileService;
+    protected FileService $fileService;
+    protected ServiceServiceInterface $serviceService;
+    protected ServiceFormServiceInterface $serviceFormService;
 
-    public function __construct(FileService $fileService)
-    {
+    public function __construct(
+        FileService $fileService,
+        ServiceServiceInterface $serviceService,
+        ServiceFormServiceInterface $serviceFormService
+    ) {
         $this->fileService = $fileService;
+        $this->serviceService = $serviceService;
+        $this->serviceFormService = $serviceFormService;
     }
 
-    public function store(StoreServiceFormRequest $request)
+    public function store(StoreServiceFormRequest $request): JsonResponse
     {
         try {
             $lang = $request->get('lang', 'az');
 
             // Check if service exists and active
-            $service = Service::active()->find($request->service_id);
+            $service = $this->serviceService->first(['status' => true], ['id' => $request->service_id]);
             if (!$service) {
-                return response()->json([
-                    'success' => false,
-                    'message' => DictionaryHelper::trans('service_not_available', $lang),
-                ], 404);
+                return $this->notFound(DictionaryHelper::trans('service_not_available', $lang));
             }
 
             // Handle file upload
@@ -45,16 +51,12 @@ class ServiceFormController extends Controller
                 );
 
                 if (!$filePath) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => DictionaryHelper::trans('file_upload_failed', $lang),
-                        'data' => null,
-                    ], 500);
+                    return $this->serverError(DictionaryHelper::trans('file_upload_failed', $lang));
                 }
             }
 
             // Create form submission
-            $form = ServiceForm::create([
+            $form = $this->serviceFormService->create([
                 'service_id' => $request->service_id,
                 'name' => trim($request->name),
                 'mobile' => trim($request->mobile),
@@ -64,26 +66,10 @@ class ServiceFormController extends Controller
                 'is_read' => false,
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => DictionaryHelper::trans('form_submitted_success', $lang),
-                'data' => [
-                    'id' => $form->id,
-                    'service_id' => $form->service_id,
-                    'name' => $form->name,
-                    'mobile' => $form->mobile,
-                    'email' => $form->email,
-                    'message' => $form->message,
-                    'file' => $form->file,
-                    'created_at' => $form->created_at,
-                ],
-            ], 201);
+            return $this->created(new ServiceFormResource($form), DictionaryHelper::trans('form_submitted_success', $lang));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => DictionaryHelper::trans('form_submit_error', $request->get('lang', 'az')) . ': ' . $e->getMessage(),
-            ], 500);
+            return $this->serverError(DictionaryHelper::trans('form_submit_error', $request->get('lang', 'az')) . ': ' . $e->getMessage());
         }
     }
 }

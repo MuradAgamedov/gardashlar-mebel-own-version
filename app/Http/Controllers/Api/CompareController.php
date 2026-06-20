@@ -137,11 +137,7 @@ class CompareController extends Controller
             $compareProductIds = $request->product_ids;
 
             if (empty($compareProductIds)) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'No products in compare list.',
-                    'data'    => ['categories' => [], 'products' => [], 'selected_category' => null],
-                ]);
+                return $this->success(['categories' => [], 'products' => [], 'selected_category' => null], 'No products in compare list.');
             }
 
             $categories = ProductCategory::whereNotNull('parent_id')

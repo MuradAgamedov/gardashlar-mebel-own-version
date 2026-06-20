@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\PageResource;
-use App\Models\Page;
+use App\Interfaces\Services\Front\PageServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -14,6 +14,13 @@ class PageController extends Controller
 {
     use LocaleFromHeader;
 
+    protected PageServiceInterface $pageService;
+
+    public function __construct(PageServiceInterface $pageService)
+    {
+        $this->pageService = $pageService;
+    }
+
     public function index(Request $request): JsonResponse
     {
         try {
@@ -21,9 +28,7 @@ class PageController extends Controller
             $cacheKey = "api:pages:all:lang:{$languageId}";
 
             $pages = Cache::rememberForever($cacheKey, function () {
-                return Page::where('status', true)
-                    ->with(['translates.language'])
-                    ->get();
+                return $this->pageService->getActiveOrdered(['translates.language']);
             });
 
             $resources = $pages->map(function ($page) use ($languageId) {
@@ -32,18 +37,18 @@ class PageController extends Controller
                 return $resource;
             });
 
-            return response()->json(['success' => true, 'data' => $resources]);
+            return $this->success($resources, 'Pages retrieved successfully');
 
         } catch (\Throwable $e) {
             report($e);
-            return response()->json(['success' => false, 'message' => 'Error retrieving pages.', 'data' => []], 500);
+            return $this->serverError('Error retrieving pages.');
         }
     }
 
     public function findByKeyword(Request $request, $keyword): JsonResponse
     {
         if (empty($keyword)) {
-            return response()->json(['success' => false, 'message' => 'Keyword parameter is required', 'data' => null], 400);
+            return $this->error('Keyword parameter is required', 400);
         }
 
         try {
@@ -51,24 +56,21 @@ class PageController extends Controller
             $cacheKey = "api:page:keyword:{$keyword}:lang:{$languageId}";
 
             $page = Cache::rememberForever($cacheKey, function () use ($keyword) {
-                return Page::where('status', true)
-                    ->where('keyword', $keyword)
-                    ->with(['translates.language'])
-                    ->first();
+                return $this->pageService->getPageByKeyword($keyword);
             });
 
             if (!$page) {
-                return response()->json(['success' => false, 'message' => 'Page not found with this keyword', 'data' => null], 404);
+                return $this->notFound('Page not found with this keyword');
             }
 
             $resource = new PageResource($page);
             $resource->languageId = $languageId;
 
-            return response()->json(['success' => true, 'data' => $resource]);
+            return $this->success($resource, 'Page retrieved successfully');
 
         } catch (\Throwable $e) {
             report($e);
-            return response()->json(['success' => false, 'message' => 'Error retrieving page.', 'data' => null], 500);
+            return $this->serverError('Error retrieving page.');
         }
     }
 }

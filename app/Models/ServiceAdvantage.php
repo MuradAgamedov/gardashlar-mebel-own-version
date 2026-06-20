@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ServiceAdvantage extends Model
 {
-    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\Translatable, \App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'service_id',

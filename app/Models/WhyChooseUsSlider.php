@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class WhyChooseUsSlider extends Model
 {
-    use HasFactory, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\HasStatusAndOrder, \App\Traits\HasImage;
 
     protected $fillable = [
         'order',
@@ -34,26 +34,7 @@ class WhyChooseUsSlider extends Model
      * Scope for ordering by order field
      */
 
-    /**
-     * Get image URL
-     */
-    public function getImageUrlAttribute()
-    {
-        return $this->getImageUrl($this->image);
-    }
 
-    /**
-     * Get image URL helper method
-     */
-    private function getImageUrl($imagePath)
-    {
-        if (empty($imagePath)) {
-            return '';
-        }
-
-        $imageService = app(ImageService::class);
-        return $imageService->getUrl($imagePath);
-    }
 
     /**
      * Auto-increment order when creating

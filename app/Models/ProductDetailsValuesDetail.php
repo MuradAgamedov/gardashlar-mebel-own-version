@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductDetailsValuesDetail extends Model
 {
-    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\Translatable, \App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'product_detail_value_id',

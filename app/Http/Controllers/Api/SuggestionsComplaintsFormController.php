@@ -40,11 +40,7 @@ class SuggestionsComplaintsFormController extends Controller
                 );
 
                 if (!$filePath) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => DictionaryHelper::trans('file_upload_failed', $lang),
-                        'data' => null
-                    ], 500);
+                    return $this->serverError(DictionaryHelper::trans('file_upload_failed', $lang));
                 }
             }
 
@@ -56,18 +52,10 @@ class SuggestionsComplaintsFormController extends Controller
                 'message' => trim($request->message),
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => DictionaryHelper::trans('form_submitted_success', $lang),
-                'data' => new SuggestionsComplaintsFormResource($form)
-            ], 201);
+            return $this->created(new SuggestionsComplaintsFormResource($form), DictionaryHelper::trans('form_submitted_success', $lang));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => DictionaryHelper::trans('form_submit_error', $request->get('lang', 'az')) . ': ' . $e->getMessage(),
-                'data' => null
-            ], 500);
+            return $this->serverError(DictionaryHelper::trans('form_submit_error', $request->get('lang', 'az')) . ': ' . $e->getMessage());
         }
     }
 }

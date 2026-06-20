@@ -32,24 +32,13 @@ class MapController extends Controller
             });
 
             if ($maps->isEmpty()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No maps found'
-                ], 404);
+                return $this->notFound('No maps found');
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Maps retrieved successfully',
-                'data' => MapResource::collection($maps)
-            ], 200);
+            return $this->success(MapResource::collection($maps), 'Maps retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving maps: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error retrieving maps: ' . $e->getMessage());
         }
     }
 

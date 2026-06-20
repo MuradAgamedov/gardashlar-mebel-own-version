@@ -35,9 +35,9 @@ class OurGoalController extends Controller
                 return $this->ourGoalService->getActiveOrderedWithTranslations($languageId);
             });
 
-            return response()->json(['success' => true, 'data' => OurGoalResource::collection($ourGoals)], 200);
+            return $this->success(OurGoalResource::collection($ourGoals), 'Our goals retrieved successfully');
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error retrieving our goals: ' . $e->getMessage(), 'data' => []], 500);
+            return $this->serverError('Error retrieving our goals: ' . $e->getMessage());
         }
     }
 } 

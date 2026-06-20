@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Phone extends Model
 {
-    use HasFactory, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'phone_type_id',

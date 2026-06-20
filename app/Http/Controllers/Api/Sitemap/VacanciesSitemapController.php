@@ -25,9 +25,6 @@ class VacanciesSitemapController extends Controller
             return $translations;
         });
         
-        return response()->json([
-            'success' => true,
-            'data' => $transformedVacancies
-        ]);
+        return $this->success($transformedVacancies);
     }
 }

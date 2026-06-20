@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PrivacyPolicy extends Model
 {
-    use HasFactory, App\Traits\Translatable;
+    use HasFactory, \App\Traits\Translatable;
 
     protected $fillable = [];
 

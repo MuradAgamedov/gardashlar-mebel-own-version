@@ -4,47 +4,23 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\BecomeAPartnerForm\StoreBecomeAPartnerFormRequest;
-use App\Models\BecomeAPartnerForm;
+use App\Interfaces\Services\Front\BecomeAPartnerFormServiceInterface;
 use App\Services\FileService;
 use Illuminate\Http\JsonResponse;
-use OpenApi\Annotations as OA;
-
 
 class BecomeAPartnerFormController extends Controller
 {
-    protected $fileService;
+    protected FileService $fileService;
+    protected BecomeAPartnerFormServiceInterface $becomeAPartnerFormService;
 
-    public function __construct(FileService $fileService)
-    {
+    public function __construct(
+        FileService $fileService,
+        BecomeAPartnerFormServiceInterface $becomeAPartnerFormService
+    ) {
         $this->fileService = $fileService;
+        $this->becomeAPartnerFormService = $becomeAPartnerFormService;
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/become-a-partner-form",
-     *     operationId="storeBecomeAPartnerForm",
-     *     tags={"Become A Partner Form"},
-     *     summary="Submit become a partner form",
-     *     description="Submit a new become a partner form with file upload",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="multipart/form-data",
-     *             @OA\Schema(
-     *                 type="object",
-     *                 @OA\Property(property="name", type="string", example="John Doe", description="Full name"),
-     *                 @OA\Property(property="mobile", type="string", example="+994501234567", description="Mobile number"),
-     *                 @OA\Property(property="email", type="string", format="email", example="john@example.com", description="Email address"),
-     *                 @OA\Property(property="file", type="string", format="binary", description="Uploaded file (optional)"),
-     *                 @OA\Property(property="message", type="string", example="I want to become a partner", description="Application message")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(response=201, description="Form submitted successfully", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=true), @OA\Property(property="message", type="string", example="Form submitted successfully"), @OA\Property(property="data", type="object", @OA\Property(property="id", type="integer", example=1)))),
-     *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=false), @OA\Property(property="message", type="string", example="Validation failed"), @OA\Property(property="errors", type="object"))),
-     *     @OA\Response(response=500, description="Internal server error", @OA\JsonContent(type="object", @OA\Property(property="success", type="boolean", example=false), @OA\Property(property="message", type="string", example="Error submitting form"), @OA\Property(property="data", type="object")))
-     * )
-     */
     public function store(StoreBecomeAPartnerFormRequest $request): JsonResponse
     {
         try {
@@ -66,7 +42,7 @@ class BecomeAPartnerFormController extends Controller
             }
 
             // Create form
-            $form = BecomeAPartnerForm::create([
+            $form = $this->becomeAPartnerFormService->create([
                 'name' => trim($request->name),
                 'mobile' => trim($request->mobile),
                 'email' => trim($request->email),

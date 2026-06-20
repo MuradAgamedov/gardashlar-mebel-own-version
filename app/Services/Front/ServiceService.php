@@ -15,4 +15,9 @@ class ServiceService extends BaseService implements ServiceServiceInterface
         parent::__construct($repository);
         $this->serviceRepository = $repository;
     }
+
+    public function getServiceBySlugWithRelations(string $slug, int $languageId)
+    {
+        return $this->serviceRepository->getServiceBySlugWithRelations($slug, $languageId);
+    }
 }

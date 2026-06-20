@@ -35,17 +35,10 @@ class PhoneController extends Controller
                 return $this->phoneService->getPhonesByType(3);
             });
 
-            return response()->json([
-                'success' => true,
-                'data' => $phones
-            ], 200);
+            return $this->success($phones, 'General phones retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving general phones: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error retrieving general phones: ' . $e->getMessage());
         }
     }
 
@@ -61,17 +54,10 @@ class PhoneController extends Controller
                 return $this->phoneTypeService->getPhonesGroupedByTypes($languageId);
             });
 
-            return response()->json([
-                'success' => true,
-                'data' => PhoneTypeResource::collection($phoneTypes),
-            ], 200);
+            return $this->success(PhoneTypeResource::collection($phoneTypes), 'Phones retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving phones: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error retrieving phones: ' . $e->getMessage());
         }
     }
 
@@ -90,17 +76,10 @@ class PhoneController extends Controller
                 return $phoneType->phones->first()->phone;
             });
 
-            return response()->json([
-                'success' => true,
-                'data' => $phone
-            ], 200);
+            return $this->success($phone, 'Special phone retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving special phone: ' . $e->getMessage(),
-                'data' => null
-            ], 500);
+            return $this->serverError('Error retrieving special phone: ' . $e->getMessage());
         }
     }
 }

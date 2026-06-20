@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\PartnerSliderResource;
-use App\Models\PartnerSlider;
+use App\Interfaces\Services\Front\PartnerSliderServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Traits\LocaleFromHeader;
@@ -12,6 +12,13 @@ use App\Traits\LocaleFromHeader;
 class PartnerSliderController extends Controller
 {
     use LocaleFromHeader;
+
+    protected PartnerSliderServiceInterface $partnerSliderService;
+
+    public function __construct(PartnerSliderServiceInterface $partnerSliderService)
+    {
+        $this->partnerSliderService = $partnerSliderService;
+    }
 
     /**
      * Get all active partner sliders with translations
@@ -21,22 +28,12 @@ class PartnerSliderController extends Controller
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
 
-            $sliders = PartnerSlider::with(['translates' => fn($q) => $q->where('language_id', $languageId)])
-                ->active()
-                ->ordered()
-                ->get();
+            $sliders = $this->partnerSliderService->getActiveOrderedWithTranslations($languageId);
 
-            return response()->json([
-                'success' => true,
-                'data' => PartnerSliderResource::collection($sliders),
-                'message' => 'Partner sliders retrieved successfully'
-            ]);
+            return $this->success(PartnerSliderResource::collection($sliders), 'Partner sliders retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving partner sliders: ' . $e->getMessage()
-            ], 500);
+            return $this->serverError('Error retrieving partner sliders: ' . $e->getMessage());
         }
     }
 
@@ -48,30 +45,16 @@ class PartnerSliderController extends Controller
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
 
-            $slider = PartnerSlider::with(['translates' => function($query) use ($languageId) {
-                $query->where('language_id', $languageId);
-            }])
-            ->active()
-            ->find($id);
+            $slider = $this->partnerSliderService->getByIdWithTranslations((int)$id, $languageId);
 
             if (!$slider) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Partner slider not found'
-                ], 404);
+                return $this->notFound('Partner slider not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'data' => new PartnerSliderResource($slider),
-                'message' => 'Partner slider retrieved successfully'
-            ]);
+            return $this->success(new PartnerSliderResource($slider), 'Partner slider retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving partner slider: ' . $e->getMessage()
-            ], 500);
+            return $this->serverError('Error retrieving partner slider: ' . $e->getMessage());
         }
     }
 
@@ -81,10 +64,7 @@ class PartnerSliderController extends Controller
     public function withAllTranslations(): JsonResponse
     {
         try {
-            $sliders = PartnerSlider::with('translates.language')
-                ->active()
-                ->ordered()
-                ->get()
+            $sliders = $this->partnerSliderService->getActiveOrdered(['translates.language'])
                 ->map(function ($slider) {
                     $translations = $slider->translates->map(function ($translation) {
                         return [
@@ -102,17 +82,10 @@ class PartnerSliderController extends Controller
                     ];
                 });
 
-            return response()->json([
-                'success' => true,
-                'data' => $sliders,
-                'message' => 'Partner sliders with all translations retrieved successfully'
-            ]);
+            return $this->success($sliders, 'Partner sliders with all translations retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving partner sliders: ' . $e->getMessage()
-            ], 500);
+            return $this->serverError('Error retrieving partner sliders: ' . $e->getMessage());
         }
     }
 }

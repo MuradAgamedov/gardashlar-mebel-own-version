@@ -42,11 +42,8 @@ class BlogsSitemapController extends Controller
             ];
         });
         
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'categories' => $transformedCategories
-            ]
+        return $this->success([
+            'categories' => $transformedCategories
         ]);
     }
 }

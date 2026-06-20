@@ -7,10 +7,11 @@ use App\Services\EmailService;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\JsonResponse;
 
 class RegisterController extends Controller
 {
-    protected $emailService;
+    protected EmailService $emailService;
 
     public function __construct(EmailService $emailService)
     {
@@ -20,7 +21,7 @@ class RegisterController extends Controller
     /**
      * Register a new user
      */
-    public function register(Request $request)
+    public function register(Request $request): JsonResponse
     {
         // Get and validate input fields
         $name = trim($request->input('name'));
@@ -51,7 +52,6 @@ class RegisterController extends Controller
         if (!empty($fin) && !preg_match('/^[A-Za-z0-9._-]{2,50}$/', $fin)) {
             $errors['fin'] = __('Invalid FIN format');
         }
-        
 
         if (empty($email)) {
             $errors['email'] = __('Email is required');
@@ -82,25 +82,13 @@ class RegisterController extends Controller
 
         // Return validation errors if any
         if (!empty($errors)) {
-            return response()->json([
-                'success' => false,
-                'message' => __('Validation failed'),
-                'data' => [
-                    'errors' => $errors
-                ]
-            ], 422);
+            return $this->error(__('Validation failed'), 422, ['errors' => $errors]);
         }
 
         // Check if user already exists
         $existingUser = User::where('email', $email)->first();
         if ($existingUser) {
-            return response()->json([
-                'success' => false,
-                'message' => 'user_already_exists',
-                'data' => [
-                    'error' => __('A user with this email already exists')
-                ]
-            ], 422);
+            return $this->error('user_already_exists', 422, ['error' => __('A user with this email already exists')]);
         }
 
         // Save user to database immediately (but unverified)
@@ -119,85 +107,51 @@ class RegisterController extends Controller
             $emailSent = $this->emailService->sendOTP($email, 'registration');
 
             if ($emailSent) {
-                return response()->json([
-                    'success' => true,
-                    'message' => __('User registered successfully, OTP sent to email'),
-                    'data' => [
-                        'user' => [
-                            'id' => $user->id,
-                            'name' => $user->name,
-                            'surname' => $user->surname,
-                            'phone' => $user->phone,
-                            'email' => $user->email,
-                            'fin' => $user->fin,
-                            'email_verified' => false
-                        ],
-                        'otp_sent' => true,
-                        'expires_at' => now()->addMinutes(10)->toISOString(),
-                        'message' => __('Please verify your email with the OTP code')
-                    ]
-                ], 201);
+                return $this->created([
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'surname' => $user->surname,
+                        'phone' => $user->phone,
+                        'email' => $user->email,
+                        'fin' => $user->fin,
+                        'email_verified' => false
+                    ],
+                    'otp_sent' => true,
+                    'expires_at' => now()->addMinutes(10)->toISOString(),
+                    'message' => __('Please verify your email with the OTP code')
+                ], __('User registered successfully, OTP sent to email'));
             } else {
                 // Delete user if email sending failed
                 $user->delete();
-                return response()->json([
-                    'success' => false,
-                    'message' => __('Registration failed - could not send OTP'),
-                    'data' => [
-                        'error' => __('Email sending failed')
-                    ]
-                ], 500);
+                return $this->error(__('Registration failed - could not send OTP'), 500, ['error' => __('Email sending failed')]);
             }
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => __('Registration failed'),
-                'data' => [
-                    'error' => __('Could not create user') . ': ' . $e->getMessage()
-                ]
-            ], 500);
+            return $this->error(__('Registration failed'), 500, ['error' => __('Could not create user') . ': ' . $e->getMessage()]);
         }
     }
 
     /**
      * Verify OTP and mark email as verified
      */
-    public function verifyOtp(Request $request)
+    public function verifyOtp(Request $request): JsonResponse
     {
         $email = $request->input('email');
         $otpCode = $request->input('otp_code');
 
         // Check if email and OTP code are provided
         if (empty($email)) {
-            return response()->json([
-                'success' => false,
-                'message' => __('Email is required'),
-                'data' => [
-                    'error' => __('Email field cannot be empty')
-                ]
-            ], 422);
+            return $this->error(__('Email is required'), 422, ['error' => __('Email field cannot be empty')]);
         }
 
         if (empty($otpCode)) {
-            return response()->json([
-                'success' => false,
-                'message' => __('OTP code is required'),
-                'data' => [
-                    'error' => __('OTP code field cannot be empty')
-                ]
-            ], 422);
+            return $this->error(__('OTP code is required'), 422, ['error' => __('OTP code field cannot be empty')]);
         }
 
         // Find user by email
         $user = User::where('email', $email)->first();
         if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => __('User not found'),
-                'data' => [
-                    'error' => __('No user found with this email address')
-                ]
-            ], 404);
+            return $this->notFound(__('User not found'));
         }
 
         // Verify OTP using EmailService
@@ -211,38 +165,30 @@ class RegisterController extends Controller
             // Generate authentication token (automatic login)
             $token = $user->createToken('auth_token')->plainTextToken;
 
-            return response()->json([
-                'success' => true,
-                'message' => __('Email verified and logged in successfully'),
-                'data' => [
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'surname' => $user->surname,
-                        'phone' => $user->phone,
-                        'email' => $user->email,
-                        'fin' => $user->fin,
-                        'email_verified' => true,
-                        'email_verified_at' => $user->email_verified_at->toDateTimeString()
-                    ],
-                    'token' => $token,
-                    'token_type' => 'Bearer',
-                    'verified' => true,
-                    'logged_in' => true,
-                    'verification_date' => $user->email_verified_at->toDateTimeString(),
-                    'message' => __('Registration completed and logged in successfully')
-                ]
-            ], 200);
+            return $this->success([
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'surname' => $user->surname,
+                    'phone' => $user->phone,
+                    'email' => $user->email,
+                    'fin' => $user->fin,
+                    'email_verified' => true,
+                    'email_verified_at' => $user->email_verified_at->toDateTimeString()
+                ],
+                'token' => $token,
+                'token_type' => 'Bearer',
+                'verified' => true,
+                'logged_in' => true,
+                'verification_date' => $user->email_verified_at->toDateTimeString(),
+                'message' => __('Registration completed and logged in successfully')
+            ], __('Email verified and logged in successfully'));
         } else {
-            return response()->json([
-                'success' => false,
-                'message' => __('OTP verification failed'),
-                'data' => [
-                    'email' => $email,
-                    'verified' => false,
-                    'error' => __('Invalid or expired OTP code')
-                ]
-            ], 422);
+            return $this->error(__('OTP verification failed'), 422, [
+                'email' => $email,
+                'verified' => false,
+                'error' => __('Invalid or expired OTP code')
+            ]);
         }
     }
 }

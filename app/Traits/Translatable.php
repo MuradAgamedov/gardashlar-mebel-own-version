@@ -15,6 +15,6 @@ trait Translatable
             $languageId = Language::getMainLanguage()->id;
         }
         
-        return $this->translates()->where('language_id', $languageId);
+        return $this->translates()->where('language_id', $languageId)->first();
     }
 }

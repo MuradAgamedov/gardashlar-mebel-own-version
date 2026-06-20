@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CreditCard extends Model
 {
-    use App\Traits\HasStatusAndOrder;
+    use \App\Traits\HasStatusAndOrder;
     protected $fillable = [
         'title',
         'order',

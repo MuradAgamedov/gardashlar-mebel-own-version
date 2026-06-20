@@ -6,4 +6,5 @@ use App\Interfaces\Repositories\BaseRepositoryInterface;
 
 interface PageRepositoryInterface extends BaseRepositoryInterface
 {
+    public function getPageByKeyword(string $keyword);
 }

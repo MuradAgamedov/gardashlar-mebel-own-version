@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
-    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\Translatable, \App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'project_category_id',

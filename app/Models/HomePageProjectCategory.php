@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class HomePageProjectCategory extends Model
 {
-    use App\Traits\HasStatusAndOrder;
+    use \App\Traits\HasStatusAndOrder;
     protected $fillable = [
         'project_category_id',
         'order',

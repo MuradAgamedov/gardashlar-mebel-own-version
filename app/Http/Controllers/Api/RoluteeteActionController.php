@@ -5,93 +5,54 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\RoluteeteAction\AddActionRequest;
 use App\Http\Resources\Api\RoluteeteActionResource;
-use App\Models\RoluteeteAction;
-use App\Models\UserRoluteeteAction;
+use App\Interfaces\Services\Front\RoluteeteActionServiceInterface;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Traits\LocaleFromHeader;
+
 class RoluteeteActionController extends Controller
 {
     use LocaleFromHeader;
-    public function index(Request $request)
+
+    protected RoluteeteActionServiceInterface $roluteeteActionService;
+
+    public function __construct(RoluteeteActionServiceInterface $roluteeteActionService)
     {
-        $languageId = $this->getLanguageIdFromHeader($request);
-
-        $actions = RoluteeteAction::where('status', 1)
-            ->with(['translates' => fn($q) => $q->where('language_id', $languageId)])
-            ->orderBy('id', 'desc')
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'data'    => RoluteeteActionResource::collection($actions),
-        ]);
+        $this->roluteeteActionService = $roluteeteActionService;
     }
 
-    public function add(AddActionRequest $request)
+    public function index(Request $request): JsonResponse
+    {
+        $languageId = $this->getLanguageIdFromHeader($request);
+        $actions = $this->roluteeteActionService->getActiveActions($languageId);
+
+        return $this->success(RoluteeteActionResource::collection($actions));
+    }
+
+    public function add(AddActionRequest $request): JsonResponse
     {
         $user = $request->user();
 
         if (!$user) {
-            return response()->json([
-                "success" => false,
-                "message" => "You must be logged in to add an action!"
-            ], 401);
+            return $this->error('You must be logged in to add an action!', 401);
         }
 
-        // User üçün aksiya əlavə et (dublikat olmadan)
-        $userAction = UserRoluteeteAction::updateOrCreate(
-            [
-                'user_id' => $user->id,
-                'roluteete_action_id' => $request->roluteete_action_id,
-            ],
-            [
-                'used' => false,
-            ]
-        );
+        $userAction = $this->roluteeteActionService->addUserAction($user->id, $request->roluteete_action_id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Action successfully added to user!',
-            'data'    => $userAction
-        ]);
+        return $this->success($userAction, 'Action successfully added to user!');
     }
 
-    public function getUserActions(Request $request)
+    public function getUserActions(Request $request): JsonResponse
     {
         $user = $request->user();
     
         if (!$user) {
-            return response()->json([
-                "success" => false,
-                "message" => "You must be logged in to see your actions!"
-            ], 401);
+            return $this->error('You must be logged in to see your actions!', 401);
         }
     
         $languageId = $this->getLanguageIdFromHeader($request);
+        $actions = $this->roluteeteActionService->getUserActions($user->id, $languageId);
     
-        $actions = $user->roluteeteActions()
-            ->with(['roluteeteAction.translates' => function($q) use ($languageId) {
-                $q->where('language_id', $languageId);
-            }])
-            ->get()
-            ->map(function ($userAction) {
-                $tr = $userAction->roluteeteAction->translates->first();
-    
-                return [
-                    'id'      => $userAction->roluteeteAction->id,
-                    'percent' => $userAction->roluteeteAction->percent,
-                    'title'   => $tr ? $tr->title : null,
-                    'used'    => $userAction->used,
-                    'image'   => $userAction->roluteeteAction->image 
-                        ? asset('storage/' . $userAction->roluteeteAction->image) 
-                        : null,
-                ];
-            });
-    
-        return response()->json([
-            'success' => true,
-            'data'    => $actions,
-        ]);
+        return $this->success($actions);
     }
-    
 }

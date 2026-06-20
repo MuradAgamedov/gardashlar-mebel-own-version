@@ -21,9 +21,6 @@ class TestimonialController extends Controller
         $this->testimonialService = $testimonialService;
     }
 
-    /**
-     * Display a listing of active testimonials.
-     */
     public function index(Request $request): JsonResponse
     {
         try {
@@ -31,19 +28,10 @@ class TestimonialController extends Controller
 
             $testimonials = $this->testimonialService->getActiveOrderedWithTranslations($languageId);
 
-            return response()->json([
-                'success' => true,
-                'data' => TestimonialResource::collection($testimonials),
-                'message' => 'Testimonials retrieved successfully',
-                'total' => $testimonials->count(),
-            ]);
+            return $this->success(TestimonialResource::collection($testimonials), 'Testimonials retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving testimonials: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error retrieving testimonials: ' . $e->getMessage());
         }
     }
 
@@ -61,25 +49,13 @@ class TestimonialController extends Controller
             ]);
 
             if (!$testimonial) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Testimonial not found',
-                    'data' => null
-                ], 404);
+                return $this->notFound('Testimonial not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'data' => new TestimonialResource($testimonial),
-                'message' => 'Testimonial retrieved successfully',
-            ]);
+            return $this->success(new TestimonialResource($testimonial), 'Testimonial retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving testimonial: ' . $e->getMessage(),
-                'data' => null
-            ], 500);
+            return $this->serverError('Error retrieving testimonial: ' . $e->getMessage());
         }
     }
 
@@ -91,19 +67,10 @@ class TestimonialController extends Controller
         try {
             $testimonials = $this->testimonialService->getActiveOrdered(['translates.language']);
 
-            return response()->json([
-                'success' => true,
-                'data'    => TestimonialWithTranslationsResource::collection($testimonials),
-                'message' => 'Testimonials with translations retrieved successfully',
-                'total'   => $testimonials->count(),
-            ]);
+            return $this->success(TestimonialWithTranslationsResource::collection($testimonials), 'Testimonials with translations retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving testimonials: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error retrieving testimonials: ' . $e->getMessage());
         }
     }
 } 

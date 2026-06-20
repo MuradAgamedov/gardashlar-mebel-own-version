@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BlogImage extends Model
 {
-    use HasFactory, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'blog_post_id',

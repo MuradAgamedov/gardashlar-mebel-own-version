@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PopupAd extends Model
 {
-    use HasFactory, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'image',

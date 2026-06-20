@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductCategory extends Model
 {
-    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\Translatable, \App\Traits\HasStatusAndOrder, \App\Traits\HasImage;
 
     protected $fillable = [
         'parent_id',
@@ -109,31 +109,4 @@ class ProductCategory extends Model
      * Scope for ordered categories
      */
 
-    /**
-     * Get the full URL for the image
-     */
-    public function getImageUrlAttribute()
-    {
-        if (!$this->image) {
-            return null;
-        }
-        
-        // Check if it's already a full URL
-        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
-            return $this->image;
-        }
-        
-        // Check if it's a storage path
-        if (strpos($this->image, 'storage/') === 0) {
-            return asset($this->image);
-        }
-        
-        // Default: treat as storage path
-        return Storage::exists($this->image) ? Storage::url($this->image) : null;
-    }
-
-    /**
-     * Auto-increment order when creating
-     */
-    
 } 

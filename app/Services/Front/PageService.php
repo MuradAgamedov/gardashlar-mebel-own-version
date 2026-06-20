@@ -15,4 +15,9 @@ class PageService extends BaseService implements PageServiceInterface
         parent::__construct($repository);
         $this->pageRepository = $repository;
     }
+
+    public function getPageByKeyword(string $keyword)
+    {
+        return $this->pageRepository->getPageByKeyword($keyword);
+    }
 }

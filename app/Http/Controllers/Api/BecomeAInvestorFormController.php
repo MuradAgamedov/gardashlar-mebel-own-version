@@ -4,21 +4,24 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\BecomeAInvestorForm\StoreBecomeAInvestorFormRequest;
-use App\Models\BecomeAInvestorForm;
+use App\Interfaces\Services\Front\BecomeAInvestorFormServiceInterface;
 use App\Services\FileService;
-
+use Illuminate\Http\JsonResponse;
 
 class BecomeAInvestorFormController extends Controller
 {
-    protected $fileService;
+    protected FileService $fileService;
+    protected BecomeAInvestorFormServiceInterface $becomeAInvestorFormService;
 
-    public function __construct(FileService $fileService)
-    {
+    public function __construct(
+        FileService $fileService,
+        BecomeAInvestorFormServiceInterface $becomeAInvestorFormService
+    ) {
         $this->fileService = $fileService;
+        $this->becomeAInvestorFormService = $becomeAInvestorFormService;
     }
 
-  
-    public function store(StoreBecomeAInvestorFormRequest $request)
+    public function store(StoreBecomeAInvestorFormRequest $request): JsonResponse
     {
         try {
             // Handle file upload
@@ -35,7 +38,7 @@ class BecomeAInvestorFormController extends Controller
             }
 
             // Create form submission
-            $form = BecomeAInvestorForm::create([
+            $form = $this->becomeAInvestorFormService->create([
                 'name' => $request->name,
                 'mobile' => $request->mobile,
                 'email' => $request->email,

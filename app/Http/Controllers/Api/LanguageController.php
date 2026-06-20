@@ -3,41 +3,35 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Language;
+use App\Interfaces\Services\Front\LanguageServiceInterface;
+use App\Http\Resources\Api\LanguageResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use App\Traits\LocaleFromHeader;
-use OpenApi\Annotations as OA;
 
 class LanguageController extends Controller
 {
     use LocaleFromHeader;
 
+    protected LanguageServiceInterface $languageService;
+
+    public function __construct(LanguageServiceInterface $languageService)
+    {
+        $this->languageService = $languageService;
+    }
    
     public function index(Request $request): JsonResponse
     {
         try {
-      
-            
             $languages = Cache::rememberForever('api_languages', function () {
-                return Language::where('status', true)
-                    ->orderBy('order')
-                    ->select(['id', 'title', 'lang_code', 'lang_name', 'is_default', 'is_main_language', 'order'])
-                    ->get();
+                return $this->languageService->get(['status' => true], ['order' => 'asc']);
             });
 
-            return response()->json([
-                'success' => true,
-                'data' => $languages
-            ], 200);
+            return $this->success(LanguageResource::collection($languages), 'Languages retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving languages: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error retrieving languages: ' . $e->getMessage());
         }
     }
 }

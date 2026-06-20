@@ -20,7 +20,7 @@ class ServiceStaticDataController extends Controller
         $this->serviceStaticDataService = $serviceStaticDataService;
     }
 
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         $languageId = $this->getLanguageIdFromHeader($request);
         $cacheKey = "service_static_data_{$languageId}";
@@ -30,17 +30,13 @@ class ServiceStaticDataController extends Controller
         });
 
         if (!$serviceStaticData) {
-            return response()->json(['success' => false, 'message' => 'Service static data not found'], 404);
+            return $this->notFound('Service static data not found');
         }
 
         if ($serviceStaticData->translates->isEmpty()) {
-            return response()->json(['success' => false, 'message' => 'Translation not found for the specified language'], 404);
+            return $this->notFound('Translation not found for the specified language');
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Service static data retrieved successfully',
-            'data' => new ServiceStaticDataResource($serviceStaticData),
-        ]);
+        return $this->success(new ServiceStaticDataResource($serviceStaticData), 'Service static data retrieved successfully');
     }
 }

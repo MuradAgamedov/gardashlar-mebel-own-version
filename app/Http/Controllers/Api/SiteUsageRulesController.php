@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\ContentPageResource;
 use App\Interfaces\Services\Front\SiteUsageRulesServiceInterface;
-use App\Models\Language;
+use App\Interfaces\Services\Front\LanguageServiceInterface;
 use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
 class SiteUsageRulesController extends Controller
@@ -15,20 +16,24 @@ class SiteUsageRulesController extends Controller
     use LocaleFromHeader;
 
     protected SiteUsageRulesServiceInterface $siteUsageRulesService;
+    protected LanguageServiceInterface $languageService;
 
-    public function __construct(SiteUsageRulesServiceInterface $siteUsageRulesService)
-    {
+    public function __construct(
+        SiteUsageRulesServiceInterface $siteUsageRulesService,
+        LanguageServiceInterface $languageService
+    ) {
         $this->siteUsageRulesService = $siteUsageRulesService;
+        $this->languageService = $languageService;
     }
 
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         try {
             $languageId = $this->getLanguageIdFromHeader($request);
 
-            $language = Language::find($languageId);
+            $language = $this->languageService->find($languageId);
             if (!$language) {
-                return response()->json(['success' => false, 'message' => 'Invalid language ID'], 400);
+                return $this->error('Invalid language ID', 400);
             }
 
             $siteUsageRules = Cache::rememberForever("site_usage_rules_{$languageId}", function () use ($languageId) {
@@ -36,20 +41,13 @@ class SiteUsageRulesController extends Controller
             });
 
             if (!$siteUsageRules) {
-                return response()->json(['success' => false, 'message' => 'Site usage rules not found'], 404);
+                return $this->notFound('Site usage rules not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Site usage rules retrieved successfully',
-                'data' => new ContentPageResource($siteUsageRules),
-            ]);
+            return $this->success(new ContentPageResource($siteUsageRules), 'Site usage rules retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving site usage rules: ' . $e->getMessage(),
-            ], 500);
+            return $this->serverError('Error retrieving site usage rules: ' . $e->getMessage());
         }
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class WhyChooseUs extends Model
 {
-    use HasFactory, App\Traits\Translatable;
+    use HasFactory, \App\Traits\Translatable;
 
     protected $fillable = [
         'first_icon',

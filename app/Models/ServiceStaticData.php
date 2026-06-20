@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ServiceStaticData extends Model
 {
-    use HasFactory, App\Traits\Translatable;
+    use HasFactory, \App\Traits\Translatable;
 
     protected $table = 'service_static_data';
     

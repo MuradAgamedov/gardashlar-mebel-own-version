@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductImage extends Model
 {
-    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\Translatable, \App\Traits\HasStatusAndOrder, \App\Traits\HasImage;
 
     protected $fillable = [
         'product_id',
@@ -47,26 +47,7 @@ class ProductImage extends Model
         return $query->where('is_main', true);
     }
 
-    /**
-     * Get image URL
-     */
-    public function getImageUrlAttribute()
-    {
-        return $this->getImageUrl($this->image);
-    }
 
-    /**
-     * Get image URL helper method
-     */
-    private function getImageUrl($imagePath)
-    {
-        if (empty($imagePath)) {
-            return '';
-        }
-
-        $imageService = app(ImageService::class);
-        return $imageService->getUrl($imagePath);
-    }
 
     /**
      * Product relationship

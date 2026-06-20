@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Page extends Model
 {
-    use App\Traits\Translatable, App\Traits\HasStatusAndOrder;
+    use \App\Traits\Translatable, \App\Traits\HasStatusAndOrder;
     protected $fillable = [
         'status',
         'order',

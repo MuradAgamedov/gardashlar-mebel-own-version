@@ -15,4 +15,19 @@ class RoluteeteActionService extends BaseService implements RoluteeteActionServi
         parent::__construct($repository);
         $this->roluteeteActionRepository = $repository;
     }
+
+    public function getActiveActions(int $languageId)
+    {
+        return $this->roluteeteActionRepository->getActiveActions($languageId);
+    }
+
+    public function addUserAction(int $userId, int $actionId)
+    {
+        return $this->roluteeteActionRepository->addUserAction($userId, $actionId);
+    }
+
+    public function getUserActions(int $userId, int $languageId)
+    {
+        return $this->roluteeteActionRepository->getUserActions($userId, $languageId);
+    }
 }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BecomeAPartner extends Model
 {
-    use HasFactory, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\HasStatusAndOrder;
 
     protected $table = 'become_a_partners';
 

@@ -10,7 +10,7 @@ use App\Models\ProductCompare;
 
 class GetAllCountController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = $request->user();
 

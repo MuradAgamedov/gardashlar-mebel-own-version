@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Catalog extends Model
 {
-    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\Translatable, \App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'order',

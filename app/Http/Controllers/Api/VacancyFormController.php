@@ -8,6 +8,8 @@ use App\Interfaces\Services\Front\VacancyFormServiceInterface;
 use App\Interfaces\Services\Front\VacancyServiceInterface;
 use App\Services\FileService;
 use App\Helpers\DictionaryHelper;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class VacancyFormController extends Controller
 {
@@ -25,7 +27,57 @@ class VacancyFormController extends Controller
         $this->vacancyService = $vacancyService;
     }
 
-    public function store(StoreVacancyFormRequest $request)
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $forms = $this->vacancyFormService->all();
+            return $this->success($forms, 'Vacancy forms retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->serverError('Error retrieving vacancy forms: ' . $e->getMessage());
+        }
+    }
+
+    public function show($id): JsonResponse
+    {
+        try {
+            $form = $this->vacancyFormService->find((int)$id);
+            if (!$form) {
+                return $this->notFound('Vacancy form not found');
+            }
+
+            if (!$form->is_read) {
+                $form->update([
+                    'is_read' => true,
+                    'read_at' => now()
+                ]);
+            }
+
+            return $this->success($form, 'Vacancy form retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->serverError('Error retrieving vacancy form: ' . $e->getMessage());
+        }
+    }
+
+    public function markAsRead($id): JsonResponse
+    {
+        try {
+            $form = $this->vacancyFormService->find((int)$id);
+            if (!$form) {
+                return $this->notFound('Vacancy form not found');
+            }
+
+            $form->update([
+                'is_read' => true,
+                'read_at' => now()
+            ]);
+
+            return $this->success(null, 'Vacancy form marked as read');
+        } catch (\Exception $e) {
+            return $this->serverError('Error marking vacancy form as read: ' . $e->getMessage());
+        }
+    }
+
+    public function store(StoreVacancyFormRequest $request): JsonResponse
     {
         try {
             $lang = $request->header('locale', 'az');

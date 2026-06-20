@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Map extends Model
 {
-    use HasFactory, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'map',

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\Translatable, \App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'project_category_id',
@@ -155,129 +155,8 @@ class Product extends Model
         return $this->hasMany(CompanyProduct::class);
     }
 
-    // Auto-increment order
-
-    // User modelinə əlavə etmək lazım deyil, Product modelinə əlavə olunur
-
-// Product modelində əlavə et
-public function apiData($languageId = null, $colorId = null)
-{
-    // Default language
-    if (!$languageId) {
-        $languageId = app()->getLocale();
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
-
-    // Translation
-    $translation = $this->translates()->where('language_id', $languageId)->first();
-
-    // Product types
-    $productTypes = $this->types->map(fn($type) => [
-        'id' => $type->id,
-        'title' => $type->translates()->where('language_id', $languageId)->first()?->title ?? ''
-    ]);
-
-    // Product details
-    $productDetails = $this->details()->orderBy('order')->get()->map(fn($detail) => [
-        'id' => $detail->id,
-        'keyword' => $detail->translate($languageId)?->keyword ?? '',
-        'value' => $detail->translate($languageId)?->value ?? ''
-    ])->filter(fn($d) => $d['keyword'] && $d['value'])->values();
-
-    // Images
-    $images = $this->images()->where('status', true)->orderBy('order')->get()->map(fn($img) => [
-        'id' => $img->id,
-        'image_url' => $img->image ? asset('storage/' . $img->image) : asset('images/default_image.webp'),
-        'color_id' => $img->product_color_id ?? null,
-        'is_main' => $img->is_main
-    ]);
-
-    return [
-        'id' => $this->id,
-        'slug' => $translation?->slug ?? '',
-        'title' => $translation?->title ?? '',
-        'price' => $this->price,
-        'discount_price' => $this->discount_price,
-        'product_types' => $productTypes,
-        'product_details' => $productDetails,
-        'images' => $images,
-        'view_count' => $this->view_count,
-        'available_colors' => $this->colors->map(fn($color) => [
-            'id' => $color->id,
-            'color_code' => $color->color_code
-        ]),
-    ];
-}
-
-public function similarData($languageId = null)
-{
-    if (!$languageId) {
-        $languageId = app()->getLocale();
-    }
-
-    // Tərcümə
-    $translation = $this->translates()
-        ->where('language_id', $languageId)
-        ->first();
-
-    // Məhsul tipləri
-    $productTypes = $this->types->map(function ($type) use ($languageId) {
-        $tr = $type->translates()->where('language_id', $languageId)->first();
-        return [
-            'id' => $type->id,
-            'title' => $tr ? $tr->title : ''
-        ];
-    });
-
-    // Əsas şəkil
-    $mainImage = $this->images()
-        ->where('status', true)
-        ->orderBy('order')
-        ->first();
-
-    $cardImage = $mainImage && $mainImage->image
-        ? asset('storage/' . $mainImage->image)
-        : asset('images/default_image.webp');
-
-    // Kategoriyalar (parent_slug və parent_title ilə birlikdə)
-    $categories = $this->categories->map(function ($category) use ($languageId) {
-        $tr = $category->translates()->where('language_id', $languageId)->first();
-
-        $parentSlug = null;
-        $parentTitle = null;
-        if ($category->parent_id) {
-            $parentCategory = ProductCategory::find($category->parent_id);
-            if ($parentCategory) {
-                $parentTr = $parentCategory->translates()->where('language_id', $languageId)->first();
-                $parentSlug = $parentTr ? $parentTr->slug : null;
-                $parentTitle = $parentTr ? $parentTr->title : null;
-            }
-        }
-
-        return [
-            'id' => $category->id,
-            'title' => $tr ? $tr->title : '',
-            'slug' => $tr ? $tr->slug : '',
-            'parent_slug' => $parentSlug,
-            'parent_title' => $parentTitle,
-        ];
-    });
-
-    return [
-        'id' => $this->id,
-        'title' => $translation ? $translation->title : '',
-        'slug' => $translation ? $translation->slug : '',
-        'price' => $this->price,
-        'discount_price' => $this->discount_price,
-        'view_count' => $this->view_count,
-        'card_image' => $cardImage,
-        'product_types' => $productTypes,
-        'categories' => $categories
-    ];
-}
-
-public function comments()
-{
-    return $this->hasMany(Comment::class);
-}
-
 }

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ProjectCategory extends Model
 {
-    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\Translatable, \App\Traits\HasStatusAndOrder, \App\Traits\HasImage;
 
     protected $fillable = [
         'order',
@@ -51,13 +51,7 @@ class ProjectCategory extends Model
         return $this->hasMany(Project::class);
     }
 
-    /**
-     * Get the full URL for the image
-     */
-    public function getImageUrlAttribute()
-    {
-        return $this->image ? env('APP_URL') . Storage::url($this->image) : null;
-    }
+
 
     /**
      * Auto-increment order when creating

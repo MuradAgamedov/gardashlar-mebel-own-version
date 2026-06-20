@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Dictionary extends Model
 {
-    use App\Traits\Translatable;
+    use \App\Traits\Translatable;
     protected $fillable = [
         'keyword'
     ];

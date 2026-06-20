@@ -22,9 +22,6 @@ class CompaignsSitemapController extends Controller
             return $translations;
         });
         
-        return response()->json([
-            'success' => true,
-            'data' => $transformedCompaigns
-        ]);
+        return $this->success($transformedCompaigns);
     }
 }

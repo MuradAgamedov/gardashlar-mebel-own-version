@@ -23,17 +23,14 @@ class IndividualProjectOrderController extends Controller
     }
 
 
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         $languageId = $this->getLanguageIdFromHeader($request);
         
         $cacheKey = "individual_project_orders_{$languageId}";
         
         $orders = Cache::remember($cacheKey, 3600, function () use ($languageId) {
-            return IndividualProjectOrder::active()
-                ->ordered()
-                ->with(['translates' => fn($q) => $q->where('language_id', $languageId)])
-                ->get();
+            return $this->individualProjectOrderService->getActiveOrderedWithTranslations($languageId);
         });
 
         if ($orders->isEmpty()) {

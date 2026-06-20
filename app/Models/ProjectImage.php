@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ProjectImage extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Traits\HasImage;
 
     protected $fillable = [
         'image',
@@ -28,12 +28,5 @@ class ProjectImage extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function getImageUrlAttribute()
-    {
-        if (!$this->image) {
-            return null;
-        }
-        
-        return Storage::disk('public')->url($this->image);
-    }
+
 }

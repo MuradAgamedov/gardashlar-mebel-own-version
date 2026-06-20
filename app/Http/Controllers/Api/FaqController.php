@@ -3,35 +3,32 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\Api\FaqResource;
-
 use App\Http\Controllers\Controller;
 use App\Interfaces\Services\Front\FaqServiceInterface;
+use App\Interfaces\Services\Front\LanguageServiceInterface;
 use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
-
 
 class FaqController extends Controller
 {
     use LocaleFromHeader;
 
     protected FaqServiceInterface $faqService;
+    protected LanguageServiceInterface $languageService;
 
-    public function __construct(FaqServiceInterface $faqService)
-    {
+    public function __construct(
+        FaqServiceInterface $faqService,
+        LanguageServiceInterface $languageService
+    ) {
         $this->faqService = $faqService;
+        $this->languageService = $languageService;
     }
 
-
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $languageId = $this->getLanguageIdFromHeader($request);
-        // Debug məlumatları əlavə edirik
-        $debug = [
-            'requested_locale' => $request->header('locale'),
-            'detected_language_id' => $languageId,
-            'all_languages' => \App\Models\Language::where('status', true)->get(['id', 'lang_code', 'is_default'])
-        ];
         
         $cacheKey = "faqs_{$languageId}";
         

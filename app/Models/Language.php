@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Language extends Model
 {
-    use HasFactory, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'title',
@@ -32,12 +32,18 @@ class Language extends Model
      * Boot method to set default values
      */
 
+    protected static ?Language $mainLanguage = null;
+    protected static ?\Illuminate\Database\Eloquent\Collection $activeLanguages = null;
+
     /**
      * Get the main language
      */
     public static function getMainLanguage()
     {
-        return static::where('is_main_language', true)->first();
+        if (self::$mainLanguage === null) {
+            self::$mainLanguage = static::where('is_main_language', true)->first();
+        }
+        return self::$mainLanguage;
     }
 
     /**
@@ -45,7 +51,10 @@ class Language extends Model
      */
     public static function getActiveLanguages()
     {
-        return static::where('status', true)->orderBy('order')->get();
+        if (self::$activeLanguages === null) {
+            self::$activeLanguages = static::where('status', true)->orderBy('order')->get();
+        }
+        return self::$activeLanguages;
     }
 
     /**

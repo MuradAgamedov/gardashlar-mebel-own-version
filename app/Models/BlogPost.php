@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BlogPost extends Model
 {
-    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
+    use HasFactory, \App\Traits\Translatable, \App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'blog_category_id',

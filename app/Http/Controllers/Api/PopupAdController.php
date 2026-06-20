@@ -33,17 +33,10 @@ class PopupAdController extends Controller
                 ]);
             });
 
-            return response()->json([
-                'success' => true,
-                'data' => PopupAdResource::collection($popupAds),
-            ], 200);
+            return $this->success(PopupAdResource::collection($popupAds), 'Popup ads retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving popup ads: ' . $e->getMessage(),
-                'data' => [],
-            ], 500);
+            return $this->serverError('Error retrieving popup ads: ' . $e->getMessage());
         }
     }
 }

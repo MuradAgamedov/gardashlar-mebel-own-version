@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SeoPage extends Model
 {
-    use App\Traits\Translatable, App\Traits\HasStatusAndOrder;
+    use \App\Traits\Translatable, \App\Traits\HasStatusAndOrder;
     protected $fillable = [
         'category_id',
         'status',
