@@ -458,7 +458,7 @@ class AppServiceProvider extends ServiceProvider
             'Page', 'PartnerSlider', 'Phone', 'PhoneType', 'PopupAd', 'PrivacyPolicy',
             'Product', 'ProductType', 'ProjectCategory', 'Project', 'RefundPolicy', 'Report',
             'RoluteeteAction', 'SeoPage', 'Service', 'ServiceStaticData', 'SimpleImage', 'SocialNetwork',
-            'Subscriber', 'Suggestion', 'SuggestAPlace', 'SuggestionsComplaints', 'Testimonial', 'Vacancy',
+            'Subscriber', 'Suggestion', 'SuggestAPlace', 'SuggestAPlaceForm', 'SuggestionsComplaints', 'SuggestionsComplaintsForm', 'Testimonial', 'Vacancy',
             'VacancyForm', 'WarrantyPolicy', 'WhyChooseUs', 'WhyChooseUsSlider'
         ];
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\RoluteeteAction\AddActionRequest;
 use App\Http\Resources\Api\RoluteeteActionResource;
 use App\Models\RoluteeteAction;
 use App\Models\UserRoluteeteAction;

@@ -4,19 +4,23 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\SuggestionsComplaintsForm\StoreSuggestionsComplaintsFormRequest;
-use App\Models\SuggestionsComplaintsForm;
+use App\Http\Resources\Api\SuggestionsComplaintsFormResource;
+use App\Interfaces\Services\Front\SuggestionsComplaintsFormServiceInterface;
 use App\Services\FileService;
 use Illuminate\Http\JsonResponse;
 use App\Helpers\DictionaryHelper;
-use OpenApi\Annotations as OA;
 
 class SuggestionsComplaintsFormController extends Controller
 {
-    protected $fileService;
+    protected FileService $fileService;
+    protected SuggestionsComplaintsFormServiceInterface $suggestionsComplaintsFormService;
 
-    public function __construct(FileService $fileService)
-    {
+    public function __construct(
+        FileService $fileService,
+        SuggestionsComplaintsFormServiceInterface $suggestionsComplaintsFormService
+    ) {
         $this->fileService = $fileService;
+        $this->suggestionsComplaintsFormService = $suggestionsComplaintsFormService;
     }
 
     public function store(StoreSuggestionsComplaintsFormRequest $request): JsonResponse
@@ -44,7 +48,7 @@ class SuggestionsComplaintsFormController extends Controller
                 }
             }
 
-            $form = SuggestionsComplaintsForm::create([
+            $form = $this->suggestionsComplaintsFormService->create([
                 'name' => trim($request->name),
                 'mobile' => trim($request->mobile),
                 'email' => trim($request->email),
@@ -55,9 +59,7 @@ class SuggestionsComplaintsFormController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => DictionaryHelper::trans('form_submitted_success', $lang),
-                'data' => [
-                    'id' => $form->id
-                ]
+                'data' => new SuggestionsComplaintsFormResource($form)
             ], 201);
 
         } catch (\Exception $e) {

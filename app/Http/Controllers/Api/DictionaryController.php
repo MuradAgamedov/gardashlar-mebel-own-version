@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Dictionary\GetByKeywordsRequest;
 use App\Http\Resources\Api\DictionaryResource;
 use App\Models\Dictionary;
 use Illuminate\Http\Request;
@@ -74,14 +75,9 @@ class DictionaryController extends Controller
     }
 
   
-    public function getByKeywordsArray(Request $request): JsonResponse
+    public function getByKeywordsArray(GetByKeywordsRequest $request): JsonResponse
     {
         try {
-            $request->validate([
-                'keywords' => 'required|array',
-                'keywords.*' => 'string'
-            ]);
-
             $languageId = $this->getLanguageIdFromHeader($request);
             $keywords = $request->input('keywords');
 
@@ -100,12 +96,6 @@ class DictionaryController extends Controller
                 'data' => $dictionaries
             ], 200);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error: ' . $e->getMessage(),
-                'data' => []
-            ], 400);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\SimpleImage\GetByKeywordsRequest;
 use App\Http\Resources\Api\SimpleImageResource;
 use App\Models\SimpleImage;
 use Illuminate\Http\Request;
@@ -126,14 +127,9 @@ class SimpleImageController extends Controller
      *     )
      * )
      */
-    public function getByKeywordsArray(Request $request): JsonResponse
+    public function getByKeywordsArray(GetByKeywordsRequest $request): JsonResponse
     {
         try {
-            $request->validate([
-                'keywords' => 'required|array',
-                'keywords.*' => 'string'
-            ]);
-
             $languageId = $this->getLanguageIdFromHeader($request);
             $keywords = $request->input('keywords');
             
@@ -156,12 +152,6 @@ class SimpleImageController extends Controller
                 'data' => $images
             ], 200);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error: ' . $e->getMessage(),
-                'data' => []
-            ], 400);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

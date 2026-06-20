@@ -4,18 +4,22 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\SuggestAPlaceForm\StoreSuggestAPlaceFormRequest;
-use App\Models\SuggestAPlaceForm;
+use App\Http\Resources\Api\SuggestAPlaceFormResource;
+use App\Interfaces\Services\Front\SuggestAPlaceFormServiceInterface;
 use App\Services\FileService;
 use Illuminate\Http\JsonResponse;
-use OpenApi\Annotations as OA;
 
 class SuggestAPlaceFormController extends Controller
 {
-    protected $fileService;
+    protected FileService $fileService;
+    protected SuggestAPlaceFormServiceInterface $suggestAPlaceFormService;
 
-    public function __construct(FileService $fileService)
-    {
+    public function __construct(
+        FileService $fileService,
+        SuggestAPlaceFormServiceInterface $suggestAPlaceFormService
+    ) {
         $this->fileService = $fileService;
+        $this->suggestAPlaceFormService = $suggestAPlaceFormService;
     }
 
     public function store(StoreSuggestAPlaceFormRequest $request): JsonResponse
@@ -41,7 +45,7 @@ class SuggestAPlaceFormController extends Controller
                 }
             }
 
-            $form = SuggestAPlaceForm::create([
+            $form = $this->suggestAPlaceFormService->create([
                 'name_surname' => trim($request->name_surname),
                 'email' => trim($request->email),
                 'area_sqm' => trim($request->area_sqm),
@@ -58,9 +62,7 @@ class SuggestAPlaceFormController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => dict('form_submitted_success'),
-                'data' => [
-                    'id' => $form->id
-                ]
+                'data' => new SuggestAPlaceFormResource($form)
             ], 201);
 
         } catch (\Exception $e) {
