@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Address;
+use App\Interfaces\Services\Front\AddressServiceInterface;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +15,14 @@ class AddressController extends Controller
 {
     use LocaleFromHeader;
 
+    protected AddressServiceInterface $addressService;
+
+    public function __construct(AddressServiceInterface $addressService)
+    {
+        $this->addressService = $addressService;
+    }
+
+
     
     public function index(Request $request): JsonResponse
     {
@@ -25,14 +33,11 @@ class AddressController extends Controller
             $cacheKey = "api_addresses_{$languageId}";
             
             $addresses = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                return Address::with(['addressType.translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                }, 'translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                }])
-                ->where('status', true)
-                ->orderBy('order')
-                ->get()
+                return $this->addressService->getActiveOrderedWithTranslations($languageId, [
+                    'addressType.translates' => function($query) use ($languageId) {
+                        $query->where('language_id', $languageId);
+                    }
+                ])
                 ->map(function ($address) {
                     $typeTranslation = $address->addressType->translates->first();
                     $addressTranslation = $address->translates->first();

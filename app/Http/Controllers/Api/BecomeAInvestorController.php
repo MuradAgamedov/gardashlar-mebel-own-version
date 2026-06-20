@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\BecomeAInvestor;
+use App\Interfaces\Services\Front\BecomeAInvestorServiceInterface;
 use App\Models\BecomeAInvestorAdvantage;
 use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
@@ -17,6 +17,14 @@ use OpenApi\Annotations as OA;
 class BecomeAInvestorController extends Controller
 {
     use LocaleFromHeader;
+
+    protected BecomeAInvestorServiceInterface $becomeAInvestorService;
+
+    public function __construct(BecomeAInvestorServiceInterface $becomeAInvestorService)
+    {
+        $this->becomeAInvestorService = $becomeAInvestorService;
+    }
+
    
     public function index(Request $request): JsonResponse
     {

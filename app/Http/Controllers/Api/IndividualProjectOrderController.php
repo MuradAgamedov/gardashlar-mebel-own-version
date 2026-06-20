@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\IndividualProjectOrder;
+use App\Interfaces\Services\Front\IndividualProjectOrderServiceInterface;
 use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -17,6 +17,14 @@ use Illuminate\Support\Facades\Cache;
 class IndividualProjectOrderController extends Controller
 {
     use LocaleFromHeader;
+
+    protected IndividualProjectOrderServiceInterface $individualProjectOrderService;
+
+    public function __construct(IndividualProjectOrderServiceInterface $individualProjectOrderService)
+    {
+        $this->individualProjectOrderService = $individualProjectOrderService;
+    }
+
 
     /**
      * @OA\Get(

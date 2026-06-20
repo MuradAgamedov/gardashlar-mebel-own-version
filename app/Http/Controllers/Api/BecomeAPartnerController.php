@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\BecomeAPartner;
+use App\Interfaces\Services\Front\BecomeAPartnerServiceInterface;
 use App\Models\BecomeAPartnerAdvantage;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -19,6 +19,14 @@ use App\Traits\LocaleFromHeader;
 class BecomeAPartnerController extends Controller
 {
     use LocaleFromHeader;
+
+    protected BecomeAPartnerServiceInterface $becomeAPartnerService;
+
+    public function __construct(BecomeAPartnerServiceInterface $becomeAPartnerService)
+    {
+        $this->becomeAPartnerService = $becomeAPartnerService;
+    }
+
     /**
      * @OA\Get(
      *     path="/api/become-a-partner",

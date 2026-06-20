@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\SuggestionsComplaints;
+use App\Interfaces\Services\Front\SuggestionsComplaintsServiceInterface;
 use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -19,6 +19,14 @@ use OpenApi\Annotations as OA;
 class SuggestionsComplaintsController extends Controller
 {
     use LocaleFromHeader;
+
+    protected SuggestionsComplaintsServiceInterface $suggestionsComplaintsService;
+
+    public function __construct(SuggestionsComplaintsServiceInterface $suggestionsComplaintsService)
+    {
+        $this->suggestionsComplaintsService = $suggestionsComplaintsService;
+    }
+
 
     /**
      * @OA\Get(

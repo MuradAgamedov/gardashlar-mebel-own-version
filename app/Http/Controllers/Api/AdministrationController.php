@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Administration;
+use App\Interfaces\Services\Front\AdministrationServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -13,6 +13,14 @@ use OpenApi\Annotations as OA;
 class AdministrationController extends Controller
 {
     use LocaleFromHeader;
+
+    protected AdministrationServiceInterface $administrationService;
+
+    public function __construct(AdministrationServiceInterface $administrationService)
+    {
+        $this->administrationService = $administrationService;
+    }
+
 
     
     public function index(Request $request): JsonResponse
@@ -24,12 +32,7 @@ class AdministrationController extends Controller
             $cacheKey = "api_administrations_{$languageId}";
             
             $administrations = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                return Administration::with(['translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                }])
-                ->where('status', true)
-                ->orderBy('order')
-                ->get()
+                return $this->administrationService->getActiveOrderedWithTranslations($languageId)
                 ->map(function ($administration) {
                     $translation = $administration->translates->first();
                     

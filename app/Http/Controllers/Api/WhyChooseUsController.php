@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\WhyChooseUs;
+use App\Interfaces\Services\Front\WhyChooseUsServiceInterface;
 use App\Models\WhyChooseUsSlider;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -14,6 +14,14 @@ use OpenApi\Annotations as OA;
 class WhyChooseUsController extends Controller
 {
     use LocaleFromHeader;
+
+    protected WhyChooseUsServiceInterface $whyChooseUsService;
+
+    public function __construct(WhyChooseUsServiceInterface $whyChooseUsService)
+    {
+        $this->whyChooseUsService = $whyChooseUsService;
+    }
+
 
     /**
      * @OA\Get(

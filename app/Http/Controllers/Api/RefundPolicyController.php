@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Traits\LocaleFromHeader;
-use App\Models\RefundPolicy;
+use App\Interfaces\Services\Front\RefundPolicyServiceInterface;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -12,6 +12,14 @@ use Illuminate\Support\Facades\Cache;
 class RefundPolicyController extends Controller
 {
     use LocaleFromHeader;
+
+    protected RefundPolicyServiceInterface $refundPolicyService;
+
+    public function __construct(RefundPolicyServiceInterface $refundPolicyService)
+    {
+        $this->refundPolicyService = $refundPolicyService;
+    }
+
     /**
      * @OA\Get(
      *     path="/api/refund-policy",

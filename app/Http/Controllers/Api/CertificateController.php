@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Certificate;
+use App\Interfaces\Services\Front\CertificateServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -13,6 +13,14 @@ use OpenApi\Annotations as OA;
 class CertificateController extends Controller
 {
     use LocaleFromHeader;
+
+    protected CertificateServiceInterface $certificateService;
+
+    public function __construct(CertificateServiceInterface $certificateService)
+    {
+        $this->certificateService = $certificateService;
+    }
+
 
     /**
      * @OA\Get(
@@ -33,12 +41,7 @@ class CertificateController extends Controller
             $cacheKey = "api_certificates_{$languageId}";
             
             $certificates = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                return Certificate::with(['translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                }])
-                ->where('status', true)
-                ->orderBy('order')
-                ->get()
+                return $this->certificateService->getActiveOrderedWithTranslations($languageId)
                 ->map(function ($certificate) {
                     $translation = $certificate->translates->first();
                     return [

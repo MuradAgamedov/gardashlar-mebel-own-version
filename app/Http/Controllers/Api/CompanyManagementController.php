@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Traits\LocaleFromHeader;
-use App\Models\CompanyManagement;
+use App\Interfaces\Services\Front\CompanyManagementServiceInterface;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -12,6 +12,14 @@ use Illuminate\Support\Facades\Cache;
 class CompanyManagementController extends Controller
 {
     use LocaleFromHeader;
+
+    protected CompanyManagementServiceInterface $companyManagementService;
+
+    public function __construct(CompanyManagementServiceInterface $companyManagementService)
+    {
+        $this->companyManagementService = $companyManagementService;
+    }
+
     /**
      * @OA\Get(
      *     path="/api/company-management",

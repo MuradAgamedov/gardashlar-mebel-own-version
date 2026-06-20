@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\OurGoal;
+use App\Interfaces\Services\Front\OurGoalServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -13,6 +13,14 @@ use OpenApi\Annotations as OA;
 class OurGoalController extends Controller
 {
     use LocaleFromHeader;
+
+    protected OurGoalServiceInterface $ourGoalService;
+
+    public function __construct(OurGoalServiceInterface $ourGoalService)
+    {
+        $this->ourGoalService = $ourGoalService;
+    }
+
 
     /**
      * @OA\Get(
@@ -33,12 +41,7 @@ class OurGoalController extends Controller
             $cacheKey = "api_our_goals_{$languageId}";
             
             $ourGoals = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                return OurGoal::with(['translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                }])
-                ->where('status', true)
-                ->orderBy('order')
-                ->get()
+                return $this->ourGoalService->getActiveOrderedWithTranslations($languageId)
                 ->map(function ($ourGoal) {
                     $translation = $ourGoal->translates->first();
                     return [

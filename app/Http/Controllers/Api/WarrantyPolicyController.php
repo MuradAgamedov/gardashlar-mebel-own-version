@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Traits\LocaleFromHeader;
-use App\Models\WarrantyPolicy;
+use App\Interfaces\Services\Front\WarrantyPolicyServiceInterface;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -12,6 +12,14 @@ use Illuminate\Support\Facades\Cache;
 class WarrantyPolicyController extends Controller
 {
     use LocaleFromHeader;
+
+    protected WarrantyPolicyServiceInterface $warrantyPolicyService;
+
+    public function __construct(WarrantyPolicyServiceInterface $warrantyPolicyService)
+    {
+        $this->warrantyPolicyService = $warrantyPolicyService;
+    }
+
     /**
      * @OA\Get(
      *     path="/api/warranty-policy",

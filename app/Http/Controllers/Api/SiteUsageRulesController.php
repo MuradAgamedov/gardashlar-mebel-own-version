@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Traits\LocaleFromHeader;
-use App\Models\SiteUsageRules;
+use App\Interfaces\Services\Front\SiteUsageRulesServiceInterface;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -12,6 +12,14 @@ use Illuminate\Support\Facades\Cache;
 class SiteUsageRulesController extends Controller
 {
     use LocaleFromHeader;
+
+    protected SiteUsageRulesServiceInterface $siteUsageRulesService;
+
+    public function __construct(SiteUsageRulesServiceInterface $siteUsageRulesService)
+    {
+        $this->siteUsageRulesService = $siteUsageRulesService;
+    }
+
     /**
      * @OA\Get(
      *     path="/api/site-usage-rules",

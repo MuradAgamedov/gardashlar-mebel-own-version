@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Faq;
+use App\Interfaces\Services\Front\FaqServiceInterface;
 use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -17,6 +17,14 @@ use Illuminate\Support\Facades\Cache;
 class FaqController extends Controller
 {
     use LocaleFromHeader;
+
+    protected FaqServiceInterface $faqService;
+
+    public function __construct(FaqServiceInterface $faqService)
+    {
+        $this->faqService = $faqService;
+    }
+
 
     /**
      * @OA\Get(

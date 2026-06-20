@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Traits\LocaleFromHeader;
-use App\Models\PrivacyPolicy;
+use App\Interfaces\Services\Front\PrivacyPolicyServiceInterface;
 use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -12,6 +12,14 @@ use Illuminate\Support\Facades\Cache;
 class PrivacyPolicyController extends Controller
 {
     use LocaleFromHeader;
+
+    protected PrivacyPolicyServiceInterface $privacyPolicyService;
+
+    public function __construct(PrivacyPolicyServiceInterface $privacyPolicyService)
+    {
+        $this->privacyPolicyService = $privacyPolicyService;
+    }
+
     /**
      * @OA\Get(
      *     path="/api/privacy-policy",

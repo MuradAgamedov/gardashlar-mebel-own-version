@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Map;
+use App\Interfaces\Services\Front\MapServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -17,6 +17,14 @@ use OpenApi\Annotations as OA;
  */
 class MapController extends Controller
 {
+
+    protected MapServiceInterface $mapService;
+
+    public function __construct(MapServiceInterface $mapService)
+    {
+        $this->mapService = $mapService;
+    }
+
     /**
      * @OA\Get(
      *     path="/api/maps",
