@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductDetailValue extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'product_id',
@@ -37,14 +37,6 @@ class ProductDetailValue extends Model
     /**
      * Get translation for specific language
      */
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::where('is_default', true)->first()->id ?? 1;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
 
     /**
      * Get all details for this product detail value
@@ -57,23 +49,9 @@ class ProductDetailValue extends Model
     /**
      * Scope for ordered values
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Auto-increment order when creating
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($value) {
-            if (!isset($value->order)) {
-                $maxOrder = static::where('product_id', $value->product_id)->max('order');
-                $value->order = $maxOrder + 1;
-            }
-        });
-    }
+    
 }

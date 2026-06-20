@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SuggestAPlace extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable;
 
     protected $table = 'suggest_a_places';
 
@@ -26,14 +26,6 @@ class SuggestAPlace extends Model
     /**
      * Get translation for specific language
      */
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::where('is_default', true)->first()->id ?? 1;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
 
     /**
      * Get first or create a single record for this section

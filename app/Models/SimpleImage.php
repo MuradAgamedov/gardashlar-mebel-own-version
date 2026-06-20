@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SimpleImage extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable;
 
     protected $fillable = [
         'keyword',
@@ -28,14 +28,6 @@ class SimpleImage extends Model
     /**
      * Get translation for specific language
      */
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::getMainLanguage()->id;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
 
     /**
      * Get translated image_go_url for specific language

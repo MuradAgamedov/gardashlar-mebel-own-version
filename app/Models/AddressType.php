@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AddressType extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'order',
@@ -59,31 +59,13 @@ class AddressType extends Model
     /**
      * Scope for active address types
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered address types
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Auto-increment order when creating
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($addressType) {
-            if (!isset($addressType->order)) {
-                $maxOrder = static::max('order');
-                $addressType->order = $maxOrder + 1;
-            }
-        });
-    }
+    
 } 

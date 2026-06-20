@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PhoneType extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'order',
@@ -30,14 +30,6 @@ class PhoneType extends Model
     /**
      * Get translation for specific language
      */
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::where('is_default', true)->first()->id ?? 1;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
 
     /**
      * Get all phones for this type
@@ -50,31 +42,13 @@ class PhoneType extends Model
     /**
      * Scope for active phone types
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered phone types
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Auto-increment order when creating
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($phoneType) {
-            if (!isset($phoneType->order)) {
-                $maxOrder = static::max('order');
-                $phoneType->order = $maxOrder + 1;
-            }
-        });
-    }
+    
 } 

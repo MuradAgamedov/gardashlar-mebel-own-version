@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Language extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'title',
@@ -31,18 +31,6 @@ class Language extends Model
     /**
      * Boot method to set default values
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($language) {
-            // Set order to max order + 1 if not provided
-            if (!isset($language->order)) {
-                $maxOrder = static::max('order');
-                $language->order = $maxOrder + 1;
-            }
-        });
-    }
 
     /**
      * Get the main language
@@ -63,10 +51,6 @@ class Language extends Model
     /**
      * Scope for active languages
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for main language

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BlogImage extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'blog_post_id',
@@ -24,20 +24,4 @@ class BlogImage extends Model
         return $this->belongsTo(BlogPost::class);
     }
 
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-        
-        static::creating(function ($blogImage) {
-            if (!$blogImage->order) {
-                $maxOrder = static::where('blog_post_id', $blogImage->blog_post_id)->max('order');
-                $blogImage->order = $maxOrder + 1;
-            }
-        });
-    }
 }

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class WhyChooseUsSlider extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'order',
@@ -29,18 +29,10 @@ class WhyChooseUsSlider extends Model
     /**
      * Scope for active sliders
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordering by order field
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Get image URL

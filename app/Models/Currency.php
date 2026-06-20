@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Currency extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'code',
@@ -26,18 +26,10 @@ class Currency extends Model
     /**
      * Scope for active currencies
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered currencies
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Get currency by code

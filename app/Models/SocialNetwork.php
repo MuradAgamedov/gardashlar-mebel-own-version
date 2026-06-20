@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SocialNetwork extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'type',
@@ -144,18 +144,10 @@ class SocialNetwork extends Model
     /**
      * Scope for active social networks
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered social networks
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Get social networks by types

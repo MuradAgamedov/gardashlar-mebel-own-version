@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class About extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'image',
@@ -22,39 +22,9 @@ class About extends Model
         'order' => 'integer'
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-        
-        static::creating(function ($about) {
-            if (!isset($about->order)) {
-                $maxOrder = static::max('order');
-                $about->order = $maxOrder + 1;
-            }
-        });
-    }
-
     public function translates(): HasMany
     {
         return $this->hasMany(AboutTranslate::class);
     }
 
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = \App\Models\Language::getMainLanguage()->id;
-        }
-        
-        return $this->translates()->where('language_id', $languageId);
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
-
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 } 

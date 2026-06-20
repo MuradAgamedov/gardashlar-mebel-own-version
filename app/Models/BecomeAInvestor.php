@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BecomeAInvestor extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable;
 
     protected $table = 'become_a_investors';
     protected $fillable = []; // No direct fields on this table
@@ -23,14 +23,6 @@ class BecomeAInvestor extends Model
     /**
      * Get translation for specific language
      */
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::where('is_default', true)->first()->id ?? 1;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
 
     /**
      * Get or create the first investor record

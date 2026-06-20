@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class NewsPost extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'news_category_id',
@@ -30,19 +30,6 @@ class NewsPost extends Model
     public function translates()
     {
         return $this->hasMany(NewsPostTranslate::class);
-    }
-
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::where('is_default', true)->first()->id ?? 1;
-        }
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
     }
 
     public function scopePublished($query)
@@ -70,14 +57,4 @@ class NewsPost extends Model
         return $this->inner_banner_image ? asset('storage/' . $this->inner_banner_image) : null;
     }
 
-    protected static function boot()
-    {
-        parent::boot();
-        
-        static::creating(function ($newsPost) {
-            if (!$newsPost->published_at && request()->has('publish_now')) {
-                $newsPost->published_at = now();
-            }
-        });
-    }
 }

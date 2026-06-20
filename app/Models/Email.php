@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Email extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'email_type_id',
@@ -33,31 +33,13 @@ class Email extends Model
     /**
      * Scope for active emails
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered emails
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Auto-increment order when creating
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($email) {
-            if (!isset($email->order)) {
-                $maxOrder = static::max('order');
-                $email->order = $maxOrder + 1;
-            }
-        });
-    }
+    
 } 

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductCategory extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'parent_id',
@@ -100,30 +100,14 @@ class ProductCategory extends Model
     /**
      * Get translation for specific language
      */
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::getMainLanguage()->id;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
 
     /**
      * Scope for active categories
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered categories
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Get the full URL for the image
@@ -151,15 +135,5 @@ class ProductCategory extends Model
     /**
      * Auto-increment order when creating
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($category) {
-            if (!isset($category->order)) {
-                $maxOrder = static::max('order');
-                $category->order = $maxOrder + 1;
-            }
-        });
-    }
+    
 } 

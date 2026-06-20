@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class NewsImage extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'news_post_id',
@@ -30,10 +30,6 @@ class NewsImage extends Model
     /**
      * Scope for ordered images
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Accessor for full image URL

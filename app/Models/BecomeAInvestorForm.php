@@ -52,5 +52,4 @@ class BecomeAInvestorForm extends Model
         return $this->file ? basename($this->file) : null;
     }
 
-
 }

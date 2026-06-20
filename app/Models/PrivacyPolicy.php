@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PrivacyPolicy extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable;
 
     protected $fillable = [];
 
@@ -17,12 +17,4 @@ class PrivacyPolicy extends Model
         return $this->hasMany(PrivacyPolicyTranslate::class);
     }
 
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::getMainLanguage()->id;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
 } 

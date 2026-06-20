@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ServiceAdvantage extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'service_id',
@@ -58,25 +58,6 @@ class ServiceAdvantage extends Model
     public function translates(): HasMany
     {
         return $this->hasMany(ServiceAdvantageTranslate::class);
-    }
-
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::getMainLanguage()->id;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
-
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
     }
 
     public function getIconUrlAttribute()

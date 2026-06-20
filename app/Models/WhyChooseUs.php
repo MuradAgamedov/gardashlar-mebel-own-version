@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class WhyChooseUs extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable;
 
     protected $fillable = [
         'first_icon',
@@ -35,14 +35,6 @@ class WhyChooseUs extends Model
     /**
      * Get translation for specific language
      */
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::active()->first()->id ?? null;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
 
     /**
      * Get first record or create if not exists

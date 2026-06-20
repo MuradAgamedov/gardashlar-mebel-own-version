@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ProjectCategory extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'order',
@@ -34,26 +34,14 @@ class ProjectCategory extends Model
     /**
      * Get the first translation
      */
-    public function translate()
-    {
-        return $this->hasOne(ProjectCategoryTranslate::class);
-    }
 
     /**
      * Scope for active project categories
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered project categories
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Get the projects for this category
@@ -74,15 +62,5 @@ class ProjectCategory extends Model
     /**
      * Auto-increment order when creating
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($projectCategory) {
-            if (!isset($projectCategory->order)) {
-                $maxOrder = static::max('order');
-                $projectCategory->order = $maxOrder + 1;
-            }
-        });
-    }
+    
 } 

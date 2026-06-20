@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CreditCard extends Model
 {
+    use App\Traits\HasStatusAndOrder;
     protected $fillable = [
         'title',
         'order',
@@ -19,8 +20,5 @@ class CreditCard extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
+    
 }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class HeroCategory extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'product_category_id',
@@ -31,16 +31,9 @@ class HeroCategory extends Model
     /**
      * Scope for active hero categories
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered hero categories
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
+    
 }

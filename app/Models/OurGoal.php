@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class OurGoal extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'order',
@@ -30,39 +30,17 @@ class OurGoal extends Model
     /**
      * Get the first translation
      */
-    public function translate()
-    {
-        return $this->hasOne(OurGoalTranslate::class);
-    }
 
     /**
      * Scope for active goals
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered goals
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Auto-increment order when creating
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($ourGoal) {
-            if (!isset($ourGoal->order)) {
-                $maxOrder = static::max('order');
-                $ourGoal->order = $maxOrder + 1;
-            }
-        });
-    }
+    
 }

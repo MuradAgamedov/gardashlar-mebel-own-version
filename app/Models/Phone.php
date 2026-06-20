@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Phone extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'phone_type_id',
@@ -33,31 +33,13 @@ class Phone extends Model
     /**
      * Scope for active phones
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered phones
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Auto-increment order when creating
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($phone) {
-            if (!isset($phone->order)) {
-                $maxOrder = static::max('order');
-                $phone->order = $maxOrder + 1;
-            }
-        });
-    }
+    
 } 

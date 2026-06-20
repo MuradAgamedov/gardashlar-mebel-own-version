@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Action extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'company_id',
@@ -27,18 +27,6 @@ class Action extends Model
         'end_date' => 'date'
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-        
-        static::creating(function ($action) {
-            if (!isset($action->order)) {
-                $maxOrder = static::where('company_id', $action->company_id)->max('order');
-                $action->order = $maxOrder + 1;
-            }
-        });
-    }
-
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
@@ -49,28 +37,9 @@ class Action extends Model
         return $this->hasMany(ActionTranslate::class);
     }
 
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::getMainLanguage()->id;
-        }
-        
-        return $this->translates()->where('language_id', $languageId);
-    }
-
     public function companyProducts(): HasMany
     {
         return $this->hasMany(CompanyProduct::class);
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
-
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
     }
 
     public function scopeCurrent($query)

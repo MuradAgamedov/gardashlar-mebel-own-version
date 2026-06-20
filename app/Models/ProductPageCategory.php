@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductPageCategory extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'product_category_id',
@@ -31,31 +31,13 @@ class ProductPageCategory extends Model
     /**
      * Scope for active categories
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered categories
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Auto-increment order when creating
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($productPageCategory) {
-            if (!isset($productPageCategory->order)) {
-                $maxOrder = static::max('order');
-                $productPageCategory->order = $maxOrder + 1;
-            }
-        });
-    }
+    
 }

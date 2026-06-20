@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PopupAd extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'image',
@@ -33,10 +33,6 @@ class PopupAd extends Model
     {
         $locale = $locale ?? app()->getLocale();
         return $this->translations()->where('locale', $locale)->first();
-    }
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order', 'asc');
     }
 
 }

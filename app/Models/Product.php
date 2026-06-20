@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'project_category_id',
@@ -25,7 +25,6 @@ class Product extends Model
         'price' => 'decimal:2',
         'discount_price' => 'decimal:2', // əlavə edildi
     ];
-    
 
     // Relationships
     public function categories()
@@ -122,15 +121,6 @@ class Product extends Model
     }
 
     // Scopes
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
-
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     public function scopeWithDiscount($query)
     {
@@ -138,14 +128,6 @@ class Product extends Model
     }
 
     // Helper methods
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::where('is_default', true)->first()->id ?? 1;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
 
     public function getTitleAttribute()
     {
@@ -174,18 +156,6 @@ class Product extends Model
     }
 
     // Auto-increment order
-    protected static function boot()
-    {
-        parent::boot();
-        
-        static::creating(function ($product) {
-            if (!isset($product->order)) {
-                $maxOrder = static::max('order');
-                $product->order = $maxOrder + 1;
-            }
-        });
-    }
-
 
     // User modelinə əlavə etmək lazım deyil, Product modelinə əlavə olunur
 
@@ -213,7 +183,6 @@ public function apiData($languageId = null, $colorId = null)
         'value' => $detail->translate($languageId)?->value ?? ''
     ])->filter(fn($d) => $d['keyword'] && $d['value'])->values();
 
- 
     // Images
     $images = $this->images()->where('status', true)->orderBy('order')->get()->map(fn($img) => [
         'id' => $img->id,
@@ -238,9 +207,6 @@ public function apiData($languageId = null, $colorId = null)
         ]),
     ];
 }
-
-
-
 
 public function similarData($languageId = null)
 {
@@ -271,7 +237,6 @@ public function similarData($languageId = null)
     $cardImage = $mainImage && $mainImage->image
         ? asset('storage/' . $mainImage->image)
         : asset('images/default_image.webp');
-
 
     // Kategoriyalar (parent_slug və parent_title ilə birlikdə)
     $categories = $this->categories->map(function ($category) use ($languageId) {
@@ -314,7 +279,5 @@ public function comments()
 {
     return $this->hasMany(Comment::class);
 }
-
-
 
 }

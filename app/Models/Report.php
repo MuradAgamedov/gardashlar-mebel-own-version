@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Report extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'order',
@@ -36,32 +36,14 @@ class Report extends Model
     /**
      * Get translation for specific language
      */
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::where('is_default', true)->first()->id ?? 1;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
 
     /**
      * Scope for active reports
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered reports
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
-
-
 
     /**
      * Get PDF URL attribute

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'project_category_id',
@@ -31,10 +31,6 @@ class Project extends Model
     /**
      * Get the first translation
      */
-    public function translate()
-    {
-        return $this->hasOne(ProjectTranslate::class);
-    }
 
     /**
      * Get the project category that owns this project
@@ -71,31 +67,13 @@ class Project extends Model
     /**
      * Scope for active projects
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered projects
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Auto-increment order when creating
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($project) {
-            if (!isset($project->order)) {
-                $maxOrder = static::max('order');
-                $project->order = $maxOrder + 1;
-            }
-        });
-    }
+    
 } 

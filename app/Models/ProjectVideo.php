@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProjectVideo extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'project_id',
@@ -33,31 +33,13 @@ class ProjectVideo extends Model
     /**
      * Scope for active videos
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered videos
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Auto-increment order when creating
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($video) {
-            if (!isset($video->order)) {
-                $maxOrder = static::where('project_id', $video->project_id)->max('order');
-                $video->order = $maxOrder + 1;
-            }
-        });
-    }
+    
 } 

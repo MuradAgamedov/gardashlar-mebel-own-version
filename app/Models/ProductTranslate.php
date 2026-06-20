@@ -20,8 +20,6 @@ class ProductTranslate extends Model
         'seo_description'
     ];
 
- 
-
     // Relationships
     public function product()
     {

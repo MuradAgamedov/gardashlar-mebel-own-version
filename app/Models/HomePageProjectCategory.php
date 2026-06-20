@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class HomePageProjectCategory extends Model
 {
+    use App\Traits\HasStatusAndOrder;
     protected $fillable = [
         'project_category_id',
         'order',
@@ -29,31 +30,13 @@ class HomePageProjectCategory extends Model
     /**
      * Scope for active items
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered items
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Auto-increment order when creating
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($item) {
-            if (!isset($item->order)) {
-                $maxOrder = static::max('order');
-                $item->order = $maxOrder + 1;
-            }
-        });
-    }
+    
 }

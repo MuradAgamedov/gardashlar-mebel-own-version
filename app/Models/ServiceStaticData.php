@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ServiceStaticData extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable;
 
     protected $table = 'service_static_data';
     
@@ -35,14 +35,6 @@ class ServiceStaticData extends Model
     /**
      * Get translation for specific language
      */
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::where('is_default', true)->first()->id ?? 1;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
 
     /**
      * Get or create the first service static data record

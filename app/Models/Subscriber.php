@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subscriber extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'email',
@@ -20,10 +20,6 @@ class Subscriber extends Model
     /**
      * Scope for active subscribers
      */
-    public function scopeActive($query)
-    {
-        return $query;
-    }
 
     /**
      * Auto-increment order when creating

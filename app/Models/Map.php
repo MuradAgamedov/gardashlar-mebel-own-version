@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Map extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'map',
@@ -23,31 +23,13 @@ class Map extends Model
     /**
      * Scope for active maps
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered maps
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Auto-increment order when creating
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($map) {
-            if (!isset($map->order)) {
-                $maxOrder = static::max('order');
-                $map->order = $maxOrder + 1;
-            }
-        });
-    }
+    
 } 

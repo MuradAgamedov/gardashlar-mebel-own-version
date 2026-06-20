@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Image extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable;
 
     protected $fillable = [
         'keyword',
@@ -25,8 +25,5 @@ class Image extends Model
     /**
      * Get the first translation
      */
-    public function translate()
-    {
-        return $this->hasOne(ImageTranslate::class);
-    }
+    
 }

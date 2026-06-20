@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class HomePageProject extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'project_id',
@@ -34,16 +34,9 @@ class HomePageProject extends Model
     /**
      * Scope for active projects
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered projects
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
+    
 }

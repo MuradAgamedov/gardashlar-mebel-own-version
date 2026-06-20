@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BecomeAPartner extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $table = 'become_a_partners';
 
@@ -26,10 +26,6 @@ class BecomeAPartner extends Model
     /**
      * Scope for ordering
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('created_at', 'desc');
-    }
 
     /**
      * Get first record or create if not exists

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Vacancy extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\Translatable, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'last_apply_date',
@@ -37,18 +37,6 @@ class Vacancy extends Model
     /**
      * Boot method to set default values
      */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($vacancy) {
-            // Set order to max order + 1 if not provided
-            if (!isset($vacancy->order)) {
-                $maxOrder = static::max('order');
-                $vacancy->order = $maxOrder + 1;
-            }
-        });
-    }
 
     /**
      * Get all translations for this vacancy
@@ -61,14 +49,6 @@ class Vacancy extends Model
     /**
      * Get translation for specific language
      */
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::where('is_default', true)->first()->id ?? 1;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
 
     /**
      * Get all requirements for this vacancy
@@ -89,25 +69,14 @@ class Vacancy extends Model
     /**
      * Scope for active vacancies
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for vacancies that haven't expired
      */
-  
 
     /**
      * Scope for ordered vacancies
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
-
-
 
     /**
      * Check if vacancy is expired

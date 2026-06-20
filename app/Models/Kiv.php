@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Kiv extends Model
 {
-    use HasFactory;
+    use HasFactory, App\Traits\HasStatusAndOrder;
 
     protected $fillable = [
         'order',
@@ -39,18 +39,10 @@ class Kiv extends Model
     /**
      * Scope for active KIVs
      */
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 
     /**
      * Scope for ordered KIVs
      */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order');
-    }
 
     /**
      * Get image URL

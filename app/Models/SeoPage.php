@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SeoPage extends Model
 {
+    use App\Traits\Translatable, App\Traits\HasStatusAndOrder;
     protected $fillable = [
         'category_id',
         'status',
@@ -30,17 +31,4 @@ class SeoPage extends Model
         return $this->belongsTo(ProductCategory::class, 'category_id');
     }
 
-    public function translate($languageId = null)
-    {
-        if (!$languageId) {
-            $languageId = Language::getMainLanguage()->id;
-        }
-        
-        return $this->translates()->where('language_id', $languageId)->first();
-    }
-
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
 }
