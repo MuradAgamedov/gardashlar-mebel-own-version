@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\Api\OurGoalResource;
+
 use App\Http\Controllers\Controller;
 use App\Interfaces\Services\Front\OurGoalServiceInterface;
 use Illuminate\Http\Request;
@@ -41,18 +43,10 @@ class OurGoalController extends Controller
             $cacheKey = "api_our_goals_{$languageId}";
             
             $ourGoals = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                return $this->ourGoalService->getActiveOrderedWithTranslations($languageId)
-                ->map(function ($ourGoal) {
-                    $translation = $ourGoal->translates->first();
-                    return [
-                        'id' => $ourGoal->id,
-                        'title' => $translation ? $translation->title : '',
-                        'description' => $translation ? $translation->description : ''
-                    ];
-                });
+                return $this->ourGoalService->getActiveOrderedWithTranslations($languageId);
             });
 
-            return response()->json(['success' => true, 'data' => $ourGoals], 200);
+            return response()->json(['success' => true, 'data' => OurGoalResource::collection($ourGoals)], 200);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error retrieving our goals: ' . $e->getMessage(), 'data' => []], 500);
         }

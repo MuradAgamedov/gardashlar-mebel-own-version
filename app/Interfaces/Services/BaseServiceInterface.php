@@ -14,6 +14,11 @@ interface BaseServiceInterface
     public function all(array $with = []): Collection;
 
     /**
+     * Birinci qeydi əldə et
+     */
+    public function first(array $with = []): ?Model;
+
+    /**
      * ID ilə qeydi tap
      */
     public function find(int $id, array $with = []): ?Model;

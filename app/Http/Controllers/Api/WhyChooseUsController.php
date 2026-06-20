@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Interfaces\Services\Front\WhyChooseUsServiceInterface;
-use App\Models\WhyChooseUsSlider;
+use App\Interfaces\Services\Front\WhyChooseUsSliderServiceInterface;
+use App\Http\Resources\Api\WhyChooseUsResource;
+use App\Http\Resources\Api\WhyChooseUsSliderResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -16,12 +18,15 @@ class WhyChooseUsController extends Controller
     use LocaleFromHeader;
 
     protected WhyChooseUsServiceInterface $whyChooseUsService;
+    protected WhyChooseUsSliderServiceInterface $whyChooseUsSliderService;
 
-    public function __construct(WhyChooseUsServiceInterface $whyChooseUsService)
-    {
+    public function __construct(
+        WhyChooseUsServiceInterface $whyChooseUsService,
+        WhyChooseUsSliderServiceInterface $whyChooseUsSliderService
+    ) {
         $this->whyChooseUsService = $whyChooseUsService;
+        $this->whyChooseUsSliderService = $whyChooseUsSliderService;
     }
-
 
     /**
      * @OA\Get(
@@ -99,45 +104,36 @@ class WhyChooseUsController extends Controller
             $cacheKey = "api:why-choose-us:lang:{$languageId}";
             
             $data = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                // Get Why Choose Us data
-                $whyChooseUs = WhyChooseUs::getFirstOrCreate();
-                $translation = $whyChooseUs->translate($languageId);
-                
-                // Get active sliders
-                $sliders = WhyChooseUsSlider::active()
-                    ->ordered()
-                    ->get()
-                    ->map(function ($slider) {
-                        return [
-                            'id' => $slider->id,
-                            'image_url' => $slider->image_url,
-                            'video_id' => $this->extractYouTubeVideoId($slider->video_link)
-                        ];
-                    });
-                
+                $whyChooseUs = $this->whyChooseUsService->first(['translates' => function($q) use ($languageId) {
+                    $q->where('language_id', $languageId);
+                }]);
+
+                if (!$whyChooseUs) {
+                    return null;
+                }
+
+                $sliders = $this->whyChooseUsSliderService->getActiveOrderedWithTranslations($languageId);
+
                 return [
-                    'why_choose_us' => [
-                        'id' => $whyChooseUs->id,
-                        'first_icon_url' => $whyChooseUs->first_icon_url,
-                        'second_icon_url' => $whyChooseUs->second_icon_url,
-                        'third_icon_url' => $whyChooseUs->third_icon_url,
-                        'fourth_icon_url' => $whyChooseUs->fourth_icon_url,
-                        'first_title' => $translation ? $translation->first_title : null,
-                        'first_description' => $translation ? $translation->first_description : null,
-                        'second_title' => $translation ? $translation->second_title : null,
-                        'second_description' => $translation ? $translation->second_description : null,
-                        'third_title' => $translation ? $translation->third_title : null,
-                        'third_description' => $translation ? $translation->third_description : null,
-                        'fourth_title' => $translation ? $translation->fourth_title : null,
-                        'fourth_description' => $translation ? $translation->fourth_description : null
-                    ],
+                    'why_choose_us' => $whyChooseUs,
                     'sliders' => $sliders
                 ];
             });
 
+            if (!$data) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Why Choose Us data not found',
+                    'data' => null
+                ], 404);
+            }
+
             return response()->json([
                 'success' => true,
-                'data' => $data
+                'data' => [
+                    'why_choose_us' => new WhyChooseUsResource($data['why_choose_us']),
+                    'sliders' => WhyChooseUsSliderResource::collection($data['sliders'])
+                ]
             ], 200);
 
         } catch (\Exception $e) {
@@ -147,34 +143,5 @@ class WhyChooseUsController extends Controller
                 'data' => []
             ], 500);
         }
-    }
-
-    /**
-     * Extract YouTube video ID from various YouTube URL formats
-     *
-     * @param string|null $url
-     * @return string|null
-     */
-    private function extractYouTubeVideoId(?string $url): ?string
-    {
-        if (empty($url)) {
-            return null;
-        }
-
-        // YouTube URL patterns
-        $patterns = [
-            '/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/',
-            '/youtu\.be\/([a-zA-Z0-9_-]+)/',
-            '/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/',
-            '/youtube\.com\/v\/([a-zA-Z0-9_-]+)/',
-        ];
-
-        foreach ($patterns as $pattern) {
-            if (preg_match($pattern, $url, $matches)) {
-                return $matches[1];
-            }
-        }
-
-        return null;
     }
 } 

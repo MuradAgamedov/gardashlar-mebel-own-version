@@ -34,6 +34,14 @@ abstract class BaseRepository implements BaseRepositoryInterface
     /**
      * {@inheritdoc}
      */
+    public function first(array $with = []): ?Model
+    {
+        return $this->model->newQuery()->with($with)->first();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function find(int $id, array $with = []): ?Model
     {
         return $this->model->newQuery()->with($with)->find($id);

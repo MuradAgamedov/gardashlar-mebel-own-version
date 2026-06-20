@@ -34,6 +34,14 @@ abstract class BaseService implements BaseServiceInterface
     /**
      * {@inheritdoc}
      */
+    public function first(array $with = []): ?Model
+    {
+        return $this->repository->first($with);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function find(int $id, array $with = []): ?Model
     {
         return $this->repository->find($id, $with);

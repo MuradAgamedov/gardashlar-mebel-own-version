@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\Api\CompanyManagementResource;
+
 use App\Http\Controllers\Controller;
 use App\Traits\LocaleFromHeader;
 use App\Interfaces\Services\Front\CompanyManagementServiceInterface;

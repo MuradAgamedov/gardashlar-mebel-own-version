@@ -450,8 +450,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Dynamically register Front Service/Repository bindings
         $frontModules = [
-            'About', 'Action', 'Address', 'Administration', 'BecomeAInvestor',
-            'BecomeAPartner', 'BlogCategory', 'BlogPost', 'Catalog', 'Certificate',
+            'About', 'Action', 'Address', 'Administration', 'BecomeAInvestor', 'BecomeAInvestorAdvantage',
+            'BecomeAPartner', 'BecomeAPartnerAdvantage', 'BlogCategory', 'BlogPost', 'Catalog', 'Certificate',
             'Company', 'CompanyManagement', 'CreditCard', 'Currency', 'Dictionary',
             'Faq', 'HeroCategory', 'HomePageCategory', 'IndividualProjectOrder', 'Kiv',
             'Language', 'Map', 'NewsCategory', 'NewsPost', 'OurGoal',
@@ -459,7 +459,7 @@ class AppServiceProvider extends ServiceProvider
             'ProductType', 'ProjectCategory', 'Project', 'RefundPolicy', 'Report',
             'RoluteeteAction', 'SeoPage', 'Service', 'SimpleImage', 'SocialNetwork',
             'Subscriber', 'Suggestion', 'SuggestionsComplaints', 'Testimonial', 'Vacancy',
-            'WarrantyPolicy', 'WhyChooseUs'
+            'WarrantyPolicy', 'WhyChooseUs', 'WhyChooseUsSlider'
         ];
 
         foreach ($frontModules as $module) {

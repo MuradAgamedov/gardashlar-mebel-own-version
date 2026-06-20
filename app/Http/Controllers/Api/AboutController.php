@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Interfaces\Services\Front\AboutServiceInterface;
+use App\Http\Resources\Api\AboutResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -30,24 +31,12 @@ class AboutController extends Controller
             $cacheKey = "api_abouts_{$languageId}";
             
             $abouts = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                return $this->aboutService->getActiveOrderedWithTranslations($languageId)
-                    ->map(function ($about) {
-                        $translation = $about->translates->first();
-                        
-                        return [
-                            'id' => $about->id,
-                            'image_url' => $about->image ? asset('storage/' . $about->image) : asset('images/default_image.webp'),
-                            'date' => $about->date,
-                            'title' => $translation ? $translation->title : '',
-                            'description' => $translation ? $translation->description : '',
-                            'image_alt_text' => $translation ? $translation->image_alt_text : null
-                        ];
-                    });
+                return $this->aboutService->getActiveOrderedWithTranslations($languageId);
             });
 
             return response()->json([
                 'success' => true,
-                'data' => $abouts
+                'data' => AboutResource::collection($abouts)
             ], 200);
 
         } catch (\Exception $e) {

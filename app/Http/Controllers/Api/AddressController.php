@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\Api\AddressResource;
+
 use App\Http\Controllers\Controller;
 use App\Interfaces\Services\Front\AddressServiceInterface;
 use App\Models\Language;
@@ -37,22 +39,12 @@ class AddressController extends Controller
                     'addressType.translates' => function($query) use ($languageId) {
                         $query->where('language_id', $languageId);
                     }
-                ])
-                ->map(function ($address) {
-                    $typeTranslation = $address->addressType->translates->first();
-                    $addressTranslation = $address->translates->first();
-                    
-                    return [
-                        'id' => $address->id,
-                        'type' => $typeTranslation ? $typeTranslation->title : '',
-                        'address' => $addressTranslation ? $addressTranslation->address : ''
-                    ];
-                });
+                ]);
             });
 
             return response()->json([
                 'success' => true,
-                'data' => $addresses
+                'data' => AddressResource::collection($addresses)
             ], 200);
 
         } catch (\Exception $e) {

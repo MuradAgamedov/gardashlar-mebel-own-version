@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\Api\AdministrationResource;
+
 use App\Http\Controllers\Controller;
 use App\Interfaces\Services\Front\AdministrationServiceInterface;
 use Illuminate\Http\Request;
@@ -32,22 +34,12 @@ class AdministrationController extends Controller
             $cacheKey = "api_administrations_{$languageId}";
             
             $administrations = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                return $this->administrationService->getActiveOrderedWithTranslations($languageId)
-                ->map(function ($administration) {
-                    $translation = $administration->translates->first();
-                    
-                    return [
-                        'id' => $administration->id,
-                        'image_url' => $administration->image ? asset('storage/' . $administration->image) : asset('images/default_image.webp'),
-                        'title' => $translation ? $translation->title : '',
-                        'position' => $translation ? $translation->position : ''
-                    ];
-                });
+                return $this->administrationService->getActiveOrderedWithTranslations($languageId);
             });
 
             return response()->json([
                 'success' => true,
-                'data' => $administrations
+                'data' => AdministrationResource::collection($administrations)
             ], 200);
 
         } catch (\Exception $e) {

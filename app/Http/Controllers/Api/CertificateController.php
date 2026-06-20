@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\Api\CertificateResource;
+
 use App\Http\Controllers\Controller;
 use App\Interfaces\Services\Front\CertificateServiceInterface;
 use Illuminate\Http\Request;
@@ -41,19 +43,10 @@ class CertificateController extends Controller
             $cacheKey = "api_certificates_{$languageId}";
             
             $certificates = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                return $this->certificateService->getActiveOrderedWithTranslations($languageId)
-                ->map(function ($certificate) {
-                    $translation = $certificate->translates->first();
-                    return [
-                        'id' => $certificate->id,
-                        'image_url' => $certificate->image ? asset('storage/' . $certificate->image) : asset('images/default_image.webp'),
-                        'title' => $translation ? $translation->title : '',
-                        'date' => $certificate->date
-                    ];
-                });
+                return $this->certificateService->getActiveOrderedWithTranslations($languageId);
             });
 
-            return response()->json(['success' => true, 'data' => $certificates], 200);
+            return response()->json(['success' => true, 'data' => CertificateResource::collection($certificates)], 200);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error retrieving certificates: ' . $e->getMessage(), 'data' => []], 500);
         }

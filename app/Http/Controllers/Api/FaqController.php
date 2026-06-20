@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\Api\FaqResource;
+
 use App\Http\Controllers\Controller;
 use App\Interfaces\Services\Front\FaqServiceInterface;
 use App\Traits\LocaleFromHeader;
@@ -79,40 +81,23 @@ class FaqController extends Controller
         
         $cacheKey = "faqs_{$languageId}";
         
-        return Cache::remember($cacheKey, 3600, function () use ($languageId, $debug) {
-            $faqs = Faq::active()
-                ->ordered()
-                ->with(['translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                }])
-                ->get();
-            
-            if ($faqs->isEmpty()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No FAQs found',
-                    'debug' => $debug
-                ], 404);
-            }
-            
-            $data = $faqs->map(function ($faq) {
-                $translation = $faq->translates->first();
-                
-                return [
-                    'id' => $faq->id,
-                    'question' => $translation ? $translation->question : null,
-                    'answer' => $translation ? $translation->answer : null,
-                    'has_translation' => $translation ? true : false,
-                    'all_translations' => $faq->translates->count()
-                ];
-            });
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'FAQs retrieved successfully',
-                'data' => $data,
-                'debug' => $debug
-            ]);
+        $faqs = Cache::remember($cacheKey, 3600, function () use ($languageId) {
+            return $this->faqService->getActiveOrderedWithTranslations($languageId);
         });
+        
+        if ($faqs->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No FAQs found',
+                'debug' => $debug
+            ], 404);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'FAQs retrieved successfully',
+            'data' => FaqResource::collection($faqs),
+            'debug' => $debug
+        ]);
     }
 } 
