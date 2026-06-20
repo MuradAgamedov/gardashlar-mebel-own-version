@@ -447,6 +447,31 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->registerRepositories();
         $this->registerServices();
+
+        // Dynamically register Front Service/Repository bindings
+        $frontModules = [
+            'About', 'Action', 'Address', 'Administration', 'BecomeAInvestor',
+            'BecomeAPartner', 'BlogCategory', 'BlogPost', 'Catalog', 'Certificate',
+            'Company', 'CompanyManagement', 'CreditCard', 'Currency', 'Dictionary',
+            'Faq', 'HeroCategory', 'HomePageCategory', 'IndividualProjectOrder', 'Kiv',
+            'Language', 'Map', 'NewsCategory', 'NewsPost', 'OurGoal',
+            'Page', 'PartnerSlider', 'Phone', 'PopupAd', 'PrivacyPolicy',
+            'ProductType', 'ProjectCategory', 'Project', 'RefundPolicy', 'Report',
+            'RoluteeteAction', 'SeoPage', 'Service', 'SimpleImage', 'SocialNetwork',
+            'Subscriber', 'Suggestion', 'SuggestionsComplaints', 'Testimonial', 'Vacancy',
+            'WarrantyPolicy', 'WhyChooseUs'
+        ];
+
+        foreach ($frontModules as $module) {
+            $this->app->bind(
+                "App\\Interfaces\\Repositories\\Front\\{$module}RepositoryInterface",
+                "App\\Repositories\\Front\\{$module}Repository"
+            );
+            $this->app->bind(
+                "App\\Interfaces\\Services\\Front\\{$module}ServiceInterface",
+                "App\\Services\\Front\\{$module}Service"
+            );
+        }
     }
 
     /**

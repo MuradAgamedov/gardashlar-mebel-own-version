@@ -62,4 +62,14 @@ interface BaseRepositoryInterface
      * Tərcümələrlə birgə yenilə
      */
     public function updateWithTranslations(int $id, array $data, array $translations, string $foreignKey): Model;
+
+    /**
+     * Aktiv və sıralanmış qeydləri tərcümələri ilə birgə əldə et
+     */
+    public function getActiveOrderedWithTranslations(int $languageId, array $relations = []): Collection;
+
+    /**
+     * ID ilə qeydi və onun tərcüməsini əldə et
+     */
+    public function getByIdWithTranslations(int $id, int $languageId, array $relations = []): ?Model;
 }

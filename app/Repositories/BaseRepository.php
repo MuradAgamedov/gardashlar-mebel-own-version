@@ -198,4 +198,48 @@ abstract class BaseRepository implements BaseRepositoryInterface
     {
         return $this->model->newQuery();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getActiveOrderedWithTranslations(int $languageId, array $relations = []): Collection
+    {
+        $query = $this->query();
+        
+        if (method_exists($this->model, 'scopeActive')) {
+            $query->active();
+        }
+        
+        if (method_exists($this->model, 'scopeOrdered')) {
+            $query->ordered();
+        }
+        
+        $query->with(array_merge([
+            'translates' => function ($q) use ($languageId) {
+                $q->where('language_id', $languageId);
+            }
+        ], $relations));
+        
+        return $query->get();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getByIdWithTranslations(int $id, int $languageId, array $relations = []): ?Model
+    {
+        $query = $this->query();
+        
+        if (method_exists($this->model, 'scopeActive')) {
+            $query->active();
+        }
+        
+        $query->with(array_merge([
+            'translates' => function ($q) use ($languageId) {
+                $q->where('language_id', $languageId);
+            }
+        ], $relations));
+        
+        return $query->find($id);
+    }
 }

@@ -32,6 +32,9 @@ trait HasStatusAndOrder
      */
     public function scopeOrdered($query)
     {
-        return $query->orderBy('order');
+        if (Schema::hasColumn($this->getTable(), 'order')) {
+            return $query->orderBy($this->getTable() . '.order');
+        }
+        return $query;
     }
 }
