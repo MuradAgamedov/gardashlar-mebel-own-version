@@ -50,25 +50,13 @@ class BecomeAInvestorController extends Controller
             });
 
             if (!$data) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Become a investor data not found',
-                    'data' => null
-                ], 404);
+                return $this->notFound('Become a investor data not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Become a investor data retrieved successfully',
-                'data' => new BecomeAInvestorResource($data)
-            ], 200);
+            return $this->success(new BecomeAInvestorResource($data), 'Become a investor data retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving become a investor data: ' . $e->getMessage(),
-                'data' => null
-            ], 500);
+            return $this->serverError('Error retrieving become a investor data: ' . $e->getMessage());
         }
     }
 }

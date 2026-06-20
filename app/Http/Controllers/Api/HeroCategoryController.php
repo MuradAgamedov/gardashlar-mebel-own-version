@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Interfaces\Services\Front\HeroCategoryServiceInterface;
 use App\Interfaces\Services\Front\HeroProductServiceInterface;
 use App\Http\Resources\Api\HeroCategoryResource;
+use App\Http\Resources\Api\ProductCardResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
@@ -36,17 +37,10 @@ class HeroCategoryController extends Controller
                 return $this->heroCategoryService->getActiveOrderedWithTranslations($languageId);
             });
 
-            return response()->json([
-                'success' => true,
-                'data' => HeroCategoryResource::collection($heroCategories),
-            ], 200);
+            return $this->success(HeroCategoryResource::collection($heroCategories));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving hero categories: ' . $e->getMessage(),
-                'data' => [],
-            ], 500);
+            return $this->serverError('Error retrieving hero categories: ' . $e->getMessage());
         }
     }
 
@@ -73,54 +67,19 @@ class HeroCategoryController extends Controller
                 }
             }
 
-            $data = $heroProducts->map(function ($heroProduct) use ($cartIds, $favIds, $compareIds, $languageId) {
-                $product = $heroProduct->product;
-                if (!$product) {
-                    return null;
-                }
-                $translate = $product->translates->first();
-                $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
+            $request->attributes->set('cartIds', $cartIds);
+            $request->attributes->set('favIds', $favIds);
+            $request->attributes->set('compareIds', $compareIds);
 
-                $categorySlug = null;
-                $parentSlug = null;
+            $products = $heroProducts
+                ->map(fn($hp) => $hp->product)
+                ->filter()
+                ->values();
 
-                if ($product->categories && $product->categories->isNotEmpty()) {
-                    $category = $product->categories->first();
-                    $categoryTranslation = $category->translates->first();
-                    $categorySlug = $categoryTranslation?->slug;
-
-                    if ($category->parent_id) {
-                        $parentCategory = \App\Models\ProductCategory::find($category->parent_id);
-                        if ($parentCategory) {
-                            $parentTranslation = $parentCategory->translates()->where('language_id', $languageId)->first();
-                            $parentSlug = $parentTranslation?->slug;
-                        }
-                    }
-                }
-
-                return [
-                    'id' => $product->id,
-                    'title' => $translate?->title,
-                    'slug' => $translate?->slug,
-                    'price' => $product->price,
-                    'discount_price' => $product->discount_price ?? 0,
-                    'main_image_url' => $mainImage?->image_url,
-                    'category_slug' => $categorySlug,
-                    'parentSlug' => $parentSlug,
-                    'inCart' => in_array($product->id, $cartIds),
-                    'inFavorite' => in_array($product->id, $favIds),
-                    'inCompare' => in_array($product->id, $compareIds),
-                ];
-            })->filter()->values()->toArray();
-
-            return response()->json(['success' => true, 'data' => $data], 200);
+            return $this->success(ProductCardResource::collection($products));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving hero products: ' . $e->getMessage(),
-                'data' => [],
-            ], 500);
+            return $this->serverError('Error retrieving hero products: ' . $e->getMessage());
         }
     }
 }

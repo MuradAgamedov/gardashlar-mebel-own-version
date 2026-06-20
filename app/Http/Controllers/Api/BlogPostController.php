@@ -57,32 +57,25 @@ class BlogPostController extends Controller
                 }
             }
 
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'blogs' => BlogPostListResource::collection($blogPosts->getCollection()),
-                    'pagination' => [
-                        'current_page' => $blogPosts->currentPage(),
-                        'last_page' => $blogPosts->lastPage(),
-                        'per_page' => $blogPosts->perPage(),
-                        'total' => $blogPosts->total(),
-                    ],
-                    'sort_options' => [
-                        ['value' => 'newest', 'label' => __('newest')],
-                        ['value' => 'oldest', 'label' => __('oldest')],
-                    ],
-                    'translates' => [
-                        'slug' => $categorySlugTranslations ?? (object)[],
-                    ],
+            return $this->success([
+                'blogs' => BlogPostListResource::collection($blogPosts->getCollection()),
+                'pagination' => [
+                    'current_page' => $blogPosts->currentPage(),
+                    'last_page' => $blogPosts->lastPage(),
+                    'per_page' => $blogPosts->perPage(),
+                    'total' => $blogPosts->total(),
                 ],
-            ], 200);
+                'sort_options' => [
+                    ['value' => 'newest', 'label' => __('newest')],
+                    ['value' => 'oldest', 'label' => __('oldest')],
+                ],
+                'translates' => [
+                    'slug' => $categorySlugTranslations ?? (object)[],
+                ],
+            ]);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving blog posts: ' . $e->getMessage(),
-                'data' => [],
-            ], 500);
+            return $this->serverError('Error retrieving blog posts: ' . $e->getMessage());
         }
     }
 
@@ -97,27 +90,16 @@ class BlogPostController extends Controller
             });
 
             if (!$blogPost) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Blog post not found',
-                    'data' => null,
-                ], 404);
+                return $this->notFound('Blog post not found');
             }
 
             $resource = new BlogPostDetailResource($blogPost);
             $resource->languageId = $languageId;
 
-            return response()->json([
-                'success' => true,
-                'data' => $resource,
-            ], 200);
+            return $this->success($resource);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving blog post: ' . $e->getMessage(),
-                'data' => null,
-            ], 500);
+            return $this->serverError('Error retrieving blog post: ' . $e->getMessage());
         }
     }
 }

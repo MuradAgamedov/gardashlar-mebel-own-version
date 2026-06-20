@@ -440,7 +440,7 @@ Route::post('/payment/products', [PaymentController::class, 'getProducts'])->nam
 Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('api.payment.callback');
 
 // 🔹 Ödəniş nəticələri
-Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
+Route::get('/payment/success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
 Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
 Route::get('/payment/decline', [PaymentController::class, 'decline'])->name('payment.decline');
 Route::post('/payment/status', [PaymentController::class, 'getPaymentStatus'])->name('api.payment.status');

@@ -53,25 +53,13 @@ class BecomeAPartnerController extends Controller
             });
             
             if (!$data) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Become a partner data not found',
-                    'data' => null
-                ], 404);
+                return $this->notFound('Become a partner data not found');
             }
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Become a partner data retrieved successfully',
-                'data' => new BecomeAPartnerResource($data)
-            ], 200);
-            
+
+            return $this->success(new BecomeAPartnerResource($data), 'Become a partner data retrieved successfully');
+
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving become a partner data: ' . $e->getMessage(),
-                'data' => null
-            ], 500);
+            return $this->serverError('Error retrieving become a partner data: ' . $e->getMessage());
         }
     }
 }

@@ -27,7 +27,7 @@ class RoluteeteActionController extends Controller
         ]);
     }
 
-    public function add(Request $request)
+    public function add(AddActionRequest $request)
     {
         $user = $request->user();
 
@@ -37,10 +37,6 @@ class RoluteeteActionController extends Controller
                 "message" => "You must be logged in to add an action!"
             ], 401);
         }
-
-        $request->validate([
-            'roluteete_action_id' => 'required|exists:roluteete_actions,id',
-        ]);
 
         // User üçün aksiya əlavə et (dublikat olmadan)
         $userAction = UserRoluteeteAction::updateOrCreate(

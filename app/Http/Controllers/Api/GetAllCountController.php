@@ -15,25 +15,18 @@ class GetAllCountController extends Controller
         $user = $request->user();
 
         if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized',
-            ], 401);
+            return $this->unauthorized();
         }
 
-        // 🔹 Sayları götür
+        // Sayları götür
         $cartCount = Cart::where('user_id', $user->id)->count();
         $favoriteCount = Favorite::where('user_id', $user->id)->count();
         $compareCount = ProductCompare::where('user_id', $user->id)->count();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Counts fetched successfully.',
-            'data' => [
-                'cart_count' => $cartCount,
-                'favorite_count' => $favoriteCount,
-                'compare_count' => $compareCount,
-            ],
-        ]);
+        return $this->success([
+            'cart_count' => $cartCount,
+            'favorite_count' => $favoriteCount,
+            'compare_count' => $compareCount,
+        ], 'Counts fetched successfully.');
     }
 }

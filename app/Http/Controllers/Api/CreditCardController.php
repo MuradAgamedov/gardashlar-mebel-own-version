@@ -13,9 +13,6 @@ class CreditCardController extends Controller
     {
         $creditCards = CreditCard::ordered()->get(['id', 'title', 'image', 'months', 'order']);
 
-        return response()->json([
-            'success' => true,
-            'data' => CreditCardResource::collection($creditCards),
-        ]);
+        return $this->success(CreditCardResource::collection($creditCards));
     }
 }

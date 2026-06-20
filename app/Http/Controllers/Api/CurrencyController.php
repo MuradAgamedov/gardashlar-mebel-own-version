@@ -31,16 +31,10 @@ class CurrencyController extends Controller
         $currency = Currency::getByCode(strtoupper($code));
 
         if (!$currency) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Currency not found'
-            ], 404);
+            return $this->notFound('Currency not found');
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => new CurrencyResource($currency)
-        ]);
+        return $this->success(new CurrencyResource($currency));
     }
 
   
@@ -50,10 +44,7 @@ class CurrencyController extends Controller
             return Currency::getAvailableCodes();
         });
 
-        return response()->json([
-            'success' => true,
-            'data' => $codes
-        ]);
+        return $this->success($codes);
     }
 
     public function getByCodesArray(GetByCodesRequest $request)
@@ -64,13 +55,10 @@ class CurrencyController extends Controller
             ->ordered()
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => CurrencyResource::collection($currencies)
-        ]);
+        return $this->success(CurrencyResource::collection($currencies));
     }
 
-    
+
     public function convert(ConvertCurrencyRequest $request)
     {
         $amount = $request->amount;
@@ -79,15 +67,12 @@ class CurrencyController extends Controller
 
         $convertedAmount = Currency::convert($amount, $fromCode, $toCode);
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'amount' => $amount,
-                'from' => $fromCode,
-                'to' => $toCode,
-                'converted_amount' => $convertedAmount,
-                'rate' => $convertedAmount / $amount
-            ]
+        return $this->success([
+            'amount' => $amount,
+            'from' => $fromCode,
+            'to' => $toCode,
+            'converted_amount' => $convertedAmount,
+            'rate' => $convertedAmount / $amount
         ]);
     }
 }

@@ -21,7 +21,7 @@ class DeliveryPaymentController extends Controller
 
             $language = Language::find($languageId);
             if (!$language) {
-                return response()->json(['success' => false, 'message' => 'Invalid language ID'], 400);
+                return $this->error('Invalid language ID', 400);
             }
 
             $deliveryPayment = Cache::rememberForever("delivery_payment_{$languageId}", function () use ($languageId) {
@@ -29,20 +29,13 @@ class DeliveryPaymentController extends Controller
             });
 
             if (!$deliveryPayment) {
-                return response()->json(['success' => false, 'message' => 'Delivery payment not found'], 404);
+                return $this->notFound('Delivery payment not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Delivery payment retrieved successfully',
-                'data' => new ContentPageResource($deliveryPayment),
-            ]);
+            return $this->success(new ContentPageResource($deliveryPayment), 'Delivery payment retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving delivery payment: ' . $e->getMessage(),
-            ], 500);
+            return $this->serverError('Error retrieving delivery payment: ' . $e->getMessage());
         }
     }
 }

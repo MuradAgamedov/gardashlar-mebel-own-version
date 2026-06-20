@@ -34,17 +34,10 @@ class AboutController extends Controller
                 return $this->aboutService->getActiveOrderedWithTranslations($languageId);
             });
 
-            return response()->json([
-                'success' => true,
-                'data' => AboutResource::collection($abouts)
-            ], 200);
+            return $this->success(AboutResource::collection($abouts));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving about information: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error retrieving about information: ' . $e->getMessage());
         }
     }
 } 

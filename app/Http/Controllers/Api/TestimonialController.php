@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Interfaces\Services\Front\TestimonialServiceInterface;
 use App\Http\Resources\Api\TestimonialResource;
+use App\Http\Resources\Api\TestimonialWithTranslationsResource;
 use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -90,30 +91,11 @@ class TestimonialController extends Controller
         try {
             $testimonials = $this->testimonialService->getActiveOrdered(['translates.language']);
 
-            $formattedTestimonials = $testimonials->map(function ($testimonial) {
-                $translations = $testimonial->translates->map(function ($translation) {
-                    return [
-                        'language_code' => $translation->language->lang_code,
-                        'language_name' => $translation->language->title,
-                        'full_name' => $translation->full_name,
-                        'position' => $translation->position,
-                        'comment' => $translation->comment,
-                    ];
-                });
-
-                return [
-                    'id' => $testimonial->id,
-                    'customer_image_url' => $testimonial->customer_image ? asset('storage/' . $testimonial->customer_image) : asset('images/default_image.webp'),
-                    'company_logo_url' => $testimonial->company_logo ? asset('storage/' . $testimonial->company_logo) : asset('images/default_image.webp'),
-                    'translations' => $translations,
-                ];
-            });
-
             return response()->json([
                 'success' => true,
-                'data' => $formattedTestimonials,
+                'data'    => TestimonialWithTranslationsResource::collection($testimonials),
                 'message' => 'Testimonials with translations retrieved successfully',
-                'total' => $formattedTestimonials->count(),
+                'total'   => $testimonials->count(),
             ]);
 
         } catch (\Exception $e) {

@@ -34,25 +34,13 @@ class SuggestAPlaceController extends Controller
             });
 
             if (!$suggestAPlace) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Suggest a place data not found',
-                    'data' => null
-                ], 404);
+                return $this->notFound('Suggest a place data not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Suggest a place data retrieved successfully',
-                'data' => new SuggestAPlaceResource($suggestAPlace)
-            ], 200);
+            return $this->success(new SuggestAPlaceResource($suggestAPlace), 'Suggest a place data retrieved successfully');
             
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving suggest a place data: ' . $e->getMessage(),
-                'data' => null
-            ], 500);
+            return $this->serverError('Error retrieving suggest a place data: ' . $e->getMessage());
         }
     }
 }

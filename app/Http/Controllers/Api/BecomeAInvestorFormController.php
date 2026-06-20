@@ -44,25 +44,18 @@ class BecomeAInvestorFormController extends Controller
                 'is_read' => false
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Form submitted successfully',
-                'data' => [
-                    'id' => $form->id,
-                    'name' => $form->name,
-                    'mobile' => $form->mobile,
-                    'email' => $form->email,
-                    'message' => $form->message,
-                    'file' => $form->file,
-                    'created_at' => $form->created_at
-                ]
-            ], 201);
+            return $this->created([
+                'id' => $form->id,
+                'name' => $form->name,
+                'mobile' => $form->mobile,
+                'email' => $form->email,
+                'message' => $form->message,
+                'file' => $form->file,
+                'created_at' => $form->created_at
+            ], 'Form submitted successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error submitting form: ' . $e->getMessage()
-            ], 500);
+            return $this->serverError('Error submitting form: ' . $e->getMessage());
         }
     }
 }

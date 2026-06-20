@@ -37,17 +37,10 @@ class AdministrationController extends Controller
                 return $this->administrationService->getActiveOrderedWithTranslations($languageId);
             });
 
-            return response()->json([
-                'success' => true,
-                'data' => AdministrationResource::collection($administrations)
-            ], 200);
+            return $this->success(AdministrationResource::collection($administrations));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving administration members: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error retrieving administration members: ' . $e->getMessage());
         }
     }
 } 

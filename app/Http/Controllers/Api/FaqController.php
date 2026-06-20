@@ -40,18 +40,9 @@ class FaqController extends Controller
         });
         
         if ($faqs->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No FAQs found',
-                'debug' => $debug
-            ], 404);
+            return $this->notFound('No FAQs found');
         }
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'FAQs retrieved successfully',
-            'data' => FaqResource::collection($faqs),
-            'debug' => $debug
-        ]);
+
+        return $this->success(FaqResource::collection($faqs), 'FAQs retrieved successfully');
     }
 } 

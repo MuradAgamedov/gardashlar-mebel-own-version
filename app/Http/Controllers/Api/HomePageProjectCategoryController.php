@@ -39,14 +39,10 @@ class HomePageProjectCategoryController extends Controller
                 return $resource;
             });
 
-            return response()->json(['success' => true, 'data' => $resources], 200);
+            return $this->success($resources);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ana səhifə layihə kateqoriyaları əldə edilərkən xəta baş verdi: ' . $e->getMessage(),
-                'data' => [],
-            ], 500);
+            return $this->serverError('Ana səhifə layihə kateqoriyaları əldə edilərkən xəta baş verdi: ' . $e->getMessage());
         }
     }
 }

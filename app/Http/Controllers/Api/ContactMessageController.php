@@ -19,11 +19,7 @@ class ContactMessageController extends Controller
             // Verify reCAPTCHA token
             $recaptchaResponse = $this->verifyRecaptcha($request->recaptcha_token);
             if (!$recaptchaResponse['success']) {
-                return response()->json([
-                    'success' => false,
-                    'message' => dict('recaptcha_verification_failed'),
-                    'errors' => ['recaptcha' => [dict('recaptcha_verification_failed')]]
-                ], 422);
+                return $this->error(dict('recaptcha_verification_failed'), 422);
             }
 
             $message = ContactMessage::create([
@@ -34,18 +30,10 @@ class ContactMessageController extends Controller
                 'is_read' => false
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => dict('message_sent_successfully'),
-                'data' => $message
-            ], 201);
+            return $this->created($message, dict('message_sent_successfully'));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => dict('message_send_error') . ': ' . $e->getMessage(),
-                'data' => null
-            ], 500);
+            return $this->serverError(dict('message_send_error') . ': ' . $e->getMessage());
         }
     }
 
@@ -74,21 +62,12 @@ class ContactMessageController extends Controller
             $siteKey = env('SITE_KEY');
             
             if (!$siteKey) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'reCAPTCHA site key not configured'
-                ], 500);
+                return $this->serverError('reCAPTCHA site key not configured');
             }
 
-            return response()->json([
-                'success' => true,
-                'site_key' => $siteKey
-            ]);
+            return $this->success(['site_key' => $siteKey]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving site key: ' . $e->getMessage()
-            ], 500);
+            return $this->serverError('Error retrieving site key: ' . $e->getMessage());
         }
     }
 }

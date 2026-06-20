@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Subscriber\StoreSubscriberRequest;
 use App\Interfaces\Services\Front\SubscriberServiceInterface;
+use App\Http\Resources\Api\SubscriberResource;
 use Illuminate\Http\JsonResponse;
 
 class SubscriberController extends Controller
@@ -23,21 +24,10 @@ class SubscriberController extends Controller
                 'email' => $request->email,
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => dict('subscribe_success'),
-                'data' => [
-                    'id' => $subscriber->id,
-                    'email' => $subscriber->email,
-                    'subscribed_at' => $subscriber->created_at->format('Y-m-d H:i:s')
-                ]
-            ], 200);
+            return $this->success(new SubscriberResource($subscriber), dict('subscribe_success'));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error subscribing email: ' . $e->getMessage()
-            ], 500);
+            return $this->serverError('Error subscribing email: ' . $e->getMessage());
         }
     }
 }

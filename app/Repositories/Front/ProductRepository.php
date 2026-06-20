@@ -27,7 +27,8 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
                 'types.translates' => fn ($q) => $q->where('language_id', $languageId),
                 'images' => fn ($q) => $q->active()->ordered(),
                 'images.translates' => fn ($q) => $q->where('language_id', $languageId),
-                'categories.translates' => fn ($q) => $q->where('language_id', $languageId),
+                'categories.translates'        => fn ($q) => $q->where('language_id', $languageId),
+                'categories.parent.translates' => fn ($q) => $q->where('language_id', $languageId),
             ])
             ->orderBy('order')
             ->get();
@@ -40,8 +41,9 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->with([
                 'translates' => fn($q) => $q->where('language_id', $languageId),
                 'images' => fn($q) => $q->where('status', true)->orderBy('order'),
-                'types.translates' => fn($q) => $q->where('language_id', $languageId),
-                'categories.translates' => fn($q) => $q->where('language_id', $languageId),
+                'types.translates'             => fn($q) => $q->where('language_id', $languageId),
+                'categories.translates'        => fn($q) => $q->where('language_id', $languageId),
+                'categories.parent.translates' => fn($q) => $q->where('language_id', $languageId),
             ])
             ->active();
 
@@ -71,7 +73,10 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
                 },
                 'categories.translates' => function($query) use ($languageId) {
                     $query->where('language_id', $languageId);
-                }
+                },
+                'categories.parent.translates' => function($query) use ($languageId) {
+                    $query->where('language_id', $languageId);
+                },
             ])
             ->whereHas('categories', function($query) use ($categoryIds) {
                 $query->whereIn('product_categories.id', $categoryIds);

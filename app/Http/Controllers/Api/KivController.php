@@ -37,25 +37,13 @@ class KivController extends Controller
             });
 
             if ($categories->isEmpty()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No KIVs found',
-                    'data' => []
-                ], 404);
+                return $this->notFound('No KIVs found');
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'KIVs retrieved successfully',
-                'data' => KivCategoryResource::collection($categories)
-            ], 200);
-            
+            return $this->success(KivCategoryResource::collection($categories), 'KIVs retrieved successfully');
+
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving KIVs: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error retrieving KIVs: ' . $e->getMessage());
         }
     }
 }

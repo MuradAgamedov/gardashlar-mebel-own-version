@@ -15,4 +15,19 @@ class SocialNetworkService extends BaseService implements SocialNetworkServiceIn
         parent::__construct($repository);
         $this->socialNetworkRepository = $repository;
     }
+
+    public function getByType(string $type)
+    {
+        return $this->socialNetworkRepository->getByType($type);
+    }
+
+    public function getByTypes(array $types)
+    {
+        return $this->socialNetworkRepository->getByTypes($types);
+    }
+
+    public function getAvailableTypes(): array
+    {
+        return $this->socialNetworkRepository->getAvailableTypes();
+    }
 }

@@ -488,7 +488,7 @@ class PaymentController extends Controller
         }
     }
 
-   public function success(Request $request)
+   public function paymentSuccess(Request $request)
     {
         $orderId = $request->query('order_id');
         $order = Order::find($orderId);

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\IndividualProjectOrderResource;
 use App\Interfaces\Services\Front\IndividualProjectOrderServiceInterface;
+use App\Models\IndividualProjectOrder;
 use App\Traits\LocaleFromHeader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -27,36 +29,17 @@ class IndividualProjectOrderController extends Controller
         
         $cacheKey = "individual_project_orders_{$languageId}";
         
-        return Cache::remember($cacheKey, 3600, function () use ($languageId) {
-            $orders = IndividualProjectOrder::active()
+        $orders = Cache::remember($cacheKey, 3600, function () use ($languageId) {
+            return IndividualProjectOrder::active()
                 ->ordered()
-                ->with(['translates' => function($query) use ($languageId) {
-                    $query->where('language_id', $languageId);
-                }])
+                ->with(['translates' => fn($q) => $q->where('language_id', $languageId)])
                 ->get();
-            
-            if ($orders->isEmpty()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No individual project orders found'
-                ], 404);
-            }
-            
-            $data = $orders->map(function ($order) {
-                $translation = $order->translates->first();
-                
-                return [
-                    'id' => $order->id,
-                    'title' => $translation ? $translation->title : null,
-                    'description' => $translation ? $translation->description : null,
-                ];
-            });
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Individual project orders retrieved successfully',
-                'data' => $data
-            ]);
         });
+
+        if ($orders->isEmpty()) {
+            return $this->notFound('No individual project orders found');
+        }
+
+        return $this->success(IndividualProjectOrderResource::collection($orders), 'Individual project orders retrieved successfully');
     }
 } 

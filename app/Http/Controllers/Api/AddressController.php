@@ -42,17 +42,10 @@ class AddressController extends Controller
                 ]);
             });
 
-            return response()->json([
-                'success' => true,
-                'data' => AddressResource::collection($addresses)
-            ], 200);
+            return $this->success(AddressResource::collection($addresses));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving addresses: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error retrieving addresses: ' . $e->getMessage());
         }
     }
 } 

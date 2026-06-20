@@ -28,17 +28,10 @@ class DictionaryController extends Controller
                     ->get();
             });
 
-            return response()->json([
-                'success' => true,
-                'data' => DictionaryResource::collection($dictionaries)
-            ], 200);
+            return $this->success(DictionaryResource::collection($dictionaries));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving dictionaries: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error retrieving dictionaries: ' . $e->getMessage());
         }
     }
 
@@ -53,24 +46,13 @@ class DictionaryController extends Controller
                 ->first();
 
             if (!$dictionary) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Dictionary item not found',
-                    'data' => null
-                ], 404);
+                return $this->notFound('Dictionary item not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'data' => new DictionaryResource($dictionary)
-            ], 200);
+            return $this->success(new DictionaryResource($dictionary));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving dictionary item: ' . $e->getMessage(),
-                'data' => null
-            ], 500);
+            return $this->serverError('Error retrieving dictionary item: ' . $e->getMessage());
         }
     }
 
@@ -91,17 +73,10 @@ class DictionaryController extends Controller
                     ];
                 });
 
-            return response()->json([
-                'success' => true,
-                'data' => $dictionaries
-            ], 200);
+            return $this->success($dictionaries);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving dictionaries: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error retrieving dictionaries: ' . $e->getMessage());
         }
     }
 }

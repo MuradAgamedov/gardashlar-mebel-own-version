@@ -35,8 +35,7 @@ class BlogCategoryController extends Controller
                 return $this->blogCategoryService->getActivePaginatedWithCount($languageId, $perPage);
             });
 
-            return response()->json([
-                'success' => true,
+            return $this->success([
                 'data' => BlogCategoryResource::collection($blogCategories->getCollection()),
                 'pagination' => [
                     'current_page' => $blogCategories->currentPage(),
@@ -44,14 +43,10 @@ class BlogCategoryController extends Controller
                     'per_page' => $blogCategories->perPage(),
                     'total' => $blogCategories->total(),
                 ],
-            ], 200);
+            ]);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving blog categories: ' . $e->getMessage(),
-                'data' => [],
-            ], 500);
+            return $this->serverError('Error retrieving blog categories: ' . $e->getMessage());
         }
     }
 
@@ -66,24 +61,13 @@ class BlogCategoryController extends Controller
             });
 
             if (!$blogCategory) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Blog category not found',
-                    'data' => (object)[],
-                ], 404);
+                return $this->notFound('Blog category not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'data' => new BlogCategoryDetailResource($blogCategory),
-            ], 200);
+            return $this->success(new BlogCategoryDetailResource($blogCategory));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving blog category: ' . $e->getMessage(),
-                'data' => (object)[],
-            ], 500);
+            return $this->serverError('Error retrieving blog category: ' . $e->getMessage());
         }
     }
 }

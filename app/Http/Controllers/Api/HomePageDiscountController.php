@@ -32,24 +32,13 @@ class HomePageDiscountController extends Controller
             });
 
             if (!$homePageDiscount) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Home Page Discount data not found',
-                    'data' => null,
-                ], 404);
+                return $this->notFound('Home Page Discount data not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'data' => new HomePageDiscountResource($homePageDiscount),
-            ], 200);
+            return $this->success(new HomePageDiscountResource($homePageDiscount));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving Home Page Discount data: ' . $e->getMessage(),
-                'data' => null,
-            ], 500);
+            return $this->serverError('Error retrieving Home Page Discount data: ' . $e->getMessage());
         }
     }
 }

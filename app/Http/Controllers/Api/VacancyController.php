@@ -33,20 +33,13 @@ class VacancyController extends Controller
             });
 
             if ($vacancies->isEmpty()) {
-                return response()->json(['success' => false, 'message' => 'No vacancies found'], 404);
+                return $this->notFound('No vacancies found');
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Vacancies retrieved successfully',
-                'data' => VacancyResource::collection($vacancies),
-            ], 200);
+            return $this->success(VacancyResource::collection($vacancies), 'Vacancies retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving vacancies: ' . $e->getMessage(),
-            ], 500);
+            return $this->serverError('Error retrieving vacancies: ' . $e->getMessage());
         }
     }
 
@@ -61,24 +54,16 @@ class VacancyController extends Controller
             });
 
             if (!$vacancy) {
-                return response()->json(['success' => false, 'message' => 'Vacancy not found'], 404);
+                return $this->notFound('Vacancy not found');
             }
 
             $resource = new VacancyDetailResource($vacancy);
             $resource->languageId = $languageId;
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Vacancy retrieved successfully',
-                'data' => $resource,
-            ], 200);
+            return $this->success($resource, 'Vacancy retrieved successfully');
 
         } catch (\Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving vacancy',
-                'error' => $e->getMessage(),
-            ], 500);
+            return $this->serverError('Error retrieving vacancy: ' . $e->getMessage());
         }
     }
 }

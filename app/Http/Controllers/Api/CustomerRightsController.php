@@ -21,7 +21,7 @@ class CustomerRightsController extends Controller
 
             $language = Language::find($languageId);
             if (!$language) {
-                return response()->json(['success' => false, 'message' => 'Invalid language ID'], 400);
+                return $this->error('Invalid language ID', 400);
             }
 
             $customerRights = Cache::rememberForever("customer_rights_{$languageId}", function () use ($languageId) {
@@ -29,20 +29,13 @@ class CustomerRightsController extends Controller
             });
 
             if (!$customerRights) {
-                return response()->json(['success' => false, 'message' => 'Customer rights not found'], 404);
+                return $this->notFound('Customer rights not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Customer rights retrieved successfully',
-                'data' => new ContentPageResource($customerRights),
-            ]);
+            return $this->success(new ContentPageResource($customerRights), 'Customer rights retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving customer rights: ' . $e->getMessage(),
-            ], 500);
+            return $this->serverError('Error retrieving customer rights: ' . $e->getMessage());
         }
     }
 }

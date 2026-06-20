@@ -35,9 +35,9 @@ class CertificateController extends Controller
                 return $this->certificateService->getActiveOrderedWithTranslations($languageId);
             });
 
-            return response()->json(['success' => true, 'data' => CertificateResource::collection($certificates)], 200);
+            return $this->success(CertificateResource::collection($certificates));
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error retrieving certificates: ' . $e->getMessage(), 'data' => []], 500);
+            return $this->serverError('Error retrieving certificates: ' . $e->getMessage());
         }
     }
 } 

@@ -61,11 +61,7 @@ class BecomeAPartnerFormController extends Controller
                 );
                 
                 if (!$filePath) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Failed to upload file.',
-                        'data' => null
-                    ], 500);
+                    return $this->serverError('Failed to upload file.');
                 }
             }
 
@@ -78,20 +74,10 @@ class BecomeAPartnerFormController extends Controller
                 'message' => trim($request->message),
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Form submitted successfully',
-                'data' => [
-                    'id' => $form->id
-                ]
-            ], 201);
+            return $this->created(['id' => $form->id], 'Form submitted successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error submitting form: ' . $e->getMessage(),
-                'data' => null
-            ], 500);
+            return $this->serverError('Error submitting form: ' . $e->getMessage());
         }
     }
 }

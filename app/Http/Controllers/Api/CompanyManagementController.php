@@ -32,10 +32,7 @@ class CompanyManagementController extends Controller
             // Validate language ID
             $language = Language::find($languageId);
             if (!$language) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid language ID'
-                ], 400);
+                return $this->error('Invalid language ID', 400);
             }
 
             // Get company management with cache
@@ -46,10 +43,7 @@ class CompanyManagementController extends Controller
             });
 
             if (!$companyManagement) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Company management not found'
-                ], 404);
+                return $this->notFound('Company management not found');
             }
 
             $translation = $companyManagement->translates->first();
@@ -59,17 +53,10 @@ class CompanyManagementController extends Controller
                 'content' => $translation ? $translation->content : ''
             ];
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Company management retrieved successfully',
-                'data' => $companyManagementData
-            ]);
+            return $this->success($companyManagementData, 'Company management retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving company management: ' . $e->getMessage()
-            ], 500);
+            return $this->serverError('Error retrieving company management: ' . $e->getMessage());
         }
     }
 } 

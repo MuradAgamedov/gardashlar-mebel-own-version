@@ -26,17 +26,10 @@ class EmailController extends Controller
                     ->get();
             });
 
-            return response()->json([
-                'success' => true,
-                'data' => $emails
-            ], 200);
+            return $this->success($emails);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving emails: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error retrieving emails: ' . $e->getMessage());
         }
     }
 } 

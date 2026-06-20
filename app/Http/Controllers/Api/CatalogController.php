@@ -34,17 +34,10 @@ class CatalogController extends Controller
         });
 
         if ($catalogs->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No catalogs found'
-            ], 404);
+            return $this->notFound('No catalogs found');
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Catalogs retrieved successfully',
-            'data' => CatalogResource::collection($catalogs)
-        ]);
+        return $this->success(CatalogResource::collection($catalogs), 'Catalogs retrieved successfully');
     }
 
     public function show(Request $request, $id): JsonResponse
@@ -63,16 +56,9 @@ class CatalogController extends Controller
         });
 
         if (!$catalog) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Catalog not found'
-            ], 404);
+            return $this->notFound('Catalog not found');
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Catalog retrieved successfully',
-            'data' => new CatalogResource($catalog)
-        ]);
+        return $this->success(new CatalogResource($catalog), 'Catalog retrieved successfully');
     }
 }

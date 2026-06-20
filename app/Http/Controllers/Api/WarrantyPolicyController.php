@@ -32,7 +32,7 @@ class WarrantyPolicyController extends Controller
 
             $language = $this->languageService->find($languageId);
             if (!$language) {
-                return response()->json(['success' => false, 'message' => 'Invalid language ID'], 400);
+                return $this->error('Invalid language ID', 400);
             }
 
             $warrantyPolicy = Cache::rememberForever("warranty_policy_{$languageId}", function () use ($languageId) {
@@ -40,20 +40,13 @@ class WarrantyPolicyController extends Controller
             });
 
             if (!$warrantyPolicy) {
-                return response()->json(['success' => false, 'message' => 'Warranty policy not found'], 404);
+                return $this->notFound('Warranty policy not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Warranty policy retrieved successfully',
-                'data' => new ContentPageResource($warrantyPolicy),
-            ]);
+            return $this->success(new ContentPageResource($warrantyPolicy), 'Warranty policy retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving warranty policy: ' . $e->getMessage(),
-            ], 500);
+            return $this->serverError('Error retrieving warranty policy: ' . $e->getMessage());
         }
     }
 }

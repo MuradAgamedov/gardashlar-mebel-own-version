@@ -40,23 +40,13 @@ class SuggestionsComplaintsController extends Controller
             });
 
             if (!$suggestionsComplaints) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Suggestions & Complaints not found'
-                ], 404);
+                return $this->notFound('Suggestions & Complaints not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Suggestions & Complaints retrieved successfully',
-                'data' => new SuggestionsComplaintsResource($suggestionsComplaints)
-            ], 200);
+            return $this->success(new SuggestionsComplaintsResource($suggestionsComplaints), 'Suggestions & Complaints retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving suggestions & complaints information: ' . $e->getMessage()
-            ], 500);
+            return $this->serverError('Error retrieving suggestions & complaints information: ' . $e->getMessage());
         }
     }
 } 

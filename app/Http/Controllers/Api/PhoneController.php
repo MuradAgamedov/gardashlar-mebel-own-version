@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\PhoneTypeResource;
 use App\Interfaces\Services\Front\PhoneServiceInterface;
 use App\Interfaces\Services\Front\PhoneTypeServiceInterface;
 use Illuminate\Http\Request;
@@ -57,24 +58,12 @@ class PhoneController extends Controller
             Cache::forget($cacheKey);
 
             $phoneTypes = Cache::rememberForever($cacheKey, function () use ($languageId) {
-                return $this->phoneTypeService->getPhonesGroupedByTypes($languageId)
-                    ->map(function ($phoneType) {
-                        $translation = $phoneType->translates->first();
-                        return [
-                            'type' => $translation ? $translation->title : '',
-                            'phones' => $phoneType->phones->map(function ($phone) {
-                                return [
-                                    'id' => $phone->id,
-                                    'phone' => $phone->phone,
-                                ];
-                            })->values(),
-                        ];
-                    });
+                return $this->phoneTypeService->getPhonesGroupedByTypes($languageId);
             });
 
             return response()->json([
                 'success' => true,
-                'data' => $phoneTypes
+                'data' => PhoneTypeResource::collection($phoneTypes),
             ], 200);
 
         } catch (\Exception $e) {

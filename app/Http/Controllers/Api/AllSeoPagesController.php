@@ -37,18 +37,11 @@ class AllSeoPagesController extends Controller
                 ];
             });
 
-            return response()->json([
-                'success' => true,
-                'data' => $seoSettings
-            ]);
+            return $this->success($seoSettings);
 
         } catch (\Throwable $e) {
             report($e);
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving SEO settings.',
-                'data' => null
-            ], 500);
+            return $this->serverError('Error retrieving SEO settings.');
         }
     }
 

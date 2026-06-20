@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\CartItemResource;
 use Illuminate\Http\Request;
 use App\Models\Cart;
 use App\Traits\LocaleFromHeader;
@@ -20,10 +21,7 @@ class CartController extends Controller
         $user = $request->user();
 
         if (!$user) {
-            return response()->json([
-                "success" => false,
-                "message" => "You must be logged in to complete this transaction!"
-            ], 401);
+            return $this->unauthorized('You must be logged in to complete this transaction!');
         }
 
         // Cart əlavə et və ya yenilə
@@ -39,11 +37,7 @@ class CartController extends Controller
         );
         
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Product added to cart successfully!',
-            'data' => $cart
-        ]);
+        return $this->success($cart, 'Product added to cart successfully!');
     }
 
     public function favoriteProductsAddToCart(Request $request)
@@ -51,19 +45,13 @@ class CartController extends Controller
         $user = $request->user();
 
         if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You must be logged in to complete this transaction!'
-            ], 401);
+            return $this->unauthorized('You must be logged in to complete this transaction!');
         }
 
         $items = $request->all();
 
         if (!is_array($items) || empty($items)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Request payload must be a non-empty array of items.'
-            ], 422);
+            return $this->error('Request payload must be a non-empty array of items.', 422);
         }
 
         $validator = Validator::make($items, [
@@ -72,11 +60,7 @@ class CartController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
+            return $this->error('Validation failed', 422, $validator->errors());
         }
 
         $addedItems = [];
@@ -102,14 +86,10 @@ class CartController extends Controller
         // Cari istifadəçinin cart-indakı item sayını hesabla
         $cartLength = $user->cart()->count();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Favorite products added to cart successfully!',
-            'data' => [
-                'cart' => $addedItems,
-                'length' => $cartLength,
-            ],
-        ]);
+        return $this->success([
+            'cart' => $addedItems,
+            'length' => $cartLength,
+        ], 'Favorite products added to cart successfully!');
     }
 
     public function getCart(Request $request)
@@ -129,89 +109,14 @@ class CartController extends Controller
         // 2️⃣ Favorit və müqayisə məlumatlarını öncədən çək
         $favoriteProducts = $user->favorites()->select('product_id', 'color_id')->get();
         $favoritesMap = $favoriteProducts->groupBy(fn($item) => $item->product_id . '-' . $item->color_id);
-    
         $compareProducts = \App\Models\ProductCompare::select('product_id')->pluck('product_id')->toArray();
-    
-        // 3️⃣ Cart məlumatlarını map et
-        $cartData = $carts->map(function ($cart) use ($languageId, $favoritesMap, $compareProducts) {
-            $product = $cart->product;
-    
-            if (!$product) return null;
-    
-            // Əsas kateqoriyanı al (bir məhsul bir neçə kateqoriyaya bağlı ola bilər, ilkini götürürük)
-            $category = $product->categories->first();
-            $parentCategory = $category?->parent;
-    
-            // Məhsul məlumatı
-            $productData = [
-                'id' => $product->id,
-                'title' => $product->translate($languageId)?->title ?? '',
-                'slug' => $product->translate($languageId)?->slug ?? '',
-                'price' => $product->price,
-                'discount_price' => $product->discount_price,
-                'view_count' => $product->view_count,
-    
-                // 🔹 Category məlumatı product-un içində
-                'category_title' => $category?->translates->where('language_id', $languageId)->first()?->title ?? '',
-                'category_slug' => $category?->translates->where('language_id', $languageId)->first()?->slug ?? '',
-                'parent_title' => $parentCategory?->translates->where('language_id', $languageId)->first()?->title ?? '',
-                'parent_slug' => $parentCategory?->translates->where('language_id', $languageId)->first()?->slug ?? '',
-    
-                'images' => $product->images
-                    ->sortBy('order')
-                    ->map(fn($image) => [
-                        'id' => $image->id,
-                        'image_url' => $image->image ? asset('storage/' . $image->image) : asset('images/default_image.webp'),
-                        'is_main' => $image->is_main,
-                        'color_id' => $image->product_color_id
-                    ])->values(),
-    
-                'available_colors' => $product->colors->map(fn($color) => [
-                    'id' => $color->id,
-                    'color_code' => $color->color_code
-                ]),
-    
-                'product_types' => $product->types->map(fn($type) => [
-                    'id' => $type->id,
-                    'title' => $type->translates->where('language_id', $languageId)->first()?->title ?? ''
-                ]),
-    
-                'product_details' => $product->details->map(function ($detail) use ($languageId) {
-                    $translation = $detail->translates->where('language_id', $languageId)->first();
-                    return [
-                        'id' => $detail->id,
-                        'keyword' => $translation?->keyword ?? '',
-                        'value' => $translation?->value ?? '',
-                    ];
-                }),
-            ];
-    
-            $key = $cart->product_id . '-' . $cart->color_id;
-    
-            return [
-                'cart_id' => $cart->id,
-                'count' => $cart->count,
-                'color_id' => $cart->color_id,
-                'product' => $productData,
-                'inCart' => [
-                    'isActive' => true,
-                    'color_id' => $cart->color_id,
-                    'count' => $cart->count,
-                ],
-                'inFavorite' => [
-                    'isActive' => isset($favoritesMap[$key]),
-                    'color_id' => $cart->color_id,
-                ],
-                'inCompare' => in_array($cart->product_id, $compareProducts),
-            ];
-        })->filter();
-    
-        // 4️⃣ Cavabı qaytar
-        return response()->json([
-            'success' => true,
-            'data' => $cartData->values(),
-            'message' => 'Cart fetched successfully',
-        ]);
+
+        // 3️⃣ Cavabı qaytar
+        $request->attributes->set('languageId', $languageId);
+        $request->attributes->set('favoritesMap', $favoritesMap);
+        $request->attributes->set('compareIds', $compareProducts);
+
+        return $this->success(CartItemResource::collection($carts->filter(fn($c) => $c->product)->values()), 'Cart fetched successfully');
     }
     
     
@@ -222,20 +127,14 @@ class CartController extends Controller
         $user = $request->user();
 
         if (!$user) {
-            return response()->json([
-                "success" => false,
-                "message" => "You must be logged in!"
-            ], 401);
+            return $this->unauthorized('You must be logged in!');
         }
 
         $deleted = Cart::where('user_id', $user->id)
             ->where('product_id', $request->product_id)
             ->delete();
 
-        return response()->json([
-            'success' => (bool) $deleted,
-            'message' => $deleted ? 'Product removed from cart successfully!' : 'Product not found in cart!'
-        ]);
+        return $this->success(null, $deleted ? 'Product removed from cart successfully!' : 'Product not found in cart!');
     }
 
 
@@ -341,24 +240,12 @@ class CartController extends Controller
                 ];
             });
     
-            return response()->json([
-                'success' => true,
-                'data' => $productsData,
-                'message' => true
-            ], 200);
-    
+            return $this->success($productsData);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'data' => null,
-                'message' => 'Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? [])
-            ], 400);
+            return $this->error('Validation error: ' . implode(', ', $e->errors()['product_ids'] ?? []), 400);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'data' => null,
-                'message' => 'Error checking compare products: ' . $e->getMessage()
-            ], 500);
+            return $this->serverError('Error checking compare products: ' . $e->getMessage());
         }
     }
     

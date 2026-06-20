@@ -12,4 +12,19 @@ class SocialNetworkRepository extends BaseRepository implements SocialNetworkRep
     {
         parent::__construct($model);
     }
+
+    public function getByType(string $type)
+    {
+        return $this->model::getByType($type);
+    }
+
+    public function getByTypes(array $types)
+    {
+        return $this->model::getByTypes($types);
+    }
+
+    public function getAvailableTypes(): array
+    {
+        return $this->model::getAvailableTypes();
+    }
 }

@@ -39,17 +39,10 @@ class HomePageCategoryController extends Controller
                 return $resource;
             });
 
-            return response()->json([
-                'success' => true,
-                'data' => $resources,
-            ], 200);
+            return $this->success($resources);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving homepage categories: ' . $e->getMessage(),
-                'data' => [],
-            ], 500);
+            return $this->serverError('Error retrieving homepage categories: ' . $e->getMessage());
         }
     }
 }

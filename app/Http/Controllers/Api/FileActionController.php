@@ -20,18 +20,12 @@ class FileActionController extends Controller
             $url = $request->query('url');
             
             if (!$url) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'URL parameter is required'
-                ], 400);
+                return $this->error('URL parameter is required', 400);
             }
 
             // URL-in düzgünlüyünü yoxlayırıq
             if (!filter_var($url, FILTER_VALIDATE_URL)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid URL format'
-                ], 400);
+                return $this->error('Invalid URL format', 400);
             }
 
             // URL-in bizim domain-dən olduğunu yoxlayırıq
@@ -45,34 +39,19 @@ class FileActionController extends Controller
             ];
 
             if (!in_array($parsedUrl['host'] ?? '', $allowedHosts)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Access denied. Only files from authorized domains can be downloaded.'
-                ], 403);
+                return $this->forbidden('Access denied. Only files from authorized domains can be downloaded.');
             }
 
             // URL-dən storage path-i çıxarırıq
             $path = $this->extractStoragePath($url);
             
             if (!$path) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Could not extract file path from URL'
-                ], 400);
+                return $this->error('Could not extract file path from URL', 400);
             }
 
             // Faylın mövcudluğunu yoxlayırıq
             if (!Storage::disk('public')->exists($path)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'File not found',
-                    'debug' => [
-                        'requested_url' => $url,
-                        'extracted_path' => $path,
-                        'storage_path' => Storage::disk('public')->path($path),
-                        'storage_exists' => Storage::disk('public')->exists($path)
-                    ]
-                ], 404);
+                return $this->notFound('File not found');
             }
 
             // Faylın tam yolunu alırıq
@@ -94,10 +73,7 @@ class FileActionController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error downloading file: ' . $e->getMessage()
-            ], 500);
+            return $this->serverError('Error downloading file: ' . $e->getMessage());
         }
     }
 

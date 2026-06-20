@@ -38,10 +38,7 @@ class VacancyFormController extends Controller
 
             // Check expiration on vacancy if needed
             if (!$vacancy || ($vacancy->expire_date && \Carbon\Carbon::parse($vacancy->expire_date)->isPast())) {
-                return response()->json([
-                    'success' => false,
-                    'message' => DictionaryHelper::trans('vacancy_not_available', $lang),
-                ], 404);
+                return $this->error(DictionaryHelper::trans('vacancy_not_available', $lang), 404);
             }
 
             // File upload
@@ -57,11 +54,7 @@ class VacancyFormController extends Controller
                 );
 
                 if (!$filePath) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => DictionaryHelper::trans('file_upload_failed', $lang),
-                        'data' => null
-                    ], 500);
+                    return $this->serverError(DictionaryHelper::trans('file_upload_failed', $lang));
                 }
             }
 
@@ -76,26 +69,19 @@ class VacancyFormController extends Controller
                 'is_read' => false,
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => DictionaryHelper::trans('form_submitted_success', $lang),
-                'data' => [
-                    'id' => $form->id,
-                    'vacancy_id' => $form->vacancy_id,
-                    'name' => $form->name,
-                    'mobile' => $form->mobile,
-                    'email' => $form->email,
-                    'message' => $form->message,
-                    'file' => $form->file,
-                    'created_at' => $form->created_at,
-                ],
-            ], 201);
+            return $this->created([
+                'id' => $form->id,
+                'vacancy_id' => $form->vacancy_id,
+                'name' => $form->name,
+                'mobile' => $form->mobile,
+                'email' => $form->email,
+                'message' => $form->message,
+                'file' => $form->file,
+                'created_at' => $form->created_at,
+            ], DictionaryHelper::trans('form_submitted_success', $lang));
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => DictionaryHelper::trans('form_submit_error', $request->get('lang', 'az')) . ': ' . $e->getMessage(),
-            ], 500);
+            return $this->serverError(DictionaryHelper::trans('form_submit_error', $request->get('lang', 'az')) . ': ' . $e->getMessage());
         }
     }
 }

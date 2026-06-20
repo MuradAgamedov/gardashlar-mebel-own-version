@@ -53,27 +53,16 @@ class WhyChooseUsController extends Controller
             });
 
             if (!$data) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Why Choose Us data not found',
-                    'data' => null
-                ], 404);
+                return $this->notFound('Why Choose Us data not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'why_choose_us' => new WhyChooseUsResource($data['why_choose_us']),
-                    'sliders' => WhyChooseUsSliderResource::collection($data['sliders'])
-                ]
-            ], 200);
+            return $this->success([
+                'why_choose_us' => new WhyChooseUsResource($data['why_choose_us']),
+                'sliders' => WhyChooseUsSliderResource::collection($data['sliders'])
+            ]);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving Why Choose Us data: ' . $e->getMessage(),
-                'data' => []
-            ], 500);
+            return $this->serverError('Error retrieving Why Choose Us data: ' . $e->getMessage());
         }
     }
 } 

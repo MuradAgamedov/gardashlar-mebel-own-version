@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\ProductCardResource;
 use App\Interfaces\Services\Front\ProductTypeServiceInterface;
 use App\Interfaces\Services\Front\ProductServiceInterface;
-use App\Models\ProductCategory;
 use App\Models\ProductCompare;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -74,50 +74,13 @@ class ProductTypeProductController extends Controller
                     ->toArray();
             }
 
-            $products = $products->map(function ($product) use ($languageId, $cartIds, $favIds, $compareIds) {
-                $translation = $product->translates->first();
-                $mainImage = $product->images->where('is_main', true)->first() ?? $product->images->first();
-
-                $categorySlug = null;
-                $parentSlug = null;
-
-                if ($product->categories && $product->categories->isNotEmpty()) {
-                    $category = $product->categories->first();
-                    $tr = $category->translates->first();
-                    $categorySlug = $tr ? $tr->slug : null;
-
-                    if ($category->parent_id) {
-                        $parent = ProductCategory::find($category->parent_id);
-                        if ($parent) {
-                            $ptr = $parent->translates()->where('language_id', $languageId)->first();
-                            $parentSlug = $ptr ? $ptr->slug : null;
-                        }
-                    }
-                }
-
-                return [
-                    'id' => $product->id,
-                    'title' => $translation ? $translation->title : '',
-                    'slug' => $translation ? $translation->slug : '',
-                    'price' => $product->price,
-                    'discount_price' => $product->discount_price,
-                    'view_count' => $product->view_count ?? 0,
-                    'card_image' => $mainImage && $mainImage->image
-                        ? asset('storage/' . $mainImage->image)
-                        : asset('images/default_image.webp'),
-                    'category_slug' => $categorySlug,
-                    'parentSlug' => $parentSlug,
-
-                    // ✅ BİRİNCİ CONTROLLER İLƏ TAM EYNİ
-                    'inCart' => in_array($product->id, $cartIds),
-                    'inFavorite' => in_array($product->id, $favIds),
-                    'inCompare' => in_array($product->id, $compareIds),
-                ];
-            });
+            $request->attributes->set('cartIds', $cartIds);
+            $request->attributes->set('favIds', $favIds);
+            $request->attributes->set('compareIds', $compareIds);
 
             return response()->json([
                 'success' => true,
-                'data' => $products
+                'data'    => ProductCardResource::collection($products),
             ], 200);
 
         } catch (\Exception $e) {

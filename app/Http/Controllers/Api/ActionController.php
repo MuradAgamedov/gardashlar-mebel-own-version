@@ -32,17 +32,10 @@ class ActionController extends Controller
                 return $this->actionService->getActiveCurrentOrdered($languageId, $request->company_id);
             });
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Actions retrieved successfully',
-                'data' => ActionResource::collection($actions),
-            ]);
+            return $this->success(ActionResource::collection($actions), 'Actions retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving actions: ' . $e->getMessage(),
-            ], 500);
+            return $this->serverError('Error retrieving actions: ' . $e->getMessage());
         }
     }
 
@@ -56,20 +49,13 @@ class ActionController extends Controller
             });
 
             if (!$action) {
-                return response()->json(['success' => false, 'message' => 'Action not found'], 404);
+                return $this->notFound('Action not found');
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Action retrieved successfully',
-                'data' => new ActionResource($action),
-            ]);
+            return $this->success(new ActionResource($action), 'Action retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error retrieving action: ' . $e->getMessage(),
-            ], 500);
+            return $this->serverError('Error retrieving action: ' . $e->getMessage());
         }
     }
 }
