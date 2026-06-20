@@ -2,23 +2,28 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Product\DuplicateProductRequest;
+
+use App\Http\Requests\Admin\Product\ReorderProductRequest;
+
+use App\Http\Requests\Admin\Product\StoreProductRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductTranslate;
 use App\Models\ProductCategory;
 use App\Models\ProductType;
 use App\Models\ProductTag;
-use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\Repositories\ProductRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\ProductServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class ProductController extends Controller
 {
     public function __construct(
-        public ProductRepository $repository,
-        public LanguageRepository $languageRepository
+        protected ProductServiceInterface $productService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
@@ -27,9 +32,9 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $products = $this->repository->getProducts($request);
-        $categories = $this->repository->getActiveSubcategories();
-        $types = $this->repository->getActiveTypes();
+        $products = $this->productService->getProducts($request);
+        $categories = $this->productService->getActiveSubcategories();
+        $types = $this->productService->getActiveTypes();
         
         return view('admin.products.index', compact('products', 'categories', 'types'));
     }
@@ -39,10 +44,10 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = $this->repository->getActiveSubcategories();
-        $types = $this->repository->getActiveTypes();
-        $tags = $this->repository->getActiveTags();
-        $languages = $this->languageRepository->getAllLanguages();
+        $categories = $this->productService->getActiveSubcategories();
+        $types = $this->productService->getActiveTypes();
+        $tags = $this->productService->getActiveTags();
+        $languages = $this->languageService->getAllLanguages();
         
         return view('admin.products.create', compact('categories', 'types', 'tags', 'languages'));
     }
@@ -50,24 +55,9 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        $request->validate([
-            'product_categories' => 'nullable|string',
-            'product_types' => 'nullable|string',
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.title' => 'required|string|max:255',
-            'translations.*.description' => 'nullable|string',
-            'translations.*.slug' => 'required|string|max:255',
-            'translations.*.seo_title' => 'nullable|string|max:255',
-            'translations.*.seo_keywords' => 'nullable|string',
-            'translations.*.seo_description' => 'nullable|string',
-            'price' => 'nullable|numeric|min:0',
-            'discount_price' => 'nullable|numeric',
-            'product_tags' => 'nullable|string',
-            'status' => 'boolean'
-        ]);
+        $request->validated();
 
         try {
             $product = Product::create([
@@ -142,10 +132,10 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $product->load(['translates.language', 'tags']);
-        $categories = $this->repository->getActiveSubcategories();
-        $types = $this->repository->getActiveTypes();
-        $tags = $this->repository->getActiveTags();
-        $languages = $this->languageRepository->getAllLanguages();
+        $categories = $this->productService->getActiveSubcategories();
+        $types = $this->productService->getActiveTypes();
+        $tags = $this->productService->getActiveTags();
+        $languages = $this->languageService->getAllLanguages();
         
         return view('admin.products.edit', compact('product', 'categories', 'types', 'tags', 'languages'));
     }
@@ -155,22 +145,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $request->validate([
-            'product_categories' => 'nullable|string',
-            'product_types' => 'nullable|string',
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.title' => 'required|string|max:255',
-            'translations.*.description' => 'nullable|string',
-            'translations.*.slug' => 'required|string|max:255',
-            'translations.*.seo_title' => 'nullable|string|max:255',
-            'translations.*.seo_keywords' => 'nullable|string',
-            'translations.*.seo_description' => 'nullable|string',
-            'price' => 'nullable|numeric|min:0',
-            'discount_price' => 'nullable|numeric',
-            'product_tags' => 'nullable|string',
-            'status' => 'boolean'
-        ]);
+        $request->validated();
     
         try {
             // Əsas məhsul məlumatlarını yenilə
@@ -271,12 +246,9 @@ class ProductController extends Controller
     /**
      * Reorder products
      */
-    public function reorder(Request $request)
+    public function reorder(ReorderProductRequest $request)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'exists:products,id'
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->input('items') as $index => $id) {
@@ -290,11 +262,9 @@ class ProductController extends Controller
     }
 
 
-    public function duplicate(Request $request, Product $product)
+    public function duplicate(DuplicateProductRequest $request, Product $product)
     {
-        $request->validate([
-            'category_id' => 'required|exists:product_categories,id'
-        ]);
+        $request->validated();
     
         try {
             // Yeni product yaradılır (əsas məlumatlar)

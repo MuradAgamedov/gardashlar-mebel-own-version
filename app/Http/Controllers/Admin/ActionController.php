@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Action\AddProductActionRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Action;
-use App\Models\Company;
 use App\Models\CompanyProduct;
-use App\Models\Language;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use App\Repositories\CompanyRepository;
-use App\Repositories\ActionRepository;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
+use App\Interfaces\Services\Admin\CompanyServiceInterface;
+use App\Interfaces\Services\Admin\ActionServiceInterface;
 use App\Http\Requests\Admin\Action\StoreActionRequest;
 use App\Http\Requests\Admin\Action\UpdateActionRequest;
 
@@ -18,28 +19,28 @@ use App\Http\Requests\Admin\Action\UpdateActionRequest;
 
 class ActionController extends Controller
 {
-    public function __construct(public ActionRepository $repository, public CompanyRepository $companyRepository)
+    public function __construct(protected LanguageServiceInterface $languageService, protected ActionServiceInterface $actionService, protected CompanyServiceInterface $companyService)
     {
     }
 
     public function index(Request $request)
     {
-        $actions = $this->repository->getAction($request);
-        $companies = $this->companyRepository->getCompanies();
+        $actions = $this->actionService->getAction($request);
+        $companies = $this->companyService->getCompanies();
         return view('admin.actions.index', compact('actions', 'companies'));
     }
 
     public function create()
     {
-        $companies = Company::with('translates.language')->active()->ordered()->get();
-        $languages = Language::getActiveLanguages();
+        $companies = $this->companyService->getCompanies();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.actions.create', compact('companies', 'languages'));
     }
 
     public function store(StoreActionRequest $request)
     {
         try {
-            $this->repository->createAction(
+            $this->actionService->createAction(
                 [
                     'company_id' => $request->company_id,
                     'icon' => $request->icon,
@@ -69,15 +70,15 @@ class ActionController extends Controller
     public function edit(Action $action)
     {
         $action->load(['translates.language']);
-        $companies = Company::with('translates.language')->active()->ordered()->get();
-        $languages = Language::getActiveLanguages();
+        $companies = $this->companyService->getCompanies();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.actions.edit', compact('action', 'companies', 'languages'));
     }
 
     public function update(UpdateActionRequest $request, Action $action)
     {
         try {
-            $this->repository->updateAction(
+            $this->actionService->updateAction(
                 $action,
                 [
                     'company_id' => $request->company_id,
@@ -102,7 +103,7 @@ class ActionController extends Controller
     public function destroy(Action $action)
     {
         try {
-            $this->repository->deleteAction($action);
+            $this->actionService->deleteAction($action);
 
             return redirect()->route('admin.actions.index')
                 ->with('success', __('Action deleted successfully.'));
@@ -133,11 +134,9 @@ class ActionController extends Controller
         return view('admin.actions.products', compact('action', 'products'));
     }
 
-    public function addProduct(Request $request, Action $action)
+    public function addProduct(AddProductActionRequest $request, Action $action)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-        ]);
+        $request->validated();
 
         try {
             $existing = CompanyProduct::where('action_id', $action->id)
@@ -173,9 +172,7 @@ class ActionController extends Controller
 
     public function removeProduct(Request $request, Action $action)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-        ]);
+        $request->validated();
 
         try {
             CompanyProduct::where('action_id', $action->id)

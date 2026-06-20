@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Email\ReorderEmailRequest;
+
+use App\Http\Requests\Admin\Email\StoreEmailRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Email;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Repositories\EmailRepository;
+use App\Interfaces\Services\Admin\EmailServiceInterface;
 
 class EmailController extends Controller
 {
-    public function __construct(public EmailRepository $repository)
+    public function __construct(protected EmailServiceInterface $emailService)
     {
     }
 
@@ -19,7 +23,7 @@ class EmailController extends Controller
      */
     public function index()
     {
-        $emails = $this->repository->getEmails();
+        $emails = $this->emailService->getEmails();
         return view('admin.emails.index', compact('emails'));
     }
 
@@ -34,12 +38,9 @@ class EmailController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreEmailRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email|max:255',
-            'status' => 'boolean',
-        ]);
+        $request->validated();
 
         try {
             Email::create([
@@ -71,10 +72,7 @@ class EmailController extends Controller
      */
     public function update(Request $request, Email $email)
     {
-        $request->validate([
-            'email' => 'required|email|max:255',
-            'status' => 'boolean',
-        ]);
+        $request->validated();
 
         try {
             $email->update([
@@ -111,12 +109,9 @@ class EmailController extends Controller
     /**
      * Reorder emails
      */
-    public function reorder(Request $request)
+    public function reorder(ReorderEmailRequest $request)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'integer|exists:emails,id'
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->items as $index => $id) {

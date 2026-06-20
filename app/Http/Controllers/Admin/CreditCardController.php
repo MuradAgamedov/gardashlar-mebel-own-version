@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\CreditCard\ReorderCreditCardRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\CreditCard;
 use Illuminate\Http\Request;
-use App\Repositories\CreditCardRepository;
+use App\Interfaces\Services\Admin\CreditCardServiceInterface;
 use App\Http\Requests\Admin\CreditCard\StoreCreditCardRequest;
 use App\Http\Requests\Admin\CreditCard\UpdateCreditCardRequest;
 
 class CreditCardController extends Controller
 {
-    public function __construct(public CreditCardRepository $repository)
+    public function __construct(protected CreditCardServiceInterface $creditCardService)
     {
     }
 
     public function index()
     {
-        $creditCards = $this->repository->getCreditCards();
+        $creditCards = $this->creditCardService->getCreditCards();
         return view('admin.CreditCard.index', compact('creditCards'));
     }
 
@@ -29,7 +31,7 @@ class CreditCardController extends Controller
     public function store(StoreCreditCardRequest $request)
     {
         try {
-            $this->repository->createCreditCard(
+            $this->creditCardService->createCreditCard(
                 [
                     'title' => $request->input('title'),
                     'months' => $request->input('months'),
@@ -55,7 +57,7 @@ class CreditCardController extends Controller
     public function update(UpdateCreditCardRequest $request, CreditCard $creditCard)
     {
         try {
-            $this->repository->updateCreditCard(
+            $this->creditCardService->updateCreditCard(
                 $creditCard,
                 [
                     'title' => $request->input('title'),
@@ -77,7 +79,7 @@ class CreditCardController extends Controller
     public function destroy(CreditCard $creditCard)
     {
         try {
-            $this->repository->deleteCreditCard($creditCard);
+            $this->creditCardService->deleteCreditCard($creditCard);
             return redirect()->route('admin.credit-cards.index')
                 ->with('success', __('Credit Card deleted successfully!'));
         } catch (\Exception $e) {
@@ -86,15 +88,12 @@ class CreditCardController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderCreditCardRequest $request)
     {
-        $request->validate([
-            'credit_cards' => 'required|array',
-            'credit_cards.*' => 'required|integer|exists:credit_cards,id',
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderCreditCards($request->credit_cards);
+            $this->creditCardService->reorderCreditCards($request->credit_cards);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

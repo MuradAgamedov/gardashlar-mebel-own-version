@@ -8,8 +8,16 @@ use App\Models\Vacancy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+use App\Interfaces\Services\Admin\VacancyFormServiceInterface;
+
 class VacancyFormController extends Controller
 {
+    public function __construct(
+        protected VacancyFormServiceInterface $vacancyFormService
+    ) {
+    }
+
+
     /**
      * Display a listing of the resource.
      */
@@ -66,7 +74,7 @@ class VacancyFormController extends Controller
      */
     public function markAsRead(string $id)
     {
-        $form = VacancyForm::findOrFail($id);
+        $form = $this->vacancyFormService->findOrFail($id);
         $form->markAsRead();
 
         return redirect()->back()->with('success', __('Form marked as read'));
@@ -77,7 +85,7 @@ class VacancyFormController extends Controller
      */
     public function markAsUnread(string $id)
     {
-        $form = VacancyForm::findOrFail($id);
+        $form = $this->vacancyFormService->findOrFail($id);
         $form->update(['is_read' => false, 'read_at' => null]);
 
         return redirect()->back()->with('success', __('Form marked as unread'));
@@ -88,7 +96,7 @@ class VacancyFormController extends Controller
      */
     public function downloadFile(string $id)
     {
-        $form = VacancyForm::findOrFail($id);
+        $form = $this->vacancyFormService->findOrFail($id);
         
         if (!$form->file) {
             return redirect()->back()->with('error', __('No file attached'));
@@ -111,7 +119,7 @@ class VacancyFormController extends Controller
      */
     public function destroy(string $id)
     {
-        $form = VacancyForm::findOrFail($id);
+        $form = $this->vacancyFormService->findOrFail($id);
         
         // Delete file if exists
         if ($form->file && Storage::exists($form->file)) {

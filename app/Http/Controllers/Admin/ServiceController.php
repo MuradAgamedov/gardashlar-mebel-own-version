@@ -2,33 +2,34 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Service\DeleteSelectedServiceRequest;
+
+use App\Http\Requests\Admin\Service\UpdateOrderServiceRequest;
+
+use App\Http\Requests\Admin\Service\StoreServiceRequest;
+
 use App\Http\Controllers\Controller;
-use App\Models\Language;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
+use App\Interfaces\Services\Admin\ServiceServiceInterface;
 use Illuminate\Support\Str;
 
 class ServiceController extends Controller
 {
+    public function __construct(
+        protected ServiceServiceInterface $serviceService,
+        protected LanguageServiceInterface $languageService
+    ) {
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Service::with('translates.language');
-        
-        // Search functionality
-        if ($request->has('search') && !empty($request->search)) {
-            $search = $request->search;
-            $query->whereHas('translates', function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('card_description', 'like', "%{$search}%")
-                  ->orWhere('main_description', 'like', "%{$search}%");
-            });
-        }
-        
-        $services = $query->orderBy('order')->get();
-        $languages = Language::active()->orderBy('order')->get();
+        $services = $this->serviceService->getServices($request);
+        $languages = $this->languageService->getActiveLanguages();
         
         return view('admin.services.index', compact('services', 'languages'));
     }
@@ -38,57 +39,22 @@ class ServiceController extends Controller
      */
     public function create()
     {
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.services.create', compact('languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreServiceRequest $request)
     {
-        // Validate the request
-        $request->validate([
-            'status' => 'nullable',
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string|max:255',
-            'translates.*.slug' => 'nullable|string|max:255',
-            'translates.*.card_description' => 'required|string',
-            'translates.*.main_description' => 'required|string',
-            'translates.*.form_top_text' => 'nullable|string',
-            'translates.*.advantages_title' => 'nullable|string|max:255',
-            'translates.*.seo_title' => 'nullable|string|max:255',
-            'translates.*.seo_keywords' => 'nullable|string',
-            'translates.*.seo_description' => 'nullable|string',
-        ], [
-            'translates.required' => 'At least one language translation is required.',
-            'translates.*.title.required' => 'Title is required for all languages.',
-            'translates.*.card_description.required' => 'Card description is required for all languages.',
-            'translates.*.main_description.required' => 'Main description is required for all languages.',
-        ]);
+        $request->validated();
 
         try {
-            // Create the service
-            $service = Service::create([
-                'status' => $request->status == '1'
-            ]);
-
-            // Create translations for each language
-            foreach ($request->translates as $translate) {
-                $service->translates()->create([
-                    'language_id' => $translate['language_id'],
-                    'title' => trim($translate['title']),
-                    'slug' => trim($translate['slug'] ?? ''),
-                    'card_description' => trim($translate['card_description']),
-                    'main_description' => trim($translate['main_description']),
-                    'form_top_text' => trim($translate['form_top_text'] ?? ''),
-                    'advantages_title' => trim($translate['advantages_title'] ?? ''),
-                    'seo_title' => trim($translate['seo_title'] ?? ''),
-                    'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
-                    'seo_description' => trim($translate['seo_description'] ?? ''),
-                ]);
-            }
+            $this->serviceService->createService(
+                ['status' => $request->status == '1'],
+                $request->translates
+            );
 
             return redirect()->route('admin.services.index')
                 ->with('success', __('Service created successfully!'));
@@ -105,7 +71,7 @@ class ServiceController extends Controller
      */
     public function show(string $id)
     {
-        $service = Service::with(['translates.language'])->findOrFail($id);
+        $service = $this->serviceService->findOrFail((int)$id, ['translates.language']);
         return view('admin.services.show', compact('service'));
     }
 
@@ -114,8 +80,8 @@ class ServiceController extends Controller
      */
     public function edit(string $id)
     {
-        $service = Service::with(['translates.language'])->findOrFail($id);
-        $languages = Language::active()->orderBy('order')->get();
+        $service = $this->serviceService->findOrFail((int)$id, ['translates.language']);
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.services.edit', compact('service', 'languages'));
     }
 
@@ -124,52 +90,14 @@ class ServiceController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $service = Service::findOrFail($id);
-
-        // Validate the request
-        $request->validate([
-            'status' => 'nullable',
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string|max:255',
-            'translates.*.slug' => 'nullable|string|max:255',
-            'translates.*.card_description' => 'required|string',
-            'translates.*.main_description' => 'required|string',
-            'translates.*.form_top_text' => 'nullable|string',
-            'translates.*.advantages_title' => 'nullable|string|max:255',
-            'translates.*.seo_title' => 'nullable|string|max:255',
-            'translates.*.seo_keywords' => 'nullable|string',
-            'translates.*.seo_description' => 'nullable|string',
-        ], [
-            'translates.required' => 'At least one language translation is required.',
-            'translates.*.title.required' => 'Title is required for all languages.',
-            'translates.*.card_description.required' => 'Card description is required for all languages.',
-            'translates.*.main_description.required' => 'Main description is required for all languages.',
-        ]);
+        $request->validated();
 
         try {
-            // Update the service
-            $service->update([
-                'status' => $request->status == '1'
-            ]);
-
-            // Update or create translations
-            foreach ($request->translates as $translate) {
-                $service->translates()->updateOrCreate(
-                    ['language_id' => $translate['language_id']],
-                    [
-                        'title' => trim($translate['title']),
-                        'slug' => trim($translate['slug'] ?? ''),
-                        'card_description' => trim($translate['card_description']),
-                        'main_description' => trim($translate['main_description']),
-                        'form_top_text' => trim($translate['form_top_text'] ?? ''),
-                        'advantages_title' => trim($translate['advantages_title'] ?? ''),
-                        'seo_title' => trim($translate['seo_title'] ?? ''),
-                        'seo_keywords' => trim($translate['seo_keywords'] ?? ''),
-                        'seo_description' => trim($translate['seo_description'] ?? ''),
-                    ]
-                );
-            }
+            $this->serviceService->updateService(
+                (int)$id,
+                ['status' => $request->status == '1'],
+                $request->translates
+            );
 
             return redirect()->route('admin.services.index')
                 ->with('success', __('Service updated successfully!'));
@@ -187,8 +115,7 @@ class ServiceController extends Controller
     public function destroy(string $id)
     {
         try {
-            $service = Service::findOrFail($id);
-            $service->delete();
+            $this->serviceService->delete((int)$id);
 
             return redirect()->route('admin.services.index')
                 ->with('success', __('Service deleted successfully!'));
@@ -202,20 +129,12 @@ class ServiceController extends Controller
     /**
      * Update the order of services
      */
-    public function updateOrder(Request $request)
+    public function updateOrder(UpdateOrderServiceRequest $request)
     {
-        $request->validate([
-            'services' => 'required|array',
-            'services.*.id' => 'required|exists:services,id',
-            'services.*.order' => 'required|integer|min:0'
-        ]);
+        $request->validated();
 
         try {
-            foreach ($request->services as $serviceData) {
-                Service::where('id', $serviceData['id'])
-                    ->update(['order' => $serviceData['order']]);
-            }
-
+            $this->serviceService->updateServiceOrder($request->services);
             return response()->json(['success' => true]);
 
         } catch (\Exception $e) {
@@ -230,7 +149,7 @@ class ServiceController extends Controller
     {
         try {
             $status = $request->boolean('status');
-            $service->update(['status' => $status ? 1 : 0]);
+            $this->serviceService->update($service->id, ['status' => $status ? 1 : 0]);
 
             return response()->json(['success' => true]);
 
@@ -242,19 +161,12 @@ class ServiceController extends Controller
     /**
      * Delete selected services.
      */
-    public function deleteSelected(Request $request)
+    public function deleteSelected(DeleteSelectedServiceRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:services,id'
-        ]);
+        $request->validated();
 
         try {
-            // Delete translations first
-            \App\Models\ServiceTranslate::whereIn('service_id', $request->ids)->delete();
-            
-            // Delete services
-            Service::whereIn('id', $request->ids)->delete();
+            $this->serviceService->bulkDelete($request->ids);
 
             return redirect()->route('admin.services.index')
                 ->with('success', __(':count service(s) deleted successfully.', ['count' => count($request->ids)]));
@@ -263,4 +175,4 @@ class ServiceController extends Controller
             return back()->with('error', __('Error occurred: :error', ['error' => $e->getMessage()]));
         }
     }
-} 
+}

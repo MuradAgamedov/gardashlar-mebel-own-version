@@ -2,40 +2,39 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Kiv\ReorderKivRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Kiv;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
-use App\Repositories\KivRepository;
+use App\Interfaces\Services\Admin\KivServiceInterface;
 use App\Http\Requests\Admin\Kiv\StoreKivRequest;
 use App\Http\Requests\Admin\Kiv\UpdateKivRequest;
 
 class KivController extends Controller
 {
-    protected $imageService;
-
-    public function __construct(ImageService $imageService, public KivRepository $repository)
+    public function __construct(protected ImageService $imageService, protected KivServiceInterface $kivService)
     {
-        $this->imageService = $imageService;
-    }
+}
 
     public function index(Request $request)
     {
-        $kivs = $this->repository->getKivs($request);
-        $categories = $this->repository->getCategories();
+        $kivs = $this->kivService->getKivs($request);
+        $categories = $this->kivService->getCategories();
         return view('admin.kivs.index', compact('kivs', 'categories'));
     }
 
     public function create()
     {
-        $categories = $this->repository->getCategories();
+        $categories = $this->kivService->getCategories();
         return view('admin.kivs.create', compact('categories'));
     }
 
     public function store(StoreKivRequest $request)
     {
         try {
-            $this->repository->createKiv([
+            $this->kivService->createKiv([
                 'video_link' => $request->input('video_link'),
                 'kiv_category_id' => $request->input('kiv_category_id'),
                 'status' => $request->input('status'),
@@ -53,14 +52,14 @@ class KivController extends Controller
     public function edit(Kiv $kiv)
     {
         $kiv->load('category.translates');
-        $categories = $this->repository->getCategories();
+        $categories = $this->kivService->getCategories();
         return view('admin.kivs.edit', compact('kiv', 'categories'));
     }
 
     public function update(UpdateKivRequest $request, Kiv $kiv)
     {
         try {
-            $this->repository->updateKiv($kiv, [
+            $this->kivService->updateKiv($kiv, [
                 'video_link' => $request->input('video_link'),
                 'kiv_category_id' => $request->input('kiv_category_id'),
                 'status' => $request->input('status'),
@@ -78,7 +77,7 @@ class KivController extends Controller
     public function destroy(Kiv $kiv)
     {
         try {
-            $this->repository->deleteKiv($kiv);
+            $this->kivService->deleteKiv($kiv);
             return redirect()->route('admin.kivs.index')
                 ->with('success', 'KIV deleted successfully!');
         } catch (\Exception $e) {
@@ -87,15 +86,12 @@ class KivController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderKivRequest $request)
     {
-        $request->validate([
-            'kivs' => 'required|array',
-            'kivs.*' => 'required|integer|exists:kivs,id',
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderKivs($request->kivs);
+            $this->kivService->reorderKivs($request->kivs);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

@@ -2,32 +2,34 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\CompanyManagement\UploadImageCompanyManagementRequest;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Repositories\LanguageRepository;
-use App\Repositories\CompanyManagementRepository;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
+use App\Interfaces\Services\Admin\CompanyManagementServiceInterface;
 
 class CompanyManagementController extends Controller
 {
     public function __construct(
-        public LanguageRepository $languageRepository,
-        public CompanyManagementRepository $repository
+        protected LanguageServiceInterface $languageService,
+        protected CompanyManagementServiceInterface $companyManagementService
     )
     {
     }
 
     public function edit()
     {
-        $companyManagement = $this->repository->getFirstOrCreate();
-        $languages = $this->languageRepository->getAllLanguages();
+        $companyManagement = $this->companyManagementService->getFirstOrCreate();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.company-management.edit', compact('companyManagement', 'languages'));
     }
 
     public function update(Request $request)
     {
         try {
-            $languages = $this->languageRepository->getAllLanguages();
-            $this->repository->updateCompanyManagement($request->input('translations'), $languages);
+            $languages = $this->languageService->getAllLanguages();
+            $this->companyManagementService->updateCompanyManagement($request->input('translations'), $languages);
 
             return redirect()->back()
                 ->with('success', __('Company Management updated successfully!'));
@@ -39,14 +41,12 @@ class CompanyManagementController extends Controller
         }
     }
 
-    public function uploadImage(Request $request)
+    public function uploadImage(UploadImageCompanyManagementRequest $request)
     {
         try {
-            $request->validate([
-                'upload' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
-            ]);
+            $request->validated();
 
-            $url = $this->repository->uploadImage($request->file('upload'));
+            $url = $this->companyManagementService->uploadImage($request->file('upload'));
 
             return response()->json(['url' => $url]);
         } catch (\Exception $e) {

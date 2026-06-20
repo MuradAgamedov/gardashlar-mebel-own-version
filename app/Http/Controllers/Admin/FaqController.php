@@ -2,45 +2,44 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Faq\StoreFaqRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Faq;
 use Illuminate\Http\Request;
-use App\Repositories\FaqRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\FaqServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class FaqController extends Controller
 {
     public function __construct(
-        public FaqRepository $repository,
-        public LanguageRepository $languageRepository
+        protected FaqServiceInterface $faqService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
 
     public function index(Request $request)
     {
-        $faqs = $this->repository->getFaqs($request);
+        $faqs = $this->faqService->getFaqs($request);
         return view('admin.faqs.index', compact('faqs'));
     }
 
     public function create()
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.faqs.create', compact('languages'));
     }
 
-    public function store(Request $request)
+    public function store(StoreFaqRequest $request)
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
 
         foreach ($languages as $index => $language) {
             $translationData = $request->input("translations.{$index}", []);
             
             if (!empty($translationData['question']) || !empty($translationData['answer'])) {
-                $request->validate([
-                    "translations.{$index}.question" => 'required|string|max:255',
-                    "translations.{$index}.answer" => 'required|string',
-                ]);
+                $request->validated();
             }
         }
 
@@ -53,7 +52,7 @@ class FaqController extends Controller
                 }
             }
 
-            $this->repository->createFaq(
+            $this->faqService->createFaq(
                 ['status' => $request->input('status', true)],
                 $translations
             );
@@ -76,22 +75,19 @@ class FaqController extends Controller
     public function edit(Faq $faq)
     {
         $faq->load(['translates.language']);
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.faqs.edit', compact('faq', 'languages'));
     }
 
     public function update(Request $request, Faq $faq)
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
 
         foreach ($languages as $index => $language) {
             $translationData = $request->input("translations.{$index}", []);
             
             if (!empty($translationData['question']) || !empty($translationData['answer'])) {
-                $request->validate([
-                    "translations.{$index}.question" => 'required|string|max:255',
-                    "translations.{$index}.answer" => 'required|string',
-                ]);
+                $request->validated();
             }
         }
 
@@ -104,7 +100,7 @@ class FaqController extends Controller
                 }
             }
 
-            $this->repository->updateFaq(
+            $this->faqService->updateFaq(
                 $faq,
                 ['status' => $request->input('status', true)],
                 $translations
@@ -123,7 +119,7 @@ class FaqController extends Controller
     public function destroy(Faq $faq)
     {
         try {
-            $this->repository->deleteFaq($faq);
+            $this->faqService->deleteFaq($faq);
             return redirect()->route('admin.faqs.index')
                 ->with('success', 'FAQ deleted successfully!');
         } catch (\Exception $e) {
@@ -135,7 +131,7 @@ class FaqController extends Controller
     public function reorder(Request $request)
     {
         try {
-            $this->repository->reorderFaqs($request->input('faqs', []));
+            $this->faqService->reorderFaqs($request->input('faqs', []));
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
@@ -151,7 +147,7 @@ class FaqController extends Controller
                 return redirect()->back()->with('error', 'No FAQs selected for deletion.');
             }
             
-            $count = $this->repository->deleteSelected($ids);
+            $count = $this->faqService->deleteSelected($ids);
             
             return redirect()->route('admin.faqs.index')
                 ->with('success', $count . ' FAQ(s) deleted successfully!');

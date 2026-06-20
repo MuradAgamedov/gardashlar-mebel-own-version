@@ -2,21 +2,24 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Dictionary\UpdateDictionaryRequest;
+
+use App\Http\Requests\Admin\Dictionary\StoreDictionaryRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Dictionary;
 use App\Models\DictionaryTranslate;
-use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
-use App\Repositories\DictionaryRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\DictionaryServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class DictionaryController extends Controller
 {
     public function __construct(
-        public DictionaryRepository $repository,
-        public LanguageRepository $languageRepository
+        protected DictionaryServiceInterface $dictionaryService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
@@ -26,8 +29,8 @@ class DictionaryController extends Controller
      */
     public function index(Request $request): View
     {
-        $dictionaries = $this->repository->getDictionaries($request);
-        $languages = $this->languageRepository->getActiveLanguages();
+        $dictionaries = $this->dictionaryService->getDictionaries($request);
+        $languages = $this->languageService->getActiveLanguages();
         
         return view('admin.dictionaries.index', compact('dictionaries', 'languages'));
     }
@@ -37,21 +40,16 @@ class DictionaryController extends Controller
      */
     public function create(): View
     {
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.dictionaries.create', compact('languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreDictionaryRequest $request): RedirectResponse
     {
-        $request->validate([
-            'keyword' => 'required|string|max:255|unique:dictionaries',
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.value' => 'required|string',
-        ]);
+        $request->validated();
 
         try {
             $dictionary = Dictionary::create([
@@ -83,7 +81,7 @@ class DictionaryController extends Controller
      */
     public function edit(Dictionary $dictionary): View
     {
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         $translations = $dictionary->translates->keyBy('language_id');
         return view('admin.dictionaries.edit', compact('dictionary', 'languages', 'translations'));
     }
@@ -91,14 +89,9 @@ class DictionaryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Dictionary $dictionary): RedirectResponse
+    public function update(UpdateDictionaryRequest $request, Dictionary $dictionary): RedirectResponse
     {
-        $request->validate([
-            'keyword' => 'required|string|max:255|unique:dictionaries,keyword,' . $dictionary->id,
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.value' => 'required|string',
-        ]);
+        $request->validated();
 
         try {
             $dictionary->update([

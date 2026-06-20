@@ -5,39 +5,39 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Phone;
 use Illuminate\Http\Request;
-use App\Repositories\PhoneRepository;
+use App\Interfaces\Services\Admin\PhoneServiceInterface;
 use App\Http\Requests\Admin\Phone\StorePhoneRequest;
 use App\Http\Requests\Admin\Phone\UpdatePhoneRequest;
 
 class PhoneController extends Controller
 {
-    public function __construct(public PhoneRepository $repository)
+    public function __construct(protected PhoneServiceInterface $phoneService)
     {
     }
 
     public function index()
     {
-        $phones = $this->repository->getPhones();
-        $phoneTypes = $this->repository->getPhoneTypes();
+        $phones = $this->phoneService->getPhones();
+        $phoneTypes = $this->phoneService->getPhoneTypes();
         return view('admin.phones.index', compact('phones', 'phoneTypes'));
     }
 
     public function create()
     {
-        $phoneTypes = $this->repository->getActivePhoneTypes();
+        $phoneTypes = $this->phoneService->getActivePhoneTypes();
         return view('admin.phones.create', compact('phoneTypes'));
     }
 
     public function createForType($typeId)
     {
-        $phoneType = $this->repository->findPhoneType($typeId);
+        $phoneType = $this->phoneService->findPhoneType($typeId);
         return view('admin.phones.create-for-type', compact('phoneType'));
     }
 
     public function store(StorePhoneRequest $request)
     {
         try {
-            $this->repository->createPhone([
+            $this->phoneService->createPhone([
                 'phone_type_id' => $request->input('phone_type_id'),
                 'phone' => trim($request->input('phone')),
                 'status' => $request->input('status', false),
@@ -56,14 +56,14 @@ class PhoneController extends Controller
     public function edit(Phone $phone)
     {
         $phone->load('phoneType.translates.language');
-        $phoneTypes = $this->repository->getActivePhoneTypes();
+        $phoneTypes = $this->phoneService->getActivePhoneTypes();
         return view('admin.phones.edit', compact('phone', 'phoneTypes'));
     }
 
     public function update(UpdatePhoneRequest $request, Phone $phone)
     {
         try {
-            $this->repository->updatePhone($phone, [
+            $this->phoneService->updatePhone($phone, [
                 'phone_type_id' => $request->input('phone_type_id'),
                 'phone' => trim($request->input('phone')),
                 'status' => $request->input('status', false),
@@ -82,7 +82,7 @@ class PhoneController extends Controller
     public function destroy(Phone $phone)
     {
         try {
-            $this->repository->deletePhone($phone);
+            $this->phoneService->deletePhone($phone);
             return redirect()->route('admin.phones.index')
                 ->with('success', __('Phone deleted successfully!'));
         } catch (\Exception $e) {
@@ -94,7 +94,7 @@ class PhoneController extends Controller
     public function reorder(Request $request)
     {
         try {
-            $this->repository->reorderPhones($request->input('phones', []));
+            $this->phoneService->reorderPhones($request->input('phones', []));
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);

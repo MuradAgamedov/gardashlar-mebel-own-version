@@ -2,36 +2,38 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Administration\ReorderAdministrationRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Administration;
-use App\Models\Language;
 use Illuminate\Http\Request;
-use App\Repositories\AdministrationRepository;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
+use App\Interfaces\Services\Admin\AdministrationServiceInterface;
 use App\Http\Requests\Admin\Administration\StoreAdministrationRequest;
 use App\Http\Requests\Admin\Administration\UpdateAdministrationRequest;
 
 class AdministrationController extends Controller
 {
-    public function __construct(public AdministrationRepository $repository)
+    public function __construct(protected LanguageServiceInterface $languageService, protected AdministrationServiceInterface $administrationService)
     {
     }
 
     public function index()
     {
-        $administrations = $this->repository->getAdministrations();
+        $administrations = $this->administrationService->getAdministrations();
         return view('admin.administrations.index', compact('administrations'));
     }
 
     public function create()
     {
-        $languages = Language::getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.administrations.create', compact('languages'));
     }
 
     public function store(StoreAdministrationRequest $request)
     {
         try {
-            $this->repository->createAdministration(
+            $this->administrationService->createAdministration(
                 ['status' => $request->input('status', true)],
                 $request->input('translates'),
                 $request->file('image')
@@ -48,14 +50,14 @@ class AdministrationController extends Controller
     public function edit(Administration $administration)
     {
         $administration->load('translates');
-        $languages = Language::getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.administrations.edit', compact('administration', 'languages'));
     }
 
     public function update(UpdateAdministrationRequest $request, Administration $administration)
     {
         try {
-            $this->repository->updateAdministration(
+            $this->administrationService->updateAdministration(
                 $administration,
                 ['status' => $request->input('status', true)],
                 $request->input('translates'),
@@ -73,7 +75,7 @@ class AdministrationController extends Controller
     public function destroy(Administration $administration)
     {
         try {
-            $this->repository->deleteAdministration($administration);
+            $this->administrationService->deleteAdministration($administration);
             
             return redirect()->route('admin.administrations.index')
                 ->with('success', __('Administration member deleted successfully.'));
@@ -83,15 +85,12 @@ class AdministrationController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderAdministrationRequest $request)
     {
-        $request->validate([
-            'order' => 'required|array',
-            'order.*' => 'required|integer|exists:administrations,id'
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderAdministrations($request->input('order'));
+            $this->administrationService->reorderAdministrations($request->input('order'));
             return response()->json(['success' => true]);
 
         } catch (\Exception $e) {

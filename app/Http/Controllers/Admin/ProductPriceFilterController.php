@@ -2,20 +2,23 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ProductPriceFilter\ReorderProductPriceFilterRequest;
+
+use App\Http\Requests\Admin\ProductPriceFilter\StoreProductPriceFilterRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\ProductPriceFilter;
 use App\Models\ProductPriceFilterTranslate;
-use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Repositories\ProductPriceFilterRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\ProductPriceFilterServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class ProductPriceFilterController extends Controller
 {
     public function __construct(
-        public ProductPriceFilterRepository $repository,
-        public LanguageRepository $languageRepository
+        protected ProductPriceFilterServiceInterface $productPriceFilterService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
@@ -24,7 +27,7 @@ class ProductPriceFilterController extends Controller
      */
     public function index()
     {
-        $filters = $this->repository->getFilters();
+        $filters = $this->productPriceFilterService->getFilters();
 
         return view('admin.product-price-filters.index', compact('filters'));
     }
@@ -34,22 +37,16 @@ class ProductPriceFilterController extends Controller
      */
     public function create()
     {
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.product-price-filters.create', compact('languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProductPriceFilterRequest $request)
     {
-        $request->validate([
-            'min_price' => 'nullable|numeric|min:0',
-            'max_price' => 'nullable|numeric|min:0|gte:min_price',
-            'translates' => 'required|array',
-            'translates.*.title' => 'required|string|max:255',
-            'status' => 'boolean'
-        ]);
+        $request->validated();
     
         try {
             DB::beginTransaction();
@@ -97,7 +94,7 @@ class ProductPriceFilterController extends Controller
     public function edit(ProductPriceFilter $productPriceFilter)
     {
         $productPriceFilter->load('translates');
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.product-price-filters.edit', compact('productPriceFilter', 'languages'));
     }
 
@@ -106,13 +103,7 @@ class ProductPriceFilterController extends Controller
      */
     public function update(Request $request, ProductPriceFilter $productPriceFilter)
     {
-        $request->validate([
-            'min_price' => 'nullable|numeric|min:0',
-            'max_price' => 'nullable|numeric|min:0|gte:min_price',
-            'translates' => 'required|array',
-            'translates.*.title' => 'required|string|max:255',
-            'status' => 'boolean'
-        ]);
+        $request->validated();
 
         try {
             DB::beginTransaction();
@@ -175,12 +166,9 @@ class ProductPriceFilterController extends Controller
     /**
      * Reorder filters
      */
-    public function reorder(Request $request)
+    public function reorder(ReorderProductPriceFilterRequest $request)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'required|integer|exists:product_price_filters,id'
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->input('items') as $index => $id) {

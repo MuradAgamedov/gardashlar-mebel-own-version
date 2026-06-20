@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\RoluteeteAction\UpdateRoluteeteActionRequest;
+
+use App\Http\Requests\Admin\RoluteeteAction\StoreRoluteeteActionRequest;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Models\RoluteeteAction;
 use App\Models\RoluteeteActionTranslate;
-use App\Models\Language;
 use App\Services\ImageService;
 
 class RoluteeteActionController extends Controller
 {
-    protected $imageService;
-
-    public function __construct(ImageService $imageService)
+    public function __construct(protected LanguageServiceInterface $languageService, protected ImageService $imageService)
     {
-        $this->imageService = $imageService;
-    }
+}
 
     public function index()
     {
@@ -26,19 +27,15 @@ class RoluteeteActionController extends Controller
 
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         return view("admin.RoluteeteAction.create", compact('languages'));
     }
 
-    public function store(Request $request)
+    public function store(StoreRoluteeteActionRequest $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
 
-        $request->validate([
-            'percent' => 'nullable|numeric|min:1|max:100',
-            'image' => 'nullable|image|max:5120',
-            "percent_value" => "nullable"
-        ]);
+        $request->validated();
 
         $imagePath = null;
         if ($request->hasFile('image')) {
@@ -66,19 +63,16 @@ class RoluteeteActionController extends Controller
     public function edit($id)
     {
         $action = RoluteeteAction::with('translates')->findOrFail($id);
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         return view("admin.RoluteeteAction.edit", compact('action', 'languages'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateRoluteeteActionRequest $request, $id)
     {
-        $action = RoluteeteAction::findOrFail($id);
-        $languages = Language::all();
+        $action = $this->languageService->findOrFail($id);
+        $languages = $this->languageService->getAllLanguages();
 
-        $request->validate([
-            'percent' => 'nullable|numeric|min:1|max:100',
-            'image' => 'nullable|image|max:5120',
-        ]);
+        $request->validated();
 
         $imagePath = $action->image;
         if ($request->hasFile('image')) {
@@ -119,7 +113,7 @@ class RoluteeteActionController extends Controller
 
     public function destroy($id)
     {
-        $action = RoluteeteAction::findOrFail($id);
+        $action = $this->languageService->findOrFail($id);
 
         // Əgər şəkilləri də silmək istəsən:
         // if ($action->image) {
@@ -135,7 +129,7 @@ class RoluteeteActionController extends Controller
 
     public function toggleStatus($id)
 {
-    $action = RoluteeteAction::findOrFail($id);
+    $action = $this->languageService->findOrFail($id);
     $action->status = !$action->status;
     $action->save();
 

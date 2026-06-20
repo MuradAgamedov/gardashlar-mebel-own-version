@@ -2,39 +2,43 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\IndividualProjectOrder\DeleteSelectedIndividualProjectOrderRequest;
+
+use App\Http\Requests\Admin\IndividualProjectOrder\ReorderIndividualProjectOrderRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\IndividualProjectOrder;
 use Illuminate\Http\Request;
-use App\Repositories\IndividualProjectOrderRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\IndividualProjectOrderServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\IndividualProjectOrder\StoreIndividualProjectOrderRequest;
 use App\Http\Requests\Admin\IndividualProjectOrder\UpdateIndividualProjectOrderRequest;
 
 class IndividualProjectOrderController extends Controller
 {
     public function __construct(
-        public IndividualProjectOrderRepository $repository,
-        public LanguageRepository $languageRepository
+        protected IndividualProjectOrderServiceInterface $individualProjectOrderService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
 
     public function index(Request $request)
     {
-        $individualProjectOrders = $this->repository->getIndividualProjectOrders($request);
+        $individualProjectOrders = $this->individualProjectOrderService->getIndividualProjectOrders($request);
         return view('admin.individual-project-orders.index', compact('individualProjectOrders'));
     }
 
     public function create()
     {
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.individual-project-orders.create', compact('languages'));
     }
 
     public function store(StoreIndividualProjectOrderRequest $request)
     {
         try {
-            $this->repository->createIndividualProjectOrder(
+            $this->individualProjectOrderService->createIndividualProjectOrder(
                 ['status' => $request->input('status', true)],
                 $request->input('translates')
             );
@@ -50,14 +54,14 @@ class IndividualProjectOrderController extends Controller
     public function edit(IndividualProjectOrder $individualProjectOrder)
     {
         $individualProjectOrder->load('translates');
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.individual-project-orders.edit', compact('individualProjectOrder', 'languages'));
     }
 
     public function update(UpdateIndividualProjectOrderRequest $request, IndividualProjectOrder $individualProjectOrder)
     {
         try {
-            $this->repository->updateIndividualProjectOrder(
+            $this->individualProjectOrderService->updateIndividualProjectOrder(
                 $individualProjectOrder,
                 ['status' => $request->input('status', true)],
                 $request->input('translates')
@@ -74,7 +78,7 @@ class IndividualProjectOrderController extends Controller
     public function destroy(IndividualProjectOrder $individualProjectOrder)
     {
         try {
-            $this->repository->deleteIndividualProjectOrder($individualProjectOrder);
+            $this->individualProjectOrderService->deleteIndividualProjectOrder($individualProjectOrder);
             return redirect()->route('admin.individual-project-orders.index')
                 ->with('success', __('Individual project order successfully deleted.'));
 
@@ -83,15 +87,12 @@ class IndividualProjectOrderController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderIndividualProjectOrderRequest $request)
     {
-        $request->validate([
-            'order' => 'required|array',
-            'order.*' => 'required|integer|exists:individual_project_orders,id'
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderIndividualProjectOrders($request->input('order'));
+            $this->individualProjectOrderService->reorderIndividualProjectOrders($request->input('order'));
             return response()->json(['success' => true]);
 
         } catch (\Exception $e) {
@@ -99,15 +100,12 @@ class IndividualProjectOrderController extends Controller
         }
     }
 
-    public function deleteSelected(Request $request)
+    public function deleteSelected(DeleteSelectedIndividualProjectOrderRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:individual_project_orders,id'
-        ]);
+        $request->validated();
 
         try {
-            $count = $this->repository->deleteSelected($request->ids);
+            $count = $this->individualProjectOrderService->deleteSelected($request->ids);
             return redirect()->route('admin.individual-project-orders.index')
                 ->with('success', __(':count individual project order(s) deleted successfully.', ['count' => $count]));
 

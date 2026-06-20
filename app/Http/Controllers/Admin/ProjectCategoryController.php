@@ -2,37 +2,39 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ProjectCategory\BulkDeleteProjectCategoryRequest;
+
+use App\Http\Requests\Admin\ProjectCategory\ReorderProjectCategoryRequest;
+
+use App\Http\Requests\Admin\ProjectCategory\StoreProjectCategoryRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\ProjectCategory;
 use App\Models\ProjectCategoryTranslate;
-use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use App\Services\ImageService;
-use App\Repositories\ProjectCategoryRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\ProjectCategoryServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class ProjectCategoryController extends Controller
 {
-    protected $imageService;
-
     public function __construct(
-        ImageService $imageService,
-        public ProjectCategoryRepository $repository,
-        public LanguageRepository $languageRepository
+        protected ImageService $imageService,
+        protected ProjectCategoryServiceInterface $projectCategoryService,
+        protected LanguageServiceInterface $languageService
     )
     {
-        $this->imageService = $imageService;
-    }
+}
 
     /**
      * Clear project categories cache for all languages
      */
     private function clearProjectCategoriesCache()
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         foreach ($languages as $language) {
             Cache::forget("api:project-categories:all:lang:{$language->id}");
         }
@@ -43,7 +45,7 @@ class ProjectCategoryController extends Controller
      */
     public function index()
     {
-        $projectCategories = $this->repository->getProjectCategories();
+        $projectCategories = $this->projectCategoryService->getProjectCategories();
         return view('admin.project-categories.index', compact('projectCategories'));
     }
 
@@ -52,28 +54,16 @@ class ProjectCategoryController extends Controller
      */
     public function create()
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.project-categories.create', compact('languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProjectCategoryRequest $request)
     {
-        $request->validate([
-            'status' => 'boolean',
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.title' => 'required|string|max:255',
-            'translations.*.slug' => 'required|string|max:255',
-            'translations.*.seo_title' => 'nullable|string|max:255',
-            'translations.*.seo_keywords' => 'nullable|string',
-            'translations.*.seo_description' => 'nullable|string',
-            'translations.*.seo_text' => 'nullable|string',
-            'translations.*.image_alt_text' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-        ]);
+        $request->validated();
 
         try {
             $imagePath = null;
@@ -121,7 +111,7 @@ class ProjectCategoryController extends Controller
      */
     public function edit(ProjectCategory $projectCategory)
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         $translations = $projectCategory->translates->keyBy('language_id');
         return view('admin.project-categories.edit', compact('projectCategory', 'languages', 'translations'));
     }
@@ -131,19 +121,7 @@ class ProjectCategoryController extends Controller
      */
     public function update(Request $request, ProjectCategory $projectCategory)
     {
-        $request->validate([
-            'status' => 'boolean',
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.title' => 'required|string|max:255',
-            'translations.*.slug' => 'required|string|max:255',
-            'translations.*.seo_title' => 'nullable|string|max:255',
-            'translations.*.seo_keywords' => 'nullable|string',
-            'translations.*.seo_description' => 'nullable|string',
-            'translations.*.seo_text' => 'nullable|string',
-            'translations.*.image_alt_text' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-        ]);
+        $request->validated();
 
         try {
             $data = [
@@ -214,12 +192,9 @@ class ProjectCategoryController extends Controller
     /**
      * Reorder project categories
      */
-    public function reorder(Request $request)
+    public function reorder(ReorderProjectCategoryRequest $request)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'integer|exists:project_categories,id'
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->items as $index => $id) {
@@ -239,12 +214,9 @@ class ProjectCategoryController extends Controller
     /**
      * Bulk delete project categories
      */
-    public function bulkDelete(Request $request)
+    public function bulkDelete(BulkDeleteProjectCategoryRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'required|integer|exists:project_categories,id',
-        ]);
+        $request->validated();
 
         try {
             $deletedCount = ProjectCategory::whereIn('id', $request->ids)->delete();

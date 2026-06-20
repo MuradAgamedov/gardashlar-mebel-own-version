@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\PartnerSlider\ReorderPartnerSliderRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\PartnerSlider;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
-use App\Repositories\PartnerSliderRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\PartnerSliderServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\PartnerSlider\StorePartnerSliderRequest;
 use App\Http\Requests\Admin\PartnerSlider\UpdatePartnerSliderRequest;
 
@@ -15,30 +17,31 @@ class PartnerSliderController extends Controller
 {
     public function __construct(
         protected ImageService $imageService,
-        public PartnerSliderRepository $repository,
-        public LanguageRepository $languageRepository
-    ) {
+        protected PartnerSliderServiceInterface $partnerSliderService,
+        protected LanguageServiceInterface $languageService
+    )
+    {
     }
 
     public function index()
     {
-        $sliders = $this->repository->getPartnerSliders();
-        $languages = $this->languageRepository->getAllLanguages();
+        $sliders = $this->partnerSliderService->getPartnerSliders();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.partner-sliders.index', compact('sliders', 'languages'));
     }
 
     public function create()
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.partner-sliders.create', compact('languages'));
     }
 
     public function store(StorePartnerSliderRequest $request)
     {
         try {
-            $languages = $this->languageRepository->getAllLanguages();
+            $languages = $this->languageService->getAllLanguages();
             
-            $this->repository->createPartnerSlider(
+            $this->partnerSliderService->createPartnerSlider(
                 [
                     'status' => $request->boolean('status'),
                     'link' => $request->input('link'),
@@ -62,16 +65,16 @@ class PartnerSliderController extends Controller
     public function edit(PartnerSlider $partnerSlider)
     {
         $partnerSlider->load('translates.language');
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.partner-sliders.edit', compact('partnerSlider', 'languages'));
     }
 
     public function update(UpdatePartnerSliderRequest $request, PartnerSlider $partnerSlider)
     {
         try {
-            $languages = $this->languageRepository->getAllLanguages();
+            $languages = $this->languageService->getAllLanguages();
             
-            $this->repository->updatePartnerSlider(
+            $this->partnerSliderService->updatePartnerSlider(
                 $partnerSlider,
                 [
                     'status' => $request->boolean('status'),
@@ -96,7 +99,7 @@ class PartnerSliderController extends Controller
     public function destroy(PartnerSlider $partnerSlider)
     {
         try {
-            $this->repository->deletePartnerSlider($partnerSlider);
+            $this->partnerSliderService->deletePartnerSlider($partnerSlider);
             return redirect()->route('admin.partner-sliders.index')
                 ->with('success', __('Partner slider deleted successfully!'));
         } catch (\Throwable $e) {
@@ -105,15 +108,12 @@ class PartnerSliderController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderPartnerSliderRequest $request)
     {
-        $request->validate([
-            'sliders' => 'required|array',
-            'sliders.*' => 'required|integer|exists:partner_sliders,id',
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderPartnerSliders($request->sliders);
+            $this->partnerSliderService->reorderPartnerSliders($request->sliders);
             return response()->json(['success' => true]);
         } catch (\Throwable $e) {
             return response()->json([

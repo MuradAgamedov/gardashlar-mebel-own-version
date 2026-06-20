@@ -7,8 +7,16 @@ use App\Models\SuggestionsComplaintsForm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use App\Interfaces\Services\Admin\SuggestionsComplaintsFormServiceInterface;
+
 class SuggestionsComplaintsFormController extends Controller
 {
+    public function __construct(
+        protected SuggestionsComplaintsFormServiceInterface $suggestionsComplaintsFormService
+    ) {
+    }
+
+
     public function index()
     {
         $forms = SuggestionsComplaintsForm::orderBy('created_at', 'desc')->paginate(20);
@@ -17,7 +25,7 @@ class SuggestionsComplaintsFormController extends Controller
 
     public function show($id)
     {
-        $form = SuggestionsComplaintsForm::findOrFail($id);
+        $form = $this->suggestionsComplaintsFormService->findOrFail($id);
         
         // Mark as read if not already read
         if (!$form->is_read) {
@@ -29,7 +37,7 @@ class SuggestionsComplaintsFormController extends Controller
 
     public function destroy($id)
     {
-        $form = SuggestionsComplaintsForm::findOrFail($id);
+        $form = $this->suggestionsComplaintsFormService->findOrFail($id);
         $form->delete();
         
         return redirect()->route('admin.suggestions-complaints-forms.index')
@@ -51,7 +59,7 @@ class SuggestionsComplaintsFormController extends Controller
 
     public function markAsRead($id)
     {
-        $form = SuggestionsComplaintsForm::findOrFail($id);
+        $form = $this->suggestionsComplaintsFormService->findOrFail($id);
         $form->update(['is_read' => true]);
         
         return response()->json(['success' => true, 'message' => __('Form marked as read')]);

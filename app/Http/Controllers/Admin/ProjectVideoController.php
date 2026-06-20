@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ProjectVideo\ReorderProjectVideoRequest;
+
+use App\Http\Requests\Admin\ProjectVideo\StoreProjectVideoRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectVideo;
-use App\Repositories\ProjectVideoRepository;
+use App\Interfaces\Services\Admin\ProjectVideoServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -13,7 +17,7 @@ class ProjectVideoController extends Controller
 {
     protected $repository;
 
-    public function __construct(ProjectVideoRepository $repository)
+    public function __construct(protected ProjectVideoServiceInterface $projectVideoService)
     {
         $this->repository = $repository;
     }
@@ -23,7 +27,7 @@ class ProjectVideoController extends Controller
      */
     public function index(Project $project)
     {
-        $videos = $this->repository->getVideosByProject($project->id);
+        $videos = $this->projectVideoService->getVideosByProject($project->id);
         return view('admin.project-videos.index', compact('project', 'videos'));
     }
 
@@ -38,12 +42,9 @@ class ProjectVideoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Project $project)
+    public function store(StoreProjectVideoRequest $request, Project $project)
     {
-        $request->validate([
-            'video_link' => 'required|string|max:500',
-            'status' => 'boolean',
-        ]);
+        $request->validated();
 
         try {
             ProjectVideo::create([
@@ -76,10 +77,7 @@ class ProjectVideoController extends Controller
      */
     public function update(Request $request, Project $project, ProjectVideo $video)
     {
-        $request->validate([
-            'video_link' => 'required|string|max:500',
-            'status' => 'boolean',
-        ]);
+        $request->validated();
 
         try {
             $video->update([
@@ -116,12 +114,9 @@ class ProjectVideoController extends Controller
     /**
      * Reorder videos
      */
-    public function reorder(Request $request, Project $project)
+    public function reorder(ReorderProjectVideoRequest $request, Project $project)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'integer|exists:project_videos,id'
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->items as $index => $id) {

@@ -2,34 +2,34 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Testimonial\ReorderTestimonialRequest;
+
+use App\Http\Requests\Admin\Testimonial\StoreTestimonialRequest;
+
 use App\Http\Controllers\Controller;
-use App\Models\Language;
 use App\Models\Testimonial;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
-use App\Repositories\TestimonialRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\TestimonialServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class TestimonialController extends Controller
 {
-    protected $imageService;
-
     public function __construct(
-        ImageService $imageService,
-        public TestimonialRepository $repository,
-        public LanguageRepository $languageRepository
+        protected ImageService $imageService,
+        protected TestimonialServiceInterface $testimonialService,
+        protected LanguageServiceInterface $languageService
     )
     {
-        $this->imageService = $imageService;
-    }
+}
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $testimonials = $this->repository->getTestimonials();
-        $languages = $this->languageRepository->getAllLanguages();
+        $testimonials = $this->testimonialService->getTestimonials();
+        $languages = $this->languageService->getAllLanguages();
         
         return view('admin.testimonials.index', compact('testimonials', 'languages'));
     }
@@ -39,46 +39,23 @@ class TestimonialController extends Controller
      */
     public function create()
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.testimonials.create', compact('languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreTestimonialStoreTestimonialRequest $request)
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         
         // Base validation
-        $request->validate([
-            'customer_image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'company_logo' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'status' => 'boolean',
-        ], [
-            'customer_image.image' => __('Customer image must be an image file.'),
-            'customer_image.mimes' => __('Customer image must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
-            'customer_image.max' => __('Customer image may not be greater than :size.', ['size' => '2MB']),
-            'company_logo.image' => __('Company logo must be an image file.'),
-            'company_logo.mimes' => __('Company logo must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
-            'company_logo.max' => __('Company logo may not be greater than :size.', ['size' => '2MB']),
-            'status.boolean' => __('Status must be true or false.'),
-        ]);
+        $request->validated();
 
         // Translation validation
         foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.full_name" => 'required|string|max:255',
-                "translations.{$language->id}.position" => 'required|string|max:255',
-                "translations.{$language->id}.comment" => 'required|string|max:1000',
-            ], [
-                "translations.{$language->id}.full_name.required" => __('Full name is required for :language.', ['language' => $language->name]),
-                "translations.{$language->id}.full_name.max" => __('Full name may not be greater than :max characters for :language.', ['max' => 255, 'language' => $language->name]),
-                "translations.{$language->id}.position.required" => __('Position is required for :language.', ['language' => $language->name]),
-                "translations.{$language->id}.position.max" => __('Position may not be greater than :max characters for :language.', ['max' => 255, 'language' => $language->name]),
-                "translations.{$language->id}.comment.required" => __('Comment is required for :language.', ['language' => $language->name]),
-                "translations.{$language->id}.comment.max" => __('Comment may not be greater than :max characters for :language.', ['max' => 1000, 'language' => $language->name]),
-            ]);
+            $request->validated();
         }
 
         try {
@@ -155,7 +132,7 @@ class TestimonialController extends Controller
     public function edit(Testimonial $testimonial)
     {
         $testimonial->load('translates.language');
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         
         return view('admin.testimonials.edit', compact('testimonial', 'languages'));
     }
@@ -165,37 +142,14 @@ class TestimonialController extends Controller
      */
     public function update(Request $request, Testimonial $testimonial)
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         
         // Base validation
-        $request->validate([
-            'customer_image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'company_logo' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'status' => 'boolean',
-        ], [
-            'customer_image.image' => __('Customer image must be an image file.'),
-            'customer_image.mimes' => __('Customer image must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
-            'customer_image.max' => __('Customer image may not be greater than :size.', ['size' => '2MB']),
-            'company_logo.image' => __('Company logo must be an image file.'),
-            'company_logo.mimes' => __('Company logo must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
-            'company_logo.max' => __('Company logo may not be greater than :size.', ['size' => '2MB']),
-            'status.boolean' => __('Status must be true or false.'),
-        ]);
+        $request->validated();
 
         // Translation validation
         foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.full_name" => 'required|string|max:255',
-                "translations.{$language->id}.position" => 'required|string|max:255',
-                "translations.{$language->id}.comment" => 'required|string|max:1000',
-            ], [
-                "translations.{$language->id}.full_name.required" => __('Full name is required for :language.', ['language' => $language->name]),
-                "translations.{$language->id}.full_name.max" => __('Full name may not be greater than :max characters for :language.', ['max' => 255, 'language' => $language->name]),
-                "translations.{$language->id}.position.required" => __('Position is required for :language.', ['language' => $language->name]),
-                "translations.{$language->id}.position.max" => __('Position may not be greater than :max characters for :language.', ['max' => 255, 'language' => $language->name]),
-                "translations.{$language->id}.comment.required" => __('Comment is required for :language.', ['language' => $language->name]),
-                "translations.{$language->id}.comment.max" => __('Comment may not be greater than :max characters for :language.', ['max' => 1000, 'language' => $language->name]),
-            ]);
+            $request->validated();
         }
 
         try {
@@ -289,12 +243,9 @@ class TestimonialController extends Controller
     /**
      * Reorder testimonials
      */
-    public function reorder(Request $request)
+    public function reorder(ReorderTestimonialRequest $request)
     {
-        $request->validate([
-            'testimonials' => 'required|array',
-            'testimonials.*' => 'required|integer|exists:testimonials,id',
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->testimonials as $index => $testimonialId) {

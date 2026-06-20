@@ -2,36 +2,38 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\PopupAd\ReorderPopupAdRequest;
+
 use App\Http\Controllers\Controller;
-use App\Models\Language;
 use App\Models\PopupAd;
-use App\Repositories\PopupAdRepository;
+use App\Interfaces\Services\Admin\PopupAdServiceInterface;
 use App\Http\Requests\Admin\PopupAd\StorePopupAdRequest;
 use App\Http\Requests\Admin\PopupAd\UpdatePopupAdRequest;
 use Illuminate\Http\Request;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class PopupAdController extends Controller
 {
-    public function __construct(public PopupAdRepository $repository)
+    public function __construct(protected LanguageServiceInterface $languageService, protected PopupAdServiceInterface $popupAdService)
     {
     }
 
     public function index(Request $request)
     {
-        $ads = $this->repository->getPopupAds($request);
+        $ads = $this->popupAdService->getPopupAds($request);
         return view('admin.popup_ads.index', compact('ads'));
     }
 
     public function create()
     {
-        $languages = Language::getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.popup_ads.create', compact('languages'));
     }
 
     public function store(StorePopupAdRequest $request)
     {
         try {
-            $this->repository->createPopupAd(
+            $this->popupAdService->createPopupAd(
                 [
                     'image'  => $request->image,
                     'status' => $request->boolean('status', true),
@@ -52,7 +54,7 @@ class PopupAdController extends Controller
     public function edit(PopupAd $popupAd)
     {
         $popupAd->load(['translations.language']);
-        $languages = Language::getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
 
         return view('admin.popup_ads.edit', compact('popupAd', 'languages'));
     }
@@ -60,7 +62,7 @@ class PopupAdController extends Controller
     public function update(UpdatePopupAdRequest $request, PopupAd $popupAd)
     {
         try {
-            $this->repository->updatePopupAd(
+            $this->popupAdService->updatePopupAd(
                 $popupAd,
                 [
                     'image'  => $request->image,
@@ -82,7 +84,7 @@ class PopupAdController extends Controller
     public function destroy(PopupAd $popupAd)
     {
         try {
-            $this->repository->deletePopupAd($popupAd);
+            $this->popupAdService->deletePopupAd($popupAd);
 
             return redirect()->route('admin.popup-ads.index')
                 ->with('success', __('PopupAd deleted successfully.'));
@@ -93,14 +95,12 @@ class PopupAdController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderPopupAdRequest $request)
     {
-        $request->validate([
-            'items' => 'required|array',
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorder($request->items);
+            $this->popupAdService->reorder($request->items);
 
             return response()->json([
                 'success' => true,

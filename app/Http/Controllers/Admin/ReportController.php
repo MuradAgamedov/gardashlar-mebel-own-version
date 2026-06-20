@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Report\ReorderReportRequest;
+
+use App\Http\Requests\Admin\Report\StoreReportRequest;
+
 use App\Http\Controllers\Controller;
-use App\Repositories\ReportRepository;
+use App\Interfaces\Services\Admin\ReportServiceInterface;
 use App\Models\Report;
 use App\Services\FileService;
 use Illuminate\Http\Request;
@@ -14,7 +18,7 @@ class ReportController extends Controller
     protected $repository;
     protected $fileService;
 
-    public function __construct(ReportRepository $repository, FileService $fileService)
+    public function __construct(protected ReportServiceInterface $reportService, FileService $fileService)
     {
         $this->repository = $repository;
         $this->fileService = $fileService;
@@ -25,8 +29,8 @@ class ReportController extends Controller
      */
     public function index()
     {
-        $reports = $this->repository->getAllReports();
-        $languages = $this->repository->getActiveLanguages();
+        $reports = $this->reportService->getAllReports();
+        $languages = $this->reportService->getActiveLanguages();
         
         return view('admin.reports.index', compact('reports', 'languages'));
     }
@@ -36,36 +40,23 @@ class ReportController extends Controller
      */
     public function create()
     {
-        $languages = $this->repository->getActiveLanguages();
+        $languages = $this->reportService->getActiveLanguages();
         return view('admin.reports.create', compact('languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreReportStoreReportRequest $request)
     {
-        $languages = $this->repository->getActiveLanguages();
+        $languages = $this->reportService->getActiveLanguages();
 
         // Base validation
-        $request->validate([
-            'pdf' => 'nullable|file|mimes:pdf',
-            'status' => 'boolean',
-        ], [
-            'pdf.mimes' => 'PDF must be a file of type: pdf.',
-            'status.boolean' => 'Status must be true or false.',
-        ]);
+        $request->validated();
 
         // Translation validation
         foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.title" => 'required|string|max:255',
-                "translations.{$language->id}.description" => 'required|string',
-            ], [
-                "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.description.required" => "Description is required for {$language->lang_code}.",
-            ]);
+            $request->validated();
         }
 
         try {
@@ -108,7 +99,7 @@ class ReportController extends Controller
     public function edit(Report $report)
     {
         $report->load('translates.language');
-        $languages = $this->repository->getActiveLanguages();
+        $languages = $this->reportService->getActiveLanguages();
 
         return view('admin.reports.edit', compact('report', 'languages'));
     }
@@ -118,27 +109,14 @@ class ReportController extends Controller
      */
     public function update(Request $request, Report $report)
     {
-        $languages = $this->repository->getActiveLanguages();
+        $languages = $this->reportService->getActiveLanguages();
 
         // Base validation
-        $request->validate([
-            'pdf' => 'nullable|file|mimes:pdf',
-            'status' => 'boolean',
-        ], [
-            'pdf.mimes' => 'PDF must be a file of type: pdf.',
-            'status.boolean' => 'Status must be true or false.',
-        ]);
+        $request->validated();
 
         // Translation validation
         foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.title" => 'required|string|max:255',
-                "translations.{$language->id}.description" => 'required|string',
-            ], [
-                "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.description.required" => "Description is required for {$language->lang_code}.",
-            ]);
+            $request->validated();
         }
 
         try {
@@ -210,12 +188,9 @@ class ReportController extends Controller
     /**
      * Reorder reports
      */
-    public function reorder(Request $request)
+    public function reorder(ReorderReportRequest $request)
     {
-        $request->validate([
-            'reports' => 'required|array',
-            'reports.*' => 'required|integer|exists:reports,id',
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->reports as $index => $reportId) {

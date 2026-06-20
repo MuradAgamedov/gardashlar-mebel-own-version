@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ProductDetailValue\BulkDeleteProductDetailValueRequest;
+
+use App\Http\Requests\Admin\ProductDetailValue\ReorderProductDetailValueRequest;
+
+use App\Http\Requests\Admin\ProductDetailValue\StoreProductDetailValueRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductDetailValue;
 use App\Models\ProductDetailValueTranslate;
-use App\Models\Language;
-use App\Repositories\ProductDetailValueRepository;
+use App\Interfaces\Services\Admin\ProductDetailValueServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -15,7 +20,7 @@ class ProductDetailValueController extends Controller
 {
     protected $repository;
 
-    public function __construct(ProductDetailValueRepository $repository)
+    public function __construct(protected ProductDetailValueServiceInterface $productDetailValueService)
     {
         $this->repository = $repository;
     }
@@ -23,13 +28,9 @@ class ProductDetailValueController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Product $product)
+    public function store(StoreProductDetailValueRequest $request, Product $product)
     {
-        $request->validate([
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.keyword' => 'required|string|max:255',
-        ]);
+        $request->validated();
 
         DB::transaction(function () use ($request, $product) {
             $detailValue = ProductDetailValue::create([
@@ -55,11 +56,7 @@ class ProductDetailValueController extends Controller
      */
     public function update(Request $request, Product $product, ProductDetailValue $detailValue)
     {
-        $request->validate([
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.keyword' => 'required|string|max:255',
-        ]);
+        $request->validated();
 
         DB::transaction(function () use ($request, $detailValue) {
             $detailValue->translates()->delete();
@@ -94,12 +91,9 @@ class ProductDetailValueController extends Controller
     /**
      * Reorder product detail values
      */
-    public function reorder(Request $request, Product $product)
+    public function reorder(ReorderProductDetailValueRequest $request, Product $product)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'exists:product_detail_values,id'
-        ]);
+        $request->validated();
 
         DB::transaction(function () use ($request) {
             foreach ($request->items as $index => $id) {
@@ -113,13 +107,10 @@ class ProductDetailValueController extends Controller
     /**
      * Bulk delete product detail values
      */
-    public function bulkDelete(Request $request, Product $product)
+    public function bulkDelete(BulkDeleteProductDetailValueRequest $request, Product $product)
     {
         try {
-            $request->validate([
-                'ids' => 'required|array',
-                'ids.*' => 'exists:product_detail_values,id'
-            ]);
+            $request->validated();
 
             DB::transaction(function () use ($request) {
                 $detailValues = ProductDetailValue::whereIn('id', $request->ids)->get();

@@ -5,39 +5,39 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
 use Illuminate\Http\Request;
-use App\Repositories\ContactMessageRepository;
+use App\Interfaces\Services\Admin\ContactMessageServiceInterface;
 
 class ContactMessageController extends Controller
 {
-    public function __construct(public ContactMessageRepository $repository)
+    public function __construct(protected ContactMessageServiceInterface $contactMessageService)
     {
     }
 
     public function index(Request $request)
     {
-        $messages = $this->repository->getMessages($request);
+        $messages = $this->contactMessageService->getMessages($request);
         return view('admin.contact-messages.index', compact('messages'));
     }
 
     public function show(string $id)
     {
-        $message = $this->repository->findMessage($id);
-        $this->repository->markAsRead($message);
+        $message = $this->contactMessageService->findMessage($id);
+        $this->contactMessageService->markAsRead($message);
         return view('admin.contact-messages.show', compact('message'));
     }
 
     public function destroy(string $id)
     {
-        $message = $this->repository->findMessage($id);
-        $this->repository->deleteMessage($message);
+        $message = $this->contactMessageService->findMessage($id);
+        $this->contactMessageService->deleteMessage($message);
         return redirect()->route('admin.contact-messages.index')
             ->with('success', __('Message deleted successfully!'));
     }
 
     public function markAsRead(string $id)
     {
-        $message = $this->repository->findMessage($id);
-        $this->repository->markAsRead($message);
+        $message = $this->contactMessageService->findMessage($id);
+        $this->contactMessageService->markAsRead($message);
         return redirect()->back()->with('success', __('Message marked as read!'));
     }
 
@@ -52,7 +52,7 @@ class ContactMessageController extends Controller
         }
         
         if ($idsArray && is_array($idsArray) && !empty($idsArray)) {
-            $this->repository->deleteSelected($idsArray);
+            $this->contactMessageService->deleteSelected($idsArray);
             return response()->json(['success' => true, 'message' => __('Selected messages deleted successfully')]);
         }
 

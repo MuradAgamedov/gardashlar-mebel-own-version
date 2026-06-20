@@ -2,13 +2,28 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Vacancy\ReorderVacancyRequest;
+
+use App\Http\Requests\Admin\Vacancy\UpdateVacancyRequest;
+
+use App\Http\Requests\Admin\Vacancy\StoreVacancyRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Vacancy;
-use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
+
+use App\Interfaces\Services\Admin\VacancyServiceInterface;
 
 class VacancyController extends Controller
 {
+    public function __construct(
+        protected VacancyServiceInterface $vacancyService,
+        protected LanguageServiceInterface $languageService
+    ) {
+    }
+
+
     /**
      * Display a listing of the resource.
      */
@@ -23,42 +38,23 @@ class VacancyController extends Controller
      */
     public function create()
     {
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.vacancies.create', compact('languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
- public function store(Request $request)
+ public function store(StoreVacancyStoreVacancyRequest $request)
 {
-    $languages = Language::all();
+    $languages = $this->languageService->getAllLanguages();
 
     // ✅ Base validation
-    $request->validate([
-        'last_apply_date' => 'nullable|date|after:today',
-        'email' => 'nullable|email|max:255',
-        'phone' => 'nullable|max:50',
-        'age' => 'nullable|integer|min:1|max:150',
-        'status' => 'boolean',
-    ]);
+    $request->validated();
 
     // ✅ Translation validation
     foreach ($languages as $language) {
-        $request->validate([
-            "translations.{$language->id}.title" => 'max:255',
-            "translations.{$language->id}.position" => 'max:255',
-            "translations.{$language->id}.experience" => 'max:255',
-            "translations.{$language->id}.work_schedule" => 'max:1000',
-            "translations.{$language->id}.salary" => 'nullable|max:255',
-            "translations.{$language->id}.address" => 'nullable|max:500',
-            "translations.{$language->id}.education" => 'nullable|max:255',
-            "translations.{$language->id}.related_person" => 'nullable|max:255',
-            "translations.{$language->id}.city" => 'nullable|max:255',
-            "translations.{$language->id}.seo_title" => 'nullable|max:255',
-            "translations.{$language->id}.seo_keywords" => 'nullable|string',
-            "translations.{$language->id}.seo_description" => 'nullable|string',
-        ]);
+        $request->validated();
     }
 
     try {
@@ -111,7 +107,7 @@ class VacancyController extends Controller
     public function edit(Vacancy $vacancy)
     {
         $vacancy->load('translates.language');
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         
         return view('admin.vacancies.edit', compact('vacancy', 'languages'));
     }
@@ -119,35 +115,16 @@ class VacancyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-  public function update(Request $request, Vacancy $vacancy)
+  public function update(UpdateVacancyRequest $request, Vacancy $vacancy)
 {
-    $languages = Language::all();
+    $languages = $this->languageService->getAllLanguages();
 
     // ✅ Base validation
-    $request->validate([
-        'last_apply_date' => 'nullable|date',
-        'email' => 'nullable|email|max:255',
-        'phone' => 'nullable|max:50',
-        'age' => 'nullable|integer|min:1|max:150',
-        'status' => 'boolean',
-    ]);
+    $request->validated();
 
     // ✅ Translation validation
     foreach ($languages as $language) {
-        $request->validate([
-            "translations.{$language->id}.title" => 'max:255',
-            "translations.{$language->id}.position" => 'max:255',
-            "translations.{$language->id}.experience" => 'max:255',
-            "translations.{$language->id}.work_schedule" => 'max:1000',
-            "translations.{$language->id}.salary" => 'nullable|max:255',
-            "translations.{$language->id}.address" => 'nullable|max:500',
-            "translations.{$language->id}.education" => 'nullable|max:255',
-            "translations.{$language->id}.related_person" => 'nullable|max:255',
-            "translations.{$language->id}.city" => 'nullable|max:255',
-            "translations.{$language->id}.seo_title" => 'nullable|max:255',
-            "translations.{$language->id}.seo_keywords" => 'nullable|string',
-            "translations.{$language->id}.seo_description" => 'nullable|string',
-        ]);
+        $request->validated();
     }
 
     try {
@@ -214,12 +191,9 @@ class VacancyController extends Controller
     /**
      * Reorder vacancies
      */
-    public function reorder(Request $request)
+    public function reorder(ReorderVacancyRequest $request)
     {
-        $request->validate([
-            'vacancies' => 'array',
-            'vacancies.*' => 'integer|exists:vacancies,id',
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->vacancies as $index => $vacancyId) {

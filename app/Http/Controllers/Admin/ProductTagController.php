@@ -2,20 +2,23 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ProductTag\ReorderProductTagRequest;
+
+use App\Http\Requests\Admin\ProductTag\StoreProductTagRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\ProductTag;
 use App\Models\ProductTagTranslate;
-use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\Repositories\ProductTagRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\ProductTagServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class ProductTagController extends Controller
 {
     public function __construct(
-        public ProductTagRepository $repository,
-        public LanguageRepository $languageRepository
+        protected ProductTagServiceInterface $productTagService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
@@ -24,7 +27,7 @@ class ProductTagController extends Controller
      */
     public function index()
     {
-        $productTags = $this->repository->getTags();
+        $productTags = $this->productTagService->getTags();
             
         return view('admin.product-tags.index', compact('productTags'));
     }
@@ -34,22 +37,16 @@ class ProductTagController extends Controller
      */
     public function create()
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.product-tags.create', compact('languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProductTagRequest $request)
     {
-        $request->validate([
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.title' => 'required|string|max:255',
-            'translations.*.slug' => 'required|string|max:255',
-            'status' => 'boolean'
-        ]);
+        $request->validated();
 
         try {
             $productTag = ProductTag::create([
@@ -87,7 +84,7 @@ class ProductTagController extends Controller
      */
     public function edit(ProductTag $productTag)
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         $productTag->load('translates.language');
         
         return view('admin.product-tags.edit', compact('productTag', 'languages'));
@@ -98,13 +95,7 @@ class ProductTagController extends Controller
      */
     public function update(Request $request, ProductTag $productTag)
     {
-        $request->validate([
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.title' => 'required|string|max:255',
-            'translations.*.slug' => 'required|string|max:255',
-            'status' => 'boolean'
-        ]);
+        $request->validated();
 
         try {
             $productTag->update([
@@ -163,12 +154,9 @@ class ProductTagController extends Controller
     /**
      * Reorder tags
      */
-    public function reorder(Request $request)
+    public function reorder(ReorderProductTagRequest $request)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'required|integer|exists:product_tags,id'
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->input('items') as $index => $id) {

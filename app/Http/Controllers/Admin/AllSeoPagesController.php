@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\AllSeoPages\UpdateAllSeoPagesRequest;
+
 use App\Http\Controllers\Controller;
-use App\Repositories\AllSeoPagesRepository;
+use App\Interfaces\Services\Admin\AllSeoPagesServiceInterface;
 use Illuminate\Http\Request;
 
 class AllSeoPagesController extends Controller
 {
     protected $allSeoPagesRepository;
 
-    public function __construct(AllSeoPagesRepository $allSeoPagesRepository)
+    public function __construct(protected AllSeoPagesServiceInterface $allSeoPagesService)
     {
         $this->allSeoPagesRepository = $allSeoPagesRepository;
     }
@@ -28,16 +30,9 @@ class AllSeoPagesController extends Controller
     /**
      * Update the SEO pages settings in storage.
      */
-    public function update(Request $request)
+    public function update(UpdateAllSeoPagesRequest $request)
     {
-        $request->validate([
-            'is_indexed' => 'nullable|boolean',
-            'is_followed' => 'nullable|boolean',
-            'rolette_actions' => 'nullable|boolean',
-            'popup_ads_show' => 'nullable|boolean',
-            'page_header' => 'nullable|string',
-            'page_footer' => 'nullable|string',
-        ]);
+        $request->validated();
 
         try {
             $this->allSeoPagesRepository->update($request->all());

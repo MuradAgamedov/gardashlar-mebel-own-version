@@ -2,27 +2,29 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\BecomeAPartnerForm\DeleteSelectedBecomeAPartnerFormRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\BecomeAPartnerForm;
 use Illuminate\Http\Request;
-use App\Repositories\BecomeAPartnerFormRepository;
+use App\Interfaces\Services\Admin\BecomeAPartnerFormServiceInterface;
 
 class BecomeAPartnerFormController extends Controller
 {
-    public function __construct(public BecomeAPartnerFormRepository $repository)
+    public function __construct(protected BecomeAPartnerFormServiceInterface $becomeAPartnerFormService)
     {
     }
 
     public function index(Request $request)
     {
-        $forms = $this->repository->getForms($request);
+        $forms = $this->becomeAPartnerFormService->getForms($request);
         return view('admin.become-a-partner-forms.index', compact('forms'));
     }
 
     public function show(BecomeAPartnerForm $becomeAPartnerForm)
     {
         if (!$becomeAPartnerForm->is_read) {
-            $this->repository->markAsRead($becomeAPartnerForm);
+            $this->becomeAPartnerFormService->markAsRead($becomeAPartnerForm);
         }
         return view('admin.become-a-partner-forms.show', compact('becomeAPartnerForm'));
     }
@@ -30,7 +32,7 @@ class BecomeAPartnerFormController extends Controller
     public function destroy(BecomeAPartnerForm $becomeAPartnerForm)
     {
         try {
-            $this->repository->deleteForm($becomeAPartnerForm);
+            $this->becomeAPartnerFormService->deleteForm($becomeAPartnerForm);
             return redirect()->route('admin.become-a-partner-forms.index')
                 ->with('success', __('Form deleted successfully!'));
         } catch (\Exception $e) {
@@ -42,23 +44,20 @@ class BecomeAPartnerFormController extends Controller
     public function markAsRead($id)
     {
         try {
-            $form = BecomeAPartnerForm::findOrFail($id);
-            $this->repository->markAsRead($form);
+            $form = $this->becomeAPartnerFormService->findOrFail($id);
+            $this->becomeAPartnerFormService->markAsRead($form);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
-    public function deleteSelected(Request $request)
+    public function deleteSelected(DeleteSelectedBecomeAPartnerFormRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:become_a_partner_forms,id'
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->deleteSelected($request->ids);
+            $this->becomeAPartnerFormService->deleteSelected($request->ids);
             return redirect()->route('admin.become-a-partner-forms.index')
                 ->with('success', __(':count form(s) deleted successfully.', ['count' => count($request->ids)]));
 

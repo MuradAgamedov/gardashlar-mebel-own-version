@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ProductDetailsValuesDetail\BulkDeleteProductDetailsValuesDetailRequest;
+
+use App\Http\Requests\Admin\ProductDetailsValuesDetail\ReorderProductDetailsValuesDetailRequest;
+
+use App\Http\Requests\Admin\ProductDetailsValuesDetail\StoreProductDetailsValuesDetailRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductDetailValue;
 use App\Models\ProductDetailsValuesDetail;
 use App\Models\ProductDetailsValuesDetailTranslate;
-use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class ProductDetailsValuesDetailController extends Controller
 {
     protected $repository;
 
-    public function __construct(ProductDetailsValuesDetailRepository $repository)
+    public function __construct(protected LanguageServiceInterface $languageService, protected ProductDetailsValuesDetailServiceInterface $productDetailsValuesDetailService)
     {
         $this->repository = $repository;
     }
@@ -23,7 +29,7 @@ class ProductDetailsValuesDetailController extends Controller
      */
     public function index(Product $product, ProductDetailValue $detailValue)
     {
-        $details = $this->repository->getDetailsByValueId($detailValue->id);
+        $details = $this->productDetailsValuesDetailService->getDetailsByValueId($detailValue->id);
         return view('admin.product-details-values-details.index', compact('product', 'detailValue', 'details'));
     }
 
@@ -32,21 +38,16 @@ class ProductDetailsValuesDetailController extends Controller
      */
     public function create(Product $product, ProductDetailValue $detailValue)
     {
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.product-details-values-details.create', compact('product', 'detailValue', 'languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Product $product, ProductDetailValue $detailValue)
+    public function store(StoreProductDetailsValuesDetailRequest $request, Product $product, ProductDetailValue $detailValue)
     {
-        $request->validate([
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.keyword' => 'required|string|max:255',
-            'translates.*.value' => 'required|string',
-        ]);
+        $request->validated();
 
         // Create a separate detail for each keyword-value pair
         foreach ($request->translates as $translate) {
@@ -83,7 +84,7 @@ class ProductDetailsValuesDetailController extends Controller
      */
     public function edit(Product $product, ProductDetailValue $detailValue, ProductDetailsValuesDetail $detail)
     {
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         $detail->load(['translates.language']);
         return view('admin.product-details-values-details.edit', compact('product', 'detailValue', 'detail', 'languages'));
     }
@@ -93,12 +94,7 @@ class ProductDetailsValuesDetailController extends Controller
      */
     public function update(Request $request, Product $product, ProductDetailValue $detailValue, ProductDetailsValuesDetail $detail)
     {
-        $request->validate([
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.keyword' => 'required|string|max:255',
-            'translates.*.value' => 'required|string',
-        ]);
+        $request->validated();
 
         // Since each detail now has only one translation, we'll update the first one
         $translate = $request->translates[0];
@@ -133,12 +129,9 @@ class ProductDetailsValuesDetailController extends Controller
     /**
      * Reorder details
      */
-    public function reorder(Request $request, Product $product, ProductDetailValue $detailValue)
+    public function reorder(ReorderProductDetailsValuesDetailRequest $request, Product $product, ProductDetailValue $detailValue)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'exists:product_details_values_details,id'
-        ]);
+        $request->validated();
 
         foreach ($request->items as $index => $id) {
             ProductDetailsValuesDetail::where('id', $id)->update(['order' => $index + 1]);
@@ -150,13 +143,10 @@ class ProductDetailsValuesDetailController extends Controller
     /**
      * Bulk delete details
      */
-    public function bulkDelete(Request $request, Product $product, ProductDetailValue $detailValue)
+    public function bulkDelete(BulkDeleteProductDetailsValuesDetailRequest $request, Product $product, ProductDetailValue $detailValue)
     {
         try {
-            $request->validate([
-                'ids' => 'required|array',
-                'ids.*' => 'exists:product_details_values_details,id'
-            ]);
+            $request->validated();
 
             $details = ProductDetailsValuesDetail::whereIn('id', $request->ids)->get();
             

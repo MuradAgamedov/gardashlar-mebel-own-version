@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Comment\StoreAnswerCommentRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\CommentAnswer;
 use Illuminate\Http\Request;
-use App\Repositories\CommentRepository;
+use App\Interfaces\Services\Admin\CommentServiceInterface;
 
 class CommentController extends Controller
 {
-    public function __construct(public CommentRepository $repository)
+    public function __construct(protected CommentServiceInterface $commentService)
     {
     }
 
     public function index()
     {
-        $comments = $this->repository->getComments();
+        $comments = $this->commentService->getComments();
         return view("admin.comments.index", compact('comments'));
     }
 
@@ -27,43 +29,41 @@ class CommentController extends Controller
 
     public function destroy(Comment $comment)
     {
-        $this->repository->deleteComment($comment);
+        $this->commentService->deleteComment($comment);
         return redirect()->route('admin.comments.index')->with('success', __('Comment deleted successfully!'));
     }
     public function markAsRead($id)
     {
-        $comment = Comment::find($id);
-        $this->repository->toggleReadStatus($comment);
+        $comment = $this->commentService->find($id);
+        $this->commentService->toggleReadStatus($comment);
         return redirect()->back()->with('success', __('Comment status updated successfully!'));
     }
     
     
     public function toggleApprove(Comment $comment)
     {
-        $this->repository->toggleApprove($comment);
+        $this->commentService->toggleApprove($comment);
         return redirect()->back()->with('success', __('Comment approval status changed successfully!'));
     }
 
     
     public function answers(Comment $comment)
     {
-        $answers = $this->repository->getAnswers($comment);
+        $answers = $this->commentService->getAnswers($comment);
         return view('admin.comments.answers', compact('comment', 'answers'));
     }
 
-    public function storeAnswer(Request $request, Comment $comment)
+    public function storeAnswer(StoreAnswerCommentRequest $request, Comment $comment)
     {
-        $request->validate([
-            'text' => 'required|string|max:1000',
-        ]);
+        $request->validated();
 
-        $this->repository->storeAnswer($comment, ['text' => $request->text]);
+        $this->commentService->storeAnswer($comment, ['text' => $request->text]);
         return redirect()->back()->with('success', __('Reply added successfully!'));
     }
 
     public function destroyAnswer(CommentAnswer $answer)
     {
-        $this->repository->deleteAnswer($answer);
+        $this->commentService->deleteAnswer($answer);
         return redirect()->back()->with('success', __('Reply deleted successfully!'));
     }
 

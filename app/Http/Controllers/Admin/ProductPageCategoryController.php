@@ -2,16 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ProductPageCategory\ReorderProductPageCategoryRequest;
+
+use App\Http\Requests\Admin\ProductPageCategory\UpdateProductPageCategoryRequest;
+
+use App\Http\Requests\Admin\ProductPageCategory\StoreProductPageCategoryRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\ProductPageCategory;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Repositories\ProductPageCategoryRepository;
+use App\Interfaces\Services\Admin\ProductPageCategoryServiceInterface;
 
 class ProductPageCategoryController extends Controller
 {
-    public function __construct(public ProductPageCategoryRepository $repository)
+    public function __construct(protected ProductPageCategoryServiceInterface $productPageCategoryService)
     {
     }
     /**
@@ -19,8 +25,8 @@ class ProductPageCategoryController extends Controller
      */
     public function index()
     {
-        $productPageCategories = $this->repository->getProductPageCategories();
-        $allCategories = $this->repository->getUnusedCategories($productPageCategories->pluck('product_category_id'));
+        $productPageCategories = $this->productPageCategoryService->getProductPageCategories();
+        $allCategories = $this->productPageCategoryService->getUnusedCategories($productPageCategories->pluck('product_category_id'));
             
         return view('admin.product-page-categories.index', compact('productPageCategories', 'allCategories'));
     }
@@ -30,7 +36,7 @@ class ProductPageCategoryController extends Controller
      */
     public function create()
     {
-        $categories = $this->repository->getCategoriesNotInProductPage();
+        $categories = $this->productPageCategoryService->getCategoriesNotInProductPage();
             
         return view('admin.product-page-categories.create', compact('categories'));
     }
@@ -38,12 +44,9 @@ class ProductPageCategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProductPageCategoryRequest $request)
     {
-        $request->validate([
-            'product_category_id' => 'required|exists:product_categories,id|unique:product_page_categories,product_category_id',
-            'status' => 'boolean'
-        ]);
+        $request->validated();
 
         try {
             ProductPageCategory::create([
@@ -72,7 +75,7 @@ class ProductPageCategoryController extends Controller
      */
     public function edit(ProductPageCategory $productPageCategory)
     {
-        $categories = $this->repository->getCategoriesForEdit($productPageCategory->product_category_id);
+        $categories = $this->productPageCategoryService->getCategoriesForEdit($productPageCategory->product_category_id);
             
         return view('admin.product-page-categories.edit', compact('productPageCategory', 'categories'));
     }
@@ -80,12 +83,9 @@ class ProductPageCategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ProductPageCategory $productPageCategory)
+    public function update(UpdateProductPageCategoryRequest $request, ProductPageCategory $productPageCategory)
     {
-        $request->validate([
-            'product_category_id' => 'required|exists:product_categories,id|unique:product_page_categories,product_category_id,' . $productPageCategory->id,
-            'status' => 'boolean'
-        ]);
+        $request->validated();
 
         try {
             $productPageCategory->update([
@@ -120,12 +120,9 @@ class ProductPageCategoryController extends Controller
     /**
      * Reorder categories
      */
-    public function reorder(Request $request)
+    public function reorder(ReorderProductPageCategoryRequest $request)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'required|integer|exists:product_page_categories,id'
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->input('items') as $index => $id) {

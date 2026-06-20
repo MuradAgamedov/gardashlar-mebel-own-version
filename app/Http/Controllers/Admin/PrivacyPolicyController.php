@@ -3,31 +3,31 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\LanguageRepository;
-use App\Repositories\PrivacyPolicyRepository;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
+use App\Interfaces\Services\Admin\PrivacyPolicyServiceInterface;
 use App\Http\Requests\Admin\PrivacyPolicy\UpdatePrivacyPolicyRequest;
 
 class PrivacyPolicyController extends Controller
 {
     public function __construct(
-        public LanguageRepository $languageRepository,
-        public PrivacyPolicyRepository $repository
+        protected LanguageServiceInterface $languageService,
+        protected PrivacyPolicyServiceInterface $privacyPolicyService
     )
     {
     }
 
     public function edit()
     {
-        $privacyPolicy = $this->repository->getOrCreatePrivacyPolicy();
-        $languages = $this->languageRepository->getActiveLanguages();
+        $privacyPolicy = $this->privacyPolicyService->getOrCreatePrivacyPolicy();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.privacy-policy.edit', compact('privacyPolicy', 'languages'));
     }
 
     public function update(UpdatePrivacyPolicyRequest $request)
     {
         try {
-            $languages = $this->languageRepository->getActiveLanguages();
-            $this->repository->updatePrivacyPolicy($request->input('translates'), $languages);
+            $languages = $this->languageService->getActiveLanguages();
+            $this->privacyPolicyService->updatePrivacyPolicy($request->input('translates'), $languages);
 
             return redirect()->route('admin.privacy-policy.edit')
                 ->with('success', __('Privacy Policy updated successfully!'));

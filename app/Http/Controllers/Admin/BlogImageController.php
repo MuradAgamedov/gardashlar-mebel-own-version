@@ -2,34 +2,37 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\BlogImage\ReorderBlogImageRequest;
+
+use App\Http\Requests\Admin\BlogImage\UpdateBlogImageRequest;
+
+use App\Http\Requests\Admin\BlogImage\StoreBlogImageRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\BlogImage;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Repositories\BlogImageRepository;
+use App\Interfaces\Services\Admin\BlogImageServiceInterface;
 
 class BlogImageController extends Controller
 {
-    public function __construct(public BlogImageRepository $repository)
+    public function __construct(protected BlogImageServiceInterface $blogImageService)
     {
     }
 
     public function index(BlogPost $blogPost)
     {
-        $images = $this->repository->getImagesByPost($blogPost);
+        $images = $this->blogImageService->getImagesByPost($blogPost);
         return view('admin.blog-images.index', compact('blogPost', 'images'));
     }
 
-    public function store(Request $request, BlogPost $blogPost)
+    public function store(StoreBlogImageRequest $request, BlogPost $blogPost)
     {
-        $request->validate([
-            'images' => 'required|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-        ]);
+        $request->validated();
 
         try {
-            $uploadedCount = $this->repository->storeImages($blogPost, $request->file('images'));
+            $uploadedCount = $this->blogImageService->storeImages($blogPost, $request->file('images'));
             $message = $uploadedCount === 1 ? 'Image uploaded successfully!' : "{$uploadedCount} images uploaded successfully!";
             
             return redirect()->route('admin.blog-posts.images.index', $blogPost)
@@ -40,14 +43,12 @@ class BlogImageController extends Controller
         }
     }
 
-    public function update(Request $request, BlogPost $blogPost, BlogImage $blogImage)
+    public function update(UpdateBlogImageRequest $request, BlogPost $blogPost, BlogImage $blogImage)
     {
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->updateImage($blogImage, $request->file('image'));
+            $this->blogImageService->updateImage($blogImage, $request->file('image'));
             return redirect()->route('admin.blog-posts.images.index', $blogPost)
                 ->with('success', 'Image updated successfully!');
 
@@ -59,7 +60,7 @@ class BlogImageController extends Controller
     public function destroy(BlogPost $blogPost, BlogImage $blogImage)
     {
         try {
-            $this->repository->deleteImage($blogImage);
+            $this->blogImageService->deleteImage($blogImage);
             return redirect()->route('admin.blog-posts.images.index', $blogPost)
                 ->with('success', 'Image deleted successfully!');
 
@@ -68,16 +69,12 @@ class BlogImageController extends Controller
         }
     }
 
-    public function reorder(Request $request, BlogPost $blogPost)
+    public function reorder(ReorderBlogImageRequest $request, BlogPost $blogPost)
     {
-        $request->validate([
-            'images' => 'required|array',
-            'images.*.id' => 'required|integer|exists:blog_images,id',
-            'images.*.order' => 'required|integer|min:0',
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderImages($blogPost, $request->images);
+            $this->blogImageService->reorderImages($blogPost, $request->images);
             return response()->json([
                 'success' => true,
                 'message' => 'Images reordered successfully!'

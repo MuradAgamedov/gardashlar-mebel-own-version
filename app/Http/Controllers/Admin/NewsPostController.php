@@ -2,43 +2,45 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\NewsPost\BulkDeleteNewsPostRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\NewsPost;
 use Illuminate\Http\Request;
-use App\Repositories\NewsPostRepository;
-use App\Repositories\NewsCategoryRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\NewsPostServiceInterface;
+use App\Interfaces\Services\Admin\NewsCategoryServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\NewsPost\StoreNewsPostRequest;
 use App\Http\Requests\Admin\NewsPost\UpdateNewsPostRequest;
 
 class NewsPostController extends Controller
 {
     public function __construct(
-        public NewsPostRepository $repository,
-        public NewsCategoryRepository $categoryRepository,
-        public LanguageRepository $languageRepository
+        protected NewsPostServiceInterface $newsPostService,
+        protected NewsCategoryServiceInterface $newsCategoryService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
 
     public function index(Request $request)
     {
-        $newsPosts = $this->repository->getPosts($request);
-        $categories = $this->categoryRepository->getCategories();
+        $newsPosts = $this->newsPostService->getPosts($request);
+        $categories = $this->blogCategoryService->getCategories();
         return view('admin.news-posts.index', compact('newsPosts', 'categories'));
     }
 
     public function create()
     {
-        $categories = $this->categoryRepository->getCategories();
-        $languages = $this->languageRepository->getActiveLanguages();
+        $categories = $this->blogCategoryService->getCategories();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.news-posts.create', compact('categories', 'languages'));
     }
 
     public function store(StoreNewsPostRequest $request)
     {
         try {
-            $this->repository->createPost(
+            $this->newsPostService->createPost(
                 [
                     'news_category_id' => $request->news_category_id,
                     'status' => $request->has('status'),
@@ -61,15 +63,15 @@ class NewsPostController extends Controller
     public function edit(NewsPost $newsPost)
     {
         $newsPost->load(['category.translates', 'translates.language']);
-        $categories = $this->categoryRepository->getCategories();
-        $languages = $this->languageRepository->getActiveLanguages();
+        $categories = $this->blogCategoryService->getCategories();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.news-posts.edit', compact('newsPost', 'categories', 'languages'));
     }
 
     public function update(UpdateNewsPostRequest $request, NewsPost $newsPost)
     {
         try {
-            $this->repository->updatePost(
+            $this->newsPostService->updatePost(
                 $newsPost,
                 [
                     'news_category_id' => $request->news_category_id,
@@ -93,7 +95,7 @@ class NewsPostController extends Controller
     public function destroy(NewsPost $newsPost)
     {
         try {
-            $this->repository->deletePost($newsPost);
+            $this->newsPostService->deletePost($newsPost);
             return redirect()->route('admin.news-posts.index')
                 ->with('success', 'News post deleted successfully.');
         } catch (\Exception $e) {
@@ -101,15 +103,12 @@ class NewsPostController extends Controller
         }
     }
 
-    public function bulkDelete(Request $request)
+    public function bulkDelete(BulkDeleteNewsPostRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'required|integer|exists:news_posts,id',
-        ]);
+        $request->validated();
 
         try {
-            $deletedCount = $this->repository->bulkDelete($request->ids);
+            $deletedCount = $this->newsPostService->bulkDelete($request->ids);
             return redirect()->route('admin.news-posts.index')
                 ->with('success', "{$deletedCount} news post(s) deleted successfully!");
         } catch (\Exception $e) {

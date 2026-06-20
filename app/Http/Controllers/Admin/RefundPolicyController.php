@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\RefundPolicy\UpdateRefundPolicyRequest;
+
 use App\Http\Controllers\Controller;
-use App\Repositories\RefundPolicyRepository;
+use App\Interfaces\Services\Admin\RefundPolicyServiceInterface;
 use App\Models\RefundPolicy;
-use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -14,7 +16,7 @@ class RefundPolicyController extends Controller
 {
     protected $repository;
 
-    public function __construct(RefundPolicyRepository $repository)
+    public function __construct(protected LanguageServiceInterface $languageService, protected RefundPolicyServiceInterface $refundPolicyService)
     {
         $this->repository = $repository;
     }
@@ -24,8 +26,8 @@ class RefundPolicyController extends Controller
      */
     public function edit()
     {
-        $refundPolicy = $this->repository->getRefundPolicyWithTranslations();
-        $languages = $this->repository->getActiveLanguages();
+        $refundPolicy = $this->refundPolicyService->getRefundPolicyWithTranslations();
+        $languages = $this->refundPolicyService->getActiveLanguages();
         
         return view('admin.refund-policy.edit', compact('refundPolicy', 'languages'));
     }
@@ -33,18 +35,13 @@ class RefundPolicyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(UpdateRefundPolicyRequest $request)
     {
-        $languages = $this->repository->getActiveLanguages();
+        $languages = $this->refundPolicyService->getActiveLanguages();
         
         // Translation validation
         foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.content" => 'required|string|max:5000',
-            ], [
-                "translations.{$language->id}.content.required" => "Content is required for {$language->lang_code}.",
-                "translations.{$language->id}.content.max" => "Content may not be greater than 5000 characters for {$language->lang_code}.",
-            ]);
+            $request->validated();
         }
 
         try {
@@ -65,7 +62,7 @@ class RefundPolicyController extends Controller
                 }
 
                 // Clear cache for all languages
-                $languages = Language::getActiveLanguages();
+                $languages = $this->languageService->getActiveLanguages();
                 foreach ($languages as $language) {
                     Cache::forget("refund_policy_{$language->id}");
                 }

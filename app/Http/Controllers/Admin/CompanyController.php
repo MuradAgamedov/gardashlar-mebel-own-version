@@ -2,43 +2,49 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Company\AddCategoryProductsToActionCompanyRequest;
+
+use App\Http\Requests\Admin\Company\AddProductToActionCompanyRequest;
+
+use App\Http\Requests\Admin\Company\ReorderCompanyRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\CompanyProduct;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Repositories\CompanyRepository;
+use App\Interfaces\Services\Admin\CompanyServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\Company\StoreCompanyRequest;
 use App\Http\Requests\Admin\Company\UpdateCompanyRequest;
 
 class CompanyController extends Controller
 {
     public function __construct(
-        public CompanyRepository $repository,
-        public LanguageRepository $languageRepository
+        protected CompanyServiceInterface $companyService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
 
     public function index()
     {
-        $companies = $this->repository->getCompanies();
+        $companies = $this->companyService->getCompanies();
         return view('admin.companies.index', compact('companies'));
     }
 
     public function create()
     {
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.companies.create', compact('languages'));
     }
 
     public function store(StoreCompanyRequest $request)
     {
         try {
-            $this->repository->createCompany(
+            $this->companyService->createCompany(
                 [
                     'status' => $request->input('status', true),
                     'discount_percent' => $request->input('discount_percent')
@@ -58,14 +64,14 @@ class CompanyController extends Controller
     public function edit(Company $campaign)
     {
         $campaign->load('translates');
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.companies.edit', ['company' => $campaign, 'languages' => $languages]);
     }
 
     public function update(UpdateCompanyRequest $request, Company $campaign)
     {
         try {
-            $this->repository->updateCompany(
+            $this->companyService->updateCompany(
                 $campaign,
                 [
                     'status' => $request->input('status', true),
@@ -86,7 +92,7 @@ class CompanyController extends Controller
     public function destroy(Company $campaign)
     {
         try {
-            $this->repository->deleteCompany($campaign);
+            $this->companyService->deleteCompany($campaign);
             return redirect()->route('admin.campaigns.index')
                 ->with('success', __('Campaign deleted successfully.'));
 
@@ -95,15 +101,12 @@ class CompanyController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderCompanyRequest $request)
     {
-        $request->validate([
-            'order' => 'required|array',
-            'order.*' => 'required|integer|exists:companies,id'
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderCompanies($request->input('order'));
+            $this->companyService->reorderCompanies($request->input('order'));
             return response()->json(['success' => true]);
 
         } catch (\Exception $e) {
@@ -152,14 +155,12 @@ class CompanyController extends Controller
         ]);
     }
 
-    public function addProductToAction(Request $request, Company $campaign)
+    public function addProductToAction(AddProductToActionCompanyRequest $request, Company $campaign)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-        ]);
+        $request->validated();
 
         try {
-            $result = $this->repository->addProductToCompany($campaign, $request->product_id);
+            $result = $this->companyService->addProductToCompany($campaign, $request->product_id);
 
             if (!$result) {
                 return response()->json([
@@ -183,12 +184,10 @@ class CompanyController extends Controller
 
     public function removeProductFromAction(Request $request, Company $campaign)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->removeProductFromCompany($campaign, $request->product_id);
+            $this->companyService->removeProductFromCompany($campaign, $request->product_id);
 
             return response()->json([
                 'success' => true,
@@ -203,13 +202,9 @@ class CompanyController extends Controller
         }
     }
 
-    public function addCategoryProductsToAction(Request $request, Company $campaign)
+    public function addCategoryProductsToAction(AddCategoryProductsToActionCompanyRequest $request, Company $campaign)
     {
-        $request->validate([
-            'category_ids' => 'required|array',
-            'category_ids.*' => 'exists:product_categories,id',
-            'include_subcategories' => 'boolean'
-        ]);
+        $request->validated();
 
         try {
             $categoryIds = $request->category_ids;
@@ -241,7 +236,7 @@ class CompanyController extends Controller
 
             $addedCount = 0;
             foreach ($products as $product) {
-                $this->repository->addProductToCompany($campaign, $product->id);
+                $this->companyService->addProductToCompany($campaign, $product->id);
                 $addedCount++;
             }
 
@@ -261,11 +256,7 @@ class CompanyController extends Controller
 
     public function removeCategoryProductsFromAction(Request $request, Company $campaign)
     {
-        $request->validate([
-            'category_ids' => 'required|array',
-            'category_ids.*' => 'exists:product_categories,id',
-            'include_subcategories' => 'boolean'
-        ]);
+        $request->validated();
 
         try {
             $categoryIds = $request->category_ids;
@@ -297,7 +288,7 @@ class CompanyController extends Controller
 
             $removedCount = 0;
             foreach ($products as $product) {
-                $this->repository->removeProductFromCompany($campaign, $product->id);
+                $this->companyService->removeProductFromCompany($campaign, $product->id);
                 $removedCount++;
             }
 

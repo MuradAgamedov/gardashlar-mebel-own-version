@@ -2,20 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ProductDetail\BulkDeleteProductDetailRequest;
+
+use App\Http\Requests\Admin\ProductDetail\ReorderProductDetailRequest;
+
+use App\Http\Requests\Admin\ProductDetail\StoreProductDetailRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductDetail;
 use App\Models\ProductDetailTranslate;
-use App\Models\Language;
 use Illuminate\Http\Request;
-use App\Repositories\LanguageRepository;
-use App\Repositories\ProductDetailRepository;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
+use App\Interfaces\Services\Admin\ProductDetailServiceInterface;
 
 class ProductDetailController extends Controller
 {
     public function __construct(
-        public LanguageRepository $languageRepository,
-        public ProductDetailRepository $repository
+        protected LanguageServiceInterface $languageService,
+        protected ProductDetailServiceInterface $productDetailService
     )
     {
     }
@@ -24,7 +29,7 @@ class ProductDetailController extends Controller
      */
     public function index(Product $product, Request $request)
     {
-        $details = $this->repository->getProductDetails($product);
+        $details = $this->productDetailService->getProductDetails($product);
         $currentPage = $request->get('page', 1);
         return view('admin.product-details.index', compact('product', 'details', 'currentPage'));
     }
@@ -34,26 +39,21 @@ class ProductDetailController extends Controller
      */
     public function create(Product $product)
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.product-details.create', compact('product', 'languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Product $product)
+    public function store(StoreProductDetailRequest $request, Product $product)
     {
-        $request->validate([
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.keyword' => 'required|string|max:255',
-            'translates.*.value' => 'required|string',
-        ]);
+        $request->validated();
 
         try {
             // === Create product detail for current product ===
-            $order = $this->repository->getNextOrder($product->id);
-            $productDetail = $this->repository->createDetail($product->id, $order);
+            $order = $this->productDetailService->getNextOrder($product->id);
+            $productDetail = $this->productDetailService->createDetail($product->id, $order);
 
             // Create translations for current product detail
             foreach ($request->translates as $translate) {
@@ -76,8 +76,8 @@ class ProductDetailController extends Controller
 
             foreach ($sameSlugProducts as $sameProduct) {
                 // Create corresponding product detail with same order
-                $correspondingOrder = $this->repository->getNextOrder($sameProduct->id);
-                $correspondingDetail = $this->repository->createDetail($sameProduct->id, $correspondingOrder);
+                $correspondingOrder = $this->productDetailService->getNextOrder($sameProduct->id);
+                $correspondingDetail = $this->productDetailService->createDetail($sameProduct->id, $correspondingOrder);
 
                 // Create translations with same data
                 foreach ($request->translates as $translate) {
@@ -112,7 +112,7 @@ class ProductDetailController extends Controller
      */
     public function edit(Product $product, ProductDetail $detail)
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         $detail->load(['translates.language']);
         return view('admin.product-details.edit', compact('product', 'detail', 'languages'));
     }
@@ -122,12 +122,7 @@ class ProductDetailController extends Controller
      */
     public function update(Request $request, Product $product, ProductDetail $detail)
     {
-        $request->validate([
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.keyword' => 'required|string|max:255',
-            'translates.*.value' => 'required|string',
-        ]);
+        $request->validated();
 
         try {
             // === Update current product detail translations ===
@@ -227,15 +222,12 @@ class ProductDetailController extends Controller
     /**
      * Reorder product details
      */
-    public function reorder(Request $request, Product $product)
+    public function reorder(ReorderProductDetailRequest $request, Product $product)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'exists:product_details,id'
-        ]);
+        $request->validated();
 
         foreach ($request->items as $index => $id) {
-            $this->repository->updateOrder($id, $index + 1);
+            $this->productDetailService->updateOrder($id, $index + 1);
         }
 
         return response()->json(['success' => true]);
@@ -244,15 +236,12 @@ class ProductDetailController extends Controller
     /**
      * Bulk delete product details
      */
-    public function bulkDelete(Request $request, Product $product)
+    public function bulkDelete(BulkDeleteProductDetailRequest $request, Product $product)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:product_details,id'
-        ]);
+        $request->validated();
 
         try {
-            $details = $this->repository->getDetailsByIds($request->ids);
+            $details = $this->productDetailService->getDetailsByIds($request->ids);
             
             // Store orders for synchronization
             $detailOrders = $details->pluck('order')->toArray();

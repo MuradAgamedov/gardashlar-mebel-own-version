@@ -2,36 +2,38 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\HeroCategory\ReorderHeroCategoryRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\HeroCategory;
 use Illuminate\Http\Request;
-use App\Repositories\HeroCategoryRepository;
+use App\Interfaces\Services\Admin\HeroCategoryServiceInterface;
 use App\Http\Requests\Admin\HeroCategory\StoreHeroCategoryRequest;
 use App\Http\Requests\Admin\HeroCategory\UpdateHeroCategoryRequest;
 
 class HeroCategoryController extends Controller
 {
-    public function __construct(public HeroCategoryRepository $repository)
+    public function __construct(protected HeroCategoryServiceInterface $heroCategoryService)
     {
     }
 
     public function index()
     {
-        $heroCategories = $this->repository->getHeroCategories();
-        $allCategories = $this->repository->getAvailableCategories($heroCategories);
+        $heroCategories = $this->heroCategoryService->getHeroCategories();
+        $allCategories = $this->heroCategoryService->getAvailableCategories($heroCategories);
         return view('admin.hero-categories.index', compact('heroCategories', 'allCategories'));
     }
 
     public function create()
     {
-        $categories = $this->repository->getCategoriesForCreate();
+        $categories = $this->heroCategoryService->getCategoriesForCreate();
         return view('admin.hero-categories.create', compact('categories'));
     }
 
     public function store(StoreHeroCategoryRequest $request)
     {
         try {
-            $this->repository->createHeroCategory([
+            $this->heroCategoryService->createHeroCategory([
                 'product_category_id' => $request->input('product_category_id'),
                 'status' => $request->boolean('status', true)
             ]);
@@ -51,14 +53,14 @@ class HeroCategoryController extends Controller
 
     public function edit(HeroCategory $heroCategory)
     {
-        $categories = $this->repository->getCategoriesForEdit($heroCategory);
+        $categories = $this->heroCategoryService->getCategoriesForEdit($heroCategory);
         return view('admin.hero-categories.edit', compact('heroCategory', 'categories'));
     }
 
     public function update(UpdateHeroCategoryRequest $request, HeroCategory $heroCategory)
     {
         try {
-            $this->repository->updateHeroCategory($heroCategory, [
+            $this->heroCategoryService->updateHeroCategory($heroCategory, [
                 'product_category_id' => $request->input('product_category_id'),
                 'status' => $request->boolean('status', true)
             ]);
@@ -74,7 +76,7 @@ class HeroCategoryController extends Controller
     public function destroy(HeroCategory $heroCategory)
     {
         try {
-            $this->repository->deleteHeroCategory($heroCategory);
+            $this->heroCategoryService->deleteHeroCategory($heroCategory);
             return redirect()->route('admin.hero-categories.index')
                 ->with('success', __('Hero category deleted successfully.'));
 
@@ -83,15 +85,12 @@ class HeroCategoryController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderHeroCategoryRequest $request)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'required|integer|exists:hero_categories,id'
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderHeroCategories($request->input('items'));
+            $this->heroCategoryService->reorderHeroCategories($request->input('items'));
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

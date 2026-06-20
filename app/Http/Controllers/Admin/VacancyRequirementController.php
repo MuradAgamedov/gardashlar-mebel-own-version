@@ -2,14 +2,27 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\VacancyRequirement\ReorderVacancyRequirementRequest;
+
+use App\Http\Requests\Admin\VacancyRequirement\StoreVacancyRequirementRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\VacancyRequirement;
 use App\Models\Vacancy;
-use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
+
+use App\Interfaces\Services\Admin\VacancyRequirementServiceInterface;
 
 class VacancyRequirementController extends Controller
 {
+    public function __construct(
+        protected VacancyRequirementServiceInterface $vacancyRequirementService,
+        protected LanguageServiceInterface $languageService
+    ) {
+    }
+
+
     /**
      * Display a listing of the resource.
      */
@@ -34,7 +47,7 @@ class VacancyRequirementController extends Controller
     public function create()
     {
         $vacancies = Vacancy::all();
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.vacancy-requirements.create', compact('vacancies', 'languages'));
     }
 
@@ -44,37 +57,23 @@ class VacancyRequirementController extends Controller
     public function createForVacancy($vacancy_id)
     {
         $vacancy = Vacancy::with(['requirements.translates.language', 'translates.language'])->findOrFail($vacancy_id);
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.vacancy-requirements.create', compact('vacancy', 'languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreVacancyRequirementStoreVacancyRequirementRequest $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         
         // Base validation
-        $request->validate([
-            'vacancy_id' => 'required|exists:vacancies,id',
-            'status' => 'boolean',
-        ], [
-            'vacancy_id.required' => 'Vacancy is required.',
-            'vacancy_id.exists' => 'Selected vacancy does not exist.',
-            'status.boolean' => 'Status must be true or false.',
-        ]);
+        $request->validated();
 
         // Translation validation
         foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.title" => 'required|string|max:255',
-                "translations.{$language->id}.description" => 'required|string',
-            ], [
-                "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.description.required" => "Description is required for {$language->lang_code}.",
-            ]);
+            $request->validated();
         }
 
         try {
@@ -112,7 +111,7 @@ class VacancyRequirementController extends Controller
     {
         $vacancyRequirement->load(['vacancy', 'translates.language']);
         $vacancies = Vacancy::all();
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         
         return view('admin.vacancy-requirements.edit', compact('vacancyRequirement', 'vacancies', 'languages'));
     }
@@ -122,28 +121,14 @@ class VacancyRequirementController extends Controller
      */
     public function update(Request $request, VacancyRequirement $vacancyRequirement)
     {
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         
         // Base validation
-        $request->validate([
-            'vacancy_id' => 'required|exists:vacancies,id',
-            'status' => 'boolean',
-        ], [
-            'vacancy_id.required' => 'Vacancy is required.',
-            'vacancy_id.exists' => 'Selected vacancy does not exist.',
-            'status.boolean' => 'Status must be true or false.',
-        ]);
+        $request->validated();
 
         // Translation validation
         foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.title" => 'required|string|max:255',
-                "translations.{$language->id}.description" => 'required|string',
-            ], [
-                "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.description.required" => "Description is required for {$language->lang_code}.",
-            ]);
+            $request->validated();
         }
 
         try {
@@ -194,12 +179,9 @@ class VacancyRequirementController extends Controller
     /**
      * Reorder requirements
      */
-    public function reorder(Request $request)
+    public function reorder(ReorderVacancyRequirementRequest $request)
     {
-        $request->validate([
-            'requirements' => 'required|array',
-            'requirements.*' => 'required|integer|exists:vacancy_requirements,id',
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->requirements as $index => $requirementId) {

@@ -5,18 +5,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ProductColor;
 use Illuminate\Http\Request;
-use App\Repositories\ProductColorRepository;
+use App\Interfaces\Services\Admin\ProductColorServiceInterface;
 use App\Http\Requests\Admin\ProductColor\StoreProductColorRequest;
 use App\Http\Requests\Admin\ProductColor\UpdateProductColorRequest;
 
 class ProductColorController extends Controller
 {
-    public function __construct(public ProductColorRepository $repository)
+    public function __construct(protected ProductColorServiceInterface $productColorService)
     {
     }
     public function index(Request $request)
     {
-        $productColors = $this->repository->getProductColors($request);
+        $productColors = $this->productColorService->getProductColors($request);
         return view('admin.product-colors.index', compact('productColors'));
     }
 
@@ -28,7 +28,7 @@ class ProductColorController extends Controller
     public function store(StoreProductColorRequest $request)
     {
         try {
-            $this->repository->createProductColor($request->input('color_code'));
+            $this->productColorService->createProductColor($request->input('color_code'));
             return redirect()->route('admin.product-colors.index')
                 ->with('success', __('Color added successfully.'));
 
@@ -45,7 +45,7 @@ class ProductColorController extends Controller
     public function update(UpdateProductColorRequest $request, ProductColor $productColor)
     {
         try {
-            $this->repository->updateProductColor($productColor, $request->input('color_code'));
+            $this->productColorService->updateProductColor($productColor, $request->input('color_code'));
             return redirect()->route('admin.product-colors.index')
                 ->with('success', __('Color updated successfully.'));
 
@@ -57,7 +57,7 @@ class ProductColorController extends Controller
     public function destroy(ProductColor $productColor)
     {
         try {
-            $this->repository->deleteProductColor($productColor);
+            $this->productColorService->deleteProductColor($productColor);
             return redirect()->route('admin.product-colors.index')
                 ->with('success', __('Color deleted successfully.'));
 
@@ -69,7 +69,7 @@ class ProductColorController extends Controller
     public function bulkDelete(Request $request)
     {
         try {
-            $count = $this->repository->bulkDeleteProductColors($request->input('ids', []));
+            $count = $this->productColorService->bulkDeleteProductColors($request->input('ids', []));
             return response()->json(['success' => true, 'message' => __('Selected colors deleted!')]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);

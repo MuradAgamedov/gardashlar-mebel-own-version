@@ -5,38 +5,38 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\HomePageProject;
 use Illuminate\Http\Request;
-use App\Repositories\HomePageProjectRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\HomePageProjectServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\HomePageProject\StoreHomePageProjectRequest;
 use App\Http\Requests\Admin\HomePageProject\UpdateHomePageProjectRequest;
 
 class HomePageProjectController extends Controller
 {
     public function __construct(
-        public HomePageProjectRepository $repository,
-        public LanguageRepository $languageRepository
+        protected HomePageProjectServiceInterface $homePageProjectService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
 
     public function index()
     {
-        $homePageProjects = $this->repository->getHomePageProjects();
+        $homePageProjects = $this->homePageProjectService->getHomePageProjects();
         return view('admin.home-page-projects.index', compact('homePageProjects'));
     }
 
     public function create()
     {
-        $mainLanguage = $this->languageRepository->getMainLanguage();
-        $projects = $this->repository->getProjectsWithMainLanguage($mainLanguage);
-        $categories = $this->repository->getCategoriesWithMainLanguage($mainLanguage);
+        $mainLanguage = $this->languageService->getMainLanguage();
+        $projects = $this->homePageProjectService->getProjectsWithMainLanguage($mainLanguage);
+        $categories = $this->homePageProjectService->getCategoriesWithMainLanguage($mainLanguage);
         return view('admin.home-page-projects.create', compact('projects', 'categories', 'mainLanguage'));
     }
 
     public function store(StoreHomePageProjectRequest $request)
     {
         try {
-            $this->repository->createHomePageProject([
+            $this->homePageProjectService->createHomePageProject([
                 'project_id' => $request->project_id,
                 'project_category_id' => $request->project_category_id,
                 'status' => $request->boolean('status', true),
@@ -59,16 +59,16 @@ class HomePageProjectController extends Controller
 
     public function edit(HomePageProject $homePageProject)
     {
-        $mainLanguage = $this->languageRepository->getMainLanguage();
-        $projects = $this->repository->getProjectsWithMainLanguage($mainLanguage);
-        $categories = $this->repository->getCategoriesWithMainLanguage($mainLanguage);
+        $mainLanguage = $this->languageService->getMainLanguage();
+        $projects = $this->homePageProjectService->getProjectsWithMainLanguage($mainLanguage);
+        $categories = $this->homePageProjectService->getCategoriesWithMainLanguage($mainLanguage);
         return view('admin.home-page-projects.edit', compact('homePageProject', 'projects', 'categories', 'mainLanguage'));
     }
 
     public function update(UpdateHomePageProjectRequest $request, HomePageProject $homePageProject)
     {
         try {
-            $this->repository->updateHomePageProject($homePageProject, [
+            $this->homePageProjectService->updateHomePageProject($homePageProject, [
                 'project_id' => $request->project_id,
                 'project_category_id' => $request->project_category_id,
                 'status' => $request->boolean('status', true),
@@ -87,7 +87,7 @@ class HomePageProjectController extends Controller
     public function destroy(HomePageProject $homePageProject)
     {
         try {
-            $this->repository->deleteHomePageProject($homePageProject);
+            $this->homePageProjectService->deleteHomePageProject($homePageProject);
             return redirect()->route('admin.home-page-projects.index')
                 ->with('success', __('Project removed from home page successfully!'));
 
@@ -100,15 +100,15 @@ class HomePageProjectController extends Controller
     public function getProjectsByCategory(Request $request)
     {
         $categoryId = $request->input('category_id');
-        $mainLanguage = $this->languageRepository->getMainLanguage();
-        $projects = $this->repository->getProjectsByCategory($categoryId, $mainLanguage);
+        $mainLanguage = $this->languageService->getMainLanguage();
+        $projects = $this->homePageProjectService->getProjectsByCategory($categoryId, $mainLanguage);
         return response()->json($projects);
     }
 
     public function reorder(Request $request)
     {
         try {
-            $this->repository->reorderHomePageProjects($request->input('items', []));
+            $this->homePageProjectService->reorderHomePageProjects($request->input('items', []));
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);

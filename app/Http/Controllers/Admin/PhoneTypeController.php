@@ -5,39 +5,39 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\PhoneType;
 use Illuminate\Http\Request;
-use App\Repositories\PhoneTypeRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\PhoneTypeServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\PhoneType\StorePhoneTypeRequest;
 use App\Http\Requests\Admin\PhoneType\UpdatePhoneTypeRequest;
 
 class PhoneTypeController extends Controller
 {
     public function __construct(
-        public PhoneTypeRepository $repository,
-        public LanguageRepository $languageRepository
+        protected PhoneTypeServiceInterface $phoneTypeService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
 
     public function index()
     {
-        $phoneTypes = $this->repository->getPhoneTypes();
-        $languages = $this->languageRepository->getAllLanguages();
+        $phoneTypes = $this->phoneTypeService->getPhoneTypes();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.phone-types.index', compact('phoneTypes', 'languages'));
     }
 
     public function create()
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.phone-types.create', compact('languages'));
     }
 
     public function store(StorePhoneTypeRequest $request)
     {
         try {
-            $languages = $this->languageRepository->getAllLanguages();
+            $languages = $this->languageService->getAllLanguages();
             
-            $this->repository->createPhoneType(
+            $this->phoneTypeService->createPhoneType(
                 ['status' => $request->input('status', false)],
                 $request->input('translations'),
                 $languages
@@ -56,16 +56,16 @@ class PhoneTypeController extends Controller
     public function edit(PhoneType $phoneType)
     {
         $phoneType->load('translates.language');
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.phone-types.edit', compact('phoneType', 'languages'));
     }
 
     public function update(UpdatePhoneTypeRequest $request, PhoneType $phoneType)
     {
         try {
-            $languages = $this->languageRepository->getAllLanguages();
+            $languages = $this->languageService->getAllLanguages();
             
-            $this->repository->updatePhoneType(
+            $this->phoneTypeService->updatePhoneType(
                 $phoneType,
                 ['status' => $request->input('status', false)],
                 $request->input('translations'),
@@ -85,7 +85,7 @@ class PhoneTypeController extends Controller
     public function destroy(PhoneType $phoneType)
     {
         try {
-            $this->repository->deletePhoneType($phoneType);
+            $this->phoneTypeService->deletePhoneType($phoneType);
             return redirect()->route('admin.phones.index')
                 ->with('success', __('Phone type deleted successfully!'));
         } catch (\Exception $e) {
@@ -97,7 +97,7 @@ class PhoneTypeController extends Controller
     public function reorder(Request $request)
     {
         try {
-            $this->repository->reorderPhoneTypes($request->input('phone_types', []));
+            $this->phoneTypeService->reorderPhoneTypes($request->input('phone_types', []));
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);

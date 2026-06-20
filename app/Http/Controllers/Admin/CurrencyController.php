@@ -2,24 +2,28 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Currency\BulkDeleteCurrencyRequest;
+
+use App\Http\Requests\Admin\Currency\ReorderCurrencyRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
-use App\Repositories\CurrencyRepository;
+use App\Interfaces\Services\Admin\CurrencyServiceInterface;
 use App\Http\Requests\Admin\Currency\StoreCurrencyRequest;
 use App\Http\Requests\Admin\Currency\UpdateCurrencyRequest;
 
 class CurrencyController extends Controller
 {
-    public function __construct(public CurrencyRepository $repository)
+    public function __construct(protected CurrencyServiceInterface $currencyService)
     {
     }
 
     public function index(): View
     {
-        $currencies = $this->repository->getCurrencies();
+        $currencies = $this->currencyService->getCurrencies();
         return view('admin.currencies.index', compact('currencies'));
     }
 
@@ -31,7 +35,7 @@ class CurrencyController extends Controller
     public function store(StoreCurrencyRequest $request): RedirectResponse
     {
         try {
-            $this->repository->createCurrency([
+            $this->currencyService->createCurrency([
                 'code' => $request->code,
                 'course' => $request->course,
                 'status' => $request->has('status')
@@ -54,7 +58,7 @@ class CurrencyController extends Controller
     public function update(UpdateCurrencyRequest $request, Currency $currency): RedirectResponse
     {
         try {
-            $this->repository->updateCurrency($currency, [
+            $this->currencyService->updateCurrency($currency, [
                 'code' => $request->code,
                 'course' => $request->course,
                 'status' => $request->status == '1'
@@ -72,7 +76,7 @@ class CurrencyController extends Controller
     public function destroy(Currency $currency): RedirectResponse
     {
         try {
-            $this->repository->deleteCurrency($currency);
+            $this->currencyService->deleteCurrency($currency);
             return redirect()->route('admin.currencies.index')
                 ->with('success', __('Currency deleted successfully.'));
         } catch (\Exception $e) {
@@ -80,15 +84,12 @@ class CurrencyController extends Controller
         }
     }
 
-    public function reorder(Request $request): RedirectResponse
+    public function reorder(ReorderCurrencyRequest $request): RedirectResponse
     {
-        $request->validate([
-            'orders' => 'required|array',
-            'orders.*' => 'integer|exists:currencies,id'
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderCurrencies($request->orders);
+            $this->currencyService->reorderCurrencies($request->orders);
             return redirect()->route('admin.currencies.index')
                 ->with('success', __('Currencies reordered successfully.'));
 
@@ -100,7 +101,7 @@ class CurrencyController extends Controller
     public function toggleStatus(Currency $currency): RedirectResponse
     {
         try {
-            $this->repository->toggleStatus($currency);
+            $this->currencyService->toggleStatus($currency);
             $status = $currency->fresh()->status ? 'enabled' : 'disabled';
             return redirect()->route('admin.currencies.index')
                 ->with('success', __('Currency :status successfully.', ['status' => $status]));
@@ -110,15 +111,12 @@ class CurrencyController extends Controller
         }
     }
 
-    public function bulkDelete(Request $request): RedirectResponse
+    public function bulkDelete(BulkDeleteCurrencyRequest $request): RedirectResponse
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:currencies,id'
-        ]);
+        $request->validated();
 
         try {
-            $deletedCount = $this->repository->bulkDelete($request->ids);
+            $deletedCount = $this->currencyService->bulkDelete($request->ids);
             return redirect()->route('admin.currencies.index')
                 ->with('success', __(':count currency(ies) deleted successfully.', ['count' => $deletedCount]));
 
@@ -129,13 +127,10 @@ class CurrencyController extends Controller
 
     public function bulkToggleStatus(Request $request): RedirectResponse
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:currencies,id'
-        ]);
+        $request->validated();
 
         try {
-            $updatedCount = $this->repository->bulkToggleStatus($request->ids);
+            $updatedCount = $this->currencyService->bulkToggleStatus($request->ids);
             return redirect()->route('admin.currencies.index')
                 ->with('success', __(':count currency(ies) status toggled successfully.', ['count' => $updatedCount]));
 

@@ -2,34 +2,32 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ServiceStaticData\UpdateServiceStaticDataRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\ServiceStaticData;
-use App\Models\Language;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
-use App\Repositories\ServiceStaticDataRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\ServiceStaticDataServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class ServiceStaticDataController extends Controller
 {
-    protected $imageService;
-
     public function __construct(
-        ImageService $imageService,
-        public ServiceStaticDataRepository $repository,
-        public LanguageRepository $languageRepository
+        protected ImageService $imageService,
+        protected ServiceStaticDataServiceInterface $serviceStaticDataService,
+        protected LanguageServiceInterface $languageService
     )
     {
-        $this->imageService = $imageService;
-    }
+}
 
     /**
      * Show the form for editing the service static data section.
      */
     public function edit()
     {
-        $serviceStaticData = $this->repository->getFirstOrCreate();
-        $languages = $this->languageRepository->getAllLanguages();
+        $serviceStaticData = $this->serviceStaticDataService->getFirstOrCreate();
+        $languages = $this->languageService->getAllLanguages();
         
         return view('admin.service-static-data.edit', compact('serviceStaticData', 'languages'));
     }
@@ -37,55 +35,23 @@ class ServiceStaticDataController extends Controller
     /**
      * Update the service static data section.
      */
-    public function update(Request $request)
+    public function update(UpdateServiceStaticDataUpdateServiceStaticDataRequest $request)
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         
         // Debug: Check what data is being sent
         \Log::info('ServiceStaticData Update Request:', $request->all());
         
         // Base validation for image uploads
-        $request->validate([
-            'card_1_image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,svg|max:2048',
-            'card_2_image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,svg|max:2048',
-            'card_3_image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp,svg|max:2048',
-        ], [
-            'card_1_image.image' => 'Card 1 image must be an image file.',
-            'card_1_image.mimes' => 'Card 1 image must be a file of type: jpg, jpeg, png, gif, webp, svg.',
-            'card_1_image.max' => 'Card 1 image may not be greater than 2MB.',
-            'card_2_image.image' => 'Card 2 image must be an image file.',
-            'card_2_image.mimes' => 'Card 2 image must be a file of type: jpg, jpeg, png, gif, webp, svg.',
-            'card_2_image.max' => 'Card 2 image may not be greater than 2MB.',
-            'card_3_image.image' => 'Card 3 image must be an image file.',
-            'card_3_image.mimes' => 'Card 3 image must be a file of type: jpg, jpeg, png, gif, webp, svg.',
-            'card_3_image.max' => 'Card 3 image may not be greater than 2MB.',
-        ]);
+        $request->validated();
 
         // Translation validation
         foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.title" => 'nullable|string|max:255',
-                "translations.{$language->id}.description" => 'nullable|string|max:2000',
-                "translations.{$language->id}.card_1_image_title" => 'nullable|string|max:255',
-                "translations.{$language->id}.card_1_image_alt_text" => 'nullable|string|max:255',
-                "translations.{$language->id}.card_2_image_title" => 'nullable|string|max:255',
-                "translations.{$language->id}.card_2_image_alt_text" => 'nullable|string|max:255',
-                "translations.{$language->id}.card_3_image_title" => 'nullable|string|max:255',
-                "translations.{$language->id}.card_3_image_alt_text" => 'nullable|string|max:255',
-            ], [
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.description.max" => "Description may not be greater than 2000 characters for {$language->lang_code}.",
-                "translations.{$language->id}.card_1_image_title.max" => "Card 1 image title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.card_1_image_alt_text.max" => "Card 1 image alt text may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.card_2_image_title.max" => "Card 2 image title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.card_2_image_alt_text.max" => "Card 2 image alt text may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.card_3_image_title.max" => "Card 3 image title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.card_3_image_alt_text.max" => "Card 3 image alt text may not be greater than 255 characters for {$language->lang_code}.",
-            ]);
+            $request->validated();
         }
 
         try {
-            $serviceStaticData = $this->repository->getFirstOrCreate();
+            $serviceStaticData = $this->serviceStaticDataService->getFirstOrCreate();
 
             // Handle image uploads
             $imageData = [];

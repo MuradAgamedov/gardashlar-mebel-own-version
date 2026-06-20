@@ -2,39 +2,41 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\AddressType\ReorderAddressTypeRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\AddressType;
 use Illuminate\Http\Request;
-use App\Repositories\AddressTypeRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\AddressTypeServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\AddressType\StoreAddressTypeRequest;
 use App\Http\Requests\Admin\AddressType\UpdateAddressTypeRequest;
 
 class AddressTypeController extends Controller
 {
     public function __construct(
-        public AddressTypeRepository $repository,
-        public LanguageRepository $languageRepository
+        protected AddressTypeServiceInterface $addressTypeService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
 
     public function index()
     {
-        $addressTypes = $this->repository->getAddressTypes();
+        $addressTypes = $this->addressTypeService->getAddressTypes();
         return view('admin.address-types.index', compact('addressTypes'));
     }
 
     public function create()
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.address-types.create', compact('languages'));
     }
 
     public function store(StoreAddressTypeRequest $request)
     {
         try {
-            $this->repository->createAddressType(
+            $this->addressTypeService->createAddressType(
                 ['status' => $request->input('status', false)],
                 $request->translations
             );
@@ -50,7 +52,7 @@ class AddressTypeController extends Controller
 
     public function edit(AddressType $addressType)
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         $addressType->load('translates.language');
         return view('admin.address-types.edit', compact('addressType', 'languages'));
     }
@@ -58,7 +60,7 @@ class AddressTypeController extends Controller
     public function update(UpdateAddressTypeRequest $request, AddressType $addressType)
     {
         try {
-            $this->repository->updateAddressType(
+            $this->addressTypeService->updateAddressType(
                 $addressType,
                 ['status' => $request->input('status', false)],
                 $request->translations
@@ -76,7 +78,7 @@ class AddressTypeController extends Controller
     public function destroy(AddressType $addressType)
     {
         try {
-            $this->repository->deleteAddressType($addressType);
+            $this->addressTypeService->deleteAddressType($addressType);
             return redirect()->route('admin.addresses.index')
                 ->with('success', __('Address type deleted successfully.'));
         } catch (\Exception $e) {
@@ -84,15 +86,12 @@ class AddressTypeController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderAddressTypeRequest $request)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'integer|exists:address_types,id'
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderAddressTypes($request->items);
+            $this->addressTypeService->reorderAddressTypes($request->items);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => __('Error reordering address types')], 500);

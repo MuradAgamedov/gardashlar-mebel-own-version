@@ -2,36 +2,38 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\HomePageCategory\ReorderHomePageCategoryRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\HomePageCategory;
 use Illuminate\Http\Request;
-use App\Repositories\HomePageCategoryRepository;
+use App\Interfaces\Services\Admin\HomePageCategoryServiceInterface;
 use App\Http\Requests\Admin\HomePageCategory\StoreHomePageCategoryRequest;
 use App\Http\Requests\Admin\HomePageCategory\UpdateHomePageCategoryRequest;
 
 class HomePageCategoryController extends Controller
 {
-    public function __construct(public HomePageCategoryRepository $repository)
+    public function __construct(protected HomePageCategoryServiceInterface $homePageCategoryService)
     {
     }
 
     public function index()
     {
-        $homePageCategories = $this->repository->getHomePageCategories();
-        $allCategories = $this->repository->getAvailableCategories($homePageCategories);
+        $homePageCategories = $this->homePageCategoryService->getHomePageCategories();
+        $allCategories = $this->homePageCategoryService->getAvailableCategories($homePageCategories);
         return view('admin.home-page-categories.index', compact('homePageCategories', 'allCategories'));
     }
 
     public function create()
     {
-        $categories = $this->repository->getCategoriesForCreate();
+        $categories = $this->homePageCategoryService->getCategoriesForCreate();
         return view('admin.home-page-categories.create', compact('categories'));
     }
 
     public function store(StoreHomePageCategoryRequest $request)
     {
         try {
-            $this->repository->createHomePageCategory([
+            $this->homePageCategoryService->createHomePageCategory([
                 'product_category_id' => $request->input('product_category_id'),
                 'status' => $request->boolean('status')
             ]);
@@ -51,14 +53,14 @@ class HomePageCategoryController extends Controller
 
     public function edit(HomePageCategory $homePageCategory)
     {
-        $categories = $this->repository->getCategoriesForEdit($homePageCategory);
+        $categories = $this->homePageCategoryService->getCategoriesForEdit($homePageCategory);
         return view('admin.home-page-categories.edit', compact('homePageCategory', 'categories'));
     }
 
     public function update(UpdateHomePageCategoryRequest $request, HomePageCategory $homePageCategory)
     {
         try {
-            $this->repository->updateHomePageCategory($homePageCategory, [
+            $this->homePageCategoryService->updateHomePageCategory($homePageCategory, [
                 'product_category_id' => $request->input('product_category_id'),
                 'status' => $request->boolean('status')
             ]);
@@ -74,7 +76,7 @@ class HomePageCategoryController extends Controller
     public function destroy(HomePageCategory $homePageCategory)
     {
         try {
-            $this->repository->deleteHomePageCategory($homePageCategory);
+            $this->homePageCategoryService->deleteHomePageCategory($homePageCategory);
             return redirect()->route('admin.home-page-categories.index')
                 ->with('success', __('Home page category deleted successfully.'));
 
@@ -83,15 +85,12 @@ class HomePageCategoryController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderHomePageCategoryRequest $request)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'required|integer|exists:home_page_categories,id'
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderHomePageCategories($request->input('items'));
+            $this->homePageCategoryService->reorderHomePageCategories($request->input('items'));
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

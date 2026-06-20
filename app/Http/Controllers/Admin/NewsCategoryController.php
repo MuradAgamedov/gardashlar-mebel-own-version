@@ -2,41 +2,45 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\NewsCategory\BulkDeleteNewsCategoryRequest;
+
+use App\Http\Requests\Admin\NewsCategory\ReorderNewsCategoryRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\NewsCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
-use App\Repositories\NewsCategoryRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\NewsCategoryServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\NewsCategory\StoreNewsCategoryRequest;
 use App\Http\Requests\Admin\NewsCategory\UpdateNewsCategoryRequest;
 
 class NewsCategoryController extends Controller
 {
     public function __construct(
-        public NewsCategoryRepository $repository,
-        public LanguageRepository $languageRepository
+        protected NewsCategoryServiceInterface $newsCategoryService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
 
     public function index(): View
     {
-        $categories = $this->repository->getCategories();
+        $categories = $this->newsCategoryService->getCategories();
         return view('admin.news-categories.index', compact('categories'));
     }
 
     public function create(): View
     {
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.news-categories.create', compact('languages'));
     }
 
     public function store(StoreNewsCategoryRequest $request): RedirectResponse
     {
         try {
-            $this->repository->createCategory(
+            $this->newsCategoryService->createCategory(
                 ['status' => $request->input('status', true)],
                 $request->input('translations')
             );
@@ -54,7 +58,7 @@ class NewsCategoryController extends Controller
     public function edit(NewsCategory $newsCategory): View
     {
         $newsCategory->load('translates.language');
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         $translations = $newsCategory->translates->keyBy('language_id');
         return view('admin.news-categories.edit', compact('newsCategory', 'languages', 'translations'));
     }
@@ -62,7 +66,7 @@ class NewsCategoryController extends Controller
     public function update(UpdateNewsCategoryRequest $request, NewsCategory $newsCategory): RedirectResponse
     {
         try {
-            $this->repository->updateCategory(
+            $this->newsCategoryService->updateCategory(
                 $newsCategory,
                 ['status' => $request->input('status', true)],
                 $request->input('translations')
@@ -81,7 +85,7 @@ class NewsCategoryController extends Controller
     public function destroy(NewsCategory $newsCategory): RedirectResponse
     {
         try {
-            $this->repository->deleteCategory($newsCategory);
+            $this->newsCategoryService->deleteCategory($newsCategory);
             return redirect()->route('admin.news-categories.index')
                 ->with('success', 'News category deleted successfully!');
         } catch (\Exception $e) {
@@ -89,30 +93,24 @@ class NewsCategoryController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderNewsCategoryRequest $request)
     {
-        $request->validate([
-            'categories' => 'required|array',
-            'categories.*' => 'required|integer|exists:news_categories,id',
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderCategories($request->categories);
+            $this->newsCategoryService->reorderCategories($request->categories);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
-    public function bulkDelete(Request $request)
+    public function bulkDelete(BulkDeleteNewsCategoryRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'required|integer|exists:news_categories,id',
-        ]);
+        $request->validated();
 
         try {
-            $deletedCount = $this->repository->bulkDelete($request->ids);
+            $deletedCount = $this->newsCategoryService->bulkDelete($request->ids);
             return redirect()->route('admin.news-categories.index')
                 ->with('success', "{$deletedCount} news category(ies) deleted successfully!");
         } catch (\Exception $e) {

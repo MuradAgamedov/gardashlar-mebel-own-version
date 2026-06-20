@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Map\ReorderMapRequest;
+
+use App\Http\Requests\Admin\Map\StoreMapRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Map;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Repositories\MapRepository;
+use App\Interfaces\Services\Admin\MapServiceInterface;
 
 class MapController extends Controller
 {
-    public function __construct(public MapRepository $repository)
+    public function __construct(protected MapServiceInterface $mapService)
     {
     }
 
@@ -19,7 +23,7 @@ class MapController extends Controller
      */
     public function index()
     {
-        $maps = $this->repository->getMaps();
+        $maps = $this->mapService->getMaps();
         return view('admin.maps.index', compact('maps'));
     }
 
@@ -34,12 +38,9 @@ class MapController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreMapRequest $request)
     {
-        $request->validate([
-            'map' => 'required|string|max:65535',
-            'status' => 'boolean',
-        ]);
+        $request->validated();
 
         try {
             Map::create([
@@ -71,10 +72,7 @@ class MapController extends Controller
      */
     public function update(Request $request, Map $map)
     {
-        $request->validate([
-            'map' => 'required|string|max:65535',
-            'status' => 'boolean',
-        ]);
+        $request->validated();
 
         try {
             $map->update([
@@ -111,12 +109,9 @@ class MapController extends Controller
     /**
      * Reorder maps
      */
-    public function reorder(Request $request)
+    public function reorder(ReorderMapRequest $request)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'integer|exists:maps,id'
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->items as $index => $id) {

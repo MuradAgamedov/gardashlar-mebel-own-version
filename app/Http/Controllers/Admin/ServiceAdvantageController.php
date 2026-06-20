@@ -2,23 +2,27 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ServiceAdvantage\UpdateOrderServiceAdvantageRequest;
+
+use App\Http\Requests\Admin\ServiceAdvantage\UpdateServiceAdvantageRequest;
+
+use App\Http\Requests\Admin\ServiceAdvantage\StoreServiceAdvantageRequest;
+
 use App\Http\Controllers\Controller;
-use App\Models\Language;
 use App\Models\Service;
 use App\Models\ServiceAdvantage;
-use App\Repositories\ServiceAdvantageRepository;
+use App\Interfaces\Services\Admin\ServiceAdvantageServiceInterface;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class ServiceAdvantageController extends Controller
 {
-    protected $imageService;
     protected $repository;
 
-    public function __construct(ImageService $imageService, ServiceAdvantageRepository $repository)
+    public function __construct(protected LanguageServiceInterface $languageService, protected ImageService $imageService, protected ServiceAdvantageServiceInterface $serviceAdvantageService)
     {
-        $this->imageService = $imageService;
-        $this->repository = $repository;
+$this->repository = $repository;
     }
 
     /**
@@ -26,9 +30,9 @@ class ServiceAdvantageController extends Controller
      */
     public function index($serviceId)
     {
-        $service = $this->repository->getServiceWithTranslations($serviceId);
-        $advantages = $this->repository->getServiceAdvantages($serviceId);
-        $languages = $this->repository->getActiveLanguages();
+        $service = $this->serviceAdvantageService->getServiceWithTranslations($serviceId);
+        $advantages = $this->serviceAdvantageService->getServiceAdvantages($serviceId);
+        $languages = $this->serviceAdvantageService->getActiveLanguages();
         
         return view('admin.service-advantages.index', compact('service', 'advantages', 'languages'));
     }
@@ -38,34 +42,20 @@ class ServiceAdvantageController extends Controller
      */
     public function create($serviceId)
     {
-        $service = $this->repository->getServiceWithTranslations($serviceId);
-        $languages = $this->repository->getActiveLanguages();
+        $service = $this->serviceAdvantageService->getServiceWithTranslations($serviceId);
+        $languages = $this->serviceAdvantageService->getActiveLanguages();
         return view('admin.service-advantages.create', compact('service', 'languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, $serviceId)
+    public function store(StoreServiceAdvantageRequest $request, $serviceId)
     {
         $service = Service::findOrFail($serviceId);
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageService->getActiveLanguages();
         // Base validation
-        $request->validate([
-            'service_id' => 'required|exists:services,id',
-            'icon' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string|max:255',
-            'translates.*.icon_alt_text' => 'nullable|string|max:255',
-            'translates.*.description' => 'required|string',
-        ], [
-            'service_id.required' => 'Service ID is required.',
-            'service_id.exists' => 'Selected service does not exist.',
-            'translates.required' => 'At least one language translation is required.',
-            'translates.*.title.required' => 'Title is required for all languages.',
-            'translates.*.description.required' => 'Description is required for all languages.',
-        ]);
+        $request->validated();
 
         try {
             \Log::info('ServiceAdvantage creation started', [
@@ -128,7 +118,7 @@ class ServiceAdvantageController extends Controller
     {
         $service = Service::with(['translates.language'])->findOrFail($serviceId);
         $advantage = ServiceAdvantage::with(['translates.language'])->findOrFail($advantageId);
-        $languages = Language::active()->orderBy('order')->get();
+        $languages = $this->languageService->getActiveLanguages();
         
         return view('admin.service-advantages.edit', compact('service', 'advantage', 'languages'));
     }
@@ -136,25 +126,14 @@ class ServiceAdvantageController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $serviceId, $advantageId)
+    public function update(UpdateServiceAdvantageRequest $request, $serviceId, $advantageId)
     {
         $service = Service::findOrFail($serviceId);
-        $advantage = ServiceAdvantage::findOrFail($advantageId);
-        $languages = Language::active()->orderBy('order')->get();
+        $advantage = $this->languageService->findOrFail($advantageId);
+        $languages = $this->languageService->getActiveLanguages();
 
         // Base validation
-        $request->validate([
-            'icon' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string|max:255',
-            'translates.*.icon_alt_text' => 'nullable|string|max:255',
-            'translates.*.description' => 'required|string',
-        ], [
-            'translates.required' => 'At least one language translation is required.',
-            'translates.*.title.required' => 'Title is required for all languages.',
-            'translates.*.description.required' => 'Description is required for all languages.',
-        ]);
+        $request->validated();
 
         try {
             // Handle icon upload
@@ -198,7 +177,7 @@ class ServiceAdvantageController extends Controller
     public function destroy($serviceId, $advantageId)
     {
         try {
-            $advantage = ServiceAdvantage::findOrFail($advantageId);
+            $advantage = $this->languageService->findOrFail($advantageId);
             $advantage->delete();
 
             return redirect()->route('admin.service-advantages.index', $serviceId)
@@ -213,13 +192,9 @@ class ServiceAdvantageController extends Controller
     /**
      * Update the order of advantages
      */
-    public function updateOrder(Request $request, $serviceId)
+    public function updateOrder(UpdateOrderServiceAdvantageRequest $request, $serviceId)
     {
-        $request->validate([
-            'advantages' => 'required|array',
-            'advantages.*.id' => 'required|exists:service_advantages,id',
-            'advantages.*.order' => 'required|integer|min:0'
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->advantages as $advantageData) {

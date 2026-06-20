@@ -2,33 +2,35 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ProductAccordion\ReorderProductAccordionRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\ProductAccordion;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use App\Repositories\LanguageRepository;
-use App\Repositories\ProductAccordionRepository;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
+use App\Interfaces\Services\Admin\ProductAccordionServiceInterface;
 use App\Http\Requests\Admin\ProductAccordion\StoreProductAccordionRequest;
 use App\Http\Requests\Admin\ProductAccordion\UpdateProductAccordionRequest;
 
 class ProductAccordionController extends Controller
 {
     public function __construct(
-        public LanguageRepository $languageRepository,
-        public ProductAccordionRepository $repository
+        protected LanguageServiceInterface $languageService,
+        protected ProductAccordionServiceInterface $productAccordionService
     )
     {
     }
     public function index(Product $product, Request $request)
     {
-        $accordions = $this->repository->getProductAccordions($product);
+        $accordions = $this->productAccordionService->getProductAccordions($product);
         $currentPage = $request->get('page', 1);
         return view('admin.product-accordions.index', compact('product', 'accordions', 'currentPage'));
     }
 
     public function create(Product $product)
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.product-accordions.create', compact('product', 'languages'));
     }
 
@@ -36,7 +38,7 @@ class ProductAccordionController extends Controller
     {
         try {
             // === Create accordion for current product ===
-            $accordion = $this->repository->createProductAccordion(
+            $accordion = $this->productAccordionService->createProductAccordion(
                 $product,
                 ['status' => $request->boolean('status', true)],
                 $request->input('translations')
@@ -53,7 +55,7 @@ class ProductAccordionController extends Controller
 
             foreach ($sameSlugProducts as $sameProduct) {
                 // Create corresponding accordion with same data
-                $this->repository->createProductAccordion(
+                $this->productAccordionService->createProductAccordion(
                     $sameProduct,
                     ['status' => $request->boolean('status', true)],
                     $request->input('translations')
@@ -71,7 +73,7 @@ class ProductAccordionController extends Controller
     public function edit(Product $product, ProductAccordion $accordion)
     {
         $accordion->load(['translates.language']);
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.product-accordions.edit', compact('product', 'accordion', 'languages'));
     }
 
@@ -79,7 +81,7 @@ class ProductAccordionController extends Controller
     {
         try {
             // === Update current product accordion ===
-            $this->repository->updateProductAccordion(
+            $this->productAccordionService->updateProductAccordion(
                 $accordion,
                 ['status' => $request->boolean('status', true)],
                 $request->input('translations')
@@ -102,7 +104,7 @@ class ProductAccordionController extends Controller
 
                 if ($correspondingAccordion) {
                     // Update corresponding accordion with same data
-                    $this->repository->updateProductAccordion(
+                    $this->productAccordionService->updateProductAccordion(
                         $correspondingAccordion,
                         ['status' => $request->boolean('status', true)],
                         $request->input('translations')
@@ -125,7 +127,7 @@ class ProductAccordionController extends Controller
             $accordionOrder = $accordion->order;
 
             // === Delete current product accordion ===
-            $this->repository->deleteProductAccordion($accordion);
+            $this->productAccordionService->deleteProductAccordion($accordion);
 
             // === Synchronize same slug products ===
             // Get current product's slugs
@@ -144,7 +146,7 @@ class ProductAccordionController extends Controller
 
                 if ($correspondingAccordion) {
                     // Delete corresponding accordion
-                    $this->repository->deleteProductAccordion($correspondingAccordion);
+                    $this->productAccordionService->deleteProductAccordion($correspondingAccordion);
                 }
             }
 
@@ -155,16 +157,13 @@ class ProductAccordionController extends Controller
         }
     }
 
-    public function reorder(Request $request, Product $product)
+    public function reorder(ReorderProductAccordionRequest $request, Product $product)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'exists:product_accordions,id'
-        ]);
+        $request->validated();
 
         try {
             // === Reorder current product accordions ===
-            $this->repository->reorderProductAccordions($request->input('items'));
+            $this->productAccordionService->reorderProductAccordions($request->input('items'));
 
             // === Synchronize same slug products ===
             // Get current product's slugs

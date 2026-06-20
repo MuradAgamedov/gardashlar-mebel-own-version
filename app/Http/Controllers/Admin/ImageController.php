@@ -4,36 +4,36 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Image;
-use App\Repositories\ImageRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\ImageServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\Image\StoreImageRequest;
 use App\Http\Requests\Admin\Image\UpdateImageRequest;
 
 class ImageController extends Controller
 {
     public function __construct(
-        public ImageRepository $repository,
-        public LanguageRepository $languageRepository
+        protected ImageServiceInterface $imageService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
 
     public function index()
     {
-        $images = $this->repository->getImages();
+        $images = $this->imageService->getImages();
         return view('admin.images.index', compact('images'));
     }
 
     public function create()
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.images.create', compact('languages'));
     }
 
     public function store(StoreImageRequest $request)
     {
         try {
-            $this->repository->createImage(
+            $this->imageService->createImage(
                 ['keyword' => $request->input('keyword')],
                 $request->translations,
                 $request->file('image')
@@ -50,7 +50,7 @@ class ImageController extends Controller
 
     public function edit(Image $image)
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         $translations = $image->translates->keyBy('language_id');
         return view('admin.images.edit', compact('image', 'languages', 'translations'));
     }
@@ -58,7 +58,7 @@ class ImageController extends Controller
     public function update(UpdateImageRequest $request, Image $image)
     {
         try {
-            $this->repository->updateImage(
+            $this->imageService->updateImage(
                 $image,
                 ['keyword' => $request->input('keyword')],
                 $request->translations,
@@ -77,7 +77,7 @@ class ImageController extends Controller
     public function destroy(Image $image)
     {
         try {
-            $this->repository->deleteImage($image);
+            $this->imageService->deleteImage($image);
             return redirect()->route('admin.images.index')
                 ->with('success', 'Image deleted successfully.');
         } catch (\Exception $e) {

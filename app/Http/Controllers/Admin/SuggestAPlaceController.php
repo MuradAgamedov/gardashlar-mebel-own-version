@@ -2,13 +2,24 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\SuggestAPlace\UpdateSuggestAPlaceRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\SuggestAPlace;
-use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
+
+use App\Interfaces\Services\Admin\SuggestAPlaceServiceInterface;
 
 class SuggestAPlaceController extends Controller
 {
+    public function __construct(
+        protected SuggestAPlaceServiceInterface $suggestAPlaceService,
+        protected LanguageServiceInterface $languageService
+    ) {
+    }
+
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -16,7 +27,7 @@ class SuggestAPlaceController extends Controller
     {
         $suggestAPlace = SuggestAPlace::getFirstOrCreate();
         $suggestAPlace->load('translates.language');
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         
         return view('admin.suggest-a-place.edit', compact('suggestAPlace', 'languages'));
     }
@@ -24,21 +35,14 @@ class SuggestAPlaceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(UpdateSuggestAPlaceRequest $request)
     {
         $suggestAPlace = SuggestAPlace::getFirstOrCreate();
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         
         // Translation validation
         foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.title" => 'required|string|max:255',
-                "translations.{$language->id}.description" => 'required|string',
-            ], [
-                "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.description.required" => "Description is required for {$language->lang_code}.",
-            ]);
+            $request->validated();
         }
 
         try {

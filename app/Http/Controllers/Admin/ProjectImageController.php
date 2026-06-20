@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ProjectImage\ReorderProjectImageRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectImage;
-use App\Repositories\ProjectImageRepository;
+use App\Interfaces\Services\Admin\ProjectImageServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -13,7 +15,7 @@ class ProjectImageController extends Controller
 {
     protected $repository;
      
-    public function __construct(ProjectImageRepository $repository)
+    public function __construct(protected ProjectImageServiceInterface $projectImageService)
     {
         $this->repository = $repository;
     }
@@ -31,7 +33,7 @@ class ProjectImageController extends Controller
      */
     public function index(Project $project)
     {
-        $images = $this->repository->getOrderedImages($project->id);
+        $images = $this->projectImageService->getOrderedImages($project->id);
         return view('admin.project-images.index', compact('project', 'images'));
     }
 
@@ -45,7 +47,7 @@ class ProjectImageController extends Controller
             $errors = [];
 
             if ($request->hasFile('images')) {
-                $uploadedImages = $this->repository->createImages(
+                $uploadedImages = $this->projectImageService->createImages(
                     $project->id,
                     $request->file('images'),
                     $request->boolean('status', true)
@@ -93,7 +95,7 @@ class ProjectImageController extends Controller
             ];
 
             $newImage = $request->hasFile('image') ? $request->file('image') : null;
-            $this->repository->updateImage($image, $data, $newImage);
+            $this->projectImageService->updateImage($image, $data, $newImage);
 
             return redirect()->route('admin.projects.images.index', $project)
                 ->with('success', 'Image updated successfully!');
@@ -112,7 +114,7 @@ class ProjectImageController extends Controller
     public function destroy(Project $project, ProjectImage $image)
     {
         try {
-            $this->repository->deleteImage($image);
+            $this->projectImageService->deleteImage($image);
 
             return redirect()->route('admin.projects.images.index', $project)
                 ->with('success', 'Image deleted successfully!');
@@ -130,7 +132,7 @@ class ProjectImageController extends Controller
     public function setMainImage(Project $project, ProjectImage $image)
     {
         try {
-            $this->repository->setMainImage($project->id, $image->id);
+            $this->projectImageService->setMainImage($project->id, $image->id);
 
             return redirect()->route('admin.projects.images.index', $project)
                 ->with('success', 'Main image updated successfully!');
@@ -145,15 +147,12 @@ class ProjectImageController extends Controller
     /**
      * Reorder images
      */
-    public function reorder(Request $request, Project $project)
+    public function reorder(ReorderProjectImageRequest $request, Project $project)
     {
         try {
-            $request->validate([
-                'items' => 'required|array|min:1',
-                'items.*' => 'required|integer|exists:project_images,id'
-            ]);
+            $request->validated();
 
-            $success = $this->repository->reorderImages($project->id, $request->input('items', []));
+            $success = $this->projectImageService->reorderImages($project->id, $request->input('items', []));
 
             if (!$success) {
                 return response()->json([

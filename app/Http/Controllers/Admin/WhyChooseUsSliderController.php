@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\WhyChooseUsSlider\ReorderWhyChooseUsSliderRequest;
+
+use App\Http\Requests\Admin\WhyChooseUsSlider\StoreWhyChooseUsSliderRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\WhyChooseUsSlider;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
 
+use App\Interfaces\Services\Admin\WhyChooseUsSliderServiceInterface;
+
 class WhyChooseUsSliderController extends Controller
 {
-    protected $imageService;
-
-    public function __construct(ImageService $imageService)
+    public function __construct(
+        protected ImageService $imageService,
+        protected WhyChooseUsSliderServiceInterface $whyChooseUsSliderService
+    )
     {
-        $this->imageService = $imageService;
     }
 
     /**
@@ -37,19 +43,9 @@ class WhyChooseUsSliderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreWhyChooseUsSliderRequest $request)
     {
-        $request->validate([
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'video_link' => 'nullable|url|max:500',
-            'status' => 'boolean',
-        ], [
-            'image.image' => __('Image must be an image file.'),
-            'image.mimes' => __('Image must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
-            'image.max' => __('Image may not be greater than :size.', ['size' => '2MB']),
-            'video_link.url' => __('Video link must be a valid URL.'),
-            'status.boolean' => __('Status must be true or false.'),
-        ]);
+        $request->validated();
 
         try {
             // Handle image upload
@@ -101,17 +97,7 @@ class WhyChooseUsSliderController extends Controller
      */
     public function update(Request $request, WhyChooseUsSlider $whyChooseUsSlider)
     {
-        $request->validate([
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'video_link' => 'nullable|url|max:500',
-            'status' => 'boolean',
-        ], [
-            'image.image' => __('Image must be an image file.'),
-            'image.mimes' => __('Image must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
-            'image.max' => __('Image may not be greater than :size.', ['size' => '2MB']),
-            'video_link.url' => __('Video link must be a valid URL.'),
-            'status.boolean' => __('Status must be true or false.'),
-        ]);
+        $request->validated();
 
         try {
             // Handle image upload
@@ -170,12 +156,9 @@ class WhyChooseUsSliderController extends Controller
     /**
      * Reorder sliders
      */
-    public function reorder(Request $request)
+    public function reorder(ReorderWhyChooseUsSliderRequest $request)
     {
-        $request->validate([
-            'sliders' => 'required|array',
-            'sliders.*' => 'required|integer|exists:why_choose_us_sliders,id',
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->sliders as $index => $sliderId) {

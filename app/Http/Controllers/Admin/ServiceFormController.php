@@ -2,12 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ServiceForm\DeleteSelectedServiceFormRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\ServiceForm;
 use Illuminate\Http\Request;
 
+use App\Interfaces\Services\Admin\ServiceFormServiceInterface;
+
 class ServiceFormController extends Controller
 {
+    public function __construct(
+        protected ServiceFormServiceInterface $serviceFormService
+    ) {
+    }
+
+
     public function index(Request $request)
     {
         $query = ServiceForm::with('service.translates');
@@ -67,7 +77,7 @@ class ServiceFormController extends Controller
     public function markAsRead($id)
     {
         try {
-            $form = ServiceForm::findOrFail($id);
+            $form = $this->serviceFormService->findOrFail($id);
             $form->markAsRead();
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
@@ -75,12 +85,9 @@ class ServiceFormController extends Controller
         }
     }
 
-    public function deleteSelected(Request $request)
+    public function deleteSelected(DeleteSelectedServiceFormRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:service_forms,id'
-        ]);
+        $request->validated();
 
         try {
             ServiceForm::whereIn('id', $request->ids)->delete();

@@ -2,14 +2,28 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\SocialNetwork\ReorderSocialNetworkRequest;
+
+use App\Http\Requests\Admin\SocialNetwork\StoreSocialNetworkRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\SocialNetwork;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
+use App\Interfaces\Services\Admin\SocialNetworkServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
+
 class SocialNetworkController extends Controller
 {
+    public function __construct(
+        protected SocialNetworkServiceInterface $socialNetworkService,
+        protected LanguageServiceInterface $languageService
+    ) {
+    }
+
+
     /**
      * Display a listing of the resource.
      */
@@ -31,12 +45,9 @@ class SocialNetworkController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreSocialNetworkRequest $request): RedirectResponse
     {
-        $request->validate([
-            'type' => 'required|string|max:255',
-            'url' => 'required|url|max:500',
-        ]);
+        $request->validated();
 
         try {
             // Get the highest order and add 1 for new item
@@ -74,10 +85,7 @@ class SocialNetworkController extends Controller
      */
     public function update(Request $request, SocialNetwork $socialNetwork): RedirectResponse
     {
-        $request->validate([
-            'type' => 'required|string|max:255',
-            'url' => 'required|url|max:500',
-        ]);
+        $request->validated();
 
         try {
             $socialNetwork->update([
@@ -114,12 +122,9 @@ class SocialNetworkController extends Controller
     /**
      * Reorder social networks
      */
-    public function reorder(Request $request): RedirectResponse
+    public function reorder(ReorderSocialNetworkRequest $request): RedirectResponse
     {
-        $request->validate([
-            'orders' => 'required|array',
-            'orders.*' => 'integer|exists:social_networks,id'
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->orders as $order => $id) {

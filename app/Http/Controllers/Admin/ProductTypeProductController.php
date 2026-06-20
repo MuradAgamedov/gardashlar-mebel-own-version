@@ -8,11 +8,11 @@ use App\Models\ProductType;
 use App\Models\HomePageTypeProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Repositories\ProductTypeProductRepository;
+use App\Interfaces\Services\Admin\ProductTypeProductServiceInterface;
 
 class ProductTypeProductController extends Controller
 {
-    public function __construct(public ProductTypeProductRepository $repository)
+    public function __construct(protected ProductTypeProductServiceInterface $productTypeProductService)
     {
     }
     /**
@@ -20,9 +20,9 @@ class ProductTypeProductController extends Controller
      */
     public function index(Request $request, $productTypeId)
     {
-        $productType = $this->repository->getProductType($productTypeId);
-        $products = $this->repository->getProductsByType($productTypeId, $request);
-        $homePageProductIds = $this->repository->getHomePageProductIds($productTypeId);
+        $productType = $this->productTypeProductService->getProductType($productTypeId);
+        $products = $this->productTypeProductService->getProductsByType($productTypeId, $request);
+        $homePageProductIds = $this->productTypeProductService->getHomePageProductIds($productTypeId);
 
         return view('admin.product-type-products.index', compact('products', 'productType', 'homePageProductIds'));
     }
@@ -33,7 +33,7 @@ class ProductTypeProductController extends Controller
     public function toggleHomePage(Request $request, $productTypeId, $productId)
     {
         try {
-            $existing = $this->repository->checkHomePageStatus($productTypeId, $productId);
+            $existing = $this->productTypeProductService->checkHomePageStatus($productTypeId, $productId);
 
             if ($existing) {
                 // Remove from homepage
@@ -71,7 +71,7 @@ class ProductTypeProductController extends Controller
     {
         $search = $request->search;
         
-        $products = $this->repository->searchProductsByType($productTypeId, $search);
+        $products = $this->productTypeProductService->searchProductsByType($productTypeId, $search);
 
         return response()->json([
             'success' => true,

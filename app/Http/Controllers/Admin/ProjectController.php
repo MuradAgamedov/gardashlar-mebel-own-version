@@ -2,32 +2,40 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Project\BulkDeleteProjectRequest;
+
+use App\Http\Requests\Admin\Project\ReorderProjectRequest;
+
+use App\Http\Requests\Admin\Project\UpdateProjectRequest;
+
+use App\Http\Requests\Admin\Project\StoreProjectRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectTranslate;
 use App\Models\ProjectCategory;
-use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use App\Repositories\ProjectRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\ProjectServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 
 class ProjectController extends Controller
 {
     public function __construct(
-        public ProjectRepository $repository,
-        public LanguageRepository $languageRepository
-    ) {}
+        protected ProjectServiceInterface $projectService,
+        protected LanguageServiceInterface $languageService
+    )
+    {}
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $mainLanguage = $this->languageRepository->getMainLanguage();
-        $categories = $this->repository->getActiveCategoriesWithMainLanguage($mainLanguage->id);
-        $projects = $this->repository->getProjects($request);
+        $mainLanguage = $this->languageService->getMainLanguage();
+        $categories = $this->projectService->getActiveCategoriesWithMainLanguage($mainLanguage->id);
+        $projects = $this->projectService->getProjects($request);
 
         return view('admin.projects.index', compact('projects', 'categories'));
     }
@@ -37,29 +45,17 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        $languages = $this->languageRepository->getAllLanguages();
-        $categories = $this->repository->getActiveCategories();
+        $languages = $this->languageService->getAllLanguages();
+        $categories = $this->projectService->getActiveCategories();
         return view('admin.projects.create', compact('languages', 'categories'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request)
     {
-        $request->validate([
-            'project_category_id' => 'required|exists:project_categories,id',
-            'status' => 'boolean',
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.title' => 'required|string|max:255',
-            'translations.*.company_name' => 'required|string|max:255',
-            'translations.*.slug' => 'required|string|max:255|unique:project_translates,slug',
-            'translations.*.description' => 'required|string',
-            'translations.*.seo_title' => 'nullable|string|max:255',
-            'translations.*.seo_keywords' => 'nullable|string',
-            'translations.*.seo_description' => 'nullable|string',
-        ]);
+        $request->validated();
 
         try {
             $project = Project::create([
@@ -101,8 +97,8 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        $languages = $this->languageRepository->getAllLanguages();
-        $categories = $this->repository->getActiveCategories();
+        $languages = $this->languageService->getAllLanguages();
+        $categories = $this->projectService->getActiveCategories();
         $translations = $project->translates->keyBy('language_id');
         return view('admin.projects.edit', compact('project', 'languages', 'categories', 'translations'));
     }
@@ -110,7 +106,7 @@ class ProjectController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Project $project)
+    public function update(UpdateProjectRequest $request, Project $project)
     {
         // Custom validation for slug uniqueness excluding current translations
         $customRules = [
@@ -140,7 +136,7 @@ class ProjectController extends Controller
             $customRules["translations.{$languageId}.slug"] = $slugRule;
         }
 
-        $request->validate($customRules);
+        $request->validated();
 
         try {
             $project->update([
@@ -209,12 +205,9 @@ class ProjectController extends Controller
     /**
      * Reorder projects
      */
-    public function reorder(Request $request)
+    public function reorder(ReorderProjectRequest $request)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'integer|exists:projects,id'
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->items as $index => $id) {
@@ -231,12 +224,9 @@ class ProjectController extends Controller
     /**
      * Bulk delete projects
      */
-    public function bulkDelete(Request $request)
+    public function bulkDelete(BulkDeleteProjectRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'required|integer|exists:projects,id',
-        ]);
+        $request->validated();
 
         try {
             $deletedCount = Project::whereIn('id', $request->ids)->delete();

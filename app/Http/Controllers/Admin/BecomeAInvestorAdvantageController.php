@@ -2,40 +2,44 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\BecomeAInvestorAdvantage\DeleteSelectedBecomeAInvestorAdvantageRequest;
+
+use App\Http\Requests\Admin\BecomeAInvestorAdvantage\ReorderBecomeAInvestorAdvantageRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\BecomeAInvestorAdvantage;
 use Illuminate\Http\Request;
-use App\Repositories\BecomeAInvestorAdvantageRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\BecomeAInvestorAdvantageServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\BecomeAInvestorAdvantage\StoreBecomeAInvestorAdvantageRequest;
 use App\Http\Requests\Admin\BecomeAInvestorAdvantage\UpdateBecomeAInvestorAdvantageRequest;
 
 class BecomeAInvestorAdvantageController extends Controller
 {
     public function __construct(
-        public BecomeAInvestorAdvantageRepository $repository,
-        public LanguageRepository $languageRepository
+        protected BecomeAInvestorAdvantageServiceInterface $becomeAInvestorAdvantageService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
 
     public function index()
     {
-        $advantages = $this->repository->getAdvantages();
-        $languages = $this->languageRepository->getAllLanguages();
+        $advantages = $this->becomeAInvestorAdvantageService->getAdvantages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.become-a-investor-advantages.index', compact('advantages', 'languages'));
     }
 
     public function create()
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.become-a-investor-advantages.create', compact('languages'));
     }
 
     public function store(StoreBecomeAInvestorAdvantageRequest $request)
     {
         try {
-            $this->repository->createAdvantage(
+            $this->becomeAInvestorAdvantageService->createAdvantage(
                 ['status' => $request->input('status', true)],
                 $request->input('translations'),
                 $request->file('icon')
@@ -54,14 +58,14 @@ class BecomeAInvestorAdvantageController extends Controller
     public function edit(BecomeAInvestorAdvantage $becomeAInvestorAdvantage)
     {
         $becomeAInvestorAdvantage->load('translates.language');
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.become-a-investor-advantages.edit', compact('becomeAInvestorAdvantage', 'languages'));
     }
 
     public function update(UpdateBecomeAInvestorAdvantageRequest $request, BecomeAInvestorAdvantage $becomeAInvestorAdvantage)
     {
         try {
-            $this->repository->updateAdvantage(
+            $this->becomeAInvestorAdvantageService->updateAdvantage(
                 $becomeAInvestorAdvantage,
                 ['status' => $request->input('status', true)],
                 $request->input('translations'),
@@ -81,7 +85,7 @@ class BecomeAInvestorAdvantageController extends Controller
     public function destroy(BecomeAInvestorAdvantage $becomeAInvestorAdvantage)
     {
         try {
-            $this->repository->deleteAdvantage($becomeAInvestorAdvantage);
+            $this->becomeAInvestorAdvantageService->deleteAdvantage($becomeAInvestorAdvantage);
             return redirect()->route('admin.become-a-investor.edit')
                 ->with('success', 'Advantage deleted successfully!');
         } catch (\Exception $e) {
@@ -90,30 +94,24 @@ class BecomeAInvestorAdvantageController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderBecomeAInvestorAdvantageRequest $request)
     {
-        $request->validate([
-            'advantages' => 'required|array',
-            'advantages.*' => 'required|integer|exists:become_a_investor_advantages,id',
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderAdvantages($request->advantages);
+            $this->becomeAInvestorAdvantageService->reorderAdvantages($request->advantages);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
-    public function deleteSelected(Request $request)
+    public function deleteSelected(DeleteSelectedBecomeAInvestorAdvantageRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:become_a_investor_advantages,id'
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->deleteSelected($request->ids);
+            $this->becomeAInvestorAdvantageService->deleteSelected($request->ids);
             return redirect()->route('admin.become-a-investor.edit')
                 ->with('success', count($request->ids) . ' advantage(s) deleted successfully.');
 

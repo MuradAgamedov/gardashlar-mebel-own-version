@@ -2,34 +2,32 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\WhyChooseUs\UpdateWhyChooseUsRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\WhyChooseUs;
-use App\Models\Language;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
-use App\Repositories\WhyChooseUsRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\WhyChooseUsServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class WhyChooseUsController extends Controller
 {
-    protected $imageService;
-
     public function __construct(
-        ImageService $imageService,
-        public WhyChooseUsRepository $repository,
-        public LanguageRepository $languageRepository
+        protected ImageService $imageService,
+        protected WhyChooseUsServiceInterface $whyChooseUsService,
+        protected LanguageServiceInterface $languageService
     )
     {
-        $this->imageService = $imageService;
-    }
+}
 
     /**
      * Show the form for editing the Why Choose Us section.
      */
     public function edit()
     {
-        $whyChooseUs = $this->repository->getFirstOrCreate();
-        $languages = $this->languageRepository->getActiveLanguages();
+        $whyChooseUs = $this->whyChooseUsService->getFirstOrCreate();
+        $languages = $this->languageService->getActiveLanguages();
         
         return view('admin.why-choose-us.edit', compact('whyChooseUs', 'languages'));
     }
@@ -37,44 +35,11 @@ class WhyChooseUsController extends Controller
     /**
      * Update the Why Choose Us section.
      */
-    public function update(Request $request)
+    public function update(UpdateWhyChooseUsRequest $request)
     {
-        $whyChooseUs = $this->repository->getFirstOrCreate();
+        $whyChooseUs = $this->whyChooseUsService->getFirstOrCreate();
 
-        $request->validate([
-            'first_icon' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'second_icon' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'third_icon' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'fourth_icon' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.first_icon_alt_text' => 'nullable|string|max:255',
-            'translates.*.first_title' => 'nullable|string|max:255',
-            'translates.*.first_description' => 'nullable|string',
-            'translates.*.second_icon_alt_text' => 'nullable|string|max:255',
-            'translates.*.second_title' => 'nullable|string|max:255',
-            'translates.*.second_description' => 'nullable|string',
-            'translates.*.third_icon_alt_text' => 'nullable|string|max:255',
-            'translates.*.third_title' => 'nullable|string|max:255',
-            'translates.*.third_description' => 'nullable|string',
-            'translates.*.fourth_icon_alt_text' => 'nullable|string|max:255',
-            'translates.*.fourth_title' => 'nullable|string|max:255',
-            'translates.*.fourth_description' => 'nullable|string',
-        ], [
-            'translates.required' => __('At least one language translation is required.'),
-            'first_icon.image' => __('First icon must be an image file.'),
-            'first_icon.mimes' => __('First icon must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
-            'first_icon.max' => __('First icon may not be greater than :size.', ['size' => '2MB']),
-            'second_icon.image' => __('Second icon must be an image file.'),
-            'second_icon.mimes' => __('Second icon must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
-            'second_icon.max' => __('Second icon may not be greater than :size.', ['size' => '2MB']),
-            'third_icon.image' => __('Third icon must be an image file.'),
-            'third_icon.mimes' => __('Third icon must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
-            'third_icon.max' => __('Third icon may not be greater than :size.', ['size' => '2MB']),
-            'fourth_icon.image' => __('Fourth icon must be an image file.'),
-            'fourth_icon.mimes' => __('Fourth icon must be a file of type: :types.', ['types' => 'jpg, jpeg, png, gif, webp']),
-            'fourth_icon.max' => __('Fourth icon may not be greater than :size.', ['size' => '2MB']),
-        ]);
+        $request->validated();
 
         try {
             // Handle icon uploads

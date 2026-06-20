@@ -2,41 +2,45 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\BlogCategory\BulkDeleteBlogCategoryRequest;
+
+use App\Http\Requests\Admin\BlogCategory\ReorderBlogCategoryRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
-use App\Repositories\BlogCategoryRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\BlogCategoryServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\BlogCategory\StoreBlogCategoryRequest;
 use App\Http\Requests\Admin\BlogCategory\UpdateBlogCategoryRequest;
 
 class BlogCategoryController extends Controller
 {
     public function __construct(
-        public BlogCategoryRepository $repository,
-        public LanguageRepository $languageRepository
+        protected BlogCategoryServiceInterface $blogCategoryService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
 
     public function index(): View
     {
-        $categories = $this->repository->getCategories();
+        $categories = $this->blogCategoryService->getCategories();
         return view('admin.blog-categories.index', compact('categories'));
     }
 
     public function create(): View
     {
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.blog-categories.create', compact('languages'));
     }
 
     public function store(StoreBlogCategoryRequest $request): RedirectResponse
     {
         try {
-            $this->repository->createCategory(
+            $this->blogCategoryService->createCategory(
                 ['status' => $request->input('status', true)],
                 $request->input('translations')
             );
@@ -54,7 +58,7 @@ class BlogCategoryController extends Controller
     public function edit(BlogCategory $blogCategory): View
     {
         $blogCategory->load('translates.language');
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         $translations = $blogCategory->translates->keyBy('language_id');
         return view('admin.blog-categories.edit', compact('blogCategory', 'languages', 'translations'));
     }
@@ -62,7 +66,7 @@ class BlogCategoryController extends Controller
     public function update(UpdateBlogCategoryRequest $request, BlogCategory $blogCategory): RedirectResponse
     {
         try {
-            $this->repository->updateCategory(
+            $this->blogCategoryService->updateCategory(
                 $blogCategory,
                 ['status' => $request->input('status', true)],
                 $request->input('translations')
@@ -81,7 +85,7 @@ class BlogCategoryController extends Controller
     public function destroy(BlogCategory $blogCategory): RedirectResponse
     {
         try {
-            $this->repository->deleteCategory($blogCategory);
+            $this->blogCategoryService->deleteCategory($blogCategory);
             return redirect()->route('admin.blog-categories.index')
                 ->with('success', 'Blog category deleted successfully!');
         } catch (\Exception $e) {
@@ -89,30 +93,24 @@ class BlogCategoryController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderBlogCategoryRequest $request)
     {
-        $request->validate([
-            'categories' => 'required|array',
-            'categories.*' => 'required|integer|exists:blog_categories,id',
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderCategories($request->categories);
+            $this->blogCategoryService->reorderCategories($request->categories);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
-    public function bulkDelete(Request $request)
+    public function bulkDelete(BulkDeleteBlogCategoryRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'required|integer|exists:blog_categories,id',
-        ]);
+        $request->validated();
 
         try {
-            $deletedCount = $this->repository->bulkDelete($request->ids);
+            $deletedCount = $this->blogCategoryService->bulkDelete($request->ids);
             return redirect()->route('admin.blog-categories.index')
                 ->with('success', "{$deletedCount} blog category(ies) deleted successfully!");
         } catch (\Exception $e) {

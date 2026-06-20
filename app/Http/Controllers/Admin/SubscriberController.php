@@ -2,13 +2,23 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Subscriber\BulkDeleteSubscriberRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Subscriber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use App\Interfaces\Services\Admin\SubscriberServiceInterface;
+
 class SubscriberController extends Controller
 {
+    public function __construct(
+        protected SubscriberServiceInterface $subscriberService
+    ) {
+    }
+
+
     /**
      * Display a listing of the resource.
      */
@@ -36,7 +46,7 @@ class SubscriberController extends Controller
     public function destroy(string $id)
     {
         try {
-            $subscriber = Subscriber::findOrFail($id);
+            $subscriber = $this->subscriberService->findOrFail($id);
             $subscriber->delete();
 
             return redirect()->route('admin.subscribers.index')
@@ -50,12 +60,9 @@ class SubscriberController extends Controller
     /**
      * Bulk delete subscribers
      */
-    public function bulkDelete(Request $request)
+    public function bulkDelete(BulkDeleteSubscriberRequest $request)
     {
-        $request->validate([
-            'subscriber_ids' => 'required|array',
-            'subscriber_ids.*' => 'exists:subscribers,id'
-        ]);
+        $request->validated();
 
         try {
             $deletedCount = Subscriber::whereIn('id', $request->subscriber_ids)->delete();

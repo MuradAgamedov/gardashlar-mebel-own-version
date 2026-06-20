@@ -2,26 +2,32 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Suggestion\DeleteSelectedSuggestionRequest;
+
+use App\Http\Requests\Admin\Suggestion\ReorderSuggestionRequest;
+
+use App\Http\Requests\Admin\Suggestion\UpdateSuggestionRequest;
+
+use App\Http\Requests\Admin\Suggestion\StoreSuggestionRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Suggestion;
 use App\Models\SuggestionTranslate;
-use App\Models\Language;
 use App\Services\ImageService;
 use App\Services\FileService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class SuggestionController extends Controller
 {
-    protected $imageService;
     protected $fileService;
 
-    public function __construct(ImageService $imageService, FileService $fileService)
+    public function __construct(protected LanguageServiceInterface $languageService, protected ImageService $imageService, FileService $fileService)
     {
-        $this->imageService = $imageService;
-        $this->fileService = $fileService;
+$this->fileService = $fileService;
     }
 
     /**
@@ -30,7 +36,7 @@ class SuggestionController extends Controller
     public function index()
     {
         $suggestions = Suggestion::with(['translates' => function($query) {
-            $query->where('language_id', Language::getMainLanguage()->id);
+            $query->where('language_id', $this->languageService->getMainLanguage()->id);
         }])->ordered()->get();
 
         return view('admin.suggestions.index', compact('suggestions'));
@@ -41,24 +47,16 @@ class SuggestionController extends Controller
      */
     public function create()
     {
-        $languages = Language::getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.suggestions.create', compact('languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreSuggestionRequest $request)
     {
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'pdf' => 'nullable|file|mimes:pdf|max:10240',
-            'status' => 'boolean',
-            'translates' => 'required|array',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string|max:255',
-            'translates.*.image_alt_text' => 'nullable|string|max:255',
-        ]);
+        $request->validated();
 
         try {
             DB::beginTransaction();
@@ -92,7 +90,7 @@ class SuggestionController extends Controller
             DB::commit();
 
             // Clear cache for all languages
-            $languages = Language::getActiveLanguages();
+            $languages = $this->languageService->getActiveLanguages();
             foreach ($languages as $language) {
                 Cache::forget("suggestions_{$language->id}");
                 Cache::forget("suggestion_{$suggestion->id}_{$language->id}");
@@ -122,7 +120,7 @@ class SuggestionController extends Controller
     public function edit(string $id)
     {
         $suggestion = Suggestion::with('translates')->findOrFail($id);
-        $languages = Language::getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         
         return view('admin.suggestions.edit', compact('suggestion', 'languages'));
     }
@@ -130,19 +128,11 @@ class SuggestionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateSuggestionRequest $request, string $id)
     {
-        $suggestion = Suggestion::findOrFail($id);
+        $suggestion = $this->languageService->findOrFail($id);
 
-        $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'pdf' => 'nullable|file|mimes:pdf|max:10240',
-            'status' => 'boolean',
-            'translates' => 'required|array',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string|max:255',
-            'translates.*.image_alt_text' => 'nullable|string|max:255',
-        ]);
+        $request->validated();
 
         try {
             DB::beginTransaction();
@@ -191,7 +181,7 @@ class SuggestionController extends Controller
             DB::commit();
 
             // Clear cache for all languages
-            $languages = Language::getActiveLanguages();
+            $languages = $this->languageService->getActiveLanguages();
             foreach ($languages as $language) {
                 Cache::forget("suggestions_{$language->id}");
                 Cache::forget("suggestion_{$suggestion->id}_{$language->id}");
@@ -211,7 +201,7 @@ class SuggestionController extends Controller
      */
     public function destroy(string $id)
     {
-        $suggestion = Suggestion::findOrFail($id);
+        $suggestion = $this->languageService->findOrFail($id);
 
         try {
             // Delete image
@@ -227,7 +217,7 @@ class SuggestionController extends Controller
             $suggestion->delete();
 
             // Clear cache for all languages
-            $languages = Language::getActiveLanguages();
+            $languages = $this->languageService->getActiveLanguages();
             foreach ($languages as $language) {
                 Cache::forget("suggestions_{$language->id}");
                 Cache::forget("suggestion_{$suggestion->id}_{$language->id}");
@@ -244,12 +234,9 @@ class SuggestionController extends Controller
     /**
      * Reorder suggestions
      */
-    public function reorder(Request $request)
+    public function reorder(ReorderSuggestionRequest $request)
     {
-        $request->validate([
-            'orders' => 'required|array',
-            'orders.*' => 'required|integer|exists:suggestions,id'
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->input('orders') as $order => $id) {
@@ -257,7 +244,7 @@ class SuggestionController extends Controller
             }
 
             // Clear cache for all languages
-            $languages = Language::getActiveLanguages();
+            $languages = $this->languageService->getActiveLanguages();
             foreach ($languages as $language) {
                 Cache::forget("suggestions_{$language->id}");
             }
@@ -271,12 +258,9 @@ class SuggestionController extends Controller
     /**
      * Delete selected suggestions
      */
-    public function deleteSelected(Request $request)
+    public function deleteSelected(DeleteSelectedSuggestionRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'required|integer|exists:suggestions,id'
-        ]);
+        $request->validated();
 
         try {
             $suggestions = Suggestion::whereIn('id', $request->input('ids'))->get();
@@ -296,7 +280,7 @@ class SuggestionController extends Controller
             }
 
             // Clear cache for all languages
-            $languages = Language::getActiveLanguages();
+            $languages = $this->languageService->getActiveLanguages();
             foreach ($languages as $language) {
                 Cache::forget("suggestions_{$language->id}");
                 foreach ($request->input('ids') as $id) {

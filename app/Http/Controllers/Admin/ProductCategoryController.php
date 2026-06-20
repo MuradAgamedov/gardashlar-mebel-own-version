@@ -5,37 +5,37 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
-use App\Repositories\ProductCategoryRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\ProductCategoryServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\ProductCategory\StoreProductCategoryRequest;
 use App\Http\Requests\Admin\ProductCategory\UpdateProductCategoryRequest;
 
 class ProductCategoryController extends Controller
 {
     public function __construct(
-        public ProductCategoryRepository $repository,
-        public LanguageRepository $languageRepository
+        protected ProductCategoryServiceInterface $productCategoryService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
     public function index(Request $request)
     {
-        $categories = $this->repository->getCategories($request);
-        $allCategories = $this->repository->getAllCategories();
+        $categories = $this->productCategoryService->getCategories($request);
+        $allCategories = $this->productCategoryService->getAllCategories();
         return view('admin.product-categories.index', compact('categories', 'allCategories'));
     }
 
     public function create()
     {
-        $languages = $this->languageRepository->getActiveLanguages();
-        $categories = $this->repository->getRootCategories();
+        $languages = $this->languageService->getActiveLanguages();
+        $categories = $this->productCategoryService->getRootCategories();
         return view('admin.product-categories.create', compact('languages', 'categories'));
     }
 
     public function store(StoreProductCategoryRequest $request)
     {
         try {
-            $this->repository->createProductCategory(
+            $this->productCategoryService->createProductCategory(
                 [
                     'parent_id' => $request->input('parent_id'),
                     'status' => $request->has('status') ? true : false,
@@ -63,15 +63,15 @@ class ProductCategoryController extends Controller
     public function edit(ProductCategory $productCategory)
     {
         $productCategory->load('translates.language');
-        $languages = $this->languageRepository->getActiveLanguages();
-        $categories = $this->repository->getRootCategoriesExcept($productCategory->id);
+        $languages = $this->languageService->getActiveLanguages();
+        $categories = $this->productCategoryService->getRootCategoriesExcept($productCategory->id);
         return view('admin.product-categories.edit', compact('productCategory', 'languages', 'categories'));
     }
 
     public function update(UpdateProductCategoryRequest $request, ProductCategory $productCategory)
     {
         try {
-            $this->repository->updateProductCategory(
+            $this->productCategoryService->updateProductCategory(
                 $productCategory,
                 [
                     'parent_id' => $request->input('parent_id'),
@@ -95,7 +95,7 @@ class ProductCategoryController extends Controller
     public function destroy(ProductCategory $productCategory)
     {
         try {
-            $this->repository->deleteProductCategory($productCategory);
+            $this->productCategoryService->deleteProductCategory($productCategory);
             return redirect()->route('admin.product-categories.index')
                 ->with('success', __('Product category deleted successfully!'));
         } catch (\Exception $e) {
@@ -107,7 +107,7 @@ class ProductCategoryController extends Controller
     public function reorder(Request $request)
     {
         try {
-            $this->repository->reorderProductCategories(
+            $this->productCategoryService->reorderProductCategories(
                 $request->input('items', []),
                 $request->input('type', 'main')
             );
@@ -130,7 +130,7 @@ class ProductCategoryController extends Controller
                 return redirect()->back()->with('error', __('No categories selected for deletion.'));
             }
 
-            $count = $this->repository->deleteSelectedCategories($selectedIds);
+            $count = $this->productCategoryService->deleteSelectedCategories($selectedIds);
 
             return redirect()->route('admin.product-categories.index')
                 ->with('success', __(':count categories deleted successfully!', ['count' => $count]));

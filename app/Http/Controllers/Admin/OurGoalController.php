@@ -2,39 +2,41 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\OurGoal\ReorderOurGoalRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\OurGoal;
 use Illuminate\Http\Request;
-use App\Repositories\OurGoalRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\OurGoalServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\OurGoal\StoreOurGoalRequest;
 use App\Http\Requests\Admin\OurGoal\UpdateOurGoalRequest;
 
 class OurGoalController extends Controller
 {
     public function __construct(
-        public OurGoalRepository $repository,
-        public LanguageRepository $languageRepository
+        protected OurGoalServiceInterface $ourGoalService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
 
     public function index()
     {
-        $ourGoals = $this->repository->getOurGoals();
+        $ourGoals = $this->ourGoalService->getOurGoals();
         return view('admin.our-goals.index', compact('ourGoals'));
     }
 
     public function create()
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.our-goals.create', compact('languages'));
     }
 
     public function store(StoreOurGoalRequest $request)
     {
         try {
-            $this->repository->createOurGoal(
+            $this->ourGoalService->createOurGoal(
                 ['status' => $request->input('status', false)],
                 $request->translations
             );
@@ -50,7 +52,7 @@ class OurGoalController extends Controller
 
     public function edit(OurGoal $ourGoal)
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         $translations = $ourGoal->translates->keyBy('language_id');
         return view('admin.our-goals.edit', compact('ourGoal', 'languages', 'translations'));
     }
@@ -58,7 +60,7 @@ class OurGoalController extends Controller
     public function update(UpdateOurGoalRequest $request, OurGoal $ourGoal)
     {
         try {
-            $this->repository->updateOurGoal(
+            $this->ourGoalService->updateOurGoal(
                 $ourGoal,
                 ['status' => $request->input('status', false)],
                 $request->translations
@@ -76,7 +78,7 @@ class OurGoalController extends Controller
     public function destroy(OurGoal $ourGoal)
     {
         try {
-            $this->repository->deleteOurGoal($ourGoal);
+            $this->ourGoalService->deleteOurGoal($ourGoal);
             return redirect()->route('admin.our-goals.index')
                 ->with('success', 'Our Goal deleted successfully.');
         } catch (\Exception $e) {
@@ -84,15 +86,12 @@ class OurGoalController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderOurGoalRequest $request)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'integer|exists:our_goals,id'
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderOurGoals($request->items);
+            $this->ourGoalService->reorderOurGoals($request->items);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Error reordering our goals'], 500);

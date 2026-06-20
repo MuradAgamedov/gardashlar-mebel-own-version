@@ -2,36 +2,38 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\SimpleImage\QuickUploadStoreSimpleImageRequest;
+
+use App\Http\Requests\Admin\SimpleImage\UpdateSimpleImageRequest;
+
+use App\Http\Requests\Admin\SimpleImage\StoreSimpleImageRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\SimpleImage;
 use App\Models\SimpleImageTranslate;
-use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use App\Services\ImageService;
-use App\Repositories\SimpleImageRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\SimpleImageServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class SimpleImageController extends Controller
 {
-    protected $imageService;
-
     public function __construct(
-        ImageService $imageService,
-        public SimpleImageRepository $repository,
-        public LanguageRepository $languageRepository
+        protected ImageService $imageService,
+        protected SimpleImageServiceInterface $simpleImageService,
+        protected LanguageServiceInterface $languageService
     )
     {
-        $this->imageService = $imageService;
-    }
+}
 
     /**
      * Display a listing of the resource.
      */
     public function index(): View
     {
-        $images = $this->repository->getImages();
+        $images = $this->simpleImageService->getImages();
         return view('admin.simple-images.index', compact('images'));
     }
 
@@ -40,27 +42,16 @@ class SimpleImageController extends Controller
      */
     public function create(): View
     {
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.simple-images.create', compact('languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreSimpleImageRequest $request): RedirectResponse
     {
-        $request->validate([
-            'keyword' => 'required|string|max:255|unique:simple_images',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.image_go_url' => 'nullable|string|max:255',
-            'translations.*.image_alt_text' => 'nullable|string|max:255',
-        ], [
-            'image.required' => 'Image is required.',
-            'image.image' => 'The file must be an image.',
-            'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
-        ]);
+        $request->validated();
 
         try {
             // Additional file validation
@@ -137,7 +128,7 @@ class SimpleImageController extends Controller
      */
     public function edit(SimpleImage $simpleImage): View
     {
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         $translations = $simpleImage->translates->keyBy('language_id');
         return view('admin.simple-images.edit', compact('simpleImage', 'languages', 'translations'));
     }
@@ -145,19 +136,9 @@ class SimpleImageController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, SimpleImage $simpleImage): RedirectResponse
+    public function update(UpdateSimpleImageRequest $request, SimpleImage $simpleImage): RedirectResponse
     {
-        $request->validate([
-            'keyword' => 'required|string|max:255|unique:simple_images,keyword,' . $simpleImage->id,
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.image_go_url' => 'nullable|string|max:255',
-            'translations.*.image_alt_text' => 'nullable|string|max:255',
-        ], [
-            'image.image' => 'The file must be an image.',
-            'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
-        ]);
+        $request->validated();
 
         try {
             $data = [
@@ -250,7 +231,7 @@ class SimpleImageController extends Controller
     public function quickUpload(Request $request, string $keyword): View
     {
         $simpleImage = SimpleImage::where('keyword', $keyword)->first();
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         
         if ($simpleImage) {
             $translations = $simpleImage->translates->keyBy('language_id');
@@ -264,19 +245,9 @@ class SimpleImageController extends Controller
     /**
      * Store quick uploaded image by keyword
      */
-    public function quickUploadStore(Request $request, string $keyword): RedirectResponse
+    public function quickUploadStore(QuickUploadStoreSimpleImageRequest $request, string $keyword): RedirectResponse
     {
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
-            'translations' => 'required|array',
-            'translations.*.language_id' => 'required|exists:languages,id',
-            'translations.*.image_go_url' => 'nullable|string|max:255',
-            'translations.*.image_alt_text' => 'nullable|string|max:255',
-        ], [
-            'image.required' => 'Image is required.',
-            'image.image' => 'The file must be an image.',
-            'image.mimes' => 'Image must be a file of type: jpg, jpeg, png, gif, webp.',
-        ]);
+        $request->validated();
 
         try {
             $file = $request->file('image');

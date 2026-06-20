@@ -1,23 +1,27 @@
 <?php
+
 namespace App\Repositories\Global;
 
-use Illuminate\Support\Facades\DB;
-
-abstract class BaseRepository 
+/**
+ * @deprecated Yeni BaseRepository (App\Repositories\BaseRepository) istifadə edin.
+ * Bu sinif geriyə uyğunluq üçün saxlanılır.
+ * Yeni modullarda App\Repositories\BaseRepository istifadə edin.
+ */
+abstract class BaseRepository
 {
-    public function GetData($model, $with = []) 
+    public function GetData($model, $with = [])
     {
         return $model::with($with)->ordered();
     }
 
-    public function FindById($model, $id, $with = []) 
+    public function FindById($model, $id, $with = [])
     {
         return $model::with($with)->findOrFail($id);
     }
 
-    public function UpdateOrder($model, array $items) 
+    public function UpdateOrder($model, array $items)
     {
-        return DB::transaction(function () use ($model, $items) {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($model, $items) {
             foreach ($items as $index => $id) {
                 $model::where('id', $id)->update(['order' => $index + 1]);
             }

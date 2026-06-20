@@ -2,14 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\SiteUsageRules\UpdateSiteUsageRulesRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\SiteUsageRules;
-use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use Illuminate\Support\Facades\Cache;
+
+use App\Interfaces\Services\Admin\SiteUsageRulesServiceInterface;
 
 class SiteUsageRulesController extends Controller
 {
+    public function __construct(
+        protected SiteUsageRulesServiceInterface $siteUsageRulesService,
+        protected LanguageServiceInterface $languageService
+    ) {
+    }
+
+
     /**
      * Display the specified resource.
      */
@@ -21,7 +32,7 @@ class SiteUsageRulesController extends Controller
             $siteUsageRules = SiteUsageRules::create(['status' => true]);
         }
         
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         
         return view('admin.site-usage-rules.edit', compact('siteUsageRules', 'languages'));
     }
@@ -29,18 +40,13 @@ class SiteUsageRulesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request)
+    public function update(UpdateSiteUsageRulesRequest $request)
     {
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         
         // Translation validation
         foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.content" => 'required|string|max:5000',
-            ], [
-                "translations.{$language->id}.content.required" => "Content is required for {$language->lang_code}.",
-                "translations.{$language->id}.content.max" => "Content may not be greater than 5000 characters for {$language->lang_code}.",
-            ]);
+            $request->validated();
         }
 
         try {
@@ -65,7 +71,7 @@ class SiteUsageRulesController extends Controller
             }
 
             // Clear cache for all languages
-            $languages = Language::getActiveLanguages();
+            $languages = $this->languageService->getActiveLanguages();
             foreach ($languages as $language) {
                 Cache::forget("site_usage_rules_{$language->id}");
             }

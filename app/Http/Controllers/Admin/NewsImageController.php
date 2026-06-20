@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\NewsImage\ReorderNewsImageRequest;
+
+use App\Http\Requests\Admin\NewsImage\UpdateNewsImageRequest;
+
+use App\Http\Requests\Admin\NewsImage\StoreNewsImageRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\NewsPost;
 use App\Models\NewsImage;
 use Illuminate\Http\Request;
-use App\Repositories\NewsPostRepository;
+use App\Interfaces\Services\Admin\NewsPostServiceInterface;
 use App\Services\ImageService;
 use Illuminate\Http\JsonResponse;
 
 class NewsImageController extends Controller
 {
     public function __construct(
-        public NewsPostRepository $newsPostRepository,
-        public ImageService $imageService
+        protected NewsPostServiceInterface $newsPostService,
+        protected ImageService $imageService
     )
     {
     }
@@ -25,12 +31,9 @@ class NewsImageController extends Controller
         return view('admin.news-images.index', compact('news_post'));
     }
 
-    public function store(Request $request, NewsPost $news_post)
+    public function store(StoreNewsImageRequest $request, NewsPost $news_post)
     {
-        $request->validate([
-            'images' => 'required|array',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-        ]);
+        $request->validated();
 
         try {
             $uploadedCount = 0;
@@ -53,11 +56,9 @@ class NewsImageController extends Controller
         }
     }
 
-    public function update(Request $request, NewsPost $news_post, NewsImage $news_image): JsonResponse
+    public function update(UpdateNewsImageRequest $request, NewsPost $news_post, NewsImage $news_image): JsonResponse
     {
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-        ]);
+        $request->validated();
 
         try {
             // Delete old image
@@ -104,12 +105,9 @@ class NewsImageController extends Controller
         }
     }
 
-    public function reorder(Request $request, NewsPost $news_post): JsonResponse
+    public function reorder(ReorderNewsImageRequest $request, NewsPost $news_post): JsonResponse
     {
-        $request->validate([
-            'images' => 'required|array',
-            'images.*' => 'required|integer|exists:news_images,id',
-        ]);
+        $request->validated();
 
         try {
             foreach ($request->images as $index => $imageId) {

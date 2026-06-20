@@ -2,36 +2,41 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ProductImage\UpdateAltTextProductImageRequest;
+
+use App\Http\Requests\Admin\ProductImage\ReorderProductImageRequest;
+
+use App\Http\Requests\Admin\ProductImage\UpdateProductImageRequest;
+
+use App\Http\Requests\Admin\ProductImage\StoreProductImageRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\ProductImage;
 use App\Models\Product;
 use App\Models\ProductColor;
 use App\Services\ImageService;
 use Illuminate\Http\Request;
-use App\Repositories\ProductImageRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\ProductImageServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class ProductImageController extends Controller
 {
-    protected $imageService;
-
     public function __construct(
-        ImageService $imageService,
-        public ProductImageRepository $repository,
-        public LanguageRepository $languageRepository
+        protected ImageService $imageService,
+        protected ProductImageServiceInterface $productImageService,
+        protected LanguageServiceInterface $languageService
     )
     {
-        $this->imageService = $imageService;
-    }
+}
 
     /**
      * Display a listing of the resource.
      */
     public function index(Product $product, Request $request)
     {
-        $images = $this->repository->getProductImages($product, $request);
-        $colors = $this->repository->getAllColors();
-        $languages = $this->languageRepository->getActiveLanguages();
+        $images = $this->productImageService->getProductImages($product, $request);
+        $colors = $this->productImageService->getAllColors();
+        $languages = $this->languageService->getActiveLanguages();
         $currentPage = $request->get('page', 1);
         
         return view('admin.product-images.index', compact('product', 'images', 'colors', 'languages', 'currentPage'));
@@ -42,20 +47,16 @@ class ProductImageController extends Controller
      */
     public function create(Product $product)
     {
-        $colors = $this->repository->getAllColors();
+        $colors = $this->productImageService->getAllColors();
         return view('admin.product-images.create', compact('product', 'colors'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Product $product)
+    public function store(StoreProductImageRequest $request, Product $product)
     {
-        $request->validate([
-            'images' => 'required|array',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp',
-            'product_color_id' => 'nullable|exists:product_colors,id'
-        ]);
+        $request->validated();
         
         // Load product translations
         $product->load('translates');
@@ -128,20 +129,16 @@ class ProductImageController extends Controller
      */
     public function edit(Product $product, ProductImage $image)
     {
-        $colors = $this->repository->getAllColors();
+        $colors = $this->productImageService->getAllColors();
         return view('admin.product-images.edit', compact('product', 'image', 'colors'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product, ProductImage $image)
+    public function update(UpdateProductImageRequest $request, Product $product, ProductImage $image)
     {
-        $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp',
-            'status' => 'boolean',
-            'product_color_id' => 'nullable|exists:product_colors,id'
-        ]);
+        $request->validated();
 
         try {
             $data = [
@@ -248,12 +245,9 @@ class ProductImageController extends Controller
     /**
      * Reorder images
      */
-    public function reorder(Request $request, Product $product)
+    public function reorder(ReorderProductImageRequest $request, Product $product)
     {
-        $request->validate([
-            'items' => 'required|array',
-            'items.*' => 'exists:product_images,id'
-        ]);
+        $request->validated();
 
         try {
             // === Reorder current product images ===
@@ -347,13 +341,9 @@ class ProductImageController extends Controller
     /**
      * Update alt text for product image
      */
-    public function updateAltText(Request $request, Product $product, ProductImage $image)
+    public function updateAltText(UpdateAltTextProductImageRequest $request, Product $product, ProductImage $image)
     {
-        $request->validate([
-            'translates' => 'required|array',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.alt_text' => 'nullable|string|max:255'
-        ]);
+        $request->validated();
 
         try {
             // Delete existing translations

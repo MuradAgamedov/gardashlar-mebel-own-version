@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Page\GenerateSlugPageRequest;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Repositories\PageRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\PageServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\Page\StorePageRequest;
 use App\Http\Requests\Admin\Page\UpdatePageRequest;
 use App\Services\ImageService;
@@ -13,22 +15,22 @@ use App\Services\ImageService;
 class PageController extends Controller
 {
     public function __construct(
-        public PageRepository $repository,
-        public LanguageRepository $languageRepository,
-        public ImageService $imageService
+        protected PageServiceInterface $pageService,
+        protected LanguageServiceInterface $languageService,
+        protected ImageService $imageService
     )
     {
     }
 
     public function index()
     {
-        $pages = $this->repository->getPages();
+        $pages = $this->pageService->getPages();
         return view('admin.pages.index', compact('pages'));
     }
 
     public function create()
     {
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.pages.create', compact('languages'));
     }
 
@@ -53,7 +55,7 @@ class PageController extends Controller
                 }
             }
 
-            $this->repository->createPage($data, $request->translates);
+            $this->pageService->createPage($data, $request->translates);
 
             return redirect()->route('admin.pages.index')
                 ->with('success', __('Page created successfully!'));
@@ -67,21 +69,21 @@ class PageController extends Controller
 
     public function show(string $id)
     {
-        $page = $this->repository->findPage($id);
+        $page = $this->pageService->findPage($id);
         return view('admin.pages.show', compact('page'));
     }
 
     public function edit(string $id)
     {
-        $page = $this->repository->findPage($id);
-        $languages = $this->languageRepository->getActiveLanguages();
+        $page = $this->pageService->findPage($id);
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.pages.edit', compact('page', 'languages'));
     }
 
     public function update(UpdatePageRequest $request, string $id)
     {
         try {
-            $page = $this->repository->findPage($id);
+            $page = $this->pageService->findPage($id);
             
             $data = [
                 'status' => $request->has('status') ? true : false,
@@ -106,7 +108,7 @@ class PageController extends Controller
                 }
             }
 
-            $this->repository->updatePage($id, $data, $request->translates);
+            $this->pageService->updatePage($id, $data, $request->translates);
 
             return redirect()->route('admin.pages.index')
                 ->with('success', __('Page updated successfully!'));
@@ -121,7 +123,7 @@ class PageController extends Controller
     public function destroy(string $id)
     {
         try {
-            $this->repository->deletePage($id);
+            $this->pageService->deletePage($id);
             return redirect()->route('admin.pages.index')
                 ->with('success', __('Page deleted successfully!'));
 
@@ -137,7 +139,7 @@ class PageController extends Controller
     public function deleteOpenGraphImage(string $id)
     {
         try {
-            $page = $this->repository->findPage($id);
+            $page = $this->pageService->findPage($id);
             
             if ($page->opengraph_image) {
                 // Delete the image file
@@ -169,14 +171,10 @@ class PageController extends Controller
         }
     }
 
-    public function generateSlug(Request $request)
+    public function generateSlug(GenerateSlugPageRequest $request)
     {
         try {
-            $request->validate([
-                'title' => 'required|string|max:255',
-                'language_id' => 'required|exists:languages,id',
-                'page_id' => 'nullable|exists:pages,id',
-            ]);
+            $request->validated();
 
             return response()->json(['success' => true, 'slug' => '']);
 

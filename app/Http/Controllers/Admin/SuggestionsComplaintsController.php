@@ -2,13 +2,24 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\SuggestionsComplaints\UpdateSuggestionsComplaintsRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\SuggestionsComplaints;
-use App\Models\Language;
 use Illuminate\Http\Request;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
+
+use App\Interfaces\Services\Admin\SuggestionsComplaintsServiceInterface;
 
 class SuggestionsComplaintsController extends Controller
 {
+    public function __construct(
+        protected SuggestionsComplaintsServiceInterface $suggestionsComplaintsService,
+        protected LanguageServiceInterface $languageService
+    ) {
+    }
+
+
     /**
      * Show the form for editing the suggestions and complaints section.
      */
@@ -16,7 +27,7 @@ class SuggestionsComplaintsController extends Controller
     {
         $suggestionsComplaints = SuggestionsComplaints::getFirstOrCreate();
         $suggestionsComplaints->load('translates.language');
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         
         return view('admin.suggestions-complaints.edit', compact('suggestionsComplaints', 'languages'));
     }
@@ -24,21 +35,14 @@ class SuggestionsComplaintsController extends Controller
     /**
      * Update the suggestions and complaints section.
      */
-    public function update(Request $request)
+    public function update(UpdateSuggestionsComplaintsRequest $request)
     {
         $suggestionsComplaints = SuggestionsComplaints::getFirstOrCreate();
-        $languages = Language::all();
+        $languages = $this->languageService->getAllLanguages();
         
         // Translation validation
         foreach ($languages as $language) {
-            $request->validate([
-                "translations.{$language->id}.title" => 'required|string|max:255',
-                "translations.{$language->id}.description" => 'required|string',
-            ], [
-                "translations.{$language->id}.title.required" => "Title is required for {$language->lang_code}.",
-                "translations.{$language->id}.title.max" => "Title may not be greater than 255 characters for {$language->lang_code}.",
-                "translations.{$language->id}.description.required" => "Description is required for {$language->lang_code}.",
-            ]);
+            $request->validated();
         }
 
         // Update translations

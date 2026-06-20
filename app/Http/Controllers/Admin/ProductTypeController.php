@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\ProductType\StoreProductTypeRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\ProductType;
-use App\Models\Language;
 use Illuminate\Http\Request;
-use App\Repositories\ProductTypeRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\ProductTypeServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class ProductTypeController extends Controller
 {
     public function __construct(
-        public ProductTypeRepository $repository,
-        public LanguageRepository $languageRepository
+        protected ProductTypeServiceInterface $productTypeService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
@@ -23,7 +24,7 @@ class ProductTypeController extends Controller
      */
     public function index(Request $request)
     {
-        $types = $this->repository->getTypes($request);
+        $types = $this->productTypeService->getTypes($request);
         return view('admin.product-types.index', compact('types'));
     }
 
@@ -32,25 +33,17 @@ class ProductTypeController extends Controller
      */
     public function create()
     {
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.product-types.create', compact('languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProductTypeRequest $request)
     {
         // Validate the request
-        $request->validate([
-            'status' => 'nullable',
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string|max:255',
-        ], [
-            'translates.required' => 'At least one language translation is required.',
-            'translates.*.title.required' => 'Title is required for all languages.',
-        ]);
+        $request->validated();
 
         try {
             // Create the type
@@ -91,7 +84,7 @@ class ProductTypeController extends Controller
     public function edit(ProductType $productType)
     {
         $productType->load('translates.language');
-        $languages = $this->languageRepository->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.product-types.edit', compact('productType', 'languages'));
     }
 
@@ -101,15 +94,7 @@ class ProductTypeController extends Controller
     public function update(Request $request, ProductType $productType)
     {
         // Validate the request
-        $request->validate([
-            'status' => 'nullable',
-            'translates' => 'required|array|min:1',
-            'translates.*.language_id' => 'required|exists:languages,id',
-            'translates.*.title' => 'required|string|max:255',
-        ], [
-            'translates.required' => 'At least one language translation is required.',
-            'translates.*.title.required' => 'Title is required for all languages.',
-        ]);
+        $request->validated();
 
         try {
             // Update the type

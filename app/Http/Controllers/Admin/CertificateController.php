@@ -2,40 +2,42 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Certificate\ReorderCertificateRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\Certificate;
 use Illuminate\Http\Request;
-use App\Repositories\CertificateRepository;
-use App\Repositories\LanguageRepository;
+use App\Interfaces\Services\Admin\CertificateServiceInterface;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Http\Requests\Admin\Certificate\StoreCertificateRequest;
 use App\Http\Requests\Admin\Certificate\UpdateCertificateRequest;
 
 class CertificateController extends Controller
 {
     public function __construct(
-        public CertificateRepository $repository,
-        public LanguageRepository $languageRepository
+        protected CertificateServiceInterface $certificateService,
+        protected LanguageServiceInterface $languageService
     )
     {
     }
 
     public function index()
     {
-        $certificates = $this->repository->getCertificates();
-        $languages = $this->languageRepository->getAllLanguages();
+        $certificates = $this->certificateService->getCertificates();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.certificates.index', compact('certificates', 'languages'));
     }
 
     public function create()
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.certificates.create', compact('languages'));
     }
 
     public function store(StoreCertificateRequest $request)
     {
         try {
-            $this->repository->createCertificate(
+            $this->certificateService->createCertificate(
                 [
                     'date' => $request->input('date'),
                     'status' => $request->input('status', true),
@@ -57,14 +59,14 @@ class CertificateController extends Controller
     public function edit(Certificate $certificate)
     {
         $certificate->load('translates.language');
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.certificates.edit', compact('certificate', 'languages'));
     }
 
     public function update(UpdateCertificateRequest $request, Certificate $certificate)
     {
         try {
-            $this->repository->updateCertificate(
+            $this->certificateService->updateCertificate(
                 $certificate,
                 [
                     'date' => $request->input('date'),
@@ -87,7 +89,7 @@ class CertificateController extends Controller
     public function destroy(Certificate $certificate)
     {
         try {
-            $this->repository->deleteCertificate($certificate);
+            $this->certificateService->deleteCertificate($certificate);
             return redirect()->route('admin.certificates.index')
                 ->with('success', 'Certificate deleted successfully!');
         } catch (\Exception $e) {
@@ -96,15 +98,12 @@ class CertificateController extends Controller
         }
     }
 
-    public function reorder(Request $request)
+    public function reorder(ReorderCertificateRequest $request)
     {
-        $request->validate([
-            'certificates' => 'required|array',
-            'certificates.*' => 'required|integer|exists:certificates,id',
-        ]);
+        $request->validated();
 
         try {
-            $this->repository->reorderCertificates($request->certificates);
+            $this->certificateService->reorderCertificates($request->certificates);
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

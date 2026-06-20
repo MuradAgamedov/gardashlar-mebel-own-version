@@ -3,31 +3,32 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\LanguageRepository;
-use App\Repositories\HomePageDiscountRepository;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
+use App\Interfaces\Services\Admin\HomePageDiscountServiceInterface;
 use App\Http\Requests\Admin\HomePageDiscount\UpdateHomePageDiscountRequest;
 
 class HomePageDiscountController extends Controller
 {
     public function __construct(
-        public LanguageRepository $languageRepository,
-        public HomePageDiscountRepository $repository
-    ) {
+        protected LanguageServiceInterface $languageService,
+        protected HomePageDiscountServiceInterface $homePageDiscountService
+    )
+    {
     }
 
     public function edit()
     {
-        $homePageDiscount = $this->repository->getFirstOrCreate();
-        $languages = $this->languageRepository->getAllLanguages();
+        $homePageDiscount = $this->homePageDiscountService->getFirstOrCreate();
+        $languages = $this->languageService->getAllLanguages();
         return view('admin.home-page-discount.edit', compact('homePageDiscount', 'languages'));
     }
 
     public function update(UpdateHomePageDiscountRequest $request)
     {
-        $languages = $this->languageRepository->getAllLanguages();
+        $languages = $this->languageService->getAllLanguages();
 
         try {
-            $this->repository->updateHomePageDiscount(
+            $this->homePageDiscountService->updateHomePageDiscount(
                 $request->input('translations', []),
                 $languages,
                 $request->file('bg_image')

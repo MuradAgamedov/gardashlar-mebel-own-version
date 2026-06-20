@@ -2,12 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\SuggestAPlaceForm\DeleteSelectedSuggestAPlaceFormRequest;
+
 use App\Http\Controllers\Controller;
 use App\Models\SuggestAPlaceForm;
 use Illuminate\Http\Request;
 
+use App\Interfaces\Services\Admin\SuggestAPlaceFormServiceInterface;
+
 class SuggestAPlaceFormController extends Controller
 {
+    public function __construct(
+        protected SuggestAPlaceFormServiceInterface $suggestAPlaceFormService
+    ) {
+    }
+
+
     public function index(Request $request)
     {
         $query = SuggestAPlaceForm::query();
@@ -61,7 +71,7 @@ class SuggestAPlaceFormController extends Controller
     public function markAsRead($id)
     {
         try {
-            $form = SuggestAPlaceForm::findOrFail($id);
+            $form = $this->suggestAPlaceFormService->findOrFail($id);
             $form->markAsRead();
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
@@ -69,12 +79,9 @@ class SuggestAPlaceFormController extends Controller
         }
     }
 
-    public function deleteSelected(Request $request)
+    public function deleteSelected(DeleteSelectedSuggestAPlaceFormRequest $request)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:suggest_a_place_forms,id'
-        ]);
+        $request->validated();
 
         try {
             SuggestAPlaceForm::whereIn('id', $request->ids)->delete();
