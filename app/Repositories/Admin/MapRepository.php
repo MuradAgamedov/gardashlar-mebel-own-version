@@ -16,4 +16,9 @@ class MapRepository extends BaseRepository implements MapRepositoryInterface
         parent::__construct($model);
         $this->imageService = $imageService;
     }
+
+    public function getMaps()
+    {
+        return $this->GetData($this->map, [])->get();
+    }
 }

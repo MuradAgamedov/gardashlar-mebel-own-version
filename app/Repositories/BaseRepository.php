@@ -78,7 +78,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function delete(int $id): bool
     {
         $record = $this->findOrFail($id);
-        return $record->delete();
+        return (bool) $record->delete();
     }
 
     /**
@@ -86,7 +86,11 @@ abstract class BaseRepository implements BaseRepositoryInterface
      */
     public function allOrdered(array $with = []): Collection
     {
-        return $this->model->newQuery()->with($with)->ordered()->get();
+        $query = $this->model->newQuery()->with($with);
+        if (method_exists($this->model, 'scopeOrdered')) {
+            return $query->ordered()->get();
+        }
+        return $query->orderBy('order')->get();
     }
 
     /**
@@ -272,5 +276,60 @@ abstract class BaseRepository implements BaseRepositoryInterface
         }
         
         return $query->get();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFirstOrCreate(array $relations = []): Model
+    {
+        $record = $this->model->newQuery()->with($relations)->first();
+        if (!$record) {
+            $record = $this->model->create([]);
+        }
+        return $record;
+    }
+
+    public function GetData($model, $with = [])
+    {
+        return $model::with($with)->ordered();
+    }
+
+    public function FindById($model, $id, $with = [])
+    {
+        return $model::with($with)->findOrFail($id);
+    }
+
+    public function UpdateOrder($model, array $items)
+    {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($model, $items) {
+            foreach ($items as $index => $id) {
+                $model::where('id', $id)->update(['order' => $index + 1]);
+            }
+            return true;
+        });
+    }
+
+    public function __get($name)
+    {
+        if (!isset($this->model)) {
+            return null;
+        }
+
+        $modelName = class_basename($this->model);
+
+        if ($name === 'form' && str_contains($modelName, 'Form')) {
+            return $this->model;
+        }
+
+        if (strcasecmp($name, $modelName) === 0) {
+            return $this->model;
+        }
+
+        if (str_contains(strtolower($modelName), strtolower($name)) || str_contains(strtolower($name), strtolower($modelName))) {
+            return $this->model;
+        }
+
+        return null;
     }
 }

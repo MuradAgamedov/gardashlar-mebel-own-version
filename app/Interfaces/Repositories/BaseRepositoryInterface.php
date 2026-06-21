@@ -82,4 +82,15 @@ interface BaseRepositoryInterface
      * Aktiv və sıralanmış qeydləri əldə et
      */
     public function getActiveOrdered(array $with = []): Collection;
+
+    /**
+     * Birinci qeydi əldə et və ya yoxdursa yarat
+     */
+    public function getFirstOrCreate(array $relations = []): Model;
+
+    public function GetData($model, $with = []);
+
+    public function FindById($model, $id, $with = []);
+
+    public function UpdateOrder($model, array $items);
 }

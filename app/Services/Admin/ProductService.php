@@ -15,4 +15,24 @@ class ProductService extends BaseService implements ProductServiceInterface
         parent::__construct($repository);
         $this->productRepository = $repository;
     }
+
+    public function getProducts($request)
+    {
+        return $this->productRepository->getProducts($request);
+    }
+
+    public function getActiveSubcategories()
+    {
+        return $this->productRepository->getActiveSubcategories();
+    }
+
+    public function getActiveTypes()
+    {
+        return $this->productRepository->getActiveTypes();
+    }
+
+    public function getActiveTags()
+    {
+        return $this->productRepository->getActiveTags();
+    }
 }

@@ -7,4 +7,6 @@ use App\Interfaces\Services\BaseServiceInterface;
 interface SimpleImageServiceInterface extends BaseServiceInterface
 {
     //
+
+    public function getImages();
 }

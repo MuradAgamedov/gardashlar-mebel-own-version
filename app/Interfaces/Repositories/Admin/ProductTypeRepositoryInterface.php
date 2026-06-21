@@ -7,4 +7,6 @@ use App\Interfaces\Repositories\BaseRepositoryInterface;
 interface ProductTypeRepositoryInterface extends BaseRepositoryInterface
 {
     //
+
+    public function getTypes($request);
 }

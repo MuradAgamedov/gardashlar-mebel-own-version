@@ -7,4 +7,6 @@ use App\Interfaces\Repositories\BaseRepositoryInterface;
 interface ProductTagRepositoryInterface extends BaseRepositoryInterface
 {
     //
+
+    public function getTags();
 }

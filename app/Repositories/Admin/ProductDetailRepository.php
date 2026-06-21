@@ -16,4 +16,32 @@ class ProductDetailRepository extends BaseRepository implements ProductDetailRep
         parent::__construct($model);
         $this->imageService = $imageService;
     }
+
+    public function getProductDetails($product)
+    {
+        return $product->details()->with(['translates.language'])->ordered()->get();
+    }
+
+    public function getNextOrder($productId)
+    {
+        return $this->productDetail->where('product_id', $productId)->max('order') + 1;
+    }
+
+    public function createDetail($productId, $order)
+    {
+        return $this->productDetail->create([
+            'product_id' => $productId,
+            'order' => $order
+        ]);
+    }
+
+    public function updateOrder($detailId, $order)
+    {
+        return $this->productDetail->where('id', $detailId)->update(['order' => $order]);
+    }
+
+    public function getDetailsByIds($ids)
+    {
+        return $this->productDetail->whereIn('id', $ids)->get();
+    }
 }

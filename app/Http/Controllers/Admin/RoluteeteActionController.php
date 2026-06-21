@@ -69,7 +69,7 @@ class RoluteeteActionController extends Controller
 
     public function update(UpdateRoluteeteActionRequest $request, $id)
     {
-        $action = $this->languageService->findOrFail($id);
+        $action = RoluteeteAction::findOrFail($id);
         $languages = $this->languageService->getAllLanguages();
 
         $request->validated();
@@ -113,7 +113,7 @@ class RoluteeteActionController extends Controller
 
     public function destroy($id)
     {
-        $action = $this->languageService->findOrFail($id);
+        $action = RoluteeteAction::findOrFail($id);
 
         // Əgər şəkilləri də silmək istəsən:
         // if ($action->image) {
@@ -129,7 +129,7 @@ class RoluteeteActionController extends Controller
 
     public function toggleStatus($id)
 {
-    $action = $this->languageService->findOrFail($id);
+    $action = RoluteeteAction::findOrFail($id);
     $action->status = !$action->status;
     $action->save();
 

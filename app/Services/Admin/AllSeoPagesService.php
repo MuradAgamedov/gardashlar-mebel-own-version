@@ -15,4 +15,20 @@ class AllSeoPagesService extends BaseService implements AllSeoPagesServiceInterf
         parent::__construct($repository);
         $this->AllSeoPagesRepository = $repository;
     }
+
+    /**
+     * Get the first (and only) SEO pages record or create it if it doesn't exist
+     */
+    public function getOrCreate()
+    {
+        return $this->AllSeoPagesRepository->getOrCreate();
+    }
+
+    /**
+     * Get the current SEO pages data
+     */
+    public function get()
+    {
+        return $this->AllSeoPagesRepository->get();
+    }
 }

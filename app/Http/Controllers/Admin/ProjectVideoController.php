@@ -15,11 +15,8 @@ use Illuminate\Support\Facades\Log;
 
 class ProjectVideoController extends Controller
 {
-    protected $repository;
-
     public function __construct(protected ProjectVideoServiceInterface $projectVideoService)
     {
-        $this->repository = $repository;
     }
 
     /**

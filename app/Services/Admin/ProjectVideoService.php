@@ -15,4 +15,9 @@ class ProjectVideoService extends BaseService implements ProjectVideoServiceInte
         parent::__construct($repository);
         $this->ProjectVideoRepository = $repository;
     }
+
+    public function getVideosByProject($projectId)
+    {
+        return $this->ProjectVideoRepository->getVideosByProject($projectId);
+    }
 }

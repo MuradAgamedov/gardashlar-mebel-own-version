@@ -8,11 +8,21 @@ use App\Services\BaseService;
 
 class CompanyManagementService extends BaseService implements CompanyManagementServiceInterface
 {
-    protected CompanyManagementRepositoryInterface $CompanyManagementRepository;
+    protected CompanyManagementRepositoryInterface $companyManagementRepository;
 
     public function __construct(CompanyManagementRepositoryInterface $repository)
     {
         parent::__construct($repository);
-        $this->CompanyManagementRepository = $repository;
+        $this->companyManagementRepository = $repository;
+    }
+
+    public function updateCompanyManagement(array $translations, $languages)
+    {
+        return $this->companyManagementRepository->updateCompanyManagement($translations, $languages);
+    }
+
+    public function uploadImage($imageFile)
+    {
+        return $this->companyManagementRepository->uploadImage($imageFile);
     }
 }

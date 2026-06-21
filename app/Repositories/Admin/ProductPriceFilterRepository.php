@@ -16,4 +16,9 @@ class ProductPriceFilterRepository extends BaseRepository implements ProductPric
         parent::__construct($model);
         $this->imageService = $imageService;
     }
+
+    public function getFilters()
+    {
+        return $this->productPriceFilter->with('translates.language')->ordered()->get();
+    }
 }

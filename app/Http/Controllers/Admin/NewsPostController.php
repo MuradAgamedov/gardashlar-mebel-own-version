@@ -26,13 +26,13 @@ class NewsPostController extends Controller
     public function index(Request $request)
     {
         $newsPosts = $this->newsPostService->getPosts($request);
-        $categories = $this->blogCategoryService->getCategories();
+        $categories = $this->newsCategoryService->getCategories();
         return view('admin.news-posts.index', compact('newsPosts', 'categories'));
     }
 
     public function create()
     {
-        $categories = $this->blogCategoryService->getCategories();
+        $categories = $this->newsCategoryService->getCategories();
         $languages = $this->languageService->getActiveLanguages();
         return view('admin.news-posts.create', compact('categories', 'languages'));
     }
@@ -63,7 +63,7 @@ class NewsPostController extends Controller
     public function edit(NewsPost $newsPost)
     {
         $newsPost->load(['category.translates', 'translates.language']);
-        $categories = $this->blogCategoryService->getCategories();
+        $categories = $this->newsCategoryService->getCategories();
         $languages = $this->languageService->getActiveLanguages();
         return view('admin.news-posts.edit', compact('newsPost', 'categories', 'languages'));
     }

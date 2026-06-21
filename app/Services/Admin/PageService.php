@@ -15,4 +15,29 @@ class PageService extends BaseService implements PageServiceInterface
         parent::__construct($repository);
         $this->pageRepository = $repository;
     }
+
+    public function getPages()
+    {
+        return $this->pageRepository->getPages();
+    }
+
+    public function findPage($id)
+    {
+        return $this->pageRepository->findPage($id);
+    }
+
+    public function createPage(array $data, array $translates)
+    {
+        return $this->pageRepository->createPage($data, $translates);
+    }
+
+    public function updatePage($id, array $data, array $translates)
+    {
+        return $this->pageRepository->updatePage($id, $data, $translates);
+    }
+
+    public function deletePage($id)
+    {
+        return $this->pageRepository->deletePage($id);
+    }
 }

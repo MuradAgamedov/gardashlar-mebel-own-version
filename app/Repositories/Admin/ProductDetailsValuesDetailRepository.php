@@ -16,4 +16,12 @@ class ProductDetailsValuesDetailRepository extends BaseRepository implements Pro
         parent::__construct($model);
         $this->imageService = $imageService;
     }
+
+    public function getDetailsByValueId($detailValueId)
+    {
+        return ProductDetailsValuesDetail::with(['translates.language'])
+            ->where('product_detail_value_id', $detailValueId)
+            ->ordered()
+            ->get();
+    }
 }

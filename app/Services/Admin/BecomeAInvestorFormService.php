@@ -15,4 +15,24 @@ class BecomeAInvestorFormService extends BaseService implements BecomeAInvestorF
         parent::__construct($repository);
         $this->BecomeAInvestorFormRepository = $repository;
     }
+
+    public function getForms($request)
+    {
+        return $this->BecomeAInvestorFormRepository->getForms($request);
+    }
+
+    public function deleteForm($form)
+    {
+        return $this->BecomeAInvestorFormRepository->deleteForm($form);
+    }
+
+    public function markAsRead($form)
+    {
+        return $this->BecomeAInvestorFormRepository->markAsRead($form);
+    }
+
+    public function deleteSelected(array $ids)
+    {
+        return $this->BecomeAInvestorFormRepository->deleteSelected($ids);
+    }
 }

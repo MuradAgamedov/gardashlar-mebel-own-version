@@ -8,11 +8,16 @@ use App\Services\BaseService;
 
 class BecomeAInvestorService extends BaseService implements BecomeAInvestorServiceInterface
 {
-    protected BecomeAInvestorRepositoryInterface $BecomeAInvestorRepository;
+    protected BecomeAInvestorRepositoryInterface $becomeAInvestorRepository;
 
     public function __construct(BecomeAInvestorRepositoryInterface $repository)
     {
         parent::__construct($repository);
-        $this->BecomeAInvestorRepository = $repository;
+        $this->becomeAInvestorRepository = $repository;
+    }
+
+    public function updateBecomeAInvestor($becomeAInvestor, array $translations)
+    {
+        return $this->becomeAInvestorRepository->updateBecomeAInvestor($becomeAInvestor, $translations);
     }
 }

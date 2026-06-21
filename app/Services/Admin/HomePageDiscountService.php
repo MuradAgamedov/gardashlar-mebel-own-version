@@ -15,4 +15,9 @@ class HomePageDiscountService extends BaseService implements HomePageDiscountSer
         parent::__construct($repository);
         $this->HomePageDiscountRepository = $repository;
     }
+
+    public function updateHomePageDiscount(array $translations, $languages, $bgImageFile = null)
+    {
+        return $this->HomePageDiscountRepository->updateHomePageDiscount($translations, $languages, $bgImageFile);
+    }
 }

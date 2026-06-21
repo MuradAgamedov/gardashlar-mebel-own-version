@@ -7,4 +7,6 @@ use App\Interfaces\Repositories\BaseRepositoryInterface;
 interface ProductDetailsValuesDetailRepositoryInterface extends BaseRepositoryInterface
 {
     //
+
+    public function getDetailsByValueId($detailValueId);
 }

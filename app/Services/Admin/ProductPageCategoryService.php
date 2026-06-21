@@ -15,4 +15,24 @@ class ProductPageCategoryService extends BaseService implements ProductPageCateg
         parent::__construct($repository);
         $this->ProductPageCategoryRepository = $repository;
     }
+
+    public function getProductPageCategories()
+    {
+        return $this->ProductPageCategoryRepository->getProductPageCategories();
+    }
+
+    public function getUnusedCategories($excludeIds = [])
+    {
+        return $this->ProductPageCategoryRepository->getUnusedCategories($excludeIds);
+    }
+
+    public function getCategoriesNotInProductPage()
+    {
+        return $this->ProductPageCategoryRepository->getCategoriesNotInProductPage();
+    }
+
+    public function getCategoriesForEdit($currentCategoryId)
+    {
+        return $this->ProductPageCategoryRepository->getCategoriesForEdit($currentCategoryId);
+    }
 }

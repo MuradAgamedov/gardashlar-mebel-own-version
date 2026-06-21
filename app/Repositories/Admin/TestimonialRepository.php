@@ -16,4 +16,9 @@ class TestimonialRepository extends BaseRepository implements TestimonialReposit
         parent::__construct($model);
         $this->imageService = $imageService;
     }
+
+    public function getTestimonials()
+    {
+        return $this->GetData($this->testimonial, ['translates.language'])->orderBy('order')->get();
+    }
 }

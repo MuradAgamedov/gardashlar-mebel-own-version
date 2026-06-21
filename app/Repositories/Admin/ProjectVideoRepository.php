@@ -5,15 +5,19 @@ namespace App\Repositories\Admin;
 use App\Interfaces\Repositories\Admin\ProjectVideoRepositoryInterface;
 use App\Models\ProjectVideo;
 use App\Repositories\BaseRepository;
-use App\Services\ImageService;
 
 class ProjectVideoRepository extends BaseRepository implements ProjectVideoRepositoryInterface
 {
-    protected ImageService $imageService;
-
-    public function __construct(ProjectVideo $model, ImageService $imageService)
+    public function __construct(ProjectVideo $model)
     {
         parent::__construct($model);
-        $this->imageService = $imageService;
+    }
+
+    public function getVideosByProject($projectId)
+    {
+        return $this->model->newQuery()
+            ->where('project_id', $projectId)
+            ->orderBy('order')
+            ->get();
     }
 }

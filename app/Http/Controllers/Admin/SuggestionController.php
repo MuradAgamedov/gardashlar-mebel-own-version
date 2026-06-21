@@ -130,7 +130,7 @@ $this->fileService = $fileService;
      */
     public function update(UpdateSuggestionRequest $request, string $id)
     {
-        $suggestion = $this->languageService->findOrFail($id);
+        $suggestion = Suggestion::findOrFail($id);
 
         $request->validated();
 
@@ -201,7 +201,7 @@ $this->fileService = $fileService;
      */
     public function destroy(string $id)
     {
-        $suggestion = $this->languageService->findOrFail($id);
+        $suggestion = Suggestion::findOrFail($id);
 
         try {
             // Delete image

@@ -15,4 +15,14 @@ class ProductImageService extends BaseService implements ProductImageServiceInte
         parent::__construct($repository);
         $this->productImageRepository = $repository;
     }
+
+    public function getProductImages($product, $request)
+    {
+        return $this->productImageRepository->getProductImages($product, $request);
+    }
+
+    public function getAllColors()
+    {
+        return $this->productImageRepository->getAllColors();
+    }
 }

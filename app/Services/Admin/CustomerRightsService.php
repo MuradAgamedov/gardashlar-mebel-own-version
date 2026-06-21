@@ -8,11 +8,16 @@ use App\Services\BaseService;
 
 class CustomerRightsService extends BaseService implements CustomerRightsServiceInterface
 {
-    protected CustomerRightsRepositoryInterface $CustomerRightsRepository;
+    protected CustomerRightsRepositoryInterface $customerRightsRepository;
 
     public function __construct(CustomerRightsRepositoryInterface $repository)
     {
         parent::__construct($repository);
-        $this->CustomerRightsRepository = $repository;
+        $this->customerRightsRepository = $repository;
+    }
+
+    public function updateCustomerRights(array $translations, $languages)
+    {
+        return $this->customerRightsRepository->updateCustomerRights($translations, $languages);
     }
 }

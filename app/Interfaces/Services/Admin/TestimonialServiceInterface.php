@@ -7,4 +7,6 @@ use App\Interfaces\Services\BaseServiceInterface;
 interface TestimonialServiceInterface extends BaseServiceInterface
 {
     //
+
+    public function getTestimonials();
 }

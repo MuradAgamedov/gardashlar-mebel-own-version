@@ -16,4 +16,9 @@ class SimpleImageRepository extends BaseRepository implements SimpleImageReposit
         parent::__construct($model);
         $this->imageService = $imageService;
     }
+
+    public function getImages()
+    {
+        return $this->simpleImage::with(['translates.language'])->get();
+    }
 }

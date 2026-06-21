@@ -15,4 +15,19 @@ class PrivacyPolicyService extends BaseService implements PrivacyPolicyServiceIn
         parent::__construct($repository);
         $this->PrivacyPolicyRepository = $repository;
     }
+
+    public function getPrivacyPolicy()
+    {
+        return $this->PrivacyPolicyRepository->getPrivacyPolicy();
+    }
+
+    public function getOrCreatePrivacyPolicy()
+    {
+        return $this->PrivacyPolicyRepository->getOrCreatePrivacyPolicy();
+    }
+
+    public function updatePrivacyPolicy(array $translates, $languages)
+    {
+        return $this->PrivacyPolicyRepository->updatePrivacyPolicy($translates, $languages);
+    }
 }

@@ -15,4 +15,9 @@ class MapService extends BaseService implements MapServiceInterface
         parent::__construct($repository);
         $this->MapRepository = $repository;
     }
+
+    public function getMaps()
+    {
+        return $this->MapRepository->getMaps();
+    }
 }

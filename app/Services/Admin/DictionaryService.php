@@ -15,4 +15,9 @@ class DictionaryService extends BaseService implements DictionaryServiceInterfac
         parent::__construct($repository);
         $this->dictionaryRepository = $repository;
     }
+
+    public function getDictionaries($request)
+    {
+        return $this->dictionaryRepository->getDictionaries($request);
+    }
 }

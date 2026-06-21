@@ -18,11 +18,8 @@ use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class ServiceAdvantageController extends Controller
 {
-    protected $repository;
-
     public function __construct(protected LanguageServiceInterface $languageService, protected ImageService $imageService, protected ServiceAdvantageServiceInterface $serviceAdvantageService)
     {
-$this->repository = $repository;
     }
 
     /**
@@ -129,7 +126,7 @@ $this->repository = $repository;
     public function update(UpdateServiceAdvantageRequest $request, $serviceId, $advantageId)
     {
         $service = Service::findOrFail($serviceId);
-        $advantage = $this->languageService->findOrFail($advantageId);
+        $advantage = ServiceAdvantage::findOrFail($advantageId);
         $languages = $this->languageService->getActiveLanguages();
 
         // Base validation
@@ -177,7 +174,7 @@ $this->repository = $repository;
     public function destroy($serviceId, $advantageId)
     {
         try {
-            $advantage = $this->languageService->findOrFail($advantageId);
+            $advantage = ServiceAdvantage::findOrFail($advantageId);
             $advantage->delete();
 
             return redirect()->route('admin.service-advantages.index', $serviceId)

@@ -15,4 +15,34 @@ class KivService extends BaseService implements KivServiceInterface
         parent::__construct($repository);
         $this->KivRepository = $repository;
     }
+
+    public function getKivs($request)
+    {
+        return $this->KivRepository->getKivs($request);
+    }
+
+    public function getCategories()
+    {
+        return $this->KivRepository->getCategories();
+    }
+
+    public function createKiv(array $data, $imageFile, $imageService)
+    {
+        return $this->KivRepository->createKiv($data, $imageFile, $imageService);
+    }
+
+    public function updateKiv(\App\Models\Kiv $kiv, array $data, $imageFile, $imageService)
+    {
+        return $this->KivRepository->updateKiv($kiv, $data, $imageFile, $imageService);
+    }
+
+    public function deleteKiv(\App\Models\Kiv $kiv)
+    {
+        return $this->KivRepository->deleteKiv($kiv);
+    }
+
+    public function reorderKivs(array $kivs)
+    {
+        return $this->KivRepository->reorderKivs($kivs);
+    }
 }

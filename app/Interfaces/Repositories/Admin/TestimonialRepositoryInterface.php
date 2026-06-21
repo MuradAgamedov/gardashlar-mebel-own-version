@@ -7,4 +7,6 @@ use App\Interfaces\Repositories\BaseRepositoryInterface;
 interface TestimonialRepositoryInterface extends BaseRepositoryInterface
 {
     //
+
+    public function getTestimonials();
 }

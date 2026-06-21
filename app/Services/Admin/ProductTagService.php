@@ -15,4 +15,9 @@ class ProductTagService extends BaseService implements ProductTagServiceInterfac
         parent::__construct($repository);
         $this->ProductTagRepository = $repository;
     }
+
+    public function getTags()
+    {
+        return $this->ProductTagRepository->getTags();
+    }
 }

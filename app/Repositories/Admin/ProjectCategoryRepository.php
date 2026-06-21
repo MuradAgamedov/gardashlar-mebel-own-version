@@ -16,4 +16,9 @@ class ProjectCategoryRepository extends BaseRepository implements ProjectCategor
         parent::__construct($model);
         $this->imageService = $imageService;
     }
+
+    public function getProjectCategories()
+    {
+        return $this->projectCategory->with('translates.language')->ordered()->get();
+    }
 }

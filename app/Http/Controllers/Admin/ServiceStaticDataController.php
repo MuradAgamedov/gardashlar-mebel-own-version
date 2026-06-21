@@ -35,7 +35,7 @@ class ServiceStaticDataController extends Controller
     /**
      * Update the service static data section.
      */
-    public function update(UpdateServiceStaticDataUpdateServiceStaticDataRequest $request)
+    public function update(UpdateServiceStaticDataRequest $request)
     {
         $languages = $this->languageService->getAllLanguages();
         

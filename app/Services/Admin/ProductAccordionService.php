@@ -15,4 +15,29 @@ class ProductAccordionService extends BaseService implements ProductAccordionSer
         parent::__construct($repository);
         $this->ProductAccordionRepository = $repository;
     }
+
+    public function getProductAccordions($product)
+    {
+        return $this->ProductAccordionRepository->getProductAccordions($product);
+    }
+
+    public function createProductAccordion($product, array $data, array $translations)
+    {
+        return $this->ProductAccordionRepository->createProductAccordion($product, $data, $translations);
+    }
+
+    public function updateProductAccordion(\App\Models\ProductAccordion $accordion, array $data, array $translations)
+    {
+        return $this->ProductAccordionRepository->updateProductAccordion($accordion, $data, $translations);
+    }
+
+    public function deleteProductAccordion(\App\Models\ProductAccordion $accordion)
+    {
+        return $this->ProductAccordionRepository->deleteProductAccordion($accordion);
+    }
+
+    public function reorderProductAccordions(array $items)
+    {
+        return $this->ProductAccordionRepository->reorderProductAccordions($items);
+    }
 }

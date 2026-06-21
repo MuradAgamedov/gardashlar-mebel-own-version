@@ -7,4 +7,6 @@ use App\Interfaces\Repositories\BaseRepositoryInterface;
 interface EmailRepositoryInterface extends BaseRepositoryInterface
 {
     //
+
+    public function getEmails();
 }

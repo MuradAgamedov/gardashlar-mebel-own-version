@@ -16,4 +16,9 @@ class EmailRepository extends BaseRepository implements EmailRepositoryInterface
         parent::__construct($model);
         $this->imageService = $imageService;
     }
+
+    public function getEmails()
+    {
+        return $this->GetData($this->email, [])->get();
+    }
 }

@@ -6,5 +6,5 @@ use App\Interfaces\Services\BaseServiceInterface;
 
 interface CustomerRightsServiceInterface extends BaseServiceInterface
 {
-    //
+    public function updateCustomerRights(array $translations, $languages);
 }

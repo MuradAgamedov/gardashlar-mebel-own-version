@@ -15,4 +15,34 @@ class IndividualProjectOrderService extends BaseService implements IndividualPro
         parent::__construct($repository);
         $this->IndividualProjectOrderRepository = $repository;
     }
+
+    public function getIndividualProjectOrders($request)
+    {
+        return $this->IndividualProjectOrderRepository->getIndividualProjectOrders($request);
+    }
+
+    public function createIndividualProjectOrder(array $data, array $translates)
+    {
+        return $this->IndividualProjectOrderRepository->createIndividualProjectOrder($data, $translates);
+    }
+
+    public function updateIndividualProjectOrder(\App\Models\IndividualProjectOrder $individualProjectOrder, array $data, array $translates)
+    {
+        return $this->IndividualProjectOrderRepository->updateIndividualProjectOrder($individualProjectOrder, $data, $translates);
+    }
+
+    public function deleteIndividualProjectOrder(\App\Models\IndividualProjectOrder $individualProjectOrder)
+    {
+        return $this->IndividualProjectOrderRepository->deleteIndividualProjectOrder($individualProjectOrder);
+    }
+
+    public function reorderIndividualProjectOrders(array $order)
+    {
+        return $this->IndividualProjectOrderRepository->reorderIndividualProjectOrders($order);
+    }
+
+    public function deleteSelected(array $ids)
+    {
+        return $this->IndividualProjectOrderRepository->deleteSelected($ids);
+    }
 }

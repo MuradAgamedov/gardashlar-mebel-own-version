@@ -9,7 +9,6 @@ use App\Http\Requests\Admin\Testimonial\StoreTestimonialRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Testimonial;
 use App\Services\ImageService;
-use Illuminate\Http\Request;
 use App\Interfaces\Services\Admin\TestimonialServiceInterface;
 use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
@@ -19,16 +18,15 @@ class TestimonialController extends Controller
         protected ImageService $imageService,
         protected TestimonialServiceInterface $testimonialService,
         protected LanguageServiceInterface $languageService
-    )
-    {
-}
+    ) {
+    }
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $testimonials = $this->testimonialService->getTestimonials();
+        $testimonials = $this->testimonialService->allOrdered(['translates.language']);
         $languages = $this->languageService->getAllLanguages();
         
         return view('admin.testimonials.index', compact('testimonials', 'languages'));
@@ -46,17 +44,9 @@ class TestimonialController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTestimonialStoreTestimonialRequest $request)
+    public function store(StoreTestimonialRequest $request)
     {
         $languages = $this->languageService->getAllLanguages();
-        
-        // Base validation
-        $request->validated();
-
-        // Translation validation
-        foreach ($languages as $language) {
-            $request->validated();
-        }
 
         try {
             // Handle customer image upload
@@ -140,17 +130,9 @@ class TestimonialController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Testimonial $testimonial)
+    public function update(StoreTestimonialRequest $request, Testimonial $testimonial)
     {
         $languages = $this->languageService->getAllLanguages();
-        
-        // Base validation
-        $request->validated();
-
-        // Translation validation
-        foreach ($languages as $language) {
-            $request->validated();
-        }
 
         try {
             // Handle customer image upload
@@ -231,6 +213,12 @@ class TestimonialController extends Controller
     public function destroy(Testimonial $testimonial)
     {
         try {
+            if ($testimonial->customer_image) {
+                $this->imageService->delete($testimonial->customer_image);
+            }
+            if ($testimonial->company_logo) {
+                $this->imageService->delete($testimonial->company_logo);
+            }
             $testimonial->delete();
             return redirect()->route('admin.testimonials.index')
                 ->with('success', __('Testimonial deleted successfully!'));

@@ -15,4 +15,9 @@ class ProductDetailsValuesDetailService extends BaseService implements ProductDe
         parent::__construct($repository);
         $this->ProductDetailsValuesDetailRepository = $repository;
     }
+
+    public function getDetailsByValueId($detailValueId)
+    {
+        return $this->ProductDetailsValuesDetailRepository->getDetailsByValueId($detailValueId);
+    }
 }

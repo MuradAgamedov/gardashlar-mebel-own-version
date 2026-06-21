@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\Report\ReorderReportRequest;
 use App\Http\Requests\Admin\Report\StoreReportRequest;
 
 use App\Http\Controllers\Controller;
+use App\Interfaces\Services\Admin\LanguageServiceInterface;
 use App\Interfaces\Services\Admin\ReportServiceInterface;
 use App\Models\Report;
 use App\Services\FileService;
@@ -15,13 +16,11 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
-    protected $repository;
-    protected $fileService;
-
-    public function __construct(protected ReportServiceInterface $reportService, FileService $fileService)
-    {
-        $this->repository = $repository;
-        $this->fileService = $fileService;
+    public function __construct(
+        protected ReportServiceInterface $reportService,
+        protected LanguageServiceInterface $languageService,
+        protected FileService $fileService
+    ) {
     }
 
     /**
@@ -29,8 +28,8 @@ class ReportController extends Controller
      */
     public function index()
     {
-        $reports = $this->reportService->getAllReports();
-        $languages = $this->reportService->getActiveLanguages();
+        $reports = $this->reportService->allOrdered(['translates.language']);
+        $languages = $this->languageService->getActiveLanguages();
         
         return view('admin.reports.index', compact('reports', 'languages'));
     }
@@ -40,16 +39,16 @@ class ReportController extends Controller
      */
     public function create()
     {
-        $languages = $this->reportService->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
         return view('admin.reports.create', compact('languages'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreReportStoreReportRequest $request)
+    public function store(StoreReportRequest $request)
     {
-        $languages = $this->reportService->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
 
         // Base validation
         $request->validated();
@@ -99,7 +98,7 @@ class ReportController extends Controller
     public function edit(Report $report)
     {
         $report->load('translates.language');
-        $languages = $this->reportService->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
 
         return view('admin.reports.edit', compact('report', 'languages'));
     }
@@ -109,7 +108,7 @@ class ReportController extends Controller
      */
     public function update(Request $request, Report $report)
     {
-        $languages = $this->reportService->getActiveLanguages();
+        $languages = $this->languageService->getActiveLanguages();
 
         // Base validation
         $request->validated();

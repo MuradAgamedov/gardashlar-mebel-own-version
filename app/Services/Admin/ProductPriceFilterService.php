@@ -15,4 +15,9 @@ class ProductPriceFilterService extends BaseService implements ProductPriceFilte
         parent::__construct($repository);
         $this->ProductPriceFilterRepository = $repository;
     }
+
+    public function getFilters()
+    {
+        return $this->ProductPriceFilterRepository->getFilters();
+    }
 }

@@ -82,4 +82,9 @@ interface BaseServiceInterface
      * Aktiv və sıralanmış qeydləri əldə et
      */
     public function getActiveOrdered(array $with = []): Collection;
+
+    /**
+     * Birinci qeydi əldə et və ya yoxdursa yarat
+     */
+    public function getFirstOrCreate(array $relations = []): Model;
 }

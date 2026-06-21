@@ -13,11 +13,8 @@ use Illuminate\Support\Facades\Log;
 
 class ProjectImageController extends Controller
 {
-    protected $repository;
-     
     public function __construct(protected ProjectImageServiceInterface $projectImageService)
     {
-        $this->repository = $repository;
     }
 
     /**

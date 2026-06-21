@@ -15,4 +15,9 @@ class ProjectCategoryService extends BaseService implements ProjectCategoryServi
         parent::__construct($repository);
         $this->ProjectCategoryRepository = $repository;
     }
+
+    public function getProjectCategories()
+    {
+        return $this->ProjectCategoryRepository->getProjectCategories();
+    }
 }

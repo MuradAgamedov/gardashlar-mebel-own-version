@@ -7,4 +7,6 @@ use App\Interfaces\Services\BaseServiceInterface;
 interface ProductDetailsValuesDetailServiceInterface extends BaseServiceInterface
 {
     //
+
+    public function getDetailsByValueId($detailValueId);
 }

@@ -16,4 +16,9 @@ class ProductTagRepository extends BaseRepository implements ProductTagRepositor
         parent::__construct($model);
         $this->imageService = $imageService;
     }
+
+    public function getTags()
+    {
+        return $this->productTag->with('translates.language')->ordered()->get();
+    }
 }

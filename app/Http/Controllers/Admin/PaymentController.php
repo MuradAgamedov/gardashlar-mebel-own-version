@@ -14,13 +14,13 @@ class PaymentController extends Controller
 
     public function index(Request $request)
     {
-        $orders = $this->paymentService->getOrders($request);
+        $orders = $this->orderService->getOrders($request);
         return view("admin.orders.index", compact('orders'));
     }
 
     public function show($id)
     {
-        $order = $this->paymentService->findOrder($id);
+        $order = $this->orderService->findOrder($id);
         return response()->json([
             'success' => true,
             'data' => $order

@@ -16,4 +16,16 @@ class ReportRepository extends BaseRepository implements ReportRepositoryInterfa
         parent::__construct($model);
         $this->imageService = $imageService;
     }
+
+    public function getAllReports()
+    {
+        return $this->report->with('translates.language')
+            ->orderBy('order')
+            ->get();
+    }
+
+    public function getActiveLanguages()
+    {
+        return $this->language->all();
+    }
 }

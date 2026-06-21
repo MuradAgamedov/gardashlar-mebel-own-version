@@ -16,4 +16,28 @@ class ProjectRepository extends BaseRepository implements ProjectRepositoryInter
         parent::__construct($model);
         $this->imageService = $imageService;
     }
+
+    public function getProjects($request)
+    {
+        $query = $this->project->with(['translates.language', 'category.translates']);
+        
+        // Filter by category if selected
+        if ($request->filled('category_id')) {
+            $query->where('project_category_id', $request->category_id);
+        }
+        
+        return $query->ordered()->get();
+    }
+
+    public function getActiveCategoriesWithMainLanguage($mainLanguageId)
+    {
+        return ProjectCategory::with(['translates' => function($query) use ($mainLanguageId) {
+            $query->where('language_id', $mainLanguageId);
+        }])->active()->ordered()->get();
+    }
+
+    public function getActiveCategories()
+    {
+        return ProjectCategory::with('translates')->active()->ordered()->get();
+    }
 }

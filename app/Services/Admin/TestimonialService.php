@@ -15,4 +15,9 @@ class TestimonialService extends BaseService implements TestimonialServiceInterf
         parent::__construct($repository);
         $this->testimonialRepository = $repository;
     }
+
+    public function getTestimonials()
+    {
+        return $this->testimonialRepository->getTestimonials();
+    }
 }

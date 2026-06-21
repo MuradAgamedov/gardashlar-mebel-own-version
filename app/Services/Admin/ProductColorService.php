@@ -15,4 +15,29 @@ class ProductColorService extends BaseService implements ProductColorServiceInte
         parent::__construct($repository);
         $this->ProductColorRepository = $repository;
     }
+
+    public function getProductColors($request)
+    {
+        return $this->ProductColorRepository->getProductColors($request);
+    }
+
+    public function createProductColor($colorCode)
+    {
+        return $this->ProductColorRepository->createProductColor($colorCode);
+    }
+
+    public function updateProductColor(\App\Models\ProductColor $productColor, $colorCode)
+    {
+        return $this->ProductColorRepository->updateProductColor($productColor, $colorCode);
+    }
+
+    public function deleteProductColor(\App\Models\ProductColor $productColor)
+    {
+        return $this->ProductColorRepository->deleteProductColor($productColor);
+    }
+
+    public function bulkDeleteProductColors(array $ids)
+    {
+        return $this->ProductColorRepository->bulkDeleteProductColors($ids);
+    }
 }

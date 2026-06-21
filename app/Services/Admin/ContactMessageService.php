@@ -15,4 +15,29 @@ class ContactMessageService extends BaseService implements ContactMessageService
         parent::__construct($repository);
         $this->contactMessageRepository = $repository;
     }
+
+    public function getMessages($request)
+    {
+        return $this->contactMessageRepository->getMessages($request);
+    }
+
+    public function findMessage(string $id)
+    {
+        return $this->contactMessageRepository->findMessage($id);
+    }
+
+    public function markAsRead(\App\Models\ContactMessage $message)
+    {
+        return $this->contactMessageRepository->markAsRead($message);
+    }
+
+    public function deleteMessage(\App\Models\ContactMessage $message)
+    {
+        return $this->contactMessageRepository->deleteMessage($message);
+    }
+
+    public function deleteSelected(array $ids)
+    {
+        return $this->contactMessageRepository->deleteSelected($ids);
+    }
 }

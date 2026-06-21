@@ -15,4 +15,9 @@ class ProductTypeService extends BaseService implements ProductTypeServiceInterf
         parent::__construct($repository);
         $this->ProductTypeRepository = $repository;
     }
+
+    public function getTypes($request)
+    {
+        return $this->ProductTypeRepository->getTypes($request);
+    }
 }

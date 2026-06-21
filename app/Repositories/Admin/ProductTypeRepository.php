@@ -16,4 +16,19 @@ class ProductTypeRepository extends BaseRepository implements ProductTypeReposit
         parent::__construct($model);
         $this->imageService = $imageService;
     }
+
+    public function getTypes($request)
+    {
+        $query = $this->productType->with('translates.language');
+        
+        // Search functionality
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->whereHas('translates', function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%');
+            });
+        }
+        
+        return $query->ordered()->get();
+    }
 }

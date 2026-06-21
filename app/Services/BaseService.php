@@ -142,4 +142,12 @@ abstract class BaseService implements BaseServiceInterface
     {
         return $this->repository->getActiveOrdered($with);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFirstOrCreate(array $relations = []): Model
+    {
+        return $this->repository->getFirstOrCreate($relations);
+    }
 }

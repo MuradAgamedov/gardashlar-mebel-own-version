@@ -15,4 +15,24 @@ class BecomeAPartnerFormService extends BaseService implements BecomeAPartnerFor
         parent::__construct($repository);
         $this->BecomeAPartnerFormRepository = $repository;
     }
+
+    public function getForms($request)
+    {
+        return $this->BecomeAPartnerFormRepository->getForms($request);
+    }
+
+    public function deleteForm($form)
+    {
+        return $this->BecomeAPartnerFormRepository->deleteForm($form);
+    }
+
+    public function markAsRead($form)
+    {
+        return $this->BecomeAPartnerFormRepository->markAsRead($form);
+    }
+
+    public function deleteSelected(array $ids)
+    {
+        return $this->BecomeAPartnerFormRepository->deleteSelected($ids);
+    }
 }

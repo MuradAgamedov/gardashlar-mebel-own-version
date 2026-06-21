@@ -6,5 +6,5 @@ use App\Interfaces\Services\BaseServiceInterface;
 
 interface HomePageDiscountServiceInterface extends BaseServiceInterface
 {
-    //
+    public function updateHomePageDiscount(array $translations, $languages, $bgImageFile = null);
 }

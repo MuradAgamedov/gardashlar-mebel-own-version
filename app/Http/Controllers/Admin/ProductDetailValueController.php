@@ -18,11 +18,8 @@ use Illuminate\Support\Facades\DB;
 
 class ProductDetailValueController extends Controller
 {
-    protected $repository;
-
     public function __construct(protected ProductDetailValueServiceInterface $productDetailValueService)
     {
-        $this->repository = $repository;
     }
 
     /**

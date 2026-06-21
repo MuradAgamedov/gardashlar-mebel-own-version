@@ -7,4 +7,6 @@ use App\Interfaces\Services\BaseServiceInterface;
 interface EmailServiceInterface extends BaseServiceInterface
 {
     //
+
+    public function getEmails();
 }

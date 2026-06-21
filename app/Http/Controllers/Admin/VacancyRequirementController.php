@@ -64,7 +64,7 @@ class VacancyRequirementController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreVacancyRequirementStoreVacancyRequirementRequest $request)
+    public function store(StoreVacancyRequirementRequest $request)
     {
         $languages = $this->languageService->getAllLanguages();
         

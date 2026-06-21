@@ -15,4 +15,9 @@ class EmailService extends BaseService implements EmailServiceInterface
         parent::__construct($repository);
         $this->EmailRepository = $repository;
     }
+
+    public function getEmails()
+    {
+        return $this->EmailRepository->getEmails();
+    }
 }

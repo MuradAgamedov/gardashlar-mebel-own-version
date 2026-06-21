@@ -15,4 +15,9 @@ class SimpleImageService extends BaseService implements SimpleImageServiceInterf
         parent::__construct($repository);
         $this->simpleImageRepository = $repository;
     }
+
+    public function getImages()
+    {
+        return $this->simpleImageRepository->getImages();
+    }
 }

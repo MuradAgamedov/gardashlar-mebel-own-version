@@ -18,11 +18,8 @@ use App\Interfaces\Services\Admin\LanguageServiceInterface;
 
 class ProductDetailsValuesDetailController extends Controller
 {
-    protected $repository;
-
-    public function __construct(protected LanguageServiceInterface $languageService, protected ProductDetailsValuesDetailServiceInterface $productDetailsValuesDetailService)
+    public function __construct(protected LanguageServiceInterface $languageService, protected \App\Interfaces\Services\Admin\ProductDetailsValuesDetailServiceInterface $productDetailsValuesDetailService)
     {
-        $this->repository = $repository;
     }
     /**
      * Display a listing of the resource.

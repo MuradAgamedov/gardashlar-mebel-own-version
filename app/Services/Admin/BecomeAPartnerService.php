@@ -8,11 +8,16 @@ use App\Services\BaseService;
 
 class BecomeAPartnerService extends BaseService implements BecomeAPartnerServiceInterface
 {
-    protected BecomeAPartnerRepositoryInterface $BecomeAPartnerRepository;
+    protected BecomeAPartnerRepositoryInterface $becomeAPartnerRepository;
 
     public function __construct(BecomeAPartnerRepositoryInterface $repository)
     {
         parent::__construct($repository);
-        $this->BecomeAPartnerRepository = $repository;
+        $this->becomeAPartnerRepository = $repository;
+    }
+
+    public function updateBecomeAPartner($becomeAPartner, array $translations)
+    {
+        return $this->becomeAPartnerRepository->updateBecomeAPartner($becomeAPartner, $translations);
     }
 }

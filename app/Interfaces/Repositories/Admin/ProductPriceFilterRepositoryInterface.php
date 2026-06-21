@@ -7,4 +7,6 @@ use App\Interfaces\Repositories\BaseRepositoryInterface;
 interface ProductPriceFilterRepositoryInterface extends BaseRepositoryInterface
 {
     //
+
+    public function getFilters();
 }

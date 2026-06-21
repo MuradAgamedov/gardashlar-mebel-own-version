@@ -7,4 +7,6 @@ use App\Interfaces\Repositories\BaseRepositoryInterface;
 interface MapRepositoryInterface extends BaseRepositoryInterface
 {
     //
+
+    public function getMaps();
 }

@@ -5,15 +5,28 @@ namespace App\Repositories\Admin;
 use App\Interfaces\Repositories\Admin\BecomeAInvestorRepositoryInterface;
 use App\Models\BecomeAInvestor;
 use App\Repositories\BaseRepository;
-use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class BecomeAInvestorRepository extends BaseRepository implements BecomeAInvestorRepositoryInterface
 {
-    protected ImageService $imageService;
-
-    public function __construct(BecomeAInvestor $model, ImageService $imageService)
+    public function __construct(BecomeAInvestor $model)
     {
         parent::__construct($model);
-        $this->imageService = $imageService;
+    }
+
+    public function updateBecomeAInvestor($becomeAInvestor, array $translations)
+    {
+        return DB::transaction(function () use ($becomeAInvestor, $translations) {
+            foreach ($translations as $languageId => $translation) {
+                $becomeAInvestor->translates()->updateOrCreate(
+                    ['language_id' => $languageId],
+                    [
+                        'content' => trim($translation['content'] ?? ''),
+                    ]
+                );
+            }
+
+            return $becomeAInvestor->load('translates.language');
+        });
     }
 }
