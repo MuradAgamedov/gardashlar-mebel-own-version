@@ -6,6 +6,7 @@ use App\Interfaces\Repositories\Admin\CatalogRepositoryInterface;
 use App\Models\Catalog;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class CatalogRepository extends BaseRepository implements CatalogRepositoryInterface
 {

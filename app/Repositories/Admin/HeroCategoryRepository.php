@@ -4,8 +4,10 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\HeroCategoryRepositoryInterface;
 use App\Models\HeroCategory;
+use App\Models\ProductCategory;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class HeroCategoryRepository extends BaseRepository implements HeroCategoryRepositoryInterface
 {

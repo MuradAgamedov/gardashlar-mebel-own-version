@@ -4,6 +4,7 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\PhoneRepositoryInterface;
 use App\Models\Phone;
+use App\Models\PhoneType;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
 

@@ -4,6 +4,7 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\HeroProductRepositoryInterface;
 use App\Models\HeroProduct;
+use App\Models\Product;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
 

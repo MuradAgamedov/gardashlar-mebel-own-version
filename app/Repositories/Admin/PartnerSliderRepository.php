@@ -6,6 +6,7 @@ use App\Interfaces\Repositories\Admin\PartnerSliderRepositoryInterface;
 use App\Models\PartnerSlider;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class PartnerSliderRepository extends BaseRepository implements PartnerSliderRepositoryInterface
 {

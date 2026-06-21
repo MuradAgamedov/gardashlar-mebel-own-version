@@ -4,7 +4,9 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\AddressTypeRepositoryInterface;
 use App\Models\AddressType;
+use App\Models\AddressTypeTranslate;
 use App\Repositories\BaseRepository;
+use Illuminate\Support\Facades\DB;
 
 class AddressTypeRepository extends BaseRepository implements AddressTypeRepositoryInterface
 {

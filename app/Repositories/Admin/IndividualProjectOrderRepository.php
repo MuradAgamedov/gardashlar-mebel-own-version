@@ -6,6 +6,7 @@ use App\Interfaces\Repositories\Admin\IndividualProjectOrderRepositoryInterface;
 use App\Models\IndividualProjectOrder;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class IndividualProjectOrderRepository extends BaseRepository implements IndividualProjectOrderRepositoryInterface
 {

@@ -4,13 +4,19 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\BlogPostRepositoryInterface;
 use App\Models\BlogPost;
+use App\Models\BlogPostTranslate;
 use App\Repositories\BaseRepository;
+use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class BlogPostRepository extends BaseRepository implements BlogPostRepositoryInterface
 {
-    public function __construct(BlogPost $model)
+    protected ImageService $imageService;
+
+    public function __construct(BlogPost $model, ImageService $imageService)
     {
         parent::__construct($model);
+        $this->imageService = $imageService;
     }
 
     public function getPosts($request)

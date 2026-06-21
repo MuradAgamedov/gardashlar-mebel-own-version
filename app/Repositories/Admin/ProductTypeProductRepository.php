@@ -4,6 +4,8 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\ProductTypeProductRepositoryInterface;
 use App\Models\HomePageTypeProduct;
+use App\Models\Product;
+use App\Models\ProductType;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
 
@@ -19,7 +21,7 @@ class ProductTypeProductRepository extends BaseRepository implements ProductType
 
     public function getProductsByType($productTypeId, $request)
     {
-        $query = $this->product->whereHas('types', function($q) use ($productTypeId) {
+        $query = Product::whereHas('types', function($q) use ($productTypeId) {
             $q->where('product_types.id', $productTypeId);
         })->with(['types', 'categories', 'translates']);
 
@@ -44,7 +46,7 @@ class ProductTypeProductRepository extends BaseRepository implements ProductType
 
     public function searchProductsByType($productTypeId, $search)
     {
-        return $this->product->whereHas('types', function($q) use ($productTypeId) {
+        return Product::whereHas('types', function($q) use ($productTypeId) {
             $q->where('product_types.id', $productTypeId);
         })
         ->whereHas('translates', function($q) use ($search) {

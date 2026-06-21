@@ -6,6 +6,7 @@ use App\Interfaces\Repositories\Admin\BecomeAPartnerAdvantageRepositoryInterface
 use App\Models\BecomeAPartnerAdvantage;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class BecomeAPartnerAdvantageRepository extends BaseRepository implements BecomeAPartnerAdvantageRepositoryInterface
 {

@@ -4,8 +4,10 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\ActionRepositoryInterface;
 use App\Models\Action;
+use App\Models\ActionTranslate;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class ActionRepository extends BaseRepository implements ActionRepositoryInterface
 {

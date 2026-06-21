@@ -4,8 +4,10 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\BlogImageRepositoryInterface;
 use App\Models\BlogImage;
+use App\Models\BlogPost;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class BlogImageRepository extends BaseRepository implements BlogImageRepositoryInterface
 {

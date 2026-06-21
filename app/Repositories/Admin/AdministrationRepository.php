@@ -4,8 +4,10 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\AdministrationRepositoryInterface;
 use App\Models\Administration;
+use App\Models\AdministrationTranslate;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class AdministrationRepository extends BaseRepository implements AdministrationRepositoryInterface
 {

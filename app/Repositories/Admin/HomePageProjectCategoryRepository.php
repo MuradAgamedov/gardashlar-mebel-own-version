@@ -4,6 +4,7 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\HomePageProjectCategoryRepositoryInterface;
 use App\Models\HomePageProjectCategory;
+use App\Models\ProjectCategory;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
 

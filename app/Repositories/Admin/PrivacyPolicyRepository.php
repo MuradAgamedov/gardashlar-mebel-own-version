@@ -6,6 +6,8 @@ use App\Interfaces\Repositories\Admin\PrivacyPolicyRepositoryInterface;
 use App\Models\PrivacyPolicy;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class PrivacyPolicyRepository extends BaseRepository implements PrivacyPolicyRepositoryInterface
 {

@@ -4,6 +4,7 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\KivRepositoryInterface;
 use App\Models\Kiv;
+use App\Models\KivCategory;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
 

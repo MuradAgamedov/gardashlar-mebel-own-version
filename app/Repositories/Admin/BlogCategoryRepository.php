@@ -4,7 +4,9 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\BlogCategoryRepositoryInterface;
 use App\Models\BlogCategory;
+use App\Models\BlogCategoryTranslate;
 use App\Repositories\BaseRepository;
+use Illuminate\Support\Facades\DB;
 
 class BlogCategoryRepository extends BaseRepository implements BlogCategoryRepositoryInterface
 {

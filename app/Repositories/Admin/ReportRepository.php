@@ -3,6 +3,7 @@
 namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\ReportRepositoryInterface;
+use App\Models\Language;
 use App\Models\Report;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
@@ -26,6 +27,6 @@ class ReportRepository extends BaseRepository implements ReportRepositoryInterfa
 
     public function getActiveLanguages()
     {
-        return $this->language->all();
+        return Language::where('status', 1)->get();
     }
 }

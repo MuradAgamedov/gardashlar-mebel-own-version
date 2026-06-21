@@ -4,8 +4,12 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\CompanyRepositoryInterface;
 use App\Models\Company;
+use App\Models\CompanyProduct;
+use App\Models\CompanyTranslate;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class CompanyRepository extends BaseRepository implements CompanyRepositoryInterface
 {

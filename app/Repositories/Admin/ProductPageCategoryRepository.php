@@ -3,9 +3,11 @@
 namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\ProductPageCategoryRepositoryInterface;
+use App\Models\ProductCategory;
 use App\Models\ProductPageCategory;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class ProductPageCategoryRepository extends BaseRepository implements ProductPageCategoryRepositoryInterface
 {

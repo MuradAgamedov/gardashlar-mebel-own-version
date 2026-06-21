@@ -6,6 +6,7 @@ use App\Interfaces\Repositories\Admin\BecomeAInvestorAdvantageRepositoryInterfac
 use App\Models\BecomeAInvestorAdvantage;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class BecomeAInvestorAdvantageRepository extends BaseRepository implements BecomeAInvestorAdvantageRepositoryInterface
 {

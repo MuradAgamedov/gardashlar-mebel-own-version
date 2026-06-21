@@ -6,6 +6,7 @@ use App\Interfaces\Repositories\Admin\CertificateRepositoryInterface;
 use App\Models\Certificate;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class CertificateRepository extends BaseRepository implements CertificateRepositoryInterface
 {

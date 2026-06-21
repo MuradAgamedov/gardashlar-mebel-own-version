@@ -4,8 +4,10 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\HomePageCategoryRepositoryInterface;
 use App\Models\HomePageCategory;
+use App\Models\ProductCategory;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class HomePageCategoryRepository extends BaseRepository implements HomePageCategoryRepositoryInterface
 {

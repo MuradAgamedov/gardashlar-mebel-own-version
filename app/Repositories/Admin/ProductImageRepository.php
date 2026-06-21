@@ -3,6 +3,7 @@
 namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\ProductImageRepositoryInterface;
+use App\Models\ProductColor;
 use App\Models\ProductImage;
 use App\Repositories\BaseRepository;
 use App\Services\ImageService;

@@ -4,6 +4,9 @@ namespace App\Repositories\Admin;
 
 use App\Interfaces\Repositories\Admin\ProductRepositoryInterface;
 use App\Models\Product;
+use App\Models\ProductCategory;
+use App\Models\ProductTag;
+use App\Models\ProductType;
 use App\Repositories\BaseRepository;
 
 class ProductRepository extends BaseRepository implements ProductRepositoryInterface
